@@ -1,0 +1,57 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: skill-user-auth
+  version: 0.7.1
+  description: 用户认证服务，支持多种认证方式
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-user-auth
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - authentication
+    - user
+    - login
+    - token
+    - session
+
+spec:
+  type: service-skill
+  
+  capabilities:
+    - user-auth
+    - token-validate
+    - session-manage
+
+  scenes:
+    - auth
+
+  parameters:
+    - name: AUTH_TOKEN_EXPIRE
+      type: number
+      required: false
+      default: 3600
+      description: Token过期时间(秒)
+    - name: AUTH_REFRESH_ENABLED
+      type: boolean
+      required: false
+      default: true
+      description: 是否启用Token刷新
+
+  execution:
+    timeout: 30000
+    memoryLimit: 256M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: net.ooder.skill.user.auth.UserAuthSkillApplication
+    assets:
+      - name: skill-user-auth-0.7.1.jar
+        platform: all
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-user-auth-0.7.1.jar
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

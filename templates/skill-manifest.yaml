@@ -1,0 +1,52 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: ${skill.name}
+  version: ${skill.version}
+  description: ${skill.description}
+  author: ${skill.author}
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills/tree/main/skills/${skill.name}
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - ${skill.keyword1}
+    - ${skill.keyword2}
+
+spec:
+  type: ${skill.type}
+  
+  capabilities:
+    - id: ${capability.id}
+      name: ${capability.name}
+      description: ${capability.description}
+      category: ${capability.category}
+
+  scenes:
+    - ${scene.name}
+
+  parameters:
+    - name: ${param.name}
+      type: ${param.type}
+      required: ${param.required}
+      default: ${param.default}
+      description: ${param.description}
+      secret: ${param.secret}
+
+  execution:
+    timeout: 30000
+    memoryLimit: 256M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: ${skill.mainClass}
+    assets:
+      - name: ${skill.name}-${skill.version}.jar
+        platform: all
+        url: https://github.com/ooderCN/skills/releases/download/v${skill.version}/${skill.name}-${skill.version}.jar
+        checksum: ${skill.checksum}
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

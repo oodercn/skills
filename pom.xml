@@ -1,0 +1,137 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.ooder</groupId>
+    <artifactId>ooder-skills</artifactId>
+    <version>0.7.1</version>
+    <packaging>pom</packaging>
+
+    <name>ooder-skills</name>
+    <description>Ooder Skills Repository - Shared skills for Ooder Agent Platform</description>
+    <url>https://github.com/ooderCN/ooder-skills</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <distribution>repo</distribution>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>ooder</id>
+            <name>Ooder Team</name>
+            <email>team@ooder.net</email>
+            <organization>Ooder</organization>
+            <organizationUrl>https://ooder.net</organizationUrl>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/ooderCN/ooder-skills.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ooderCN/ooder-skills.git</developerConnection>
+        <url>https://github.com/ooderCN/ooder-skills</url>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        <spring-boot.version>2.7.0</spring-boot.version>
+        <agent-sdk.version>0.7.1</agent-sdk.version>
+    </properties>
+
+    <modules>
+        <module>skills/skill-a2ui</module>
+        <module>skills/skill-org-dingding</module>
+        <module>skills/skill-org-feishu</module>
+        <module>skills/skill-user-auth</module>
+        <module>skills/skill-trae-solo</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>agent-sdk</artifactId>
+                <version>${agent-sdk.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                    <executions>
+                        <execution>
+                            <goals>
+                                <goal>repackage</goal>
+                            </goals>
+                        </execution>
+                    </executions>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>1.8</source>
+                        <target>1.8</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>ooder-releases</id>
+            <name>Ooder Releases</name>
+            <url>https://repo.ooder.net/releases</url>
+        </repository>
+    </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>ooder-releases</id>
+            <name>Ooder Releases</name>
+            <url>https://repo.ooder.net/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>ooder-snapshots</id>
+            <name>Ooder Snapshots</name>
+            <url>https://repo.ooder.net/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
+</project>

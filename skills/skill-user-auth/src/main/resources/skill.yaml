@@ -1,0 +1,123 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-user-auth
+  name: User Authentication Service
+  version: 0.7.1
+  description: 用户认证服务，支持多种认证方式
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-user-auth
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - authentication
+    - user
+    - login
+    - token
+    - session
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.user.auth.UserAuthSkillApplication
+  
+  capabilities:
+    - id: user-auth
+      name: User Authentication
+      description: 用户登录认证
+      category: authentication
+      parameters:
+        - name: username
+          type: string
+          required: true
+          description: 用户名
+        - name: password
+          type: string
+          required: true
+          description: 密码
+      returns:
+        type: object
+        description: 认证结果和Token
+    
+    - id: token-validate
+      name: Token Validation
+      description: 验证Token有效性
+      category: authentication
+      parameters:
+        - name: token
+          type: string
+          required: true
+          description: 认证Token
+      returns:
+        type: object
+        description: 验证结果
+    
+    - id: session-manage
+      name: Session Management
+      description: 会话管理
+      category: management
+      parameters:
+        - name: action
+          type: string
+          required: true
+          description: 操作类型
+      returns:
+        type: object
+        description: 操作结果
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - user-auth
+        - token-validate
+        - session-manage
+  
+  config:
+    optional:
+      - name: AUTH_TOKEN_EXPIRE
+        type: number
+        description: Token过期时间(秒)
+        default: 3600
+        secret: false
+      - name: AUTH_REFRESH_ENABLED
+        type: boolean
+        description: 是否启用Token刷新
+        default: true
+        secret: false
+  
+  endpoints:
+    - path: /api/info
+      method: GET
+      description: 获取技能信息
+    - path: /api/login
+      method: POST
+      description: 用户登录
+      capability: user-auth
+    - path: /api/validate
+      method: POST
+      description: 验证Token
+      capability: token-validate
+    - path: /api/logout
+      method: POST
+      description: 用户登出
+      capability: session-manage
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "250m"
+    memory: "256Mi"
+    storage: "512Mi"
+
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: false

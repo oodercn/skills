@@ -1,0 +1,128 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-a2ui
+  name: A2UI Skill
+  version: 0.7.1
+  description: A2UI图转代码技能，支持将设计图转换为前端代码
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-a2ui
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - a2ui
+    - ui
+    - code-generation
+    - frontend
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.a2ui.A2UISkillApplication
+  
+  capabilities:
+    - id: generate-ui
+      name: Generate UI
+      description: 从设计图生成前端代码
+      category: code-generation
+      parameters:
+        - name: designFile
+          type: file
+          required: true
+          description: 设计图文件
+        - name: framework
+          type: string
+          required: false
+          description: 目标框架
+      returns:
+        type: object
+        description: 生成的代码
+    
+    - id: preview-ui
+      name: Preview UI
+      description: 预览生成的UI
+      category: preview
+      parameters:
+        - name: code
+          type: object
+          required: true
+          description: 生成的代码
+      returns:
+        type: string
+        description: 预览URL
+    
+    - id: create-view
+      name: Create View
+      description: 创建新的视图组件
+      category: development
+      parameters:
+        - name: viewName
+          type: string
+          required: true
+          description: 视图名称
+        - name: template
+          type: string
+          required: false
+          description: 模板类型
+      returns:
+        type: object
+        description: 创建结果
+  
+  scenes:
+    - name: ui-generation
+      description: UI生成场景
+      capabilities:
+        - generate-ui
+        - preview-ui
+        - create-view
+  
+  dependencies:
+    skills:
+      - id: skill-vfs
+        version: ">=0.7.0"
+        optional: true
+  
+  config:
+    optional:
+      - name: A2UI_PORT
+        type: number
+        description: 服务端口
+        default: 8081
+        secret: false
+      - name: A2UI_OUTPUT_DIR
+        type: string
+        description: 输出目录
+        default: ./output
+        secret: false
+  
+  endpoints:
+    - path: /api/info
+      method: GET
+      description: 获取技能信息
+      capability: get-info
+    - path: /api/generate
+      method: POST
+      description: 生成UI代码
+      capability: generate-ui
+    - path: /api/preview
+      method: POST
+      description: 预览UI
+      capability: preview-ui
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+
+  deployment:
+    modes:
+      - local-deployed
+    singleton: false

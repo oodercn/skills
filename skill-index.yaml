@@ -1,0 +1,93 @@
+apiVersion: ooder.io/v1
+kind: SkillIndex
+
+metadata:
+  name: ooder-skills
+  version: "0.7.1"
+  description: Ooder Skills Repository - Shared skills for Ooder Agent Platform
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  giteeMirror: https://gitee.com/ooderCN/skills
+  createdAt: "2026-02-16T00:00:00Z"
+  updatedAt: "2026-02-18T00:00:00Z"
+
+spec:
+  skills:
+    - skillId: skill-a2ui
+      name: A2UI Skill
+      version: "0.7.1"
+      description: A2UI图转代码技能，支持将设计图转换为前端代码
+      sceneId: ui-generation
+      path: skills/skill-a2ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-a2ui-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-a2ui-0.7.1.jar
+      checksum: ""
+      
+    - skillId: skill-org-dingding
+      name: DingTalk Organization Service
+      version: "0.7.1"
+      description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-dingding
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-org-dingding-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-org-dingding-0.7.1.jar
+      checksum: ""
+      
+    - skillId: skill-org-feishu
+      name: Feishu Organization Service
+      version: "0.7.1"
+      description: 飞书组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-feishu
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-org-feishu-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-org-feishu-0.7.1.jar
+      checksum: ""
+      
+    - skillId: skill-user-auth
+      name: User Authentication Service
+      version: "0.7.1"
+      description: 用户认证服务，支持多种认证方式
+      sceneId: auth
+      path: skills/skill-user-auth
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-user-auth-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-user-auth-0.7.1.jar
+      checksum: ""
+      
+    - skillId: skill-trae-solo
+      name: Trae Solo Service
+      version: "0.7.1"
+      description: 连接实用功能，运行结果通过A2UI节点展示
+      sceneId: utility
+      path: skills/skill-trae-solo
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-trae-solo-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-trae-solo-0.7.1.jar
+      checksum: ""
+
+  scenes:
+    - sceneId: ui-generation
+      name: UI Generation
+      description: UI生成场景，支持图转代码、组件生成等能力
+      version: "1.0.0"
+      requiredCapabilities:
+        - generate-ui
+        - preview-ui
+      maxMembers: 10
+      
+    - sceneId: auth
+      name: Authentication
+      description: 认证场景，支持用户认证和组织数据访问
+      version: "1.0.0"
+      requiredCapabilities:
+        - user-auth
+        - org-data-read
+      maxMembers: 100
+      
+    - sceneId: utility
+      name: Utility
+      description: 实用工具场景，提供各种实用功能
+      version: "1.0.0"
+      requiredCapabilities:
+        - execute-task
+      maxMembers: 50

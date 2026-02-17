@@ -1,0 +1,56 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: skill-a2ui
+  version: 0.7.1
+  description: A2UI图转代码技能，支持将设计图转换为前端代码
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-a2ui
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - a2ui
+    - ui
+    - code-generation
+    - frontend
+
+spec:
+  type: tool-skill
+  
+  capabilities:
+    - generate-ui
+    - preview-ui
+    - create-view
+
+  scenes:
+    - ui-generation
+
+  parameters:
+    - name: A2UI_PORT
+      type: number
+      required: false
+      default: 8081
+      description: 服务端口
+    - name: A2UI_OUTPUT_DIR
+      type: string
+      required: false
+      default: ./output
+      description: 输出目录
+
+  execution:
+    timeout: 60000
+    memoryLimit: 512M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: net.ooder.skill.a2ui.A2UISkillApplication
+    assets:
+      - name: skill-a2ui-0.7.1.jar
+        platform: all
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-a2ui-0.7.1.jar
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

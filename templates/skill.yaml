@@ -1,0 +1,78 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: ${skill.name}
+  name: ${skill.displayName}
+  version: ${skill.version}
+  description: ${skill.description}
+  author: ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills/tree/main/skills/${skill.name}
+  keywords:
+    - ${skill.keyword1}
+    - ${skill.keyword2}
+
+spec:
+  type: ${skill.type}
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: ${skill.mainClass}
+    jvmOpts: "-Xms128m -Xmx256m"
+  
+  capabilities:
+    - id: ${capability.id}
+      name: ${capability.name}
+      description: ${capability.description}
+      category: ${capability.category}
+  
+  scenes:
+    - name: ${scene.name}
+      description: ${scene.description}
+      capabilities:
+        - ${capability.id}
+      roles:
+        - roleId: ${role.id}
+          name: ${role.name}
+          required: true
+          capabilities: [${capability.id}]
+      communicationProtocol: http
+      securityPolicy: jwt
+      allowParallel: true
+  
+  config:
+    required:
+      - name: ${config.name}
+        type: string
+        description: ${config.description}
+        secret: true
+    optional:
+      - name: ${config.optionalName}
+        type: string
+        default: ${config.default}
+        description: ${config.description}
+  
+  endpoints:
+    - path: /api/${endpoint.path}
+      method: ${endpoint.method}
+      description: ${endpoint.description}
+      capability: ${capability.id}
+      authentication: true
+  
+  resources:
+    cpu: "250m"
+    memory: "256Mi"
+    storage: "512Mi"
+  
+  deployment:
+    modes:
+      - local-deployed
+    singleton: true
+    requiresAuth: false
+    healthCheck:
+      path: /actuator/health
+      interval: 30
+      timeout: 10

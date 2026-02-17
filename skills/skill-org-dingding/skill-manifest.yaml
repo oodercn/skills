@@ -1,0 +1,60 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: skill-org-dingding
+  version: 0.7.1
+  description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-dingding
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - dingding
+    - dingtalk
+    - organization
+    - enterprise
+    - authentication
+
+spec:
+  type: enterprise-skill
+  
+  capabilities:
+    - org-data-read
+    - user-auth
+
+  scenes:
+    - auth
+
+  parameters:
+    - name: DINGTALK_APP_KEY
+      type: string
+      required: true
+      description: 钉钉应用Key
+    - name: DINGTALK_APP_SECRET
+      type: string
+      required: true
+      description: 钉钉应用Secret
+      secret: true
+    - name: DINGTALK_API_BASE_URL
+      type: string
+      required: false
+      default: https://oapi.dingtalk.com
+      description: 钉钉API基础URL
+
+  execution:
+    timeout: 30000
+    memoryLimit: 512M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: net.ooder.skill.org.dingding.DingTalkOrgSkillApplication
+    assets:
+      - name: skill-org-dingding-0.7.1.jar
+        platform: all
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-org-dingding-0.7.1.jar
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

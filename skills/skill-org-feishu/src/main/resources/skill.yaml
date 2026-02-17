@@ -1,0 +1,105 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-feishu
+  name: Feishu Organization Service
+  version: 0.7.1
+  description: 飞书组织数据集成服务，包括组织架构同步和用户认证
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-org-feishu
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - feishu
+    - lark
+    - organization
+    - enterprise
+    - authentication
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.feishu.FeishuOrgSkillApplication
+  
+  capabilities:
+    - id: org-data-read
+      name: Organization Data Read
+      description: 读取飞书组织架构和成员数据
+      category: data-access
+      parameters:
+        - name: orgId
+          type: string
+          required: false
+          description: 组织ID
+      returns:
+        type: object
+        description: 组织树和成员
+    
+    - id: user-auth
+      name: User Authentication
+      description: 通过飞书OAuth认证用户
+      category: authentication
+      parameters:
+        - name: code
+          type: string
+          required: true
+          description: 飞书授权码
+      returns:
+        type: object
+        description: 认证结果
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - org-data-read
+        - user-auth
+  
+  config:
+    required:
+      - name: FEISHU_APP_ID
+        type: string
+        description: 飞书应用ID
+        secret: false
+      - name: FEISHU_APP_SECRET
+        type: string
+        description: 飞书应用Secret
+        secret: true
+    optional:
+      - name: FEISHU_API_BASE_URL
+        type: string
+        description: 飞书API基础URL
+        default: https://open.feishu.cn/open-apis
+        secret: false
+  
+  endpoints:
+    - path: /api/info
+      method: GET
+      description: 获取技能信息
+    - path: /api/org/tree
+      method: GET
+      description: 获取组织树
+      capability: org-data-read
+    - path: /api/auth/verify
+      method: POST
+      description: 验证用户认证
+      capability: user-auth
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: true
