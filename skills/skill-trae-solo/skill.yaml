@@ -1,0 +1,58 @@
+skill:
+  id: skill-trae-solo
+  name: Trae Solo Skill
+  version: 0.7.1
+  description: 项目管理与协作工具集
+  
+  provider:
+    name: ooder
+    version: 0.7.1
+    
+  capabilities:
+    - id: project-navigation
+      name: 项目导航
+      type: query
+      description: 工程目录结构导航和文件查找
+      operations:
+        - list: 列出所有项目
+        - tree: 获取项目目录树
+        - find: 查找文件
+        - info: 获取项目信息
+        
+    - id: task-management
+      name: 任务管理
+      type: admin
+      description: 协作任务创建、更新和进度跟踪
+      operations:
+        - list: 列出任务
+        - get: 获取任务详情
+        - create: 创建任务
+        - update: 更新任务
+        - progress: 更新进度
+        
+    - id: notification
+      name: 通知管理
+      type: event
+      description: 跨工程通知发送和确认
+      operations:
+        - list: 列出通知
+        - get: 获取通知详情
+        - send: 发送通知
+        - acknowledge: 确认通知
+        - archive: 归档通知
+        
+  endpoints:
+    http:
+      base: http://localhost:8085/api
+      paths:
+        info: /info
+        health: /health
+        projectNavigation: /capability/project-navigation
+        taskManagement: /capability/task-management
+        notification: /capability/notification
+        
+  config:
+    githubRoot: E:\github
+    sharedPath: .shared
+    tasksPath: .shared/tasks
+    notificationsPath: .shared/notifications

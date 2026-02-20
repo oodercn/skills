@@ -21,9 +21,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk</artifactId>
-            <version>${agent-sdk.version}</version>
-            <scope>system</scope>
-            <systemPath>${project.basedir}/../../../guper-Agent/agent-sdk/target/agent-sdk-0.7.1.jar</systemPath>
+            <version>0.7.3</version>
         </dependency>
     </dependencies>
 

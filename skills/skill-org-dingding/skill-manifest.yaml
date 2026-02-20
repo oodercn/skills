@@ -3,7 +3,7 @@ kind: SkillPackage
 
 metadata:
   name: skill-org-dingding
-  version: 0.7.1
+  version: 0.7.3
   description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
   author: Ooder Team
   license: Apache-2.0
@@ -51,9 +51,9 @@ spec:
     format: jar
     entrypoint: net.ooder.skill.org.dingding.DingTalkOrgSkillApplication
     assets:
-      - name: skill-org-dingding-0.7.1.jar
+      - name: skill-org-dingding-0.7.3.jar
         platform: all
-        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-org-dingding-0.7.1.jar
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
 
   compatibility:
     sdkVersion: ">=0.7.0"

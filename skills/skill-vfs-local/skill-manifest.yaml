@@ -1,0 +1,61 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: skill-vfs-local
+  version: 0.7.3
+  description: 本地文件系统存储服务 - 提供基本的文件操作和版本管理
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-vfs-local
+  repository: https://github.com/ooderCN/ooder-skills.git
+  giteeMirror: https://gitee.com/ooderCN/ooder-skills.git
+  keywords:
+    - local
+    - filesystem
+    - vfs
+    - storage
+
+spec:
+  type: enterprise-skill
+  
+  capabilities:
+    - vfs-storage
+    - file-read
+    - file-write
+    - file-delete
+    - folder-create
+    - folder-list
+
+  scenes:
+    - vfs-local
+
+  parameters:
+    - name: VFS_LOCAL_ROOT_PATH
+      type: string
+      required: false
+      default: ./data/vfs
+      description: 本地存储根路径
+    - name: VFS_LOCAL_MAX_FILE_SIZE
+      type: number
+      required: false
+      default: 104857600
+      description: 最大文件大小(字节)
+
+  execution:
+    timeout: 30000
+    memoryLimit: 256M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: net.ooder.skill.vfs.local.LocalVfsApplication
+    assets:
+      - name: skill-vfs-local-0.7.3.jar
+        platform: all
+        url: https://github.com/ooderCN/ooder-skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+        giteeUrl: https://gitee.com/ooderCN/ooder-skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

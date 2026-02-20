@@ -3,7 +3,7 @@ kind: SkillPackage
 
 metadata:
   name: skill-user-auth
-  version: 0.7.1
+  version: 0.7.3
   description: 用户认证服务，支持多种认证方式
   author: Ooder Team
   license: Apache-2.0
@@ -48,9 +48,9 @@ spec:
     format: jar
     entrypoint: net.ooder.skill.user.auth.UserAuthSkillApplication
     assets:
-      - name: skill-user-auth-0.7.1.jar
+      - name: skill-user-auth-0.7.3.jar
         platform: all
-        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-user-auth-0.7.1.jar
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
 
   compatibility:
     sdkVersion: ">=0.7.0"

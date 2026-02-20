@@ -3,7 +3,7 @@ kind: SkillPackage
 
 metadata:
   name: skill-a2ui
-  version: 0.7.1
+  version: 0.7.3
   description: A2UI图转代码技能，支持将设计图转换为前端代码
   author: Ooder Team
   license: Apache-2.0
@@ -47,9 +47,9 @@ spec:
     format: jar
     entrypoint: net.ooder.skill.a2ui.A2UISkillApplication
     assets:
-      - name: skill-a2ui-0.7.1.jar
+      - name: skill-a2ui-0.7.3.jar
         platform: all
-        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-a2ui-0.7.1.jar
+        url: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
 
   compatibility:
     sdkVersion: ">=0.7.0"

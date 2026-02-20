@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>ooder-skills</artifactId>
-    <version>0.7.1</version>
+    <version>0.7.3</version>
     <packaging>pom</packaging>
 
     <name>ooder-skills</name>

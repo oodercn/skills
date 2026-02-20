@@ -3,7 +3,7 @@ kind: SkillPackage
 
 metadata:
   name: skill-mqtt
-  version: 0.7.1
+  version: 0.7.3
   description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
   author: Ooder Team
   license: Apache-2.0
@@ -63,10 +63,10 @@ spec:
     format: jar
     entrypoint: net.ooder.skill.mqtt.MqttSkillApplication
     assets:
-      - name: skill-mqtt-0.7.1.jar
+      - name: skill-mqtt-0.7.3.jar
         platform: all
-        url: https://github.com/ooderCN/ooder-skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
-        giteeUrl: https://gitee.com/ooderCN/ooder-skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
+        url: https://github.com/ooderCN/ooder-skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
+        giteeUrl: https://gitee.com/ooderCN/ooder-skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
 
   compatibility:
     sdkVersion: ">=0.7.0"
