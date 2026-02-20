@@ -21,6 +21,42 @@
 
 Ooder Skills 是 Ooder Agent Platform 的官方技能仓库，提供多个可复用的技能包，支持P2P模式和组织模式下的技能发现与分发。
 
+### v0.7.3 新特性
+
+本版本是 Ooder Agent 协议的重要升级版本，主要实现了场景管理的全面增强：
+
+| 特性 | 说明 |
+|------|------|
+| **DiscoveryProtocol** | 节点发现协议，支持局域网和广域网节点自动发现 |
+| **LoginProtocol** | 本地认证协议，支持离线认证和会话管理 |
+| **CollaborationProtocol** | 场景组协作协议，支持任务分配和状态同步 |
+| **OfflineService** | 离线服务，支持网络断开时的场景运行和数据同步 |
+| **SkillShareService** | 技能分享服务，支持跨域技能发现和调用 |
+| **EventBus** | 事件总线，统一事件管理和模块解耦 |
+
+#### 离线支持
+
+v0.7.3 新增离线模式支持，允许在网络断开时继续运行：
+
+- **离线发现**：使用本地缓存的技能注册表
+- **离线安装**：从本地缓存安装技能包
+- **自动同步**：网络恢复后自动同步数据
+- **事件通知**：发布离线模式切换事件
+
+#### 事件驱动生命周期
+
+技能生命周期事件：
+
+| 事件类型 | 描述 |
+|----------|------|
+| `SkillDownloadStartedEvent` | 技能包下载开始 |
+| `SkillDownloadCompletedEvent` | 技能包下载完成 |
+| `SkillInstalledEvent` | 技能安装完成 |
+| `SkillUpdatedEvent` | 技能更新完成 |
+| `SkillUninstalledEvent` | 技能卸载完成 |
+| `SkillCacheHitEvent` | 离线缓存命中 |
+| `SkillCacheMissEvent` | 离线缓存未命中 |
+
 ### 总体设计
 
 #### 技能架构
@@ -440,6 +476,42 @@ skill.discovery.gitee.token=${GITEE_TOKEN}
 ### Overview
 
 Ooder Skills is the official skill repository for Ooder Agent Platform, providing multiple reusable skill packages with support for P2P and organizational skill discovery and distribution.
+
+### v0.7.3 New Features
+
+This version is a major upgrade to the Ooder Agent protocol, implementing comprehensive scene management enhancements:
+
+| Feature | Description |
+|---------|-------------|
+| **DiscoveryProtocol** | Node discovery protocol for LAN and WAN node auto-discovery |
+| **LoginProtocol** | Local authentication protocol for offline auth and session management |
+| **CollaborationProtocol** | Scene group collaboration protocol for task distribution and state sync |
+| **OfflineService** | Offline service for scene execution and data sync when disconnected |
+| **SkillShareService** | Skill sharing service for cross-domain skill discovery and invocation |
+| **EventBus** | Event bus for unified event management and module decoupling |
+
+#### Offline Support
+
+v0.7.3 adds offline mode support, allowing continued operation when disconnected:
+
+- **Offline Discovery**: Use cached skill registry
+- **Offline Install**: Install skill packages from local cache
+- **Auto Sync**: Automatic data sync when network reconnects
+- **Event Notification**: Publish offline mode switch events
+
+#### Event-Driven Lifecycle
+
+Skill lifecycle events:
+
+| Event Type | Description |
+|------------|-------------|
+| `SkillDownloadStartedEvent` | Package download started |
+| `SkillDownloadCompletedEvent` | Package download completed |
+| `SkillInstalledEvent` | Installation completed |
+| `SkillUpdatedEvent` | Update completed |
+| `SkillUninstalledEvent` | Uninstall completed |
+| `SkillCacheHitEvent` | Offline cache hit |
+| `SkillCacheMissEvent` | Offline cache miss |
 
 ### Architecture Design
 
