@@ -1,0 +1,73 @@
+apiVersion: ooder.io/v1
+kind: SkillPackage
+
+metadata:
+  name: skill-mqtt
+  version: 0.7.1
+  description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-mqtt
+  repository: https://github.com/ooderCN/ooder-skills.git
+  giteeMirror: https://gitee.com/ooderCN/ooder-skills.git
+  keywords:
+    - mqtt
+    - broker
+    - iot
+    - messaging
+    - lightweight
+
+spec:
+  type: service-skill
+  
+  capabilities:
+    - mqtt-broker
+    - mqtt-publish
+    - mqtt-subscribe
+    - mqtt-p2p
+    - mqtt-topic
+    - mqtt-command
+
+  scenes:
+    - mqtt-messaging
+    - iot-device
+
+  parameters:
+    - name: MQTT_PORT
+      type: number
+      required: false
+      default: 1883
+      description: MQTT服务端口
+    - name: MQTT_WS_PORT
+      type: number
+      required: false
+      default: 8083
+      description: WebSocket端口
+    - name: MQTT_MAX_CONNECTIONS
+      type: number
+      required: false
+      default: 10000
+      description: 最大连接数
+    - name: MQTT_ALLOW_ANONYMOUS
+      type: boolean
+      required: false
+      default: false
+      description: 是否允许匿名连接
+
+  execution:
+    timeout: 30000
+    memoryLimit: 256M
+    cpuLimit: 1
+
+  distribution:
+    format: jar
+    entrypoint: net.ooder.skill.mqtt.MqttSkillApplication
+    assets:
+      - name: skill-mqtt-0.7.1.jar
+        platform: all
+        url: https://github.com/ooderCN/ooder-skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
+        giteeUrl: https://gitee.com/ooderCN/ooder-skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
+
+  compatibility:
+    sdkVersion: ">=0.7.0"
+    javaVersion: ">=8"

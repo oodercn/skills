@@ -51,6 +51,7 @@
         <module>skills/skill-org-feishu</module>
         <module>skills/skill-user-auth</module>
         <module>skills/skill-trae-solo</module>
+        <module>skills/skill-mqtt</module>
     </modules>
 
     <dependencyManagement>

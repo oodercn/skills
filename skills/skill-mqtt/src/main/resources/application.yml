@@ -1,0 +1,24 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: skill-mqtt
+
+mqtt:
+  broker:
+    enabled: true
+    port: 1883
+    websocket-port: 8083
+    max-connections: 10000
+    allow-anonymous: false
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+
+logging:
+  level:
+    net.ooder: DEBUG

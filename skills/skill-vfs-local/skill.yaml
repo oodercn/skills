@@ -1,0 +1,222 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-vfs-local
+  name: Local File System Storage Service
+  version: 0.7.0
+  description: Local file system storage implementation, supports basic file operations and versioning
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-vfs-local
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - local
+    - filesystem
+    - vfs
+    - storage
+  maintainers:
+    - name: Ooder Team
+      email: team@ooder.net
+      github: ooderCN
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.vfs.local.LocalVfsApplication
+    jvmOpts: "-Xms128m -Xmx256m"
+  
+  vfsCapabilities:
+    supported:
+      - id: file-read
+        name: File Read
+        description: Read file content
+        fallback: none
+      - id: file-write
+        name: File Write
+        description: Write file content
+        fallback: none
+      - id: file-delete
+        name: File Delete
+        description: Delete file
+        fallback: none
+      - id: file-copy
+        name: File Copy
+        description: Copy file
+        fallback: none
+      - id: file-move
+        name: File Move
+        description: Move file
+        fallback: none
+      - id: folder-create
+        name: Folder Create
+        description: Create folder
+        fallback: none
+      - id: folder-delete
+        name: Folder Delete
+        description: Delete folder
+        fallback: none
+      - id: folder-list
+        name: Folder List
+        description: List folder contents
+        fallback: none
+      - id: file-version
+        name: File Versioning
+        description: File version management
+        fallback: none
+      - id: file-compress
+        name: File Compression
+        description: Compress/decompress files
+        fallback: none
+      - id: stream-download
+        name: Stream Download
+        description: Stream download large files
+        fallback: none
+    notSupported:
+      - id: file-share
+        name: File Sharing
+        description: Generate share links
+        fallback: none
+        fallbackDescription: Local storage does not support sharing
+      - id: file-preview
+        name: File Preview
+        description: Online preview
+        fallback: none
+        fallbackDescription: Local storage does not support preview
+      - id: stream-upload
+        name: Stream Upload
+        description: Chunked upload large files
+        fallback: none
+        fallbackDescription: Local storage uses direct write
+      - id: acl-manage
+        name: ACL Management
+        description: Access control list management
+        fallback: none
+        fallbackDescription: Local storage uses OS permissions
+      - id: metadata
+        name: Metadata
+        description: Custom metadata
+        fallback: none
+        fallbackDescription: Local storage does not support custom metadata
+  
+  capabilities:
+    - id: vfs-storage
+      name: VFS Storage
+      description: Local file system storage operations
+      category: storage
+      parameters:
+        - name: operation
+          type: string
+          required: true
+          description: Operation type (read/write/delete/list)
+      returns:
+        type: object
+        description: Operation result
+  
+  scenes:
+    - name: vfs-local
+      description: Local file system storage scene
+      capabilities:
+        - vfs-storage
+      roles:
+        - roleId: vfs-provider
+          name: VFS Provider
+          required: true
+          capabilities: [vfs-storage]
+        - roleId: vfs-consumer
+          name: VFS Consumer
+          required: false
+          capabilities: [vfs-storage]
+      communicationProtocol: http
+      securityPolicy: api-key
+      allowParallel: true
+  
+  dependencies:
+    skills: []
+    libraries:
+      - group: org.springframework.boot
+        artifact: spring-boot-starter-web
+        version: "2.7.0"
+        scope: compile
+      - group: commons-io
+        artifact: commons-io
+        version: "2.11.0"
+        scope: compile
+  
+  config:
+    required:
+      - name: VFS_LOCAL_ROOT_PATH
+        type: string
+        description: Root path for local storage
+        default: ./data/vfs
+        secret: false
+    optional:
+      - name: VFS_LOCAL_TEMP_PATH
+        type: string
+        description: Temp path for uploads
+        default: ./temp/vfs
+        secret: false
+      - name: VFS_LOCAL_MAX_FILE_SIZE
+        type: number
+        description: Max file size in bytes
+        default: 104857600
+        secret: false
+  
+  endpoints:
+    - path: /api/vfs/file/{id}
+      method: GET
+      description: Get file info
+      capability: vfs-storage
+      authentication: true
+    - path: /api/vfs/file
+      method: POST
+      description: Upload file
+      capability: vfs-storage
+      authentication: true
+    - path: /api/vfs/file/{id}/download
+      method: GET
+      description: Download file
+      capability: vfs-storage
+      authentication: true
+    - path: /api/vfs/folder/{id}
+      method: GET
+      description: Get folder info
+      capability: vfs-storage
+      authentication: true
+    - path: /api/vfs/folder
+      method: POST
+      description: Create folder
+      capability: vfs-storage
+      authentication: true
+    - path: /api/vfs/capabilities
+      method: GET
+      description: Get supported capabilities
+      authentication: false
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "10Gi"
+    network:
+      ingress: true
+      egress: false
+      ports:
+        - 8080
+  
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: true
+    requiresAuth: true
+    healthCheck:
+      path: /actuator/health
+      interval: 30
+      timeout: 10
+    startup:
+      timeout: 30
+      order: 5

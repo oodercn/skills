@@ -1,0 +1,97 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-mqtt
+  name: MQTT Service Skill
+  version: 0.7.1
+  description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-mqtt
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - mqtt
+    - broker
+    - iot
+    - messaging
+    - p2p
+    - pubsub
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.mqtt.MqttSkillApplication
+  
+  capabilities:
+    - id: mqtt-broker
+      name: MQTT Broker
+      description: 提供MQTT Broker服务
+      category: messaging
+    - id: mqtt-publish
+      name: MQTT Publish
+      description: 发布MQTT消息
+      category: messaging
+    - id: mqtt-subscribe
+      name: MQTT Subscribe
+      description: 订阅MQTT主题
+      category: messaging
+    - id: mqtt-p2p
+      name: MQTT P2P
+      description: 点对点消息
+      category: messaging
+    - id: mqtt-topic
+      name: MQTT Topic
+      description: 主题订阅/广播
+      category: messaging
+    - id: mqtt-command
+      name: MQTT Command
+      description: 设备命令
+      category: control
+  
+  scenes:
+    - name: mqtt-messaging
+      description: MQTT消息场景
+    - name: iot-device
+      description: IoT设备场景
+  
+  providers:
+    - id: lightweight-mqtt
+      name: Lightweight MQTT Server
+      type: LIGHTWEIGHT
+      priority: 100
+    - id: emqx-enterprise
+      name: EMQX Enterprise
+      type: ENTERPRISE_SELF_HOSTED
+      priority: 50
+    - id: mosquitto-enterprise
+      name: Mosquitto
+      type: ENTERPRISE_SELF_HOSTED
+      priority: 60
+    - id: aliyun-iot
+      name: Aliyun IoT
+      type: CLOUD_MANAGED
+      priority: 10
+    - id: tencent-iot
+      name: Tencent IoT
+      type: CLOUD_MANAGED
+      priority: 15
+  
+  config:
+    optional:
+      - name: mqttProvider
+        type: string
+        default: lightweight-mqtt
+      - name: mqttPort
+        type: number
+        default: 1883
+      - name: mqttWsPort
+        type: number
+        default: 8083
+      - name: mqttMaxConnections
+        type: number
+        default: 10000

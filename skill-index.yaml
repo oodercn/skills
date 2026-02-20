@@ -11,7 +11,7 @@ metadata:
   repository: https://github.com/ooderCN/skills.git
   giteeMirror: https://gitee.com/ooderCN/skills
   createdAt: "2026-02-16T00:00:00Z"
-  updatedAt: "2026-02-18T00:00:00Z"
+  updatedAt: "2026-02-20T00:00:00Z"
 
 spec:
   skills:
@@ -64,6 +64,16 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-trae-solo-0.7.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-trae-solo-0.7.1.jar
       checksum: ""
+      
+    - skillId: skill-mqtt
+      name: MQTT Service Skill
+      version: "0.7.1"
+      description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
+      sceneId: mqtt-messaging
+      path: skills/skill-mqtt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.1/skill-mqtt-0.7.1.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
@@ -91,3 +101,22 @@ spec:
       requiredCapabilities:
         - execute-task
       maxMembers: 50
+      
+    - sceneId: mqtt-messaging
+      name: MQTT Messaging
+      description: MQTT消息场景，提供MQTT Broker和消息服务能力
+      version: "1.0.0"
+      requiredCapabilities:
+        - mqtt-broker
+        - mqtt-publish
+        - mqtt-subscribe
+      maxMembers: 1000
+      
+    - sceneId: iot-device
+      name: IoT Device
+      description: IoT设备场景，提供设备连接、数据上报和命令控制能力
+      version: "1.0.0"
+      requiredCapabilities:
+        - mqtt-broker
+        - mqtt-command
+      maxMembers: 10000

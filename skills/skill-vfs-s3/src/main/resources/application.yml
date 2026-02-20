@@ -1,0 +1,39 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: skill-vfs-s3
+  servlet:
+    multipart:
+      max-file-size: 500MB
+      max-request-size: 500MB
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+vfs:
+  s3:
+    endpoint: ${S3_ENDPOINT:}
+    accessKey: ${S3_ACCESS_KEY:}
+    secretKey: ${S3_SECRET_KEY:}
+    bucket: ${S3_BUCKET:vfs-storage}
+    region: ${S3_REGION:us-east-1}
+    pathStyle: ${S3_PATH_STYLE:true}
+  sync:
+    enabled: ${VFS_SYNC_ENABLED:true}
+    port: ${VFS_S3_SYNC_PORT:9878}
+    multicast: ${VFS_S3_SYNC_MULTICAST:239.255.255.252}
+
+logging:
+  level:
+    root: INFO
+    net.ooder: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"

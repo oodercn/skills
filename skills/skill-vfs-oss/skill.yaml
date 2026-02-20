@@ -1,0 +1,178 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-vfs-oss
+  name: Aliyun OSS Storage Service
+  version: 0.7.0
+  description: Aliyun OSS object storage implementation with advanced features like sharing, preview, and streaming
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/ooder-skills/tree/main/skills/skill-vfs-oss
+  repository: https://github.com/ooderCN/ooder-skills.git
+  keywords:
+    - oss
+    - aliyun
+    - object-storage
+    - vfs
+    - cloud-storage
+  maintainers:
+    - name: Ooder Team
+      email: team@ooder.net
+      github: ooderCN
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.vfs.oss.OssVfsApplication
+    jvmOpts: "-Xms256m -Xmx512m"
+  
+  vfsCapabilities:
+    supported:
+      - id: file-read
+        name: File Read
+        description: Read file content
+        fallback: none
+      - id: file-write
+        name: File Write
+        description: Write file content
+        fallback: none
+      - id: file-delete
+        name: File Delete
+        description: Delete file
+        fallback: none
+      - id: file-copy
+        name: File Copy
+        description: Copy file
+        fallback: none
+      - id: file-move
+        name: File Move
+        description: Move file
+        fallback: none
+      - id: folder-create
+        name: Folder Create
+        description: Create folder
+        fallback: none
+      - id: folder-list
+        name: Folder List
+        description: List folder contents
+        fallback: none
+      - id: file-share
+        name: File Sharing
+        description: Generate share links
+        fallback: none
+      - id: file-preview
+        name: File Preview
+        description: Online preview
+        fallback: none
+      - id: stream-upload
+        name: Stream Upload
+        description: Chunked upload large files
+        fallback: none
+      - id: stream-download
+        name: Stream Download
+        description: Stream download large files
+        fallback: none
+      - id: acl-manage
+        name: ACL Management
+        description: Access control list management
+        fallback: none
+      - id: metadata
+        name: Metadata
+        description: Custom metadata
+        fallback: none
+    notSupported:
+      - id: file-version
+        name: File Versioning
+        description: File version management
+        fallback: local-fallback
+        fallbackDescription: Use local storage for versioning
+      - id: file-compress
+        name: File Compression
+        description: Compress/decompress files
+        fallback: local-fallback
+        fallbackDescription: Use local storage for compression
+  
+  config:
+    required:
+      - name: OSS_ENDPOINT
+        type: string
+        description: OSS endpoint (e.g., oss-cn-hangzhou.aliyuncs.com)
+        secret: false
+      - name: OSS_ACCESS_KEY_ID
+        type: string
+        description: AccessKey ID
+        secret: false
+      - name: OSS_ACCESS_KEY_SECRET
+        type: string
+        description: AccessKey Secret
+        secret: true
+      - name: OSS_BUCKET_NAME
+        type: string
+        description: Bucket name
+        secret: false
+    optional:
+      - name: OSS_REGION
+        type: string
+        description: OSS region
+        default: cn-hangzhou
+        secret: false
+      - name: OSS_MAX_FILE_SIZE
+        type: number
+        description: Max file size in bytes
+        default: 5368709120
+        secret: false
+  
+  endpoints:
+    - path: /api/vfs/file/{id}
+      method: GET
+      description: Get file info
+      authentication: true
+    - path: /api/vfs/file
+      method: POST
+      description: Upload file
+      authentication: true
+    - path: /api/vfs/file/{id}/download
+      method: GET
+      description: Download file
+      authentication: true
+    - path: /api/vfs/file/{id}/share
+      method: GET
+      description: Generate share link
+      authentication: true
+    - path: /api/vfs/file/{id}/preview
+      method: GET
+      description: Preview file
+      authentication: true
+    - path: /api/vfs/capabilities
+      method: GET
+      description: Get supported capabilities
+      authentication: false
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+    network:
+      ingress: true
+      egress: true
+      ports:
+        - 8080
+  
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: true
+    requiresAuth: true
+    healthCheck:
+      path: /actuator/health
+      interval: 30
+      timeout: 10
+    startup:
+      timeout: 60
+      order: 10
