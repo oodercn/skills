@@ -12,7 +12,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-oss</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.3</version>
     <name>Skill VFS OSS - Aliyun OSS Storage Implementation</name>
     <description>Aliyun OSS object storage implementation for OoderAgent VFS</description>
 

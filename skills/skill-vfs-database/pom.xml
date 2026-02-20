@@ -12,7 +12,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-database</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.3</version>
     <name>Skill VFS Database - Database Storage Implementation</name>
     <description>Database storage implementation for OoderAgent VFS</description>
 

@@ -12,7 +12,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-s3</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.3</version>
     <name>Skill VFS S3 - S3 Compatible Object Storage Implementation</name>
     <description>S3 compatible object storage implementation for OoderAgent VFS (supports MinIO, AWS S3, Aliyun OSS, Tencent COS)</description>
 

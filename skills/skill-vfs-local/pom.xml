@@ -12,7 +12,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-local</artifactId>
-    <version>0.7.0</version>
+    <version>0.7.3</version>
     <name>Skill VFS Local - Local File System Storage Implementation</name>
     <description>Local file system storage implementation for OoderAgent VFS</description>
 
