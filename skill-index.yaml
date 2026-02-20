@@ -45,6 +45,26 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-org-wecom
+      name: WeCom Organization Service
+      version: "0.7.3"
+      description: 企业微信组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-wecom
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-org-ldap
+      name: LDAP Organization Service
+      version: "0.7.3"
+      description: LDAP组织服务，提供基于LDAP的组织架构管理和用户认证
+      sceneId: auth
+      path: skills/skill-org-ldap
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      checksum: ""
+      
     - skillId: skill-user-auth
       name: User Authentication Service
       version: "0.7.3"

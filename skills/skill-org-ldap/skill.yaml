@@ -1,0 +1,246 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-ldap
+  name: LDAP Organization Service
+  version: 0.7.0
+  description: Provides organization data integration with LDAP/Active Directory, including org structure and user authentication
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/guper-Agent/tree/main/skill-org-ldap
+  repository: https://github.com/ooderCN/guper-Agent.git
+  keywords:
+    - ldap
+    - active-directory
+    - ad
+    - organization
+    - enterprise
+    - authentication
+  maintainers:
+    - name: Ooder Team
+      email: team@ooder.net
+      github: ooderCN
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.ldap.LdapOrgApplication
+    jvmOpts: "-Xms256m -Xmx512m"
+  
+  orgCapabilities:
+    supported:
+      - id: org-query
+        name: Organization Query
+        description: Query organization structure from LDAP
+        fallback: none
+      - id: person-query
+        name: Person Query
+        description: Query person info from LDAP
+        fallback: none
+      - id: user-auth
+        name: User Authentication
+        description: Authenticate users via LDAP bind
+        fallback: none
+      - id: org-level
+        name: Organization Level
+        description: Organization level from LDAP hierarchy
+        fallback: none
+      - id: person-group
+        name: Person Group
+        description: Person groups from LDAP groups
+        fallback: none
+      - id: person-role
+        name: Person Role
+        description: Person roles from LDAP attributes
+        fallback: json-fallback
+        fallbackDescription: Use JSON fallback for extended person roles
+    notSupported:
+      - id: org-role
+        name: Organization Role
+        description: Organization role management
+        fallback: json-fallback
+        fallbackDescription: Use JSON fallback for org roles
+      - id: person-duty
+        name: Person Duty
+        description: Person duty management
+        fallback: json-fallback
+        fallbackDescription: Use JSON fallback for person duties
+      - id: person-level
+        name: Person Level
+        description: Person level management
+        fallback: json-fallback
+        fallbackDescription: Use JSON fallback for person levels
+      - id: person-position
+        name: Person Position
+        description: Person position management
+        fallback: json-fallback
+        fallbackDescription: Use JSON fallback for person positions
+      - id: org-sync
+        name: Organization Sync
+        description: Sync organization structure
+        fallback: none
+        fallbackDescription: LDAP is read-only
+  
+  capabilities:
+    - id: org-data-read
+      name: Organization Data Read
+      description: Read organization structure and member data from LDAP
+      category: data-access
+      parameters:
+        - name: orgId
+          type: string
+          required: false
+          description: Organization DN (optional, uses base if not provided)
+      returns:
+        type: object
+        description: Organization tree with members
+    - id: user-auth
+      name: User Authentication
+      description: Authenticate users via LDAP bind
+      category: authentication
+      parameters:
+        - name: username
+          type: string
+          required: true
+          description: User DN or username
+        - name: password
+          type: string
+          required: true
+          description: User password
+      returns:
+        type: object
+        description: Authentication result with user info
+  
+  scenes:
+    - name: auth
+      description: Authentication scene with organization data support
+      capabilities:
+        - org-data-read
+        - user-auth
+      roles:
+        - roleId: org-provider
+          name: Organization Provider
+          required: true
+          capabilities: [org-data-read, user-auth]
+        - roleId: org-consumer
+          name: Organization Consumer
+          required: false
+          capabilities: [org-data-read]
+      communicationProtocol: http
+      securityPolicy: api-key
+      allowParallel: true
+  
+  dependencies:
+    skills: []
+    libraries:
+      - group: org.springframework.boot
+        artifact: spring-boot-starter-web
+        version: "2.7.0"
+        scope: compile
+      - group: org.springframework.boot
+        artifact: spring-boot-starter-actuator
+        version: "2.7.0"
+        scope: compile
+      - group: org.springframework.ldap
+        artifact: spring-ldap-core
+        version: "2.4.1"
+        scope: compile
+      - group: com.alibaba
+        artifact: fastjson
+        version: "1.2.83"
+        scope: compile
+  
+  config:
+    required:
+      - name: LDAP_URL
+        type: string
+        description: LDAP server URL (e.g., ldap://localhost:389)
+        secret: false
+      - name: LDAP_BASE_DN
+        type: string
+        description: Base DN for LDAP searches
+        secret: false
+      - name: LDAP_USERNAME
+        type: string
+        description: LDAP bind username
+        secret: false
+      - name: LDAP_PASSWORD
+        type: string
+        description: LDAP bind password
+        secret: true
+    optional:
+      - name: LDAP_USER_DN_PATTERN
+        type: string
+        description: User DN pattern for authentication
+        default: uid={0},ou=people
+        secret: false
+      - name: LDAP_GROUP_SEARCH_BASE
+        type: string
+        description: Group search base DN
+        default: ou=groups
+        secret: false
+      - name: LDAP_ORG_SEARCH_BASE
+        type: string
+        description: Organization search base DN
+        default: ou=departments
+        secret: false
+      - name: LDAP_TIMEOUT
+        type: number
+        description: LDAP operation timeout in milliseconds
+        default: 30000
+        secret: false
+  
+  endpoints:
+    - path: /api/org/tree
+      method: GET
+      description: Get organization tree
+      capability: org-data-read
+      authentication: true
+    - path: /api/org/person/{id}
+      method: GET
+      description: Get person by ID
+      capability: org-data-read
+      authentication: true
+    - path: /api/org/department/{id}
+      method: GET
+      description: Get department by DN
+      capability: org-data-read
+      authentication: true
+    - path: /api/auth/verify
+      method: POST
+      description: Verify user authentication
+      capability: user-auth
+      authentication: false
+    - path: /api/org/capabilities
+      method: GET
+      description: Get supported org capabilities
+      authentication: false
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+    network:
+      ingress: true
+      egress: true
+      ports:
+        - 8080
+  
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: true
+    requiresAuth: true
+    healthCheck:
+      path: /actuator/health
+      interval: 30
+      timeout: 10
+    startup:
+      timeout: 60
+      order: 10

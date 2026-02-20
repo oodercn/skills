@@ -1,0 +1,188 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-wecom
+  name: WeCom (Enterprise WeChat) Organization Service
+  version: 0.7.0
+  description: Provides organization data integration with WeCom (Enterprise WeChat), including org structure sync and user authentication
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/guper-Agent/tree/main/skill-org-wecom
+  repository: https://github.com/ooderCN/guper-Agent.git
+  documentation: https://github.com/ooderCN/guper-Agent/blob/main/skill-org-wecom/SKILLS.md
+  keywords:
+    - wecom
+    - enterprise-wechat
+    - qywx
+    - organization
+    - enterprise
+    - authentication
+  maintainers:
+    - name: Ooder Team
+      email: team@ooder.net
+      github: ooderCN
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.wecom.WeComOrgApplication
+    jvmOpts: "-Xms256m -Xmx512m"
+  
+  capabilities:
+    - id: org-data-read
+      name: Organization Data Read
+      description: Read organization structure and member data from WeCom
+      category: data-access
+      parameters:
+        - name: orgId
+          type: string
+          required: false
+          description: Department ID (optional, uses root if not provided)
+        - name: includeInactive
+          type: boolean
+          required: false
+          default: false
+          description: Whether to include inactive members
+      returns:
+        type: object
+        description: Organization tree with members
+    - id: user-auth
+      name: User Authentication
+      description: Authenticate users via WeCom OAuth
+      category: authentication
+      parameters:
+        - name: code
+          type: string
+          required: true
+          description: WeCom authorization code
+      returns:
+        type: object
+        description: Authentication result with user info and access token
+  
+  scenes:
+    - name: auth
+      description: Authentication scene with organization data support
+      capabilities:
+        - org-data-read
+        - user-auth
+      roles:
+        - roleId: org-provider
+          name: Organization Provider
+          required: true
+          capabilities: [org-data-read, user-auth]
+        - roleId: org-consumer
+          name: Organization Consumer
+          required: false
+          capabilities: [org-data-read]
+      communicationProtocol: http
+      securityPolicy: api-key
+      allowParallel: true
+  
+  dependencies:
+    skills: []
+    libraries:
+      - group: org.springframework.boot
+        artifact: spring-boot-starter-web
+        version: "2.7.0"
+        scope: compile
+      - group: org.springframework.boot
+        artifact: spring-boot-starter-actuator
+        version: "2.7.0"
+        scope: compile
+      - group: com.alibaba
+        artifact: fastjson
+        version: "1.2.83"
+        scope: compile
+  
+  config:
+    required:
+      - name: WECOM_CORP_ID
+        type: string
+        description: WeCom corporation ID
+        secret: false
+      - name: WECOM_AGENT_ID
+        type: string
+        description: WeCom application agent ID
+        secret: false
+      - name: WECOM_SECRET
+        type: string
+        description: WeCom application secret
+        secret: true
+    optional:
+      - name: WECOM_API_BASE_URL
+        type: string
+        description: WeCom API base URL
+        default: https://qyapi.weixin.qq.com
+        secret: false
+      - name: WECOM_TIMEOUT
+        type: number
+        description: API request timeout in milliseconds
+        default: 30000
+        secret: false
+      - name: WECOM_CACHE_ENABLED
+        type: boolean
+        description: Enable response caching
+        default: true
+        secret: false
+      - name: WECOM_CACHE_TTL
+        type: number
+        description: Cache expiration time in milliseconds
+        default: 300000
+        secret: false
+  
+  endpoints:
+    - path: /api/org/tree
+      method: GET
+      description: Get organization tree
+      capability: org-data-read
+      authentication: true
+      rateLimit: 60
+    - path: /api/org/person/{id}
+      method: GET
+      description: Get person by ID
+      capability: org-data-read
+      authentication: true
+    - path: /api/org/department/{id}
+      method: GET
+      description: Get department by ID
+      capability: org-data-read
+      authentication: true
+    - path: /api/auth/verify
+      method: POST
+      description: Verify user authentication
+      capability: user-auth
+      authentication: true
+    - path: /api/auth/token
+      method: POST
+      description: Get access token
+      capability: user-auth
+      authentication: true
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+    network:
+      ingress: true
+      egress: true
+      ports:
+        - 8080
+  
+  deployment:
+    modes:
+      - remote-hosted
+      - local-deployed
+    singleton: true
+    requiresAuth: true
+    healthCheck:
+      path: /actuator/health
+      interval: 30
+      timeout: 10
+    startup:
+      timeout: 60
+      order: 10
