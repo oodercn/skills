@@ -4,21 +4,48 @@ server:
 spring:
   application:
     name: skill-mqtt
+  main:
+    allow-bean-definition-overriding: true
 
 mqtt:
+  enabled: true
+  provider: lightweight-mqtt
+  
   broker:
-    enabled: true
     port: 1883
     websocket-port: 8083
+    websocket-enabled: true
     max-connections: 10000
     allow-anonymous: false
+    ssl-enabled: false
+  
+  scene:
+    scene-id: 
+    scene-type: 
+    org-id: 
+    topic-prefix: ooder
+    auto-configure: true
+  
+  discovery:
+    enabled: true
+    registry-url: https://github.com/ooderCN/skills
+    gitee-mirror: https://gitee.com/ooderCN/skills
+    index-path: skill-index.yaml
+    cache-timeout: 3600
+    auto-install: false
 
 management:
   endpoints:
     web:
       exposure:
         include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
 logging:
   level:
+    root: INFO
     net.ooder: DEBUG
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
