@@ -142,14 +142,17 @@ v0.7.3 新增离线模式支持，允许在网络断开时继续运行：
 
 #### 发现方法 (DiscoveryMethod)
 
-| 方法 | 范围 | 延迟 | 适用场景 |
-|------|------|------|---------|
-| `UDP_BROADCAST` | 本地网络 | 低 | LAN发现，局域网技能发现 |
-| `DHT (Kademlia)` | 全球 | 中 | P2P发现，广域网技能发现 |
-| `SKILL_CENTER` | 全球 | 低 | 中心化目录，企业技能市场 |
-| `mDNS/DNS-SD` | 本地网络 | 低 | 服务发现，本地服务注册 |
-| `LOCAL_FS` | 本地 | 极低 | 本地文件系统，开发调试 |
-| `AUTO` | 自动 | - | 自动推断，根据环境选择 |
+| 方法 | 代码 | 范围 | 延迟 | 适用场景 |
+|------|------|------|------|---------|
+| `UDP_BROADCAST` | `udp_broadcast` | 本地网络 | 低 | LAN发现，局域网技能发现 |
+| `DHT_KADEMLIA` | `dht_kademlia` | 全球 | 中 | P2P发现，广域网技能发现 |
+| `SKILL_CENTER` | `skill_center` | 全球 | 低 | 中心化目录，企业技能市场 |
+| `GITHUB` | `github` | 全球 | 中 | GitHub仓库发现 |
+| `GITEE` | `gitee` | 全球 | 中 | Gitee仓库发现 |
+| `GIT_REPOSITORY` | `git_repository` | 全球 | 中 | 通用Git仓库发现 |
+| `mDNS/DNS-SD` | `mdns_dns_sd` | 本地网络 | 低 | 服务发现，本地服务注册 |
+| `LOCAL_FS` | `local_fs` | 本地 | 极低 | 本地文件系统，开发调试 |
+| `AUTO` | `auto` | 自动 | - | 自动推断，根据环境选择 |
 
 ### 仓库地址
 
@@ -261,7 +264,33 @@ spec:
 
 ### 安装指南
 
-#### 方式一：从远程仓库安装（推荐）
+#### 方式一：GitHub/Gitee 仓库发现安装（推荐）
+
+v0.7.3 新增 GitHub/Gitee 仓库发现功能，支持直接从 Git 仓库发现和安装技能。
+
+**配置 GitHub/Gitee 发现**
+
+```yaml
+# application.yml
+discovery:
+  github:
+    enabled: true
+    defaultOwner: ooderCN
+    defaultRepo: skills
+    defaultBranch: main
+    token: ${GITHUB_TOKEN}           # 可选，私有仓库需要
+    baseUrl: https://api.github.com
+    timeout: 60000
+    
+  gitee:
+    enabled: true
+    defaultOwner: ooderCN
+    defaultRepo: skills
+    defaultBranch: main
+    token: ${GITEE_TOKEN}            # 可选，私有仓库需要
+    baseUrl: https://gitee.com/api/v5
+    timeout: 60000
+```
 
 **从 GitHub 安装**
 
@@ -269,14 +298,14 @@ spec:
 # 使用 ooder CLI
 ooder skill install skill-org-feishu --source github --version 0.7.3
 
-# 或使用 API
+# 或使用 API（指定发现方法）
 curl -X POST http://localhost:8081/api/skillcenter/installed/install \
   -H "Content-Type: application/json" \
   -d '{
     "skillId": "skill-org-feishu",
     "version": "0.7.3",
     "source": "github",
-    "discoveryMethod": "GIT_REPOSITORY"
+    "discoveryMethod": "GITHUB"
   }'
 ```
 
@@ -293,11 +322,41 @@ curl -X POST http://localhost:8081/api/skillcenter/installed/install \
     "skillId": "skill-org-feishu",
     "version": "0.7.3",
     "source": "gitee",
-    "discoveryMethod": "GIT_REPOSITORY"
+    "discoveryMethod": "GITEE"
   }'
 ```
 
-#### 方式二：下载到本地目录安装
+**GitHub/Gitee 发现流程**
+
+```
+┌─────────────┐                              ┌─────────────────┐
+│   SDK       │                              │  GitHub/Gitee   │
+│             │                              │    API          │
+└─────────────┘                              └─────────────────┘
+       │                                              │
+       │  1. GET /repos/{owner}/{repo}/contents/      │
+       │     skill-index.yaml                         │
+       │─────────────────────────────────────────────▶│
+       │                                              │
+       │  2. 返回 skill-index.yaml 内容               │
+       │◀─────────────────────────────────────────────│
+       │                                              │
+       │  3. 解析技能索引                              │
+       │                                              │
+       │  4. GET /repos/{owner}/{repo}/contents/      │
+       │     skills/{skillId}/skill-manifest.yaml     │
+       │─────────────────────────────────────────────▶│
+       │                                              │
+       │  5. 返回 skill-manifest.yaml 内容            │
+       │◀─────────────────────────────────────────────│
+       │                                              │
+       │  6. 解析技能清单                              │
+       │                                              │
+       │  7. 返回 SkillPackage                        │
+       │                                              │
+```
+
+#### 方式二：从远程仓库下载安装
 
 **步骤 1: 下载技能包**
 
@@ -630,14 +689,17 @@ Check Network
 
 #### Discovery Methods
 
-| Method | Scope | Latency | Use Case |
-|--------|-------|---------|----------|
-| `UDP_BROADCAST` | Local Network | Low | LAN discovery |
-| `DHT (Kademlia)` | Global | Medium | P2P discovery |
-| `SKILL_CENTER` | Global | Low | Centralized catalog |
-| `mDNS/DNS-SD` | Local Network | Low | Service discovery |
-| `LOCAL_FS` | Local | Very Low | Local filesystem, development |
-| `AUTO` | Auto | - | Auto inference by environment |
+| Method | Code | Scope | Latency | Use Case |
+|--------|------|-------|---------|----------|
+| `UDP_BROADCAST` | `udp_broadcast` | Local Network | Low | LAN discovery |
+| `DHT_KADEMLIA` | `dht_kademlia` | Global | Medium | P2P discovery |
+| `SKILL_CENTER` | `skill_center` | Global | Low | Centralized catalog |
+| `GITHUB` | `github` | Global | Medium | GitHub repository discovery |
+| `GITEE` | `gitee` | Global | Medium | Gitee repository discovery |
+| `GIT_REPOSITORY` | `git_repository` | Global | Medium | Generic Git repository discovery |
+| `mDNS/DNS-SD` | `mdns_dns_sd` | Local Network | Low | Service discovery |
+| `LOCAL_FS` | `local_fs` | Local | Very Low | Local filesystem, development |
+| `AUTO` | `auto` | Auto | - | Auto inference by environment |
 
 ### Repository URLs
 
@@ -688,17 +750,99 @@ Check Network
 
 ### Installation Guide
 
-#### Method 1: Install from Remote Repository (Recommended)
+#### Method 1: GitHub/Gitee Repository Discovery (Recommended)
 
-```bash
-# From GitHub
-ooder skill install skill-org-feishu --source github --version 0.7.3
+v0.7.3 adds GitHub/Gitee repository discovery, supporting direct skill discovery and installation from Git repositories.
 
-# From Gitee (Recommended for China)
-ooder skill install skill-org-feishu --source gitee --version 0.7.3
+**Configure GitHub/Gitee Discovery**
+
+```yaml
+# application.yml
+discovery:
+  github:
+    enabled: true
+    defaultOwner: ooderCN
+    defaultRepo: skills
+    defaultBranch: main
+    token: ${GITHUB_TOKEN}           # Optional, required for private repos
+    baseUrl: https://api.github.com
+    timeout: 60000
+    
+  gitee:
+    enabled: true
+    defaultOwner: ooderCN
+    defaultRepo: skills
+    defaultBranch: main
+    token: ${GITEE_TOKEN}            # Optional, required for private repos
+    baseUrl: https://gitee.com/api/v5
+    timeout: 60000
 ```
 
-#### Method 2: Download and Install Locally
+**Install from GitHub**
+
+```bash
+# Using ooder CLI
+ooder skill install skill-org-feishu --source github --version 0.7.3
+
+# Or using API (specify discovery method)
+curl -X POST http://localhost:8081/api/skillcenter/installed/install \
+  -H "Content-Type: application/json" \
+  -d '{
+    "skillId": "skill-org-feishu",
+    "version": "0.7.3",
+    "source": "github",
+    "discoveryMethod": "GITHUB"
+  }'
+```
+
+**Install from Gitee (Recommended for China)**
+
+```bash
+# Using ooder CLI
+ooder skill install skill-org-feishu --source gitee --version 0.7.3
+
+# Or using API
+curl -X POST http://localhost:8081/api/skillcenter/installed/install \
+  -H "Content-Type: application/json" \
+  -d '{
+    "skillId": "skill-org-feishu",
+    "version": "0.7.3",
+    "source": "gitee",
+    "discoveryMethod": "GITEE"
+  }'
+```
+
+**GitHub/Gitee Discovery Flow**
+
+```
+┌─────────────┐                              ┌─────────────────┐
+│   SDK       │                              │  GitHub/Gitee   │
+│             │                              │    API          │
+└─────────────┘                              └─────────────────┘
+       │                                              │
+       │  1. GET /repos/{owner}/{repo}/contents/      │
+       │     skill-index.yaml                         │
+       │─────────────────────────────────────────────▶│
+       │                                              │
+       │  2. Return skill-index.yaml content          │
+       │◀─────────────────────────────────────────────│
+       │                                              │
+       │  3. Parse skill index                        │
+       │                                              │
+       │  4. GET /repos/{owner}/{repo}/contents/      │
+       │     skills/{skillId}/skill-manifest.yaml     │
+       │─────────────────────────────────────────────▶│
+       │                                              │
+       │  5. Return skill-manifest.yaml content       │
+       │◀─────────────────────────────────────────────│
+       │                                              │
+       │  6. Parse skill manifest                     │
+       │                                              │
+       │  7. Return SkillPackage                      │
+       │                                              │
+```
+
+#### Method 2: Download and Install from Remote
 
 ```bash
 # Download
