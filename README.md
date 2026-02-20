@@ -45,9 +45,16 @@ Ooder Skills 是 Ooder Agent Platform 的官方技能仓库，提供多个可复
 │         ┌────────────────┼────────────────┐                 │
 │         ▼                ▼                ▼                 │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │ GitHub/Gitee│  │  本地文件   │  │  WebDAV     │         │
-│  │  远程仓库    │  │   系统     │  │   服务      │         │
+│  │ UDP Broadcast│  │SkillCenter │  │     DHT     │         │
+│  │  本地网络    │  │  技能中心   │  │  (Kademlia) │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
+│         │                │                │                 │
+│         └────────────────┼────────────────┘                 │
+│                          ▼                                   │
+│  ┌─────────────┐  ┌─────────────┐                           │
+│  │ mDNS/DNS-SD │  │   本地缓存   │                           │
+│  │  服务发现   │  │  (离线模式) │                           │
+│  └─────────────┘  └─────────────┘                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
@@ -67,13 +74,14 @@ Ooder Skills 是 Ooder Agent Platform 的官方技能仓库，提供多个可复
 
 #### 发现方法 (DiscoveryMethod)
 
-| 方法 | 说明 | 适用场景 |
-|------|------|---------|
-| `LOCAL_FS` | 本地文件系统发现 | 开发调试、离线环境 |
-| `GIT_REPOSITORY` | Git仓库发现 | GitHub/Gitee远程安装 |
-| `SKILL_CENTER` | 技能中心发现 | 企业内部技能市场 |
-| `UDP_BROADCAST` | UDP广播发现 | P2P网络发现 |
-| `AUTO` | 自动推断 | 根据source自动选择 |
+| 方法 | 范围 | 延迟 | 适用场景 |
+|------|------|------|---------|
+| `UDP_BROADCAST` | 本地网络 | 低 | LAN发现，局域网技能发现 |
+| `DHT (Kademlia)` | 全球 | 中 | P2P发现，广域网技能发现 |
+| `SKILL_CENTER` | 全球 | 低 | 中心化目录，企业技能市场 |
+| `mDNS/DNS-SD` | 本地网络 | 低 | 服务发现，本地服务注册 |
+| `LOCAL_FS` | 本地 | 极低 | 本地文件系统，开发调试 |
+| `AUTO` | 自动 | - | 自动推断，根据环境选择 |
 
 ### 仓库地址
 
@@ -457,21 +465,29 @@ Ooder Skills is the official skill repository for Ooder Agent Platform, providin
 │         ┌────────────────┼────────────────┐                 │
 │         ▼                ▼                ▼                 │
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐         │
-│  │ GitHub/Gitee│  │ Local File  │  │   WebDAV    │         │
-│  │  Repository │  │   System    │  │   Service   │         │
+│  │ UDP Broadcast│  │SkillCenter │  │     DHT     │         │
+│  │ Local Network│  │Skill Center│  │  (Kademlia) │         │
 │  └─────────────┘  └─────────────┘  └─────────────┘         │
+│         │                │                │                 │
+│         └────────────────┼────────────────┘                 │
+│                          ▼                                   │
+│  ┌─────────────┐  ┌─────────────┐                           │
+│  │ mDNS/DNS-SD │  │ Local Cache │                           │
+│  │  Discovery  │  │(Offline Mode)│                           │
+│  └─────────────┘  └─────────────┘                           │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 #### Discovery Methods
 
-| Method | Description | Use Case |
-|--------|-------------|----------|
-| `LOCAL_FS` | Local filesystem discovery | Development, offline |
-| `GIT_REPOSITORY` | Git repository discovery | GitHub/Gitee remote install |
-| `SKILL_CENTER` | Skill center discovery | Enterprise skill market |
-| `UDP_BROADCAST` | UDP broadcast discovery | P2P network discovery |
-| `AUTO` | Auto inference | Auto-select by source |
+| Method | Scope | Latency | Use Case |
+|--------|-------|---------|----------|
+| `UDP_BROADCAST` | Local Network | Low | LAN discovery |
+| `DHT (Kademlia)` | Global | Medium | P2P discovery |
+| `SKILL_CENTER` | Global | Low | Centralized catalog |
+| `mDNS/DNS-SD` | Local Network | Low | Service discovery |
+| `LOCAL_FS` | Local | Very Low | Local filesystem, development |
+| `AUTO` | Auto | - | Auto inference by environment |
 
 ### Repository URLs
 
