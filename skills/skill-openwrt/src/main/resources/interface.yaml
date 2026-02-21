@@ -1,0 +1,324 @@
+apiVersion: agent.ooder.net/v1
+kind: InterfaceDefinition
+
+metadata:
+  sceneId: scene-openwrt
+  version: 1.0.0
+  description: OpenWrt Router Management Interface Definition
+
+spec:
+  extends:
+    - NetworkConfigProvider
+    - DeviceManagementProvider
+    - SecurityConfigProvider
+  
+  capabilities:
+    uci-config:
+      description: UCI配置管理
+      methods:
+        getUciConfig:
+          description: 获取UCI配置
+          input:
+            type: object
+            required:
+              - configPath
+            properties:
+              configPath:
+                type: string
+                description: UCI配置路径
+          output:
+            type: string
+            description: UCI配置内容
+            
+        setUciConfig:
+          description: 设置UCI配置
+          input:
+            type: object
+            required:
+              - configPath
+              - config
+            properties:
+              configPath:
+                type: string
+              config:
+                type: object
+          output:
+            type: boolean
+            
+        commitUciConfig:
+          description: 提交UCI配置
+          input:
+            type: object
+            required:
+              - configPath
+            properties:
+              configPath:
+                type: string
+          output:
+            type: boolean
+            
+    wifi:
+      description: 无线网络管理
+      methods:
+        getWifiNetworks:
+          description: 获取无线网络列表
+          input:
+            type: object
+            properties: {}
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/WifiNetwork"
+              
+        getWifiNetwork:
+          description: 获取无线网络详情
+          input:
+            type: object
+            required:
+              - networkId
+            properties:
+              networkId:
+                type: string
+          output:
+            $ref: "#/components/schemas/WifiNetwork"
+            
+        updateWifiNetwork:
+          description: 更新无线网络配置
+          input:
+            type: object
+            required:
+              - networkId
+              - config
+            properties:
+              networkId:
+                type: string
+              config:
+                type: object
+          output:
+            type: boolean
+            
+        scanWifiNetworks:
+          description: 扫描无线网络
+          input:
+            type: object
+            properties: {}
+          output:
+            type: boolean
+            
+    dhcp:
+      description: DHCP管理
+      methods:
+        getDhcpLeases:
+          description: 获取DHCP租约列表
+          input:
+            type: object
+            properties: {}
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/DhcpLease"
+              
+        getStaticLeases:
+          description: 获取静态租约列表
+          input:
+            type: object
+            properties: {}
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/StaticLease"
+              
+        addStaticLease:
+          description: 添加静态租约
+          input:
+            type: object
+            required:
+              - leaseData
+            properties:
+              leaseData:
+                type: object
+          output:
+            $ref: "#/components/schemas/StaticLease"
+            
+        deleteStaticLease:
+          description: 删除静态租约
+          input:
+            type: object
+            required:
+              - leaseId
+            properties:
+              leaseId:
+                type: string
+          output:
+            type: boolean
+            
+    packages:
+      description: 软件包管理
+      methods:
+        listPackages:
+          description: 列出软件包
+          input:
+            type: object
+            properties: {}
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/PackageInfo"
+              
+        installPackage:
+          description: 安装软件包
+          input:
+            type: object
+            required:
+              - packageName
+            properties:
+              packageName:
+                type: string
+          output:
+            type: boolean
+            
+        removePackage:
+          description: 卸载软件包
+          input:
+            type: object
+            required:
+              - packageName
+            properties:
+              packageName:
+                type: string
+          output:
+            type: boolean
+            
+        updatePackages:
+          description: 更新软件包列表
+          input:
+            type: object
+            properties: {}
+          output:
+            type: boolean
+            
+    logs:
+      description: 日志管理
+      methods:
+        getSystemLogs:
+          description: 获取系统日志
+          input:
+            type: object
+            properties:
+              lines:
+                type: integer
+                default: 100
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/LogEntry"
+              
+        getKernelLogs:
+          description: 获取内核日志
+          input:
+            type: object
+            properties:
+              lines:
+                type: integer
+                default: 100
+          output:
+            type: array
+            items:
+              $ref: "#/components/schemas/LogEntry"
+  
+  components:
+    schemas:
+      WifiNetwork:
+        type: object
+        properties:
+          networkId:
+            type: string
+            description: 网络ID
+          ssid:
+            type: string
+            description: SSID
+          encryption:
+            type: string
+            description: 加密方式
+          channel:
+            type: integer
+            description: 信道
+          enabled:
+            type: boolean
+            description: 是否启用
+          hidden:
+            type: boolean
+            description: 是否隐藏
+          macaddr:
+            type: string
+            description: MAC地址
+            
+      DhcpLease:
+        type: object
+        properties:
+          ip:
+            type: string
+            description: IP地址
+          mac:
+            type: string
+            description: MAC地址
+          hostname:
+            type: string
+            description: 主机名
+          leaseTime:
+            type: string
+            description: 租约时间
+          expires:
+            type: integer
+            description: 过期时间戳
+            
+      StaticLease:
+        type: object
+        properties:
+          id:
+            type: string
+            description: 租约ID
+          ip:
+            type: string
+            description: IP地址
+          mac:
+            type: string
+            description: MAC地址
+          hostname:
+            type: string
+            description: 主机名
+            
+      PackageInfo:
+        type: object
+        properties:
+          name:
+            type: string
+            description: 包名
+          version:
+            type: string
+            description: 版本
+          installed:
+            type: boolean
+            description: 是否已安装
+          description:
+            type: string
+            description: 描述
+          size:
+            type: integer
+            description: 大小
+            
+      LogEntry:
+        type: object
+        properties:
+          timestamp:
+            type: integer
+            description: 时间戳
+          level:
+            type: string
+            description: 日志级别
+          message:
+            type: string
+            description: 日志内容
+          source:
+            type: string
+            description: 来源

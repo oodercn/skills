@@ -50,50 +50,147 @@
 
 ## 二、协作请求
 
-### 2.1 需要Engine Team定义的Provider接口
+### 2.1 接口分层架构
 
-| Provider | 优先级 | 用途 | 关联技能 |
-|----------|--------|------|----------|
-| AgentProvider | P0 | 终端代理管理 | skill-agent |
-| HealthProvider | P1 | 健康检查 | skill-health |
-| ProtocolProvider | P2 | 协议管理 | skill-protocol |
-| OpenWrtProvider | P2 | OpenWrt路由器管理 | skill-openwrt |
-| SkillShareProvider | P2 | 技能分享 | skill-share |
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    接口分层架构设计                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Layer 1: SEC 通用接口 (Engine Team 定义)                       │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ NetworkConfigProvider    - 网络配置管理                  │   │
+│  │ DeviceManagementProvider - 设备管理                      │   │
+│  │ SecurityConfigProvider   - 安全配置管理                  │   │
+│  │ HealthCheckProvider      - 健康检查                      │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                  │
+│                              │ 继承/扩展                        │
+│                              ▼                                  │
+│  Layer 2: 驱动特有接口 (Skills Team 定义)                       │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ OpenWrtDriver            - OpenWrt特有方法               │   │
+│  │ KubernetesDriver         - K8s特有方法                   │   │
+│  │ AliyunDriver             - 阿里云特有方法                │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                              │                                  │
+│                              │ 实现                            │
+│                              ▼                                  │
+│  Layer 3: 驱动实现 (Skills Team 实现)                           │
+│  ┌─────────────────────────────────────────────────────────┐   │
+│  │ OpenWrtDriverImpl        - OpenWrt具体实现               │   │
+│  │ KubernetesDriverImpl     - K8s具体实现                   │   │
+│  │ AliyunDriverImpl         - 阿里云具体实现                │   │
+│  └─────────────────────────────────────────────────────────┘   │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
 
-### 2.2 接口定义建议
+### 2.2 SEC 通用接口定义请求
 
-#### 2.2.1 AgentProvider 接口
+#### 2.2.1 NetworkConfigProvider (网络配置管理)
 
 ```java
 package net.ooder.scene.provider;
 
 /**
- * 终端代理Provider接口
+ * 网络配置Provider接口
+ * 
+ * <p>定义网络配置管理的通用操作，由具体驱动实现</p>
  */
-public interface AgentProvider extends BaseProvider {
+public interface NetworkConfigProvider extends BaseProvider {
 
-    Result<List<EndAgent>> getEndAgents();
-    Result<EndAgent> addEndAgent(Map<String, Object> agentData);
-    Result<EndAgent> editEndAgent(String agentId, Map<String, Object> agentData);
-    Result<EndAgent> deleteEndAgent(String agentId);
-    Result<EndAgent> getEndAgentDetails(String agentId);
+    // 网络设置
+    Result<NetworkSetting> getNetworkSetting(String settingType);
+    Result<List<NetworkSetting>> getAllNetworkSettings();
+    Result<NetworkSetting> updateNetworkSetting(String settingType, Map<String, Object> data);
     
-    Result<NetworkStatusData> getNetworkStatus();
-    Result<CommandStatsData> getCommandStats();
+    // IP地址管理
+    Result<List<IPAddress>> getIPAddresses(String type, String status);
+    Result<IPAddress> addStaticIPAddress(Map<String, Object> ipData);
+    Result<IPAddress> deleteIPAddress(String ipId);
     
-    Result<TestCommandResult> testCommand(Map<String, Object> commandData);
+    // IP黑名单
+    Result<List<IPBlacklist>> getIPBlacklist();
+    Result<IPBlacklist> addIPToBlacklist(Map<String, Object> data);
+    Result<IPBlacklist> removeIPFromBlacklist(String id);
+    
+    // 网络设备
+    Result<List<NetworkDevice>> getNetworkDevices();
 }
 ```
 
-#### 2.2.2 HealthProvider 接口
+#### 2.2.2 DeviceManagementProvider (设备管理)
+
+```java
+package net.ooder.scene.provider;
+
+/**
+ * 设备管理Provider接口
+ * 
+ * <p>定义设备管理的通用操作，由具体驱动实现</p>
+ */
+public interface DeviceManagementProvider extends BaseProvider {
+
+    // 设备连接
+    Result<Boolean> connect(Map<String, Object> connectionData);
+    Result<Boolean> disconnect();
+    Result<ConnectionStatus> getConnectionStatus();
+    
+    // 设备信息
+    Result<DeviceInfo> getDeviceInfo();
+    Result<SystemStatus> getSystemStatus();
+    Result<String> getFirmwareVersion();
+    
+    // 设备操作
+    Result<Boolean> reboot();
+    Result<Boolean> reset();
+    Result<Boolean> upgradeFirmware(String firmwareUrl);
+    
+    // 命令执行
+    Result<CommandResult> executeCommand(String command);
+    Result<CommandResult> executeScript(String script);
+}
+```
+
+#### 2.2.3 SecurityConfigProvider (安全配置管理)
+
+```java
+package net.ooder.scene.provider;
+
+/**
+ * 安全配置Provider接口
+ * 
+ * <p>定义安全配置管理的通用操作，由具体驱动实现</p>
+ */
+public interface SecurityConfigProvider extends BaseProvider {
+
+    // 防火墙
+    Result<FirewallStatus> getFirewallStatus();
+    Result<Boolean> enableFirewall();
+    Result<Boolean> disableFirewall();
+    Result<List<FirewallRule>> getFirewallRules();
+    Result<FirewallRule> addFirewallRule(Map<String, Object> ruleData);
+    Result<Boolean> deleteFirewallRule(String ruleId);
+    
+    // 访问控制
+    Result<List<AccessRule>> getAccessRules();
+    Result<AccessRule> addAccessRule(Map<String, Object> ruleData);
+    Result<Boolean> deleteAccessRule(String ruleId);
+}
+```
+
+#### 2.2.4 HealthCheckProvider (健康检查)
 
 ```java
 package net.ooder.scene.provider;
 
 /**
  * 健康检查Provider接口
+ * 
+ * <p>定义健康检查的通用操作，由具体驱动实现</p>
  */
-public interface HealthProvider extends BaseProvider {
+public interface HealthCheckProvider extends BaseProvider {
 
     Result<HealthCheckResult> runHealthCheck(Map<String, Object> params);
     Result<HealthReport> exportHealthReport();
@@ -102,92 +199,198 @@ public interface HealthProvider extends BaseProvider {
 }
 ```
 
-#### 2.2.3 ProtocolProvider 接口
+### 2.3 驱动特有接口定义 (Skills Team负责)
+
+#### 2.3.1 OpenWrtDriver 接口
 
 ```java
-package net.ooder.scene.provider;
+package net.ooder.skill.openwrt.driver;
+
+import net.ooder.scene.provider.*;
 
 /**
- * 协议管理Provider接口
+ * OpenWrt驱动接口
+ * 
+ * <p>继承SEC通用接口，定义OpenWrt特有方法</p>
  */
-public interface ProtocolProvider extends BaseProvider {
+public interface OpenWrtDriver 
+        extends NetworkConfigProvider, DeviceManagementProvider, SecurityConfigProvider {
 
-    Result<List<ProtocolHandler>> getProtocolHandlers();
-    Result<ProtocolHandler> registerProtocolHandler(Map<String, Object> handlerData);
-    Result<Boolean> removeProtocolHandler(String handlerType);
-    Result<ProtocolCommandResult> handleProtocolCommand(Map<String, Object> commandData);
-    Result<Boolean> refreshProtocolHandlers();
+    // OpenWrt特有方法 - UCI配置
+    Result<String> getUciConfig(String configPath);
+    Result<Boolean> setUciConfig(String configPath, Map<String, Object> config);
+    Result<Boolean> commitUciConfig(String configPath);
+    
+    // OpenWrt特有方法 - 无线
+    Result<List<WifiNetwork>> getWifiNetworks();
+    Result<WifiNetwork> getWifiNetwork(String networkId);
+    Result<Boolean> updateWifiNetwork(String networkId, Map<String, Object> config);
+    Result<Boolean> scanWifiNetworks();
+    
+    // OpenWrt特有方法 - DHCP
+    Result<List<DhcpLease>> getDhcpLeases();
+    Result<List<StaticLease>> getStaticLeases();
+    Result<StaticLease> addStaticLease(Map<String, Object> leaseData);
+    Result<Boolean> deleteStaticLease(String leaseId);
+    
+    // OpenWrt特有方法 - 系统
+    Result<List<PackageInfo>> listPackages();
+    Result<Boolean> installPackage(String packageName);
+    Result<Boolean> removePackage(String packageName);
+    Result<Boolean> updatePackages();
+    
+    // OpenWrt特有方法 - 日志
+    Result<List<LogEntry>> getSystemLogs(int lines);
+    Result<List<LogEntry>> getKernelLogs(int lines);
 }
 ```
 
-#### 2.2.4 OpenWrtProvider 接口
+### 2.4 interface.yaml 定义
 
-```java
-package net.ooder.scene.provider;
+驱动特有方法通过 `interface.yaml` 定义，供能力管理中心和调用方使用：
 
-/**
- * OpenWrt路由器管理Provider接口
- */
-public interface OpenWrtProvider extends BaseProvider {
+```yaml
+# skills/skill-openwrt/src/main/resources/interface.yaml
+apiVersion: agent.ooder.net/v1
+kind: InterfaceDefinition
 
-    Result<Boolean> connect(Map<String, Object> connectionData);
-    Result<Boolean> disconnect();
-    Result<ConnectionStatus> getConnectionStatus();
-    
-    Result<NetworkSetting> getNetworkSetting(String settingType);
-    Result<NetworkSetting> updateNetworkSetting(String settingType, Map<String, Object> data);
-    
-    Result<List<IPAddress>> getIPAddresses();
-    Result<List<IPBlacklist>> getIPBlacklist();
-    
-    Result<CommandResult> executeCommand(String command);
-    Result<SystemStatus> getSystemStatus();
-}
+metadata:
+  sceneId: scene-openwrt
+  version: 1.0.0
+
+spec:
+  # 继承SEC通用接口
+  extends:
+    - NetworkConfigProvider
+    - DeviceManagementProvider
+    - SecurityConfigProvider
+  
+  # OpenWrt特有方法
+  capabilities:
+    uci-config:
+      getUciConfig:
+        input:
+          type: object
+          properties:
+            configPath:
+              type: string
+              description: UCI配置路径
+        output:
+          type: string
+          description: UCI配置内容
+          
+      setUciConfig:
+        input:
+          type: object
+          properties:
+            configPath:
+              type: string
+            config:
+              type: object
+        output:
+          type: boolean
+          
+    wifi:
+      getWifiNetworks:
+        input:
+          type: object
+          properties: {}
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/WifiNetwork"
+            
+      scanWifiNetworks:
+        input:
+          type: object
+          properties: {}
+        output:
+          type: boolean
+          
+    dhcp:
+      getDhcpLeases:
+        input:
+          type: object
+          properties: {}
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/DhcpLease"
+            
+    packages:
+      listPackages:
+        input:
+          type: object
+          properties: {}
+        output:
+          type: array
+          items:
+            $ref: "#/components/schemas/PackageInfo"
+            
+      installPackage:
+        input:
+          type: object
+          properties:
+            packageName:
+              type: string
+        output:
+          type: boolean
+          
+  components:
+    schemas:
+      WifiNetwork:
+        type: object
+        properties:
+          networkId:
+            type: string
+          ssid:
+            type: string
+          encryption:
+            type: string
+          channel:
+            type: integer
+          enabled:
+            type: boolean
+            
+      DhcpLease:
+        type: object
+        properties:
+          ip:
+            type: string
+          mac:
+            type: string
+          hostname:
+            type: string
+          leaseTime:
+            type: string
+            
+      PackageInfo:
+        type: object
+        properties:
+          name:
+            type: string
+          version:
+            type: string
+          installed:
+            type: boolean
 ```
 
-#### 2.2.5 SkillShareProvider 接口
+### 2.5 职责分工
 
-```java
-package net.ooder.scene.provider;
+| 层级 | 定义方 | 实现方 | 发布方 |
+|------|--------|--------|--------|
+| SEC通用接口 | Engine Team | Skills Team | scene-engine |
+| 驱动特有接口 | Skills Team | Skills Team | interface.yaml |
+| 驱动实现 | - | Skills Team | 独立发布到能力管理中心 |
 
-/**
- * 技能分享Provider接口
- */
-public interface SkillShareProvider extends BaseProvider {
+### 2.6 版本规划
 
-    Result<SharedSkill> shareSkill(Map<String, Object> skillData);
-    Result<List<SharedSkill>> getSharedSkills();
-    Result<List<ReceivedSkill>> getReceivedSkills();
-    Result<Boolean> cancelShare(String shareId);
-}
-```
-
-### 2.3 数据模型定义建议
-
-```
-scene-engine-core
-    └── provider/
-        └── model/
-            ├── agent/
-            │   ├── EndAgent.java
-            │   ├── NetworkStatusData.java
-            │   ├── CommandStatsData.java
-            │   └── TestCommandResult.java
-            ├── health/
-            │   ├── HealthCheckResult.java
-            │   ├── HealthReport.java
-            │   ├── HealthCheckSchedule.java
-            │   └── ServiceCheckResult.java
-            ├── protocol/
-            │   ├── ProtocolHandler.java
-            │   └── ProtocolCommandResult.java
-            ├── openwrt/
-            │   ├── ConnectionStatus.java
-            │   └── SystemStatus.java
-            └── share/
-                ├── SharedSkill.java
-                └── ReceivedSkill.java
-```
+| 版本 | scene-engine | ooder-skills |
+|------|--------------|--------------|
+| 0.7.3 | 现有Provider | 3个Provider实现 |
+| 0.8.0 | NetworkConfigProvider, DeviceManagementProvider | OpenWrtDriver接口定义 |
+| 0.9.0 | SecurityConfigProvider, HealthCheckProvider | OpenWrtDriverImpl实现 |
+| 1.0.0 | 接口完善 | 发布到能力管理中心 |
 
 ---
 
