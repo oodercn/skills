@@ -1,0 +1,122 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-network
+  name: Network Management Skill
+  version: 0.7.3
+  description: Provides network configuration, IP management, and device scanning capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - network
+    - ip
+    - dhcp
+    - dns
+    - wifi
+    - device
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.network.NetworkSkillApplication
+  
+  capabilities:
+    - id: network-config
+      name: Network Configuration
+      description: Manage network settings including DNS, DHCP, WiFi
+      category: network
+    - id: ip-management
+      name: IP Address Management
+      description: Manage IP addresses and blacklists
+      category: network
+    - id: device-scanning
+      name: Network Device Scanning
+      description: Scan and discover network devices
+      category: network
+  
+  scenes:
+    - name: network
+      description: Network management scene
+      capabilities:
+        - network-config
+        - ip-management
+        - device-scanning
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: NETWORK_SCAN_INTERVAL
+        type: integer
+        default: 300000
+        description: Network scan interval in milliseconds
+      - name: DHCP_LEASE_FILE
+        type: string
+        default: /var/lib/dhcp/dhcpd.leases
+        description: DHCP lease file path
+      - name: ARP_CACHE_FILE
+        type: string
+        default: /proc/net/arp
+        description: ARP cache file path
+  
+  endpoints:
+    - path: /api/network/settings
+      method: GET
+      description: Get all network settings
+      capability: network-config
+    - path: /api/network/settings/{type}
+      method: GET
+      description: Get network setting by type
+      capability: network-config
+    - path: /api/network/settings/{type}
+      method: PUT
+      description: Update network setting
+      capability: network-config
+    - path: /api/network/ips
+      method: GET
+      description: Get IP address list
+      capability: ip-management
+    - path: /api/network/ips
+      method: POST
+      description: Add static IP address
+      capability: ip-management
+    - path: /api/network/ips/{id}
+      method: DELETE
+      description: Delete IP address
+      capability: ip-management
+    - path: /api/network/blacklist
+      method: GET
+      description: Get IP blacklist
+      capability: ip-management
+    - path: /api/network/blacklist
+      method: POST
+      description: Add IP to blacklist
+      capability: ip-management
+    - path: /api/network/blacklist/{id}
+      method: DELETE
+      description: Remove IP from blacklist
+      capability: ip-management
+    - path: /api/network/devices
+      method: GET
+      description: Get network devices
+      capability: device-scanning
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

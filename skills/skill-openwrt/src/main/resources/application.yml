@@ -1,0 +1,17 @@
+server:
+  port: 8088
+
+spring:
+  application:
+    name: skill-openwrt
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+openwrt:
+  connection-timeout: 30000
+  command-timeout: 60000
+  retry-count: 3

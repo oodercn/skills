@@ -1,0 +1,21 @@
+server:
+  port: 8082
+
+spring:
+  application:
+    name: skill-network
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  network:
+    scan-interval: 300000
+    dhcp-lease-file: /var/lib/dhcp/dhcpd.leases
+    arp-cache-file: /proc/net/arp

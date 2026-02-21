@@ -1,0 +1,91 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-share
+  name: Skill Share Skill
+  version: 0.7.3
+  description: Provides skill sharing and receiving management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - share
+    - skill
+    - collaboration
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.share.ShareSkillApplication
+  
+  capabilities:
+    - id: skill-sharing
+      name: Skill Sharing
+      description: Share skills with others
+      category: share
+    - id: skill-receiving
+      name: Skill Receiving
+      description: Receive shared skills
+      category: share
+    - id: share-management
+      name: Share Management
+      description: Manage skill shares
+      category: share
+  
+  scenes:
+    - name: share
+      description: Skill share scene
+      capabilities:
+        - skill-sharing
+        - skill-receiving
+        - share-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: SHARE_MAX_SKILLS
+        type: integer
+        default: 100
+        description: Maximum shared skills
+      - name: SHARE_EXPIRATION_DAYS
+        type: integer
+        default: 30
+        description: Share expiration days
+  
+  endpoints:
+    - path: /api/share/skill
+      method: POST
+      description: Share skill
+      capability: skill-sharing
+    - path: /api/share/shared
+      method: GET
+      description: Get shared skills
+      capability: share-management
+    - path: /api/share/received
+      method: GET
+      description: Get received skills
+      capability: skill-receiving
+    - path: /api/share/{id}
+      method: DELETE
+      description: Cancel share
+      capability: share-management
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

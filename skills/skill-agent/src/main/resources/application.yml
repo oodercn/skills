@@ -1,0 +1,17 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: skill-agent
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+agent:
+  heartbeat-interval: 30000
+  timeout: 60000
+  max-retry-count: 3

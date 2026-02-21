@@ -1,0 +1,124 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-agent
+  name: Agent Management Skill
+  version: 0.7.3
+  description: Provides end agent registration, management, and command execution capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - agent
+    - terminal
+    - command
+    - iot
+    - device
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.agent.AgentSkillApplication
+  
+  capabilities:
+    - id: agent-management
+      name: Agent Management
+      description: Register and manage end agents
+      category: agent
+    - id: command-execution
+      name: Command Execution
+      description: Execute commands on agents
+      category: agent
+    - id: network-status
+      name: Network Status
+      description: Monitor network status
+      category: agent
+  
+  scenes:
+    - name: agent
+      description: Agent management scene
+      capabilities:
+        - agent-management
+        - command-execution
+        - network-status
+  
+  dependencies:
+    skills:
+      - id: skill-network
+        version: ">=0.7.3"
+        optional: false
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: AGENT_HEARTBEAT_INTERVAL
+        type: integer
+        default: 30000
+        description: Heartbeat interval in milliseconds
+      - name: AGENT_TIMEOUT
+        type: integer
+        default: 60000
+        description: Agent timeout in milliseconds
+      - name: AGENT_MAX_RETRY_COUNT
+        type: integer
+        default: 3
+        description: Maximum retry count
+  
+  endpoints:
+    - path: /api/agents/status
+      method: GET
+      description: Get network status
+      capability: network-status
+    - path: /api/agents/stats
+      method: GET
+      description: Get command stats
+      capability: command-execution
+    - path: /api/agents
+      method: GET
+      description: Get agent list
+      capability: agent-management
+    - path: /api/agents
+      method: POST
+      description: Add agent
+      capability: agent-management
+    - path: /api/agents/{id}
+      method: PUT
+      description: Edit agent
+      capability: agent-management
+    - path: /api/agents/{id}
+      method: DELETE
+      description: Delete agent
+      capability: agent-management
+    - path: /api/agents/{id}
+      method: GET
+      description: Get agent details
+      capability: agent-management
+    - path: /api/agents/test-command
+      method: POST
+      description: Test command execution
+      capability: command-execution
+    - path: /api/agents/logs
+      method: GET
+      description: Get log list
+      capability: agent-management
+    - path: /api/agents/logs
+      method: DELETE
+      description: Clear logs
+      capability: agent-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

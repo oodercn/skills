@@ -1,0 +1,125 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-openwrt
+  name: OpenWrt Management Skill
+  version: 0.7.3
+  description: Provides OpenWrt router connection, configuration, and command execution capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - openwrt
+    - router
+    - uci
+    - network
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.openwrt.OpenWrtSkillApplication
+  
+  capabilities:
+    - id: router-connection
+      name: Router Connection
+      description: Connect to OpenWrt routers
+      category: openwrt
+    - id: uci-config
+      name: UCI Configuration
+      description: Manage UCI configuration
+      category: openwrt
+    - id: command-execution
+      name: Command Execution
+      description: Execute commands on router
+      category: openwrt
+  
+  scenes:
+    - name: openwrt
+      description: OpenWrt management scene
+      capabilities:
+        - router-connection
+        - uci-config
+        - command-execution
+  
+  dependencies:
+    skills:
+      - id: skill-network
+        version: ">=0.7.3"
+        optional: false
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: OPENWRT_CONNECTION_TIMEOUT
+        type: integer
+        default: 30000
+        description: Connection timeout in milliseconds
+      - name: OPENWRT_COMMAND_TIMEOUT
+        type: integer
+        default: 60000
+        description: Command timeout in milliseconds
+      - name: OPENWRT_RETRY_COUNT
+        type: integer
+        default: 3
+        description: Retry count
+  
+  endpoints:
+    - path: /api/openwrt/connect
+      method: POST
+      description: Connect to router
+      capability: router-connection
+    - path: /api/openwrt/disconnect
+      method: POST
+      description: Disconnect from router
+      capability: router-connection
+    - path: /api/openwrt/status
+      method: GET
+      description: Check connection status
+      capability: router-connection
+    - path: /api/openwrt/settings
+      method: GET
+      description: Get network settings
+      capability: uci-config
+    - path: /api/openwrt/settings/{type}
+      method: PUT
+      description: Update network settings
+      capability: uci-config
+    - path: /api/openwrt/ips
+      method: GET
+      description: Get IP addresses
+      capability: uci-config
+    - path: /api/openwrt/blacklist
+      method: GET
+      description: Get IP blacklist
+      capability: uci-config
+    - path: /api/openwrt/command
+      method: POST
+      description: Execute command
+      capability: command-execution
+    - path: /api/openwrt/reboot
+      method: POST
+      description: Reboot router
+      capability: command-execution
+    - path: /api/openwrt/system
+      method: GET
+      description: Get system status
+      capability: command-execution
+    - path: /api/openwrt/version
+      method: GET
+      description: Get version info
+      capability: command-execution
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: false

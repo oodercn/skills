@@ -1,0 +1,104 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-protocol
+  name: Protocol Management Skill
+  version: 0.7.3
+  description: Provides protocol handler registration and command dispatch capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - protocol
+    - handler
+    - command
+    - mcp
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.protocol.ProtocolSkillApplication
+  
+  capabilities:
+    - id: handler-registration
+      name: Handler Registration
+      description: Register protocol handlers
+      category: protocol
+    - id: command-dispatch
+      name: Command Dispatch
+      description: Dispatch commands to handlers
+      category: protocol
+    - id: handler-management
+      name: Handler Management
+      description: Manage protocol handlers
+      category: protocol
+  
+  scenes:
+    - name: protocol
+      description: Protocol management scene
+      capabilities:
+        - handler-registration
+        - command-dispatch
+        - handler-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: PROTOCOL_SCAN_INTERVAL
+        type: integer
+        default: 60000
+        description: Handler scan interval in milliseconds
+      - name: PROTOCOL_COMMAND_TIMEOUT
+        type: integer
+        default: 30000
+        description: Command timeout in milliseconds
+      - name: PROTOCOL_MAX_HANDLERS
+        type: integer
+        default: 100
+        description: Maximum handlers
+  
+  endpoints:
+    - path: /api/protocol/handlers
+      method: GET
+      description: Get protocol handlers
+      capability: handler-management
+    - path: /api/protocol/handlers
+      method: POST
+      description: Register protocol handler
+      capability: handler-registration
+    - path: /api/protocol/handlers/{type}
+      method: DELETE
+      description: Remove protocol handler
+      capability: handler-management
+    - path: /api/protocol/command
+      method: POST
+      description: Handle protocol command
+      capability: command-dispatch
+    - path: /api/protocol/refresh
+      method: POST
+      description: Refresh protocol handlers
+      capability: handler-management
+    - path: /api/protocol/search
+      method: GET
+      description: Search protocol handlers
+      capability: handler-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

@@ -1,0 +1,17 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: skill-security
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+security:
+  session-timeout: 1800000
+  max-login-attempts: 5
+  lockout-duration: 1800000

@@ -1,0 +1,123 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-hosting
+  name: Hosting Service Skill
+  version: 0.7.3
+  description: Provides cloud hosting management capabilities including Kubernetes, Aliyun, Tencent Cloud
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - hosting
+    - kubernetes
+    - aliyun
+    - tencent
+    - cloud
+    - container
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.hosting.HostingSkillApplication
+  
+  capabilities:
+    - id: instance-management
+      name: Instance Management
+      description: Create, delete, start, stop hosting instances
+      category: hosting
+    - id: instance-scaling
+      name: Instance Scaling
+      description: Scale instances up or down
+      category: hosting
+    - id: instance-health
+      name: Instance Health Check
+      description: Monitor instance health status
+      category: hosting
+    - id: cloud-provider
+      name: Cloud Provider Integration
+      description: Support multiple cloud providers
+      category: hosting
+  
+  scenes:
+    - name: hosting
+      description: Hosting service management scene
+      capabilities:
+        - instance-management
+        - instance-scaling
+        - instance-health
+        - cloud-provider
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: DEFAULT_PROVIDER
+        type: string
+        default: kubernetes
+        description: Default cloud provider
+      - name: HEALTH_CHECK_INTERVAL
+        type: integer
+        default: 60000
+        description: Health check interval in milliseconds
+      - name: MAX_INSTANCES
+        type: integer
+        default: 100
+        description: Maximum number of instances
+  
+  endpoints:
+    - path: /api/hosting/instances
+      method: GET
+      description: Get all hosting instances
+      capability: instance-management
+    - path: /api/hosting/instances
+      method: POST
+      description: Create a hosting instance
+      capability: instance-management
+    - path: /api/hosting/instances/{instanceId}
+      method: GET
+      description: Get instance by ID
+      capability: instance-management
+    - path: /api/hosting/instances/{instanceId}
+      method: DELETE
+      description: Delete an instance
+      capability: instance-management
+    - path: /api/hosting/instances/{instanceId}/start
+      method: POST
+      description: Start an instance
+      capability: instance-management
+    - path: /api/hosting/instances/{instanceId}/stop
+      method: POST
+      description: Stop an instance
+      capability: instance-management
+    - path: /api/hosting/instances/{instanceId}/scale
+      method: POST
+      description: Scale an instance
+      capability: instance-scaling
+    - path: /api/hosting/instances/{instanceId}/health
+      method: GET
+      description: Get instance health status
+      capability: instance-health
+    - path: /api/hosting/providers
+      method: GET
+      description: List available providers
+      capability: cloud-provider
+  
+  resources:
+    cpu: "300m"
+    memory: "512Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

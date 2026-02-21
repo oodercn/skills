@@ -1,0 +1,96 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-health
+  name: Health Check Skill
+  version: 0.7.3
+  description: Provides system health check, service check, and report generation capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - health
+    - check
+    - monitor
+    - report
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.health.HealthSkillApplication
+  
+  capabilities:
+    - id: health-check
+      name: Health Check
+      description: Perform system health checks
+      category: health
+    - id: service-check
+      name: Service Check
+      description: Check service status
+      category: health
+    - id: report-generation
+      name: Report Generation
+      description: Generate health reports
+      category: health
+  
+  scenes:
+    - name: health
+      description: Health check scene
+      capabilities:
+        - health-check
+        - service-check
+        - report-generation
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: HEALTH_CHECK_INTERVAL
+        type: integer
+        default: 60000
+        description: Health check interval in milliseconds
+      - name: HEALTH_TIMEOUT
+        type: integer
+        default: 30000
+        description: Health check timeout in milliseconds
+      - name: HEALTH_MAX_CONCURRENT
+        type: integer
+        default: 10
+        description: Maximum concurrent checks
+  
+  endpoints:
+    - path: /api/health/check
+      method: POST
+      description: Run health check
+      capability: health-check
+    - path: /api/health/report
+      method: GET
+      description: Export health report
+      capability: report-generation
+    - path: /api/health/schedule
+      method: POST
+      description: Schedule health check
+      capability: health-check
+    - path: /api/health/service/{name}
+      method: GET
+      description: Check service
+      capability: service-check
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

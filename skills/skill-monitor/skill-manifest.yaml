@@ -1,0 +1,118 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-monitor
+  name: Monitoring Service Skill
+  version: 0.7.3
+  description: Provides monitoring, metrics collection, alerting and observation capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - monitor
+    - metrics
+    - alert
+    - observation
+    - logging
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.monitor.MonitorSkillApplication
+  
+  capabilities:
+    - id: metrics-collection
+      name: Metrics Collection
+      description: Collect and aggregate system metrics
+      category: monitor
+    - id: alert-management
+      name: Alert Management
+      description: Create, manage and trigger alerts
+      category: monitor
+    - id: log-query
+      name: Log Query
+      description: Query and analyze system logs
+      category: monitor
+    - id: observation
+      name: Observation
+      description: Observe system state and performance
+      category: monitor
+  
+  scenes:
+    - name: monitor
+      description: Monitoring and operations scene
+      capabilities:
+        - metrics-collection
+        - alert-management
+        - log-query
+        - observation
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: METRICS_INTERVAL
+        type: integer
+        default: 60000
+        description: Metrics collection interval in milliseconds
+      - name: ALERT_CHECK_INTERVAL
+        type: integer
+        default: 30000
+        description: Alert check interval in milliseconds
+      - name: LOG_RETENTION_DAYS
+        type: integer
+        default: 7
+        description: Log retention period in days
+  
+  endpoints:
+    - path: /api/monitor/metrics
+      method: GET
+      description: Get all metrics
+      capability: metrics-collection
+    - path: /api/monitor/metrics/{name}
+      method: GET
+      description: Get metric by name
+      capability: metrics-collection
+    - path: /api/monitor/alerts
+      method: GET
+      description: List all alerts
+      capability: alert-management
+    - path: /api/monitor/alerts
+      method: POST
+      description: Create an alert rule
+      capability: alert-management
+    - path: /api/monitor/alerts/{alertId}/acknowledge
+      method: POST
+      description: Acknowledge an alert
+      capability: alert-management
+    - path: /api/monitor/logs
+      method: GET
+      description: Query logs
+      capability: log-query
+    - path: /api/monitor/observe/{targetId}
+      method: GET
+      description: Observe a target
+      capability: observation
+    - path: /api/monitor/observe/{targetId}/history
+      method: GET
+      description: Get observation history
+      capability: observation
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

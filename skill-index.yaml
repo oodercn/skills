@@ -144,6 +144,76 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-network
+      name: Network Management Skill
+      version: "0.7.3"
+      description: 网络管理技能 - 提供网络配置、IP管理、设备扫描能力
+      sceneId: network
+      path: skills/skill-network
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-network-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-network-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-agent
+      name: Agent Management Skill
+      version: "0.7.3"
+      description: 代理管理技能 - 提供终端代理注册、管理、命令执行能力
+      sceneId: agent
+      path: skills/skill-agent
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-security
+      name: Security Management Skill
+      version: "0.7.3"
+      description: 安全管理技能 - 提供用户管理、权限控制、安全审计能力
+      sceneId: security
+      path: skills/skill-security
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-security-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-security-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-health
+      name: Health Check Skill
+      version: "0.7.3"
+      description: 健康检查技能 - 提供系统健康检查、服务检查、报告生成能力
+      sceneId: health
+      path: skills/skill-health
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-protocol
+      name: Protocol Management Skill
+      version: "0.7.3"
+      description: 协议管理技能 - 提供协议处理器注册、命令分发能力
+      sceneId: protocol
+      path: skills/skill-protocol
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-protocol-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-protocol-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-openwrt
+      name: OpenWrt Management Skill
+      version: "0.7.3"
+      description: OpenWrt管理技能 - 提供OpenWrt路由器连接、配置、命令执行能力
+      sceneId: openwrt
+      path: skills/skill-openwrt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-share
+      name: Skill Share Skill
+      version: "0.7.3"
+      description: 技能分享技能 - 提供技能分享、接收管理能力
+      sceneId: share
+      path: skills/skill-share
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
@@ -449,3 +519,69 @@ spec:
         - audit-log
         - compliance-check
       maxMembers: 50
+      
+    - sceneId: network
+      name: Network Management
+      description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - network-config
+        - ip-management
+        - device-scanning
+      maxMembers: 100
+      
+    - sceneId: agent
+      name: Agent Management
+      description: 代理管理场景，提供终端代理注册、管理、命令执行能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - agent-management
+        - command-execution
+        - network-status
+      maxMembers: 1000
+      
+    - sceneId: health
+      name: Health Check
+      description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - health-check
+        - service-check
+        - report-generation
+      maxMembers: 100
+      
+    - sceneId: protocol
+      name: Protocol Management
+      description: 协议管理场景，提供协议处理器注册、命令分发能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - handler-registration
+        - command-dispatch
+        - handler-management
+      maxMembers: 100
+      
+    - sceneId: openwrt
+      name: OpenWrt Management
+      description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - router-connection
+        - uci-config
+        - command-execution
+      maxMembers: 50
+      
+    - sceneId: share
+      name: Skill Share
+      description: 技能分享场景，提供技能分享、接收管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - skill-sharing
+        - skill-receiving
+        - share-management
+      maxMembers: 500

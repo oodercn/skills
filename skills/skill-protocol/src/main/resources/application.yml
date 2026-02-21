@@ -1,0 +1,17 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: skill-protocol
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+protocol:
+  scan-interval: 60000
+  command-timeout: 30000
+  max-handlers: 100
