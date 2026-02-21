@@ -1,15 +1,14 @@
 package net.ooder.skill.vfs.local;
 
-import net.ooder.common.CommonConfig;
-import net.ooder.common.logging.Log;
-import net.ooder.common.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.ooder.vfs.adapter.FileAdapter;
 
 import java.io.File;
 
 public class LocalVfsConfig {
 
-    private static final Log log = LogFactory.getLog("vfs", LocalVfsConfig.class);
+    private static final Logger log = LoggerFactory.getLogger(LocalVfsConfig.class);
 
     private static String metaPath = "./data/vfs-meta";
     private static String filePath = "./data/vfs-files";
@@ -37,11 +36,14 @@ public class LocalVfsConfig {
 
         fileAdapter = new LocalFileAdapter(rootPath);
         initialized = true;
-        log.info("LocalVfsConfig initialized: metaPath=" + metaPath + ", filePath=" + filePath);
+        log.info("LocalVfsConfig initialized: metaPath={}, filePath={}", metaPath, filePath);
     }
 
     public static String getConfigValue(String key, String defaultValue) {
-        String value = CommonConfig.getValue(key);
+        String value = System.getProperty(key);
+        if (value == null) {
+            value = System.getenv(key.replace(".", "_").toUpperCase());
+        }
         return value != null ? value : defaultValue;
     }
 

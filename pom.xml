@@ -63,6 +63,7 @@
         <module>skills/skill-collaboration</module>
         <module>skills/skill-msg</module>
         <module>skills/skill-business</module>
+        <module>skills/skill-vfs-local</module>
     </modules>
 
     <dependencyManagement>

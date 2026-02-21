@@ -1,8 +1,8 @@
 package net.ooder.skill.vfs.local;
 
 import com.alibaba.fastjson.JSONObject;
-import net.ooder.common.logging.Log;
-import net.ooder.common.logging.LogFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.net.*;
@@ -12,7 +12,7 @@ import java.util.concurrent.Executors;
 
 public class VfsCacheSyncService {
 
-    private static final Log log = LogFactory.getLog("vfs", VfsCacheSyncService.class);
+    private static final Logger log = LoggerFactory.getLogger(VfsCacheSyncService.class);
 
     private static final int DEFAULT_PORT = 9876;
     private static final String MULTICAST_GROUP = "239.255.255.250";
@@ -51,7 +51,7 @@ public class VfsCacheSyncService {
             executorService = Executors.newSingleThreadExecutor();
             running = true;
             executorService.submit(this::receiveLoop);
-            log.info("VfsCacheSyncService started on port " + port);
+            log.info("VfsCacheSyncService started on port {}", port);
         } catch (SocketException e) {
             log.error("Failed to start VfsCacheSyncService", e);
         }
@@ -84,7 +84,7 @@ public class VfsCacheSyncService {
             InetAddress group = InetAddress.getByName(multicastGroup);
             DatagramPacket packet = new DatagramPacket(data, data.length, group, port);
             socket.send(packet);
-            log.debug("Broadcast cache invalidation: " + action + " - " + fileId);
+            log.debug("Broadcast cache invalidation: {} - {}", action, fileId);
         } catch (Exception e) {
             log.error("Failed to broadcast cache invalidation", e);
         }
@@ -122,7 +122,7 @@ public class VfsCacheSyncService {
             }
             String action = json.getString("action");
             String fileId = json.getString("fileId");
-            log.info("Received cache sync message: " + action + " - " + fileId + " from " + source);
+            log.info("Received cache sync message: {} - {} from {}", action, fileId, source);
             if (fileObjectManager != null) {
                 if ("save".equals(action)) {
                     fileObjectManager.removeFromCache(fileId);
@@ -163,7 +163,7 @@ public class VfsCacheSyncService {
             try {
                 return Integer.parseInt(portStr);
             } catch (NumberFormatException e) {
-                log.warn("Invalid VFS sync port: " + portStr + ", using default");
+                log.warn("Invalid VFS sync port: {}, using default", portStr);
             }
         }
         return DEFAULT_PORT;

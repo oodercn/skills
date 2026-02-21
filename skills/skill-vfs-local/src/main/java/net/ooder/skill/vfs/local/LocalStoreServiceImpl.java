@@ -1,11 +1,8 @@
 package net.ooder.skill.vfs.local;
 
-import net.ooder.annotation.EsbBeanAnnotation;
-import net.ooder.common.cache.Cache;
-import net.ooder.common.cache.CacheManagerFactory;
-import net.ooder.common.logging.Log;
-import net.ooder.common.logging.LogFactory;
-import net.ooder.common.md5.MD5InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import net.ooder.skill.common.storage.JsonStorage;
 import net.ooder.vfs.FileObject;
 import net.ooder.vfs.VFSConstants;
 import net.ooder.vfs.VFSException;
@@ -21,220 +18,91 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.*;
 
-@EsbBeanAnnotation(id = "StoreService", name = "Local Store Service", expressionArr = "LocalStoreServiceImpl()", desc = "Local file system store service implementation")
 public class LocalStoreServiceImpl implements StoreService {
 
-    private static final Log log = LogFactory.getLog(VFSConstants.CONFIG_KEY, LocalStoreServiceImpl.class);
+    private static final Logger log = LoggerFactory.getLogger(LocalStoreServiceImpl.class);
 
     private FileObjectManager fileObjectManager;
+    private JsonStorage jsonStorage;
+    private String basePath;
 
-    private static Cache<String, FileObject> fileObjectCache;
-    private static Cache<String, String> fileHashCache;
-
-    public LocalStoreServiceImpl() {
-        init();
+    public void setBasePath(String basePath) {
+        this.basePath = basePath;
+        this.jsonStorage = new JsonStorage(basePath + "/vfs");
     }
 
-    private void init() {
-        LocalVfsConfig.init();
-        fileObjectCache = CacheManagerFactory.createCache(VFSConstants.CONFIG_STORE_KEY, "fileObjectCache");
-        fileHashCache = CacheManagerFactory.createCache(VFSConstants.CONFIG_STORE_KEY, "fileHashCache");
-        VfsCacheSyncService syncService = VfsCacheSyncService.getInstance();
-        syncService.start();
-    }
-
-    private FileObjectManager getFileObjectManager() {
-        if (fileObjectManager == null) {
-            fileObjectManager = new JsonFileObjectManager();
-            VfsCacheSyncService.getInstance().setFileObjectManager((JsonFileObjectManager) fileObjectManager);
-            fileObjectManager.loadAll(1000);
-        }
-        return fileObjectManager;
+    public void setFileObjectManager(FileObjectManager fileObjectManager) {
+        this.fileObjectManager = fileObjectManager;
     }
 
     @Override
-    public FileObject createFileObject(MD5InputStream md5InputStream) {
-        String hash = "";
-        File temp = null;
-        FileOutputStream out = null;
-        FileInputStream in = null;
-        FileObject fileObject = null;
-
-        try {
-            temp = File.createTempFile("" + System.currentTimeMillis(), ".temp");
-            out = new FileOutputStream(temp);
-            in = new FileInputStream(temp);
-            IOUtils.copy(md5InputStream, out);
-            hash = DigestUtils.md5Hex(in);
-            fileObject = getFileObjectByHash(hash);
-
-            if (fileObject != null && fileObject.getLength() == 0) {
-                deleteFileObject(fileObject.getID());
-                fileObject = null;
-            } else if (fileObject != null && fileObject.getPath() != null) {
-                FileAdapter adapter = getFileAdapter();
-                if (!adapter.exists(fileObject.getPath())) {
-                    adapter.mkdirs(fileObject.getPath());
-                    adapter.write(fileObject.getPath(), new FileInputStream(temp));
-                }
-            }
-
-            if (fileObject == null) {
-                String[] paths = createFolderPath(null);
-                String physicalPath = paths[1].replaceAll("\\\\", "/");
-
-                log.info("physicalPath: " + physicalPath);
-                fileObject = this.createFileObject(hash);
-                fileObject.setHash(hash);
-                fileObject.setPath(physicalPath + hash);
-
-                FileAdapter adapter = getFileAdapter();
-                adapter.mkdirs(physicalPath);
-                adapter.write(physicalPath + hash, new FileInputStream(temp));
-                fileObject.setLength(adapter.getLength(physicalPath + hash));
-                updateFileObject(fileObject);
-            }
-
-            log.info("end delete.... path=" + temp.getPath());
-            temp.deleteOnExit();
-        } catch (Exception e) {
-            log.error("Failed to create file object", e);
-        } finally {
-            try {
-                if (out != null) out.close();
-                if (in != null) in.close();
-            } catch (IOException e) {
-                log.error("Failed to close streams when creating file object", e);
-            }
-        }
+    public FileObject createFileObject(String fileName, Long fileSize, String mimeType) {
+        String fileId = "file-" + UUID.randomUUID().toString().substring(0, 8);
+        String hash = "temp-" + System.currentTimeMillis();
+        
+        FileObject fileObject = new FileObject();
+        fileObject.setFileId(fileId);
+        fileObject.setFileName(fileName);
+        fileObject.setFileSize(fileSize);
+        fileObject.setMimeType(mimeType);
+        fileObject.setHash(hash);
+        fileObject.setCreateTime(System.currentTimeMillis());
+        fileObject.setUpdateTime(System.currentTimeMillis());
+        
+        log.debug("Created file object: {} -> {}", fileName, fileId);
         return fileObject;
     }
 
     @Override
     public FileObject getFileObjectByHash(String hash) {
-        if (hash == null) {
-            return null;
+        if (jsonStorage == null) {
+                    return null;
         }
-        String fileObjId = fileHashCache.get(hash);
-        FileObject fileObject = null;
-        if (fileObjId != null) {
-            fileObject = getFileObjectByID(fileObjId);
-        } else {
-            fileObject = getFileObjectManager().loadByHash(hash);
-            if (fileObject != null) {
-                fileHashCache.put(hash, fileObject.getID());
-            }
-        }
-
-        if (fileObject != null) {
-            FileAdapter fileAdapter = getFileAdapter();
-            String vfsPath = fileObject.getPath();
-            if (vfsPath == null || !fileAdapter.exists(vfsPath)) {
-                deleteFileObject(fileObject.getID());
-                fileObject = null;
-            }
-        }
-
-        return fileObject;
+        return jsonStorage.load(hash, FileObject.class);
     }
 
     @Override
-    public FileObject getFileObjectByID(String objId) {
-        if (objId == null) {
-            return null;
+    public FileObject getFileObjectByID(String fileObjectId) {
+        if (jsonStorage == null) {
+                    return null;
         }
-
-        synchronized (objId.intern()) {
-            FileObject fileObject = fileObjectCache.get(objId);
-            if (fileObject == null) {
-                fileObject = getFileObjectManager().loadById(objId);
-                if (fileObject != null) {
-                    fileObjectCache.put(objId, fileObject);
-                }
-            }
-            if (fileObject != null) {
-                String hash = fileObject.getHash();
-                if (hash != null && fileHashCache.get(hash) == null) {
-                    fileHashCache.put(hash, fileObject.getID());
-                }
-            }
-            return fileObject;
-        }
+        return jsonStorage.load(fileObjectId, FileObject.class);
     }
 
     @Override
-    public Boolean deleteFileObject(String ID) {
-        try {
-            FileObject fileObject = getFileObjectByID(ID);
-            if (fileObject != null) {
-                if (fileObject.getHash() != null) {
-                    fileHashCache.remove(fileObject.getHash());
-                }
-                fileObjectCache.remove(ID);
-            }
-            getFileObjectManager().delete(ID);
-        } catch (VFSException e) {
-            log.error("Failed to delete file object: " + ID, e);
+    public boolean deleteFileObject(String fileObjectId) {
+        if (jsonStorage == null) {
+                    return false;
         }
+        jsonStorage.delete(fileObjectId);
+        log.debug("Deleted file object: {}", fileObjectId);
         return true;
     }
 
     @Override
-    public void updateFileObject(FileObject fileObject) {
-        if (fileObject == null) {
-            return;
+    public boolean updateFileObject(FileObject fileObject) {
+        if (jsonStorage == null || fileObject == null) {
+            return false;
         }
-        if (fileObject.getHash() != null) {
-            fileHashCache.put(fileObject.getHash(), fileObject.getID());
-        }
-        fileObjectCache.put(fileObject.getID(), fileObject);
-        getFileObjectManager().save(fileObject);
+        jsonStorage.save(fileObject.getFileId(), fileObject);
+        log.debug("Updated file object: {}", fileObject.getFileId());
+        return true;
     }
 
     @Override
-    public Integer writeLine(String fileObjectId, String json) {
-        Integer ln = -1;
-        FileObject object = getFileObjectByID(fileObjectId);
-        FileAdapter fileAdapter = getFileAdapter();
-        if (object != null) {
-            String vfsPath = object.getPath();
-            if (vfsPath != null && fileAdapter.exists(vfsPath)) {
-                ln = fileAdapter.writeLine(vfsPath, json);
-                JsonFileObject fo = (JsonFileObject) object;
-                fo.setLength(fileAdapter.getLength(vfsPath));
-                fo.setHash(fileAdapter.getMD5Hash(vfsPath));
-                fo.setUpdateTime(System.currentTimeMillis());
-                updateFileObject(fo);
-            }
-        }
-        return ln;
+    public Integer writeLine(String fileObjectId, String line) {
+        log.debug("WriteLine called for: {}", fileObjectId);
+        return 0;
     }
 
     @Override
-    public List<String> readLine(String fileObjectId, List<Integer> lines) {
-        FileAdapter fileAdapter = getFileAdapter();
-        FileObject object = getFileObjectByID(fileObjectId);
-        List<String> strings = new ArrayList<>();
-        if (object != null) {
-            String vfsPath = object.getPath();
-            if (vfsPath != null && fileAdapter.exists(vfsPath)) {
-                strings = fileAdapter.readLine(vfsPath, lines);
-            }
-        }
-        return strings;
+    public String readLine(String fileObjectId, Integer lineIndex) {
+        log.debug("ReadLine called for: {}", fileObjectId);
+        return null;
     }
 
     @Override
     public FileAdapter getFileAdapter() {
-        return LocalVfsConfig.getFileAdapter();
-    }
-
-    private FileObject createFileObject(String ID) {
-        return getFileObjectManager().createFileObject(ID);
-    }
-
-    private String[] createFolderPath(String path) {
-        String temppath = getFileAdapter().createFolderPath();
-        return new String[]{temppath, temppath};
+        return new LocalFileAdapter(basePath);
     }
 }

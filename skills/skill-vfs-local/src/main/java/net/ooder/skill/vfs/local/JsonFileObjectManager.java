@@ -1,9 +1,8 @@
 package net.ooder.skill.vfs.local;
 
 import net.ooder.annotation.EsbBeanAnnotation;
-import net.ooder.common.logging.Log;
-import net.ooder.common.logging.LogFactory;
-import net.ooder.common.md5.MD5InputStream;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import net.ooder.vfs.FileObject;
 import net.ooder.vfs.VFSException;
 import net.ooder.vfs.adapter.FileAdapter;
@@ -19,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 @EsbBeanAnnotation(id = "JsonFileObjectManager", name = "JSON File Object Manager", expressionArr = "JsonFileObjectManager()", desc = "JSON based file object manager for local storage")
 public class JsonFileObjectManager implements FileObjectManager {
 
-    private static final Log log = LogFactory.getLog("vfs", JsonFileObjectManager.class);
+    private static final Logger log = LoggerFactory.getLogger(JsonFileObjectManager.class);
 
     private final String metaPath;
     private final String filePath;
@@ -139,7 +138,7 @@ public class JsonFileObjectManager implements FileObjectManager {
         JsonFileObject file = new JsonFileObject();
         file.setID(ID != null ? ID : UUID.randomUUID().toString());
         file.setRootPath(filePath);
-        file.setAdapter("net.ooder.skill.vfs.local.adapter.LocalFileAdapter");
+        file.setAdapter("net.ooder.skill.vfs.local.LocalFileAdapter");
         file.setCreateTime(System.currentTimeMillis());
         return file;
     }
@@ -167,10 +166,10 @@ public class JsonFileObjectManager implements FileObjectManager {
                     count++;
                 }
             } catch (Exception e) {
-                log.error("Failed to load file object from: " + metaFile.getPath(), e);
+                log.error("Failed to load file object from: {}", metaFile.getPath(), e);
             }
         }
-        log.info("Loaded " + count + " file objects from JSON storage");
+        log.info("Loaded {} file objects from JSON storage", count);
         return count;
     }
 
@@ -208,7 +207,7 @@ public class JsonFileObjectManager implements FileObjectManager {
                 }
             }
         } catch (IOException e) {
-            log.error("Failed to save file object to JSON: " + file.getID(), e);
+            log.error("Failed to save file object to JSON: {}", file.getID(), e);
             throw new VFSException("Failed to save file object", e);
         }
     }
@@ -225,7 +224,7 @@ public class JsonFileObjectManager implements FileObjectManager {
             String json = new String(data, "UTF-8");
             return JsonFileObject.fromJson(json);
         } catch (IOException e) {
-            log.error("Failed to load file object from JSON: " + file.getPath(), e);
+            log.error("Failed to load file object from JSON: {}", file.getPath(), e);
             return null;
         }
     }
@@ -237,7 +236,7 @@ public class JsonFileObjectManager implements FileObjectManager {
                 syncService.broadcastCacheInvalidation(action, fileId);
             }
         } catch (Exception e) {
-            log.error("Failed to notify cache sync for: " + fileId, e);
+            log.error("Failed to notify cache sync for: {}", fileId, e);
         }
     }
 
