@@ -1,0 +1,16 @@
+server:
+  port: 8091
+
+spring:
+  application:
+    name: skill-market
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+market:
+  cache-enabled: true
+  cache-ttl: 3600

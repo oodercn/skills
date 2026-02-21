@@ -1,0 +1,103 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-market
+  name: Skill Market Service
+  version: 0.7.3
+  description: Provides skill discovery, search, installation and management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - market
+    - skill
+    - discovery
+    - install
+    - management
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.market.SkillMarketApplication
+  
+  capabilities:
+    - id: skill-discovery
+      name: Skill Discovery
+      description: Browse and search available skills
+      category: market
+    - id: skill-installation
+      name: Skill Installation
+      description: Install, update and uninstall skills
+      category: market
+    - id: skill-auth
+      name: Skill Authentication
+      description: Query skill authentication status
+      category: market
+  
+  scenes:
+    - name: skill-market
+      description: Skill market scene
+      capabilities:
+        - skill-discovery
+        - skill-installation
+        - skill-auth
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MARKET_CACHE_ENABLED
+        type: boolean
+        default: true
+        description: Enable skill cache
+      - name: MARKET_CACHE_TTL
+        type: integer
+        default: 3600
+        description: Cache TTL in seconds
+  
+  endpoints:
+    - path: /api/skillcenter/market/list
+      method: GET
+      description: List available skills
+      capability: skill-discovery
+    - path: /api/skillcenter/market/search
+      method: POST
+      description: Search skills by keyword
+      capability: skill-discovery
+    - path: /api/skillcenter/market/{skillId}
+      method: GET
+      description: Get skill details
+      capability: skill-discovery
+    - path: /api/skillcenter/market/{skillId}/install
+      method: POST
+      description: Install a skill
+      capability: skill-installation
+    - path: /api/skillcenter/market/{skillId}
+      method: DELETE
+      description: Uninstall a skill
+      capability: skill-installation
+    - path: /api/skillcenter/market/{skillId}/update
+      method: PUT
+      description: Update a skill
+      capability: skill-installation
+    - path: /api/skillcenter/market/{skillId}/auth
+      method: GET
+      description: Get skill authentication status
+      capability: skill-auth
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true

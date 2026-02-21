@@ -1,0 +1,115 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-collaboration
+  name: Collaboration Scene Service
+  version: 0.7.3
+  description: Provides collaboration scene creation, member management and key management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - collaboration
+    - scene
+    - member
+    - team
+    - workspace
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.collaboration.CollaborationApplication
+  
+  capabilities:
+    - id: scene-management
+      name: Scene Management
+      description: Create, update, delete and manage collaboration scenes
+      category: collaboration
+    - id: member-management
+      name: Member Management
+      description: Manage scene members and roles
+      category: collaboration
+    - id: key-management
+      name: Key Management
+      description: Generate and rotate scene keys
+      category: collaboration
+  
+  scenes:
+    - name: collaboration
+      description: Collaboration scene
+      capabilities:
+        - scene-management
+        - member-management
+        - key-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: COLLABORATION_MAX_MEMBERS
+        type: integer
+        default: 500
+        description: Maximum members per scene
+      - name: COLLABORATION_KEY_TTL
+        type: integer
+        default: 86400
+        description: Scene key TTL in seconds
+  
+  endpoints:
+    - path: /api/collaboration/scene/create
+      method: POST
+      description: Create a collaboration scene
+      capability: scene-management
+    - path: /api/collaboration/scene/list
+      method: GET
+      description: List collaboration scenes
+      capability: scene-management
+    - path: /api/collaboration/scene/{sceneId}
+      method: GET
+      description: Get scene details
+      capability: scene-management
+    - path: /api/collaboration/scene/{sceneId}
+      method: PUT
+      description: Update scene
+      capability: scene-management
+    - path: /api/collaboration/scene/{sceneId}
+      method: DELETE
+      description: Delete scene
+      capability: scene-management
+    - path: /api/collaboration/scene/{sceneId}/member
+      method: POST
+      description: Add scene member
+      capability: member-management
+    - path: /api/collaboration/scene/{sceneId}/member/{memberId}
+      method: DELETE
+      description: Remove scene member
+      capability: member-management
+    - path: /api/collaboration/scene/{sceneId}/members
+      method: GET
+      description: List scene members
+      capability: member-management
+    - path: /api/collaboration/scene/{sceneId}/key
+      method: POST
+      description: Generate or rotate scene key
+      capability: key-management
+    - path: /api/collaboration/scene/{sceneId}/status
+      method: POST
+      description: Change scene status
+      capability: scene-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true

@@ -1,0 +1,103 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-business
+  name: Business Scene Service
+  version: 0.7.3
+  description: Provides business scenario management, workflow execution and data processing capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - business
+    - scenario
+    - workflow
+    - process
+    - data
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.business.BusinessApplication
+  
+  capabilities:
+    - id: scenario-management
+      name: Scenario Management
+      description: Create, update, delete business scenarios
+      category: business
+    - id: workflow-execution
+      name: Workflow Execution
+      description: Execute and manage business workflows
+      category: business
+    - id: data-processing
+      name: Data Processing
+      description: Process and transform business data
+      category: business
+  
+  scenes:
+    - name: business
+      description: Business scenario scene
+      capabilities:
+        - scenario-management
+        - workflow-execution
+        - data-processing
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: BUSINESS_DATA_PATH
+        type: string
+        default: ./data/business
+        description: Business data storage path
+  
+  endpoints:
+    - path: /api/business/scenario/create
+      method: POST
+      description: Create business scenario
+      capability: scenario-management
+    - path: /api/business/scenario/list
+      method: GET
+      description: List business scenarios
+      capability: scenario-management
+    - path: /api/business/scenario/{scenarioId}
+      method: GET
+      description: Get scenario details
+      capability: scenario-management
+    - path: /api/business/scenario/{scenarioId}
+      method: PUT
+      description: Update scenario
+      capability: scenario-management
+    - path: /api/business/scenario/{scenarioId}
+      method: DELETE
+      description: Delete scenario
+      capability: scenario-management
+    - path: /api/business/workflow/execute
+      method: POST
+      description: Execute workflow
+      capability: workflow-execution
+    - path: /api/business/workflow/status/{executionId}
+      method: GET
+      description: Get workflow execution status
+      capability: workflow-execution
+    - path: /api/business/data/process
+      method: POST
+      description: Process business data
+      capability: data-processing
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true

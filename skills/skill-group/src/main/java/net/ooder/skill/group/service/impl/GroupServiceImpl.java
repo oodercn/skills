@@ -2,17 +2,65 @@ package net.ooder.skill.group.service.impl;
 
 import net.ooder.skill.group.dto.*;
 import net.ooder.skill.group.service.GroupService;
+import net.ooder.skill.common.storage.JsonStorage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class GroupServiceImpl implements GroupService {
 
+    @Value("${group.data-path:./data/group}")
+    private String dataPath;
+    
+    private JsonStorage storage;
+    
     private final Map<String, Group> groups = new ConcurrentHashMap<>();
     private final Map<String, Map<String, GroupMember>> groupMembers = new ConcurrentHashMap<>();
     private final Map<String, List<String>> userGroups = new ConcurrentHashMap<>();
+    
+    private static final String GROUPS_KEY = "groups";
+    private static final String GROUP_MEMBERS_KEY = "group_members";
+    
+    @PostConstruct
+    public void init() {
+        storage = new JsonStorage(dataPath);
+        
+        List<Group> savedGroups = storage.loadList(GROUPS_KEY, Group.class);
+        if (savedGroups != null) {
+            for (Group group : savedGroups) {
+                groups.put(group.getGroupId(), group);
+            }
+        }
+        
+        Map<String, List<GroupMember>> savedMembers = storage.load(GROUP_MEMBERS_KEY, Map.class);
+        if (savedMembers != null) {
+            for (Map.Entry<String, List<GroupMember>> entry : savedMembers.entrySet()) {
+                Map<String, GroupMember> memberMap = new ConcurrentHashMap<>();
+                if (entry.getValue() != null) {
+                    for (GroupMember member : entry.getValue()) {
+                        memberMap.put(member.getUserId(), member);
+                    }
+                }
+                groupMembers.put(entry.getKey(), memberMap);
+            }
+        }
+    }
+    
+    private void saveGroups() {
+        storage.save(GROUPS_KEY, new ArrayList<>(groups.values()));
+    }
+    
+    private void saveGroupMembers() {
+        Map<String, List<GroupMember>> membersToSave = new HashMap<>();
+        for (Map.Entry<String, Map<String, GroupMember>> entry : groupMembers.entrySet()) {
+            membersToSave.put(entry.getKey(), new ArrayList<>(entry.getValue().values()));
+        }
+        storage.save(GROUP_MEMBERS_KEY, membersToSave);
+    }
 
     @Override
     public List<Group> getGroupList(String userId) {
@@ -39,6 +87,8 @@ public class GroupServiceImpl implements GroupService {
         group.setOwnerName(ownerName);
         group.setGroupType(groupType != null ? groupType : "normal");
         group.setMemberCount(1);
+        group.setCreateTime(System.currentTimeMillis());
+        group.setUpdateTime(System.currentTimeMillis());
         
         groups.put(group.getGroupId(), group);
         
@@ -48,6 +98,7 @@ public class GroupServiceImpl implements GroupService {
         owner.setUserId(ownerId);
         owner.setUserName(ownerName);
         owner.setRole("owner");
+        owner.setJoinTime(System.currentTimeMillis());
         members.put(ownerId, owner);
         
         if (memberIds != null) {
@@ -57,6 +108,7 @@ public class GroupServiceImpl implements GroupService {
                     member.setMemberId("member-" + UUID.randomUUID().toString().substring(0, 8));
                     member.setUserId(memberId);
                     member.setRole("member");
+                    member.setJoinTime(System.currentTimeMillis());
                     members.put(memberId, member);
                     group.setMemberCount(group.getMemberCount() + 1);
                     
@@ -67,6 +119,9 @@ public class GroupServiceImpl implements GroupService {
         
         groupMembers.put(group.getGroupId(), members);
         userGroups.computeIfAbsent(ownerId, k -> new ArrayList<>()).add(group.getGroupId());
+        
+        saveGroups();
+        saveGroupMembers();
         
         return group;
     }
@@ -103,11 +158,15 @@ public class GroupServiceImpl implements GroupService {
         member.setUserId(userId);
         member.setUserName(userName);
         member.setRole("member");
+        member.setJoinTime(System.currentTimeMillis());
         members.put(userId, member);
         group.setMemberCount(group.getMemberCount() + 1);
         group.setUpdateTime(System.currentTimeMillis());
         
         userGroups.computeIfAbsent(userId, k -> new ArrayList<>()).add(groupId);
+        
+        saveGroups();
+        saveGroupMembers();
         
         return true;
     }
@@ -135,6 +194,9 @@ public class GroupServiceImpl implements GroupService {
             userGroupList.remove(groupId);
         }
         
+        saveGroups();
+        saveGroupMembers();
+        
         return true;
     }
 
@@ -154,6 +216,7 @@ public class GroupServiceImpl implements GroupService {
             group.setDescription((String) params.get("description"));
         }
         group.setUpdateTime(System.currentTimeMillis());
+        saveGroups();
         return true;
     }
 
@@ -177,6 +240,10 @@ public class GroupServiceImpl implements GroupService {
         }
         groups.remove(groupId);
         groupMembers.remove(groupId);
+        
+        saveGroups();
+        saveGroupMembers();
+        
         return true;
     }
 
@@ -188,6 +255,7 @@ public class GroupServiceImpl implements GroupService {
         }
         group.setAnnouncement(announcement);
         group.setUpdateTime(System.currentTimeMillis());
+        saveGroups();
         return true;
     }
 
@@ -209,6 +277,7 @@ public class GroupServiceImpl implements GroupService {
             return false;
         }
         member.setRole(role);
+        saveGroupMembers();
         return true;
     }
 }

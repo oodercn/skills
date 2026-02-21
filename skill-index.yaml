@@ -734,6 +734,90 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-market
+      name: Skill Market Service
+      version: "0.7.3"
+      category: util
+      subCategory: market
+      tags:
+        - market
+        - skill
+        - discovery
+        - install
+      description: 技能市场服务 - 提供技能发现、搜索、安装和管理能力
+      sceneId: skill-market
+      path: skills/skill-market
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-collaboration
+      name: Collaboration Scene Service
+      version: "0.7.3"
+      category: util
+      subCategory: collaboration
+      tags:
+        - collaboration
+        - scene
+        - member
+        - team
+      description: 协作场景服务 - 提供场景创建、成员管理和密钥管理能力
+      sceneId: collaboration
+      path: skills/skill-collaboration
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-msg
+      name: Message Service
+      version: "0.7.3"
+      category: msg
+      subCategory: message
+      tags:
+        - message
+        - msg
+        - broadcast
+        - group
+      description: 消息服务 - 提供消息发送、广播、群组消息能力
+      sceneId: messaging
+      path: skills/skill-msg
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-business
+      name: Business Scene Service
+      version: "0.7.3"
+      category: business
+      subCategory: scenario
+      tags:
+        - business
+        - scenario
+        - workflow
+        - process
+      description: 业务场景服务 - 提供业务场景管理、工作流执行、数据处理能力
+      sceneId: business
+      path: skills/skill-business
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-business-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-business-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-common
+      name: Skill Common Library
+      version: "0.7.3"
+      category: util
+      subCategory: common
+      tags:
+        - common
+        - utility
+        - storage
+      description: 技能公共库 - 提供JSON存储等通用工具
+      sceneId: utility
+      path: skills/skill-common
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
@@ -1116,4 +1200,49 @@ spec:
         - instance-scaling
         - instance-health
         - cloud-provider
+      maxMembers: 100
+      
+    - sceneId: skill-market
+      name: Skill Market
+      description: 技能市场场景，提供技能发现、搜索、安装和管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - skill-discovery
+        - skill-search
+        - skill-installation
+        - skill-auth
+      maxMembers: 1000
+      
+    - sceneId: collaboration
+      name: Collaboration Scene
+      description: 协作场景，提供场景创建、成员管理、密钥管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - scene-management
+        - member-management
+        - key-management
+      maxMembers: 500
+      
+    - sceneId: messaging
+      name: Messaging
+      description: 消息场景，提供消息发送、广播、群组消息能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - message-sending
+        - message-management
+        - group-messaging
+      maxMembers: 1000
+      
+    - sceneId: business
+      name: Business
+      description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - scenario-management
+        - workflow-execution
+        - data-processing
       maxMembers: 100

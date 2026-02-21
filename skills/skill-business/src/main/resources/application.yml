@@ -1,0 +1,15 @@
+server:
+  port: 8094
+
+spring:
+  application:
+    name: skill-business
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+business:
+  data-path: ./data/business

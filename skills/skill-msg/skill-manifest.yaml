@@ -1,0 +1,107 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-msg
+  name: Message Service
+  version: 0.7.3
+  description: Provides message sending, broadcast, group messaging and message management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - message
+    - msg
+    - broadcast
+    - group
+    - notification
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.msg.MsgSkillApplication
+  
+  capabilities:
+    - id: message-sending
+      name: Message Sending
+      description: Send messages to users and groups
+      category: messaging
+    - id: message-management
+      name: Message Management
+      description: Mark read, recall, delete messages
+      category: messaging
+    - id: group-messaging
+      name: Group Messaging
+      description: Create groups, join groups, broadcast messages
+      category: messaging
+  
+  scenes:
+    - name: messaging
+      description: Messaging scene
+      capabilities:
+        - message-sending
+        - message-management
+        - group-messaging
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MSG_MAX_MESSAGE_SIZE
+        type: integer
+        default: 65536
+        description: Maximum message size in bytes
+      - name: MSG_HISTORY_LIMIT
+        type: integer
+        default: 1000
+        description: Message history limit
+  
+  endpoints:
+    - path: /api/msg/send
+      method: POST
+      description: Send message to user
+      capability: message-sending
+    - path: /api/msg/broadcast
+      method: POST
+      description: Broadcast message to group
+      capability: message-sending
+    - path: /api/msg/list
+      method: POST
+      description: Get message list
+      capability: message-management
+    - path: /api/msg/read
+      method: POST
+      description: Mark message as read
+      capability: message-management
+    - path: /api/msg/recall
+      method: POST
+      description: Recall message
+      capability: message-management
+    - path: /api/msg/group/create
+      method: POST
+      description: Create message group
+      capability: group-messaging
+    - path: /api/msg/group/join
+      method: POST
+      description: Join message group
+      capability: group-messaging
+    - path: /api/msg/group/list
+      method: POST
+      description: List message groups
+      capability: group-messaging
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true

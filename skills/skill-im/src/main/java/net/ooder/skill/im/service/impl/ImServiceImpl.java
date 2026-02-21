@@ -2,8 +2,11 @@ package net.ooder.skill.im.service.impl;
 
 import net.ooder.skill.im.dto.*;
 import net.ooder.skill.im.service.ImService;
+import net.ooder.skill.common.storage.JsonStorage;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -11,9 +14,44 @@ import java.util.stream.Collectors;
 @Service
 public class ImServiceImpl implements ImService {
 
+    @Value("${im.data-path:./data/im}")
+    private String dataPath;
+    
+    private JsonStorage storage;
+    
     private final Map<String, Conversation> conversations = new ConcurrentHashMap<>();
     private final Map<String, Contact> contacts = new ConcurrentHashMap<>();
     private final Map<String, Map<String, Integer>> conversationUnread = new ConcurrentHashMap<>();
+    
+    private static final String CONVERSATIONS_KEY = "conversations";
+    private static final String CONTACTS_KEY = "contacts";
+    
+    @PostConstruct
+    public void init() {
+        storage = new JsonStorage(dataPath);
+        
+        List<Conversation> savedConversations = storage.loadList(CONVERSATIONS_KEY, Conversation.class);
+        if (savedConversations != null) {
+            for (Conversation conv : savedConversations) {
+                conversations.put(conv.getConversationId(), conv);
+            }
+        }
+        
+        List<Contact> savedContacts = storage.loadList(CONTACTS_KEY, Contact.class);
+        if (savedContacts != null) {
+            for (Contact contact : savedContacts) {
+                contacts.put(contact.getContactId(), contact);
+            }
+        }
+    }
+    
+    private void saveConversations() {
+        storage.save(CONVERSATIONS_KEY, new ArrayList<>(conversations.values()));
+    }
+    
+    private void saveContacts() {
+        storage.save(CONTACTS_KEY, new ArrayList<>(contacts.values()));
+    }
 
     @Override
     public List<Conversation> getConversationList(String userId) {
@@ -29,7 +67,10 @@ public class ImServiceImpl implements ImService {
         conversation.setName(name);
         conversation.setTargetType("private".equals(type) ? "user" : "group");
         conversation.setMemberCount(1);
+        conversation.setCreateTime(System.currentTimeMillis());
+        conversation.setUpdateTime(System.currentTimeMillis());
         conversations.put(conversation.getConversationId(), conversation);
+        saveConversations();
         return conversation;
     }
 
@@ -41,6 +82,7 @@ public class ImServiceImpl implements ImService {
             conversation.setUpdateTime(System.currentTimeMillis());
             Map<String, Integer> userUnread = conversationUnread.computeIfAbsent(userId, k -> new HashMap<>());
             userUnread.put(conversationId, 0);
+            saveConversations();
             return true;
         }
         return false;
@@ -72,7 +114,12 @@ public class ImServiceImpl implements ImService {
 
     @Override
     public boolean deleteConversation(String conversationId, String userId) {
-        return conversations.remove(conversationId) != null;
+        Conversation removed = conversations.remove(conversationId);
+        if (removed != null) {
+            saveConversations();
+            return true;
+        }
+        return false;
     }
 
     @Override
@@ -127,6 +174,7 @@ public class ImServiceImpl implements ImService {
             contact.setRemark((String) params.get("remark"));
         }
         contacts.put(contact.getContactId(), contact);
+        saveContacts();
         return contact;
     }
 
@@ -157,12 +205,18 @@ public class ImServiceImpl implements ImService {
         if (params.get("remark") != null) {
             contact.setRemark((String) params.get("remark"));
         }
+        saveContacts();
         return true;
     }
 
     @Override
     public boolean deleteContact(String contactId) {
-        return contacts.remove(contactId) != null;
+        Contact removed = contacts.remove(contactId);
+        if (removed != null) {
+            saveContacts();
+            return true;
+        }
+        return false;
     }
 
     @Override

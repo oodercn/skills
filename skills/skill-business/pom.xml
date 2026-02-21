@@ -11,11 +11,11 @@
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <artifactId>skill-im</artifactId>
+    <artifactId>skill-business</artifactId>
     <packaging>jar</packaging>
 
-    <name>skill-im</name>
-    <description>Instant Messaging Service Skill for Ooder Agent Platform</description>
+    <name>skill-business</name>
+    <description>Business Scene Service for Ooder Agent Platform</description>
 
     <dependencies>
         <dependency>

@@ -46,6 +46,7 @@
     </properties>
 
     <modules>
+        <module>skills/skill-common</module>
         <module>skills/skill-a2ui</module>
         <module>skills/skill-org-dingding</module>
         <module>skills/skill-org-feishu</module>
@@ -58,6 +59,10 @@
         <module>skills/skill-monitor</module>
         <module>skills/skill-im</module>
         <module>skills/skill-group</module>
+        <module>skills/skill-market</module>
+        <module>skills/skill-collaboration</module>
+        <module>skills/skill-msg</module>
+        <module>skills/skill-business</module>
     </modules>
 
     <dependencyManagement>
@@ -73,6 +78,11 @@
                 <groupId>net.ooder</groupId>
                 <artifactId>agent-sdk</artifactId>
                 <version>${agent-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-common</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
