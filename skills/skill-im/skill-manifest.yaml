@@ -1,0 +1,116 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-im
+  name: Instant Messaging Service
+  version: 0.7.3
+  description: Provides conversation management and contact management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - im
+    - messaging
+    - conversation
+    - contact
+    - chat
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.im.ImSkillApplication
+  
+  capabilities:
+    - id: conversation-management
+      name: Conversation Management
+      description: Manage conversations including create, list, read, delete
+      category: im
+    - id: contact-management
+      name: Contact Management
+      description: Manage contacts including add, update, delete, search
+      category: im
+  
+  scenes:
+    - name: im
+      description: Instant messaging scene
+      capabilities:
+        - conversation-management
+        - contact-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MAX_CONVERSATIONS
+        type: integer
+        default: 1000
+        description: Maximum number of conversations per user
+      - name: MAX_CONTACTS
+        type: integer
+        default: 5000
+        description: Maximum number of contacts per user
+  
+  endpoints:
+    - path: /api/im/conversation/list
+      method: POST
+      description: Get conversation list
+      capability: conversation-management
+    - path: /api/im/conversation/create
+      method: POST
+      description: Create a conversation
+      capability: conversation-management
+    - path: /api/im/conversation/read
+      method: POST
+      description: Mark conversation as read
+      capability: conversation-management
+    - path: /api/im/conversation/unread
+      method: POST
+      description: Get unread summary
+      capability: conversation-management
+    - path: /api/im/conversation/delete
+      method: POST
+      description: Delete a conversation
+      capability: conversation-management
+    - path: /api/im/contact/list
+      method: POST
+      description: Get contact list
+      capability: contact-management
+    - path: /api/im/contact/search
+      method: POST
+      description: Search contacts
+      capability: contact-management
+    - path: /api/im/contact/add
+      method: POST
+      description: Add a contact
+      capability: contact-management
+    - path: /api/im/contact/update
+      method: POST
+      description: Update a contact
+      capability: contact-management
+    - path: /api/im/contact/delete
+      method: POST
+      description: Delete a contact
+      capability: contact-management
+    - path: /api/im/contact/byDepartment
+      method: POST
+      description: Get contacts by department
+      capability: contact-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

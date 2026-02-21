@@ -56,6 +56,8 @@
         <module>skills/skill-network</module>
         <module>skills/skill-hosting</module>
         <module>skills/skill-monitor</module>
+        <module>skills/skill-im</module>
+        <module>skills/skill-group</module>
     </modules>
 
     <dependencyManagement>

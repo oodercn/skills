@@ -470,72 +470,91 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-openai
-      name: OpenAI LLM Provider
+    - skillId: skill-im
+      name: Instant Messaging Service
+      version: "0.7.3"
+      category: msg
+      subCategory: im
+      tags:
+        - im
+        - messaging
+        - conversation
+        - contact
+        - chat
+      description: 即时通讯服务 - 提供会话管理和联系人管理能力
+      sceneId: im
+      path: skills/skill-im
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-group
+      name: Group Management Service
+      version: "0.7.3"
+      category: msg
+      subCategory: group
+      tags:
+        - group
+        - team
+        - member
+        - management
+        - collaboration
+      description: 群组管理服务 - 提供群组创建、成员管理和群组设置能力
+      sceneId: group
+      path: skills/skill-group
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-llm-volcengine
+      name: VolcEngine (Doubao) LLM Provider
       version: "0.7.3"
       category: util
       subCategory: llm
       tags:
         - llm
-        - openai
-        - gpt
-        - chatgpt
-      description: OpenAI LLM Provider - 提供GPT模型对话、补全、嵌入能力
+        - volcengine
+        - doubao
+        - bytedance
+      description: 火山引擎豆包LLM Provider - 提供Doubao模型对话、补全、嵌入能力
       sceneId: llm
-      path: skills/skill-llm-openai
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-openai-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-openai-0.7.3.jar
+      path: skills/skill-llm-volcengine
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-ollama
-      name: Ollama LLM Provider
+    - skillId: skill-llm-qianwen
+      name: Qianwen (Tongyi) LLM Provider
       version: "0.7.3"
       category: util
       subCategory: llm
       tags:
         - llm
-        - ollama
-        - local
-        - llama
-      description: Ollama LLM Provider - 提供本地模型对话、补全、嵌入能力
+        - qianwen
+        - tongyi
+        - aliyun
+      description: 通义千问LLM Provider - 提供Qwen模型对话、补全、嵌入能力
       sceneId: llm
-      path: skills/skill-llm-ollama
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-ollama-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-ollama-0.7.3.jar
+      path: skills/skill-llm-qianwen
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-scheduler-quartz
-      name: Quartz Scheduler Provider
+    - skillId: skill-llm-deepseek
+      name: DeepSeek LLM Provider
       version: "0.7.3"
       category: util
-      subCategory: scheduler
+      subCategory: llm
       tags:
-        - scheduler
-        - quartz
-        - cron
-        - task
-      description: Quartz调度器 - 提供任务调度、定时执行能力
-      sceneId: scheduler
-      path: skills/skill-scheduler-quartz
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
-      checksum: ""
-      
-    - skillId: skill-httpclient-okhttp
-      name: OkHttp Provider
-      version: "0.7.3"
-      category: util
-      subCategory: http
-      tags:
-        - http
-        - okhttp
-        - client
-        - request
-      description: OkHttp客户端 - 提供HTTP请求能力
-      sceneId: http
-      path: skills/skill-httpclient-okhttp
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-httpclient-okhttp-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-httpclient-okhttp-0.7.3.jar
+        - llm
+        - deepseek
+        - coder
+        - reasoning
+      description: DeepSeek LLM Provider - 提供DeepSeek模型对话、代码生成、推理能力
+      sceneId: llm
+      path: skills/skill-llm-deepseek
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       checksum: ""
 
   scenes:

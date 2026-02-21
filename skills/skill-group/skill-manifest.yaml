@@ -1,0 +1,112 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-group
+  name: Group Management Service
+  version: 0.7.3
+  description: Provides group creation, member management and group settings capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - group
+    - team
+    - member
+    - management
+    - collaboration
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.group.GroupSkillApplication
+  
+  capabilities:
+    - id: group-management
+      name: Group Management
+      description: Create, update, dismiss groups
+      category: group
+    - id: member-management
+      name: Member Management
+      description: Add, remove, set role for group members
+      category: group
+  
+  scenes:
+    - name: group
+      description: Group management scene
+      capabilities:
+        - group-management
+        - member-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MAX_GROUPS_PER_USER
+        type: integer
+        default: 100
+        description: Maximum number of groups per user
+      - name: MAX_MEMBERS_PER_GROUP
+        type: integer
+        default: 500
+        description: Maximum members per group
+  
+  endpoints:
+    - path: /api/im/group/list
+      method: POST
+      description: Get group list
+      capability: group-management
+    - path: /api/im/group/create
+      method: POST
+      description: Create a group
+      capability: group-management
+    - path: /api/im/group/get
+      method: POST
+      description: Get group details
+      capability: group-management
+    - path: /api/im/group/update
+      method: POST
+      description: Update group info
+      capability: group-management
+    - path: /api/im/group/dismiss
+      method: POST
+      description: Dismiss a group
+      capability: group-management
+    - path: /api/im/group/setAnnouncement
+      method: POST
+      description: Set group announcement
+      capability: group-management
+    - path: /api/im/group/members
+      method: POST
+      description: Get group members
+      capability: member-management
+    - path: /api/im/group/addMember
+      method: POST
+      description: Add group member
+      capability: member-management
+    - path: /api/im/group/removeMember
+      method: POST
+      description: Remove group member
+      capability: member-management
+    - path: /api/im/group/setMemberRole
+      method: POST
+      description: Set member role
+      capability: member-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true
