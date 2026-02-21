@@ -17,9 +17,15 @@
     <packaging>jar</packaging>
 
     <name>skill-hosting</name>
-    <description>Hosting Service Skill for Ooder Agent Platform - Supports Kubernetes, Aliyun, Tencent Cloud</description>
+    <description>Hosting Service Skill for Ooder Agent Platform</description>
 
     <dependencies>
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>scene-engine</artifactId>
+            <version>0.7.3</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

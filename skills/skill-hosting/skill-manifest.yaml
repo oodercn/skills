@@ -5,18 +5,17 @@ metadata:
   id: skill-hosting
   name: Hosting Service Skill
   version: 0.7.3
-  description: Provides cloud hosting management capabilities including Kubernetes, Aliyun, Tencent Cloud
+  description: Provides container hosting, instance management, and resource quota capabilities
   author: Ooder Team
   license: Apache-2.0
   homepage: https://github.com/ooderCN/skills
   repository: https://github.com/ooderCN/skills.git
   keywords:
     - hosting
-    - kubernetes
-    - aliyun
-    - tencent
-    - cloud
     - container
+    - instance
+    - kubernetes
+    - docker
 
 spec:
   type: tool-skill
@@ -30,29 +29,24 @@ spec:
   capabilities:
     - id: instance-management
       name: Instance Management
-      description: Create, delete, start, stop hosting instances
+      description: Create, update, delete and manage instances
       category: hosting
-    - id: instance-scaling
-      name: Instance Scaling
-      description: Scale instances up or down
+    - id: resource-quota
+      name: Resource Quota
+      description: Manage resource quotas and limits
       category: hosting
-    - id: instance-health
-      name: Instance Health Check
-      description: Monitor instance health status
-      category: hosting
-    - id: cloud-provider
-      name: Cloud Provider Integration
-      description: Support multiple cloud providers
+    - id: health-monitoring
+      name: Health Monitoring
+      description: Monitor instance health and metrics
       category: hosting
   
   scenes:
     - name: hosting
-      description: Hosting service management scene
+      description: Hosting service scene
       capabilities:
         - instance-management
-        - instance-scaling
-        - instance-health
-        - cloud-provider
+        - resource-quota
+        - health-monitoring
   
   dependencies:
     skills: []
@@ -61,63 +55,77 @@ spec:
   config:
     required: []
     optional:
-      - name: DEFAULT_PROVIDER
-        type: string
-        default: kubernetes
-        description: Default cloud provider
-      - name: HEALTH_CHECK_INTERVAL
-        type: integer
-        default: 60000
-        description: Health check interval in milliseconds
-      - name: MAX_INSTANCES
+      - name: HOSTING_MAX_INSTANCES
         type: integer
         default: 100
-        description: Maximum number of instances
+        description: Maximum instances
+      - name: HOSTING_MAX_CPU_CORES
+        type: integer
+        default: 16
+        description: Maximum CPU cores
+      - name: HOSTING_MAX_MEMORY_MB
+        type: integer
+        default: 32768
+        description: Maximum memory in MB
   
   endpoints:
     - path: /api/hosting/instances
       method: GET
-      description: Get all hosting instances
+      description: Get all instances
       capability: instance-management
     - path: /api/hosting/instances
       method: POST
-      description: Create a hosting instance
+      description: Create instance
       capability: instance-management
-    - path: /api/hosting/instances/{instanceId}
+    - path: /api/hosting/instances/{id}
       method: GET
-      description: Get instance by ID
+      description: Get instance
       capability: instance-management
-    - path: /api/hosting/instances/{instanceId}
+    - path: /api/hosting/instances/{id}
+      method: PUT
+      description: Update instance
+      capability: instance-management
+    - path: /api/hosting/instances/{id}
       method: DELETE
-      description: Delete an instance
+      description: Delete instance
       capability: instance-management
-    - path: /api/hosting/instances/{instanceId}/start
+    - path: /api/hosting/instances/{id}/start
       method: POST
-      description: Start an instance
+      description: Start instance
       capability: instance-management
-    - path: /api/hosting/instances/{instanceId}/stop
+    - path: /api/hosting/instances/{id}/stop
       method: POST
-      description: Stop an instance
+      description: Stop instance
       capability: instance-management
-    - path: /api/hosting/instances/{instanceId}/scale
+    - path: /api/hosting/instances/{id}/restart
       method: POST
-      description: Scale an instance
-      capability: instance-scaling
-    - path: /api/hosting/instances/{instanceId}/health
+      description: Restart instance
+      capability: instance-management
+    - path: /api/hosting/instances/{id}/scale
+      method: POST
+      description: Scale instance
+      capability: instance-management
+    - path: /api/hosting/instances/{id}/health
       method: GET
-      description: Get instance health status
-      capability: instance-health
-    - path: /api/hosting/providers
+      description: Get instance health
+      capability: health-monitoring
+    - path: /api/hosting/instances/{id}/metrics
       method: GET
-      description: List available providers
-      capability: cloud-provider
+      description: Get instance metrics
+      capability: health-monitoring
+    - path: /api/hosting/instances/{id}/logs
+      method: GET
+      description: Get instance logs
+      capability: health-monitoring
+    - path: /api/hosting/quota
+      method: GET
+      description: Get quota
+      capability: resource-quota
   
   resources:
-    cpu: "300m"
-    memory: "512Mi"
-    storage: "200Mi"
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
   
   offline:
-    enabled: true
-    cacheStrategy: "local"
-    syncOnReconnect: true
+    enabled: false

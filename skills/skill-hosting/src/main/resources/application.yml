@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8090
 
 spring:
   application:
@@ -9,13 +9,9 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,metrics
-  endpoint:
-    health:
-      show-details: always
+        include: health,info
 
-skill:
-  hosting:
-    default-provider: kubernetes
-    health-check-interval: 60000
-    max-instances: 100
+hosting:
+  max-instances: 100
+  max-cpu-cores: 16
+  max-memory-mb: 32768
