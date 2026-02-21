@@ -14,6 +14,51 @@ metadata:
   updatedAt: "2026-02-20T00:00:00Z"
 
 spec:
+  sceneDrivers:
+    - id: org
+      name: Organization Driver
+      description: 组织管理场景驱动，提供用户认证、组织架构、角色管理能力
+      capabilities:
+        - user-auth
+        - user-manage
+        - org-manage
+        - role-manage
+      builtIn: true
+      location: scene-engine
+      
+    - id: vfs
+      name: Virtual File System Driver
+      description: 虚拟文件系统场景驱动，提供文件操作、版本管理能力
+      capabilities:
+        - file-operations
+        - folder-operations
+        - stream-operations
+        - version-operations
+        - search-operations
+      builtIn: true
+      location: scene-engine
+      
+    - id: msg
+      name: Messaging Driver
+      description: 消息服务场景驱动，提供消息队列、订阅发布能力
+      capabilities:
+        - message-operations
+        - queue-operations
+        - subscription-operations
+      builtIn: true
+      location: scene-engine
+      
+    - id: sys
+      name: System Driver
+      description: 系统管理场景驱动，提供网络、安全、健康检查能力
+      capabilities:
+        - network-management
+        - security-management
+        - health-monitoring
+        - protocol-handling
+      builtIn: false
+      location: ooder-skills
+  
   categories:
     - id: org
       name: 组织服务
@@ -21,6 +66,7 @@ spec:
       description: 企业组织架构、用户认证相关服务
       icon: users
       order: 1
+      sceneDriver: org
       
     - id: vfs
       name: 存储服务
@@ -28,6 +74,7 @@ spec:
       description: 文件存储、对象存储相关服务
       icon: database
       order: 2
+      sceneDriver: vfs
       
     - id: ui
       name: UI生成
@@ -35,6 +82,7 @@ spec:
       description: 界面生成、设计转代码服务
       icon: palette
       order: 3
+      sceneDriver: null
       
     - id: msg
       name: 消息通讯
@@ -42,6 +90,7 @@ spec:
       description: 消息队列、通讯协议服务
       icon: message
       order: 4
+      sceneDriver: msg
       
     - id: sys
       name: 系统管理
@@ -49,6 +98,7 @@ spec:
       description: 系统监控、网络管理、安全审计
       icon: settings
       order: 5
+      sceneDriver: sys
       
     - id: util
       name: 工具服务
@@ -56,6 +106,7 @@ spec:
       description: 通用工具、辅助功能
       icon: tool
       order: 6
+      sceneDriver: null
   
   skills:
     - skillId: skill-a2ui

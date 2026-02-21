@@ -519,8 +519,67 @@ curl -X POST http://localhost:8081/api/skillcenter/installed/uninstall \
 skills/
 ├── README.md                   # 仓库说明
 ├── skill-index.yaml           # 技能索引文件
+├── docs/                      # 文档目录
+│   ├── SCENE_DRIVER_STRUCTURE.md  # 场景驱动结构说明
+│   └── skills-category-proposal.md # 分类管理方案
 ├── skills/                    # 技能目录
-│   ├── skill-org-dingding/    # 钉钉组织技能
+│   ├── org/                   # ORG场景技能
+│   │   ├── skill-org-dingding/
+│   │   ├── skill-org-feishu/
+│   │   ├── skill-org-wecom/
+│   │   ├── skill-org-ldap/
+│   │   └── skill-user-auth/
+│   ├── vfs/                   # VFS场景技能
+│   │   ├── skill-vfs-local/
+│   │   ├── skill-vfs-database/
+│   │   ├── skill-vfs-minio/
+│   │   ├── skill-vfs-oss/
+│   │   └── skill-vfs-s3/
+│   ├── msg/                   # MSG场景技能
+│   │   └── skill-mqtt/
+│   ├── sys/                   # SYS场景技能
+│   │   ├── skill-network/
+│   │   ├── skill-agent/
+│   │   ├── skill-security/
+│   │   ├── skill-health/
+│   │   ├── skill-protocol/
+│   │   ├── skill-openwrt/
+│   │   └── skill-hosting/
+│   ├── ui/                    # UI场景技能
+│   │   └── skill-a2ui/
+│   └── util/                  # 工具技能
+│       ├── skill-trae-solo/
+│       └── skill-share/
+└── templates/                 # 技能模板
+```
+
+### 场景驱动架构
+
+采用方案C（混合方案）设计：
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  ooderCN/scene-engine (SEC 核心 + 内置驱动)                      │
+│  ├── scene-engine/          # SEC 核心                          │
+│  ├── drivers/               # 内置场景驱动                       │
+│  │   ├── org/               # ORG 驱动                          │
+│  │   ├── vfs/               # VFS 驱动                          │
+│  │   └── msg/               # MSG 驱动                          │
+│  └── scene-gateway/                                             │
+│                                                                 │
+│  ooderCN/ooder-skills (扩展实现)                                 │
+│  └── skills/                # 具体技能实现                       │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+#### 场景驱动定义
+
+| 驱动 | 能力 | 位置 |
+|------|------|------|
+| ORG | user-auth, user-manage, org-manage, role-manage | scene-engine |
+| VFS | file-operations, folder-operations, stream-operations | scene-engine |
+| MSG | message-operations, queue-operations, subscription-operations | scene-engine |
+| SYS | network-management, security-management, health-monitoring | ooder-skills |
 │   │   ├── skill-manifest.yaml
 │   │   ├── skill.yaml
 │   │   ├── README.md
