@@ -58,6 +58,19 @@ spec:
         - protocol-handling
       builtIn: false
       location: ooder-skills
+      
+    - id: payment
+      name: Payment Driver
+      description: 支付场景驱动，提供支付、退款、回调处理能力
+      capabilities:
+        - create-payment
+        - query-payment
+        - close-payment
+        - create-refund
+        - query-refund
+        - handle-callback
+      builtIn: false
+      location: ooder-skills
   
   categories:
     - id: org
@@ -100,12 +113,20 @@ spec:
       order: 5
       sceneDriver: sys
       
+    - id: payment
+      name: 支付服务
+      nameEn: Payment
+      description: 支付渠道、退款管理、交易处理
+      icon: credit-card
+      order: 6
+      sceneDriver: payment
+      
     - id: util
       name: 工具服务
       nameEn: Utility
       description: 通用工具、辅助功能
       icon: tool
-      order: 6
+      order: 7
       sceneDriver: null
   
   skills:
@@ -555,6 +576,57 @@ spec:
       path: skills/skill-llm-deepseek
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-alipay
+      name: Alipay Payment Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: alipay
+      tags:
+        - payment
+        - alipay
+        - zhifubao
+        - mobile-pay
+      description: 支付宝支付Provider - 提供支付宝支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-alipay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-wechat
+      name: WeChat Pay Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: wechat
+      tags:
+        - payment
+        - wechat
+        - weixin
+        - wxpay
+      description: 微信支付Provider - 提供微信支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-wechat
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-unionpay
+      name: UnionPay Payment Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: unionpay
+      tags:
+        - payment
+        - unionpay
+        - yinlian
+        - bank-card
+      description: 银联支付Provider - 提供银联支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-unionpay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
       checksum: ""
 
   scenes:
