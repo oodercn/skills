@@ -201,6 +201,19 @@ v0.7.3 新增离线模式支持，允许在网络断开时继续运行：
 | skill-vfs-oss | Aliyun OSS VFS Service | 阿里云OSS存储服务 | 0.7.3 |
 | skill-vfs-s3 | AWS S3 VFS Service | AWS S3存储服务 | 0.7.3 |
 
+#### 系统管理技能 (SEC Engine)
+
+| 技能ID | 名称 | 描述 | 版本 | Provider |
+|--------|------|------|------|----------|
+| skill-network | Network Management Skill | 网络管理技能 | 0.7.3 | NetworkProvider |
+| skill-agent | Agent Management Skill | 代理管理技能 | 0.7.3 | - |
+| skill-security | Security Management Skill | 安全管理技能 | 0.7.3 | SecurityProvider |
+| skill-health | Health Check Skill | 健康检查技能 | 0.7.3 | - |
+| skill-protocol | Protocol Management Skill | 协议管理技能 | 0.7.3 | - |
+| skill-openwrt | OpenWrt Management Skill | OpenWrt管理技能 | 0.7.3 | - |
+| skill-hosting | Hosting Service Skill | 托管服务技能 | 0.7.3 | HostingProvider |
+| skill-share | Skill Share Skill | 技能分享技能 | 0.7.3 | - |
+
 ### 场景配置说明
 
 #### 场景分类
@@ -747,6 +760,19 @@ Check Network
 | skill-vfs-minio | MinIO VFS Service | MinIO storage service | 0.7.3 |
 | skill-vfs-oss | Aliyun OSS VFS Service | Aliyun OSS storage service | 0.7.3 |
 | skill-vfs-s3 | AWS S3 VFS Service | AWS S3 storage service | 0.7.3 |
+
+#### System Management Skills (SEC Engine)
+
+| Skill ID | Name | Description | Version | Provider |
+|----------|------|-------------|---------|----------|
+| skill-network | Network Management Skill | Network configuration and management | 0.7.3 | NetworkProvider |
+| skill-agent | Agent Management Skill | End agent registration and management | 0.7.3 | - |
+| skill-security | Security Management Skill | User management and security audit | 0.7.3 | SecurityProvider |
+| skill-health | Health Check Skill | System health check and monitoring | 0.7.3 | - |
+| skill-protocol | Protocol Management Skill | Protocol handler registration | 0.7.3 | - |
+| skill-openwrt | OpenWrt Management Skill | OpenWrt router management | 0.7.3 | - |
+| skill-hosting | Hosting Service Skill | Container hosting and instance management | 0.7.3 | HostingProvider |
+| skill-share | Skill Share Skill | Skill sharing and receiving | 0.7.3 | - |
 
 ### Installation Guide
 
