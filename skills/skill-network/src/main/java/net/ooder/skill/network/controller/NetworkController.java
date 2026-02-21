@@ -1,72 +1,86 @@
 package net.ooder.skill.network.controller;
 
-import net.ooder.skill.network.model.*;
-import net.ooder.skill.network.provider.NetworkProvider;
-import net.ooder.skill.network.provider.Result;
+import net.ooder.skill.network.dto.*;
+import net.ooder.skill.network.service.NetworkService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/network")
 public class NetworkController {
-    
+
     @Autowired
-    private NetworkProvider networkProvider;
-    
-    @GetMapping("/settings")
-    public Result<List<NetworkSetting>> getAllNetworkSettings() {
-        return networkProvider.getAllNetworkSettings();
+    private NetworkService networkService;
+
+    @GetMapping("/status")
+    public ResponseEntity<NetworkStatus> getStatus() {
+        return ResponseEntity.ok(networkService.getStatus());
     }
-    
-    @GetMapping("/settings/{type}")
-    public Result<NetworkSetting> getNetworkSetting(@PathVariable String type) {
-        return networkProvider.getNetworkSetting(type);
+
+    @GetMapping("/stats")
+    public ResponseEntity<NetworkStats> getStats() {
+        return ResponseEntity.ok(networkService.getStats());
     }
-    
-    @PutMapping("/settings/{type}")
-    public Result<NetworkSetting> updateNetworkSetting(
-            @PathVariable String type,
-            @RequestBody Map<String, Object> data) {
-        return networkProvider.updateNetworkSetting(type, data);
+
+    @GetMapping("/links")
+    public ResponseEntity<PageResult<NetworkLink>> listLinks(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(networkService.listLinks(page, size));
     }
-    
-    @GetMapping("/ips")
-    public Result<List<IPAddress>> getIPAddresses(
-            @RequestParam(required = false) String type,
-            @RequestParam(required = false) String status) {
-        return networkProvider.getIPAddresses(type, status);
+
+    @GetMapping("/links/{linkId}")
+    public ResponseEntity<NetworkLink> getLink(@PathVariable String linkId) {
+        NetworkLink link = networkService.getLink(linkId);
+        if (link == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(link);
     }
-    
-    @PostMapping("/ips")
-    public Result<IPAddress> addStaticIPAddress(@RequestBody Map<String, Object> ipData) {
-        return networkProvider.addStaticIPAddress(ipData);
+
+    @PostMapping("/links/{linkId}/disconnect")
+    public ResponseEntity<Boolean> disconnectLink(@PathVariable String linkId) {
+        return ResponseEntity.ok(networkService.disconnectLink(linkId));
     }
-    
-    @DeleteMapping("/ips/{id}")
-    public Result<IPAddress> deleteIPAddress(@PathVariable String id) {
-        return networkProvider.deleteIPAddress(id);
+
+    @PostMapping("/links/{linkId}/reconnect")
+    public ResponseEntity<Boolean> reconnectLink(@PathVariable String linkId) {
+        return ResponseEntity.ok(networkService.reconnectLink(linkId));
     }
-    
-    @GetMapping("/blacklist")
-    public Result<List<IPBlacklist>> getIPBlacklist() {
-        return networkProvider.getIPBlacklist();
+
+    @GetMapping("/routes")
+    public ResponseEntity<PageResult<NetworkRoute>> listRoutes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "20") int size) {
+        return ResponseEntity.ok(networkService.listRoutes(page, size));
     }
-    
-    @PostMapping("/blacklist")
-    public Result<IPBlacklist> addIPToBlacklist(@RequestBody Map<String, Object> data) {
-        return networkProvider.addIPToBlacklist(data);
+
+    @GetMapping("/routes/{routeId}")
+    public ResponseEntity<NetworkRoute> getRoute(@PathVariable String routeId) {
+        NetworkRoute route = networkService.getRoute(routeId);
+        if (route == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(route);
     }
-    
-    @DeleteMapping("/blacklist/{id}")
-    public Result<IPBlacklist> removeIPFromBlacklist(@PathVariable String id) {
-        return networkProvider.removeIPFromBlacklist(id);
+
+    @GetMapping("/routes/find")
+    public ResponseEntity<NetworkRoute> findRoute(
+            @RequestParam(required = false) String source,
+            @RequestParam(required = false) String target,
+            @RequestParam(defaultValue = "shortest") String algorithm,
+            @RequestParam(defaultValue = "10") int maxHops) {
+        return ResponseEntity.ok(networkService.findRoute(source, target, algorithm, maxHops));
     }
-    
-    @GetMapping("/devices")
-    public Result<List<NetworkDevice>> getNetworkDevices() {
-        return networkProvider.getNetworkDevices();
+
+    @GetMapping("/topology")
+    public ResponseEntity<NetworkTopology> getTopology() {
+        return ResponseEntity.ok(networkService.getTopology());
+    }
+
+    @GetMapping("/quality")
+    public ResponseEntity<NetworkQuality> getQuality() {
+        return ResponseEntity.ok(networkService.getQuality());
     }
 }

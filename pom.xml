@@ -52,6 +52,10 @@
         <module>skills/skill-user-auth</module>
         <module>skills/skill-trae-solo</module>
         <module>skills/skill-mqtt</module>
+        <module>skills/skill-security</module>
+        <module>skills/skill-network</module>
+        <module>skills/skill-hosting</module>
+        <module>skills/skill-monitor</module>
     </modules>
 
     <dependencyManagement>

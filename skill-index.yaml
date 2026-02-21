@@ -14,10 +14,59 @@ metadata:
   updatedAt: "2026-02-20T00:00:00Z"
 
 spec:
+  categories:
+    - id: org
+      name: 组织服务
+      nameEn: Organization
+      description: 企业组织架构、用户认证相关服务
+      icon: users
+      order: 1
+      
+    - id: vfs
+      name: 存储服务
+      nameEn: Storage
+      description: 文件存储、对象存储相关服务
+      icon: database
+      order: 2
+      
+    - id: ui
+      name: UI生成
+      nameEn: UI Generation
+      description: 界面生成、设计转代码服务
+      icon: palette
+      order: 3
+      
+    - id: msg
+      name: 消息通讯
+      nameEn: Messaging
+      description: 消息队列、通讯协议服务
+      icon: message
+      order: 4
+      
+    - id: sys
+      name: 系统管理
+      nameEn: System
+      description: 系统监控、网络管理、安全审计
+      icon: settings
+      order: 5
+      
+    - id: util
+      name: 工具服务
+      nameEn: Utility
+      description: 通用工具、辅助功能
+      icon: tool
+      order: 6
+  
   skills:
     - skillId: skill-a2ui
       name: A2UI Skill
       version: "0.7.3"
+      category: ui
+      subCategory: code-gen
+      tags:
+        - a2ui
+        - ui-generation
+        - design-to-code
       description: A2UI图转代码技能，支持将设计图转换为前端代码
       sceneId: ui-generation
       path: skills/skill-a2ui
@@ -28,6 +77,13 @@ spec:
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
       version: "0.7.3"
+      category: org
+      subCategory: dingtalk
+      tags:
+        - dingtalk
+        - dingding
+        - organization
+        - auth
       description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
       sceneId: auth
       path: skills/skill-org-dingding
@@ -38,6 +94,13 @@ spec:
     - skillId: skill-org-feishu
       name: Feishu Organization Service
       version: "0.7.3"
+      category: org
+      subCategory: feishu
+      tags:
+        - feishu
+        - lark
+        - organization
+        - auth
       description: 飞书组织数据集成服务，包括组织架构同步和用户认证
       sceneId: auth
       path: skills/skill-org-feishu
@@ -48,6 +111,13 @@ spec:
     - skillId: skill-org-wecom
       name: WeCom Organization Service
       version: "0.7.3"
+      category: org
+      subCategory: wecom
+      tags:
+        - wecom
+        - enterprise-wechat
+        - organization
+        - auth
       description: 企业微信组织数据集成服务，包括组织架构同步和用户认证
       sceneId: auth
       path: skills/skill-org-wecom
@@ -58,6 +128,12 @@ spec:
     - skillId: skill-org-ldap
       name: LDAP Organization Service
       version: "0.7.3"
+      category: org
+      subCategory: ldap
+      tags:
+        - ldap
+        - organization
+        - auth
       description: LDAP组织服务，提供基于LDAP的组织架构管理和用户认证
       sceneId: auth
       path: skills/skill-org-ldap
@@ -68,6 +144,12 @@ spec:
     - skillId: skill-user-auth
       name: User Authentication Service
       version: "0.7.3"
+      category: org
+      subCategory: auth
+      tags:
+        - auth
+        - authentication
+        - user
       description: 用户认证服务，支持多种认证方式
       sceneId: auth
       path: skills/skill-user-auth
@@ -78,6 +160,11 @@ spec:
     - skillId: skill-trae-solo
       name: Trae Solo Service
       version: "0.7.3"
+      category: util
+      subCategory: general
+      tags:
+        - utility
+        - tools
       description: 连接实用功能，运行结果通过A2UI节点展示
       sceneId: utility
       path: skills/skill-trae-solo
@@ -88,6 +175,12 @@ spec:
     - skillId: skill-mqtt
       name: MQTT Service Skill
       version: "0.7.3"
+      category: msg
+      subCategory: mqtt
+      tags:
+        - mqtt
+        - messaging
+        - iot
       description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
       sceneId: mqtt-messaging
       path: skills/skill-mqtt
@@ -98,6 +191,12 @@ spec:
     - skillId: skill-vfs-database
       name: Database VFS Service
       version: "0.7.3"
+      category: vfs
+      subCategory: database
+      tags:
+        - vfs
+        - database
+        - storage
       description: 数据库存储服务 - 将文件存储在数据库中，支持元数据管理
       sceneId: vfs-database
       path: skills/skill-vfs-database
@@ -108,6 +207,12 @@ spec:
     - skillId: skill-vfs-local
       name: Local VFS Service
       version: "0.7.3"
+      category: vfs
+      subCategory: local
+      tags:
+        - vfs
+        - local
+        - storage
       description: 本地文件系统存储服务 - 提供基本的文件操作和版本管理
       sceneId: vfs-local
       path: skills/skill-vfs-local
@@ -118,6 +223,13 @@ spec:
     - skillId: skill-vfs-minio
       name: MinIO VFS Service
       version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - minio
+        - object-storage
+        - s3
       description: MinIO存储服务 - 提供对象存储能力，支持S3兼容接口
       sceneId: vfs-minio
       path: skills/skill-vfs-minio
@@ -128,6 +240,13 @@ spec:
     - skillId: skill-vfs-oss
       name: Aliyun OSS VFS Service
       version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - oss
+        - aliyun
+        - object-storage
       description: 阿里云OSS存储服务 - 提供对象存储能力，支持阿里云OSS接口
       sceneId: vfs-oss
       path: skills/skill-vfs-oss
@@ -138,6 +257,13 @@ spec:
     - skillId: skill-vfs-s3
       name: AWS S3 VFS Service
       version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - s3
+        - aws
+        - object-storage
       description: AWS S3存储服务 - 提供对象存储能力，支持AWS S3接口
       sceneId: vfs-s3
       path: skills/skill-vfs-s3
@@ -148,6 +274,13 @@ spec:
     - skillId: skill-network
       name: Network Management Skill
       version: "0.7.3"
+      category: sys
+      subCategory: network
+      tags:
+        - network
+        - ip
+        - dhcp
+        - dns
       description: 网络管理技能 - 提供网络配置、IP管理、设备扫描能力
       sceneId: network
       path: skills/skill-network
@@ -158,6 +291,12 @@ spec:
     - skillId: skill-agent
       name: Agent Management Skill
       version: "0.7.3"
+      category: sys
+      subCategory: agent
+      tags:
+        - agent
+        - iot
+        - device
       description: 代理管理技能 - 提供终端代理注册、管理、命令执行能力
       sceneId: agent
       path: skills/skill-agent
@@ -168,6 +307,12 @@ spec:
     - skillId: skill-security
       name: Security Management Skill
       version: "0.7.3"
+      category: sys
+      subCategory: security
+      tags:
+        - security
+        - auth
+        - audit
       description: 安全管理技能 - 提供用户管理、权限控制、安全审计能力
       sceneId: security
       path: skills/skill-security
@@ -178,6 +323,12 @@ spec:
     - skillId: skill-health
       name: Health Check Skill
       version: "0.7.3"
+      category: sys
+      subCategory: health
+      tags:
+        - health
+        - monitor
+        - check
       description: 健康检查技能 - 提供系统健康检查、服务检查、报告生成能力
       sceneId: health
       path: skills/skill-health
@@ -188,6 +339,12 @@ spec:
     - skillId: skill-protocol
       name: Protocol Management Skill
       version: "0.7.3"
+      category: sys
+      subCategory: protocol
+      tags:
+        - protocol
+        - handler
+        - mcp
       description: 协议管理技能 - 提供协议处理器注册、命令分发能力
       sceneId: protocol
       path: skills/skill-protocol
@@ -198,6 +355,12 @@ spec:
     - skillId: skill-openwrt
       name: OpenWrt Management Skill
       version: "0.7.3"
+      category: sys
+      subCategory: router
+      tags:
+        - openwrt
+        - router
+        - network
       description: OpenWrt管理技能 - 提供OpenWrt路由器连接、配置、命令执行能力
       sceneId: openwrt
       path: skills/skill-openwrt
@@ -208,6 +371,11 @@ spec:
     - skillId: skill-share
       name: Skill Share Skill
       version: "0.7.3"
+      category: util
+      subCategory: share
+      tags:
+        - share
+        - collaboration
       description: 技能分享技能 - 提供技能分享、接收管理能力
       sceneId: share
       path: skills/skill-share
