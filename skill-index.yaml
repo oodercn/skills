@@ -469,6 +469,74 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-llm-openai
+      name: OpenAI LLM Provider
+      version: "0.7.3"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - openai
+        - gpt
+        - chatgpt
+      description: OpenAI LLM Provider - 提供GPT模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-openai
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-openai-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-openai-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-llm-ollama
+      name: Ollama LLM Provider
+      version: "0.7.3"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - ollama
+        - local
+        - llama
+      description: Ollama LLM Provider - 提供本地模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-ollama
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-ollama-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-ollama-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-scheduler-quartz
+      name: Quartz Scheduler Provider
+      version: "0.7.3"
+      category: util
+      subCategory: scheduler
+      tags:
+        - scheduler
+        - quartz
+        - cron
+        - task
+      description: Quartz调度器 - 提供任务调度、定时执行能力
+      sceneId: scheduler
+      path: skills/skill-scheduler-quartz
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-httpclient-okhttp
+      name: OkHttp Provider
+      version: "0.7.3"
+      category: util
+      subCategory: http
+      tags:
+        - http
+        - okhttp
+        - client
+        - request
+      description: OkHttp客户端 - 提供HTTP请求能力
+      sceneId: http
+      path: skills/skill-httpclient-okhttp
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-httpclient-okhttp-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-httpclient-okhttp-0.7.3.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
