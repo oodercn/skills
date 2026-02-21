@@ -382,6 +382,42 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-hosting
+      name: Hosting Service
+      version: "0.7.3"
+      category: sys
+      subCategory: hosting
+      tags:
+        - hosting
+        - kubernetes
+        - aliyun
+        - tencent
+        - cloud
+      description: 托管服务 - 提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
+      sceneId: hosting
+      path: skills/skill-hosting
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-hosting-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-hosting-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-monitor
+      name: Monitoring Service
+      version: "0.7.3"
+      category: sys
+      subCategory: monitor
+      tags:
+        - monitor
+        - metrics
+        - alert
+        - observation
+        - logging
+      description: 监控服务 - 提供指标采集、告警管理、日志查询和观测能力
+      sceneId: monitor
+      path: skills/skill-monitor
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
@@ -753,3 +789,15 @@ spec:
         - skill-receiving
         - share-management
       maxMembers: 500
+      
+    - sceneId: hosting
+      name: Hosting Service
+      description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - instance-management
+        - instance-scaling
+        - instance-health
+        - cloud-provider
+      maxMembers: 100
