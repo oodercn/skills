@@ -3,9 +3,9 @@ kind: SkillManifest
 
 metadata:
   id: skill-agent
-  name: Agent Management Skill
+  name: Agent Management Service
   version: 0.7.3
-  description: Provides end agent registration, management, and command execution capabilities
+  description: Provides terminal agent registration, management and command execution capabilities
   author: Ooder Team
   license: Apache-2.0
   homepage: https://github.com/ooderCN/skills
@@ -13,9 +13,9 @@ metadata:
   keywords:
     - agent
     - terminal
+    - management
     - command
-    - iot
-    - device
+    - execution
 
 spec:
   type: tool-skill
@@ -29,7 +29,7 @@ spec:
   capabilities:
     - id: agent-management
       name: Agent Management
-      description: Register and manage end agents
+      description: Register, update, delete agents
       category: agent
     - id: command-execution
       name: Command Execution
@@ -37,7 +37,7 @@ spec:
       category: agent
     - id: network-status
       name: Network Status
-      description: Monitor network status
+      description: Get agent network status
       category: agent
   
   scenes:
@@ -49,68 +49,53 @@ spec:
         - network-status
   
   dependencies:
-    skills:
-      - id: skill-network
-        version: ">=0.7.3"
-        optional: false
+    skills: []
     libraries: []
   
   config:
     required: []
     optional:
-      - name: AGENT_HEARTBEAT_INTERVAL
+      - name: HEARTBEAT_INTERVAL
         type: integer
         default: 30000
-        description: Heartbeat interval in milliseconds
-      - name: AGENT_TIMEOUT
+        description: Agent heartbeat interval in milliseconds
+      - name: OFFLINE_THRESHOLD
         type: integer
-        default: 60000
-        description: Agent timeout in milliseconds
-      - name: AGENT_MAX_RETRY_COUNT
-        type: integer
-        default: 3
-        description: Maximum retry count
+        default: 90000
+        description: Time threshold to mark agent as offline
   
   endpoints:
-    - path: /api/agents/status
+    - path: /api/agent/register
+      method: POST
+      description: Register a new agent
+      capability: agent-management
+    - path: /api/agent/list
       method: GET
-      description: Get network status
+      description: List all agents
+      capability: agent-management
+    - path: /api/agent/{agentId}
+      method: GET
+      description: Get agent by ID
+      capability: agent-management
+    - path: /api/agent/{agentId}
+      method: DELETE
+      description: Delete an agent
+      capability: agent-management
+    - path: /api/agent/{agentId}/heartbeat
+      method: POST
+      description: Agent heartbeat
+      capability: agent-management
+    - path: /api/agent/{agentId}/command
+      method: POST
+      description: Execute command on agent
+      capability: command-execution
+    - path: /api/agent/{agentId}/network
+      method: GET
+      description: Get agent network status
       capability: network-status
-    - path: /api/agents/stats
+    - path: /api/agent/{agentId}/status
       method: GET
-      description: Get command stats
-      capability: command-execution
-    - path: /api/agents
-      method: GET
-      description: Get agent list
-      capability: agent-management
-    - path: /api/agents
-      method: POST
-      description: Add agent
-      capability: agent-management
-    - path: /api/agents/{id}
-      method: PUT
-      description: Edit agent
-      capability: agent-management
-    - path: /api/agents/{id}
-      method: DELETE
-      description: Delete agent
-      capability: agent-management
-    - path: /api/agents/{id}
-      method: GET
-      description: Get agent details
-      capability: agent-management
-    - path: /api/agents/test-command
-      method: POST
-      description: Test command execution
-      capability: command-execution
-    - path: /api/agents/logs
-      method: GET
-      description: Get log list
-      capability: agent-management
-    - path: /api/agents/logs
-      method: DELETE
-      description: Clear logs
+      description: Get agent status
       capability: agent-management
   
   resources:

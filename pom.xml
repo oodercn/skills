@@ -59,11 +59,16 @@
         <module>skills/skill-monitor</module>
         <module>skills/skill-im</module>
         <module>skills/skill-group</module>
+        <module>skills/skill-health</module>
+        <module>skills/skill-agent</module>
+        <module>skills/skill-openwrt</module>
         <module>skills/skill-market</module>
         <module>skills/skill-collaboration</module>
         <module>skills/skill-msg</module>
         <module>skills/skill-business</module>
         <module>skills/skill-vfs-local</module>
+        <module>skills/skill-k8s</module>
+        <module>skills/skill-scheduler-quartz</module>
     </modules>
 
     <dependencyManagement>

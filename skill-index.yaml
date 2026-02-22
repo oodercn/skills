@@ -548,6 +548,60 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-health
+      name: Health Check Service
+      version: "0.7.3"
+      category: sys
+      subCategory: health
+      tags:
+        - health
+        - check
+        - monitor
+        - service
+        - report
+      description: 健康检查服务 - 提供系统健康检查、服务检查和报告生成能力
+      sceneId: health
+      path: skills/skill-health
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-agent
+      name: Agent Management Service
+      version: "0.7.3"
+      category: sys
+      subCategory: agent
+      tags:
+        - agent
+        - terminal
+        - management
+        - command
+        - execution
+      description: 代理管理服务 - 提供终端代理注册、管理和命令执行能力
+      sceneId: agent
+      path: skills/skill-agent
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-openwrt
+      name: OpenWrt Router Driver
+      version: "0.7.3"
+      category: sys
+      subCategory: openwrt
+      tags:
+        - openwrt
+        - router
+        - uci
+        - network
+        - driver
+      description: OpenWrt路由器驱动 - 提供OpenWrt路由器连接、配置和命令执行能力
+      sceneId: openwrt
+      path: skills/skill-openwrt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      checksum: ""
+      
     - skillId: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
       version: "0.7.3"
@@ -735,6 +789,108 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-notify
+      name: Notification Service
+      version: "0.7.3"
+      category: msg
+      subCategory: notify
+      tags:
+        - notify
+        - notification
+        - push
+        - alert
+      description: 通知服务 - 提供多渠道消息推送、模板管理、订阅管理能力
+      sceneId: messaging
+      path: skills/skill-notify
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-email
+      name: Email Service
+      version: "0.7.3"
+      category: msg
+      subCategory: email
+      tags:
+        - email
+        - smtp
+        - mail
+        - template
+      description: 邮件服务 - 提供邮件发送、模板管理、附件支持能力
+      sceneId: messaging
+      path: skills/skill-email
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-search
+      name: Search Service
+      version: "0.7.3"
+      category: sys
+      subCategory: search
+      tags:
+        - search
+        - elasticsearch
+        - index
+        - query
+      description: 搜索服务 - 提供文档索引、搜索、聚合分析能力
+      sceneId: sys
+      path: skills/skill-search
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-search-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-search-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-audit
+      name: Audit Service
+      version: "0.7.3"
+      category: sys
+      subCategory: audit
+      tags:
+        - audit
+        - log
+        - compliance
+        - security
+      description: 审计服务 - 提供操作审计、日志查询、合规报告能力
+      sceneId: sys
+      path: skills/skill-audit
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-report
+      name: Report Service
+      version: "0.7.3"
+      category: sys
+      subCategory: report
+      tags:
+        - report
+        - export
+        - pdf
+        - excel
+      description: 报表服务 - 提供报表生成、模板管理、多格式导出能力
+      sceneId: sys
+      path: skills/skill-report
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-report-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-report-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-task
+      name: Task Management Service
+      version: "0.7.3"
+      category: sys
+      subCategory: task
+      tags:
+        - task
+        - job
+        - async
+        - schedule
+      description: 任务管理服务 - 提供任务创建、执行、监控、依赖管理能力
+      sceneId: sys
+      path: skills/skill-task
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-task-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-task-0.7.3.jar
+      checksum: ""
+      
     - skillId: skill-market
       name: Skill Market Service
       version: "0.7.3"
@@ -818,6 +974,40 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-k8s
+      name: Kubernetes Cluster Management
+      version: "0.7.3"
+      category: infrastructure
+      subCategory: kubernetes
+      tags:
+        - kubernetes
+        - k8s
+        - cluster
+        - container
+      description: Kubernetes集群管理服务 - 提供集群、节点、命名空间、Pod管理能力
+      sceneId: kubernetes
+      path: skills/skill-k8s
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-scheduler-quartz
+      name: Quartz Scheduler Service
+      version: "0.7.3"
+      category: scheduler
+      subCategory: quartz
+      tags:
+        - scheduler
+        - quartz
+        - cron
+        - task
+      description: Quartz调度服务 - 提供任务调度、执行历史管理能力
+      sceneId: scheduling
+      path: skills/skill-scheduler-quartz
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      checksum: ""
 
   scenes:
     - sceneId: ui-generation
@@ -847,7 +1037,29 @@ spec:
       category: SYSTEM
       requiredCapabilities:
         - execute-task
+      
+    - sceneId: kubernetes
+      name: Kubernetes Management
+      description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
+      version: "1.0.0"
+      category: INFRASTRUCTURE
+      requiredCapabilities:
+        - cluster-management
+        - node-management
+        - namespace-management
+        - pod-management
       maxMembers: 50
+      
+    - sceneId: scheduling
+      name: Task Scheduling
+      description: 任务调度场景，提供任务调度、执行历史管理能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - schedule-task
+        - manage-execution
+        - history-query
+      maxMembers: 100
       
     - sceneId: mqtt-messaging
       name: MQTT Messaging

@@ -3,9 +3,9 @@ kind: SkillManifest
 
 metadata:
   id: skill-health
-  name: Health Check Skill
+  name: Health Check Service
   version: 0.7.3
-  description: Provides system health check, service check, and report generation capabilities
+  description: Provides system health check, service check and report generation capabilities
   author: Ooder Team
   license: Apache-2.0
   homepage: https://github.com/ooderCN/skills
@@ -14,6 +14,7 @@ metadata:
     - health
     - check
     - monitor
+    - service
     - report
 
 spec:
@@ -28,11 +29,11 @@ spec:
   capabilities:
     - id: health-check
       name: Health Check
-      description: Perform system health checks
+      description: Run system health checks
       category: health
     - id: service-check
       name: Service Check
-      description: Check service status
+      description: Check individual service status
       category: health
     - id: report-generation
       name: Report Generation
@@ -54,41 +55,45 @@ spec:
   config:
     required: []
     optional:
-      - name: HEALTH_CHECK_INTERVAL
+      - name: CHECK_INTERVAL
         type: integer
         default: 60000
         description: Health check interval in milliseconds
-      - name: HEALTH_TIMEOUT
+      - name: TIMEOUT
         type: integer
-        default: 30000
-        description: Health check timeout in milliseconds
-      - name: HEALTH_MAX_CONCURRENT
-        type: integer
-        default: 10
-        description: Maximum concurrent checks
+        default: 5000
+        description: Check timeout in milliseconds
   
   endpoints:
     - path: /api/health/check
       method: POST
       description: Run health check
       capability: health-check
-    - path: /api/health/report
+    - path: /api/health/services
       method: GET
-      description: Export health report
+      description: List all services
+      capability: service-check
+    - path: /api/health/services/{serviceName}/check
+      method: POST
+      description: Check specific service
+      capability: service-check
+    - path: /api/health/report
+      method: POST
+      description: Generate health report
       capability: report-generation
     - path: /api/health/schedule
       method: POST
       description: Schedule health check
       capability: health-check
-    - path: /api/health/service/{name}
+    - path: /api/health/status
       method: GET
-      description: Check service
-      capability: service-check
+      description: Get overall health status
+      capability: health-check
   
   resources:
-    cpu: "200m"
-    memory: "256Mi"
-    storage: "100Mi"
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
   
   offline:
     enabled: true

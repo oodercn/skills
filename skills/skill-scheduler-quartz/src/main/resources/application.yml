@@ -1,0 +1,15 @@
+server:
+  port: 8096
+
+spring:
+  application:
+    name: skill-scheduler-quartz
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+scheduler:
+  data-path: ./data/scheduler

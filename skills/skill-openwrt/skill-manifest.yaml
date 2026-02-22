@@ -3,9 +3,9 @@ kind: SkillManifest
 
 metadata:
   id: skill-openwrt
-  name: OpenWrt Management Skill
+  name: OpenWrt Router Driver
   version: 0.7.3
-  description: Provides OpenWrt router connection, configuration, and command execution capabilities
+  description: Provides OpenWrt router connection, configuration and command execution capabilities
   author: Ooder Team
   license: Apache-2.0
   homepage: https://github.com/ooderCN/skills
@@ -15,6 +15,7 @@ metadata:
     - router
     - uci
     - network
+    - driver
 
 spec:
   type: tool-skill
@@ -28,7 +29,7 @@ spec:
   capabilities:
     - id: router-connection
       name: Router Connection
-      description: Connect to OpenWrt routers
+      description: Connect to OpenWrt router via SSH/HTTP
       category: openwrt
     - id: uci-config
       name: UCI Configuration
@@ -38,6 +39,14 @@ spec:
       name: Command Execution
       description: Execute commands on router
       category: openwrt
+    - id: wifi-management
+      name: WiFi Management
+      description: Manage WiFi settings
+      category: openwrt
+    - id: dhcp-management
+      name: DHCP Management
+      description: Manage DHCP settings
+      category: openwrt
   
   scenes:
     - name: openwrt
@@ -46,29 +55,28 @@ spec:
         - router-connection
         - uci-config
         - command-execution
+        - wifi-management
+        - dhcp-management
   
   dependencies:
-    skills:
-      - id: skill-network
-        version: ">=0.7.3"
-        optional: false
+    skills: []
     libraries: []
   
   config:
     required: []
     optional:
-      - name: OPENWRT_CONNECTION_TIMEOUT
+      - name: CONNECTION_TIMEOUT
         type: integer
         default: 30000
         description: Connection timeout in milliseconds
-      - name: OPENWRT_COMMAND_TIMEOUT
+      - name: SSH_PORT
         type: integer
-        default: 60000
-        description: Command timeout in milliseconds
-      - name: OPENWRT_RETRY_COUNT
+        default: 22
+        description: SSH port
+      - name: HTTP_PORT
         type: integer
-        default: 3
-        description: Retry count
+        default: 80
+        description: HTTP port
   
   endpoints:
     - path: /api/openwrt/connect
@@ -81,39 +89,51 @@ spec:
       capability: router-connection
     - path: /api/openwrt/status
       method: GET
-      description: Check connection status
+      description: Get connection status
       capability: router-connection
-    - path: /api/openwrt/settings
+    - path: /api/openwrt/info
       method: GET
-      description: Get network settings
-      capability: uci-config
-    - path: /api/openwrt/settings/{type}
-      method: PUT
-      description: Update network settings
-      capability: uci-config
-    - path: /api/openwrt/ips
+      description: Get router info
+      capability: router-connection
+    - path: /api/openwrt/uci/get
       method: GET
-      description: Get IP addresses
+      description: Get UCI config
       capability: uci-config
-    - path: /api/openwrt/blacklist
-      method: GET
-      description: Get IP blacklist
+    - path: /api/openwrt/uci/set
+      method: POST
+      description: Set UCI config
+      capability: uci-config
+    - path: /api/openwrt/uci/commit
+      method: POST
+      description: Commit UCI changes
       capability: uci-config
     - path: /api/openwrt/command
       method: POST
       description: Execute command
       capability: command-execution
+    - path: /api/openwrt/wifi/list
+      method: GET
+      description: List WiFi networks
+      capability: wifi-management
+    - path: /api/openwrt/wifi/update
+      method: POST
+      description: Update WiFi config
+      capability: wifi-management
+    - path: /api/openwrt/wifi/scan
+      method: POST
+      description: Scan WiFi networks
+      capability: wifi-management
+    - path: /api/openwrt/dhcp/leases
+      method: GET
+      description: Get DHCP leases
+      capability: dhcp-management
+    - path: /api/openwrt/packages
+      method: GET
+      description: List packages
+      capability: command-execution
     - path: /api/openwrt/reboot
       method: POST
       description: Reboot router
-      capability: command-execution
-    - path: /api/openwrt/system
-      method: GET
-      description: Get system status
-      capability: command-execution
-    - path: /api/openwrt/version
-      method: GET
-      description: Get version info
       capability: command-execution
   
   resources:
@@ -122,4 +142,6 @@ spec:
     storage: "100Mi"
   
   offline:
-    enabled: false
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/skillcenter/market")
@@ -76,5 +78,37 @@ public class SkillMarketController {
             return ResponseEntity.notFound().build();
         }
         return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/sdk/config")
+    public ResponseEntity<SdkConfig> getSdkConfig() {
+        return ResponseEntity.ok(skillMarketService.getSdkConfig());
+    }
+
+    @PutMapping("/sdk/config")
+    public ResponseEntity<SdkConfig> updateSdkConfig(@RequestBody SdkConfig config) {
+        return ResponseEntity.ok(skillMarketService.updateSdkConfig(config));
+    }
+
+    @GetMapping("/sdk/status")
+    public ResponseEntity<SdkStatus> getSdkStatus() {
+        return ResponseEntity.ok(skillMarketService.getSdkStatus());
+    }
+
+    @PostMapping("/sdk/mode")
+    public ResponseEntity<Map<String, Object>> switchMode(@RequestBody Map<String, String> request) {
+        String mode = request.get("mode");
+        if (mode == null || (!mode.equals("mock") && !mode.equals("real"))) {
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "Invalid mode. Must be 'mock' or 'real'");
+            return ResponseEntity.badRequest().body(errorResponse);
+        }
+        boolean result = skillMarketService.switchMode(mode);
+        Map<String, Object> response = new HashMap<>();
+        response.put("success", result);
+        response.put("message", result ? "Mode switched to " + mode : "Failed to switch mode");
+        response.put("mode", mode);
+        return ResponseEntity.ok(response);
     }
 }

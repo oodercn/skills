@@ -1,0 +1,124 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-k8s
+  name: Kubernetes Cluster Management
+  version: 0.7.3
+  description: Provides Kubernetes cluster, node, namespace and pod management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - kubernetes
+    - k8s
+    - cluster
+    - container
+    - orchestration
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.k8s.K8sSkillApplication
+  
+  capabilities:
+    - id: cluster-management
+      name: Cluster Management
+      description: Manage Kubernetes clusters
+      category: infrastructure
+    - id: node-management
+      name: Node Management
+      description: Manage cluster nodes
+      category: infrastructure
+    - id: namespace-management
+      name: Namespace Management
+      description: Manage Kubernetes namespaces
+      category: infrastructure
+    - id: pod-management
+      name: Pod Management
+      description: Manage pods and workloads
+      category: infrastructure
+  
+  scenes:
+    - name: kubernetes
+      description: Kubernetes management scene
+      capabilities:
+        - cluster-management
+        - node-management
+        - namespace-management
+        - pod-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: K8S_MASTER_URL
+        type: string
+        default: ""
+        description: Kubernetes API server URL
+      - name: K8S_TOKEN
+        type: string
+        default: ""
+        description: Kubernetes access token
+      - name: K8S_NAMESPACE
+        type: string
+        default: "default"
+        description: Default namespace
+  
+  endpoints:
+    - path: /api/k8s/clusters
+      method: GET
+      description: List clusters
+      capability: cluster-management
+    - path: /api/k8s/clusters/{clusterId}
+      method: GET
+      description: Get cluster info
+      capability: cluster-management
+    - path: /api/k8s/nodes
+      method: GET
+      description: List nodes
+      capability: node-management
+    - path: /api/k8s/nodes/{nodeName}
+      method: GET
+      description: Get node info
+      capability: node-management
+    - path: /api/k8s/namespaces
+      method: GET
+      description: List namespaces
+      capability: namespace-management
+    - path: /api/k8s/namespaces
+      method: POST
+      description: Create namespace
+      capability: namespace-management
+    - path: /api/k8s/namespaces/{namespace}
+      method: DELETE
+      description: Delete namespace
+      capability: namespace-management
+    - path: /api/k8s/pods
+      method: GET
+      description: List pods
+      capability: pod-management
+    - path: /api/k8s/pods/{namespace}/{podName}
+      method: GET
+      description: Get pod info
+      capability: pod-management
+    - path: /api/k8s/pods/{namespace}/{podName}/logs
+      method: GET
+      description: Get pod logs
+      capability: pod-management
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true

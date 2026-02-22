@@ -12,4 +12,9 @@ public interface SkillMarketService {
     InstallResult uninstallSkill(String skillId);
     InstallResult updateSkill(String skillId);
     AuthStatus getAuthStatus(String skillId);
+    
+    SdkConfig getSdkConfig();
+    SdkConfig updateSdkConfig(SdkConfig config);
+    SdkStatus getSdkStatus();
+    boolean switchMode(String mode);
 }

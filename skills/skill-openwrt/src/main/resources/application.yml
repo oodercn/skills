@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 8090
 
 spring:
   application:
@@ -9,9 +9,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
-openwrt:
-  connection-timeout: 30000
-  command-timeout: 60000
-  retry-count: 3
+skill:
+  openwrt:
+    connection-timeout: 30000
+    ssh-port: 22
+    http-port: 80

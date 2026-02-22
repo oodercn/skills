@@ -155,4 +155,87 @@ public class SkillMarketServiceImpl implements SkillMarketService {
         SkillPackage pkg = skillCache.get(skillId);
         return pkg != null ? pkg.getAuthStatus() : null;
     }
+
+    private SdkConfig sdkConfig;
+    private final long startTime = System.currentTimeMillis();
+
+    private void initSdkConfig() {
+        sdkConfig = new SdkConfig();
+        sdkConfig.setMode("mock");
+        sdkConfig.setMockDelay(300);
+        sdkConfig.setVersion("0.7.3");
+        sdkConfig.setEndpoint("http://localhost:8091");
+        sdkConfig.setSettings(new HashMap<>());
+        sdkConfig.setUpdateTime(System.currentTimeMillis());
+    }
+
+    @Override
+    public SdkConfig getSdkConfig() {
+        if (sdkConfig == null) {
+            initSdkConfig();
+        }
+        return sdkConfig;
+    }
+
+    @Override
+    public SdkConfig updateSdkConfig(SdkConfig config) {
+        if (config == null) {
+            return sdkConfig;
+        }
+        if (config.getMode() != null) {
+            sdkConfig.setMode(config.getMode());
+        }
+        if (config.getMockDelay() != null) {
+            sdkConfig.setMockDelay(config.getMockDelay());
+        }
+        if (config.getEndpoint() != null) {
+            sdkConfig.setEndpoint(config.getEndpoint());
+        }
+        if (config.getSettings() != null) {
+            sdkConfig.setSettings(config.getSettings());
+        }
+        sdkConfig.setUpdateTime(System.currentTimeMillis());
+        return sdkConfig;
+    }
+
+    @Override
+    public SdkStatus getSdkStatus() {
+        SdkStatus status = new SdkStatus();
+        status.setStatus("running");
+        status.setMode(sdkConfig != null ? sdkConfig.getMode() : "mock");
+        status.setVersion("0.7.3");
+        status.setHealthy(true);
+        status.setUptime(System.currentTimeMillis() - startTime);
+        status.setActiveConnections(0);
+        
+        List<SdkStatus.SdkComponent> components = new ArrayList<>();
+        
+        SdkStatus.SdkComponent market = new SdkStatus.SdkComponent();
+        market.setName("skill-market");
+        market.setStatus("running");
+        market.setVersion("0.7.3");
+        components.add(market);
+        
+        SdkStatus.SdkComponent storage = new SdkStatus.SdkComponent();
+        storage.setName("storage");
+        storage.setStatus("healthy");
+        storage.setVersion("1.0.0");
+        components.add(storage);
+        
+        status.setComponents(components);
+        return status;
+    }
+
+    @Override
+    public boolean switchMode(String mode) {
+        if (mode == null || (!mode.equals("mock") && !mode.equals("real"))) {
+            return false;
+        }
+        if (sdkConfig == null) {
+            initSdkConfig();
+        }
+        sdkConfig.setMode(mode);
+        sdkConfig.setUpdateTime(System.currentTimeMillis());
+        return true;
+    }
 }

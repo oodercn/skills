@@ -17,15 +17,9 @@
     <packaging>jar</packaging>
 
     <name>skill-openwrt</name>
-    <description>OpenWrt Management Skill for Ooder Agent Platform</description>
+    <description>OpenWrt Router Driver Skill for Ooder Agent Platform</description>
 
     <dependencies>
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>scene-engine</artifactId>
-            <version>0.7.3</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -38,11 +32,6 @@
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
-        </dependency>
-        <dependency>
-            <groupId>com.jcraft</groupId>
-            <artifactId>jsch</artifactId>
-            <version>0.1.55</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>

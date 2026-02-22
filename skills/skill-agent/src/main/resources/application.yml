@@ -1,5 +1,5 @@
 server:
-  port: 8084
+  port: 8089
 
 spring:
   application:
@@ -9,9 +9,12 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
 
-agent:
-  heartbeat-interval: 30000
-  timeout: 60000
-  max-retry-count: 3
+skill:
+  agent:
+    heartbeat-interval: 30000
+    offline-threshold: 90000

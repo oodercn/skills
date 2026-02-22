@@ -4,29 +4,58 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.ooder</groupId>
+    <parent>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-skills</artifactId>
+        <version>0.7.3</version>
+        <relativePath>../../pom.xml</relativePath>
+    </parent>
+
     <artifactId>skill-scheduler-quartz</artifactId>
-    <version>0.7.3</version>
     <packaging>jar</packaging>
 
     <name>skill-scheduler-quartz</name>
-    <description>Quartz Scheduler Provider Implementation</description>
+    <description>Quartz Scheduler Provider Implementation for Ooder Agent Platform</description>
 
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>scene-engine</artifactId>
-            <version>0.7.3</version>
-            <scope>provided</scope>
+            <artifactId>skill-common</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+        <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>
+                            <groupId>org.projectlombok</groupId>
+                            <artifactId>lombok</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

@@ -17,15 +17,9 @@
     <packaging>jar</packaging>
 
     <name>skill-health</name>
-    <description>Health Check Skill for Ooder Agent Platform</description>
+    <description>Health Check Service Skill for Ooder Agent Platform</description>
 
     <dependencies>
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>scene-engine</artifactId>
-            <version>0.7.3</version>
-            <scope>provided</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

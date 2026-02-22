@@ -1,83 +1,73 @@
 package net.ooder.skill.agent.controller;
 
-import net.ooder.skill.agent.model.*;
-import net.ooder.skill.agent.provider.Result;
+import net.ooder.skill.agent.dto.*;
 import net.ooder.skill.agent.service.AgentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/agents")
+@RequestMapping("/api/agent")
 public class AgentController {
-    
+
     @Autowired
     private AgentService agentService;
-    
-    @GetMapping("/status")
-    public Result<NetworkStatusData> getNetworkStatus() {
-        return Result.success(agentService.getNetworkStatus());
+
+    @PostMapping("/register")
+    public ResponseEntity<AgentInfo> registerAgent(@RequestBody Map<String, Object> params) {
+        return ResponseEntity.ok(agentService.registerAgent(params));
     }
-    
-    @GetMapping("/stats")
-    public Result<CommandStatsData> getCommandStats() {
-        return Result.success(agentService.getCommandStats());
+
+    @GetMapping("/list")
+    public ResponseEntity<List<AgentInfo>> listAgents() {
+        return ResponseEntity.ok(agentService.listAgents());
     }
-    
-    @GetMapping
-    public Result<List<EndAgent>> getEndAgents() {
-        return Result.success(agentService.getEndAgents());
-    }
-    
-    @PostMapping
-    public Result<EndAgent> addEndAgent(@RequestBody Map<String, Object> agentData) {
-        return Result.success(agentService.addEndAgent(agentData));
-    }
-    
-    @PutMapping("/{id}")
-    public Result<EndAgent> editEndAgent(
-            @PathVariable String id,
-            @RequestBody Map<String, Object> agentData) {
-        EndAgent agent = agentService.editEndAgent(id, agentData);
+
+    @GetMapping("/{agentId}")
+    public ResponseEntity<AgentInfo> getAgent(@PathVariable String agentId) {
+        AgentInfo agent = agentService.getAgent(agentId);
         if (agent == null) {
-            return Result.notFound("Agent not found");
+            return ResponseEntity.notFound().build();
         }
-        return Result.success(agent);
+        return ResponseEntity.ok(agent);
     }
-    
-    @DeleteMapping("/{id}")
-    public Result<EndAgent> deleteEndAgent(@PathVariable String id) {
-        EndAgent agent = agentService.deleteEndAgent(id);
+
+    @DeleteMapping("/{agentId}")
+    public ResponseEntity<Boolean> deleteAgent(@PathVariable String agentId) {
+        return ResponseEntity.ok(agentService.deleteAgent(agentId));
+    }
+
+    @PostMapping("/{agentId}/heartbeat")
+    public ResponseEntity<Boolean> heartbeat(@PathVariable String agentId) {
+        return ResponseEntity.ok(agentService.heartbeat(agentId));
+    }
+
+    @PostMapping("/{agentId}/command")
+    public ResponseEntity<CommandResult> executeCommand(
+            @PathVariable String agentId,
+            @RequestBody Map<String, String> params) {
+        String command = params.get("command");
+        return ResponseEntity.ok(agentService.executeCommand(agentId, command));
+    }
+
+    @GetMapping("/{agentId}/network")
+    public ResponseEntity<AgentNetworkStatus> getNetworkStatus(@PathVariable String agentId) {
+        AgentNetworkStatus status = agentService.getNetworkStatus(agentId);
+        if (status == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(status);
+    }
+
+    @GetMapping("/{agentId}/status")
+    public ResponseEntity<AgentInfo> getStatus(@PathVariable String agentId) {
+        AgentInfo agent = agentService.getStatus(agentId);
         if (agent == null) {
-            return Result.notFound("Agent not found");
+            return ResponseEntity.notFound().build();
         }
-        return Result.success(agent);
-    }
-    
-    @GetMapping("/{id}")
-    public Result<EndAgent> getEndAgentDetails(@PathVariable String id) {
-        EndAgent agent = agentService.getEndAgentDetails(id);
-        if (agent == null) {
-            return Result.notFound("Agent not found");
-        }
-        return Result.success(agent);
-    }
-    
-    @PostMapping("/test-command")
-    public Result<TestCommandResult> testCommand(@RequestBody Map<String, Object> commandData) {
-        return Result.success(agentService.testCommand(commandData));
-    }
-    
-    @GetMapping("/logs")
-    public Result<List<LogEntry>> getLogList(@RequestParam(defaultValue = "100") int limit) {
-        return Result.success(agentService.getLogList(limit));
-    }
-    
-    @DeleteMapping("/logs")
-    public Result<Void> clearLog() {
-        agentService.clearLog();
-        return Result.success();
+        return ResponseEntity.ok(agent);
     }
 }
