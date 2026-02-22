@@ -8,11 +8,55 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
+/**
+ * 审计日志服务实现类
+ * 
+ * <p>提供审计日志的核心业务逻辑实现，使用内存存储（ConcurrentHashMap）作为临时存储方案。
+ * 生产环境建议替换为持久化存储（如数据库、Elasticsearch等）。</p>
+ * 
+ * <h3>实现特点：</h3>
+ * <ul>
+ *   <li>线程安全：使用ConcurrentHashMap保证并发安全</li>
+ *   <li>内存存储：适合开发测试，生产环境需替换</li>
+ *   <li>流式处理：使用Java 8 Stream API进行数据过滤和统计</li>
+ * </ul>
+ * 
+ * <h3>扩展建议：</h3>
+ * <ul>
+ *   <li>替换为数据库存储（MySQL、PostgreSQL等）</li>
+ *   <li>集成Elasticsearch实现高效全文检索</li>
+ *   <li>添加日志归档和清理策略</li>
+ *   <li>实现日志加密和防篡改机制</li>
+ * </ul>
+ * 
+ * @author Ooder Team
+ * @version 0.7.3
+ * @since 2026-02-22
+ */
 @Service
 public class AuditServiceImpl implements AuditService {
 
+    /**
+     * 审计日志存储
+     * 
+     * <p>使用ConcurrentHashMap实现线程安全的内存存储。
+     * Key为日志ID，Value为审计日志对象。</p>
+     * 
+     * <p>注意：这是临时存储方案，服务重启后数据会丢失。
+     * 生产环境应替换为持久化存储。</p>
+     */
     private final Map<String, AuditLog> logs = new ConcurrentHashMap<>();
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>实现说明：</p>
+     * <ul>
+     *   <li>自动生成日志ID（格式：audit-{UUID前8位}）</li>
+     *   <li>自动设置时间戳（如果未设置）</li>
+     *   <li>使用ConcurrentHashMap保证线程安全</li>
+     * </ul>
+     */
     @Override
     public AuditLog record(AuditLog log) {
         if (log.getLogId() == null || log.getLogId().isEmpty()) {
@@ -25,11 +69,26 @@ public class AuditServiceImpl implements AuditService {
         return log;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AuditLog getById(String logId) {
         return logs.get(logId);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>实现说明：</p>
+     * <ul>
+     *   <li>使用Stream API进行多条件过滤</li>
+     *   <li>支持按时间戳升序/降序排序</li>
+     *   <li>支持分页查询</li>
+     * </ul>
+     * 
+     * <p>性能考虑：当前实现为内存过滤，大数据量时建议使用索引优化。</p>
+     */
     @Override
     public AuditQueryResult query(AuditQueryRequest request) {
         List<AuditLog> filtered = logs.values().stream()
@@ -55,6 +114,16 @@ public class AuditServiceImpl implements AuditService {
         return new AuditQueryResult(pageItems, request.getPage(), request.getSize(), total);
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>统计维度：</p>
+     * <ul>
+     *   <li>总量统计：总日志数、今日日志数</li>
+     *   <li>结果统计：成功次数、失败次数</li>
+     *   <li>分布统计：操作类型分布、资源类型分布、用户活跃度</li>
+     * </ul>
+     */
     @Override
     public AuditStatistics getStatistics(Long startTime, Long endTime) {
         AuditStatistics stats = new AuditStatistics();
@@ -102,6 +171,15 @@ public class AuditServiceImpl implements AuditService {
         return stats;
     }
 
+    /**
+     * {@inheritDoc}
+     * 
+     * <p>支持的导出格式：</p>
+     * <ul>
+     *   <li>JSON：结构化数据格式，适合程序处理</li>
+     *   <li>CSV：表格格式，适合Excel打开查看</li>
+     * </ul>
+     */
     @Override
     public byte[] export(AuditQueryRequest request, String format) {
         AuditQueryResult result = query(request);
@@ -137,6 +215,9 @@ public class AuditServiceImpl implements AuditService {
         return sb.toString().getBytes();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public AuditQueryResult getByUserId(String userId, int page, int size) {
         AuditQueryRequest request = new AuditQueryRequest();
@@ -146,6 +227,13 @@ public class AuditServiceImpl implements AuditService {
         return query(request);
     }
     
+    /**
+     * 获取今日零点时间戳
+     * 
+     * <p>用于统计今日日志数量，计算从当天00:00:00开始的时间戳。</p>
+     * 
+     * @return 今日零点的毫秒时间戳
+     */
     private long getTodayStart() {
         Calendar cal = Calendar.getInstance();
         cal.set(Calendar.HOUR_OF_DAY, 0);
