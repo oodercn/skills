@@ -1,0 +1,117 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-msg-service
+  name: Message Service
+  version: 0.7.3
+  description: Provides message push, P2P communication and topic subscription management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - message
+    - push
+    - topic
+    - p2p
+    - subscription
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.msg.MsgServiceSkillApplication
+  
+  capabilities:
+    - id: message-push
+      name: Message Push
+      description: Push messages to users or groups
+      category: msg
+    - id: topic-management
+      name: Topic Management
+      description: Manage topic subscriptions
+      category: msg
+    - id: p2p-communication
+      name: P2P Communication
+      description: Peer-to-peer message communication
+      category: msg
+  
+  scenes:
+    - name: msg
+      description: Message service scene
+      capabilities:
+        - message-push
+        - topic-management
+        - p2p-communication
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MAX_MESSAGE_SIZE
+        type: integer
+        default: 1048576
+        description: Maximum message size in bytes
+      - name: MESSAGE_RETENTION_DAYS
+        type: integer
+        default: 30
+        description: Message retention days
+  
+  endpoints:
+    - path: /api/msg/push
+      method: POST
+      description: Push message
+      capability: message-push
+    - path: /api/msg/push/batch
+      method: POST
+      description: Batch push messages
+      capability: message-push
+    - path: /api/msg/history
+      method: GET
+      description: Get message history
+      capability: message-push
+    - path: /api/msg/topic
+      method: GET
+      description: List all topics
+      capability: topic-management
+    - path: /api/msg/topic
+      method: POST
+      description: Create topic
+      capability: topic-management
+    - path: /api/msg/topic/{topicId}
+      method: DELETE
+      description: Delete topic
+      capability: topic-management
+    - path: /api/msg/topic/{topicId}/subscribe
+      method: POST
+      description: Subscribe to topic
+      capability: topic-management
+    - path: /api/msg/topic/{topicId}/unsubscribe
+      method: POST
+      description: Unsubscribe from topic
+      capability: topic-management
+    - path: /api/msg/topic/{topicId}/publish
+      method: POST
+      description: Publish message to topic
+      capability: topic-management
+    - path: /api/msg/p2p/send
+      method: POST
+      description: Send P2P message
+      capability: p2p-communication
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

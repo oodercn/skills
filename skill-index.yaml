@@ -658,6 +658,60 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-remote-terminal-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-msg-service
+      name: Message Service
+      version: "0.7.3"
+      category: msg
+      subCategory: message
+      tags:
+        - message
+        - push
+        - topic
+        - p2p
+        - subscription
+      description: 消息服务 - 提供消息推送、Topic管理和P2P通信能力
+      sceneId: msg
+      path: skills/skill-msg-service
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-service-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-service-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-cmd-service
+      name: Command Monitoring Service
+      version: "0.7.3"
+      category: sys
+      subCategory: cmd
+      tags:
+        - command
+        - monitor
+        - dispatch
+        - task
+        - schedule
+      description: 命令监控服务 - 提供命令分发、任务调度和执行追踪能力
+      sceneId: cmd
+      path: skills/skill-cmd-service
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-cmd-service-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-cmd-service-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-res-service
+      name: Resource Management Service
+      version: "0.7.3"
+      category: sys
+      subCategory: res
+      tags:
+        - resource
+        - organization
+        - department
+        - management
+        - hierarchy
+      description: 资源管理服务 - 提供组织、部门和资源管理能力
+      sceneId: res
+      path: skills/skill-res-service
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-res-service-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-res-service-0.7.3.jar
+      checksum: ""
+      
     - skillId: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
       version: "0.7.3"
@@ -1479,6 +1533,39 @@ spec:
         - command-execution
         - file-transfer
         - session-management
+      maxMembers: 100
+      
+    - sceneId: msg
+      name: Message Service
+      description: 消息服务场景，提供消息推送、Topic管理和P2P通信能力
+      version: "1.0.0"
+      category: MESSAGING
+      requiredCapabilities:
+        - message-push
+        - topic-management
+        - p2p-communication
+      maxMembers: 100
+      
+    - sceneId: cmd
+      name: Command Monitoring
+      description: 命令监控场景，提供命令分发、任务调度和执行追踪能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - command-dispatch
+        - task-scheduling
+        - execution-tracking
+      maxMembers: 100
+      
+    - sceneId: res
+      name: Resource Management
+      description: 资源管理场景，提供组织、部门和资源管理能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - organization-management
+        - department-management
+        - resource-allocation
       maxMembers: 100
       
     - sceneId: share

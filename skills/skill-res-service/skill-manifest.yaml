@@ -1,0 +1,133 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-res-service
+  name: Resource Management Service
+  version: 0.7.3
+  description: Provides organization, department and resource management capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - resource
+    - organization
+    - department
+    - management
+    - hierarchy
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.res.ResServiceSkillApplication
+  
+  capabilities:
+    - id: organization-management
+      name: Organization Management
+      description: Manage organizations and their hierarchy
+      category: res
+    - id: department-management
+      name: Department Management
+      description: Manage departments within organizations
+      category: res
+    - id: resource-allocation
+      name: Resource Allocation
+      description: Allocate and track resources
+      category: res
+  
+  scenes:
+    - name: res
+      description: Resource management scene
+      capabilities:
+        - organization-management
+        - department-management
+        - resource-allocation
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MAX_ORG_DEPTH
+        type: integer
+        default: 10
+        description: Maximum organization hierarchy depth
+  
+  endpoints:
+    - path: /api/res/org
+      method: GET
+      description: List all organizations
+      capability: organization-management
+    - path: /api/res/org
+      method: POST
+      description: Create organization
+      capability: organization-management
+    - path: /api/res/org/{orgId}
+      method: GET
+      description: Get organization
+      capability: organization-management
+    - path: /api/res/org/{orgId}
+      method: DELETE
+      description: Delete organization
+      capability: organization-management
+    - path: /api/res/org/{orgId}/tree
+      method: GET
+      description: Get organization tree
+      capability: organization-management
+    - path: /api/res/dept
+      method: GET
+      description: List all departments
+      capability: department-management
+    - path: /api/res/dept
+      method: POST
+      description: Create department
+      capability: department-management
+    - path: /api/res/dept/{deptId}
+      method: GET
+      description: Get department
+      capability: department-management
+    - path: /api/res/dept/{deptId}
+      method: DELETE
+      description: Delete department
+      capability: department-management
+    - path: /api/res/dept/{deptId}/members
+      method: GET
+      description: Get department members
+      capability: department-management
+    - path: /api/res/member
+      method: GET
+      description: List all members
+      capability: resource-allocation
+    - path: /api/res/member
+      method: POST
+      description: Create member
+      capability: resource-allocation
+    - path: /api/res/member/{memberId}
+      method: GET
+      description: Get member
+      capability: resource-allocation
+    - path: /api/res/member/{memberId}
+      method: DELETE
+      description: Delete member
+      capability: resource-allocation
+    - path: /api/res/statistics
+      method: GET
+      description: Get resource statistics
+      capability: resource-allocation
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

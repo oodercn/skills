@@ -1,0 +1,20 @@
+server:
+  port: 8094
+
+spring:
+  application:
+    name: skill-msg-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  msg:
+    max-message-size: 1048576
+    message-retention-days: 30

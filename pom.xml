@@ -65,6 +65,9 @@
         <module>skills/skill-audit</module>
         <module>skills/skill-access-control</module>
         <module>skills/skill-remote-terminal</module>
+        <module>skills/skill-msg-service</module>
+        <module>skills/skill-cmd-service</module>
+        <module>skills/skill-res-service</module>
         <module>skills/skill-market</module>
         <module>skills/skill-collaboration</module>
         <module>skills/skill-msg</module>

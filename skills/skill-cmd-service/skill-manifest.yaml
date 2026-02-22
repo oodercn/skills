@@ -1,0 +1,125 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-cmd-service
+  name: Command Monitoring Service
+  version: 0.7.3
+  description: Provides command dispatch, task scheduling and execution tracking capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - command
+    - monitor
+    - dispatch
+    - task
+    - schedule
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.cmd.CmdServiceSkillApplication
+  
+  capabilities:
+    - id: command-dispatch
+      name: Command Dispatch
+      description: Dispatch commands to agents
+      category: cmd
+    - id: task-scheduling
+      name: Task Scheduling
+      description: Schedule and manage tasks
+      category: cmd
+    - id: execution-tracking
+      name: Execution Tracking
+      description: Track command execution status
+      category: cmd
+  
+  scenes:
+    - name: cmd
+      description: Command service scene
+      capabilities:
+        - command-dispatch
+        - task-scheduling
+        - execution-tracking
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: MAX_RETRY_COUNT
+        type: integer
+        default: 3
+        description: Maximum retry count for failed commands
+      - name: COMMAND_TIMEOUT
+        type: integer
+        default: 60000
+        description: Default command timeout in milliseconds
+  
+  endpoints:
+    - path: /api/north/command/dispatch
+      method: POST
+      description: Dispatch command
+      capability: command-dispatch
+    - path: /api/north/command/batch
+      method: POST
+      description: Batch dispatch commands
+      capability: command-dispatch
+    - path: /api/north/command/{commandId}
+      method: GET
+      description: Get command status
+      capability: execution-tracking
+    - path: /api/north/command/{commandId}/cancel
+      method: POST
+      description: Cancel command
+      capability: command-dispatch
+    - path: /api/north/command/{commandId}/retry
+      method: POST
+      description: Retry command
+      capability: command-dispatch
+    - path: /api/north/task
+      method: GET
+      description: List all tasks
+      capability: task-scheduling
+    - path: /api/north/task
+      method: POST
+      description: Create task
+      capability: task-scheduling
+    - path: /api/north/task/{taskId}
+      method: DELETE
+      description: Delete task
+      capability: task-scheduling
+    - path: /api/north/task/{taskId}/enable
+      method: POST
+      description: Enable task
+      capability: task-scheduling
+    - path: /api/north/task/{taskId}/disable
+      method: POST
+      description: Disable task
+      capability: task-scheduling
+    - path: /api/north/command/logs
+      method: GET
+      description: Get command logs
+      capability: execution-tracking
+    - path: /api/north/command/statistics
+      method: GET
+      description: Get command statistics
+      capability: execution-tracking
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

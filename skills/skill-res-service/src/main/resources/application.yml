@@ -1,0 +1,19 @@
+server:
+  port: 8096
+
+spring:
+  application:
+    name: skill-res-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  res:
+    max-org-depth: 10
