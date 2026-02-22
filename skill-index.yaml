@@ -1,1 +1,1550 @@
+apiVersion: ooder.io/v1
+kind: SkillIndex
+
+metadata:
+  name: ooder-skills
+  version: "0.7.3"
+  description: Ooder Skills Repository - Shared skills for Ooder Agent Platform
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  giteeMirror: https://gitee.com/ooderCN/skills
+  createdAt: "2026-02-16T00:00:00Z"
+  updatedAt: "2026-02-20T00:00:00Z"
+
+spec:
+  sceneDrivers:
+    - id: org
+      name: Organization Driver
+      description: 组织管理场景驱动，提供用户认证、组织架构、角色管理能力
+      capabilities:
+        - user-auth
+        - user-manage
+        - org-manage
+        - role-manage
+      builtIn: true
+      location: scene-engine
+      
+    - id: vfs
+      name: Virtual File System Driver
+      description: 虚拟文件系统场景驱动，提供文件操作、版本管理能力
+      capabilities:
+        - file-operations
+        - folder-operations
+        - stream-operations
+        - version-operations
+        - search-operations
+      builtIn: true
+      location: scene-engine
+      
+    - id: msg
+      name: Messaging Driver
+      description: 消息服务场景驱动，提供消息队列、订阅发布能力
+      capabilities:
+        - message-operations
+        - queue-operations
+        - subscription-operations
+      builtIn: true
+      location: scene-engine
+      
+    - id: sys
+      name: System Driver
+      description: 系统管理场景驱动，提供网络、安全、健康检查能力
+      capabilities:
+        - network-management
+        - security-management
+        - health-monitoring
+        - protocol-handling
+      builtIn: false
+      location: ooder-skills
+      
+    - id: payment
+      name: Payment Driver
+      description: 支付场景驱动，提供支付、退款、回调处理能力
+      capabilities:
+        - create-payment
+        - query-payment
+        - close-payment
+        - create-refund
+        - query-refund
+        - handle-callback
+      builtIn: false
+      location: ooder-skills
+      
+    - id: media
+      name: Media Publish Driver
+      description: 媒体发布场景驱动，提供文章发布、更新、删除、统计能力
+      capabilities:
+        - publish-article
+        - update-article
+        - delete-article
+        - get-article
+        - list-articles
+        - get-stats
+      builtIn: false
+      location: ooder-skills
+  
+  categories:
+    - id: org
+      name: 组织服务
+      nameEn: Organization
+      description: 企业组织架构、用户认证相关服务
+      icon: users
+      order: 1
+      sceneDriver: org
+      
+    - id: vfs
+      name: 存储服务
+      nameEn: Storage
+      description: 文件存储、对象存储相关服务
+      icon: database
+      order: 2
+      sceneDriver: vfs
+      
+    - id: ui
+      name: UI生成
+      nameEn: UI Generation
+      description: 界面生成、设计转代码服务
+      icon: palette
+      order: 3
+      sceneDriver: null
+      
+    - id: msg
+      name: 消息通讯
+      nameEn: Messaging
+      description: 消息队列、通讯协议服务
+      icon: message
+      order: 4
+      sceneDriver: msg
+      
+    - id: sys
+      name: 系统管理
+      nameEn: System
+      description: 系统监控、网络管理、安全审计
+      icon: settings
+      order: 5
+      sceneDriver: sys
+      
+    - id: payment
+      name: 支付服务
+      nameEn: Payment
+      description: 支付渠道、退款管理、交易处理
+      icon: credit-card
+      order: 6
+      sceneDriver: payment
+      
+    - id: media
+      name: 媒体发布
+      nameEn: Media Publishing
+      description: 自媒体文章发布、内容管理、数据分析
+      icon: edit
+      order: 7
+      sceneDriver: media
+      
+    - id: util
+      name: 工具服务
+      nameEn: Utility
+      description: 通用工具、辅助功能
+      icon: tool
+      order: 8
+      sceneDriver: null
+  
+  skills:
+    - skillId: skill-a2ui
+      name: A2UI Skill
+      version: "0.7.3"
+      category: ui
+      subCategory: code-gen
+      tags:
+        - a2ui
+        - ui-generation
+        - design-to-code
+      description: A2UI图转代码技能，支持将设计图转换为前端代码
+      sceneId: ui-generation
+      path: skills/skill-a2ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-org-dingding
+      name: DingTalk Organization Service
+      version: "0.7.3"
+      category: org
+      subCategory: dingtalk
+      tags:
+        - dingtalk
+        - dingding
+        - organization
+        - auth
+      description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-dingding
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-org-feishu
+      name: Feishu Organization Service
+      version: "0.7.3"
+      category: org
+      subCategory: feishu
+      tags:
+        - feishu
+        - lark
+        - organization
+        - auth
+      description: 飞书组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-feishu
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-org-wecom
+      name: WeCom Organization Service
+      version: "0.7.3"
+      category: org
+      subCategory: wecom
+      tags:
+        - wecom
+        - enterprise-wechat
+        - organization
+        - auth
+      description: 企业微信组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-wecom
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-org-ldap
+      name: LDAP Organization Service
+      version: "0.7.3"
+      category: org
+      subCategory: ldap
+      tags:
+        - ldap
+        - organization
+        - auth
+      description: LDAP组织服务，提供基于LDAP的组织架构管理和用户认证
+      sceneId: auth
+      path: skills/skill-org-ldap
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-user-auth
+      name: User Authentication Service
+      version: "0.7.3"
+      category: org
+      subCategory: auth
+      tags:
+        - auth
+        - authentication
+        - user
+      description: 用户认证服务，支持多种认证方式
+      sceneId: auth
+      path: skills/skill-user-auth
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-trae-solo
+      name: Trae Solo Service
+      version: "0.7.3"
+      category: util
+      subCategory: general
+      tags:
+        - utility
+        - tools
+      description: 连接实用功能，运行结果通过A2UI节点展示
+      sceneId: utility
+      path: skills/skill-trae-solo
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-mqtt
+      name: MQTT Service Skill
+      version: "0.7.3"
+      category: msg
+      subCategory: mqtt
+      tags:
+        - mqtt
+        - messaging
+        - iot
+      description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
+      sceneId: mqtt-messaging
+      path: skills/skill-mqtt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-vfs-database
+      name: Database VFS Service
+      version: "0.7.3"
+      category: vfs
+      subCategory: database
+      tags:
+        - vfs
+        - database
+        - storage
+      description: 数据库存储服务 - 将文件存储在数据库中，支持元数据管理
+      sceneId: vfs-database
+      path: skills/skill-vfs-database
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-vfs-local
+      name: Local VFS Service
+      version: "0.7.3"
+      category: vfs
+      subCategory: local
+      tags:
+        - vfs
+        - local
+        - storage
+      description: 本地文件系统存储服务 - 提供基本的文件操作和版本管理
+      sceneId: vfs-local
+      path: skills/skill-vfs-local
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-vfs-minio
+      name: MinIO VFS Service
+      version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - minio
+        - object-storage
+        - s3
+      description: MinIO存储服务 - 提供对象存储能力，支持S3兼容接口
+      sceneId: vfs-minio
+      path: skills/skill-vfs-minio
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-vfs-oss
+      name: Aliyun OSS VFS Service
+      version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - oss
+        - aliyun
+        - object-storage
+      description: 阿里云OSS存储服务 - 提供对象存储能力，支持阿里云OSS接口
+      sceneId: vfs-oss
+      path: skills/skill-vfs-oss
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-vfs-s3
+      name: AWS S3 VFS Service
+      version: "0.7.3"
+      category: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - s3
+        - aws
+        - object-storage
+      description: AWS S3存储服务 - 提供对象存储能力，支持AWS S3接口
+      sceneId: vfs-s3
+      path: skills/skill-vfs-s3
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-network
+      name: Network Management Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: network
+      tags:
+        - network
+        - ip
+        - dhcp
+        - dns
+      description: 网络管理技能 - 提供网络配置、IP管理、设备扫描能力
+      sceneId: network
+      path: skills/skill-network
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-network-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-network-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-agent
+      name: Agent Management Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: agent
+      tags:
+        - agent
+        - iot
+        - device
+      description: 代理管理技能 - 提供终端代理注册、管理、命令执行能力
+      sceneId: agent
+      path: skills/skill-agent
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-security
+      name: Security Management Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: security
+      tags:
+        - security
+        - auth
+        - audit
+      description: 安全管理技能 - 提供用户管理、权限控制、安全审计能力
+      sceneId: security
+      path: skills/skill-security
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-security-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-security-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-health
+      name: Health Check Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: health
+      tags:
+        - health
+        - monitor
+        - check
+      description: 健康检查技能 - 提供系统健康检查、服务检查、报告生成能力
+      sceneId: health
+      path: skills/skill-health
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-protocol
+      name: Protocol Management Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: protocol
+      tags:
+        - protocol
+        - handler
+        - mcp
+      description: 协议管理技能 - 提供协议处理器注册、命令分发能力
+      sceneId: protocol
+      path: skills/skill-protocol
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-protocol-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-protocol-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-openwrt
+      name: OpenWrt Management Skill
+      version: "0.7.3"
+      category: sys
+      subCategory: router
+      tags:
+        - openwrt
+        - router
+        - network
+      description: OpenWrt管理技能 - 提供OpenWrt路由器连接、配置、命令执行能力
+      sceneId: openwrt
+      path: skills/skill-openwrt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-share
+      name: Skill Share Skill
+      version: "0.7.3"
+      category: util
+      subCategory: share
+      tags:
+        - share
+        - collaboration
+      description: 技能分享技能 - 提供技能分享、接收管理能力
+      sceneId: share
+      path: skills/skill-share
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-hosting
+      name: Hosting Service
+      version: "0.7.3"
+      category: sys
+      subCategory: hosting
+      tags:
+        - hosting
+        - kubernetes
+        - aliyun
+        - tencent
+        - cloud
+      description: 托管服务 - 提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
+      sceneId: hosting
+      path: skills/skill-hosting
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-hosting-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-hosting-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-monitor
+      name: Monitoring Service
+      version: "0.7.3"
+      category: sys
+      subCategory: monitor
+      tags:
+        - monitor
+        - metrics
+        - alert
+        - observation
+        - logging
+      description: 监控服务 - 提供指标采集、告警管理、日志查询和观测能力
+      sceneId: monitor
+      path: skills/skill-monitor
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-im
+      name: Instant Messaging Service
+      version: "0.7.3"
+      category: msg
+      subCategory: im
+      tags:
+        - im
+        - messaging
+        - conversation
+        - contact
+        - chat
+      description: 即时通讯服务 - 提供会话管理和联系人管理能力
+      sceneId: im
+      path: skills/skill-im
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-group
+      name: Group Management Service
+      version: "0.7.3"
+      category: msg
+      subCategory: group
+      tags:
+        - group
+        - team
+        - member
+        - management
+        - collaboration
+      description: 群组管理服务 - 提供群组创建、成员管理和群组设置能力
+      sceneId: group
+      path: skills/skill-group
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-health
+      name: Health Check Service
+      version: "0.7.3"
+      category: sys
+      subCategory: health
+      tags:
+        - health
+        - check
+        - monitor
+        - service
+        - report
+      description: 健康检查服务 - 提供系统健康检查、服务检查和报告生成能力
+      sceneId: health
+      path: skills/skill-health
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-agent
+      name: Agent Management Service
+      version: "0.7.3"
+      category: sys
+      subCategory: agent
+      tags:
+        - agent
+        - terminal
+        - management
+        - command
+        - execution
+      description: 代理管理服务 - 提供终端代理注册、管理和命令执行能力
+      sceneId: agent
+      path: skills/skill-agent
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-openwrt
+      name: OpenWrt Router Driver
+      version: "0.7.3"
+      category: sys
+      subCategory: openwrt
+      tags:
+        - openwrt
+        - router
+        - uci
+        - network
+        - driver
+      description: OpenWrt路由器驱动 - 提供OpenWrt路由器连接、配置和命令执行能力
+      sceneId: openwrt
+      path: skills/skill-openwrt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-audit
+      name: Audit Log Service
+      version: "0.7.3"
+      category: sys
+      subCategory: audit
+      tags:
+        - audit
+        - log
+        - security
+        - compliance
+        - tracking
+      description: 审计日志服务 - 提供审计日志记录、查询和导出能力
+      sceneId: audit
+      path: skills/skill-audit
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-access-control
+      name: Access Control Service
+      version: "0.7.3"
+      category: sys
+      subCategory: access
+      tags:
+        - access
+        - control
+        - permission
+        - role
+        - acl
+        - security
+      description: 访问控制服务 - 提供权限管理、角色管理和访问控制能力
+      sceneId: security
+      path: skills/skill-access-control
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-access-control-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-access-control-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-remote-terminal
+      name: Remote Terminal Service
+      version: "0.7.3"
+      category: sys
+      subCategory: remote
+      tags:
+        - remote
+        - terminal
+        - ssh
+        - shell
+        - command
+        - sftp
+      description: 远程终端服务 - 提供SSH远程连接、命令执行和文件传输能力
+      sceneId: remote
+      path: skills/skill-remote-terminal
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-remote-terminal-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-remote-terminal-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-llm-volcengine
+      name: VolcEngine (Doubao) LLM Provider
+      version: "0.7.3"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - volcengine
+        - doubao
+        - bytedance
+      description: 火山引擎豆包LLM Provider - 提供Doubao模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-volcengine
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-llm-qianwen
+      name: Qianwen (Tongyi) LLM Provider
+      version: "0.7.3"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - qianwen
+        - tongyi
+        - aliyun
+      description: 通义千问LLM Provider - 提供Qwen模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-qianwen
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-llm-deepseek
+      name: DeepSeek LLM Provider
+      version: "0.7.3"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - deepseek
+        - coder
+        - reasoning
+      description: DeepSeek LLM Provider - 提供DeepSeek模型对话、代码生成、推理能力
+      sceneId: llm
+      path: skills/skill-llm-deepseek
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-alipay
+      name: Alipay Payment Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: alipay
+      tags:
+        - payment
+        - alipay
+        - zhifubao
+        - mobile-pay
+      description: 支付宝支付Provider - 提供支付宝支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-alipay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-wechat
+      name: WeChat Pay Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: wechat
+      tags:
+        - payment
+        - wechat
+        - weixin
+        - wxpay
+      description: 微信支付Provider - 提供微信支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-wechat
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-payment-unionpay
+      name: UnionPay Payment Provider
+      version: "0.7.3"
+      category: payment
+      subCategory: unionpay
+      tags:
+        - payment
+        - unionpay
+        - yinlian
+        - bank-card
+      description: 银联支付Provider - 提供银联支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-unionpay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-media-wechat
+      name: WeChat MP Publish Provider
+      version: "0.7.3"
+      category: media
+      subCategory: wechat
+      tags:
+        - media
+        - wechat
+        - mp
+        - official-account
+      description: 微信公众号发布Provider - 提供图文发布、素材管理能力
+      sceneId: media
+      path: skills/skill-media-wechat
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-wechat-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-wechat-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-media-weibo
+      name: Weibo Publish Provider
+      version: "0.7.3"
+      category: media
+      subCategory: weibo
+      tags:
+        - media
+        - weibo
+        - sina
+        - microblog
+      description: 微博发布Provider - 提供微博发布、文章管理能力
+      sceneId: media
+      path: skills/skill-media-weibo
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-weibo-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-weibo-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-media-zhihu
+      name: Zhihu Publish Provider
+      version: "0.7.3"
+      category: media
+      subCategory: zhihu
+      tags:
+        - media
+        - zhihu
+        - article
+        - q&a
+      description: 知乎发布Provider - 提供专栏文章、回答发布能力
+      sceneId: media
+      path: skills/skill-media-zhihu
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-zhihu-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-zhihu-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-media-toutiao
+      name: Toutiao Publish Provider
+      version: "0.7.3"
+      category: media
+      subCategory: toutiao
+      tags:
+        - media
+        - toutiao
+        - bytedance
+        - news
+      description: 头条发布Provider - 提供头条号文章发布能力
+      sceneId: media
+      path: skills/skill-media-toutiao
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-toutiao-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-toutiao-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-media-xiaohongshu
+      name: Xiaohongshu Publish Provider
+      version: "0.7.3"
+      category: media
+      subCategory: xiaohongshu
+      tags:
+        - media
+        - xiaohongshu
+        - red
+        - note
+      description: 小红书发布Provider - 提供笔记发布、图文管理能力
+      sceneId: media
+      path: skills/skill-media-xiaohongshu
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-notify
+      name: Notification Service
+      version: "0.7.3"
+      category: msg
+      subCategory: notify
+      tags:
+        - notify
+        - notification
+        - push
+        - alert
+      description: 通知服务 - 提供多渠道消息推送、模板管理、订阅管理能力
+      sceneId: messaging
+      path: skills/skill-notify
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-email
+      name: Email Service
+      version: "0.7.3"
+      category: msg
+      subCategory: email
+      tags:
+        - email
+        - smtp
+        - mail
+        - template
+      description: 邮件服务 - 提供邮件发送、模板管理、附件支持能力
+      sceneId: messaging
+      path: skills/skill-email
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-search
+      name: Search Service
+      version: "0.7.3"
+      category: sys
+      subCategory: search
+      tags:
+        - search
+        - elasticsearch
+        - index
+        - query
+      description: 搜索服务 - 提供文档索引、搜索、聚合分析能力
+      sceneId: sys
+      path: skills/skill-search
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-search-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-search-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-audit
+      name: Audit Service
+      version: "0.7.3"
+      category: sys
+      subCategory: audit
+      tags:
+        - audit
+        - log
+        - compliance
+        - security
+      description: 审计服务 - 提供操作审计、日志查询、合规报告能力
+      sceneId: sys
+      path: skills/skill-audit
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-report
+      name: Report Service
+      version: "0.7.3"
+      category: sys
+      subCategory: report
+      tags:
+        - report
+        - export
+        - pdf
+        - excel
+      description: 报表服务 - 提供报表生成、模板管理、多格式导出能力
+      sceneId: sys
+      path: skills/skill-report
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-report-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-report-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-task
+      name: Task Management Service
+      version: "0.7.3"
+      category: sys
+      subCategory: task
+      tags:
+        - task
+        - job
+        - async
+        - schedule
+      description: 任务管理服务 - 提供任务创建、执行、监控、依赖管理能力
+      sceneId: sys
+      path: skills/skill-task
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-task-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-task-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-market
+      name: Skill Market Service
+      version: "0.7.3"
+      category: util
+      subCategory: market
+      tags:
+        - market
+        - skill
+        - discovery
+        - install
+      description: 技能市场服务 - 提供技能发现、搜索、安装和管理能力
+      sceneId: skill-market
+      path: skills/skill-market
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-collaboration
+      name: Collaboration Scene Service
+      version: "0.7.3"
+      category: util
+      subCategory: collaboration
+      tags:
+        - collaboration
+        - scene
+        - member
+        - team
+      description: 协作场景服务 - 提供场景创建、成员管理和密钥管理能力
+      sceneId: collaboration
+      path: skills/skill-collaboration
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-msg
+      name: Message Service
+      version: "0.7.3"
+      category: msg
+      subCategory: message
+      tags:
+        - message
+        - msg
+        - broadcast
+        - group
+      description: 消息服务 - 提供消息发送、广播、群组消息能力
+      sceneId: messaging
+      path: skills/skill-msg
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-business
+      name: Business Scene Service
+      version: "0.7.3"
+      category: business
+      subCategory: scenario
+      tags:
+        - business
+        - scenario
+        - workflow
+        - process
+      description: 业务场景服务 - 提供业务场景管理、工作流执行、数据处理能力
+      sceneId: business
+      path: skills/skill-business
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-business-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-business-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-common
+      name: Skill Common Library
+      version: "0.7.3"
+      category: util
+      subCategory: common
+      tags:
+        - common
+        - utility
+        - storage
+      description: 技能公共库 - 提供JSON存储等通用工具
+      sceneId: utility
+      path: skills/skill-common
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-k8s
+      name: Kubernetes Cluster Management
+      version: "0.7.3"
+      category: infrastructure
+      subCategory: kubernetes
+      tags:
+        - kubernetes
+        - k8s
+        - cluster
+        - container
+      description: Kubernetes集群管理服务 - 提供集群、节点、命名空间、Pod管理能力
+      sceneId: kubernetes
+      path: skills/skill-k8s
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      checksum: ""
+      
+    - skillId: skill-scheduler-quartz
+      name: Quartz Scheduler Service
+      version: "0.7.3"
+      category: scheduler
+      subCategory: quartz
+      tags:
+        - scheduler
+        - quartz
+        - cron
+        - task
+      description: Quartz调度服务 - 提供任务调度、执行历史管理能力
+      sceneId: scheduling
+      path: skills/skill-scheduler-quartz
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      checksum: ""
+
+  scenes:
+    - sceneId: ui-generation
+      name: UI Generation
+      description: UI生成场景，支持图转代码、组件生成等能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - generate-ui
+        - preview-ui
+      maxMembers: 10
+      
+    - sceneId: auth
+      name: Authentication
+      description: 认证场景，支持用户认证和组织数据访问
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - user-auth
+        - org-data-read
+      maxMembers: 100
+      
+    - sceneId: utility
+      name: Utility
+      description: 实用工具场景，提供各种实用功能
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - execute-task
+      
+    - sceneId: kubernetes
+      name: Kubernetes Management
+      description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
+      version: "1.0.0"
+      category: INFRASTRUCTURE
+      requiredCapabilities:
+        - cluster-management
+        - node-management
+        - namespace-management
+        - pod-management
+      maxMembers: 50
+      
+    - sceneId: scheduling
+      name: Task Scheduling
+      description: 任务调度场景，提供任务调度、执行历史管理能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - schedule-task
+        - manage-execution
+        - history-query
+      maxMembers: 100
+      
+    - sceneId: mqtt-messaging
+      name: MQTT Messaging
+      description: MQTT消息场景，提供MQTT Broker和消息服务能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - mqtt-broker
+        - mqtt-publish
+        - mqtt-subscribe
+      maxMembers: 1000
+      
+    - sceneId: iot-device
+      name: IoT Device
+      description: IoT设备场景，提供设备连接、数据上报和命令控制能力
+      version: "1.0.0"
+      category: IOT
+      requiredCapabilities:
+        - mqtt-broker
+        - mqtt-command
+      maxMembers: 10000
+      
+    - sceneId: vfs-database
+      name: Database VFS
+      description: 数据库存储场景，支持将文件存储在数据库中
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 100
+      
+    - sceneId: vfs-local
+      name: Local VFS
+      description: 本地文件系统存储场景，提供基本的文件操作
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - vfs-storage
+        - file-read
+        - file-write
+      maxMembers: 100
+      
+    - sceneId: vfs-minio
+      name: MinIO VFS
+      description: MinIO存储场景，提供对象存储能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
+      
+    - sceneId: vfs-oss
+      name: Aliyun OSS VFS
+      description: 阿里云OSS存储场景，提供对象存储能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
+      
+    - sceneId: vfs-s3
+      name: AWS S3 VFS
+      description: AWS S3存储场景，提供对象存储能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
+    
+    - sceneId: p2p
+      name: P2P Communication
+      description: 点对点通讯场景，提供消息、文件、能力共享等点对点通讯能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - message-send
+        - message-receive
+        - file-upload
+        - file-download
+      maxMembers: 2
+      
+    - sceneId: group
+      name: Group Communication
+      description: 群组通讯场景，提供群组消息、群组文件、群组协作能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - message-broadcast
+        - group-members
+        - file-share
+      maxMembers: 500
+      
+    - sceneId: broadcast
+      name: Broadcast Communication
+      description: 广播通讯场景，提供一对多消息广播能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - message-broadcast
+        - message-subscribe
+      maxMembers: 10000
+      
+    - sceneId: hr
+      name: Human Resources
+      description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - employee-create
+        - employee-update
+        - employee-query
+        - department-query
+      maxMembers: 1000
+      
+    - sceneId: crm
+      name: Customer Relationship Management
+      description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - customer-create
+        - customer-update
+        - customer-query
+        - contact-manage
+      maxMembers: 500
+      
+    - sceneId: finance
+      name: Financial Management
+      description: 财务管理场景，提供账务、报销、预算、结算等财务能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - account-manage
+        - expense-manage
+        - budget-manage
+      maxMembers: 200
+      
+    - sceneId: approval
+      name: Approval Workflow
+      description: 审批流程场景，提供流程定义、审批、流转等工作流能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - flow-start
+        - flow-query
+        - approval-submit
+        - approval-approve
+      maxMembers: 1000
+      
+    - sceneId: project
+      name: Project Management
+      description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - project-create
+        - task-create
+        - task-assign
+        - progress-track
+      maxMembers: 500
+      
+    - sceneId: knowledge
+      name: Knowledge Management
+      description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - knowledge-create
+        - document-search
+        - knowledge-share
+      maxMembers: 1000
+      
+    - sceneId: device
+      name: Device Management
+      description: 设备管理场景，提供设备注册、监控、控制等IoT能力
+      version: "1.0.0"
+      category: IOT
+      requiredCapabilities:
+        - device-register
+        - device-monitor
+        - device-control
+      maxMembers: 10000
+      
+    - sceneId: collection
+      name: Data Collection
+      description: 数据采集场景，提供数据采集、存储、分析等IoT能力
+      version: "1.0.0"
+      category: IOT
+      requiredCapabilities:
+        - data-collect
+        - data-store
+        - data-analyze
+      maxMembers: 5000
+      
+    - sceneId: edge
+      name: Edge Computing
+      description: 边缘计算场景，提供边缘节点、边缘应用等边缘计算能力
+      version: "1.0.0"
+      category: IOT
+      requiredCapabilities:
+        - edge-node
+        - edge-compute
+        - edge-sync
+      maxMembers: 1000
+      
+    - sceneId: meeting
+      name: Meeting Collaboration
+      description: 会议协作场景，提供会议、白板、共享等协作能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - meeting-create
+        - whiteboard-share
+        - screen-share
+      maxMembers: 100
+      
+    - sceneId: document
+      name: Document Collaboration
+      description: 文档协作场景，提供文档编辑、评论、版本等协作能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - document-edit
+        - document-comment
+        - version-manage
+      maxMembers: 500
+      
+    - sceneId: task
+      name: Task Collaboration
+      description: 任务协作场景，提供任务分配、跟踪、报告等协作能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - task-create
+        - task-assign
+        - task-track
+        - task-report
+      maxMembers: 500
+      
+    - sceneId: sys
+      name: System Management
+      description: 系统管理场景，提供用户、权限、配置等系统管理能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - user-manage
+        - permission-manage
+        - config-manage
+      maxMembers: 50
+      
+    - sceneId: monitor
+      name: Monitoring & Operations
+      description: 监控运维场景，提供监控、告警、日志等运维能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - monitor-metrics
+        - monitor-alert
+        - log-query
+      maxMembers: 100
+      
+    - sceneId: security
+      name: Security & Audit
+      description: 安全审计场景，提供安全、审计、合规等安全能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - security-auth
+        - audit-log
+        - compliance-check
+      maxMembers: 50
+      
+    - sceneId: network
+      name: Network Management
+      description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - network-config
+        - ip-management
+        - device-scanning
+      maxMembers: 100
+      
+    - sceneId: agent
+      name: Agent Management
+      description: 代理管理场景，提供终端代理注册、管理、命令执行能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - agent-management
+        - command-execution
+        - network-status
+      maxMembers: 1000
+      
+    - sceneId: health
+      name: Health Check
+      description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - health-check
+        - service-check
+        - report-generation
+      maxMembers: 100
+      
+    - sceneId: protocol
+      name: Protocol Management
+      description: 协议管理场景，提供协议处理器注册、命令分发能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - handler-registration
+        - command-dispatch
+        - handler-management
+      maxMembers: 100
+      
+    - sceneId: openwrt
+      name: OpenWrt Management
+      description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - router-connection
+        - uci-config
+        - command-execution
+      maxMembers: 50
+      
+    - sceneId: audit
+      name: Audit Log
+      description: 审计日志场景，提供审计日志记录、查询、导出和统计分析能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - audit-log
+        - audit-export
+        - audit-statistics
+      maxMembers: 100
+      
+    - sceneId: security
+      name: Security Management
+      description: 安全管理场景，提供权限管理、角色管理和访问控制能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - permission-management
+        - role-management
+        - access-control
+      maxMembers: 100
+      
+    - sceneId: remote
+      name: Remote Management
+      description: 远程管理场景，提供SSH远程连接、命令执行和文件传输能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - ssh-connection
+        - command-execution
+        - file-transfer
+        - session-management
+      maxMembers: 100
+      
+    - sceneId: share
+      name: Skill Share
+      description: 技能分享场景，提供技能分享、接收管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - skill-sharing
+        - skill-receiving
+        - share-management
+      maxMembers: 500
+      
+    - sceneId: hosting
+      name: Hosting Service
+      description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - instance-management
+        - instance-scaling
+        - instance-health
+        - cloud-provider
+      maxMembers: 100
+      
+    - sceneId: skill-market
+      name: Skill Market
+      description: 技能市场场景，提供技能发现、搜索、安装和管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - skill-discovery
+        - skill-search
+        - skill-installation
+        - skill-auth
+      maxMembers: 1000
+      
+    - sceneId: collaboration
+      name: Collaboration Scene
+      description: 协作场景，提供场景创建、成员管理、密钥管理能力
+      version: "1.0.0"
+      category: COLLABORATION
+      requiredCapabilities:
+        - scene-management
+        - member-management
+        - key-management
+      maxMembers: 500
+      
+    - sceneId: messaging
+      name: Messaging
+      description: 消息场景，提供消息发送、广播、群组消息能力
+      version: "1.0.0"
+      category: COMMUNICATION
+      requiredCapabilities:
+        - message-sending
+        - message-management
+        - group-messaging
+      maxMembers: 1000
+      
+    - sceneId: business
+      name: Business
+      description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
+      version: "1.0.0"
+      category: BUSINESS
+      requiredCapabilities:
+        - scenario-management
+        - workflow-execution
+        - data-processing
       maxMembers: 100

@@ -62,6 +62,9 @@
         <module>skills/skill-health</module>
         <module>skills/skill-agent</module>
         <module>skills/skill-openwrt</module>
+        <module>skills/skill-audit</module>
+        <module>skills/skill-access-control</module>
+        <module>skills/skill-remote-terminal</module>
         <module>skills/skill-market</module>
         <module>skills/skill-collaboration</module>
         <module>skills/skill-msg</module>

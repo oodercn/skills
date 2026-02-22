@@ -1,0 +1,118 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-access-control
+  name: Access Control Service
+  version: 0.7.3
+  description: Provides permission management, role management and access control capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - access
+    - control
+    - permission
+    - role
+    - acl
+    - security
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.access.AccessControlSkillApplication
+  
+  capabilities:
+    - id: permission-management
+      name: Permission Management
+      description: Manage permissions and access rules
+      category: security
+    - id: role-management
+      name: Role Management
+      description: Manage roles and role assignments
+      category: security
+    - id: access-control
+      name: Access Control
+      description: Check and enforce access permissions
+      category: security
+  
+  scenes:
+    - name: security
+      description: Security management scene
+      capabilities:
+        - permission-management
+        - role-management
+        - access-control
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: DEFAULT_ADMIN_ROLE
+        type: string
+        default: "admin"
+        description: Default administrator role name
+      - name: PERMISSION_CACHE_TTL
+        type: integer
+        default: 300
+        description: Permission cache TTL in seconds
+  
+  endpoints:
+    - path: /api/access/permissions
+      method: GET
+      description: List all permissions
+      capability: permission-management
+    - path: /api/access/permissions
+      method: POST
+      description: Create permission
+      capability: permission-management
+    - path: /api/access/permissions/{permissionId}
+      method: DELETE
+      description: Delete permission
+      capability: permission-management
+    - path: /api/access/roles
+      method: GET
+      description: List all roles
+      capability: role-management
+    - path: /api/access/roles
+      method: POST
+      description: Create role
+      capability: role-management
+    - path: /api/access/roles/{roleId}
+      method: DELETE
+      description: Delete role
+      capability: role-management
+    - path: /api/access/roles/{roleId}/permissions
+      method: POST
+      description: Assign permissions to role
+      capability: role-management
+    - path: /api/access/users/{userId}/roles
+      method: GET
+      description: Get user roles
+      capability: role-management
+    - path: /api/access/users/{userId}/roles
+      method: POST
+      description: Assign roles to user
+      capability: role-management
+    - path: /api/access/check
+      method: POST
+      description: Check permission
+      capability: access-control
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

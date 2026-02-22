@@ -1,0 +1,20 @@
+server:
+  port: 8092
+
+spring:
+  application:
+    name: skill-access-control
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  access:
+    default-admin-role: admin
+    permission-cache-ttl: 300

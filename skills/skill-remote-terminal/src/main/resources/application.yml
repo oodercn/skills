@@ -1,0 +1,21 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: skill-remote-terminal
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  terminal:
+    connection-timeout: 30000
+    max-sessions: 100
+    session-timeout: 3600000

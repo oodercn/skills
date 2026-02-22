@@ -1,0 +1,123 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-remote-terminal
+  name: Remote Terminal Service
+  version: 0.7.3
+  description: Provides SSH remote connection, command execution and file transfer capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - remote
+    - terminal
+    - ssh
+    - shell
+    - command
+    - sftp
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.terminal.RemoteTerminalSkillApplication
+  
+  capabilities:
+    - id: ssh-connection
+      name: SSH Connection
+      description: Establish and manage SSH connections
+      category: remote
+    - id: command-execution
+      name: Command Execution
+      description: Execute commands on remote hosts
+      category: remote
+    - id: file-transfer
+      name: File Transfer
+      description: Upload and download files via SFTP
+      category: remote
+    - id: session-management
+      name: Session Management
+      description: Manage terminal sessions
+      category: remote
+  
+  scenes:
+    - name: remote
+      description: Remote management scene
+      capabilities:
+        - ssh-connection
+        - command-execution
+        - file-transfer
+        - session-management
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: CONNECTION_TIMEOUT
+        type: integer
+        default: 30000
+        description: SSH connection timeout in milliseconds
+      - name: MAX_SESSIONS
+        type: integer
+        default: 100
+        description: Maximum concurrent sessions
+      - name: SESSION_TIMEOUT
+        type: integer
+        default: 3600000
+        description: Session timeout in milliseconds
+  
+  endpoints:
+    - path: /api/terminal/connect
+      method: POST
+      description: Connect to remote host
+      capability: ssh-connection
+    - path: /api/terminal/disconnect
+      method: POST
+      description: Disconnect from remote host
+      capability: ssh-connection
+    - path: /api/terminal/sessions
+      method: GET
+      description: List all sessions
+      capability: session-management
+    - path: /api/terminal/sessions/{sessionId}
+      method: GET
+      description: Get session details
+      capability: session-management
+    - path: /api/terminal/sessions/{sessionId}
+      method: DELETE
+      description: Close session
+      capability: session-management
+    - path: /api/terminal/execute
+      method: POST
+      description: Execute command
+      capability: command-execution
+    - path: /api/terminal/upload
+      method: POST
+      description: Upload file
+      capability: file-transfer
+    - path: /api/terminal/download
+      method: POST
+      description: Download file
+      capability: file-transfer
+    - path: /api/terminal/status
+      method: GET
+      description: Get service status
+      capability: session-management
+  
+  resources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: false
+    cacheStrategy: "none"
+    syncOnReconnect: false
