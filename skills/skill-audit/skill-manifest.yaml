@@ -1,0 +1,101 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillManifest
+
+metadata:
+  id: skill-audit
+  name: Audit Log Service
+  version: 0.7.3
+  description: Provides audit log recording, querying and exporting capabilities
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  keywords:
+    - audit
+    - log
+    - security
+    - compliance
+    - tracking
+
+spec:
+  type: tool-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.audit.AuditSkillApplication
+  
+  capabilities:
+    - id: audit-log
+      name: Audit Log
+      description: Record and query audit logs
+      category: audit
+    - id: audit-export
+      name: Audit Export
+      description: Export audit logs
+      category: audit
+    - id: audit-statistics
+      name: Audit Statistics
+      description: Audit log statistics
+      category: audit
+  
+  scenes:
+    - name: audit
+      description: Audit log scene
+      capabilities:
+        - audit-log
+        - audit-export
+        - audit-statistics
+  
+  dependencies:
+    skills: []
+    libraries: []
+  
+  config:
+    required: []
+    optional:
+      - name: RETENTION_DAYS
+        type: integer
+        default: 90
+        description: Audit log retention days
+      - name: MAX_QUERY_SIZE
+        type: integer
+        default: 10000
+        description: Maximum query result size
+  
+  endpoints:
+    - path: /api/audit/logs
+      method: POST
+      description: Query audit logs
+      capability: audit-log
+    - path: /api/audit/logs/{logId}
+      method: GET
+      description: Get audit log by ID
+      capability: audit-log
+    - path: /api/audit/record
+      method: POST
+      description: Record audit log
+      capability: audit-log
+    - path: /api/audit/export
+      method: POST
+      description: Export audit logs
+      capability: audit-export
+    - path: /api/audit/statistics
+      method: GET
+      description: Get audit statistics
+      capability: audit-statistics
+    - path: /api/audit/users/{userId}/logs
+      method: GET
+      description: Get user audit logs
+      capability: audit-log
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: "local"
+    syncOnReconnect: true

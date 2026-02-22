@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-org-dingding
   name: DingTalk Organization Service
-  version: 0.7.1
+  version: 0.7.3
   description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
   author: Ooder Team
   license: Apache-2.0

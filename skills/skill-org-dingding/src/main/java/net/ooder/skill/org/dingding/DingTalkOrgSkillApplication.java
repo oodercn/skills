@@ -53,7 +53,7 @@ public class DingTalkOrgSkillApplication implements CommandLineRunner {
 
     @Override
     public void run(String... args) throws Exception {
-        log.info("DingTalk Organization Skill Starting with SDK 0.7.1...");
+        log.info("DingTalk Organization Skill Starting with SDK 0.7.3...");
 
         LifecycleManager.getInstance().reset();
 
@@ -75,7 +75,7 @@ public class DingTalkOrgSkillApplication implements CommandLineRunner {
         Map<String, Object> info = new HashMap<String, Object>();
         info.put("skillId", "skill-org-dingding");
         info.put("name", "DingTalk Organization Service");
-        info.put("version", "0.7.1");
+        info.put("version", "0.7.3");
         info.put("description", "钉钉组织数据集成服务");
         info.put("sceneId", "auth");
         info.put("capabilities", new String[]{"org-data-read", "user-auth"});

@@ -1,17 +1,1 @@
-server:
-  port: 8084
-
-spring:
-  application:
-    name: skill-user-auth
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info
-
-logging:
-  level:
-    net.ooder: DEBUG
     root: INFO

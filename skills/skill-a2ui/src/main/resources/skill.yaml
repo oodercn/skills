@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-a2ui
   name: A2UI Skill
-  version: 0.7.1
+  version: 0.7.3
   description: A2UI图转代码技能，支持将设计图转换为前端代码
   author: Ooder Team
   license: Apache-2.0
