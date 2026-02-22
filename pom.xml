@@ -42,7 +42,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.7.0</spring-boot.version>
-        <agent-sdk.version>0.7.1</agent-sdk.version>
+        <agent-sdk.version>0.7.3</agent-sdk.version>
     </properties>
 
     <modules>
