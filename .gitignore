@@ -49,3 +49,7 @@ Thumbs.db
 *.local
 .env
 .env.local
+
+# Internal docs (not for git)
+docs/v0.8.0/TEAM-COLLABORATION-TASKS.md
+docs/v0.8.0/SKILLS-DEV-TASKS.md
