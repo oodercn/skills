@@ -511,7 +511,143 @@ SDK 在运行时验证：
 
 ---
 
-## 7. 相关文档
+## 7. Command 规范
+
+### 7.1 Command 概念
+
+Command 是各层之间的共同语言，具备直达 CAP 的能力。
+
+```
+Command 组成：命令 + 参数
+
+Command 特点：
+├── 各层之间的共同语言
+├── 具备直达 CAP 的能力
+├── 仅适用原子能力
+└── 指令明确无歧义
+
+Command 来源无关：
+├── 场景发送
+├── 其他设备触发
+└── 用户通过网关人工干预
+```
+
+### 7.2 Command 分类
+
+| 类型 | 命名规范 | 说明 | 示例 |
+|------|----------|------|------|
+| 标准命令 | standard://{commandId} | 参考行业标准 | on, off, toggle, set, get |
+| 自定义命令 | custom://{namespace}/{commandId} | 用户/开发者定义 | custom://mycompany/special |
+
+### 7.3 标准命令参考
+
+标准命令优先参考以下行业标准：
+
+| 领域 | 参考规范 | 示例命令 |
+|------|----------|----------|
+| 智能家居 | Zigbee Cluster Library | on, off, toggle, setLevel, getColor |
+| 通用控制 | 通用抽象 | execute, cancel, pause, resume |
+| 查询 | 通用抽象 | get, status, history |
+| 配置 | 通用抽象 | configure, bind, unbind |
+
+### 7.4 CAP 命令定义
+
+在 CAP 定义中增加命令规范：
+
+```yaml
+cap:
+  id: "01"
+  name: "Switch"
+  version: "1.0.0"
+  category: "control"
+  description: "开关控制能力"
+  
+  spec:
+    # 标准命令支持列表
+    standardCommands:
+      - id: on
+        name: "开启"
+        input:
+          type: object
+          properties: {}
+        output:
+          type: boolean
+          
+      - id: off
+        name: "关闭"
+        input:
+          type: object
+          properties: {}
+        output:
+          type: boolean
+          
+      - id: toggle
+        name: "切换"
+        input:
+          type: object
+          properties: {}
+        output:
+          type: boolean
+          
+    # 自定义命令配置
+    customCommands:
+      allowed: true                    # 是否允许自定义命令
+      namespace: "custom"              # 自定义命令命名空间
+      
+    # 命令选项配置
+    commandOptions:
+      allowParams: true                # 是否允许参数
+      allowTimeout: true               # 是否允许超时设置
+      allowPriority: true              # 是否允许优先级
+```
+
+### 7.5 Command 执行流程
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                    Command 执行流程                              │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  1. 绑定路径执行                                                │
+│     ├── 发送 Command 到目标设备                                 │
+│     ├── 成功 → 结束                                             │
+│     └── 失败 → 进入失败检测                                     │
+│                                                                 │
+│  2. 失败检测                                                    │
+│     ├── 查询链路状态，确认物理链路是否正常                      │
+│     ├── 再发送确认，排除心跳期突然故障                          │
+│     └── 确认故障类型                                            │
+│                                                                 │
+│  3. 状态处理                                                    │
+│     ├── 离线状态：尝试后重置状态                                │
+│     ├── 故障状态：不再路由，避免风暴                            │
+│     └── 等待下一个心跳周期后恢复                                │
+│                                                                 │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 7.6 Command 与链路
+
+```
+链路 = 途径 + 设备内部地址 + CAP路由
+运输物 = CAP 对应的 Command
+
+链路属性：
+├── linkId: 唯一标识
+├── sourceCap: 源CAP
+├── targetDevice: 目标设备
+├── targetCap: 目标CAP
+├── status: ACTIVE | SUSPENDED | FAILED
+└── 绑定本身也是 Command
+
+绑定目的：
+├── 确定性执行
+└── 离线可运行保障
+```
+
+---
+
+## 8. 相关文档
 
 - [架构设计总览](./ARCHITECTURE-V0.8.0.md)
 - [场景引擎规范](./SCENE-ENGINE-SPEC.md)

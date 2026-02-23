@@ -461,7 +461,261 @@ public interface SceneAgent {
 
 ---
 
-## 10. 相关文档
+## 10. WorkerAgent 设计
+
+### 10.1 WorkerAgent 概念
+
+WorkerAgent 是用户看到的"助手"，封装 Skill + CapProvider，通过 agentId 绑定 Device。
+
+```java
+public class WorkerAgent {
+    
+    private String workerId;            // worker-{sceneId}-{name}-{uuid}
+    private String name;                // 显示名称，如"资料助手"
+    private String description;         // 描述
+    
+    private String sceneId;             // 所属场景
+    private String skillId;             // 关联的 Skill
+    private List<String> caps;          // 实现的 CAP 列表
+    
+    private AgentStatus status;         // IDLE | BUSY | ERROR
+    private Task currentTask;           // 当前任务
+    
+    private String preferredDevice;     // 首选设备
+    private DeviceSelector deviceSelector; // 设备选择策略
+    
+    private SkillConnector connector;   // Skill 连接器
+    
+    public <T> CompletableFuture<T> invoke(String capId, CapRequest request, Class<T> responseType) {
+        return connector.invoke(capId, request, responseType);
+    }
+    
+    private DeviceAgent selectDevice(String capId) {
+        if (preferredDevice != null) {
+            return deviceRegistry.get(preferredDevice);
+        }
+        return deviceSelector.select(capId, caps);
+    }
+}
+```
+
+### 10.2 WorkerAgent 与 SceneAgent 关系
+
+```
+SceneAgent (场景代理)
+├── 包含多个 WorkerAgent
+├── 编排 Workflow
+├── 决策协调
+└── 用户交互
+
+WorkerAgent (工作代理)
+├── 属于某个 SceneAgent
+├── 执行具体任务
+├── 调用 CAP 能力
+└── 绑定到 Device
+```
+
+---
+
+## 11. Workflow 编排
+
+### 11.1 Workflow 定义
+
+```yaml
+scene:
+  id: "blog-publish"
+  name: "博文发布"
+  
+  agents:
+    - id: research-agent
+      name: "资料助手"
+      skill: skill-research
+      caps: ["A0", "A1"]
+      
+    - id: writer-agent
+      name: "写作助手"
+      skill: skill-writer
+      caps: ["B0"]
+      
+    - id: image-agent
+      name: "图片助手"
+      skill: skill-image
+      caps: ["C0"]
+      
+    - id: publish-agent
+      name: "发布助手"
+      skill: skill-publisher
+      caps: ["A0-A4"]
+  
+  workflow:
+    steps:
+      - id: collect
+        agent: research-agent
+        cap: "A0"
+        action: searchMaterials
+        output: materials
+        
+      - id: write
+        agent: writer-agent
+        cap: "B0"
+        action: writeArticle
+        input: materials
+        output: article
+        dependsOn: [collect]
+        
+      - id: image
+        agent: image-agent
+        cap: "C0"
+        action: generateCover
+        input: article
+        output: coverImage
+        dependsOn: [write]
+        
+      - id: publish
+        agent: publish-agent
+        cap: "A0"
+        action: publishToPlatforms
+        input: [article, coverImage]
+        output: publishResult
+        dependsOn: [write, image]
+        
+    triggers:
+      - type: schedule
+        cron: "0 10 * * *"
+      - type: manual
+      - type: chat
+        intent: "发布博文"
+```
+
+### 11.2 WorkflowEngine 接口
+
+```java
+public class WorkflowEngine {
+    
+    private Map<String, WorkflowDefinition> workflows;
+    
+    public CompletableFuture<WorkflowResult> execute(String sceneId, WorkflowContext context) {
+        WorkflowDefinition workflow = workflows.get(sceneId);
+        
+        for (WorkflowStep step : workflow.getSteps()) {
+            WorkerAgent agent = getAgent(step.getAgentId());
+            
+            if (!checkDependencies(step, context)) {
+                continue;
+            }
+            
+            StepResult result = agent.invoke(
+                step.getCapId(), 
+                context.getInput(step),
+                StepResult.class
+            ).join();
+            
+            context.setOutput(step.getId(), result.getOutput());
+        }
+        
+        return CompletableFuture.completedFuture(context.getResult());
+    }
+    
+    private boolean checkDependencies(WorkflowStep step, WorkflowContext context) {
+        for (String depId : step.getDependsOn()) {
+            if (!context.hasOutput(depId)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}
+```
+
+### 11.3 WorkflowStep 定义
+
+```java
+public class WorkflowStep {
+    
+    private String id;                  // 步骤ID
+    private String agentId;             // 执行的 WorkerAgent
+    private String capId;               // 调用的 CAP
+    private String action;              // 执行的动作
+    private Object input;               // 输入
+    private String output;              // 输出变量名
+    private List<String> dependsOn;     // 依赖步骤
+    private StepConfig config;          // 步骤配置
+}
+```
+
+---
+
+## 12. 场景决策机制
+
+### 12.1 决策类型
+
+| 类型 | 说明 | 示例 |
+|------|------|------|
+| 自动决策 | 有明确规则，自动执行 | 负载均衡、故障转移 |
+| 半自动决策 | 用户预设规则，按规则执行 | 设备优先级、时间段规则 |
+| 手动决策 | 需要用户确认 | 敏感操作、新设备入网 |
+
+### 12.2 决策触发条件
+
+```
+场景需要决策时：
+├── 场景有直接支持的 CAP → 直接执行
+├── 场景没有直接支持的 CAP → 向 McpAgent 请求
+└── 需要用户参与 → McpAgent 协调
+
+用户参与方式：
+├── 预设规则：用户提前设置决策规则
+├── 实时确认：场景暂停，等待用户确认
+└── 异步通知：场景继续，同时通知用户
+```
+
+---
+
+## 13. 设备绑定管理
+
+### 13.1 agentId 与 deviceId 绑定
+
+```
+设计原则：
+├── agentId: 逻辑标识，稳定不变
+├── deviceId: 物理标识，可能变化
+└── agentId ↔ deviceId 绑定，解决设备更替问题
+
+设备更换流程：
+├── 旧设备: agentId ↔ deviceId-old
+├── 更换后: agentId ↔ deviceId-new (agentId 不变)
+└── 场景配置引用 agentId，无需修改
+```
+
+### 13.2 绑定类型
+
+| 类型 | 说明 | 处理 |
+|------|------|------|
+| 强绑定 | 不可拆分，只能故障设定 | 灯↔开关、温湿度传感器↔采集器 |
+| 弱绑定 | 用户可调整 | 场景↔设备 |
+
+### 13.3 强绑定设备故障处理
+
+```
+故障检测：
+├── 设备离线/无响应
+├── RouteAgent 上报 McpAgent
+└── McpAgent 标记设备故障
+
+用户介入：
+├── McpAgent 通知用户
+├── 用户确认故障
+└── 用户选择处理方式
+
+处理选项：
+├── 更换设备：新设备继承旧设备绑定关系
+├── 移除设备：解除所有绑定关系
+└── 临时禁用：保留绑定，标记禁用
+```
+
+---
+
+## 14. 相关文档
 
 - [架构设计总览](./ARCHITECTURE-V0.8.0.md)
 - [CAP 注册表规范](./CAP-REGISTRY-SPEC.md)
