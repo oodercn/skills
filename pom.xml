@@ -42,7 +42,9 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spring-boot.version>2.7.0</spring-boot.version>
-        <agent-sdk.version>0.8.0</agent-sdk.version>
+        <agent-sdk.version>2.3</agent-sdk.version>
+        <scene-engine.version>2.3</scene-engine.version>
+        <llm-sdk.version>2.3</llm-sdk.version>
     </properties>
 
     <modules>
