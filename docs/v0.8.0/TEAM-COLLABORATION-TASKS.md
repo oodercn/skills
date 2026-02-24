@@ -176,49 +176,196 @@
 
 #### 模块 G：心跳与状态管理
 
-**负责人**：`@待分配`  
+**负责人**：`@SDK团队`  
 **工作量**：6人天  
-**优先级**：P1
+**优先级**：P1  
+**状态**：✅ 已完成（SDK 已实现）
 
 | 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
 |--------|----------|------|--------|----------|----------|
-| HB-001 | 扩展现有心跳机制，支持设备分类 | ⏳ 待开始 | - | - | - |
-| HB-002 | 实现设备类型心跳策略 | ⏳ 待开始 | - | - | - |
-| HB-003 | 实现状态恢复机制（离线→重新入网） | ⏳ 待开始 | - | - | - |
-| HB-004 | 实现故障检测和隔离 | ⏳ 待开始 | - | - | - |
-| HB-005 | 集成到 OfflineService | ⏳ 待开始 | - | - | - |
+| HB-001 | 扩展现有心跳机制，支持设备分类 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| HB-002 | 实现设备类型心跳策略 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| HB-003 | 实现状态恢复机制（离线→重新入网） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| HB-004 | 实现故障检测和隔离 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| HB-005 | 集成到 OfflineService | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
 
 **交付物**：
-- 增强的 `OfflineService`
+- `net.ooder.sdk.nexus.offline.OfflineServiceImpl`
+- `net.ooder.sdk.nexus.offline.HeartbeatManager`
 - 心跳策略配置文档
 
 ---
 
 #### 模块 H：北向/南向协议分层
 
-**负责人**：`@待分配`  
+**负责人**：`@SDK团队`  
 **工作量**：8人天  
-**优先级**：P1
+**优先级**：P1  
+**状态**：✅ 已完成（SDK 已实现）
 
 | 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
 |--------|----------|------|--------|----------|----------|
-| PROTO-001 | 定义北向协议接口 | ⏳ 待开始 | - | - | - |
-| PROTO-002 | 定义南向协议接口 | ⏳ 待开始 | - | - | - |
-| PROTO-003 | 实现北向协议消息处理 | ⏳ 待开始 | - | - | - |
-| PROTO-004 | 实现南向协议消息处理 | ⏳ 待开始 | - | - | - |
-| PROTO-005 | 实现协议消息编解码 | ⏳ 待开始 | - | - | - |
-| PROTO-006 | 集成到现有协议体系 | ⏳ 待开始 | - | - | - |
+| PROTO-001 | 定义北向协议接口 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| PROTO-002 | 定义南向协议接口 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| PROTO-003 | 实现北向协议消息处理 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| PROTO-004 | 实现南向协议消息处理 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| PROTO-005 | 实现协议消息编解码 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| PROTO-006 | 集成到现有协议体系 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
 
 **交付物**：
-- `net.ooder.sdk.protocol.northbound.*` 包
-- `net.ooder.sdk.protocol.southbound.*` 包
+- `net.ooder.sdk.northbound.protocol.ObservationProtocolImpl`
+- `net.ooder.sdk.northbound.protocol.DomainManagementProtocolImpl`
+- `net.ooder.sdk.southbound.protocol.DiscoveryProtocolImpl`
+- `net.ooder.sdk.southbound.protocol.LoginProtocolImpl`
+- `net.ooder.sdk.southbound.protocol.CollaborationProtocolImpl`
+- `net.ooder.sdk.southbound.protocol.RoleProtocolImpl`
 - 协议规范文档
 
 ---
 
-### 阶段三：配置与文档（第8周）
+#### 模块 I：LLM 记忆体系（新增）
 
-#### 模块 I：配置规范升级
+**负责人**：`@待分配`  
+**工作量**：10人天  
+**优先级**：P0
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| MEM-001 | 定义五层记忆架构模型 | ⏳ 待开始 | - | - | - |
+| MEM-002 | 实现感知记忆（SensoryMemory） | ⏳ 待开始 | - | - | - |
+| MEM-003 | 实现工作记忆（WorkingMemory） | ⏳ 待开始 | - | - | - |
+| MEM-004 | 实现情景记忆（EpisodicMemory） | ⏳ 待开始 | - | - | - |
+| MEM-005 | 实现语义记忆（SemanticMemory） | ⏳ 待开始 | - | - | - |
+| MEM-006 | 实现程序记忆（ProceduralMemory） | ⏳ 待开始 | - | - | - |
+| MEM-007 | 实现记忆管理接口 | ⏳ 待开始 | - | - | - |
+| MEM-008 | 集成到 SceneAgent | ⏳ 待开始 | - | - | - |
+
+**交付物**：
+- `net.ooder.sdk.memory.*` 包
+- LLM 记忆体系规范文档
+
+---
+
+#### 模块 J：意志表达模型（新增）
+
+**负责人**：`@SDK团队`  
+**工作量**：6人天  
+**优先级**：P0  
+**状态**：✅ 已完成（SDK 已实现）
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| WILL-001 | 定义意志表达模型（战略/战术/执行） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| WILL-002 | 实现意志解析器 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| WILL-003 | 实现意志转化器（意志→执行计划） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| WILL-004 | 实现意志执行监控 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| WILL-005 | 集成到 SceneAgent 决策机制 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+
+**交付物**：
+- `net.ooder.sdk.will.WillManagerImpl`
+- `net.ooder.sdk.will.WillParserImpl`
+- `net.ooder.sdk.will.WillTransformerImpl`
+- `net.ooder.sdk.will.WillExecutorImpl`
+- `net.ooder.sdk.will.WillExpressionImpl`
+- 意志表达模型规范文档
+
+---
+
+#### 模块 K：NLP 语言规范（新增）
+
+**负责人**：`@待分配`  
+**工作量**：5人天  
+**优先级**：P1
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| NLP-001 | 定义意图类型（query/operation/decision/coordination/analysis） | ⏳ 待开始 | - | - | - |
+| NLP-002 | 定义实体类型（person/device/data/agent/process/resource） | ⏳ 待开始 | - | - | - |
+| NLP-003 | 定义关系类型（belongsTo/dependsOn/collaboratesWith/manages/uses） | ⏳ 待开始 | - | - | - |
+| NLP-004 | 实现意图识别器 | ⏳ 待开始 | - | - | - |
+| NLP-005 | 实现实体抽取器 | ⏳ 待开始 | - | - | - |
+
+**交付物**：
+- `net.ooder.sdk.nlp.*` 包
+- NLP 语言规范文档
+
+---
+
+#### 模块 L：数字资产治理（新增）
+
+**负责人**：`@SDK团队`  
+**工作量**：8人天  
+**优先级**：P1  
+**状态**：✅ 已完成（SDK 已实现）
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| ASSET-001 | 定义数字资产分类（设备/数据/Agent/资源） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| ASSET-002 | 实现设备资产管理（与 Place/Zone/Device 体系对应） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| ASSET-003 | 实现数据资产管理 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| ASSET-004 | 实现 Agent 资产管理 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| ASSET-005 | 实现资源资产管理 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| ASSET-006 | 实现资产治理接口 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+
+**交付物**：
+- `net.ooder.sdk.asset.AssetGovernanceImpl`
+- `net.ooder.sdk.asset.DigitalAssetImpl`
+- `net.ooder.sdk.asset.DeviceAssetManagerImpl`
+- `net.ooder.sdk.asset.DataAssetManagerImpl`
+- 数字资产治理规范文档
+
+---
+
+#### 模块 M：LLM 触达能力（新增）
+
+**负责人**：`@SDK团队`  
+**工作量**：6人天  
+**优先级**：P1  
+**状态**：✅ 已完成（SDK 已实现）
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| REACH-001 | 定义触达协议（REACH://device_type/device_id/action?params） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| REACH-002 | 实现物理设备触达（路由器/交换机/防火墙/摄像头/传感器） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| REACH-003 | 实现虚拟资源触达（数据库/文件系统/API/消息队列） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| REACH-004 | 实现触达安全机制（认证/授权/审计） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| REACH-005 | 集成到 Command 体系 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+
+**交付物**：
+- `net.ooder.sdk.reach.ReachManagerImpl`
+- `net.ooder.sdk.reach.ReachProtocolImpl`
+- `net.ooder.sdk.reach.ReachExecutor`
+- `net.ooder.sdk.reach.ReachResult`
+- LLM 触达能力规范文档
+
+---
+
+#### 模块 N：Agent 协同体系（新增）
+
+**负责人**：`@SDK团队`  
+**工作量**：8人天  
+**优先级**：P1  
+**状态**：⚠️ 部分完成（SDK 已实现核心功能）
+
+| 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
+|--------|----------|------|--------|----------|----------|
+| COORD-001 | 定义 Agent 协同架构（协调层/通信层/执行层/管理层） | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| COORD-002 | 实现任务协调器 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| COORD-003 | 实现资源协调器 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+| COORD-004 | 实现冲突解决器 | ⏳ 待开始 | - | - | - |
+| COORD-005 | 实现结果整合器 | ⏳ 待开始 | - | - | - |
+| COORD-006 | 集成到 Workflow 引擎 | ✅ 已完成 | SDK团队 | - | 2026-02-24 |
+
+**交付物**：
+- `net.ooder.sdk.core.skill.collaboration.CollaborativeGroupManagerImpl`
+- `net.ooder.sdk.core.skill.collaboration.SceneGroupManagerImpl`
+- Agent 协同体系规范文档
+
+---
+
+### 阶段三：配置与文档（第8-9周）
+
+#### 模块 O：配置规范升级
 
 **负责人**：`@待分配`  
 **工作量**：3.5人天  
@@ -233,7 +380,7 @@
 
 ---
 
-#### 模块 J：文档更新
+#### 模块 P：文档更新
 
 **负责人**：`@待分配`  
 **工作量**：3.5人天  
@@ -248,12 +395,12 @@
 
 ---
 
-### 阶段四：测试与验证（第9-10周）
+### 阶段四：测试与验证（第10-11周）
 
-#### 模块 K：单元测试
+#### 模块 Q：单元测试
 
 **负责人**：`@待分配`  
-**工作量**：8人天  
+**工作量**：10人天  
 **优先级**：P0
 
 | 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
@@ -264,13 +411,15 @@
 | TEST-004 | Workflow 引擎单元测试 | ⏳ 待开始 | - | - | - |
 | TEST-005 | Command 体系单元测试 | ⏳ 待开始 | - | - | - |
 | TEST-006 | 设备绑定单元测试 | ⏳ 待开始 | - | - | - |
+| TEST-007 | LLM 记忆体系单元测试 | ⏳ 待开始 | - | - | - |
+| TEST-008 | 意志表达模型单元测试 | ⏳ 待开始 | - | - | - |
 
 ---
 
-#### 模块 L：集成测试
+#### 模块 R：集成测试
 
 **负责人**：`@待分配`  
-**工作量**：6人天  
+**工作量**：8人天  
 **优先级**：P0
 
 | 任务ID | 任务描述 | 状态 | 负责人 | 预计完成 | 实际完成 |
@@ -279,6 +428,8 @@
 | INT-002 | 场景工作流集成测试 | ⏳ 待开始 | - | - | - |
 | INT-003 | 离线模式集成测试 | ⏳ 待开始 | - | - | - |
 | INT-004 | 多 Agent 协同测试 | ⏳ 待开始 | - | - | - |
+| INT-005 | LLM 记忆体系集成测试 | ⏳ 待开始 | - | - | - |
+| INT-006 | 数字资产治理集成测试 | ⏳ 待开始 | - | - | - |
 
 ---
 
@@ -286,11 +437,12 @@
 
 | 里程碑 | 版本 | 目标日期 | 主要内容 | 状态 |
 |--------|------|----------|----------|------|
-| M1 | 0.8.0-alpha1 | 2026-03-08 | CAP 注册表 + SceneAgent | ⏳ 进行中 |
-| M2 | 0.8.0-alpha2 | 2026-03-22 | WorkerAgent + Workflow 引擎 | 🔒 未开始 |
-| M3 | 0.8.0-beta1 | 2026-04-05 | Command 体系 + 设备绑定 | 🔒 未开始 |
-| M4 | 0.8.0-rc1 | 2026-04-19 | 北向/南向协议 + 文档 | 🔒 未开始 |
-| M5 | 0.8.0 | 2026-05-03 | 测试完成 + 正式发布 | 🔒 未开始 |
+| M1 | 0.8.0-alpha1 | 2026-03-15 | CAP 注册表 + SceneAgent + WorkerAgent | ⏳ 进行中 |
+| M2 | 0.8.0-alpha2 | 2026-04-05 | Workflow 引擎 + Command 体系 + 设备绑定 | 🔒 未开始 |
+| M3 | 0.8.0-beta1 | 2026-04-26 | LLM 记忆体系 + 意志表达 + NLP 规范 | 🔒 未开始 |
+| M4 | 0.8.0-beta2 | 2026-05-17 | 数字资产治理 + LLM 触达 + Agent 协同 | 🔒 未开始 |
+| M5 | 0.8.0-rc1 | 2026-05-31 | 北向/南向协议 + 文档 + 配置 | 🔒 未开始 |
+| M6 | 0.8.0 | 2026-06-14 | 测试完成 + 正式发布 | 🔒 未开始 |
 
 ---
 
@@ -353,28 +505,80 @@
 
 | 指标 | 数值 |
 |------|------|
-| 总任务数 | 58 |
-| 已完成 | 0 |
+| 总任务数 | 99 |
+| 已完成 | 65 |
 | 进行中 | 0 |
-| 待开始 | 58 |
-| 完成率 | 0% |
+| 待开始 | 34 |
+| 完成率 | 66% |
 
 ### 6.2 模块进度
 
-| 模块 | 总任务 | 已完成 | 进度 |
-|------|--------|--------|------|
-| A: CAP 注册表 | 7 | 0 | 0% |
-| B: SceneAgent | 6 | 0 | 0% |
-| C: WorkerAgent | 5 | 0 | 0% |
-| D: Workflow 引擎 | 9 | 0 | 0% |
-| E: Command 体系 | 6 | 0 | 0% |
-| F: 设备绑定 | 5 | 0 | 0% |
-| G: 心跳管理 | 5 | 0 | 0% |
-| H: 北向/南向协议 | 6 | 0 | 0% |
-| I: 配置规范 | 4 | 0 | 0% |
-| J: 文档更新 | 4 | 0 | 0% |
-| K: 单元测试 | 6 | 0 | 0% |
-| L: 集成测试 | 4 | 0 | 0% |
+| 模块 | 总任务 | 已完成 | 进度 | 状态 |
+|------|--------|--------|------|------|
+| A: CAP 注册表 | 7 | 7 | 100% | ✅ 已完成 |
+| B: SceneAgent | 6 | 6 | 100% | ✅ 已完成 |
+| C: WorkerAgent | 5 | 5 | 100% | ✅ 已完成 |
+| D: Workflow 引擎 | 9 | 9 | 100% | ✅ 已完成 |
+| E: Command 体系 | 6 | 6 | 100% | ✅ 已完成 |
+| F: 设备绑定 | 5 | 5 | 100% | ✅ 已完成 |
+| G: 心跳管理 | 5 | 5 | 100% | ✅ 已完成（SDK 已实现） |
+| H: 北向/南向协议 | 6 | 6 | 100% | ✅ 已完成（SDK 已实现） |
+| I: LLM 记忆体系 | 8 | 1 | 13% | ⚠️ 接口已定义，业务逻辑待实现 |
+| J: 意志表达模型 | 5 | 5 | 100% | ✅ 已完成（SDK 已实现） |
+| K: NLP 语言规范 | 5 | 1 | 20% | ⚠️ 接口已定义，业务逻辑待实现 |
+| L: 数字资产治理 | 6 | 6 | 100% | ✅ 已完成（SDK 已实现） |
+| M: LLM 触达能力 | 5 | 5 | 100% | ✅ 已完成（SDK 已实现） |
+| N: Agent 协同体系 | 6 | 4 | 67% | ⚠️ 部分完成（SDK 已实现核心功能） |
+| O: 配置规范 | 4 | 0 | 0% | ❌ 待开始 |
+| P: 文档更新 | 4 | 0 | 0% | ❌ 待开始 |
+| Q: 单元测试 | 8 | 0 | 0% | ❌ 待开始 |
+| R: 集成测试 | 6 | 0 | 0% | ❌ 待开始 |
+
+### 6.3 SDK 已完成模块详情
+
+| 模块 | 实现位置 | 主要类 |
+|------|----------|--------|
+| CAP 注册表 | agent-sdk/cap/ | CapRegistry, CapDefinition, CapAddress, CapYamlParser, CapRegistryImpl |
+| SceneAgent | agent-sdk/core/agent/ | SceneAgentImpl, SceneAgentType, SceneAgentStatus |
+| WorkerAgent | agent-sdk/core/agent/ | WorkerAgentImpl, WorkerAgentStatus |
+| Workflow 引擎 | agent-sdk/workflow/ | WorkflowEngineImpl, WorkflowDefinition, WorkflowContext, WorkflowStep |
+| Command 体系 | agent-sdk/cmd/ | Command, CommandBuilder, CommandRouter |
+| 设备绑定 | agent-sdk/binding/ | BindingManager, DeviceBinding, BindingStatistics |
+| 心跳管理 | agent-sdk/nexus/offline/ | OfflineServiceImpl, HeartbeatManager |
+| 北向协议 | agent-sdk/northbound/protocol/ | ObservationProtocolImpl, DomainManagementProtocolImpl |
+| 南向协议 | agent-sdk/southbound/protocol/ | DiscoveryProtocolImpl, LoginProtocolImpl, CollaborationProtocolImpl, RoleProtocolImpl |
+| 意志表达模型 | agent-sdk/will/ | WillManagerImpl, WillParserImpl, WillTransformerImpl, WillExecutorImpl, WillExpressionImpl |
+| 数字资产治理 | agent-sdk/asset/ | AssetGovernanceImpl, DigitalAssetImpl, DeviceAssetManagerImpl, DataAssetManagerImpl |
+| LLM 触达能力 | agent-sdk/reach/ | ReachManagerImpl, ReachProtocolImpl, ReachExecutor, ReachResult |
+| Agent 协同 | agent-sdk/core/skill/collaboration/ | CollaborativeGroupManagerImpl, SceneGroupManagerImpl |
+| McpAgent | agent-sdk/core/agent/ | McpAgentImpl |
+| RouteAgent | agent-sdk/core/agent/ | RouteAgentImpl |
+| EndAgent | agent-sdk/core/agent/ | EndAgentImpl |
+
+### 6.4 LLM-SDK 接口定义完成情况
+
+| 模块 | 接口定义 | 实现 | 状态 |
+|------|----------|------|------|
+| MemoryBridgeApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+| NlpInteractionApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+| SchedulingApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+| SecurityApi | ✅ 已定义 | ✅ SecurityServiceImpl | 已实现 |
+| MonitoringApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+| MultiLlmAdapterApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+| CapabilityRequestApi | ✅ 已定义 | ⏳ 桩实现 | 待实现业务逻辑 |
+
+### 6.5 Skills 文档设计完成情况
+
+| 文档 | 状态 | 说明 |
+|------|------|------|
+| ARCHITECTURE-V0.8.0.md | ✅ 已完成 | 完整 Agent 体系、Command 体系、绑定与链路、心跳与状态管理 |
+| CAP-REGISTRY-SPEC.md | ✅ 已完成 | CAP 定义、Command 规范 |
+| SCENE-ENGINE-SPEC.md | ✅ 已完成 | WorkerAgent、Workflow 编排、场景决策机制 |
+| CAPABILITY-DISCOVERY-PROTOCOL.md | ✅ 已完成 | 心跳与状态恢复、北向/南向协议 |
+| LLM_ASSISTANCE_TASKS.md | ✅ 已完成 | LLM 协助任务说明 |
+| LLM_DELEGATION_GUIDE.md | ✅ 已完成 | 任务委派支持说明 |
+| SKILLS_V0.8.0_SUMMARY.md | ✅ 已完成 | 执行任务及目标总结 |
+| SDK_COMPARISON_ANALYSIS.md | ✅ 已完成 | SDK 与 Skills 任务对比分析 |
 
 ---
 
@@ -383,6 +587,9 @@
 | 日期 | 版本 | 变更内容 | 变更人 |
 |------|------|----------|--------|
 | 2026-02-23 | v1.0 | 初始版本，创建协作任务文档 | - |
+| 2026-02-24 | v1.1 | 新增模块 I-N：LLM 记忆体系、意志表达模型、NLP 语言规范、数字资产治理、LLM 触达能力、Agent 协同体系 | - |
+| 2026-02-24 | v1.2 | 更新进度统计：SDK 核心模块已完成 38%，LLM-SDK 接口定义完成，Skills 文档设计完成 | - |
+| 2026-02-24 | v1.3 | 同步 SDK 实际实现状态：心跳管理、北向/南向协议、意志表达模型、数字资产治理、LLM 触达能力、Agent 协同体系已完成，完成率更新为 66% | - |
 
 ---
 

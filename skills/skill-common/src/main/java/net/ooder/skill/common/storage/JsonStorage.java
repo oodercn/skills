@@ -1,8 +1,6 @@
 package net.ooder.skill.common.storage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import com.fasterxml.jackson.databind.type.CollectionType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,122 +8,116 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class JsonStorage {
-    
+
     private static final Logger log = LoggerFactory.getLogger(JsonStorage.class);
     
-    private final ObjectMapper objectMapper;
     private final String basePath;
-    private final Map<String, Object> cache = new ConcurrentHashMap<>();
-    
+    private final ObjectMapper objectMapper;
+
     public JsonStorage(String basePath) {
         this.basePath = basePath;
         this.objectMapper = new ObjectMapper();
-        this.objectMapper.enable(SerializationFeature.INDENT_OUTPUT);
-        
+        initDirectory();
+    }
+
+    private void initDirectory() {
         File dir = new File(basePath);
         if (!dir.exists()) {
             dir.mkdirs();
         }
     }
-    
-    public <T> void save(String key, T data) {
-        if (data == null) {
+
+    public void save(String key, Object data) {
+        if (key == null || data == null) {
             return;
         }
-        cache.put(key, data);
-        
-        File file = getFilePath(key);
         try {
-            objectMapper.writeValue(file, data);
-            log.debug("Saved data to {}", file.getAbsolutePath());
+            File file = new File(basePath, key + ".json");
+            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+            log.debug("Saved data to: {}", file.getAbsolutePath());
         } catch (IOException e) {
-            log.error("Failed to save data to {}: {}", key, e.getMessage());
+            log.error("Failed to save data for key: {}", key, e);
         }
     }
-    
-    public <T> T load(String key, Class<T> clazz) {
-        Object cached = cache.get(key);
-        if (cached != null && clazz.isInstance(cached)) {
-            return clazz.cast(cached);
-        }
-        
-        File file = getFilePath(key);
-        if (!file.exists()) {
+
+    public <T> T load(String key, Class<T> type) {
+        if (key == null || type == null) {
             return null;
         }
-        
         try {
-            T data = objectMapper.readValue(file, clazz);
-            cache.put(key, data);
-            return data;
+            File file = new File(basePath, key + ".json");
+            if (!file.exists()) {
+                return null;
+            }
+            return objectMapper.readValue(file, type);
         } catch (IOException e) {
-            log.error("Failed to load data from {}: {}", key, e.getMessage());
+            log.error("Failed to load data for key: {}", key, e);
             return null;
         }
     }
-    
-    public <T> List<T> loadList(String key, Class<T> elementClass) {
-        Object cached = cache.get(key);
-        if (cached instanceof List) {
-            @SuppressWarnings("unchecked")
-            List<T> list = (List<T>) cached;
-            return list;
-        }
-        
-        File file = getFilePath(key);
-        if (!file.exists()) {
+
+    public <T> List<T> loadList(String key, Class<T> elementType) {
+        if (key == null || elementType == null) {
             return new ArrayList<>();
         }
-        
         try {
-            CollectionType type = objectMapper.getTypeFactory()
-                .constructCollectionType(List.class, elementClass);
-            List<T> data = objectMapper.readValue(file, type);
-            cache.put(key, data);
-            return data;
+            File file = new File(basePath, key + ".json");
+            if (!file.exists()) {
+                return new ArrayList<>();
+            }
+            return objectMapper.readValue(file,
+                objectMapper.getTypeFactory().constructCollectionType(List.class, elementType));
         } catch (IOException e) {
-            log.error("Failed to load list from {}: {}", key, e.getMessage());
+            log.error("Failed to load list for key: {}", key, e);
             return new ArrayList<>();
         }
     }
-    
+
     public void delete(String key) {
-        cache.remove(key);
-        
-        File file = getFilePath(key);
+        if (key == null) {
+            return;
+        }
+        File file = new File(basePath, key + ".json");
         if (file.exists()) {
             file.delete();
+            log.debug("Deleted data for key: {}", key);
         }
     }
-    
+
     public boolean exists(String key) {
-        if (cache.containsKey(key)) {
-            return true;
+        if (key == null) {
+            return false;
         }
-        return getFilePath(key).exists();
+        File file = new File(basePath, key + ".json");
+        return file.exists();
     }
-    
-    public void clear() {
-        cache.clear();
+
+    public List<String> listKeys() {
+        List<String> keys = new ArrayList<>();
         File dir = new File(basePath);
         if (dir.exists() && dir.isDirectory()) {
-            for (File file : dir.listFiles()) {
-                if (file.isFile() && file.getName().endsWith(".json")) {
+            File[] files = dir.listFiles((d, name) -> name.endsWith(".json"));
+            if (files != null) {
+                for (File file : files) {
+                    String name = file.getName();
+                    keys.add(name.substring(0, name.length() - 5));
+                }
+            }
+        }
+        return keys;
+    }
+
+    public void clear() {
+        File dir = new File(basePath);
+        if (dir.exists() && dir.isDirectory()) {
+            File[] files = dir.listFiles();
+            if (files != null) {
+                for (File file : files) {
                     file.delete();
                 }
             }
         }
-    }
-    
-    private File getFilePath(String key) {
-        return new File(basePath, key + ".json");
-    }
-    
-    public String getBasePath() {
-        return basePath;
     }
 }

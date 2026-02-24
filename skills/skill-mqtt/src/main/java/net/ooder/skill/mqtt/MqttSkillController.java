@@ -31,7 +31,7 @@ public class MqttSkillController {
     public Map<String, Object> getInfo() {
         Map<String, Object> info = new HashMap<>();
         info.put("skillId", "skill-mqtt");
-        info.put("version", "0.7.1");
+        info.put("version", "0.7.3");
         info.put("status", mqttServer != null ? mqttServer.getStatus().name() : "STOPPED");
         info.put("running", mqttServer != null && mqttServer.isRunning());
         return info;
