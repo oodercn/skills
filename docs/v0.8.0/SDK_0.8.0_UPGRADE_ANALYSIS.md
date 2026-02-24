@@ -82,34 +82,89 @@
 
 ---
 
-## 四、已移除/变更的旧 API
+## 四、依赖分析
 
-### 4.1 已移除的包
+### 4.1 问题根源
 
-| 旧包路径 | 说明 | 替代方案 |
-|----------|------|----------|
-| `net.ooder.org` | 组织模型 | 使用自定义 DTO |
-| `net.ooder.annotation` | 注解 | 使用 Spring 注解 |
-| `net.ooder.common` | 公共工具 | 使用 `net.ooder.sdk.infra.utils` |
-| `net.ooder.config` | 配置 | 使用 `net.ooder.sdk.infra.config` |
-| `net.ooder.jds.core` | JDS 核心 | 使用 `net.ooder.sdk.api.storage` |
-| `net.ooder.msg` | 消息 | 使用 `net.ooder.sdk.api.msg` |
-| `net.ooder.server` | 服务端 | 使用 `net.ooder.sdk.api` |
-| `net.ooder.engine` | 引擎 | 使用 `net.ooder.sdk.api` |
+`skill-org-dingding` 和 `skill-org-feishu` 编译失败**不是 SDK 0.8.0 移除了 API**，而是这些 Skills 依赖了**多个独立的 ooder 组件**：
 
-### 4.2 已移除的类
+| 依赖包 | Maven 坐标 | 说明 |
+|--------|------------|------|
+| `ooder-org` | `net.ooder:ooder-org:0.5` | 组织模型 (Org, Person, Role) |
+| `ooder-annotation` | `net.ooder:ooder-annotation:2.2` | 注解 (EsbBeanAnnotation, RoleType) |
+| `ooder-common` | `net.ooder:ooder-common:2.2` | 公共工具 (ConfigCode, JDSException) |
+| `ooder-config` | `net.ooder:ooder-config:2.2` | 配置 (ResultModel, ErrorResultModel) |
+| `ooder-core` | `net.ooder:ooder-core:2.1` | 核心 (User, ConnectInfo) |
+| `ooder-server` | `net.ooder:ooder-server:2.2` | 服务端 |
 
-| 旧类 | 说明 | 替代方案 |
-|------|------|----------|
-| `Org` | 组织实体 | 自定义 `OrgDTO` |
-| `Person` | 人员实体 | 自定义 `PersonDTO` |
-| `Role` | 角色实体 | 自定义 `RoleDTO` |
-| `User` | 用户实体 | 自定义 `UserDTO` |
-| `ResultModel` | 结果模型 | 使用 `Map<String, Object>` 或自定义 DTO |
-| `OrgManager` | 组织管理器 | 使用 `net.ooder.sdk.api.scene.SceneGroupManager` |
-| `UserService` | 用户服务 | 使用 `net.ooder.sdk.api.security.SecurityApi` |
-| `JDSException` | JDS 异常 | 使用 `net.ooder.sdk.infra.exception.SDKException` |
-| `ConfigCode` | 配置码 | 使用 `net.ooder.sdk.infra.config.SDKConfiguration` |
+### 4.2 解决方案
+
+**方案 A**: 添加缺失依赖到 pom.xml (已验证可行)
+
+```xml
+<dependencies>
+    <dependency>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-org-web</artifactId>
+        <version>2.2</version>
+    </dependency>
+    <dependency>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-common-client</artifactId>
+        <version>2.2</version>
+    </dependency>
+    <dependency>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-config</artifactId>
+        <version>2.2</version>
+    </dependency>
+    <dependency>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-server</artifactId>
+        <version>2.2</version>
+    </dependency>
+    <dependency>
+        <groupId>net.ooder</groupId>
+        <artifactId>ooder-msg-web</artifactId>
+        <version>2.2</version>
+    </dependency>
+</dependencies>
+```
+
+**说明**：
+- `ooder-org-web` 包含 `net.ooder.org` 包 (Org, Person, Role 等)
+- `ooder-common-client` 包含:
+  - `net.ooder.common` 包 (ConfigCode, JDSException 等)
+  - `net.ooder.jds.core` 包 (User 等)
+  - `net.ooder.engine` 包 (ConnectInfo 等)
+- `ooder-config` 包含 `net.ooder.config` 包 (ResultModel, ErrorResultModel 等)
+- `ooder-server` 包含 `net.ooder.server` 包
+- `ooder-msg-web` 包含 `net.ooder.msg` 包
+
+**注意**: `ooder-core` 依赖**不需要**，因为相关类已在 `ooder-common-client` 中提供。
+
+**方案 B**: 重构为使用 SDK 0.8.0 新 API
+
+如果希望完全迁移到 SDK 0.8.0，可以使用以下替代方案：
+
+| 旧 API | SDK 0.8.0 替代 |
+|--------|----------------|
+| `Org`, `Person`, `Role` | 自定义 DTO 或 `net.ooder.sdk.api.scene.SceneMember` |
+| `ResultModel` | `Map<String, Object>` 或自定义响应类 |
+| `UserService` | `net.ooder.sdk.api.security.SecurityApi` |
+| `OrgManager` | `net.ooder.sdk.api.scene.SceneGroupManager` |
+
+### 4.3 建议
+
+**推荐方案 A**：添加缺失依赖，保持现有业务逻辑不变。
+
+这些独立的 ooder 组件功能完善，包含：
+- 完整的组织树结构管理
+- 人员-组织-角色关系
+- 查询条件构建器
+- 异常处理体系
+
+SDK 0.8.0 的设计目标是提供**Agent 通信和协作能力**，而不是替代这些**业务领域模型**。
 
 ---
 
@@ -193,9 +248,15 @@ mvn compile -pl skills/skill-a2ui,skills/skill-user-auth
 |------|------|
 | 总 Skills 数 | 22 |
 | 兼容 Skills | 20 |
-| 需重构 Skills | 2 |
-| 兼容率 | 91% |
+| 需添加依赖的 Skills | 2 |
+| 兼容率 | **100%** (添加依赖后) |
+
+**重要发现**：
+1. SDK 0.8.0 **没有移除任何 API**，而是新增了大量功能
+2. `skill-org-dingding` 和 `skill-org-feishu` 编译失败是因为缺少独立组件依赖
+3. 这些独立组件 (`ooder-org`, `ooder-common` 等) 功能完善，建议继续使用
 
 **建议**: 
-1. 先升级兼容的 20 个 Skills
-2. 后续重构 `skill-org-dingding` 和 `skill-org-feishu`
+1. 升级所有 Skills 到 SDK 0.8.0
+2. 为 `skill-org-dingding` 和 `skill-org-feishu` 添加缺失的依赖
+3. 保持现有业务领域模型，无需重构
