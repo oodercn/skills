@@ -9,36 +9,36 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 /**
- * 审计日志REST API控制器
+ * 瀹¤鏃ュ織REST API鎺у埗鍣?
  * 
- * <p>提供审计日志相关的HTTP接口，支持日志记录、查询、统计和导出功能。</p>
+ * <p>鎻愪緵瀹¤鏃ュ織鐩稿叧鐨凥TTP鎺ュ彛锛屾敮鎸佹棩蹇楄褰曘€佹煡璇€佺粺璁″拰瀵煎嚭鍔熻兘銆?/p>
  * 
- * <h3>API端点列表：</h3>
+ * <h3>API绔偣鍒楄〃锛?/h3>
  * <table border="1">
- *   <tr><th>方法</th><th>路径</th><th>描述</th></tr>
- *   <tr><td>POST</td><td>/api/audit/record</td><td>记录审计日志</td></tr>
- *   <tr><td>GET</td><td>/api/audit/logs/{logId}</td><td>根据ID获取日志</td></tr>
- *   <tr><td>POST</td><td>/api/audit/logs</td><td>查询审计日志</td></tr>
- *   <tr><td>GET</td><td>/api/audit/statistics</td><td>获取审计统计</td></tr>
- *   <tr><td>POST</td><td>/api/audit/export</td><td>导出审计日志</td></tr>
- *   <tr><td>GET</td><td>/api/audit/users/{userId}/logs</td><td>获取用户日志</td></tr>
+ *   <tr><th>鏂规硶</th><th>璺緞</th><th>鎻忚堪</th></tr>
+ *   <tr><td>POST</td><td>/api/audit/record</td><td>璁板綍瀹¤鏃ュ織</td></tr>
+ *   <tr><td>GET</td><td>/api/audit/logs/{logId}</td><td>鏍规嵁ID鑾峰彇鏃ュ織</td></tr>
+ *   <tr><td>POST</td><td>/api/audit/logs</td><td>鏌ヨ瀹¤鏃ュ織</td></tr>
+ *   <tr><td>GET</td><td>/api/audit/statistics</td><td>鑾峰彇瀹¤缁熻</td></tr>
+ *   <tr><td>POST</td><td>/api/audit/export</td><td>瀵煎嚭瀹¤鏃ュ織</td></tr>
+ *   <tr><td>GET</td><td>/api/audit/users/{userId}/logs</td><td>鑾峰彇鐢ㄦ埛鏃ュ織</td></tr>
  * </table>
  * 
- * <h3>使用示例：</h3>
+ * <h3>浣跨敤绀轰緥锛?/h3>
  * <pre>{@code
- * // 记录审计日志
+ * // 璁板綍瀹¤鏃ュ織
  * POST /api/audit/record
  * Content-Type: application/json
  * {
  *   "userId": "user-001",
- *   "userName": "张三",
+ *   "userName": "寮犱笁",
  *   "action": "login",
  *   "resourceType": "session",
  *   "result": "success",
  *   "ipAddress": "192.168.1.100"
  * }
  * 
- * // 查询审计日志
+ * // 鏌ヨ瀹¤鏃ュ織
  * POST /api/audit/logs
  * Content-Type: application/json
  * {
@@ -62,28 +62,28 @@ public class AuditController {
     private AuditService auditService;
 
     /**
-     * 记录审计日志
+     * 璁板綍瀹¤鏃ュ織
      * 
-     * <p>将一条审计日志记录保存到系统中。通常在执行敏感操作时调用此接口进行记录。</p>
+     * <p>灏嗕竴鏉″璁℃棩蹇楄褰曚繚瀛樺埌绯荤粺涓€傞€氬父鍦ㄦ墽琛屾晱鎰熸搷浣滄椂璋冪敤姝ゆ帴鍙ｈ繘琛岃褰曘€?/p>
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "userId": "user-001",
-     *   "userName": "张三",
+     *   "userName": "寮犱笁",
      *   "action": "delete",
      *   "resourceType": "file",
      *   "resourceId": "file-123",
-     *   "resourceName": "重要文档.pdf",
+     *   "resourceName": "閲嶈鏂囨。.pdf",
      *   "result": "success",
      *   "ipAddress": "192.168.1.100",
      *   "userAgent": "Mozilla/5.0...",
-     *   "description": "删除重要文档"
+     *   "description": "鍒犻櫎閲嶈鏂囨。"
      * }
      * }</pre>
      * 
-     * @param log 审计日志对象
-     * @return 保存后的审计日志，包含生成的ID和时间戳
+     * @param log 瀹¤鏃ュ織瀵硅薄
+     * @return 淇濆瓨鍚庣殑瀹¤鏃ュ織锛屽寘鍚敓鎴愮殑ID鍜屾椂闂存埑
      */
     @PostMapping("/record")
     public ResponseEntity<AuditLog> record(@RequestBody AuditLog log) {
@@ -91,10 +91,10 @@ public class AuditController {
     }
 
     /**
-     * 根据ID获取审计日志
+     * 鏍规嵁ID鑾峰彇瀹¤鏃ュ織
      * 
-     * @param logId 日志ID
-     * @return 审计日志对象，如果不存在返回404
+     * @param logId 鏃ュ織ID
+     * @return 瀹¤鏃ュ織瀵硅薄锛屽鏋滀笉瀛樺湪杩斿洖404
      */
     @GetMapping("/logs/{logId}")
     public ResponseEntity<AuditLog> getById(@PathVariable String logId) {
@@ -106,28 +106,28 @@ public class AuditController {
     }
 
     /**
-     * 查询审计日志
+     * 鏌ヨ瀹¤鏃ュ織
      * 
-     * <p>支持多条件组合查询，包括用户ID、操作类型、资源类型、时间范围等条件。
-     * 支持分页和排序。</p>
+     * <p>鏀寔澶氭潯浠剁粍鍚堟煡璇紝鍖呮嫭鐢ㄦ埛ID銆佹搷浣滅被鍨嬨€佽祫婧愮被鍨嬨€佹椂闂磋寖鍥寸瓑鏉′欢銆?
+     * 鏀寔鍒嗛〉鍜屾帓搴忋€?/p>
      * 
-     * <h4>查询条件：</h4>
+     * <h4>鏌ヨ鏉′欢锛?/h4>
      * <ul>
-     *   <li>userId - 用户ID</li>
-     *   <li>action - 操作类型（如：login、logout、create、update、delete）</li>
-     *   <li>resourceType - 资源类型（如：user、file、session）</li>
-     *   <li>resourceId - 资源ID</li>
-     *   <li>result - 操作结果（success/failure）</li>
-     *   <li>startTime - 开始时间（毫秒时间戳）</li>
-     *   <li>endTime - 结束时间（毫秒时间戳）</li>
-     *   <li>page - 页码（从0开始）</li>
-     *   <li>size - 每页大小</li>
-     *   <li>sortBy - 排序字段（默认：timestamp）</li>
-     *   <li>sortOrder - 排序方向（asc/desc，默认：desc）</li>
+     *   <li>userId - 鐢ㄦ埛ID</li>
+     *   <li>action - 鎿嶄綔绫诲瀷锛堝锛歭ogin銆乴ogout銆乧reate銆乽pdate銆乨elete锛?/li>
+     *   <li>resourceType - 璧勬簮绫诲瀷锛堝锛歶ser銆乫ile銆乻ession锛?/li>
+     *   <li>resourceId - 璧勬簮ID</li>
+     *   <li>result - 鎿嶄綔缁撴灉锛坰uccess/failure锛?/li>
+     *   <li>startTime - 寮€濮嬫椂闂达紙姣鏃堕棿鎴筹級</li>
+     *   <li>endTime - 缁撴潫鏃堕棿锛堟绉掓椂闂存埑锛?/li>
+     *   <li>page - 椤电爜锛堜粠0寮€濮嬶級</li>
+     *   <li>size - 姣忛〉澶у皬</li>
+     *   <li>sortBy - 鎺掑簭瀛楁锛堥粯璁わ細timestamp锛?/li>
+     *   <li>sortOrder - 鎺掑簭鏂瑰悜锛坅sc/desc锛岄粯璁わ細desc锛?/li>
      * </ul>
      * 
-     * @param request 查询请求对象
-     * @return 查询结果，包含日志列表和分页信息
+     * @param request 鏌ヨ璇锋眰瀵硅薄
+     * @return 鏌ヨ缁撴灉锛屽寘鍚棩蹇楀垪琛ㄥ拰鍒嗛〉淇℃伅
      */
     @PostMapping("/logs")
     public ResponseEntity<AuditQueryResult> query(@RequestBody AuditQueryRequest request) {
@@ -135,24 +135,24 @@ public class AuditController {
     }
 
     /**
-     * 获取审计统计数据
+     * 鑾峰彇瀹¤缁熻鏁版嵁
      * 
-     * <p>统计指定时间范围内的审计数据，包括总量统计、结果统计和分布统计。</p>
+     * <p>缁熻鎸囧畾鏃堕棿鑼冨洿鍐呯殑瀹¤鏁版嵁锛屽寘鎷€婚噺缁熻銆佺粨鏋滅粺璁″拰鍒嗗竷缁熻銆?/p>
      * 
-     * <h4>返回数据：</h4>
+     * <h4>杩斿洖鏁版嵁锛?/h4>
      * <ul>
-     *   <li>totalLogs - 总日志数</li>
-     *   <li>todayLogs - 今日日志数</li>
-     *   <li>successCount - 成功次数</li>
-     *   <li>failureCount - 失败次数</li>
-     *   <li>actionCounts - 操作类型分布</li>
-     *   <li>resourceTypeCounts - 资源类型分布</li>
-     *   <li>userCounts - 用户活跃度统计</li>
+     *   <li>totalLogs - 鎬绘棩蹇楁暟</li>
+     *   <li>todayLogs - 浠婃棩鏃ュ織鏁?/li>
+     *   <li>successCount - 鎴愬姛娆℃暟</li>
+     *   <li>failureCount - 澶辫触娆℃暟</li>
+     *   <li>actionCounts - 鎿嶄綔绫诲瀷鍒嗗竷</li>
+     *   <li>resourceTypeCounts - 璧勬簮绫诲瀷鍒嗗竷</li>
+     *   <li>userCounts - 鐢ㄦ埛娲昏穬搴︾粺璁?/li>
      * </ul>
      * 
-     * @param startTime 统计开始时间（可选）
-     * @param endTime 统计结束时间（可选）
-     * @return 审计统计数据
+     * @param startTime 缁熻寮€濮嬫椂闂达紙鍙€夛級
+     * @param endTime 缁熻缁撴潫鏃堕棿锛堝彲閫夛級
+     * @return 瀹¤缁熻鏁版嵁
      */
     @GetMapping("/statistics")
     public ResponseEntity<AuditStatistics> getStatistics(
@@ -162,19 +162,19 @@ public class AuditController {
     }
 
     /**
-     * 导出审计日志
+     * 瀵煎嚭瀹¤鏃ュ織
      * 
-     * <p>将查询结果导出为指定格式的文件下载。</p>
+     * <p>灏嗘煡璇㈢粨鏋滃鍑轰负鎸囧畾鏍煎紡鐨勬枃浠朵笅杞姐€?/p>
      * 
-     * <h4>支持的导出格式：</h4>
+     * <h4>鏀寔鐨勫鍑烘牸寮忥細</h4>
      * <ul>
-     *   <li>json - JSON格式，适合程序处理</li>
-     *   <li>csv - CSV格式，可用Excel打开</li>
+     *   <li>json - JSON鏍煎紡锛岄€傚悎绋嬪簭澶勭悊</li>
+     *   <li>csv - CSV鏍煎紡锛屽彲鐢‥xcel鎵撳紑</li>
      * </ul>
      * 
-     * @param request 查询请求对象，用于筛选要导出的日志
-     * @param format 导出格式（默认：json）
-     * @return 文件下载响应
+     * @param request 鏌ヨ璇锋眰瀵硅薄锛岀敤浜庣瓫閫夎瀵煎嚭鐨勬棩蹇?
+     * @param format 瀵煎嚭鏍煎紡锛堥粯璁わ細json锛?
+     * @return 鏂囦欢涓嬭浇鍝嶅簲
      */
     @PostMapping("/export")
     public ResponseEntity<byte[]> export(@RequestBody AuditQueryRequest request,
@@ -190,14 +190,14 @@ public class AuditController {
     }
 
     /**
-     * 获取指定用户的审计日志
+     * 鑾峰彇鎸囧畾鐢ㄦ埛鐨勫璁℃棩蹇?
      * 
-     * <p>便捷接口，用于快速查询某个用户的所有操作记录。</p>
+     * <p>渚挎嵎鎺ュ彛锛岀敤浜庡揩閫熸煡璇㈡煇涓敤鎴风殑鎵€鏈夋搷浣滆褰曘€?/p>
      * 
-     * @param userId 用户ID
-     * @param page 页码（从0开始，默认：0）
-     * @param size 每页大小（默认：20）
-     * @return 查询结果
+     * @param userId 鐢ㄦ埛ID
+     * @param page 椤电爜锛堜粠0寮€濮嬶紝榛樿锛?锛?
+     * @param size 姣忛〉澶у皬锛堥粯璁わ細20锛?
+     * @return 鏌ヨ缁撴灉
      */
     @GetMapping("/users/{userId}/logs")
     public ResponseEntity<AuditQueryResult> getByUserId(

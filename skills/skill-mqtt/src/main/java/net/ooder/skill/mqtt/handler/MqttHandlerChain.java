@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
- * MQTT消息处理器链
+ * MQTT濞戝牊浼呮径鍕倞閸ｃ劑鎽?
  */
 public class MqttHandlerChain {
     

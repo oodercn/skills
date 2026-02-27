@@ -10,27 +10,27 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 远程终端REST API控制器
+ * 杩滅▼缁堢REST API鎺у埗鍣?
  * 
- * <p>提供SSH远程连接、命令执行和文件传输的HTTP接口。</p>
+ * <p>鎻愪緵SSH杩滅▼杩炴帴銆佸懡浠ゆ墽琛屽拰鏂囦欢浼犺緭鐨凥TTP鎺ュ彛銆?/p>
  * 
- * <h3>API端点列表：</h3>
+ * <h3>API绔偣鍒楄〃锛?/h3>
  * <table border="1">
- *   <tr><th>方法</th><th>路径</th><th>描述</th></tr>
- *   <tr><td>POST</td><td>/api/terminal/connect</td><td>建立SSH连接</td></tr>
- *   <tr><td>POST</td><td>/api/terminal/disconnect</td><td>断开连接</td></tr>
- *   <tr><td>GET</td><td>/api/terminal/sessions</td><td>列出所有会话</td></tr>
- *   <tr><td>GET</td><td>/api/terminal/sessions/{id}</td><td>获取会话详情</td></tr>
- *   <tr><td>DELETE</td><td>/api/terminal/sessions/{id}</td><td>关闭会话</td></tr>
- *   <tr><td>POST</td><td>/api/terminal/execute</td><td>执行命令</td></tr>
- *   <tr><td>POST</td><td>/api/terminal/upload</td><td>上传文件</td></tr>
- *   <tr><td>POST</td><td>/api/terminal/download</td><td>下载文件</td></tr>
- *   <tr><td>GET</td><td>/api/terminal/status</td><td>获取服务状态</td></tr>
+ *   <tr><th>鏂规硶</th><th>璺緞</th><th>鎻忚堪</th></tr>
+ *   <tr><td>POST</td><td>/api/terminal/connect</td><td>寤虹珛SSH杩炴帴</td></tr>
+ *   <tr><td>POST</td><td>/api/terminal/disconnect</td><td>鏂紑杩炴帴</td></tr>
+ *   <tr><td>GET</td><td>/api/terminal/sessions</td><td>鍒楀嚭鎵€鏈変細璇?/td></tr>
+ *   <tr><td>GET</td><td>/api/terminal/sessions/{id}</td><td>鑾峰彇浼氳瘽璇︽儏</td></tr>
+ *   <tr><td>DELETE</td><td>/api/terminal/sessions/{id}</td><td>鍏抽棴浼氳瘽</td></tr>
+ *   <tr><td>POST</td><td>/api/terminal/execute</td><td>鎵ц鍛戒护</td></tr>
+ *   <tr><td>POST</td><td>/api/terminal/upload</td><td>涓婁紶鏂囦欢</td></tr>
+ *   <tr><td>POST</td><td>/api/terminal/download</td><td>涓嬭浇鏂囦欢</td></tr>
+ *   <tr><td>GET</td><td>/api/terminal/status</td><td>鑾峰彇鏈嶅姟鐘舵€?/td></tr>
  * </table>
  * 
- * <h3>使用示例：</h3>
+ * <h3>浣跨敤绀轰緥锛?/h3>
  * <pre>{@code
- * // 1. 建立连接
+ * // 1. 寤虹珛杩炴帴
  * POST /api/terminal/connect
  * Content-Type: application/json
  * {
@@ -41,7 +41,7 @@ import java.util.Map;
  *   "connectionType": "ssh"
  * }
  * 
- * // 响应
+ * // 鍝嶅簲
  * {
  *   "sessionId": "session-a1b2c3d4",
  *   "host": "192.168.1.100",
@@ -51,7 +51,7 @@ import java.util.Map;
  *   "connectedAt": 1700000000000
  * }
  * 
- * // 2. 执行命令
+ * // 2. 鎵ц鍛戒护
  * POST /api/terminal/execute
  * Content-Type: application/json
  * {
@@ -60,7 +60,7 @@ import java.util.Map;
  *   "timeout": 60000
  * }
  * 
- * // 3. 断开连接
+ * // 3. 鏂紑杩炴帴
  * POST /api/terminal/disconnect
  * Content-Type: application/json
  * {
@@ -80,11 +80,11 @@ public class RemoteTerminalController {
     private RemoteTerminalService terminalService;
 
     /**
-     * 建立SSH连接
+     * 寤虹珛SSH杩炴帴
      * 
-     * <p>与远程服务器建立SSH连接，支持密码和密钥两种认证方式。</p>
+     * <p>涓庤繙绋嬫湇鍔″櫒寤虹珛SSH杩炴帴锛屾敮鎸佸瘑鐮佸拰瀵嗛挜涓ょ璁よ瘉鏂瑰紡銆?/p>
      * 
-     * <h4>请求示例（密码认证）：</h4>
+     * <h4>璇锋眰绀轰緥锛堝瘑鐮佽璇侊級锛?/h4>
      * <pre>{@code
      * {
      *   "host": "192.168.1.100",
@@ -96,7 +96,7 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * <h4>请求示例（密钥认证）：</h4>
+     * <h4>璇锋眰绀轰緥锛堝瘑閽ヨ璇侊級锛?/h4>
      * <pre>{@code
      * {
      *   "host": "192.168.1.100",
@@ -108,8 +108,8 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * @param request 连接请求
-     * @return 会话信息
+     * @param request 杩炴帴璇锋眰
+     * @return 浼氳瘽淇℃伅
      */
     @PostMapping("/connect")
     public ResponseEntity<SessionInfo> connect(@RequestBody ConnectionRequest request) {
@@ -117,17 +117,17 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 断开SSH连接
+     * 鏂紑SSH杩炴帴
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "sessionId": "session-a1b2c3d4"
      * }
      * }</pre>
      * 
-     * @param params 包含sessionId的Map
-     * @return 是否断开成功
+     * @param params 鍖呭惈sessionId鐨凪ap
+     * @return 鏄惁鏂紑鎴愬姛
      */
     @PostMapping("/disconnect")
     public ResponseEntity<Boolean> disconnect(@RequestBody Map<String, String> params) {
@@ -136,11 +136,11 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 列出所有会话
+     * 鍒楀嚭鎵€鏈変細璇?
      * 
-     * <p>返回当前所有SSH会话的列表，包括活跃和非活跃会话。</p>
+     * <p>杩斿洖褰撳墠鎵€鏈塖SH浼氳瘽鐨勫垪琛紝鍖呮嫭娲昏穬鍜岄潪娲昏穬浼氳瘽銆?/p>
      * 
-     * @return 会话列表
+     * @return 浼氳瘽鍒楄〃
      */
     @GetMapping("/sessions")
     public ResponseEntity<List<SessionInfo>> listSessions() {
@@ -148,10 +148,10 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 获取会话详情
+     * 鑾峰彇浼氳瘽璇︽儏
      * 
-     * @param sessionId 会话ID
-     * @return 会话信息，不存在返回404
+     * @param sessionId 浼氳瘽ID
+     * @return 浼氳瘽淇℃伅锛屼笉瀛樺湪杩斿洖404
      */
     @GetMapping("/sessions/{sessionId}")
     public ResponseEntity<SessionInfo> getSession(@PathVariable String sessionId) {
@@ -163,12 +163,12 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 关闭会话
+     * 鍏抽棴浼氳瘽
      * 
-     * <p>关闭指定会话并释放资源，等同于disconnect操作。</p>
+     * <p>鍏抽棴鎸囧畾浼氳瘽骞堕噴鏀捐祫婧愶紝绛夊悓浜巇isconnect鎿嶄綔銆?/p>
      * 
-     * @param sessionId 会话ID
-     * @return 是否关闭成功
+     * @param sessionId 浼氳瘽ID
+     * @return 鏄惁鍏抽棴鎴愬姛
      */
     @DeleteMapping("/sessions/{sessionId}")
     public ResponseEntity<Boolean> closeSession(@PathVariable String sessionId) {
@@ -176,11 +176,11 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 执行远程命令
+     * 鎵ц杩滅▼鍛戒护
      * 
-     * <p>在指定会话的远程服务器上执行Shell命令。</p>
+     * <p>鍦ㄦ寚瀹氫細璇濈殑杩滅▼鏈嶅姟鍣ㄤ笂鎵цShell鍛戒护銆?/p>
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "sessionId": "session-a1b2c3d4",
@@ -190,7 +190,7 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * <h4>响应示例：</h4>
+     * <h4>鍝嶅簲绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "commandId": "cmd-1700000000000",
@@ -205,8 +205,8 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * @param request 命令执行请求
-     * @return 命令执行结果
+     * @param request 鍛戒护鎵ц璇锋眰
+     * @return 鍛戒护鎵ц缁撴灉
      */
     @PostMapping("/execute")
     public ResponseEntity<CommandResult> executeCommand(@RequestBody CommandRequest request) {
@@ -217,11 +217,11 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 上传文件
+     * 涓婁紶鏂囦欢
      * 
-     * <p>通过SFTP协议将本地文件上传到远程服务器。</p>
+     * <p>閫氳繃SFTP鍗忚灏嗘湰鍦版枃浠朵笂浼犲埌杩滅▼鏈嶅姟鍣ㄣ€?/p>
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "sessionId": "session-a1b2c3d4",
@@ -232,8 +232,8 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * @param request 文件传输请求
-     * @return 传输结果
+     * @param request 鏂囦欢浼犺緭璇锋眰
+     * @return 浼犺緭缁撴灉
      */
     @PostMapping("/upload")
     public ResponseEntity<FileTransferResult> uploadFile(@RequestBody FileTransferRequest request) {
@@ -244,11 +244,11 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 下载文件
+     * 涓嬭浇鏂囦欢
      * 
-     * <p>通过SFTP协议从远程服务器下载文件到本地。</p>
+     * <p>閫氳繃SFTP鍗忚浠庤繙绋嬫湇鍔″櫒涓嬭浇鏂囦欢鍒版湰鍦般€?/p>
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "sessionId": "session-a1b2c3d4",
@@ -258,8 +258,8 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * @param request 文件传输请求
-     * @return 传输结果
+     * @param request 鏂囦欢浼犺緭璇锋眰
+     * @return 浼犺緭缁撴灉
      */
     @PostMapping("/download")
     public ResponseEntity<FileTransferResult> downloadFile(@RequestBody FileTransferRequest request) {
@@ -270,11 +270,11 @@ public class RemoteTerminalController {
     }
 
     /**
-     * 获取服务状态
+     * 鑾峰彇鏈嶅姟鐘舵€?
      * 
-     * <p>返回远程终端服务的运行状态统计。</p>
+     * <p>杩斿洖杩滅▼缁堢鏈嶅姟鐨勮繍琛岀姸鎬佺粺璁°€?/p>
      * 
-     * <h4>响应示例：</h4>
+     * <h4>鍝嶅簲绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "totalSessions": 5,
@@ -284,7 +284,7 @@ public class RemoteTerminalController {
      * }
      * }</pre>
      * 
-     * @return 状态信息
+     * @return 鐘舵€佷俊鎭?
      */
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> getStatus() {

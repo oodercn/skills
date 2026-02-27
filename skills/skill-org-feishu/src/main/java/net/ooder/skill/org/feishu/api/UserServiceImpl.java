@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-@EsbBeanAnnotation(id = "UserService", name = "飞书账号服务", expressionArr = "UserServiceImpl()", desc = "飞书账号服务")
+@EsbBeanAnnotation(id = "UserService", name = "椋炰功璐﹀彿鏈嶅姟", expressionArr = "UserServiceImpl()", desc = "椋炰功璐﹀彿鏈嶅姟")
 public class UserServiceImpl implements UserService {
 
     @Autowired

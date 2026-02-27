@@ -1,7 +1,7 @@
 package net.ooder.skill.mqtt.server;
 
 /**
- * MQTT服务端异�? */
+ * MQTT閺堝秴濮熺粩顖氱磽鐢? */
 public class MqttServerException extends Exception {
     
     private static final long serialVersionUID = 1L;

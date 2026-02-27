@@ -1,7 +1,7 @@
 package net.ooder.skill.mqtt.context;
 
 /**
- * MQTT连接句柄接口
+ * MQTT鏉╃偞甯撮崣銉︾労閹恒儱褰?
  */
 public interface MqttConnectionHandle {
     

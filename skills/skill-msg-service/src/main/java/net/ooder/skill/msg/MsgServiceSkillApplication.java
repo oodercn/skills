@@ -4,9 +4,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 /**
- * 消息服务技能启动类
+ * 娑堟伅鏈嶅姟鎶€鑳藉惎鍔ㄧ被
  * 
- * <p>提供消息推送、Topic管理和P2P通信功能。</p>
+ * <p>鎻愪緵娑堟伅鎺ㄩ€併€乀opic绠＄悊鍜孭2P閫氫俊鍔熻兘銆?/p>
  * 
  * @author Ooder Team
  * @version 0.7.3

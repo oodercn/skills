@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * 命令消息 - 设备命令/控制消息模型
+ * 閸涙垝鎶ゅ☉鍫熶紖 - 鐠佹儳顦崨鎴掓姢/閹貉冨煑濞戝牊浼呭Ο鈥崇€?
  */
 public class CommandMessage implements Serializable {
     

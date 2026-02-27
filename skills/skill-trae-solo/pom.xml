@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,18 +15,35 @@
     <packaging>jar</packaging>
 
     <name>skill-trae-solo</name>
-    <description>连接实用功能，运行结果通过A2UI节点展示</description>
+    <description>Trae Solo Skill - Connects practical functions and displays results through A2UI nodes</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
-            <version>0.7.3</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

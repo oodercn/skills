@@ -76,7 +76,7 @@ public class UserAuthSkillApplication implements CommandLineRunner {
         info.put("skillId", "skill-user-auth");
         info.put("name", "User Authentication Service");
         info.put("version", "0.7.3");
-        info.put("description", "用户认证服务");
+        info.put("description", "鐢ㄦ埛璁よ瘉鏈嶅姟");
         info.put("sceneId", "auth");
         info.put("capabilities", new String[]{"user-auth", "token-validate", "session-manage"});
         return info;

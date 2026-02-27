@@ -1,8 +1,7 @@
 package net.ooder.skill.common.sdk.driver;
 
 /**
- * 驱动未找到异常
- *
+ * 椹卞姩鏈壘鍒板紓甯? *
  * @author SDK Team
  * @version 2.3.0
  * @since 2026-02-24

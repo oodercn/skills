@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>ooder-skills</artifactId>
-    <version>0.7.3</version>
+    <version>2.3</version>
     <packaging>pom</packaging>
 
     <name>ooder-skills</name>
@@ -48,7 +48,11 @@
     </properties>
 
     <modules>
+        <!-- Base Skills -->
         <module>skills/skill-common</module>
+        <module>skills/skill-org-base</module>
+        <module>skills/skill-vfs-base</module>
+        <!-- UI Skills -->
         <module>skills/skill-a2ui</module>
         <module>skills/skill-org-dingding</module>
         <module>skills/skill-org-feishu</module>
@@ -56,6 +60,7 @@
         <module>skills/skill-trae-solo</module>
         <module>skills/skill-mqtt</module>
         <module>skills/skill-security</module>
+        <module>skills/skill-share</module>
         <module>skills/skill-network</module>
         <module>skills/skill-hosting</module>
         <module>skills/skill-monitor</module>
@@ -77,6 +82,18 @@
         <module>skills/skill-vfs-local</module>
         <module>skills/skill-k8s</module>
         <module>skills/skill-scheduler-quartz</module>
+        <module>skills/skill-protocol</module>
+        <module>skills/skill-report</module>
+        <module>skills/skill-search</module>
+        <!-- SDK 2.3 Integration Skills -->
+        <module>skills/skill-update-checker</module>
+        <module>skills/skill-capability-coordinator</module>
+        <module>skills/skill-load-balancer</module>
+        <module>skills/skill-failover-manager</module>
+        <module>skills/skill-agent-recommendation</module>
+        <module>skills/skill-command-shortcut</module>
+        <!-- Hot Plug Support -->
+        <module>skill-hotplug-starter</module>
     </modules>
 
     <dependencyManagement>
@@ -114,6 +131,12 @@
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.24</version>
+            <scope>provided</scope>
+        </dependency>
     </dependencies>
 
     <build>
@@ -139,6 +162,13 @@
                         <source>1.8</source>
                         <target>1.8</target>
                         <encoding>UTF-8</encoding>
+                        <annotationProcessorPaths>
+                            <path>
+                                <groupId>org.projectlombok</groupId>
+                                <artifactId>lombok</artifactId>
+                                <version>1.18.24</version>
+                            </path>
+                        </annotationProcessorPaths>
                     </configuration>
                 </plugin>
             </plugins>

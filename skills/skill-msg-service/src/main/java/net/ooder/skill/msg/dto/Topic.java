@@ -3,7 +3,7 @@ package net.ooder.skill.msg.dto;
 import java.util.List;
 
 /**
- * Topic实体
+ * Topic瀹炰綋
  */
 public class Topic {
     private String topicId;

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * 北向协议适配器注册表
+ * 閸栨鎮滈崡蹇氼唴闁倿鍘ら崳銊︽暈閸愬矁銆?
  */
 public class ProtocolAdapterRegistry {
     

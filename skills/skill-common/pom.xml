@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,9 +15,25 @@
     <packaging>jar</packaging>
 
     <name>skill-common</name>
-    <description>Common utilities for Ooder Skills</description>
+    <description>Common utilities for Ooder Skills - Integrated with SDK 2.3</description>
 
     <dependencies>
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>agent-sdk-api</artifactId>
+            <version>${agent-sdk.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>agent-sdk-core</artifactId>
+            <version>${agent-sdk.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
+        </dependency>
+
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -25,6 +41,12 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 </project>

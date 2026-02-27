@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,12 +15,17 @@
     <packaging>jar</packaging>
 
     <name>skill-mqtt</name>
-    <description>MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持</description>
+    <description>MQTT Skill - Lightweight MQTT Broker with multi-provider support</description>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    </properties>
 
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
+            <artifactId>agent-sdk-api</artifactId>
             <version>${agent-sdk.version}</version>
         </dependency>
         <dependency>
@@ -32,6 +37,16 @@
 
     <build>
         <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.8.1</version>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>

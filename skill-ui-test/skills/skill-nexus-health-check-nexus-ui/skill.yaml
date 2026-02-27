@@ -1,0 +1,50 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-nexus-health-check-nexus-ui
+  name: 健康检查
+  version: 1.0.0
+  description: Nexus系统健康检查，显示健康状态、健康评分、组件状态、服务状态等
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: 健康检查
+      icon: ri-heart-pulse-line
+      
+    menu:
+      position: sidebar
+      category: system-config
+      order: 30
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: health-check-view
+      name: 查看健康状态
+      description: 查看Nexus系统健康状态
+      category: ui
+    - id: health-check-run
+      name: 运行健康检查
+      description: 执行系统健康检查
+      category: ui
+      
+  apis:
+    - path: /api/nexus/health
+      method: GET
+      description: 获取健康状态
+    - path: /api/nexus/health/run
+      method: POST
+      description: 运行健康检查
+    - path: /api/nexus/health/services
+      method: GET
+      description: 获取服务健康状态

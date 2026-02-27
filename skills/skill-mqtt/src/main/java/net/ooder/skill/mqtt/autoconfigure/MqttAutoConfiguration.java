@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import java.util.Map;
 
 @Configuration
 @EnableConfigurationProperties(MqttSceneConfig.class)
@@ -63,7 +64,7 @@ public class MqttAutoConfiguration {
         String sceneType = sceneConfig.getScene().getSceneType();
         if (sceneType != null) {
             log.info("Scene discovery enabled for: {}", sceneType);
-            var sysConfig = sysConfigService.getSysSceneConfig(sceneType);
+            Map<String, Object> sysConfig = sysConfigService.getSysSceneConfig(sceneType);
             sysConfigService.applySysConfig(sceneType, sysConfig);
 
             if (sceneConfig.getDiscovery().isAutoInstall()) {

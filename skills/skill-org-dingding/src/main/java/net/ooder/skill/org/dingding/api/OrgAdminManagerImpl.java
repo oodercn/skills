@@ -19,7 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.util.ArrayList;
 import java.util.List;
 
-@EsbBeanAnnotation(id = "OrgAdminService", name = "钉钉组织机构管理服务", expressionArr = "OrgAdminManagerImpl()", desc = "钉钉组织机构管理服务")
+@EsbBeanAnnotation(id = "OrgAdminService", name = "閽夐拤缁勭粐鏈烘瀯绠＄悊鏈嶅姟", expressionArr = "OrgAdminManagerImpl()", desc = "閽夐拤缁勭粐鏈烘瀯绠＄悊鏈嶅姟")
 public class OrgAdminManagerImpl implements OrgAdminService {
 
     @Autowired

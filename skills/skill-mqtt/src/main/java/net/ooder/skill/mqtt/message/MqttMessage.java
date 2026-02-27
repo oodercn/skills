@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * MQTT消息 - 统一消息模型
+ * MQTT濞戝牊浼?- 缂佺喍绔村☉鍫熶紖濡€崇€?
  */
 public class MqttMessage implements Serializable {
     

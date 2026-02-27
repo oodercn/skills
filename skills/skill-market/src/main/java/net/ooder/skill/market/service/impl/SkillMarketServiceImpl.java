@@ -19,23 +19,23 @@ public class SkillMarketServiceImpl implements SkillMarketService {
 
     private void initMockData() {
         addMockSkill("skill-org-feishu", "Feishu Organization Service", 
-            "飞书组织数据集成服务", "org", "0.7.3");
+            "椋炰功缁勭粐鏁版嵁闆嗘垚鏈嶅姟", "org", "0.7.3");
         addMockSkill("skill-org-dingding", "DingTalk Organization Service", 
-            "钉钉组织数据集成服务", "org", "0.7.3");
+            "閽夐拤缁勭粐鏁版嵁闆嗘垚鏈嶅姟", "org", "0.7.3");
         addMockSkill("skill-org-wecom", "WeCom Organization Service", 
-            "企业微信组织数据集成服务", "org", "0.7.3");
+            "浼佷笟寰俊缁勭粐鏁版嵁闆嗘垚鏈嶅姟", "org", "0.7.3");
         addMockSkill("skill-vfs-local", "Local VFS Service", 
-            "本地文件系统存储服务", "vfs", "0.7.3");
+            "鏈湴鏂囦欢绯荤粺瀛樺偍鏈嶅姟", "vfs", "0.7.3");
         addMockSkill("skill-vfs-minio", "MinIO VFS Service", 
-            "MinIO存储服务", "vfs", "0.7.3");
+            "MinIO瀛樺偍鏈嶅姟", "vfs", "0.7.3");
         addMockSkill("skill-network", "Network Management Skill", 
-            "网络管理技能", "sys", "0.7.3");
+            "缃戠粶绠＄悊鎶€鑳?, "sys", "0.7.3");
         addMockSkill("skill-security", "Security Management Skill", 
-            "安全管理技能", "sys", "0.7.3");
+            "瀹夊叏绠＄悊鎶€鑳?, "sys", "0.7.3");
         addMockSkill("skill-mqtt", "MQTT Service Skill", 
-            "MQTT服务技能", "msg", "0.7.3");
+            "MQTT鏈嶅姟鎶€鑳?, "msg", "0.7.3");
         addMockSkill("skill-a2ui", "A2UI Skill", 
-            "A2UI图转代码技能", "ui", "0.7.3");
+            "A2UI鍥捐浆浠ｇ爜鎶€鑳?, "ui", "0.7.3");
     }
 
     private void addMockSkill(String skillId, String name, String description, 

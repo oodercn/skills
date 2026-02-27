@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 消息服务REST API控制器
+ * 娑堟伅鏈嶅姟REST API鎺у埗鍣?
  */
 @RestController
 @RequestMapping("/api/msg")
@@ -19,7 +19,7 @@ public class MsgController {
     @Autowired
     private MsgService msgService;
 
-    // 消息推送API
+    // 娑堟伅鎺ㄩ€丄PI
     @PostMapping("/push")
     public ResponseEntity<PushResult> push(@RequestBody Message message) {
         return ResponseEntity.ok(msgService.push(message));
@@ -49,7 +49,7 @@ public class MsgController {
         return ResponseEntity.ok(message);
     }
 
-    // Topic管理API
+    // Topic绠＄悊API
     @GetMapping("/topic")
     public ResponseEntity<List<Topic>> listTopics() {
         return ResponseEntity.ok(msgService.listTopics());
@@ -102,7 +102,7 @@ public class MsgController {
         return ResponseEntity.ok(msgService.getSubscribers(topicId));
     }
 
-    // P2P通信API
+    // P2P閫氫俊API
     @PostMapping("/p2p/send")
     public ResponseEntity<PushResult> sendP2P(@RequestBody Message message) {
         return ResponseEntity.ok(msgService.sendP2P(message));
@@ -117,7 +117,7 @@ public class MsgController {
         return ResponseEntity.ok(msgService.getP2PHistory(fromUserId, toUserId, page, size));
     }
 
-    // 统计API
+    // 缁熻API
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getStatistics() {
         return ResponseEntity.ok(msgService.getStatistics());

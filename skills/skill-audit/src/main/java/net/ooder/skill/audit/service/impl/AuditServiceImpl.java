@@ -9,24 +9,24 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 审计日志服务实现类
+ * 瀹¤鏃ュ織鏈嶅姟瀹炵幇绫?
  * 
- * <p>提供审计日志的核心业务逻辑实现，使用内存存储（ConcurrentHashMap）作为临时存储方案。
- * 生产环境建议替换为持久化存储（如数据库、Elasticsearch等）。</p>
+ * <p>鎻愪緵瀹¤鏃ュ織鐨勬牳蹇冧笟鍔￠€昏緫瀹炵幇锛屼娇鐢ㄥ唴瀛樺瓨鍌紙ConcurrentHashMap锛変綔涓轰复鏃跺瓨鍌ㄦ柟妗堛€?
+ * 鐢熶骇鐜寤鸿鏇挎崲涓烘寔涔呭寲瀛樺偍锛堝鏁版嵁搴撱€丒lasticsearch绛夛級銆?/p>
  * 
- * <h3>实现特点：</h3>
+ * <h3>瀹炵幇鐗圭偣锛?/h3>
  * <ul>
- *   <li>线程安全：使用ConcurrentHashMap保证并发安全</li>
- *   <li>内存存储：适合开发测试，生产环境需替换</li>
- *   <li>流式处理：使用Java 8 Stream API进行数据过滤和统计</li>
+ *   <li>绾跨▼瀹夊叏锛氫娇鐢–oncurrentHashMap淇濊瘉骞跺彂瀹夊叏</li>
+ *   <li>鍐呭瓨瀛樺偍锛氶€傚悎寮€鍙戞祴璇曪紝鐢熶骇鐜闇€鏇挎崲</li>
+ *   <li>娴佸紡澶勭悊锛氫娇鐢↗ava 8 Stream API杩涜鏁版嵁杩囨护鍜岀粺璁?/li>
  * </ul>
  * 
- * <h3>扩展建议：</h3>
+ * <h3>鎵╁睍寤鸿锛?/h3>
  * <ul>
- *   <li>替换为数据库存储（MySQL、PostgreSQL等）</li>
- *   <li>集成Elasticsearch实现高效全文检索</li>
- *   <li>添加日志归档和清理策略</li>
- *   <li>实现日志加密和防篡改机制</li>
+ *   <li>鏇挎崲涓烘暟鎹簱瀛樺偍锛圡ySQL銆丳ostgreSQL绛夛級</li>
+ *   <li>闆嗘垚Elasticsearch瀹炵幇楂樻晥鍏ㄦ枃妫€绱?/li>
+ *   <li>娣诲姞鏃ュ織褰掓。鍜屾竻鐞嗙瓥鐣?/li>
+ *   <li>瀹炵幇鏃ュ織鍔犲瘑鍜岄槻绡℃敼鏈哄埗</li>
  * </ul>
  * 
  * @author Ooder Team
@@ -37,24 +37,24 @@ import java.util.stream.Collectors;
 public class AuditServiceImpl implements AuditService {
 
     /**
-     * 审计日志存储
+     * 瀹¤鏃ュ織瀛樺偍
      * 
-     * <p>使用ConcurrentHashMap实现线程安全的内存存储。
-     * Key为日志ID，Value为审计日志对象。</p>
+     * <p>浣跨敤ConcurrentHashMap瀹炵幇绾跨▼瀹夊叏鐨勫唴瀛樺瓨鍌ㄣ€?
+     * Key涓烘棩蹇桰D锛孷alue涓哄璁℃棩蹇楀璞°€?/p>
      * 
-     * <p>注意：这是临时存储方案，服务重启后数据会丢失。
-     * 生产环境应替换为持久化存储。</p>
+     * <p>娉ㄦ剰锛氳繖鏄复鏃跺瓨鍌ㄦ柟妗堬紝鏈嶅姟閲嶅惎鍚庢暟鎹細涓㈠け銆?
+     * 鐢熶骇鐜搴旀浛鎹负鎸佷箙鍖栧瓨鍌ㄣ€?/p>
      */
     private final Map<String, AuditLog> logs = new ConcurrentHashMap<>();
 
     /**
      * {@inheritDoc}
      * 
-     * <p>实现说明：</p>
+     * <p>瀹炵幇璇存槑锛?/p>
      * <ul>
-     *   <li>自动生成日志ID（格式：audit-{UUID前8位}）</li>
-     *   <li>自动设置时间戳（如果未设置）</li>
-     *   <li>使用ConcurrentHashMap保证线程安全</li>
+     *   <li>鑷姩鐢熸垚鏃ュ織ID锛堟牸寮忥細audit-{UUID鍓?浣峿锛?/li>
+     *   <li>鑷姩璁剧疆鏃堕棿鎴筹紙濡傛灉鏈缃級</li>
+     *   <li>浣跨敤ConcurrentHashMap淇濊瘉绾跨▼瀹夊叏</li>
      * </ul>
      */
     @Override
@@ -80,14 +80,14 @@ public class AuditServiceImpl implements AuditService {
     /**
      * {@inheritDoc}
      * 
-     * <p>实现说明：</p>
+     * <p>瀹炵幇璇存槑锛?/p>
      * <ul>
-     *   <li>使用Stream API进行多条件过滤</li>
-     *   <li>支持按时间戳升序/降序排序</li>
-     *   <li>支持分页查询</li>
+     *   <li>浣跨敤Stream API杩涜澶氭潯浠惰繃婊?/li>
+     *   <li>鏀寔鎸夋椂闂存埑鍗囧簭/闄嶅簭鎺掑簭</li>
+     *   <li>鏀寔鍒嗛〉鏌ヨ</li>
      * </ul>
      * 
-     * <p>性能考虑：当前实现为内存过滤，大数据量时建议使用索引优化。</p>
+     * <p>鎬ц兘鑰冭檻锛氬綋鍓嶅疄鐜颁负鍐呭瓨杩囨护锛屽ぇ鏁版嵁閲忔椂寤鸿浣跨敤绱㈠紩浼樺寲銆?/p>
      */
     @Override
     public AuditQueryResult query(AuditQueryRequest request) {
@@ -117,11 +117,11 @@ public class AuditServiceImpl implements AuditService {
     /**
      * {@inheritDoc}
      * 
-     * <p>统计维度：</p>
+     * <p>缁熻缁村害锛?/p>
      * <ul>
-     *   <li>总量统计：总日志数、今日日志数</li>
-     *   <li>结果统计：成功次数、失败次数</li>
-     *   <li>分布统计：操作类型分布、资源类型分布、用户活跃度</li>
+     *   <li>鎬婚噺缁熻锛氭€绘棩蹇楁暟銆佷粖鏃ユ棩蹇楁暟</li>
+     *   <li>缁撴灉缁熻锛氭垚鍔熸鏁般€佸け璐ユ鏁?/li>
+     *   <li>鍒嗗竷缁熻锛氭搷浣滅被鍨嬪垎甯冦€佽祫婧愮被鍨嬪垎甯冦€佺敤鎴锋椿璺冨害</li>
      * </ul>
      */
     @Override
@@ -174,10 +174,10 @@ public class AuditServiceImpl implements AuditService {
     /**
      * {@inheritDoc}
      * 
-     * <p>支持的导出格式：</p>
+     * <p>鏀寔鐨勫鍑烘牸寮忥細</p>
      * <ul>
-     *   <li>JSON：结构化数据格式，适合程序处理</li>
-     *   <li>CSV：表格格式，适合Excel打开查看</li>
+     *   <li>JSON锛氱粨鏋勫寲鏁版嵁鏍煎紡锛岄€傚悎绋嬪簭澶勭悊</li>
+     *   <li>CSV锛氳〃鏍兼牸寮忥紝閫傚悎Excel鎵撳紑鏌ョ湅</li>
      * </ul>
      */
     @Override
@@ -228,11 +228,11 @@ public class AuditServiceImpl implements AuditService {
     }
     
     /**
-     * 获取今日零点时间戳
+     * 鑾峰彇浠婃棩闆剁偣鏃堕棿鎴?
      * 
-     * <p>用于统计今日日志数量，计算从当天00:00:00开始的时间戳。</p>
+     * <p>鐢ㄤ簬缁熻浠婃棩鏃ュ織鏁伴噺锛岃绠椾粠褰撳ぉ00:00:00寮€濮嬬殑鏃堕棿鎴炽€?/p>
      * 
-     * @return 今日零点的毫秒时间戳
+     * @return 浠婃棩闆剁偣鐨勬绉掓椂闂存埑
      */
     private long getTodayStart() {
         Calendar cal = Calendar.getInstance();

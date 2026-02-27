@@ -3,7 +3,7 @@ package net.ooder.skill.msg.dto;
 import java.util.Map;
 
 /**
- * 消息实体
+ * 娑堟伅瀹炰綋
  */
 public class Message {
     private String messageId;

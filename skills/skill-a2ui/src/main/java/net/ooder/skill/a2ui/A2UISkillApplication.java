@@ -78,7 +78,7 @@ public class A2UISkillApplication implements CommandLineRunner {
         info.put("skillId", "skill-a2ui");
         info.put("name", "A2UI Skill");
         info.put("version", "0.7.3");
-        info.put("description", "A2UI图转代码技能");
+        info.put("description", "A2UI鍥捐浆浠ｇ爜鎶€鑳?);
         info.put("sceneId", "ui-generation");
         info.put("capabilities", new String[]{"generate-ui", "preview-ui", "create-view"});
         return info;

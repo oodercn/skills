@@ -1,0 +1,21 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: skill-ui-test
+
+nexus:
+  skills:
+    path: ./skills
+    auto-scan: true
+  menu:
+    config:
+      path: ./menu-config.json
+  skill-index:
+    path: ./skill-index.yaml
+
+logging:
+  level:
+    net.ooder: DEBUG
+    org.springframework: INFO

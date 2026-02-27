@@ -1,0 +1,43 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-personal-dashboard-nexus-ui
+  name: 个人仪表盘
+  version: 1.0.0
+  description: 个人中心仪表盘，显示我的技能、执行次数、分享技能、群组等统计信息
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: 个人仪表盘
+      icon: ri-dashboard-line
+      
+    menu:
+      position: sidebar
+      category: personal-center
+      order: 10
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: personal-dashboard-view
+      name: 查看个人仪表盘
+      description: 查看个人中心仪表盘
+      category: ui
+      
+  apis:
+    - path: /api/personal/stats
+      method: GET
+      description: 获取个人统计
+    - path: /api/personal/activities
+      method: GET
+      description: 获取最近活动

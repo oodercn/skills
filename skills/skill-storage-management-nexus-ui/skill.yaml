@@ -1,0 +1,57 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-storage-management-nexus-ui
+  name: 存储管理
+  version: 1.0.0
+  description: Nexus存储管理，显示存储空间、文件浏览器、分享文件等
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: 存储管理
+      icon: ri-hard-drive-2-line
+      
+    menu:
+      position: sidebar
+      category: resource-mgmt
+      order: 30
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: storage-view
+      name: 查看存储
+      description: 查看存储空间使用情况
+      category: ui
+    - id: storage-upload
+      name: 上传文件
+      description: 上传文件到存储
+      category: ui
+    - id: storage-share
+      name: 分享文件
+      description: 分享文件给其他用户
+      category: ui
+      
+  apis:
+    - path: /api/storage/stats
+      method: GET
+      description: 获取存储统计
+    - path: /api/storage/files
+      method: GET
+      description: 获取文件列表
+    - path: /api/storage/upload
+      method: POST
+      description: 上传文件
+    - path: /api/storage/share
+      method: POST
+      description: 分享文件

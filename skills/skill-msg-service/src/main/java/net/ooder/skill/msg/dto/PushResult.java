@@ -1,7 +1,7 @@
 package net.ooder.skill.msg.dto;
 
 /**
- * 消息推送结果
+ * 娑堟伅鎺ㄩ€佺粨鏋?
  */
 public class PushResult {
     private String messageId;

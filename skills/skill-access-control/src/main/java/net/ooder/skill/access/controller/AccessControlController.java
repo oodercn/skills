@@ -10,33 +10,33 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 访问控制REST API控制器
+ * 璁块棶鎺у埗REST API鎺у埗鍣?
  * 
- * <p>提供权限管理、角色管理和访问控制的HTTP接口。</p>
+ * <p>鎻愪緵鏉冮檺绠＄悊銆佽鑹茬鐞嗗拰璁块棶鎺у埗鐨凥TTP鎺ュ彛銆?/p>
  * 
- * <h3>API端点列表：</h3>
+ * <h3>API绔偣鍒楄〃锛?/h3>
  * <table border="1">
- *   <tr><th>方法</th><th>路径</th><th>描述</th></tr>
- *   <tr><td>GET</td><td>/api/access/permissions</td><td>列出所有权限</td></tr>
- *   <tr><td>POST</td><td>/api/access/permissions</td><td>创建权限</td></tr>
- *   <tr><td>GET</td><td>/api/access/permissions/{id}</td><td>获取权限详情</td></tr>
- *   <tr><td>DELETE</td><td>/api/access/permissions/{id}</td><td>删除权限</td></tr>
- *   <tr><td>GET</td><td>/api/access/roles</td><td>列出所有角色</td></tr>
- *   <tr><td>POST</td><td>/api/access/roles</td><td>创建角色</td></tr>
- *   <tr><td>GET</td><td>/api/access/roles/{id}</td><td>获取角色详情</td></tr>
- *   <tr><td>DELETE</td><td>/api/access/roles/{id}</td><td>删除角色</td></tr>
- *   <tr><td>POST</td><td>/api/access/roles/{id}/permissions</td><td>为角色分配权限</td></tr>
- *   <tr><td>GET</td><td>/api/access/users/{userId}/roles</td><td>获取用户角色</td></tr>
- *   <tr><td>POST</td><td>/api/access/users/{userId}/roles</td><td>为用户分配角色</td></tr>
- *   <tr><td>DELETE</td><td>/api/access/users/{userId}/roles</td><td>移除用户角色</td></tr>
- *   <tr><td>POST</td><td>/api/access/check</td><td>检查权限</td></tr>
- *   <tr><td>GET</td><td>/api/access/users/{userId}/permissions</td><td>获取用户权限</td></tr>
- *   <tr><td>GET</td><td>/api/access/statistics</td><td>获取统计数据</td></tr>
+ *   <tr><th>鏂规硶</th><th>璺緞</th><th>鎻忚堪</th></tr>
+ *   <tr><td>GET</td><td>/api/access/permissions</td><td>鍒楀嚭鎵€鏈夋潈闄?/td></tr>
+ *   <tr><td>POST</td><td>/api/access/permissions</td><td>鍒涘缓鏉冮檺</td></tr>
+ *   <tr><td>GET</td><td>/api/access/permissions/{id}</td><td>鑾峰彇鏉冮檺璇︽儏</td></tr>
+ *   <tr><td>DELETE</td><td>/api/access/permissions/{id}</td><td>鍒犻櫎鏉冮檺</td></tr>
+ *   <tr><td>GET</td><td>/api/access/roles</td><td>鍒楀嚭鎵€鏈夎鑹?/td></tr>
+ *   <tr><td>POST</td><td>/api/access/roles</td><td>鍒涘缓瑙掕壊</td></tr>
+ *   <tr><td>GET</td><td>/api/access/roles/{id}</td><td>鑾峰彇瑙掕壊璇︽儏</td></tr>
+ *   <tr><td>DELETE</td><td>/api/access/roles/{id}</td><td>鍒犻櫎瑙掕壊</td></tr>
+ *   <tr><td>POST</td><td>/api/access/roles/{id}/permissions</td><td>涓鸿鑹插垎閰嶆潈闄?/td></tr>
+ *   <tr><td>GET</td><td>/api/access/users/{userId}/roles</td><td>鑾峰彇鐢ㄦ埛瑙掕壊</td></tr>
+ *   <tr><td>POST</td><td>/api/access/users/{userId}/roles</td><td>涓虹敤鎴峰垎閰嶈鑹?/td></tr>
+ *   <tr><td>DELETE</td><td>/api/access/users/{userId}/roles</td><td>绉婚櫎鐢ㄦ埛瑙掕壊</td></tr>
+ *   <tr><td>POST</td><td>/api/access/check</td><td>妫€鏌ユ潈闄?/td></tr>
+ *   <tr><td>GET</td><td>/api/access/users/{userId}/permissions</td><td>鑾峰彇鐢ㄦ埛鏉冮檺</td></tr>
+ *   <tr><td>GET</td><td>/api/access/statistics</td><td>鑾峰彇缁熻鏁版嵁</td></tr>
  * </table>
  * 
- * <h3>使用示例：</h3>
+ * <h3>浣跨敤绀轰緥锛?/h3>
  * <pre>{@code
- * // 检查权限
+ * // 妫€鏌ユ潈闄?
  * POST /api/access/check
  * Content-Type: application/json
  * {
@@ -46,12 +46,12 @@ import java.util.Map;
  *   "resourceId": "user-002"
  * }
  * 
- * // 响应
+ * // 鍝嶅簲
  * {
  *   "allowed": true,
  *   "userId": "user-001",
  *   "permissionCode": "user:delete",
- *   "matchedRoles": ["管理员"]
+ *   "matchedRoles": ["绠＄悊鍛?]
  * }
  * }</pre>
  * 
@@ -67,9 +67,9 @@ public class AccessControlController {
     private AccessControlService accessControlService;
 
     /**
-     * 列出所有权限
+     * 鍒楀嚭鎵€鏈夋潈闄?
      * 
-     * @return 权限列表
+     * @return 鏉冮檺鍒楄〃
      */
     @GetMapping("/permissions")
     public ResponseEntity<List<Permission>> listPermissions() {
@@ -77,21 +77,21 @@ public class AccessControlController {
     }
 
     /**
-     * 创建权限
+     * 鍒涘缓鏉冮檺
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
-     *   "name": "删除用户",
+     *   "name": "鍒犻櫎鐢ㄦ埛",
      *   "code": "user:delete",
      *   "resourceType": "user",
      *   "action": "delete",
-     *   "description": "允许删除系统用户"
+     *   "description": "鍏佽鍒犻櫎绯荤粺鐢ㄦ埛"
      * }
      * }</pre>
      * 
-     * @param permission 权限对象
-     * @return 创建后的权限对象
+     * @param permission 鏉冮檺瀵硅薄
+     * @return 鍒涘缓鍚庣殑鏉冮檺瀵硅薄
      */
     @PostMapping("/permissions")
     public ResponseEntity<Permission> createPermission(@RequestBody Permission permission) {
@@ -99,10 +99,10 @@ public class AccessControlController {
     }
 
     /**
-     * 获取权限详情
+     * 鑾峰彇鏉冮檺璇︽儏
      * 
-     * @param permissionId 权限ID
-     * @return 权限对象，不存在返回404
+     * @param permissionId 鏉冮檺ID
+     * @return 鏉冮檺瀵硅薄锛屼笉瀛樺湪杩斿洖404
      */
     @GetMapping("/permissions/{permissionId}")
     public ResponseEntity<Permission> getPermission(@PathVariable String permissionId) {
@@ -114,10 +114,10 @@ public class AccessControlController {
     }
 
     /**
-     * 删除权限
+     * 鍒犻櫎鏉冮檺
      * 
-     * @param permissionId 权限ID
-     * @return 是否删除成功
+     * @param permissionId 鏉冮檺ID
+     * @return 鏄惁鍒犻櫎鎴愬姛
      */
     @DeleteMapping("/permissions/{permissionId}")
     public ResponseEntity<Boolean> deletePermission(@PathVariable String permissionId) {
@@ -125,9 +125,9 @@ public class AccessControlController {
     }
 
     /**
-     * 列出所有角色
+     * 鍒楀嚭鎵€鏈夎鑹?
      * 
-     * @return 角色列表
+     * @return 瑙掕壊鍒楄〃
      */
     @GetMapping("/roles")
     public ResponseEntity<List<Role>> listRoles() {
@@ -135,19 +135,19 @@ public class AccessControlController {
     }
 
     /**
-     * 创建角色
+     * 鍒涘缓瑙掕壊
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
-     *   "name": "审计员",
+     *   "name": "瀹¤鍛?,
      *   "code": "auditor",
-     *   "description": "负责系统审计工作"
+     *   "description": "璐熻矗绯荤粺瀹¤宸ヤ綔"
      * }
      * }</pre>
      * 
-     * @param role 角色对象
-     * @return 创建后的角色对象
+     * @param role 瑙掕壊瀵硅薄
+     * @return 鍒涘缓鍚庣殑瑙掕壊瀵硅薄
      */
     @PostMapping("/roles")
     public ResponseEntity<Role> createRole(@RequestBody Role role) {
@@ -155,10 +155,10 @@ public class AccessControlController {
     }
 
     /**
-     * 获取角色详情
+     * 鑾峰彇瑙掕壊璇︽儏
      * 
-     * @param roleId 角色ID
-     * @return 角色对象，不存在返回404
+     * @param roleId 瑙掕壊ID
+     * @return 瑙掕壊瀵硅薄锛屼笉瀛樺湪杩斿洖404
      */
     @GetMapping("/roles/{roleId}")
     public ResponseEntity<Role> getRole(@PathVariable String roleId) {
@@ -170,12 +170,12 @@ public class AccessControlController {
     }
 
     /**
-     * 删除角色
+     * 鍒犻櫎瑙掕壊
      * 
-     * <p>系统角色不可删除。</p>
+     * <p>绯荤粺瑙掕壊涓嶅彲鍒犻櫎銆?/p>
      * 
-     * @param roleId 角色ID
-     * @return 是否删除成功
+     * @param roleId 瑙掕壊ID
+     * @return 鏄惁鍒犻櫎鎴愬姛
      */
     @DeleteMapping("/roles/{roleId}")
     public ResponseEntity<Boolean> deleteRole(@PathVariable String roleId) {
@@ -183,16 +183,16 @@ public class AccessControlController {
     }
 
     /**
-     * 为角色分配权限
+     * 涓鸿鑹插垎閰嶆潈闄?
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * ["perm-read", "perm-write", "perm-delete"]
      * }</pre>
      * 
-     * @param roleId 角色ID
-     * @param permissionIds 权限ID列表
-     * @return 是否分配成功
+     * @param roleId 瑙掕壊ID
+     * @param permissionIds 鏉冮檺ID鍒楄〃
+     * @return 鏄惁鍒嗛厤鎴愬姛
      */
     @PostMapping("/roles/{roleId}/permissions")
     public ResponseEntity<Boolean> assignPermissionsToRole(
@@ -202,10 +202,10 @@ public class AccessControlController {
     }
 
     /**
-     * 获取用户的角色列表
+     * 鑾峰彇鐢ㄦ埛鐨勮鑹插垪琛?
      * 
-     * @param userId 用户ID
-     * @return 角色ID列表
+     * @param userId 鐢ㄦ埛ID
+     * @return 瑙掕壊ID鍒楄〃
      */
     @GetMapping("/users/{userId}/roles")
     public ResponseEntity<List<String>> getUserRoles(@PathVariable String userId) {
@@ -213,16 +213,16 @@ public class AccessControlController {
     }
 
     /**
-     * 为用户分配角色
+     * 涓虹敤鎴峰垎閰嶈鑹?
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * ["role-admin", "role-auditor"]
      * }</pre>
      * 
-     * @param userId 用户ID
-     * @param roleIds 角色ID列表
-     * @return 是否分配成功
+     * @param userId 鐢ㄦ埛ID
+     * @param roleIds 瑙掕壊ID鍒楄〃
+     * @return 鏄惁鍒嗛厤鎴愬姛
      */
     @PostMapping("/users/{userId}/roles")
     public ResponseEntity<Boolean> assignRolesToUser(
@@ -232,11 +232,11 @@ public class AccessControlController {
     }
 
     /**
-     * 移除用户的角色
+     * 绉婚櫎鐢ㄦ埛鐨勮鑹?
      * 
-     * @param userId 用户ID
-     * @param roleIds 要移除的角色ID列表
-     * @return 是否移除成功
+     * @param userId 鐢ㄦ埛ID
+     * @param roleIds 瑕佺Щ闄ょ殑瑙掕壊ID鍒楄〃
+     * @return 鏄惁绉婚櫎鎴愬姛
      */
     @DeleteMapping("/users/{userId}/roles")
     public ResponseEntity<Boolean> removeRolesFromUser(
@@ -246,11 +246,11 @@ public class AccessControlController {
     }
 
     /**
-     * 检查用户权限
+     * 妫€鏌ョ敤鎴锋潈闄?
      * 
-     * <p>检查指定用户是否拥有某个权限。</p>
+     * <p>妫€鏌ユ寚瀹氱敤鎴锋槸鍚︽嫢鏈夋煇涓潈闄愩€?/p>
      * 
-     * <h4>请求示例：</h4>
+     * <h4>璇锋眰绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "userId": "user-001",
@@ -260,19 +260,19 @@ public class AccessControlController {
      * }
      * }</pre>
      * 
-     * <h4>响应示例：</h4>
+     * <h4>鍝嶅簲绀轰緥锛?/h4>
      * <pre>{@code
      * {
      *   "allowed": true,
      *   "userId": "user-001",
      *   "permissionCode": "user:delete",
-     *   "matchedRoles": ["管理员"],
+     *   "matchedRoles": ["绠＄悊鍛?],
      *   "denialReason": null
      * }
      * }</pre>
      * 
-     * @param request 权限检查请求
-     * @return 检查结果
+     * @param request 鏉冮檺妫€鏌ヨ姹?
+     * @return 妫€鏌ョ粨鏋?
      */
     @PostMapping("/check")
     public ResponseEntity<PermissionCheckResult> checkPermission(@RequestBody PermissionCheckRequest request) {
@@ -280,12 +280,12 @@ public class AccessControlController {
     }
 
     /**
-     * 获取用户的所有权限
+     * 鑾峰彇鐢ㄦ埛鐨勬墍鏈夋潈闄?
      * 
-     * <p>返回用户通过所有角色获得的权限聚合列表。</p>
+     * <p>杩斿洖鐢ㄦ埛閫氳繃鎵€鏈夎鑹茶幏寰楃殑鏉冮檺鑱氬悎鍒楄〃銆?/p>
      * 
-     * @param userId 用户ID
-     * @return 权限列表
+     * @param userId 鐢ㄦ埛ID
+     * @return 鏉冮檺鍒楄〃
      */
     @GetMapping("/users/{userId}/permissions")
     public ResponseEntity<List<Permission>> getUserPermissions(@PathVariable String userId) {
@@ -293,17 +293,17 @@ public class AccessControlController {
     }
 
     /**
-     * 获取访问控制统计数据
+     * 鑾峰彇璁块棶鎺у埗缁熻鏁版嵁
      * 
-     * <h4>返回数据：</h4>
+     * <h4>杩斿洖鏁版嵁锛?/h4>
      * <ul>
-     *   <li>totalPermissions - 权限总数</li>
-     *   <li>totalRoles - 角色总数</li>
-     *   <li>totalUsersWithRoles - 有角色分配的用户数</li>
-     *   <li>systemRoles - 系统角色数</li>
+     *   <li>totalPermissions - 鏉冮檺鎬绘暟</li>
+     *   <li>totalRoles - 瑙掕壊鎬绘暟</li>
+     *   <li>totalUsersWithRoles - 鏈夎鑹插垎閰嶇殑鐢ㄦ埛鏁?/li>
+     *   <li>systemRoles - 绯荤粺瑙掕壊鏁?/li>
      * </ul>
      * 
-     * @return 统计数据
+     * @return 缁熻鏁版嵁
      */
     @GetMapping("/statistics")
     public ResponseEntity<Map<String, Object>> getStatistics() {

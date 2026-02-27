@@ -223,7 +223,7 @@ public class ImServiceImpl implements ImService {
     public Map<String, List<Contact>> getContactsByDepartment(String userId) {
         Map<String, List<Contact>> result = new HashMap<>();
         for (Contact contact : contacts.values()) {
-            String dept = contact.getDepartment() != null ? contact.getDepartment() : "未分组";
+            String dept = contact.getDepartment() != null ? contact.getDepartment() : "鏈垎缁?;
             result.computeIfAbsent(dept, k -> new ArrayList<>()).add(contact);
         }
         return result;

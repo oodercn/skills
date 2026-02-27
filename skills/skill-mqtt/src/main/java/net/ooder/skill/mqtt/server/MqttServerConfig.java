@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * MQTT服务端配�? */
+ * MQTT閺堝秴濮熺粩顖炲帳缂? */
 public class MqttServerConfig implements Serializable {
     
     private static final long serialVersionUID = 1L;

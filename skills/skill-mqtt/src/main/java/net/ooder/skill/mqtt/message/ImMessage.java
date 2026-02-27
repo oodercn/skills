@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- * IM消息 - 点对点消息模�? */
+ * IM濞戝牊浼?- 閻愮懓顕悙瑙勭Х閹垱膩閸? */
 public class ImMessage implements Serializable {
     
     private static final long serialVersionUID = 1L;

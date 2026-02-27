@@ -10,7 +10,7 @@ import net.ooder.org.PersonNotFoundException;
 import net.ooder.skill.org.dingding.org.DingdingOrgManager;
 import org.springframework.beans.factory.annotation.Autowired;
 
-@EsbBeanAnnotation(id = "UserInnerService", name = "钉钉账号内部服务", expressionArr = "UserInnerServiceImpl()", desc = "钉钉账号内部服务")
+@EsbBeanAnnotation(id = "UserInnerService", name = "閽夐拤璐﹀彿鍐呴儴鏈嶅姟", expressionArr = "UserInnerServiceImpl()", desc = "閽夐拤璐﹀彿鍐呴儴鏈嶅姟")
 public class UserInnerServiceImpl implements UserInnerService {
 
     @Autowired

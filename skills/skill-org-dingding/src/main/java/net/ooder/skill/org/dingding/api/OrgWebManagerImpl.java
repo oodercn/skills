@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import java.util.ArrayList;
 import java.util.List;
 
-@EsbBeanAnnotation(id = "OrgWebManager", name = "钉钉组织机构Web服务", expressionArr = "OrgWebManagerImpl()", version = 1, desc = "钉钉组织机构Web服务")
+@EsbBeanAnnotation(id = "OrgWebManager", name = "閽夐拤缁勭粐鏈烘瀯Web鏈嶅姟", expressionArr = "OrgWebManagerImpl()", version = 1, desc = "閽夐拤缁勭粐鏈烘瀯Web鏈嶅姟")
 public class OrgWebManagerImpl implements OrgWebManager {
 
     @Autowired

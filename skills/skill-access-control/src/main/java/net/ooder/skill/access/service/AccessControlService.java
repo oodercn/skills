@@ -6,55 +6,55 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 访问控制服务接口
+ * 璁块棶鎺у埗鏈嶅姟鎺ュ彛
  * 
- * <p>提供基于RBAC（Role-Based Access Control）模型的权限管理服务，
- * 包括权限管理、角色管理和访问控制功能。</p>
+ * <p>鎻愪緵鍩轰簬RBAC锛圧ole-Based Access Control锛夋ā鍨嬬殑鏉冮檺绠＄悊鏈嶅姟锛?
+ * 鍖呮嫭鏉冮檺绠＄悊銆佽鑹茬鐞嗗拰璁块棶鎺у埗鍔熻兘銆?/p>
  * 
- * <h3>核心概念：</h3>
+ * <h3>鏍稿績姒傚康锛?/h3>
  * <ul>
- *   <li><b>权限（Permission）</b>：对特定资源的操作许可，如"读取文件"、"删除用户"</li>
- *   <li><b>角色（Role）</b>：权限的集合，如"管理员"、"普通用户"、"审计员"</li>
- *   <li><b>用户（User）</b>：被分配角色的主体，通过角色间接获得权限</li>
+ *   <li><b>鏉冮檺锛圥ermission锛?/b>锛氬鐗瑰畾璧勬簮鐨勬搷浣滆鍙紝濡?璇诲彇鏂囦欢"銆?鍒犻櫎鐢ㄦ埛"</li>
+ *   <li><b>瑙掕壊锛圧ole锛?/b>锛氭潈闄愮殑闆嗗悎锛屽"绠＄悊鍛?銆?鏅€氱敤鎴?銆?瀹¤鍛?</li>
+ *   <li><b>鐢ㄦ埛锛圲ser锛?/b>锛氳鍒嗛厤瑙掕壊鐨勪富浣擄紝閫氳繃瑙掕壊闂存帴鑾峰緱鏉冮檺</li>
  * </ul>
  * 
- * <h3>应用场景：</h3>
+ * <h3>搴旂敤鍦烘櫙锛?/h3>
  * <ul>
- *   <li>企业应用：根据部门、职位分配不同权限</li>
- *   <li>SaaS平台：多租户权限隔离，不同套餐不同权限</li>
- *   <li>管理系统：后台管理权限控制，敏感操作审批</li>
- *   <li>API网关：接口访问权限校验</li>
+ *   <li>浼佷笟搴旂敤锛氭牴鎹儴闂ㄣ€佽亴浣嶅垎閰嶄笉鍚屾潈闄?/li>
+ *   <li>SaaS骞冲彴锛氬绉熸埛鏉冮檺闅旂锛屼笉鍚屽椁愪笉鍚屾潈闄?/li>
+ *   <li>绠＄悊绯荤粺锛氬悗鍙扮鐞嗘潈闄愭帶鍒讹紝鏁忔劅鎿嶄綔瀹℃壒</li>
+ *   <li>API缃戝叧锛氭帴鍙ｈ闂潈闄愭牎楠?/li>
  * </ul>
  * 
- * <h3>使用示例：</h3>
+ * <h3>浣跨敤绀轰緥锛?/h3>
  * <pre>{@code
- * // 创建权限
+ * // 鍒涘缓鏉冮檺
  * Permission perm = new Permission();
- * perm.setName("删除用户");
+ * perm.setName("鍒犻櫎鐢ㄦ埛");
  * perm.setCode("user:delete");
  * perm.setResourceType("user");
  * perm.setAction("delete");
  * accessControlService.createPermission(perm);
  * 
- * // 创建角色并分配权限
+ * // 鍒涘缓瑙掕壊骞跺垎閰嶆潈闄?
  * Role adminRole = new Role();
- * adminRole.setName("管理员");
+ * adminRole.setName("绠＄悊鍛?);
  * adminRole.setCode("admin");
  * accessControlService.createRole(adminRole);
  * accessControlService.assignPermissionsToRole("role-admin", 
  *     Arrays.asList("perm-read", "perm-write", "perm-delete"));
  * 
- * // 给用户分配角色
+ * // 缁欑敤鎴峰垎閰嶈鑹?
  * accessControlService.assignRolesToUser("user-001", 
  *     Arrays.asList("role-admin"));
  * 
- * // 检查权限
+ * // 妫€鏌ユ潈闄?
  * PermissionCheckRequest request = new PermissionCheckRequest();
  * request.setUserId("user-001");
  * request.setPermissionCode("user:delete");
  * PermissionCheckResult result = accessControlService.checkPermission(request);
  * if (result.isAllowed()) {
- *     // 执行删除操作
+ *     // 鎵ц鍒犻櫎鎿嶄綔
  * }
  * }</pre>
  * 
@@ -65,149 +65,149 @@ import java.util.Map;
 public interface AccessControlService {
     
     /**
-     * 列出所有权限
+     * 鍒楀嚭鎵€鏈夋潈闄?
      * 
-     * @return 权限列表
+     * @return 鏉冮檺鍒楄〃
      */
     List<Permission> listPermissions();
     
     /**
-     * 创建权限
+     * 鍒涘缓鏉冮檺
      * 
-     * <p>创建一个新的权限定义。权限通常按"资源类型:操作"格式命名，
-     * 如"user:read"、"file:delete"。</p>
+     * <p>鍒涘缓涓€涓柊鐨勬潈闄愬畾涔夈€傛潈闄愰€氬父鎸?璧勬簮绫诲瀷:鎿嶄綔"鏍煎紡鍛藉悕锛?
+     * 濡?user:read"銆?file:delete"銆?/p>
      * 
-     * @param permission 权限对象
-     * @return 创建后的权限对象，包含生成的ID
+     * @param permission 鏉冮檺瀵硅薄
+     * @return 鍒涘缓鍚庣殑鏉冮檺瀵硅薄锛屽寘鍚敓鎴愮殑ID
      */
     Permission createPermission(Permission permission);
     
     /**
-     * 获取权限详情
+     * 鑾峰彇鏉冮檺璇︽儏
      * 
-     * @param permissionId 权限ID
-     * @return 权限对象，不存在则返回null
+     * @param permissionId 鏉冮檺ID
+     * @return 鏉冮檺瀵硅薄锛屼笉瀛樺湪鍒欒繑鍥瀗ull
      */
     Permission getPermission(String permissionId);
     
     /**
-     * 删除权限
+     * 鍒犻櫎鏉冮檺
      * 
-     * <p>删除权限会同时从所有角色中移除该权限。</p>
+     * <p>鍒犻櫎鏉冮檺浼氬悓鏃朵粠鎵€鏈夎鑹蹭腑绉婚櫎璇ユ潈闄愩€?/p>
      * 
-     * @param permissionId 权限ID
-     * @return 是否删除成功
+     * @param permissionId 鏉冮檺ID
+     * @return 鏄惁鍒犻櫎鎴愬姛
      */
     boolean deletePermission(String permissionId);
     
     /**
-     * 列出所有角色
+     * 鍒楀嚭鎵€鏈夎鑹?
      * 
-     * @return 角色列表
+     * @return 瑙掕壊鍒楄〃
      */
     List<Role> listRoles();
     
     /**
-     * 创建角色
+     * 鍒涘缓瑙掕壊
      * 
-     * <p>创建一个新的角色定义。系统角色（system=true）不可删除。</p>
+     * <p>鍒涘缓涓€涓柊鐨勮鑹插畾涔夈€傜郴缁熻鑹诧紙system=true锛変笉鍙垹闄ゃ€?/p>
      * 
-     * @param role 角色对象
-     * @return 创建后的角色对象，包含生成的ID
+     * @param role 瑙掕壊瀵硅薄
+     * @return 鍒涘缓鍚庣殑瑙掕壊瀵硅薄锛屽寘鍚敓鎴愮殑ID
      */
     Role createRole(Role role);
     
     /**
-     * 获取角色详情
+     * 鑾峰彇瑙掕壊璇︽儏
      * 
-     * @param roleId 角色ID
-     * @return 角色对象，不存在则返回null
+     * @param roleId 瑙掕壊ID
+     * @return 瑙掕壊瀵硅薄锛屼笉瀛樺湪鍒欒繑鍥瀗ull
      */
     Role getRole(String roleId);
     
     /**
-     * 删除角色
+     * 鍒犻櫎瑙掕壊
      * 
-     * <p>系统角色不可删除。删除角色会同时移除所有用户的该角色分配。</p>
+     * <p>绯荤粺瑙掕壊涓嶅彲鍒犻櫎銆傚垹闄よ鑹蹭細鍚屾椂绉婚櫎鎵€鏈夌敤鎴风殑璇ヨ鑹插垎閰嶃€?/p>
      * 
-     * @param roleId 角色ID
-     * @return 是否删除成功
+     * @param roleId 瑙掕壊ID
+     * @return 鏄惁鍒犻櫎鎴愬姛
      */
     boolean deleteRole(String roleId);
     
     /**
-     * 为角色分配权限
+     * 涓鸿鑹插垎閰嶆潈闄?
      * 
-     * <p>设置角色拥有的权限列表，会覆盖原有权限。</p>
+     * <p>璁剧疆瑙掕壊鎷ユ湁鐨勬潈闄愬垪琛紝浼氳鐩栧師鏈夋潈闄愩€?/p>
      * 
-     * @param roleId 角色ID
-     * @param permissionIds 权限ID列表
-     * @return 是否分配成功
+     * @param roleId 瑙掕壊ID
+     * @param permissionIds 鏉冮檺ID鍒楄〃
+     * @return 鏄惁鍒嗛厤鎴愬姛
      */
     boolean assignPermissionsToRole(String roleId, List<String> permissionIds);
     
     /**
-     * 获取用户的角色列表
+     * 鑾峰彇鐢ㄦ埛鐨勮鑹插垪琛?
      * 
-     * @param userId 用户ID
-     * @return 角色ID列表
+     * @param userId 鐢ㄦ埛ID
+     * @return 瑙掕壊ID鍒楄〃
      */
     List<String> getUserRoles(String userId);
     
     /**
-     * 为用户分配角色
+     * 涓虹敤鎴峰垎閰嶈鑹?
      * 
-     * <p>为用户添加角色，不会覆盖已有角色。</p>
+     * <p>涓虹敤鎴锋坊鍔犺鑹诧紝涓嶄細瑕嗙洊宸叉湁瑙掕壊銆?/p>
      * 
-     * @param userId 用户ID
-     * @param roleIds 角色ID列表
-     * @return 是否分配成功
+     * @param userId 鐢ㄦ埛ID
+     * @param roleIds 瑙掕壊ID鍒楄〃
+     * @return 鏄惁鍒嗛厤鎴愬姛
      */
     boolean assignRolesToUser(String userId, List<String> roleIds);
     
     /**
-     * 移除用户的角色
+     * 绉婚櫎鐢ㄦ埛鐨勮鑹?
      * 
-     * @param userId 用户ID
-     * @param roleIds 要移除的角色ID列表
-     * @return 是否移除成功
+     * @param userId 鐢ㄦ埛ID
+     * @param roleIds 瑕佺Щ闄ょ殑瑙掕壊ID鍒楄〃
+     * @return 鏄惁绉婚櫎鎴愬姛
      */
     boolean removeRolesFromUser(String userId, List<String> roleIds);
     
     /**
-     * 检查用户权限
+     * 妫€鏌ョ敤鎴锋潈闄?
      * 
-     * <p>检查用户是否拥有指定的权限。会检查用户所有角色下的权限，
-     * 只要有一个角色拥有该权限即返回允许。</p>
+     * <p>妫€鏌ョ敤鎴锋槸鍚︽嫢鏈夋寚瀹氱殑鏉冮檺銆備細妫€鏌ョ敤鎴锋墍鏈夎鑹蹭笅鐨勬潈闄愶紝
+     * 鍙鏈変竴涓鑹叉嫢鏈夎鏉冮檺鍗宠繑鍥炲厑璁搞€?/p>
      * 
-     * <h4>检查逻辑：</h4>
+     * <h4>妫€鏌ラ€昏緫锛?/h4>
      * <ol>
-     *   <li>获取用户的所有角色</li>
-     *   <li>遍历角色，检查是否包含请求的权限</li>
-     *   <li>支持通配符匹配：admin权限或*操作可匹配所有权限</li>
+     *   <li>鑾峰彇鐢ㄦ埛鐨勬墍鏈夎鑹?/li>
+     *   <li>閬嶅巻瑙掕壊锛屾鏌ユ槸鍚﹀寘鍚姹傜殑鏉冮檺</li>
+     *   <li>鏀寔閫氶厤绗﹀尮閰嶏細admin鏉冮檺鎴?鎿嶄綔鍙尮閰嶆墍鏈夋潈闄?/li>
      * </ol>
      * 
-     * @param request 权限检查请求
-     * @return 检查结果，包含是否允许、匹配的角色等信息
+     * @param request 鏉冮檺妫€鏌ヨ姹?
+     * @return 妫€鏌ョ粨鏋滐紝鍖呭惈鏄惁鍏佽銆佸尮閰嶇殑瑙掕壊绛変俊鎭?
      */
     PermissionCheckResult checkPermission(PermissionCheckRequest request);
     
     /**
-     * 获取用户的所有权限
+     * 鑾峰彇鐢ㄦ埛鐨勬墍鏈夋潈闄?
      * 
-     * <p>聚合用户所有角色下的权限，返回去重后的权限列表。</p>
+     * <p>鑱氬悎鐢ㄦ埛鎵€鏈夎鑹蹭笅鐨勬潈闄愶紝杩斿洖鍘婚噸鍚庣殑鏉冮檺鍒楄〃銆?/p>
      * 
-     * @param userId 用户ID
-     * @return 权限列表
+     * @param userId 鐢ㄦ埛ID
+     * @return 鏉冮檺鍒楄〃
      */
     List<Permission> getUserPermissions(String userId);
     
     /**
-     * 获取访问控制统计数据
+     * 鑾峰彇璁块棶鎺у埗缁熻鏁版嵁
      * 
-     * <p>返回系统中权限、角色、用户的统计信息。</p>
+     * <p>杩斿洖绯荤粺涓潈闄愩€佽鑹层€佺敤鎴风殑缁熻淇℃伅銆?/p>
      * 
-     * @return 统计数据Map
+     * @return 缁熻鏁版嵁Map
      */
     Map<String, Object> getAccessStatistics();
 }

@@ -1,8 +1,7 @@
 package net.ooder.skill.common.sdk.driver;
 
 /**
- * 驱动健康状态
- *
+ * 椹卞姩鍋ュ悍鐘舵€? *
  * @author SDK Team
  * @version 2.3.0
  * @since 2026-02-24
@@ -10,22 +9,21 @@ package net.ooder.skill.common.sdk.driver;
 public enum DriverHealthStatus {
 
     /**
-     * 健康
+     * 鍋ュ悍
      */
     HEALTHY,
 
     /**
-     * 不健康
-     */
+     * 涓嶅仴搴?     */
     UNHEALTHY,
 
     /**
-     * 故障
+     * 鏁呴殰
      */
     FAILED,
 
     /**
-     * 未知
+     * 鏈煡
      */
     UNKNOWN
 }

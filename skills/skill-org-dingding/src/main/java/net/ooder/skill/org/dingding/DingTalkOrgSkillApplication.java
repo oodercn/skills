@@ -76,7 +76,7 @@ public class DingTalkOrgSkillApplication implements CommandLineRunner {
         info.put("skillId", "skill-org-dingding");
         info.put("name", "DingTalk Organization Service");
         info.put("version", "0.7.3");
-        info.put("description", "钉钉组织数据集成服务");
+        info.put("description", "閽夐拤缁勭粐鏁版嵁闆嗘垚鏈嶅姟");
         info.put("sceneId", "auth");
         info.put("capabilities", new String[]{"org-data-read", "user-auth"});
         return info;

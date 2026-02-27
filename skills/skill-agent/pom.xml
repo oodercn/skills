@@ -13,13 +13,21 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-agent</artifactId>
-    <version>0.7.3</version>
+    <version>2.3.0</version>
     <packaging>jar</packaging>
 
     <name>skill-agent</name>
-    <description>Agent Management Service Skill for Ooder Agent Platform</description>
+    <description>Agent Management Service Skill for Ooder Agent Platform - SDK 2.3 Migrated</description>
 
     <dependencies>
+        <!-- SDK 2.3 核心 -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>agent-sdk</artifactId>
+            <version>2.3</version>
+            <scope>provided</scope>
+        </dependency>
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

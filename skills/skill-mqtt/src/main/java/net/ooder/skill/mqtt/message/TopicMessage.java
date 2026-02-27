@@ -3,7 +3,7 @@ package net.ooder.skill.mqtt.message;
 import java.io.Serializable;
 
 /**
- * Topic消息 - 广播/订阅消息模型
+ * Topic濞戝牊浼?- 楠炴寧鎸?鐠併垽妲勫☉鍫熶紖濡€崇€?
  */
 public class TopicMessage implements Serializable {
     

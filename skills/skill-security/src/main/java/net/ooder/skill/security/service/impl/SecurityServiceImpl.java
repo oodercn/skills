@@ -44,7 +44,7 @@ public class SecurityServiceImpl implements SecurityService {
         status.setActivePolicies((int) policies.values().stream().filter(p -> "enabled".equals(p.getStatus())).count());
         status.setTotalPolicies(policies.size());
         status.setRecentAlerts((int) threats.values().stream().filter(t -> "open".equals(t.getStatus())).count());
-        status.setBlockedAttempts(blockedConnections.get());
+        status.setBlockedAttempts((int) blockedConnections.get());
         status.setThreatScore(calculateThreatScore());
         status.setFirewallEnabled(firewallEnabled.get());
         status.setAuditEnabled(true);
@@ -61,7 +61,7 @@ public class SecurityServiceImpl implements SecurityService {
         SecurityStats stats = new SecurityStats();
         stats.setTotalScans(totalScans.get());
         stats.setThreatsDetected(threatsDetected.get());
-        stats.setThreatsResolved(threatsResolved.get());
+        stats.setResolvedThreats(threatsResolved.get());
         stats.setBlockedConnections(blockedConnections.get());
         stats.setAuditLogs(auditLogs.get());
         stats.setAverageScanTime(150.0);

@@ -1,7 +1,7 @@
 package net.ooder.skill.common.sdk.migration;
 
 /**
- * 迁移条件枚举
+ * 杩佺Щ鏉′欢鏋氫妇
  *
  * @author SDK Team
  * @version 2.3.0
@@ -10,32 +10,30 @@ package net.ooder.skill.common.sdk.migration;
 public enum MigrationCondition {
 
     /**
-     * 数据大小超过阈值
-     */
+     * 鏁版嵁澶у皬瓒呰繃闃堝€?     */
     DATA_SIZE_THRESHOLD,
 
     /**
-     * 服务不可用
-     */
+     * 鏈嶅姟涓嶅彲鐢?     */
     SERVICE_UNAVAILABLE,
 
     /**
-     * 性能下降
+     * 鎬ц兘涓嬮檷
      */
     PERFORMANCE_DEGRADATION,
 
     /**
-     * 手动触发
+     * 鎵嬪姩瑙﹀彂
      */
     MANUAL_TRIGGER,
 
     /**
-     * 版本过期
+     * 鐗堟湰杩囨湡
      */
     VERSION_DEPRECATED,
 
     /**
-     * 安全漏洞
+     * 瀹夊叏婕忔礊
      */
     SECURITY_VULNERABILITY
 }
