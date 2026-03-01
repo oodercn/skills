@@ -1,0 +1,66 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-management-ui
+  name: LLM配置管理
+  version: 1.0.0
+  description: LLM配置管理界面，支持企业/个人/场景级LLM配置管理
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: LLM配置
+      icon: ri-settings-4-line
+      
+    menu:
+      position: sidebar
+      category: llm
+      order: 20
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: llm-config-view
+      name: 查看配置
+      description: 查看LLM配置
+      category: ui
+    - id: llm-config-edit
+      name: 编辑配置
+      description: 编辑LLM配置
+      category: ui
+    - id: provider-manage
+      name: Provider管理
+      description: 管理LLM Provider
+      category: ui
+      
+  apis:
+    - path: /api/v1/llm/config
+      method: GET
+      description: 获取所有配置
+    - path: /api/v1/llm/config
+      method: POST
+      description: 创建配置
+    - path: /api/v1/llm/config/{id}
+      method: PUT
+      description: 更新配置
+    - path: /api/v1/llm/config/{id}
+      method: DELETE
+      description: 删除配置
+    - path: /api/llm/providers
+      method: POST
+      description: 获取Provider列表
+    - path: /api/llm/models
+      method: POST
+      description: 获取模型列表
+      
+  dependencies:
+    - skill-llm-config-manager

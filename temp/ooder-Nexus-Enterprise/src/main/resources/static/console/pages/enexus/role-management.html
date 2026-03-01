@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>角色管理 - Nexus Console</title>
+    
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-lg nx-font-semibold">角色管理</h2>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <button class="nx-btn nx-btn--primary" onclick="showCreateModal()">
+                        <i class="ri-user-add-line"></i> 新建角色
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-grid nx-grid-cols-4 nx-mb-6">
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--primary">
+                                <i class="ri-shield-user-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">总角色数</div>
+                                <div class="nx-stat-card__value" id="totalCount">-</div>
+                            </div>
+                        </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--success">
+                                <i class="ri-settings-3-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">自定义角色</div>
+                                <div class="nx-stat-card__value" id="customCount">-</div>
+                            </div>
+                        </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--warning">
+                                <i class="ri-lock-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">系统角色</div>
+                                <div class="nx-stat-card__value" id="systemCount">-</div>
+                            </div>
+                        </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--info">
+                                <i class="ri-key-2-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">权限总数</div>
+                                <div class="nx-stat-card__value" id="permCount">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-grid nx-grid-cols-2 nx-gap-6">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">角色列表</h3>
+                            </div>
+                            <div class="nx-card__body" id="roleList"></div>
+                        </div>
+                        
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">角色详情</h3>
+                            </div>
+                            <div class="nx-card__body" id="detailContent">
+                                <p style="color:var(--ns-secondary);text-align:center;padding:40px;">请选择角色查看详情</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="nx-modal" id="roleModal">
+        <div class="nx-modal__content" style="width: 500px;">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title" id="modalTitle">新建角色</h3>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="closeModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <form id="roleForm">
+                    <input type="hidden" id="editRoleId">
+                    <div class="nx-form-group">
+                        <label class="nx-label">角色编码 *</label>
+                        <input type="text" class="nx-input" id="formRoleCode" required placeholder="如: admin, user, viewer">
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">角色名称 *</label>
+                        <input type="text" class="nx-input" id="formRoleName" required placeholder="如: 管理员, 普通用户">
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">描述</label>
+                        <textarea class="nx-textarea" id="formDescription" rows="3" placeholder="角色描述..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="saveRole()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nx-modal" id="permissionModal">
+        <div class="nx-modal__content" style="width: 600px;">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title">分配权限</h3>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="closePermissionModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <div id="permissionList"></div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closePermissionModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="savePermissions()">保存</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        let currentRole = null;
+        let allRoles = [];
+        let allPermissions = [];
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadRoles();
+            loadPermissions();
+        });
+        
+        function loadRoles() {
+            NX.showLoading('roleList', '加载中...');
+            
+            fetch('/api/enexus/user/role/list', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success' && data.data) {
+                    allRoles = data.data;
+                    renderRoleList();
+                    updateStats();
+                } else {
+                    NX.showError('roleList', data.message || '加载失败');
+                }
+            });
+        }
+        
+        function loadPermissions() {
+            allPermissions = [
+                {permissionId: 'p1', permissionCode: 'user:read', permissionName: '查看用户', resourceType: 'menu'},
+                {permissionId: 'p2', permissionCode: 'user:write', permissionName: '编辑用户', resourceType: 'menu'},
+                {permissionId: 'p3', permissionCode: 'role:read', permissionName: '查看角色', resourceType: 'menu'},
+                {permissionId: 'p4', permissionCode: 'role:write', permissionName: '编辑角色', resourceType: 'menu'},
+                {permissionId: 'p5', permissionCode: 'scene:read', permissionName: '查看场景', resourceType: 'menu'},
+                {permissionId: 'p6', permissionCode: 'scene:write', permissionName: '编辑场景', resourceType: 'menu'},
+                {permissionId: 'p7', permissionCode: 'skill:install', permissionName: '安装技能', resourceType: 'action'},
+                {permissionId: 'p8', permissionCode: 'skill:uninstall', permissionName: '卸载技能', resourceType: 'action'}
+            ];
+        }
+        
+        function updateStats() {
+            const total = allRoles.length;
+            const system = allRoles.filter(r => r.systemRole).length;
+            const custom = total - system;
+            
+            document.getElementById('totalCount').textContent = total;
+            document.getElementById('customCount').textContent = custom;
+            document.getElementById('systemCount').textContent = system;
+            document.getElementById('permCount').textContent = allPermissions.length;
+        }
+        
+        function renderRoleList() {
+            const container = document.getElementById('roleList');
+            if (!allRoles || allRoles.length === 0) {
+                container.innerHTML = '<p style="color:var(--ns-secondary);text-align:center;padding:20px;">暂无角色</p>';
+                return;
+            }
+            
+            container.innerHTML = allRoles.map(role => `
+                <div class="nx-card nx-mb-3 ${currentRole && currentRole.roleId === role.roleId ? 'nx-card--selected' : ''}" 
+                     style="cursor:pointer;border:1px solid var(--ns-border);padding:16px;"
+                     onclick="selectRole('${role.roleId}')">
+                    <div class="nx-flex nx-justify-between nx-items-center nx-mb-2">
+                        <span class="nx-font-semibold">${role.roleName}</span>
+                        ${role.systemRole ? '<span class="nx-badge nx-badge--warning">系统</span>' : ''}
+                    </div>
+                    <div class="nx-text-sm" style="color:var(--ns-secondary)">${role.roleCode}</div>
+                    ${role.description ? `<div class="nx-text-sm nx-mt-2" style="color:var(--ns-secondary)">${role.description}</div>` : ''}
+                    <div class="nx-mt-2">
+                        <span class="nx-badge nx-badge--${role.status === 'ACTIVE' ? 'success' : 'secondary'}">${getStatusText(role.status)}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function selectRole(roleId) {
+            currentRole = allRoles.find(r => r.roleId === roleId);
+            renderRoleDetail();
+            renderRoleList();
+        }
+        
+        function renderRoleDetail() {
+            if (!currentRole) return;
+            
+            const html = `
+                <div class="nx-mb-4">
+                    <div class="nx-flex nx-justify-between nx-items-start nx-mb-4">
+                        <div>
+                            <h4 class="nx-font-semibold nx-mb-1">${currentRole.roleName}</h4>
+                            <p style="color:var(--ns-secondary)">${currentRole.roleCode}</p>
+                        </div>
+                        <span class="nx-badge nx-badge--${currentRole.status === 'ACTIVE' ? 'success' : 'secondary'}">${getStatusText(currentRole.status)}</span>
+                    </div>
+                    
+                    <div class="nx-mb-3">
+                        <label class="nx-text-sm" style="color:var(--ns-secondary)">描述</label>
+                        <p>${currentRole.description || '-'}</p>
+                    </div>
+                    
+                    <div class="nx-mb-3">
+                        <label class="nx-text-sm" style="color:var(--ns-secondary)">类型</label>
+                        <p>${currentRole.systemRole ? '系统角色' : '自定义角色'}</p>
+                    </div>
+                    
+                    <div class="nx-mb-3">
+                        <label class="nx-text-sm" style="color:var(--ns-secondary)">创建时间</label>
+                        <p>${NX.formatDate(currentRole.createdAt, 'YYYY-MM-DD HH:mm')}</p>
+                    </div>
+                </div>
+                
+                <div class="nx-mb-4">
+                    <div class="nx-flex nx-justify-between nx-items-center nx-mb-2">
+                        <label class="nx-text-sm nx-font-semibold">权限配置</label>
+                        <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="showPermissionModal()">
+                            <i class="ri-settings-3-line"></i> 配置
+                        </button>
+                    </div>
+                    <p style="color:var(--ns-secondary)">点击"配置"进行权限设置</p>
+                </div>
+                
+                <div class="nx-flex nx-gap-2">
+                    <button class="nx-btn nx-btn--primary" onclick="editRole()" ${currentRole.systemRole ? 'disabled' : ''}>
+                        <i class="ri-edit-line"></i> 编辑
+                    </button>
+                    <button class="nx-btn nx-btn--danger" onclick="deleteRole()" ${currentRole.systemRole ? 'disabled' : ''}>
+                        <i class="ri-delete-bin-line"></i> 删除
+                    </button>
+                </div>
+            `;
+            
+            document.getElementById('detailContent').innerHTML = html;
+        }
+        
+        function showCreateModal() {
+            document.getElementById('modalTitle').textContent = '新建角色';
+            document.getElementById('editRoleId').value = '';
+            document.getElementById('roleForm').reset();
+            document.getElementById('formRoleCode').disabled = false;
+            NX.modal.open('roleModal');
+        }
+        
+        function editRole() {
+            if (!currentRole || currentRole.systemRole) return;
+            
+            document.getElementById('modalTitle').textContent = '编辑角色';
+            document.getElementById('editRoleId').value = currentRole.roleId;
+            document.getElementById('formRoleCode').value = currentRole.roleCode;
+            document.getElementById('formRoleCode').disabled = true;
+            document.getElementById('formRoleName').value = currentRole.roleName;
+            document.getElementById('formDescription').value = currentRole.description || '';
+            NX.modal.open('roleModal');
+        }
+        
+        function closeModal() {
+            NX.modal.close('roleModal');
+        }
+        
+        function saveRole() {
+            const roleId = document.getElementById('editRoleId').value;
+            const params = {
+                roleCode: document.getElementById('formRoleCode').value,
+                roleName: document.getElementById('formRoleName').value,
+                description: document.getElementById('formDescription').value
+            };
+            
+            const url = roleId ? '/api/enexus/user/role/update' : '/api/enexus/user/role/create';
+            if (roleId) params.roleId = roleId;
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(params)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    closeModal();
+                    loadRoles();
+                    NX.success(roleId ? '角色更新成功' : '角色创建成功');
+                } else {
+                    NX.error(data.message || '操作失败');
+                }
+            });
+        }
+        
+        function deleteRole() {
+            if (!currentRole || currentRole.systemRole) return;
+            if (!confirm('确定要删除该角色吗？')) return;
+            
+            fetch('/api/enexus/user/role/delete', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({roleId: currentRole.roleId})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    currentRole = null;
+                    document.getElementById('detailContent').innerHTML = '<p style="color:var(--ns-secondary);text-align:center;padding:40px;">请选择角色查看详情</p>';
+                    loadRoles();
+                    NX.success('角色删除成功');
+                } else {
+                    NX.error(data.message || '删除失败');
+                }
+            });
+        }
+        
+        function showPermissionModal() {
+            if (!currentRole) return;
+            
+            const html = allPermissions.map(perm => `
+                <label class="nx-flex nx-items-center nx-gap-2 nx-p-2 nx-mb-2" style="background:var(--ns-card-bg);border-radius:4px;">
+                    <input type="checkbox" value="${perm.permissionId}" data-code="${perm.permissionCode}">
+                    <div>
+                        <div class="nx-font-medium">${perm.permissionName}</div>
+                        <div class="nx-text-sm" style="color:var(--ns-secondary)">${perm.permissionCode}</div>
+                    </div>
+                </label>
+            `).join('');
+            
+            document.getElementById('permissionList').innerHTML = html;
+            NX.modal.open('permissionModal');
+        }
+        
+        function closePermissionModal() {
+            NX.modal.close('permissionModal');
+        }
+        
+        function savePermissions() {
+            const checkboxes = document.querySelectorAll('#permissionList input[type="checkbox"]:checked');
+            const permissionIds = Array.from(checkboxes).map(cb => cb.value);
+            
+            fetch('/api/enexus/user/permission/assign', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({roleId: currentRole.roleId, permissionIds: permissionIds})
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    closePermissionModal();
+                    NX.success('权限配置成功');
+                } else {
+                    NX.error(data.message || '操作失败');
+                }
+            });
+        }
+        
+        function getStatusText(status) {
+            const map = {ACTIVE: '正常', INACTIVE: '未激活', DISABLED: '已禁用'};
+            return map[status] || status;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexus Help Center - 帮助中心">
+    <meta name="theme-color" content="#000000">
+    <title>帮助中心 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-lg nx-font-semibold">帮助中心</h2>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="search-section">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                            <input type="text" class="nx-input" id="searchInput" placeholder="搜索帮助文档..." onkeyup="searchHelp()">
+                        </div>
+                    </div>
+                    
+                    <div class="help-categories">
+                        <div class="category-card" onclick="showCategory('getting-started')">
+                            <div class="category-icon"><i class="ri-rocket-line"></i></div>
+                            <div class="category-title">快速入门</div>
+                            <div class="category-desc">了解如何开始使用Nexus</div>
+                        </div>
+                        <div class="category-card" onclick="showCategory('skills')">
+                            <div class="category-icon"><i class="ri-lightbulb-line"></i></div>
+                            <div class="category-title">技能管理</div>
+                            <div class="category-desc">技能的安装、配置和使用</div>
+                        </div>
+                        <div class="category-card" onclick="showCategory('collaboration')">
+                            <div class="category-icon"><i class="ri-team-line"></i></div>
+                            <div class="category-title">协同协作</div>
+                            <div class="category-desc">团队协作和消息通信</div>
+                        </div>
+                        <div class="category-card" onclick="showCategory('network')">
+                            <div class="category-icon"><i class="ri-network-line"></i></div>
+                            <div class="category-title">网络管理</div>
+                            <div class="category-desc">网络配置和设备管理</div>
+                        </div>
+                        <div class="category-card" onclick="showCategory('security')">
+                            <div class="category-icon"><i class="ri-shield-line"></i></div>
+                            <div class="category-title">安全设置</div>
+                            <div class="category-desc">安全配置和访问控制</div>
+                        </div>
+                        <div class="category-card" onclick="showCategory('api')">
+                            <div class="category-icon"><i class="ri-code-line"></i></div>
+                            <div class="category-title">API文档</div>
+                            <div class="category-desc">接口文档和开发指南</div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card nx-mb-6">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title"><i class="ri-article-line"></i> 常见问题</h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div class="faq-list" id="faqList">
+                                <div class="faq-item">
+                                    <div class="faq-question" onclick="toggleFaq(this)">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                        <span>如何安装技能包？</span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>在能力中心浏览或搜索需要的技能，点击安装按钮即可。安装完成后，技能会出现在"我的能力包"中，可以进行配置和使用。</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question" onclick="toggleFaq(this)">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                        <span>如何创建协同场景？</span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>进入协同协作 > 协同场景，点击"创建场景"按钮，填写场景名称和描述，添加参与者和能力约束，保存后即可使用。</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question" onclick="toggleFaq(this)">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                        <span>如何配置网络设备？</span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>进入网络管理 > 设备管理，添加或选择设备后，可以配置IP地址、端口映射、防火墙规则等网络参数。</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question" onclick="toggleFaq(this)">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                        <span>如何查看系统日志？</span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>进入系统配置 > 审计日志，可以查看所有操作记录。支持按时间、类型、用户等条件筛选。</p>
+                                    </div>
+                                </div>
+                                <div class="faq-item">
+                                    <div class="faq-question" onclick="toggleFaq(this)">
+                                        <i class="ri-arrow-right-s-line"></i>
+                                        <span>如何开启两步验证？</span>
+                                    </div>
+                                    <div class="faq-answer">
+                                        <p>进入个人中心 > 身份管理，在安全设置中找到两步验证选项，点击启用并按照提示完成配置。</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title"><i class="ri-customer-service-line"></i> 联系支持</h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div class="support-options">
+                                <div class="support-item">
+                                    <i class="ri-mail-line"></i>
+                                    <div class="support-info">
+                                        <div class="support-title">邮件支持</div>
+                                        <div class="support-value">support@ooder.cn</div>
+                                    </div>
+                                </div>
+                                <div class="support-item">
+                                    <i class="ri-github-line"></i>
+                                    <div class="support-info">
+                                        <div class="support-title">GitHub Issues</div>
+                                        <div class="support-value">github.com/ooderCN/ooder-Nexus</div>
+                                    </div>
+                                </div>
+                                <div class="support-item">
+                                    <i class="ri-book-line"></i>
+                                    <div class="support-info">
+                                        <div class="support-title">官方文档</div>
+                                        <div class="support-value">docs.ooder.cn</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js?v=2.2"></script>
+    <script src="/console/js/menu-loader.js?v=2.2"></script>
+    <script src="/console/js/nexus-menu.js?v=2.2"></script>
+    <script src="/console/js/page-init.js?v=2.2" data-auto-init></script>
+    <script>
+        function searchHelp() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const faqItems = document.querySelectorAll('.faq-item');
+            
+            faqItems.forEach(item => {
+                const question = item.querySelector('.faq-question span').textContent.toLowerCase();
+                const answer = item.querySelector('.faq-answer p').textContent.toLowerCase();
+                
+                if (question.includes(keyword) || answer.includes(keyword) || keyword === '') {
+                    item.style.display = 'block';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+        
+        function toggleFaq(element) {
+            const faqItem = element.parentElement;
+            const icon = element.querySelector('i');
+            const answer = faqItem.querySelector('.faq-answer');
+            
+            if (answer.style.display === 'block') {
+                answer.style.display = 'none';
+                icon.classList.remove('ri-arrow-down-s-line');
+                icon.classList.add('ri-arrow-right-s-line');
+            } else {
+                answer.style.display = 'block';
+                icon.classList.remove('ri-arrow-right-s-line');
+                icon.classList.add('ri-arrow-down-s-line');
+            }
+        }
+        
+        function showCategory(category) {
+            window.location.href = `/console/pages/help/${category}.html`;
+        }
+    </script>
+    
+    <style>
+        .search-section {
+            margin-bottom: var(--nx-space-8);
+        }
+        
+        .search-box {
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--nx-text-secondary);
+        }
+        
+        .search-box .nx-input {
+            padding: var(--nx-space-4) var(--nx-space-4) var(--nx-space-4) 44px;
+            font-size: 16px;
+        }
+        
+        .help-categories {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--nx-space-4);
+            margin-bottom: var(--nx-space-8);
+        }
+        
+        .category-card {
+            background: var(--nx-card-bg);
+            border: 1px solid var(--nx-border);
+            border-radius: var(--nx-radius-lg);
+            padding: var(--nx-space-6);
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .category-card:hover {
+            border-color: var(--nx-primary);
+            transform: translateY(-2px);
+        }
+        
+        .category-icon {
+            width: 48px;
+            height: 48px;
+            margin: 0 auto var(--nx-space-3);
+            border-radius: var(--nx-radius);
+            background: var(--nx-bg-hover);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            color: var(--nx-primary);
+        }
+        
+        .category-title {
+            font-weight: var(--nx-font-semibold);
+            margin-bottom: var(--nx-space-1);
+        }
+        
+        .category-desc {
+            font-size: var(--nx-text-sm);
+            color: var(--nx-text-secondary);
+        }
+        
+        .faq-item {
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+        }
+        
+        .faq-question {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-2);
+            padding: var(--nx-space-4) 0;
+            cursor: pointer;
+            font-weight: var(--nx-font-medium);
+        }
+        
+        .faq-question:hover {
+            color: var(--nx-primary);
+        }
+        
+        .faq-question i {
+            transition: transform 0.2s;
+        }
+        
+        .faq-answer {
+            display: none;
+            padding: 0 0 var(--nx-space-4) var(--nx-space-6);
+            color: var(--nx-text-secondary);
+        }
+        
+        .support-options {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: var(--nx-space-4);
+        }
+        
+        .support-item {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-3);
+            padding: var(--nx-space-4);
+            background: var(--nx-bg-hover);
+            border-radius: var(--nx-radius);
+        }
+        
+        .support-item i {
+            font-size: 24px;
+            color: var(--nx-primary);
+        }
+        
+        .support-title {
+            font-weight: var(--nx-font-medium);
+            margin-bottom: var(--nx-space-1);
+        }
+        
+        .support-value {
+            font-size: var(--nx-text-sm);
+            color: var(--nx-text-secondary);
+        }
+    </style>
+</body>
+</html>

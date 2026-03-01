@@ -85,6 +85,7 @@
         <module>skills/skill-protocol</module>
         <module>skills/skill-report</module>
         <module>skills/skill-search</module>
+        <module>skills/skill-scene</module>
         <!-- SDK 2.3 Integration Skills -->
         <module>skills/skill-update-checker</module>
         <module>skills/skill-capability-coordinator</module>
@@ -94,6 +95,16 @@
         <module>skills/skill-command-shortcut</module>
         <!-- Hot Plug Support -->
         <module>skill-hotplug-starter</module>
+        <!-- LLM & Knowledge Skills -->
+        <module>skills/skill-llm-deepseek</module>
+        <module>skills/skill-llm-config-manager</module>
+        <module>skills/skill-llm-context-builder</module>
+        <module>skills/skill-llm-conversation</module>
+        <module>skills/skill-document-processor</module>
+        <module>skills/skill-knowledge-base</module>
+        <module>skills/skill-rag</module>
+        <module>skills/skill-local-knowledge</module>
+        <module>skills/skill-vector-sqlite</module>
     </modules>
 
     <dependencyManagement>

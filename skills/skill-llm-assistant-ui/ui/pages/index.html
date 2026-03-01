@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM智能助手 - Nexus Console</title>
+    
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/llm-assistant.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-lg nx-font-semibold">LLM智能助手</h2>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="LLMAssistant.openSettings()">
+                        <i class="ri-settings-4-line"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-grid nx-grid-cols-3 nx-gap-6">
+                        <div class="nx-col-span-2">
+                            <div class="nx-card llm-chat-card">
+                                <div class="nx-card__header">
+                                    <div class="nx-flex nx-items-center nx-gap-2">
+                                        <i class="ri-robot-line nx-text-primary"></i>
+                                        <h3 class="nx-card__title">智能对话</h3>
+                                    </div>
+                                    <div class="nx-flex nx-items-center nx-gap-2">
+                                        <select class="nx-select nx-select--sm" id="provider-select" onchange="LLMAssistant.changeProvider()">
+                                        </select>
+                                        <select class="nx-select nx-select--sm" id="model-select" onchange="LLMAssistant.changeModel()">
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="nx-card__body nx-p-0">
+                                    <div class="llm-chat-container" id="chat-container">
+                                        <div class="llm-chat-messages" id="chat-messages">
+                                            <div class="llm-welcome">
+                                                <div class="llm-welcome__icon">
+                                                    <i class="ri-robot-2-line"></i>
+                                                </div>
+                                                <h3>您好！我是 Ooder 智能助手</h3>
+                                                <p>我可以帮助您：</p>
+                                                <ul class="llm-welcome__features">
+                                                    <li><i class="ri-file-text-line"></i> 自动配置场景和能力</li>
+                                                    <li><i class="ri-bar-chart-line"></i> 分析页面数据</li>
+                                                    <li><i class="ri-code-line"></i> 生成代码片段</li>
+                                                    <li><i class="ri-question-line"></i> 解答使用问题</li>
+                                                </ul>
+                                            </div>
+                                        </div>
+                                        <div class="llm-quick-actions" id="quick-actions">
+                                            <button class="llm-quick-btn" onclick="LLMAssistant.sendQuickMessage('帮我分析当前页面')">
+                                                <i class="ri-bar-chart-line"></i> 分析页面
+                                            </button>
+                                            <button class="llm-quick-btn" onclick="LLMAssistant.sendQuickMessage('给我一些配置建议')">
+                                                <i class="ri-settings-4-line"></i> 配置建议
+                                            </button>
+                                            <button class="llm-quick-btn" onclick="LLMAssistant.sendQuickMessage('如何使用这个功能？')">
+                                                <i class="ri-question-line"></i> 使用帮助
+                                            </button>
+                                            <button class="llm-quick-btn" onclick="LLMAssistant.sendQuickMessage('生成相关代码示例')">
+                                                <i class="ri-code-line"></i> 代码示例
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="llm-chat-input">
+                                        <div class="llm-input-wrapper">
+                                            <textarea 
+                                                class="llm-textarea" 
+                                                id="chat-input" 
+                                                placeholder="输入您的问题，按 Enter 发送..."
+                                                rows="1"
+                                                onkeydown="LLMAssistant.handleKeydown(event)"
+                                                oninput="LLMAssistant.autoResize(this)"
+                                            ></textarea>
+                                            <div class="llm-input-actions">
+                                                <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" onclick="LLMAssistant.clearChat()" title="清空对话">
+                                                    <i class="ri-delete-bin-line"></i>
+                                                </button>
+                                                <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="LLMAssistant.sendMessage()" id="send-btn">
+                                                    <i class="ri-send-plane-line"></i> 发送
+                                                </button>
+                                            </div>
+                                        </div>
+                                        <div class="llm-context-indicator" id="context-indicator">
+                                            <i class="ri-context-line"></i>
+                                            <span id="context-status">已获取页面上下文</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="nx-col-span-1">
+                            <div class="nx-card nx-mb-4">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">当前上下文</h3>
+                                    <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" onclick="LLMAssistant.refreshContext()">
+                                        <i class="ri-refresh-line"></i>
+                                    </button>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="llm-context-info" id="context-info">
+                                        <div class="llm-context-item">
+                                            <span class="llm-context-label">页面类型</span>
+                                            <span class="llm-context-value" id="ctx-page-type">-</span>
+                                        </div>
+                                        <div class="llm-context-item">
+                                            <span class="llm-context-label">页面标题</span>
+                                            <span class="llm-context-value" id="ctx-page-title">-</span>
+                                        </div>
+                                        <div class="llm-context-item">
+                                            <span class="llm-context-label">用户ID</span>
+                                            <span class="llm-context-value" id="ctx-user-id">-</span>
+                                        </div>
+                                        <div class="llm-context-item">
+                                            <span class="llm-context-label">场景ID</span>
+                                            <span class="llm-context-value" id="ctx-scene-id">-</span>
+                                        </div>
+                                        <div class="llm-context-item">
+                                            <span class="llm-context-label">Token数</span>
+                                            <span class="llm-context-value" id="ctx-tokens">0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="nx-card nx-mb-4">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">对话历史</h3>
+                                    <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" onclick="LLMAssistant.loadHistory()">
+                                        <i class="ri-refresh-line"></i>
+                                    </button>
+                                </div>
+                                <div class="nx-card__body nx-p-0">
+                                    <ul class="llm-history-list" id="history-list">
+                                        <li class="llm-history-item llm-history-item--empty">
+                                            <i class="ri-chat-off-line"></i>
+                                            <span>暂无历史对话</span>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="nx-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">使用统计</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="nx-grid nx-grid-cols-2 nx-gap-4">
+                                        <div class="llm-stat">
+                                            <div class="llm-stat__value" id="stat-messages">0</div>
+                                            <div class="llm-stat__label">消息数</div>
+                                        </div>
+                                        <div class="llm-stat">
+                                            <div class="llm-stat__value" id="stat-tokens">0</div>
+                                            <div class="llm-stat__label">Token消耗</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="nx-modal" id="settings-modal">
+        <div class="nx-modal__content nx-modal__content--sm">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title">助手设置</h3>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" onclick="LLMAssistant.closeSettings()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="nx-form-group">
+                    <label class="nx-label">温度 (Temperature)</label>
+                    <input type="range" class="nx-range" id="setting-temperature" min="0" max="1" step="0.1" value="0.7">
+                    <span class="nx-text-secondary nx-text-sm" id="temperature-value">0.7</span>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-label">最大Token数</label>
+                    <input type="number" class="nx-input" id="setting-max-tokens" value="4096" min="100" max="32000">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-label">系统提示词</label>
+                    <textarea class="nx-textarea" id="setting-system-prompt" rows="4" placeholder="自定义系统提示词..."></textarea>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-checkbox">
+                        <input type="checkbox" id="setting-auto-context" checked>
+                        <span class="nx-checkbox__label">自动获取页面上下文</span>
+                    </label>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-checkbox">
+                        <input type="checkbox" id="setting-stream" checked>
+                        <span class="nx-checkbox__label">启用流式输出</span>
+                    </label>
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="LLMAssistant.closeSettings()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="LLMAssistant.saveSettings()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="/console/js/components/context-collector.js"></script>
+    <script src="/console/js/components/llm-assistant.js"></script>
+    <script src="/console/js/pages/llm-assistant-init.js"></script>
+</body>
+</html>

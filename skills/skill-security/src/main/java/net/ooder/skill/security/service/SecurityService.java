@@ -7,6 +7,8 @@ import java.util.List;
 public interface SecurityService {
     SecurityStatus getStatus();
     SecurityStats getStats();
+    SecurityConfig getConfig();
+    void saveConfig(SecurityConfig config);
     List<SecurityPolicy> listPolicies();
     SecurityPolicy getPolicy(String policyId);
     SecurityPolicy createPolicy(SecurityPolicy policy);

@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>质量控制 - 生产管理 - eNexus Enterprise</title>
+    <link rel="stylesheet" href="/console/css/common.css">
+    <link rel="stylesheet" href="/console/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>eNexus Enterprise</h2>
+                <span class="version">SDK 2.3</span>
+            </div>
+            <nav id="nav-menu"></nav>
+        </div>
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span>生产管理</span>
+                    <span class="separator">/</span>
+                    <span>质量控制</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="ri-shield-check-line"></i> 质量控制</h1>
+                    <p class="page-description">全面监控产品质量，追踪质量问题，提供质量改进建议</p>
+                </div>
+                
+                <div class="metrics-panel">
+                    <div class="metrics-header">
+                        <h3>质量指标概览</h3>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(46, 204, 113, 0.1);">
+                                <i class="ri-shield-check-line" style="color: #2ecc71;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">99.2%</span>
+                                <span class="metric-label">合格率</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>+0.8%</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(231, 76, 60, 0.1);">
+                                <i class="ri-error-warning-line" style="color: #e74c3c;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">12</span>
+                                <span class="metric-label">质量问题</span>
+                            </div>
+                            <div class="metric-trend down">
+                                <i class="ri-arrow-down-line"></i>
+                                <span>-5</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(52, 152, 219, 0.1);">
+                                <i class="ri-file-check-line" style="color: #3498db;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">1,233</span>
+                                <span class="metric-label">检验批次</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>+86</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(155, 89, 182, 0.1);">
+                                <i class="ri-award-line" style="color: #9b59b6;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">A+</span>
+                                <span class="metric-label">质量等级</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>提升</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="ri-pie-chart-line"></i> 质量分布</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="quality-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="ri-bar-chart-line"></i> 缺陷类型统计</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="defect-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="ri-alert-line"></i> 质量问题追踪</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>问题编号</th>
+                                    <th>问题描述</th>
+                                    <th>发现时间</th>
+                                    <th>严重程度</th>
+                                    <th>状态</th>
+                                    <th>负责人</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>QC-2024-001</td>
+                                    <td>产品尺寸偏差</td>
+                                    <td>2024-02-25 08:30</td>
+                                    <td><span class="status-badge danger">严重</span></td>
+                                    <td><span class="status-badge warning">处理中</span></td>
+                                    <td>张三</td>
+                                </tr>
+                                <tr>
+                                    <td>QC-2024-002</td>
+                                    <td>表面划痕</td>
+                                    <td>2024-02-25 10:15</td>
+                                    <td><span class="status-badge warning">一般</span></td>
+                                    <td><span class="status-badge success">已解决</span></td>
+                                    <td>李四</td>
+                                </tr>
+                                <tr>
+                                    <td>QC-2024-003</td>
+                                    <td>包装破损</td>
+                                    <td>2024-02-25 11:45</td>
+                                    <td><span class="status-badge warning">一般</span></td>
+                                    <td><span class="status-badge warning">处理中</span></td>
+                                    <td>王五</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMenu();
+        });
+    </script>
+</body>
+</html>

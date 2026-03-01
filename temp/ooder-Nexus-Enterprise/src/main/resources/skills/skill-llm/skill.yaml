@@ -1,0 +1,175 @@
+apiVersion: ooder.io/v1
+kind: Skill
+metadata:
+  skillId: "skill-llm"
+  skillName: "LLM服务"
+  skillType: "SYSTEM_SERVICE"
+  version: "0.8.0"
+  description: "提供大语言模型服务、自然语言处理、智能对话、NLP组件转换功能"
+  author: "ooder Team"
+  createdAt: "2026-02-24T00:00:00Z"
+  scene: "SYS"
+
+spec:
+  capabilities:
+    - capabilityId: "cap-llm-chat"
+      capabilityName: "智能对话"
+      description: "LLM对话、多轮对话、上下文管理"
+      version: "1.0.0"
+      operations:
+        - operationId: "op-chat"
+          operationName: "对话"
+          description: "发送消息并获取LLM响应"
+          inputSchema:
+            type: "object"
+            properties:
+              message:
+                type: "string"
+              conversationId:
+                type: "string"
+              context:
+                type: "object"
+          outputSchema:
+            type: "object"
+            properties:
+              response:
+                type: "string"
+              conversationId:
+                type: "string"
+        
+        - operationId: "op-chat-stream"
+          operationName: "流式对话"
+          description: "流式对话响应"
+        
+        - operationId: "op-chat-history"
+          operationName: "对话历史"
+          description: "获取对话历史记录"
+    
+    - capabilityId: "cap-llm-embed"
+      capabilityName: "向量嵌入"
+      description: "文本向量化、相似度计算"
+      version: "1.0.0"
+      operations:
+        - operationId: "op-embed"
+          operationName: "文本嵌入"
+          description: "将文本转换为向量"
+        
+        - operationId: "op-similarity"
+          operationName: "相似度计算"
+          description: "计算文本相似度"
+        
+        - operationId: "op-batch-embed"
+          operationName: "批量嵌入"
+          description: "批量文本嵌入"
+    
+    - capabilityId: "cap-llm-function"
+      capabilityName: "函数调用"
+      description: "LLM函数调用、工具集成"
+      version: "1.0.0"
+      operations:
+        - operationId: "op-execute-function"
+          operationName: "执行函数"
+          description: "执行LLM函数调用"
+        
+        - operationId: "op-register-function"
+          operationName: "注册函数"
+          description: "注册新的LLM函数"
+        
+        - operationId: "op-list-functions"
+          operationName: "列出函数"
+          description: "列出所有可用函数"
+    
+    - capabilityId: "cap-nlp-convert"
+      capabilityName: "NLP转换"
+      description: "自然语言转UI组件、场景配置生成"
+      version: "1.0.0"
+      operations:
+        - operationId: "op-nl-to-component"
+          operationName: "自然语言转组件"
+          description: "将自然语言描述转换为UI组件"
+          inputSchema:
+            type: "object"
+            properties:
+              description:
+                type: "string"
+              componentType:
+                type: "string"
+              mode:
+                type: "string"
+                enum: ["LLM_ONLY", "SKILLS_ONLY", "HYBRID"]
+          outputSchema:
+            type: "object"
+            properties:
+              component:
+                type: "object"
+              componentType:
+                type: "string"
+        
+        - operationId: "op-config-generate"
+          operationName: "配置生成"
+          description: "根据自然语言生成场景配置"
+        
+        - operationId: "op-scene-create"
+          operationName: "场景创建"
+          description: "根据自然语言描述创建场景"
+
+  config:
+    port: 8090
+    host: "0.0.0.0"
+    endpoints:
+      - path: "/api/llm/chat"
+        description: "对话接口"
+      - path: "/api/llm/embed"
+        description: "嵌入接口"
+      - path: "/api/llm/function"
+        description: "函数调用接口"
+      - path: "/api/nlp/convert"
+        description: "NLP转换接口"
+      - path: "/api/nlp/component"
+        description: "组件生成接口"
+      - path: "/api/nlp/scene"
+        description: "场景生成接口"
+    
+    dependencies:
+      - skillId: "skill-jds-server"
+        required: true
+        description: "服务注册发现"
+      - skillId: "skill-auth-service"
+        required: true
+        description: "认证授权"
+    
+    llm:
+      defaultProvider: "openai"
+      providers:
+        openai:
+          enabled: true
+          model: "gpt-4"
+          timeout: 60000
+          maxTokens: 4096
+        local:
+          enabled: false
+          endpoint: "http://localhost:11434"
+          model: "llama2"
+    
+    converter:
+      mode: "HYBRID"
+      cacheEnabled: true
+      skillsPriority: true
+    
+    skillsBridge:
+      enabled: true
+      registerDefaultSkills: true
+
+  healthCheck:
+    enabled: true
+    interval: 30000
+    timeout: 5000
+    endpoint: "/api/llm/health"
+
+  resources:
+    cpu:
+      request: "500m"
+      limit: "2000m"
+    memory:
+      request: "512Mi"
+      limit: "2Gi"

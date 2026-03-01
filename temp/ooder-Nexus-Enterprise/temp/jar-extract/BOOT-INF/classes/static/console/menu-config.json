@@ -1,0 +1,548 @@
+{
+  "description": "Ooder Nexus Enterprise 菜单配置 - SDK 2.3 企业级（基于用户故事）",
+  "version": "2.3",
+  "menu": [
+    {
+      "id": "workspace",
+      "name": "个人工作台",
+      "icon": "ri-dashboard-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "dashboard",
+          "name": "工作台仪表盘",
+          "icon": "ri-dashboard-3-line",
+          "url": "/console/pages/admin/dashboard.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "notifications",
+          "name": "通知管理",
+          "icon": "ri-notification-3-line",
+          "url": "/console/pages/msgcmd/msg-manager.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "quick-actions",
+          "name": "快捷操作",
+          "icon": "ri-flashlight-line",
+          "url": "/console/pages/scene/list.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "scene-management",
+      "name": "场景管理",
+      "icon": "ri-layout-grid-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "scene-browse",
+          "name": "场景浏览",
+          "icon": "ri-list-check",
+          "url": "/console/pages/scene/list.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "scene-run",
+          "name": "场景运行",
+          "icon": "ri-play-circle-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "scene-config",
+          "name": "场景配置",
+          "icon": "ri-settings-4-line",
+          "url": "/console/pages/scene/config-editor.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "scene-flow",
+          "name": "场景流程",
+          "icon": "ri-flow-chart",
+          "url": "/console/pages/scene/flow-tracker.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "device-management",
+      "name": "设备管理",
+      "icon": "ri-device-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "device-list",
+          "name": "设备列表",
+          "icon": "ri-list-check-2",
+          "url": "/console/pages/nexus/network-nodes.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "device-control",
+          "name": "设备控制",
+          "icon": "ri-remote-control-line",
+          "url": "/console/pages/openwrt/command.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "device-status",
+          "name": "设备状态",
+          "icon": "ri-pulse-line",
+          "url": "/console/pages/nexus/system-status.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "device-group",
+          "name": "设备分组",
+          "icon": "ri-folder-line",
+          "url": "/console/pages/nexus/network-topology.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "production-management",
+      "name": "生产管理",
+      "icon": "ri-factory-line",
+      "status": "implemented",
+      "roles": ["enterprise"],
+      "children": [
+        {
+          "id": "efficiency-monitor",
+          "name": "效率监控",
+          "icon": "ri-speed-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "quality-monitor",
+          "name": "质量监控",
+          "icon": "ri-shield-check-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "cost-analysis",
+          "name": "成本分析",
+          "icon": "ri-money-cny-circle-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "optimization-suggest",
+          "name": "优化建议",
+          "icon": "ri-lightbulb-flash-line",
+          "url": "/console/pages/llm-integration/skill-execution.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "chain-operation",
+      "name": "连锁运营",
+      "icon": "ri-store-3-line",
+      "status": "implemented",
+      "roles": ["enterprise"],
+      "children": [
+        {
+          "id": "store-monitor",
+          "name": "门店监控",
+          "icon": "ri-store-2-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "supply-chain",
+          "name": "供应链管理",
+          "icon": "ri-truck-line",
+          "url": "/console/pages/storage/capability-monitor.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "brand-manage",
+          "name": "品牌管理",
+          "icon": "ri-award-line",
+          "url": "/console/pages/enterprise/org-management.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "data-analysis",
+          "name": "数据分析",
+          "icon": "ri-bar-chart-grouped-line",
+          "url": "/console/pages/scene/dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "enterprise-manage",
+      "name": "企业管理",
+      "icon": "ri-building-line",
+      "status": "implemented",
+      "roles": ["enterprise"],
+      "children": [
+        {
+          "id": "operation-dashboard",
+          "name": "运营仪表盘",
+          "icon": "ri-dashboard-2-line",
+          "url": "/console/pages/monitor/monitor-dashboard.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "decision-support",
+          "name": "决策支持",
+          "icon": "ri-lightbulb-line",
+          "url": "/console/pages/llm-integration/skill-execution.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "team-manage",
+          "name": "团队管理",
+          "icon": "ri-team-line",
+          "url": "/console/pages/enterprise/org-management.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "org-structure",
+          "name": "组织架构",
+          "icon": "ri-organization-chart",
+          "url": "/console/pages/im/org-structure.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "ai-intervention",
+      "name": "AI智能介入",
+      "icon": "ri-robot-2-line",
+      "status": "implemented",
+      "roles": ["enterprise"],
+      "children": [
+        {
+          "id": "proactive-intervention",
+          "name": "主动介入",
+          "icon": "ri-lightbulb-line",
+          "url": "/console/pages/llm-integration/skill-execution.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "anomaly-detection",
+          "name": "异常检测",
+          "icon": "ri-error-warning-line",
+          "url": "/console/pages/anomaly/anomaly-detection.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "trend-prediction",
+          "name": "趋势预测",
+          "icon": "ri-line-chart-line",
+          "url": "/console/pages/llm-integration/skill-execution.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "passive-response",
+          "name": "被动响应",
+          "icon": "ri-customer-service-2-line",
+          "url": "/console/pages/llm-integration/skill-market.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "collaborative",
+          "name": "协作介入",
+          "icon": "ri-user-heart-line",
+          "url": "/console/pages/collaboration/collab-requests.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "skill-center",
+      "name": "技能中心",
+      "icon": "ri-apps-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "skill-market",
+          "name": "技能市场",
+          "icon": "ri-store-2-line",
+          "url": "/console/pages/llm-integration/skill-market.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "skill-exec",
+          "name": "技能执行",
+          "icon": "ri-play-line",
+          "url": "/console/pages/llm-integration/skill-execution.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "skill-debug",
+          "name": "技能调试",
+          "icon": "ri-bug-line",
+          "url": "/console/pages/llm-integration/skill-debug.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "skill-sync",
+          "name": "技能同步",
+          "icon": "ri-refresh-line",
+          "url": "/console/pages/skillcenter-sync/sync-dashboard.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "north-protocol",
+      "name": "北向协议",
+      "icon": "ri-cloud-line",
+      "status": "implemented",
+      "roles": ["enterprise"],
+      "children": [
+        {
+          "id": "scene-engine",
+          "name": "场景引擎",
+          "icon": "ri-cpu-line",
+          "url": "/console/pages/nexus/scenario-management.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "client-api",
+          "name": "客户端API",
+          "icon": "ri-code-line",
+          "url": "/console/pages/enexus/capability-registry.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "protocol-adapter",
+          "name": "协议适配",
+          "icon": "ri-plug-line",
+          "url": "/console/pages/nexus/protocol-management.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        },
+        {
+          "id": "auth-control",
+          "name": "权限控制",
+          "icon": "ri-lock-line",
+          "url": "/console/pages/enexus/security/user-keys.html",
+          "status": "implemented",
+          "roles": ["enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "security-center",
+      "name": "安全中心",
+      "icon": "ri-shield-keyhole-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "security-status",
+          "name": "安全状态",
+          "icon": "ri-shield-check-line",
+          "url": "/console/pages/home/security-status.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "user-keys",
+          "name": "用户密钥",
+          "icon": "ri-key-line",
+          "url": "/console/pages/enexus/security/user-keys.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "certificates",
+          "name": "数字证书",
+          "icon": "ri-file-shield-line",
+          "url": "/console/pages/enexus/security/certificates.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "tokens",
+          "name": "访问令牌",
+          "icon": "ri-ticket-line",
+          "url": "/console/pages/enexus/security/tokens.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "storage-management",
+      "name": "存储管理",
+      "icon": "ri-database-2-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "storage-types",
+          "name": "存储类型",
+          "icon": "ri-database-2-line",
+          "url": "/console/pages/storage/storage-types.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "file-browser",
+          "name": "文件浏览",
+          "icon": "ri-folder-line",
+          "url": "/console/pages/storage/file-browser.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "shared-files",
+          "name": "共享文件",
+          "icon": "ri-share-line",
+          "url": "/console/pages/storage/shared-files.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "communication",
+      "name": "通信管理",
+      "icon": "ri-message-2-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "msg-push",
+          "name": "消息推送",
+          "icon": "ri-send-plane-line",
+          "url": "/console/pages/msgcmd/msg-push.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "msg-manager",
+          "name": "消息管理",
+          "icon": "ri-mail-line",
+          "url": "/console/pages/msgcmd/msg-manager.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "p2p-network",
+          "name": "P2P网络",
+          "icon": "ri-node-tree",
+          "url": "/console/pages/nexus/p2p-visualization.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "monitoring",
+      "name": "监控运维",
+      "icon": "ri-eye-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "monitor-dashboard",
+          "name": "监控仪表盘",
+          "icon": "ri-dashboard-3-line",
+          "url": "/console/pages/monitor/monitor-dashboard.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "health-check",
+          "name": "健康检查",
+          "icon": "ri-heart-pulse-line",
+          "url": "/console/pages/nexus/health-check.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "log-management",
+          "name": "日志管理",
+          "icon": "ri-file-list-3-line",
+          "url": "/console/pages/nexus/log-management.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    },
+    {
+      "id": "system-config",
+      "name": "系统配置",
+      "icon": "ri-settings-3-line",
+      "status": "implemented",
+      "roles": ["home", "lan", "enterprise"],
+      "children": [
+        {
+          "id": "app-config",
+          "name": "应用设置",
+          "icon": "ri-settings-4-line",
+          "url": "/console/pages/config/app-config.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "session-management",
+          "name": "会话管理",
+          "icon": "ri-user-line",
+          "url": "/console/pages/system/session-management.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        },
+        {
+          "id": "cache-management",
+          "name": "缓存管理",
+          "icon": "ri-database-line",
+          "url": "/console/pages/system/cache-management.html",
+          "status": "implemented",
+          "roles": ["home", "lan", "enterprise"]
+        }
+      ]
+    }
+  ]
+}

@@ -1,45 +1,76 @@
 {
   "menu": [
     {
+      "id": "my-capability",
+      "name": "我的能力",
+      "icon": "ri-user-star-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "my-skills", "name": "我的能力包", "icon": "ri-lightbulb-line", "url": "/console/pages/skill/my-skills.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "my-network", "name": "网络概览", "icon": "ri-wifi-line", "url": "/console/pages/network/network-overview.html", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
+      "id": "personal-center",
+      "name": "个人中心",
+      "icon": "ri-user-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "personal-dashboard", "name": "个人仪表盘", "icon": "ri-dashboard-line", "url": "/console/pages/personal/dashboard.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "personal-sharing", "name": "我的分享", "icon": "ri-share-line", "url": "/console/pages/personal/sharing.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "personal-identity", "name": "身份管理", "icon": "ri-shield-user-line", "url": "/console/pages/personal/identity.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "personal-execution", "name": "执行记录", "icon": "ri-history-line", "url": "/console/pages/personal/execution.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "personal-help", "name": "帮助中心", "icon": "ri-question-line", "url": "/console/pages/personal/help.html", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
+      "id": "home-center",
+      "name": "家庭管理",
+      "icon": "ri-home-smile-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "home-dashboard", "name": "家庭仪表盘", "icon": "ri-dashboard-line", "url": "/console/pages/home/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "home-devices", "name": "设备管理", "icon": "ri-device-line", "url": "/console/pages/home/index.html#devices", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "home-security", "name": "安全状态", "icon": "ri-shield-check-line", "url": "/console/pages/home/index.html#security", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
+      "id": "lan-center",
+      "name": "局域网管理",
+      "icon": "ri-wifi-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "lan-dashboard", "name": "网络仪表盘", "icon": "ri-dashboard-line", "url": "/console/pages/lan/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "lan-devices", "name": "设备列表", "icon": "ri-device-line", "url": "/console/pages/lan/index.html#devices", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "lan-traffic", "name": "流量监控", "icon": "ri-line-chart-line", "url": "/console/pages/lan/index.html#traffic", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
       "id": "nexus-ui",
       "name": "Nexus界面",
       "icon": "ri-layout-line",
-      "url": "#",
       "status": "implemented",
-      "roles": "personal,mcp",
+      "roles": ["personal", "mcp"],
       "children": [
-        {
-          "id": "skill-nexus-system-status-nexus-ui",
-          "name": "系统状态",
-          "icon": "ri-server-line",
-          "url": "/console/skills/skill-nexus-system-status-nexus-ui/ui/pages/index.html",
-          "status": "implemented",
-          "roles": "personal,mcp"
-        },
-        {
-          "id": "skill-nexus-health-check-nexus-ui",
-          "name": "健康检查",
-          "icon": "ri-heart-pulse-line",
-          "url": "/console/skills/skill-nexus-health-check-nexus-ui/ui/pages/index.html",
-          "status": "implemented",
-          "roles": "personal,mcp"
-        },
-        {
-          "id": "skill-personal-dashboard-nexus-ui",
-          "name": "个人仪表盘",
-          "icon": "ri-user-line",
-          "url": "/console/skills/skill-personal-dashboard-nexus-ui/ui/pages/index.html",
-          "status": "implemented",
-          "roles": "personal,mcp"
-        },
-        {
-          "id": "skill-storage-management-nexus-ui",
-          "name": "存储管理",
-          "icon": "ri-hard-drive-2-line",
-          "url": "/console/skills/skill-storage-management-nexus-ui/ui/pages/index.html",
-          "status": "implemented",
-          "roles": "personal,mcp"
-        }
+        {"id": "skill-nexus-system-status-nexus-ui", "name": "系统状态", "icon": "ri-server-line", "url": "/console/skills/skill-nexus-system-status-nexus-ui/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "skill-nexus-health-check-nexus-ui", "name": "健康检查", "icon": "ri-heart-pulse-line", "url": "/console/skills/skill-nexus-health-check-nexus-ui/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "skill-personal-dashboard-nexus-ui", "name": "个人仪表盘", "icon": "ri-user-line", "url": "/console/skills/skill-personal-dashboard-nexus-ui/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "skill-storage-management-nexus-ui", "name": "存储管理", "icon": "ri-hard-drive-2-line", "url": "/console/skills/skill-storage-management-nexus-ui/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
+      "id": "system-config",
+      "name": "系统配置",
+      "icon": "ri-settings-4-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "config-health", "name": "健康检查", "icon": "ri-heart-line", "url": "/console/pages/nexus/health-check.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "config-system", "name": "系统状态", "icon": "ri-computer-line", "url": "/console/pages/nexus/system-status.html", "status": "implemented", "roles": ["personal", "mcp"]}
       ]
     },
     {
@@ -48,7 +79,7 @@
       "icon": "ri-test-tube-line",
       "url": "/console/index.html",
       "status": "implemented",
-      "roles": "personal,mcp"
+      "roles": ["personal", "mcp"]
     }
   ]
 }

@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能力绑定 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .binding-page { padding: 20px; }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .page-title i { color: var(--nx-primary); }
+        
+        .page-subtitle {
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .binding-layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .scene-group-panel {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-header i { color: var(--nx-primary); }
+        
+        .scene-group-list {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .scene-group-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            border-bottom: 1px solid var(--nx-border);
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .scene-group-item:hover { background: var(--nx-bg-hover); }
+        .scene-group-item.active { background: var(--nx-primary-light); border-left: 3px solid var(--nx-primary); }
+        .scene-group-item:last-child { border-bottom: none; }
+        
+        .group-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            background: var(--nx-bg);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nx-primary);
+        }
+        
+        .group-info { flex: 1; }
+        .group-name { font-weight: 500; font-size: 14px; }
+        .group-count { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .binding-main {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .binding-header {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .binding-title {
+            font-size: 18px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .binding-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .binding-list-panel {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            overflow: hidden;
+            flex: 1;
+        }
+        
+        .binding-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .binding-table th {
+            background: var(--nx-bg);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .binding-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--nx-border);
+            vertical-align: middle;
+        }
+        
+        .binding-table tr:last-child td { border-bottom: none; }
+        .binding-table tr:hover td { background: var(--nx-bg-hover); }
+        
+        .cap-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .cap-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+        
+        .cap-icon.type-SERVICE { background: #dbeafe; color: #2563eb; }
+        .cap-icon.type-AI { background: #fce7f3; color: #db2777; }
+        .cap-icon.type-COMMUNICATION { background: #d1fae5; color: #059669; }
+        .cap-icon.type-CUSTOM { background: #f1f5f9; color: #64748b; }
+        
+        .cap-name { font-weight: 500; }
+        .cap-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+        }
+        
+        .status-badge.active { background: #d1fae5; color: #059669; }
+        .status-badge.inactive { background: #fef3c7; color: #d97706; }
+        .status-badge.pending { background: #e0e7ff; color: #4f46e5; }
+        
+        .priority-badge {
+            background: var(--nx-bg);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .add-binding-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .add-binding-modal.show { display: flex; }
+        
+        .modal-dialog {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            width: 500px;
+            max-width: 90%;
+        }
+        
+        .modal-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .modal-body { padding: 20px; }
+        
+        .form-group { margin-bottom: 16px; }
+        .form-group:last-child { margin-bottom: 0; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-select, .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--nx-border);
+            border-radius: 6px;
+            background: var(--nx-bg);
+            font-size: 14px;
+        }
+        
+        .form-select:focus, .form-input:focus {
+            outline: none;
+            border-color: var(--nx-primary);
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 4px;
+        }
+        
+        .modal-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+        .empty-state-desc { font-size: 14px; }
+        
+        .relation-graph {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            padding: 20px;
+            min-height: 200px;
+            margin-top: 20px;
+        }
+        
+        .relation-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .relation-nodes {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .relation-node {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            font-size: 13px;
+        }
+        
+        .relation-node.primary {
+            border-color: var(--nx-primary);
+            background: var(--nx-primary-light);
+        }
+        
+        .relation-arrow {
+            color: var(--nx-text-secondary);
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <div class="binding-page">
+                <header class="nx-page__header" style="border-bottom: none;">
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                            <i class="ri-menu-line"></i>
+                        </button>
+                        <div>
+                            <h2 class="page-title">
+                                <i class="ri-link"></i>
+                                能力绑定
+                            </h2>
+                            <p class="page-subtitle">配置能力与场景组的关联关系</p>
+                        </div>
+                    </div>
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                            <i class="ri-sun-line"></i>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="binding-layout">
+                    <div class="scene-group-panel">
+                        <div class="panel-header">
+                            <i class="ri-group-line"></i>
+                            场景组列表
+                        </div>
+                        <div class="scene-group-list" id="sceneGroupList">
+                        </div>
+                    </div>
+                    
+                    <div class="binding-main">
+                        <div class="binding-header">
+                            <div class="binding-title">
+                                <i class="ri-flashlight-line"></i>
+                                <span id="currentGroupName">请选择场景组</span>
+                            </div>
+                            <div class="binding-actions">
+                                <button class="nx-btn nx-btn--primary" id="addBindingBtn" onclick="showAddBindingModal()" disabled>
+                                    <i class="ri-add-line"></i> 添加绑定
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="binding-list-panel">
+                            <table class="binding-table">
+                                <thead>
+                                    <tr>
+                                        <th>能力</th>
+                                        <th>提供者类型</th>
+                                        <th>优先级</th>
+                                        <th>状态</th>
+                                        <th>最后调用</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bindingTableBody">
+                                </tbody>
+                            </table>
+                        </div>
+                        
+                        <div class="relation-graph" id="relationGraph" style="display: none;">
+                            <div class="relation-title">
+                                <i class="ri-mind-map"></i>
+                                关联关系图
+                            </div>
+                            <div class="relation-nodes" id="relationNodes">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="add-binding-modal" id="addBindingModal">
+        <div class="modal-dialog">
+            <div class="modal-header">
+                <span>添加能力绑定</span>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="hideAddBindingModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">选择能力 *</label>
+                    <select class="form-select" id="capabilitySelect">
+                        <option value="">请选择能力</option>
+                    </select>
+                    <div class="form-hint">选择要绑定到此场景组的能力</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">提供者类型</label>
+                    <select class="form-select" id="providerTypeSelect">
+                        <option value="SKILL">技能</option>
+                        <option value="AGENT">代理</option>
+                        <option value="USER">用户</option>
+                        <option value="DEVICE">设备</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">优先级</label>
+                    <input type="number" class="form-input" id="priorityInput" value="1" min="1" max="100">
+                    <div class="form-hint">数值越小优先级越高</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">连接器类型</label>
+                    <select class="form-select" id="connectorTypeSelect">
+                        <option value="INTERNAL">内部调用</option>
+                        <option value="HTTP">HTTP</option>
+                        <option value="GRPC">gRPC</option>
+                        <option value="MESSAGE_QUEUE">消息队列</option>
+                    </select>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="hideAddBindingModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="createBinding()">创建绑定</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/llm-assistant.js"></script>
+    <script src="/console/js/pages/capability-binding.js"></script>
+</body>
+</html>

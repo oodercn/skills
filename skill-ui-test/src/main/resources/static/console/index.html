@@ -144,13 +144,17 @@
             tbody.innerHTML = '';
             
             result.forEach(skill => {
+                const skillUrl = `/console/skills/${skill.id}/ui/pages/index.html`;
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${skill.id}</td>
-                    <td>${skill.name}</td>
+                    <td><a href="${skillUrl}" target="_blank" style="color: #1890ff; text-decoration: none;">${skill.id}</a></td>
+                    <td><a href="${skillUrl}" target="_blank" style="color: #333; text-decoration: none;">${skill.name}</a></td>
                     <td>${skill.type}</td>
                     <td><span class="status-badge status-installed">Yes</span></td>
-                    <td><button class="btn btn-danger" onclick="uninstallSkill('${skill.id}')">Uninstall</button></td>
+                    <td>
+                        <button class="btn btn-primary" onclick="window.open('${skillUrl}', '_blank')">Open</button>
+                        <button class="btn btn-danger" onclick="uninstallSkill('${skill.id}')">Uninstall</button>
+                    </td>
                 `;
                 tbody.appendChild(tr);
             });

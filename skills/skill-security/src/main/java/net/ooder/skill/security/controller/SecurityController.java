@@ -24,6 +24,17 @@ public class SecurityController {
     public ResponseEntity<SecurityStats> getStats() {
         return ResponseEntity.ok(securityService.getStats());
     }
+    
+    @GetMapping("/config")
+    public ResponseEntity<SecurityConfig> getConfig() {
+        return ResponseEntity.ok(securityService.getConfig());
+    }
+    
+    @PostMapping("/config")
+    public ResponseEntity<Boolean> saveConfig(@RequestBody SecurityConfig config) {
+        securityService.saveConfig(config);
+        return ResponseEntity.ok(true);
+    }
 
     @GetMapping("/policies")
     public ResponseEntity<List<SecurityPolicy>> listPolicies() {

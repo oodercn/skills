@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>发现能力 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .discovery-page { padding: 20px; }
+        
+        .discovery-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .discovery-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .discovery-title i { color: var(--nx-primary); }
+        
+        .discovery-subtitle {
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .discovery-main {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 24px;
+        }
+        
+        .discovery-sidebar {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .sidebar-header {
+            padding: 16px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-header i { color: var(--nx-primary); }
+        
+        .method-list { padding: 8px; }
+        
+        .method-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            margin-bottom: 4px;
+        }
+        
+        .method-item:hover { background: var(--nx-bg-hover); }
+        .method-item.active { background: var(--nx-primary-light); border: 1px solid var(--nx-primary); }
+        
+        .method-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .method-info { flex: 1; }
+        .method-name { font-weight: 500; font-size: 14px; }
+        .method-desc { font-size: 12px; color: var(--nx-text-secondary); margin-top: 2px; }
+        
+        .method-badge {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+        
+        .method-badge.ready { background: var(--nx-bg); color: var(--nx-text-secondary); }
+        .method-badge.running { background: var(--nx-warning-light); color: var(--nx-warning); }
+        .method-badge.done { background: var(--nx-success-light); color: var(--nx-success); }
+        
+        .discovery-content {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        
+        .radar-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .radar-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .radar-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .radar-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+        
+        .radar-body {
+            padding: 20px;
+        }
+        
+        .radar-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 20px;
+        }
+        
+        .radar-circle {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            border: 2px solid var(--nx-border);
+            position: relative;
+            background: 
+                radial-gradient(circle, transparent 30%, var(--nx-bg) 30%, var(--nx-bg) 32%, transparent 32%),
+                radial-gradient(circle, transparent 60%, var(--nx-bg) 60%, var(--nx-bg) 62%, transparent 62%);
+        }
+        
+        .radar-sweep {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 50%;
+            height: 50%;
+            transform-origin: bottom left;
+            background: linear-gradient(90deg, transparent, var(--nx-primary-light));
+            animation: radar-sweep 3s linear infinite;
+            border-radius: 0 100% 0 0;
+            opacity: 0.6;
+        }
+        
+        .radar-sweep.idle { animation: none; opacity: 0; }
+        
+        @keyframes radar-sweep {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .radar-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: var(--nx-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 24px;
+            box-shadow: 0 0 20px var(--nx-primary);
+        }
+        
+        .radar-dots {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .radar-dot {
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--nx-success);
+            box-shadow: 0 0 10px var(--nx-success);
+            animation: dot-pulse 1.5s ease-in-out infinite;
+        }
+        
+        @keyframes dot-pulse {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.3); opacity: 0.7; }
+        }
+        
+        .radar-stats {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+        }
+        
+        .stat-card {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            padding: 16px;
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--nx-primary);
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 4px;
+        }
+        
+        .config-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            padding: 20px;
+            display: none;
+        }
+        
+        .config-panel.show { display: block; }
+        
+        .config-title {
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .config-form {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+        }
+        
+        .form-group { margin-bottom: 0; }
+        .form-group.full { grid-column: span 2; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--nx-border);
+            border-radius: 6px;
+            background: var(--nx-bg);
+            font-size: 14px;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--nx-primary);
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 4px;
+        }
+        
+        .results-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .results-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .results-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .results-count {
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 12px;
+        }
+        
+        .results-filter {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .filter-chip {
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 12px;
+            cursor: pointer;
+            background: var(--nx-bg);
+            border: 1px solid var(--nx-border);
+            transition: all 0.2s;
+        }
+        
+        .filter-chip:hover { border-color: var(--nx-primary); }
+        .filter-chip.active { background: var(--nx-primary); color: white; border-color: var(--nx-primary); }
+        
+        .results-body {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .result-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            transition: background 0.2s;
+        }
+        
+        .result-item:hover { background: var(--nx-bg-hover); }
+        .result-item:last-child { border-bottom: none; }
+        
+        .result-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+        
+        .result-icon.type-SERVICE { background: #dbeafe; color: #2563eb; }
+        .result-icon.type-AI { background: #fce7f3; color: #db2777; }
+        .result-icon.type-COMMUNICATION { background: #d1fae5; color: #059669; }
+        .result-icon.type-STORAGE { background: #fef3c7; color: #d97706; }
+        .result-icon.type-SKILL { background: #cffafe; color: #0891b2; }
+        .result-icon.type-CUSTOM { background: #f1f5f9; color: #64748b; }
+        
+        .result-info { flex: 1; min-width: 0; }
+        .result-name { font-weight: 600; font-size: 15px; }
+        .result-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
+        .result-desc { font-size: 13px; color: var(--nx-text-secondary); margin-top: 4px; }
+        
+        .result-meta {
+            display: flex;
+            gap: 16px;
+            margin-top: 8px;
+        }
+        
+        .meta-item {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .result-actions {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .logs-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .logs-header {
+            padding: 12px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .logs-body {
+            max-height: 200px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 12px;
+            display: none;
+        }
+        
+        .logs-body.show { display: block; }
+        
+        .log-entry {
+            padding: 8px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            gap: 12px;
+        }
+        
+        .log-time { color: var(--nx-text-secondary); min-width: 80px; }
+        .log-level { min-width: 50px; font-weight: 500; }
+        .log-level.info { color: var(--nx-primary); }
+        .log-level.warn { color: var(--nx-warning); }
+        .log-level.error { color: var(--nx-danger); }
+        .log-level.success { color: var(--nx-success); }
+        .log-msg { flex: 1; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+        .empty-state-desc { font-size: 14px; }
+        
+        .install-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.5);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+        
+        .install-modal.show { display: flex; }
+        
+        .install-dialog {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            width: 480px;
+            max-width: 90%;
+        }
+        
+        .install-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+        }
+        
+        .install-body { padding: 20px; }
+        
+        .install-progress {
+            height: 8px;
+            background: var(--nx-bg);
+            border-radius: 4px;
+            overflow: hidden;
+            margin-bottom: 16px;
+        }
+        
+        .install-progress-bar {
+            height: 100%;
+            background: var(--nx-primary);
+            transition: width 0.3s;
+        }
+        
+        .install-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        
+        .install-step {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--nx-bg);
+            border-radius: 8px;
+        }
+        
+        .step-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+        }
+        
+        .step-icon.pending { background: var(--nx-border); color: var(--nx-text-secondary); }
+        .step-icon.running { background: var(--nx-warning-light); color: var(--nx-warning); }
+        .step-icon.done { background: var(--nx-success-light); color: var(--nx-success); }
+        
+        .step-info { flex: 1; }
+        .step-name { font-weight: 500; font-size: 14px; }
+        .step-status { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .install-footer {
+            padding: 16px 20px;
+            border-top: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <div class="discovery-page">
+                <header class="nx-page__header" style="border-bottom: none;">
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                            <i class="ri-menu-line"></i>
+                        </button>
+                        <div>
+                            <h2 class="discovery-title">
+                                <i class="ri-compass-discover-line"></i>
+                                发现能力
+                            </h2>
+                            <p class="discovery-subtitle">从多种渠道发现并安装新能力</p>
+                        </div>
+                    </div>
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                            <i class="ri-sun-line"></i>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="discovery-main">
+                    <aside class="discovery-sidebar">
+                        <div class="sidebar-header">
+                            <i class="ri-route-line"></i>
+                            发现途径
+                        </div>
+                        <div class="method-list" id="methodList">
+                        </div>
+                    </aside>
+                    
+                    <div class="discovery-content">
+                        <div class="radar-panel">
+                            <div class="radar-header">
+                                <div class="radar-title">
+                                    <i class="ri-radar-line"></i>
+                                    <span id="radarTitle">能力雷达</span>
+                                </div>
+                                <div class="radar-status">
+                                    <span id="radarStatusText">就绪</span>
+                                    <button class="nx-btn nx-btn--primary nx-btn--sm" id="startBtn" onclick="startDiscovery()">
+                                        <i class="ri-search-line"></i> 开始扫描
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="radar-body">
+                                <div class="radar-visual">
+                                    <div class="radar-circle">
+                                        <div class="radar-sweep" id="radarSweep"></div>
+                                        <div class="radar-dots" id="radarDots"></div>
+                                        <div class="radar-center">
+                                            <i class="ri-flashlight-line"></i>
+                                        </div>
+                                    </div>
+                                    <div class="radar-stats">
+                                        <div class="stat-card">
+                                            <div class="stat-value" id="statScanned">0</div>
+                                            <div class="stat-label">已扫描</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value" id="statFound">0</div>
+                                            <div class="stat-label">已发现</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value" id="statNew">0</div>
+                                            <div class="stat-label">新能力</div>
+                                        </div>
+                                        <div class="stat-card">
+                                            <div class="stat-value" id="statInstalled">0</div>
+                                            <div class="stat-label">已安装</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="config-panel" id="configPanel">
+                            <div class="config-title">
+                                <i class="ri-settings-3-line"></i>
+                                <span id="configTitle">配置</span>
+                            </div>
+                            <div class="config-form" id="configForm">
+                            </div>
+                            <div style="margin-top: 16px; display: flex; gap: 8px;">
+                                <button class="nx-btn nx-btn--secondary" onclick="hideConfig()">取消</button>
+                                <button class="nx-btn nx-btn--primary" onclick="applyConfig()">应用并扫描</button>
+                            </div>
+                        </div>
+                        
+                        <div class="results-panel">
+                            <div class="results-header">
+                                <div class="results-title">
+                                    <i class="ri-list-check"></i>
+                                    发现结果
+                                    <span class="results-count" id="resultsCount">0</span>
+                                </div>
+                                <div class="results-filter">
+                                    <span class="filter-chip active" data-filter="all">全部</span>
+                                    <span class="filter-chip" data-filter="new">新能力</span>
+                                    <span class="filter-chip" data-filter="installed">已安装</span>
+                                </div>
+                            </div>
+                            <div class="results-body" id="resultsBody">
+                                <div class="empty-state">
+                                    <i class="ri-radar-line"></i>
+                                    <div class="empty-state-title">尚未开始扫描</div>
+                                    <div class="empty-state-desc">选择发现途径后点击"开始扫描"</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="logs-panel">
+                            <div class="logs-header" onclick="toggleLogs()">
+                                <i class="ri-file-list-3-line"></i>
+                                发现日志
+                                <i class="ri-arrow-down-s-line" style="margin-left: auto;"></i>
+                            </div>
+                            <div class="logs-body" id="logsBody">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="install-modal" id="installModal">
+        <div class="install-dialog">
+            <div class="install-header">
+                <i class="ri-download-line"></i>
+                安装能力
+            </div>
+            <div class="install-body">
+                <div class="install-progress">
+                    <div class="install-progress-bar" id="installProgress" style="width: 0%"></div>
+                </div>
+                <div class="install-steps" id="installSteps">
+                </div>
+            </div>
+            <div class="install-footer">
+                <button class="nx-btn nx-btn--secondary" id="installCancel" onclick="cancelInstall()">取消</button>
+                <button class="nx-btn nx-btn--primary" id="installDone" onclick="closeInstall()" style="display: none;">完成</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/llm-assistant.js"></script>
+    <script src="/console/js/pages/capability-discovery.js"></script>
+</body>
+</html>

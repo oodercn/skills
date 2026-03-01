@@ -1,0 +1,51 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-conversation
+  name: LLM会话管理
+  version: 1.0.0
+  description: LLM会话管理服务，支持多轮对话上下文持久化和历史记录管理
+  author: ooder Team
+  type: system-service
+
+spec:
+  type: system-service
+  
+  capabilities:
+    - id: conversation-create
+      name: 创建会话
+      description: 创建新的对话会话
+      category: llm
+    - id: conversation-manage
+      name: 会话管理
+      description: 管理对话会话历史
+      category: llm
+    - id: context-persistence
+      name: 上下文持久化
+      description: 多轮对话上下文持久化存储
+      category: llm
+    - id: message-history
+      name: 消息历史
+      description: 对话消息历史记录管理
+      category: llm
+      
+  apis:
+    - path: /api/v1/conversation
+      method: POST
+      description: 创建会话
+    - path: /api/v1/conversation/{id}
+      method: GET
+      description: 获取会话详情
+    - path: /api/v1/conversation/{id}/messages
+      method: POST
+      description: 添加消息
+    - path: /api/v1/conversation/{id}/messages
+      method: GET
+      description: 获取消息历史
+    - path: /api/v1/conversation/user/{userId}
+      method: GET
+      description: 获取用户会话列表
+      
+  dependencies:
+    - skill-llm-core

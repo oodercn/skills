@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Nexus Console - 局域网管理中心">
+    <meta name="theme-color" content="#000000">
+    <title>Nexus Console - 局域网管理中心</title>
+    <link rel="stylesheet" href="../../css/theme.css">
+    <link rel="stylesheet" href="../../css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="../../css/nexus.css">
+    <link rel="stylesheet" href="../../css/main.css">
+    <link rel="stylesheet" href="lan.css">
+</head>
+<body>
+    <div class="container">
+        <nav class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ri-wifi-line"></i>
+                    <span>局域网管理</span>
+                </div>
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="ri-menu-fold-line"></i>
+                </button>
+            </div>
+            
+            <div class="sidebar-content">
+                <div class="menu-section">
+                    <div class="menu-section-title">网络概览</div>
+                    <ul class="menu-list">
+                        <li class="menu-item active">
+                            <a href="#dashboard">
+                                <i class="ri-dashboard-line"></i>
+                                <span>网络仪表盘</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#topology">
+                                <i class="ri-git-branch-line"></i>
+                                <span>网络拓扑</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#devices">
+                                <i class="ri-device-line"></i>
+                                <span>设备列表</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-section-title">网络管理</div>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="#bandwidth">
+                                <i class="ri-speed-line"></i>
+                                <span>带宽管理</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#firewall">
+                                <i class="ri-shield-line"></i>
+                                <span>防火墙</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#dhcp">
+                                <i class="ri-server-line"></i>
+                                <span>DHCP管理</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#dns">
+                                <i class="ri-global-line"></i>
+                                <span>DNS设置</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-section-title">监控</div>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="#traffic">
+                                <i class="ri-line-chart-line"></i>
+                                <span>流量监控</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="#logs">
+                                <i class="ri-file-list-line"></i>
+                                <span>系统日志</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="menu-section">
+                    <div class="menu-section-title">系统</div>
+                    <ul class="menu-list">
+                        <li class="menu-item">
+                            <a href="#settings">
+                                <i class="ri-settings-3-line"></i>
+                                <span>系统设置</span>
+                            </a>
+                        </li>
+                        <li class="menu-item">
+                            <a href="../../nexus-main.html">
+                                <i class="ri-arrow-left-line"></i>
+                                <span>返回首页</span>
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <div class="page-title">
+                    <h1><i class="ri-wifi-line"></i> 网络仪表盘</h1>
+                    <p>局域网状态总览和设备管理</p>
+                </div>
+                <div class="page-actions">
+                    <button class="btn btn-secondary" onclick="LanPage.refreshData()">
+                        <i class="ri-refresh-line"></i> 刷新
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="ri-radar-line"></i> 扫描网络
+                    </button>
+                </div>
+            </header>
+            
+            <div class="dashboard-grid">
+                <div class="stat-card">
+                    <div class="stat-icon devices">
+                        <i class="ri-device-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>在线设备</h3>
+                        <p class="stat-value">24</p>
+                        <span class="stat-change positive">全部在线</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon bandwidth">
+                        <i class="ri-speed-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>当前带宽</h3>
+                        <p class="stat-value">156 Mbps</p>
+                        <span class="stat-change">下行: 120 / 上行: 36</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon latency">
+                        <i class="ri-timer-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>网络延迟</h3>
+                        <p class="stat-value">12 ms</p>
+                        <span class="stat-change positive">网络良好</span>
+                    </div>
+                </div>
+                
+                <div class="stat-card">
+                    <div class="stat-icon security">
+                        <i class="ri-shield-check-line"></i>
+                    </div>
+                    <div class="stat-info">
+                        <h3>安全状态</h3>
+                        <p class="stat-value">安全</p>
+                        <span class="stat-change positive">无威胁</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="content-grid">
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2><i class="ri-device-line"></i> 最近设备</h2>
+                        <a href="#devices" class="btn btn-sm btn-secondary">查看全部</a>
+                    </div>
+                    
+                    <div class="device-list">
+                        <div class="device-row">
+                            <div class="device-info">
+                                <i class="ri-computer-line"></i>
+                                <div>
+                                    <h4>DESKTOP-PC01</h4>
+                                    <p>192.168.1.100</p>
+                                </div>
+                            </div>
+                            <div class="device-stats">
+                                <span class="badge badge-success">在线</span>
+                                <span class="traffic">↓ 45 Mbps ↑ 12 Mbps</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-row">
+                            <div class="device-info">
+                                <i class="ri-smartphone-line"></i>
+                                <div>
+                                    <h4>iPhone-15</h4>
+                                    <p>192.168.1.101</p>
+                                </div>
+                            </div>
+                            <div class="device-stats">
+                                <span class="badge badge-success">在线</span>
+                                <span class="traffic">↓ 8 Mbps ↑ 2 Mbps</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-row">
+                            <div class="device-info">
+                                <i class="ri-tv-line"></i>
+                                <div>
+                                    <h4>Smart-TV</h4>
+                                    <p>192.168.1.102</p>
+                                </div>
+                            </div>
+                            <div class="device-stats">
+                                <span class="badge badge-success">在线</span>
+                                <span class="traffic">↓ 25 Mbps ↑ 1 Mbps</span>
+                            </div>
+                        </div>
+                        
+                        <div class="device-row">
+                            <div class="device-info">
+                                <i class="ri-router-line"></i>
+                                <div>
+                                    <h4>OpenWrt-Router</h4>
+                                    <p>192.168.1.1</p>
+                                </div>
+                            </div>
+                            <div class="device-stats">
+                                <span class="badge badge-primary">网关</span>
+                                <span class="traffic">↓ 156 Mbps ↑ 36 Mbps</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="content-section">
+                    <div class="section-header">
+                        <h2><i class="ri-pie-chart-line"></i> 流量分布</h2>
+                    </div>
+                    
+                    <div class="traffic-chart">
+                        <div class="chart-item">
+                            <div class="chart-label">
+                                <span class="chart-color" style="background: #3b82f6;"></span>
+                                <span>视频流媒体</span>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="chart-fill" style="width: 45%; background: #3b82f6;"></div>
+                            </div>
+                            <span class="chart-value">45%</span>
+                        </div>
+                        
+                        <div class="chart-item">
+                            <div class="chart-label">
+                                <span class="chart-color" style="background: #10b981;"></span>
+                                <span>网页浏览</span>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="chart-fill" style="width: 25%; background: #10b981;"></div>
+                            </div>
+                            <span class="chart-value">25%</span>
+                        </div>
+                        
+                        <div class="chart-item">
+                            <div class="chart-label">
+                                <span class="chart-color" style="background: #f59e0b;"></span>
+                                <span>文件下载</span>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="chart-fill" style="width: 15%; background: #f59e0b;"></div>
+                            </div>
+                            <span class="chart-value">15%</span>
+                        </div>
+                        
+                        <div class="chart-item">
+                            <div class="chart-label">
+                                <span class="chart-color" style="background: #8b5cf6;"></span>
+                                <span>其他</span>
+                            </div>
+                            <div class="chart-bar">
+                                <div class="chart-fill" style="width: 15%; background: #8b5cf6;"></div>
+                            </div>
+                            <span class="chart-value">15%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="../../js/nexus.js"></script>
+    <script src="../../js/theme-manager.js"></script>
+    <script src="lan.js"></script>
+</body>
+</html>

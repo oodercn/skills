@@ -1,0 +1,181 @@
+{
+    "menu": [
+        {
+            "id": "my-workspace",
+            "name": "我的工作台",
+            "icon": "ri-home-line",
+            "roles": ["personal", "enterprise", "admin"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "my-scenes",
+                    "name": "我的场景",
+                    "icon": "ri-artboard-line",
+                    "url": "/console/pages/my-scenes.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "我创建的、我启动的场景"
+                },
+                {
+                    "id": "my-todos",
+                    "name": "我的待办",
+                    "icon": "ri-task-line",
+                    "url": "/console/pages/my-todos.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "协作邀请、领导委派的任务"
+                },
+                {
+                    "id": "my-history",
+                    "name": "已完成场景",
+                    "icon": "ri-history-line",
+                    "url": "/console/pages/my-history.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "历史场景执行记录"
+                }
+            ]
+        },
+        {
+            "id": "dashboard",
+            "name": "仪表盘",
+            "icon": "ri-dashboard-line",
+            "url": "/console/pages/scene-management.html",
+            "roles": ["personal", "enterprise", "admin"],
+            "status": "implemented"
+        },
+        {
+            "id": "scene-management",
+            "name": "场景管理",
+            "icon": "ri-artboard-line",
+            "url": "/console/pages/scene-management.html",
+            "roles": ["personal", "enterprise", "admin"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "scene-list",
+                    "name": "场景列表",
+                    "icon": "ri-list-check",
+                    "url": "/console/pages/scene-management.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "scene-detail",
+                    "name": "场景详情",
+                    "icon": "ri-file-list-3-line",
+                    "url": "/console/pages/scene-detail.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                }
+            ]
+        },
+        {
+            "id": "scene-group-management",
+            "name": "场景组管理",
+            "icon": "ri-group-line",
+            "url": "/console/pages/scene-group-management.html",
+            "roles": ["enterprise", "admin"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "scene-group-list",
+                    "name": "场景组列表",
+                    "icon": "ri-list-check",
+                    "url": "/console/pages/scene-group-management.html",
+                    "roles": ["enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "scene-group-detail",
+                    "name": "场景组详情",
+                    "icon": "ri-file-list-3-line",
+                    "url": "/console/pages/scene-group-detail.html",
+                    "roles": ["enterprise", "admin"],
+                    "status": "implemented"
+                }
+            ]
+        },
+        {
+            "id": "template-management",
+            "name": "模板管理",
+            "icon": "ri-file-copy-line",
+            "url": "/console/pages/template-management.html",
+            "roles": ["enterprise", "admin"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "template-list",
+                    "name": "模板列表",
+                    "icon": "ri-list-check",
+                    "url": "/console/pages/template-management.html",
+                    "roles": ["enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "template-detail",
+                    "name": "模板详情",
+                    "icon": "ri-file-list-3-line",
+                    "url": "/console/pages/template-detail.html",
+                    "roles": ["enterprise", "admin"],
+                    "status": "implemented"
+                }
+            ]
+        },
+        {
+            "id": "capability-center",
+            "name": "能力中心",
+            "icon": "ri-flashlight-line",
+            "url": "/console/pages/capability-discovery.html",
+            "roles": ["personal", "enterprise", "admin"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "capability-discovery",
+                    "name": "发现能力",
+                    "icon": "ri-compass-discover-line",
+                    "url": "/console/pages/capability-discovery.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "从多种渠道发现新能力"
+                },
+                {
+                    "id": "my-capabilities",
+                    "name": "我的能力",
+                    "icon": "ri-user-star-line",
+                    "url": "/console/pages/my-capabilities.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "查看和管理已安装的能力"
+                },
+                {
+                    "id": "capability-binding",
+                    "name": "能力绑定",
+                    "icon": "ri-link",
+                    "url": "/console/pages/capability-binding.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "配置能力与场景组的关联"
+                },
+                {
+                    "id": "capability-create",
+                    "name": "创建能力",
+                    "icon": "ri-add-circle-line",
+                    "url": "/console/pages/capability-create.html",
+                    "roles": ["enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "手动创建或LLM生成能力"
+                },
+                {
+                    "id": "capability-stats",
+                    "name": "能力统计",
+                    "icon": "ri-bar-chart-box-line",
+                    "url": "/console/pages/capability-stats.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented",
+                    "description": "能力调用统计和性能监控"
+                }
+            ]
+        }
+    ]
+}

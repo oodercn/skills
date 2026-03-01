@@ -1,0 +1,69 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-knowledge-ui
+  name: 知识库管理
+  version: 1.0.0
+  description: 知识库管理界面，支持知识库创建、文档上传、检索测试
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: 知识库
+      icon: ri-book-3-line
+      
+    menu:
+      position: sidebar
+      category: knowledge
+      order: 10
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: kb-view
+      name: 查看知识库
+      description: 查看知识库列表和详情
+      category: ui
+    - id: kb-manage
+      name: 管理知识库
+      description: 创建和管理知识库
+      category: ui
+    - id: kb-search
+      name: 检索测试
+      description: 测试知识库检索功能
+      category: ui
+      
+  apis:
+    - path: /api/v1/kb
+      method: GET
+      description: 获取知识库列表
+    - path: /api/v1/kb
+      method: POST
+      description: 创建知识库
+    - path: /api/v1/kb/{id}
+      method: PUT
+      description: 更新知识库
+    - path: /api/v1/kb/{id}
+      method: DELETE
+      description: 删除知识库
+    - path: /api/v1/kb/{kbId}/documents
+      method: GET
+      description: 获取文档列表
+    - path: /api/v1/kb/{kbId}/documents
+      method: POST
+      description: 添加文档
+    - path: /api/v1/kb/{kbId}/search
+      method: POST
+      description: 搜索知识库
+      
+  dependencies:
+    - skill-knowledge-base

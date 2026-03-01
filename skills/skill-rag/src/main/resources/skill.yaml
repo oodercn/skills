@@ -1,0 +1,33 @@
+id: skill-rag
+name: RAG Engine Skill
+version: 1.0.0
+description: Retrieval Augmented Generation with multiple strategies
+port: 8090
+
+capabilities:
+  - id: retrieval
+    name: Document Retrieval
+    description: Retrieve documents using keyword, semantic or hybrid strategies
+    endpoints:
+      - POST /api/v1/rag/retrieve
+      
+  - id: prompt-building
+    name: Prompt Building
+    description: Build prompts with retrieved context
+    endpoints:
+      - POST /api/v1/rag/prompt
+      - POST /api/v1/rag/prompt/custom
+      
+  - id: kb-registration
+    name: Knowledge Base Registration
+    description: Register external knowledge bases
+    endpoints:
+      - POST /api/v1/rag/kb/{kbId}/register
+      - DELETE /api/v1/rag/kb/{kbId}
+
+strategies:
+  - KEYWORD
+  - SEMANTIC
+  - HYBRID
+
+dependencies: []

@@ -1,0 +1,33 @@
+id: skill-knowledge-base
+name: Knowledge Base Skill
+version: 1.0.0
+description: Knowledge base management with BM25 search
+port: 8089
+
+capabilities:
+  - id: kb-management
+    name: Knowledge Base Management
+    description: Create, update, delete knowledge bases
+    endpoints:
+      - POST /api/v1/kb
+      - GET /api/v1/kb/{id}
+      - PUT /api/v1/kb/{id}
+      - DELETE /api/v1/kb/{id}
+      
+  - id: document-management
+    name: Document Management
+    description: Manage documents in knowledge bases
+    endpoints:
+      - POST /api/v1/kb/{kbId}/documents
+      - GET /api/v1/kb/{kbId}/documents
+      - PUT /api/v1/kb/{kbId}/documents/{docId}
+      - DELETE /api/v1/kb/{kbId}/documents/{docId}
+      
+  - id: search
+    name: Knowledge Search
+    description: BM25-based document search
+    endpoints:
+      - POST /api/v1/kb/{kbId}/search
+      - POST /api/v1/kb/search/multi
+
+dependencies: []

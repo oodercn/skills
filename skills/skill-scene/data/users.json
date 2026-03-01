@@ -1,0 +1,72 @@
+{
+  "user-hr-001" : {
+    "userId" : "user-hr-001",
+    "name" : "刘HR",
+    "email" : "liu.hr@example.com",
+    "phone" : null,
+    "departmentId" : "dept-hr",
+    "role" : "hr",
+    "title" : "HR经理",
+    "avatar" : null,
+    "permissions" : null,
+    "createTime" : 1772377373222,
+    "updateTime" : 0,
+    "active" : true
+  },
+  "user-employee-003" : {
+    "userId" : "user-employee-003",
+    "name" : "赵员工",
+    "email" : "zhao.employee@example.com",
+    "phone" : null,
+    "departmentId" : "dept-rd",
+    "role" : "employee",
+    "title" : "工程师",
+    "avatar" : null,
+    "permissions" : null,
+    "createTime" : 1772377373222,
+    "updateTime" : 0,
+    "active" : true
+  },
+  "user-employee-002" : {
+    "userId" : "user-employee-002",
+    "name" : "王员工",
+    "email" : "wang.employee@example.com",
+    "phone" : null,
+    "departmentId" : "dept-rd",
+    "role" : "employee",
+    "title" : "工程师",
+    "avatar" : null,
+    "permissions" : null,
+    "createTime" : 1772377373222,
+    "updateTime" : 0,
+    "active" : true
+  },
+  "user-employee-001" : {
+    "userId" : "user-employee-001",
+    "name" : "李员工",
+    "email" : "li.employee@example.com",
+    "phone" : null,
+    "departmentId" : "dept-rd",
+    "role" : "employee",
+    "title" : "高级工程师",
+    "avatar" : null,
+    "permissions" : null,
+    "createTime" : 1772377373222,
+    "updateTime" : 0,
+    "active" : true
+  },
+  "user-manager-001" : {
+    "userId" : "user-manager-001",
+    "name" : "张经理",
+    "email" : "zhang.manager@example.com",
+    "phone" : null,
+    "departmentId" : "dept-rd",
+    "role" : "manager",
+    "title" : "研发经理",
+    "avatar" : null,
+    "permissions" : null,
+    "createTime" : 1772377373222,
+    "updateTime" : 0,
+    "active" : true
+  }
+}

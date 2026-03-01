@@ -4,11 +4,15 @@ server:
 spring:
   application:
     name: skill-ui-test
+  http:
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 nexus:
   skills:
     path: ./skills
-    auto-scan: true
   menu:
     config:
       path: ./menu-config.json

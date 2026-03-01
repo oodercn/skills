@@ -1,5 +1,19 @@
 {
   "menu" : [ {
+    "id" : "skill-personal-dashboard-nexus-ui",
+    "name" : "个人仪表盘",
+    "icon" : "ri-dashboard-line",
+    "url" : "/console/skills/skill-personal-dashboard-nexus-ui/ui/pages/index.html",
+    "status" : "implemented",
+    "roles" : "personal,mcp"
+  }, {
+    "id" : "skill-storage-management-nexus-ui",
+    "name" : "存储管理",
+    "icon" : "ri-hard-drive-2-line",
+    "url" : "/console/skills/skill-storage-management-nexus-ui/ui/pages/index.html",
+    "status" : "implemented",
+    "roles" : "personal,mcp"
+  }, {
     "id" : "skill-nexus-system-status-nexus-ui",
     "name" : "系统状态",
     "icon" : "ri-computer-line",
@@ -14,17 +28,10 @@
     "status" : "implemented",
     "roles" : "personal,mcp"
   }, {
-    "id" : "skill-personal-dashboard-nexus-ui",
-    "name" : "个人仪表盘",
+    "id" : "skill-nexus-dashboard-nexus-ui",
+    "name" : "Nexus仪表盘",
     "icon" : "ri-dashboard-line",
-    "url" : "/console/skills/skill-personal-dashboard-nexus-ui/ui/pages/index.html",
-    "status" : "implemented",
-    "roles" : "personal,mcp"
-  }, {
-    "id" : "skill-storage-management-nexus-ui",
-    "name" : "存储管理",
-    "icon" : "ri-hard-drive-2-line",
-    "url" : "/console/skills/skill-storage-management-nexus-ui/ui/pages/index.html",
+    "url" : "/console/skills/skill-nexus-dashboard-nexus-ui/ui/pages/index.html",
     "status" : "implemented",
     "roles" : "personal,mcp"
   } ]

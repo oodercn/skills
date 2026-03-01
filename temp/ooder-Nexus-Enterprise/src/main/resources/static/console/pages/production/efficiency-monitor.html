@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>效率监控 - 生产管理 - eNexus Enterprise</title>
+    <link rel="stylesheet" href="/console/css/common.css">
+    <link rel="stylesheet" href="/console/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>eNexus Enterprise</h2>
+                <span class="version">SDK 2.3</span>
+            </div>
+            <nav id="nav-menu"></nav>
+        </div>
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span>生产管理</span>
+                    <span class="separator">/</span>
+                    <span>效率监控</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="ri-speed-line"></i> 效率监控</h1>
+                    <p class="page-description">实时监控生产效率，分析生产数据，提供优化建议</p>
+                </div>
+                
+                <div class="metrics-panel">
+                    <div class="metrics-header">
+                        <h3>效率指标概览</h3>
+                        <div class="time-selector">
+                            <button class="time-btn active">今日</button>
+                            <button class="time-btn">本周</button>
+                            <button class="time-btn">本月</button>
+                        </div>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(46, 204, 113, 0.1);">
+                                <i class="ri-speed-line" style="color: #2ecc71;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">92.5%</span>
+                                <span class="metric-label">整体效率</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>+5.2%</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(52, 152, 219, 0.1);">
+                                <i class="ri-time-line" style="color: #3498db;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">8.2h</span>
+                                <span class="metric-label">平均运行时间</span>
+                            </div>
+                            <div class="metric-trend down">
+                                <i class="ri-arrow-down-line"></i>
+                                <span>-0.5h</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(241, 196, 15, 0.1);">
+                                <i class="ri-pie-chart-line" style="color: #f1c40f;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">1,245</span>
+                                <span class="metric-label">完成任务数</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>+128</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(155, 89, 182, 0.1);">
+                                <i class="ri-user-star-line" style="color: #9b59b6;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">98.7%</span>
+                                <span class="metric-label">人员效率</span>
+                            </div>
+                            <div class="metric-trend up">
+                                <i class="ri-arrow-up-line"></i>
+                                <span>+2.1%</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="ri-line-chart-line"></i> 效率趋势</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="efficiency-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <h3><i class="ri-bar-chart-grouped-line"></i> 部门效率对比</h3>
+                        </div>
+                        <div class="panel-body">
+                            <div id="department-chart" style="height: 300px;"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="ri-list-check"></i> 效率详情</h3>
+                        <div class="panel-actions">
+                            <button class="btn btn-secondary"><i class="ri-download-line"></i> 导出</button>
+                            <button class="btn btn-primary"><i class="ri-refresh-line"></i> 刷新</button>
+                        </div>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>部门</th>
+                                    <th>效率评分</th>
+                                    <th>完成任务</th>
+                                    <th>平均时长</th>
+                                    <th>状态</th>
+                                    <th>趋势</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>生产一部</td>
+                                    <td><span class="score high">95.2%</span></td>
+                                    <td>328</td>
+                                    <td>7.8h</td>
+                                    <td><span class="status-badge success">优秀</span></td>
+                                    <td><i class="ri-arrow-up-line text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>生产二部</td>
+                                    <td><span class="score medium">88.6%</span></td>
+                                    <td>285</td>
+                                    <td>8.5h</td>
+                                    <td><span class="status-badge warning">良好</span></td>
+                                    <td><i class="ri-arrow-up-line text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>生产三部</td>
+                                    <td><span class="score high">93.1%</span></td>
+                                    <td>312</td>
+                                    <td>8.0h</td>
+                                    <td><span class="status-badge success">优秀</span></td>
+                                    <td><i class="ri-arrow-up-line text-success"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>生产四部</td>
+                                    <td><span class="score low">76.4%</span></td>
+                                    <td>198</td>
+                                    <td>9.2h</td>
+                                    <td><span class="status-badge danger">待改进</span></td>
+                                    <td><i class="ri-arrow-down-line text-danger"></i></td>
+                                </tr>
+                                <tr>
+                                    <td>生产五部</td>
+                                    <td><span class="score medium">85.8%</span></td>
+                                    <td>267</td>
+                                    <td>8.3h</td>
+                                    <td><span class="status-badge warning">良好</span></td>
+                                    <td><i class="ri-arrow-up-line text-success"></i></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMenu();
+        });
+    </script>
+</body>
+</html>

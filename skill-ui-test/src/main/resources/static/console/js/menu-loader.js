@@ -79,15 +79,22 @@ if (window.MenuLoader) {
          */
         async loadMenuConfig() {
             try {
-                // 从根路径加载菜单配置，确保从任何页面访问都正确
-                // 添加时间戳参数防止缓存
                 const timestamp = new Date().getTime();
-                const response = await fetch(`/console/menu-config.json?v=${timestamp}`);
+                
+                let response = await fetch(`/api/test/menu?v=${timestamp}`);
+                if (response.ok) {
+                    const data = await response.json();
+                    this.menuConfig = { menu: data.menu || data };
+                    console.log('[MenuLoader] 从API加载菜单配置成功:', this.menuConfig);
+                    return this.menuConfig;
+                }
+                
+                response = await fetch(`/console/menu-config.json?v=${timestamp}`);
                 if (!response.ok) {
                     throw new Error('菜单配置加载失败');
                 }
                 this.menuConfig = await response.json();
-                console.log('[MenuLoader] 菜单配置加载成功:', this.menuConfig);
+                console.log('[MenuLoader] 从静态文件加载菜单配置成功:', this.menuConfig);
                 return this.menuConfig;
             } catch (error) {
                 console.error('加载菜单配置错误:', error);

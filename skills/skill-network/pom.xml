@@ -7,27 +7,16 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
-    <groupId>net.ooder</groupId>
     <artifactId>skill-network</artifactId>
-    <version>2.3.0</version>
     <packaging>jar</packaging>
-
     <name>skill-network</name>
-    <description>Network Management Skill for Ooder Agent Platform - SDK 2.3 Migrated</description>
+    <description>Network Management Module - P2P networking, topology management, and device discovery</description>
 
     <dependencies>
-        <!-- SDK 2.3 核心 -->
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
-            <version>2.3</version>
-            <scope>provided</scope>
-        </dependency>
-        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -37,14 +26,12 @@
             <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <optional>true</optional>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
     </dependencies>
 
@@ -53,14 +40,6 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
-                </configuration>
             </plugin>
         </plugins>
     </build>

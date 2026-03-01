@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>云托管管理 - Nexus</title>
+    <link rel="stylesheet" href="/console/css/theme.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="hosting.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar" id="sidebar">
+            <div class="nx-sidebar-header">
+                <div class="nx-sidebar-logo">
+                    <i class="ri-cloud-line"></i>
+                    <span>云托管</span>
+                </div>
+                <button class="nx-sidebar-toggle" data-nx-sidebar-toggle>
+                    <i class="ri-menu-fold-line"></i>
+                </button>
+            </div>
+            <nav class="nx-sidebar-content">
+                <ul class="nav-menu" id="nav-menu"></ul>
+            </nav>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__header-left">
+                    <button class="nx-sidebar-toggle" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h1 class="nx-page__title">
+                        <i class="ri-cloud-line"></i>
+                        云托管管理
+                    </h1>
+                </div>
+                <div class="nx-page__header-right">
+                    <button class="nx-btn nx-btn--primary" onclick="HostingManager.showCreateModal()">
+                        <i class="ri-add-line"></i> 创建实例
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-grid nx-grid--4" id="stats-grid">
+                        <div class="nx-card">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon nx-stat-card__icon--primary">
+                                    <i class="ri-cloud-line"></i>
+                                </div>
+                                <div class="nx-stat-card__info">
+                                    <div class="nx-stat-card__value" id="instance-count">0</div>
+                                    <div class="nx-stat-card__label">实例总数</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-card">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon nx-stat-card__icon--success">
+                                    <i class="ri-play-circle-line"></i>
+                                </div>
+                                <div class="nx-stat-card__info">
+                                    <div class="nx-stat-card__value" id="running-count">0</div>
+                                    <div class="nx-stat-card__label">运行中</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-card">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon nx-stat-card__icon--warning">
+                                    <i class="ri-stop-circle-line"></i>
+                                </div>
+                                <div class="nx-stat-card__info">
+                                    <div class="nx-stat-card__value" id="stopped-count">0</div>
+                                    <div class="nx-stat-card__label">已停止</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-card">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon nx-stat-card__icon--info">
+                                    <i class="ri-cpu-line"></i>
+                                </div>
+                                <div class="nx-stat-card__info">
+                                    <div class="nx-stat-card__value" id="total-cpu">0</div>
+                                    <div class="nx-stat-card__label">CPU核心</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card nx-mt-6">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-cloud-line"></i> 云服务提供商
+                            </h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div class="provider-grid" id="provider-grid"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card nx-mt-6">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-list-check"></i> 实例列表
+                            </h3>
+                            <div class="nx-card__actions">
+                                <button class="nx-btn nx-btn--sm" onclick="HostingManager.refresh()">
+                                    <i class="ri-refresh-line"></i> 刷新
+                                </button>
+                            </div>
+                        </div>
+                        <div class="nx-card__body">
+                            <table class="nx-table" id="instance-table">
+                                <thead>
+                                    <tr>
+                                        <th>实例名称</th>
+                                        <th>提供商</th>
+                                        <th>状态</th>
+                                        <th>副本数</th>
+                                        <th>CPU/内存</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="instance-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="nx-modal" id="create-modal">
+        <div class="nx-modal__content">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title">创建托管实例</h3>
+                <button class="nx-modal__close" onclick="HostingManager.closeModal('create-modal')">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="nx-form-group">
+                    <label class="nx-form-label">实例名称</label>
+                    <input type="text" class="nx-input" id="instance-name" placeholder="输入实例名称">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-form-label">云服务提供商</label>
+                    <select class="nx-select" id="instance-provider">
+                        <option value="kubernetes">Kubernetes</option>
+                        <option value="aliyun">阿里云 ECS</option>
+                        <option value="tencent">腾讯云 CVM</option>
+                    </select>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-form-label">镜像地址</label>
+                    <input type="text" class="nx-input" id="instance-image" placeholder="例如: nginx:latest">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-form-label">副本数</label>
+                    <input type="number" class="nx-input" id="instance-replicas" value="1" min="1" max="10">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-form-label">CPU (核)</label>
+                    <input type="number" class="nx-input" id="instance-cpu" value="1" min="0.5" step="0.5">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-form-label">内存 (GB)</label>
+                    <input type="number" class="nx-input" id="instance-memory" value="1" min="0.5" step="0.5">
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn" onclick="HostingManager.closeModal('create-modal')">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="HostingManager.createInstance()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nx-modal" id="health-modal">
+        <div class="nx-modal__content">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title">实例健康状态</h3>
+                <button class="nx-modal__close" onclick="HostingManager.closeModal('health-modal')">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body" id="health-content"></div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="hosting.js"></script>
+</body>
+</html>

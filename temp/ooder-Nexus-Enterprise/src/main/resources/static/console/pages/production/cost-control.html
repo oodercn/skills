@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成本控制 - 生产管理 - eNexus Enterprise</title>
+    <link rel="stylesheet" href="/console/css/common.css">
+    <link rel="stylesheet" href="/console/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>eNexus Enterprise</h2>
+                <span class="version">SDK 2.3</span>
+            </div>
+            <nav id="nav-menu"></nav>
+        </div>
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span>生产管理</span>
+                    <span class="separator">/</span>
+                    <span>成本控制</span>
+                </div>
+            </header>
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="ri-money-cny-circle-line"></i> 成本控制</h1>
+                    <p class="page-description">全面分析生产成本，提供成本优化建议</p>
+                </div>
+                <div class="metrics-panel">
+                    <div class="metrics-grid">
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(46, 204, 113, 0.1);">
+                                <i class="ri-money-cny-circle-line" style="color: #2ecc71;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">¥125.8万</span>
+                                <span class="metric-label">本月成本</span>
+                            </div>
+                        </div>
+                        <div class="metric-item">
+                            <div class="metric-icon" style="background-color: rgba(52, 152, 219, 0.1);">
+                                <i class="ri-percent-line" style="color: #3498db;"></i>
+                            </div>
+                            <div class="metric-info">
+                                <span class="metric-value">-8.5%</span>
+                                <span class="metric-label">成本节约</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMenu();
+        });
+    </script>
+</body>
+</html>

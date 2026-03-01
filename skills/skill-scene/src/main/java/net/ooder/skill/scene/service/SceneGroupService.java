@@ -1,0 +1,51 @@
+package net.ooder.skill.scene.service;
+
+import net.ooder.skill.scene.dto.PageResult;
+import net.ooder.skill.scene.dto.scene.*;
+
+public interface SceneGroupService {
+    
+    SceneGroupDTO create(String templateId, SceneGroupConfigDTO config);
+    
+    boolean destroy(String sceneGroupId);
+    
+    SceneGroupDTO get(String sceneGroupId);
+    
+    PageResult<SceneGroupDTO> listAll(int pageNum, int pageSize);
+    
+    PageResult<SceneGroupDTO> listByTemplate(String templateId, int pageNum, int pageSize);
+    
+    PageResult<SceneGroupDTO> listByCreator(String creatorId, int pageNum, int pageSize);
+    
+    PageResult<SceneGroupDTO> listByParticipant(String participantId, int pageNum, int pageSize);
+    
+    boolean activate(String sceneGroupId);
+    
+    boolean deactivate(String sceneGroupId);
+    
+    boolean join(String sceneGroupId, SceneParticipantDTO participant);
+    
+    boolean leave(String sceneGroupId, String participantId);
+    
+    boolean changeRole(String sceneGroupId, String participantId, String newRole);
+    
+    PageResult<SceneParticipantDTO> listParticipants(String sceneGroupId, int pageNum, int pageSize);
+    
+    SceneParticipantDTO getParticipant(String sceneGroupId, String participantId);
+    
+    boolean bindCapability(String sceneGroupId, CapabilityBindingDTO binding);
+    
+    boolean unbindCapability(String sceneGroupId, String bindingId);
+    
+    PageResult<CapabilityBindingDTO> listCapabilityBindings(String sceneGroupId, int pageNum, int pageSize);
+    
+    SceneSnapshotDTO createSnapshot(String sceneGroupId);
+    
+    boolean restoreSnapshot(String sceneGroupId, SceneSnapshotDTO snapshot);
+    
+    boolean deleteSnapshot(String sceneGroupId, String snapshotId);
+    
+    FailoverStatusDTO getFailoverStatus(String sceneGroupId);
+    
+    boolean handleFailover(String sceneGroupId, String failedParticipantId);
+}

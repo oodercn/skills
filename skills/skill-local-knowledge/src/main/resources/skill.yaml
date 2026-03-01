@@ -1,0 +1,49 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+metadata:
+  name: skill-local-knowledge
+  version: "1.0.0"
+  description: 本地知识能力 - 文档检索、意图分类、术语映射、表单辅助、查询构建
+  author: ooder Team
+  
+spec:
+  type: SYSTEM_SERVICE
+  category: intelligence
+  
+  capabilities:
+    - id: local-search
+      name: 本地文档检索
+      description: 检索本地文档，支持关键词匹配和自动分类
+      category: search
+      
+    - id: intent-classify
+      name: 意图分类
+      description: 识别用户自然语言的操作意图
+      category: nlp
+      
+    - id: term-mapping
+      name: 术语映射
+      description: 将用户术语映射到系统概念
+      category: nlp
+      
+    - id: form-assist
+      name: 表单辅助
+      description: 通过自然语言辅助表单填写
+      category: ui
+      
+    - id: query-build
+      name: 查询构建
+      description: 将自然语言转换为查询条件
+      category: search
+
+  config:
+    knowledge:
+      local:
+        enabled: true
+        docPath: ./docs
+      index:
+        type: memory
+        algorithm: bm25
+      term:
+        builtin: true
+        userDefined: true

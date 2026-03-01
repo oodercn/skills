@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>网络管理 - Ooder Skills</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link href="/console/css/nexus.css" rel="stylesheet">
+    <style>
+        :root {
+            --ns-primary: #1890ff;
+            --ns-success: #52c41a;
+            --ns-warning: #faad14;
+            --ns-error: #ff4d4f;
+            --ns-bg: #f5f7fa;
+            --ns-card-bg: #ffffff;
+            --ns-border: #e8e8e8;
+            --ns-text: #333333;
+            --ns-text-secondary: #666666;
+            --ns-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        
+        body {
+            margin: 0;
+            padding: 20px;
+            background: var(--ns-bg);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--ns-text);
+            margin: 0;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--ns-card-bg);
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: var(--ns-shadow);
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: var(--ns-text-secondary);
+            margin-bottom: 8px;
+        }
+        
+        .stat-value {
+            font-size: 28px;
+            font-weight: 600;
+            color: var(--ns-text);
+        }
+        
+        .stat-value.success { color: var(--ns-success); }
+        .stat-value.warning { color: var(--ns-warning); }
+        .stat-value.error { color: var(--ns-error); }
+        
+        .toolbar {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+        
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.3s;
+        }
+        
+        .btn-primary {
+            background: var(--ns-primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #40a9ff;
+        }
+        
+        .btn-default {
+            background: white;
+            border: 1px solid var(--ns-border);
+            color: var(--ns-text);
+        }
+        
+        .btn-default:hover {
+            border-color: var(--ns-primary);
+            color: var(--ns-primary);
+        }
+        
+        .btn-success {
+            background: var(--ns-success);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--ns-error);
+            color: white;
+        }
+        
+        .tabs {
+            display: flex;
+            border-bottom: 1px solid var(--ns-border);
+            margin-bottom: 20px;
+        }
+        
+        .tab {
+            padding: 12px 24px;
+            border: none;
+            background: none;
+            font-size: 14px;
+            cursor: pointer;
+            color: var(--ns-text-secondary);
+            position: relative;
+        }
+        
+        .tab.active {
+            color: var(--ns-primary);
+        }
+        
+        .tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            right: 0;
+            height: 2px;
+            background: var(--ns-primary);
+        }
+        
+        .card {
+            background: var(--ns-card-bg);
+            border-radius: 8px;
+            box-shadow: var(--ns-shadow);
+            margin-bottom: 20px;
+        }
+        
+        .card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--ns-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .card-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin: 0;
+        }
+        
+        .card-body {
+            padding: 20px;
+        }
+        
+        .node-list {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 16px;
+        }
+        
+        .node-card {
+            background: #fafafa;
+            border-radius: 6px;
+            padding: 16px;
+            border: 1px solid var(--ns-border);
+        }
+        
+        .node-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .node-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background: linear-gradient(135deg, var(--ns-primary), #40a9ff);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        
+        .node-info {
+            flex: 1;
+        }
+        
+        .node-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+        
+        .node-type {
+            font-size: 12px;
+            color: var(--ns-text-secondary);
+        }
+        
+        .node-status {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .status-online {
+            background: #f6ffed;
+            color: var(--ns-success);
+        }
+        
+        .status-offline {
+            background: #fff7e6;
+            color: var(--ns-warning);
+        }
+        
+        .node-details {
+            font-size: 13px;
+            color: var(--ns-text-secondary);
+        }
+        
+        .node-details div {
+            margin-bottom: 4px;
+        }
+        
+        .topology-container {
+            min-height: 400px;
+            background: #fafafa;
+            border-radius: 6px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .topology-canvas {
+            width: 100%;
+            height: 400px;
+        }
+        
+        .device-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .device-table th,
+        .device-table td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid var(--ns-border);
+        }
+        
+        .device-table th {
+            background: #fafafa;
+            font-weight: 600;
+        }
+        
+        .device-table tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+        }
+        
+        .loading i {
+            font-size: 32px;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-header">
+        <h1 class="page-title">网络管理</h1>
+        <div>
+            <button class="btn btn-success" id="startBtn" onclick="startP2P()">
+                <i class="ri-play-line"></i> 启动服务
+            </button>
+            <button class="btn btn-danger" id="stopBtn" onclick="stopP2P()" style="display: none;">
+                <i class="ri-stop-line"></i> 停止服务
+            </button>
+            <button class="btn btn-default" onclick="loadData()">
+                <i class="ri-refresh-line"></i> 刷新
+            </button>
+        </div>
+    </div>
+    
+    <div class="stats-grid" id="statsGrid">
+        <div class="stat-card">
+            <div class="stat-label">总节点数</div>
+            <div class="stat-value" id="totalNodes">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">在线节点</div>
+            <div class="stat-value success" id="onlineNodes">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">活跃连接</div>
+            <div class="stat-value" id="activeConnections">-</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">平均延迟</div>
+            <div class="stat-value" id="avgLatency">-</div>
+        </div>
+    </div>
+    
+    <div class="tabs">
+        <button class="tab active" data-tab="nodes" onclick="switchTab('nodes')">节点列表</button>
+        <button class="tab" data-tab="topology" onclick="switchTab('topology')">网络拓扑</button>
+        <button class="tab" data-tab="devices" onclick="switchTab('devices')">网络设备</button>
+    </div>
+    
+    <div id="nodesTab" class="tab-content">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">已发现节点</h3>
+            </div>
+            <div class="card-body">
+                <div class="node-list" id="nodeList">
+                    <div class="loading">
+                        <i class="ri-loader-4-line"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="topologyTab" class="tab-content" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">网络拓扑图</h3>
+            </div>
+            <div class="card-body">
+                <div class="topology-container">
+                    <canvas id="topologyCanvas" class="topology-canvas"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div id="devicesTab" class="tab-content" style="display: none;">
+        <div class="card">
+            <div class="card-header">
+                <h3 class="card-title">网络设备</h3>
+            </div>
+            <div class="card-body">
+                <table class="device-table">
+                    <thead>
+                        <tr>
+                            <th>名称</th>
+                            <th>类型</th>
+                            <th>IP地址</th>
+                            <th>MAC地址</th>
+                            <th>状态</th>
+                            <th>厂商</th>
+                        </tr>
+                    </thead>
+                    <tbody id="deviceTable">
+                        <tr>
+                            <td colspan="6" class="loading">
+                                <i class="ri-loader-4-line"></i>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        let p2pRunning = false;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadData();
+        });
+        
+        function switchTab(tab) {
+            document.querySelectorAll('.tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === tab);
+            });
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.style.display = 'none';
+            });
+            document.getElementById(tab + 'Tab').style.display = 'block';
+            
+            if (tab === 'topology') {
+                loadTopology();
+            }
+        }
+        
+        async function loadData() {
+            await Promise.all([
+                loadStatus(),
+                loadNodes(),
+                loadDevices()
+            ]);
+        }
+        
+        async function loadStatus() {
+            try {
+                const response = await fetch('/api/network/status');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const data = result.data;
+                    p2pRunning = data.p2pRunning;
+                    
+                    document.getElementById('totalNodes').textContent = data.totalNodes + 1;
+                    document.getElementById('onlineNodes').textContent = data.onlineNodes + 1;
+                    
+                    document.getElementById('startBtn').style.display = p2pRunning ? 'none' : 'inline-flex';
+                    document.getElementById('stopBtn').style.display = p2pRunning ? 'inline-flex' : 'none';
+                }
+            } catch (error) {
+                console.error('Load status error:', error);
+            }
+        }
+        
+        async function loadNodes() {
+            const container = document.getElementById('nodeList');
+            
+            try {
+                const response = await fetch('/api/network/nodes');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const nodes = result.data;
+                    
+                    if (nodes.length === 0) {
+                        container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--ns-text-secondary);">暂无节点数据</div>';
+                        return;
+                    }
+                    
+                    container.innerHTML = nodes.map(node => {
+                        const status = node.status ? node.status.code : 'offline';
+                        const statusClass = status === 'online' ? 'status-online' : 'status-offline';
+                        const statusText = status === 'online' ? '在线' : '离线';
+                        const type = node.type ? node.type.description : '未知';
+                        
+                        return `
+                            <div class="node-card">
+                                <div class="node-header">
+                                    <div class="node-icon">
+                                        <i class="ri-computer-line"></i>
+                                    </div>
+                                    <div class="node-info">
+                                        <div class="node-name">${node.name}</div>
+                                        <div class="node-type">${type}</div>
+                                    </div>
+                                    <span class="node-status ${statusClass}">${statusText}</span>
+                                </div>
+                                <div class="node-details">
+                                    <div><i class="ri-ip-line"></i> IP: ${node.ip || '-'}</div>
+                                    <div><i class="ri-router-line"></i> 端口: ${node.port || '-'}</div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                container.innerHTML = '<div style="text-align: center; padding: 40px; color: var(--ns-error);">加载失败</div>';
+            }
+        }
+        
+        async function loadDevices() {
+            const tbody = document.getElementById('deviceTable');
+            
+            try {
+                const response = await fetch('/api/network/devices');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const devices = result.data;
+                    
+                    if (devices.length === 0) {
+                        tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--ns-text-secondary);">暂无设备数据</td></tr>';
+                        return;
+                    }
+                    
+                    tbody.innerHTML = devices.map(device => {
+                        const statusClass = device.isOnline() ? 'status-online' : 'status-offline';
+                        const statusText = device.isOnline() ? '在线' : '离线';
+                        
+                        return `
+                            <tr>
+                                <td>${device.name}</td>
+                                <td>${device.type}</td>
+                                <td>${device.ipAddress}</td>
+                                <td>${device.macAddress}</td>
+                                <td><span class="node-status ${statusClass}">${statusText}</span></td>
+                                <td>${device.vendor || '-'}</td>
+                            </tr>
+                        `;
+                    }).join('');
+                }
+            } catch (error) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--ns-error);">加载失败</td></tr>';
+            }
+        }
+        
+        async function loadTopology() {
+            const canvas = document.getElementById('topologyCanvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            try {
+                const response = await fetch('/api/network/topology');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    const topology = result.data;
+                    
+                    ctx.fillStyle = '#f5f5f5';
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    topology.links.forEach(link => {
+                        const source = topology.nodes.find(n => n.id === link.source);
+                        const target = topology.nodes.find(n => n.id === link.target);
+                        
+                        if (source && target) {
+                            ctx.beginPath();
+                            ctx.moveTo(source.x || 100, source.y || 200);
+                            ctx.lineTo(target.x || 300, target.y || 200);
+                            ctx.strokeStyle = '#1890ff';
+                            ctx.lineWidth = 2;
+                            ctx.stroke();
+                        }
+                    });
+                    
+                    topology.nodes.forEach(node => {
+                        const x = node.x || 100;
+                        const y = node.y || 200;
+                        
+                        ctx.beginPath();
+                        ctx.arc(x, y, 25, 0, Math.PI * 2);
+                        ctx.fillStyle = node.status === 'online' ? '#52c41a' : '#faad14';
+                        ctx.fill();
+                        
+                        ctx.fillStyle = '#fff';
+                        ctx.font = '12px sans-serif';
+                        ctx.textAlign = 'center';
+                        ctx.fillText(node.name.substring(0, 6), x, y + 4);
+                    });
+                }
+            } catch (error) {
+                ctx.fillStyle = '#ff4d4f';
+                ctx.font = '14px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('加载拓扑失败', canvas.width / 2, canvas.height / 2);
+            }
+        }
+        
+        async function startP2P() {
+            try {
+                const response = await fetch('/api/network/start', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    p2pRunning = true;
+                    document.getElementById('startBtn').style.display = 'none';
+                    document.getElementById('stopBtn').style.display = 'inline-flex';
+                    loadData();
+                } else {
+                    alert(result.message || '启动失败');
+                }
+            } catch (error) {
+                alert('网络错误');
+            }
+        }
+        
+        async function stopP2P() {
+            try {
+                const response = await fetch('/api/network/stop', { method: 'POST' });
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    p2pRunning = false;
+                    document.getElementById('startBtn').style.display = 'inline-flex';
+                    document.getElementById('stopBtn').style.display = 'none';
+                    loadData();
+                } else {
+                    alert(result.message || '停止失败');
+                }
+            } catch (error) {
+                alert('网络错误');
+            }
+        }
+    </script>
+</body>
+</html>

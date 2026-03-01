@@ -159,8 +159,15 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
-    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/theme-manager.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async () => {
+            await NexusMenu.init();
+            ThemeManager.init();
+        });
+    </script>
     <script src="/console/js/pages/health-check.js"></script>
 </body>
 </html>

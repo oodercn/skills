@@ -1,0 +1,10 @@
+server:
+  port: 8090
+
+spring:
+  application:
+    name: skill-rag
+
+logging:
+  level:
+    net.ooder.skill.rag: DEBUG

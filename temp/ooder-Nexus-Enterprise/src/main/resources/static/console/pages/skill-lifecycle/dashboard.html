@@ -1,0 +1,1139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill 生命周期管理 - Nexus Console</title>
+    
+    <!-- Nexus UI Framework -->
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    
+    <style>
+        /* Skill 生命周期管理专用样式 */
+        .skill-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: var(--ns-spacing);
+        }
+        
+        .skill-card {
+            background: var(--ns-card-bg);
+            border: 1px solid var(--ns-border);
+            border-radius: var(--ns-radius);
+            padding: var(--ns-spacing);
+            transition: all var(--nx-transition-base);
+            cursor: pointer;
+        }
+        
+        .skill-card:hover {
+            border-color: var(--ns-primary);
+            box-shadow: var(--nx-shadow);
+            transform: translateY(-2px);
+        }
+        
+        .skill-card--active {
+            border-left: 3px solid var(--ns-success);
+        }
+        
+        .skill-card--inactive {
+            border-left: 3px solid var(--ns-secondary);
+        }
+        
+        .skill-card--error {
+            border-left: 3px solid var(--ns-danger);
+        }
+        
+        .skill-card__header {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-3);
+            margin-bottom: var(--nx-space-3);
+        }
+        
+        .skill-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: var(--nx-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .skill-card__icon--system {
+            background: var(--nx-primary-light);
+            color: var(--ns-primary);
+        }
+        
+        .skill-card__icon--app {
+            background: var(--nx-success-light);
+            color: var(--ns-success);
+        }
+        
+        .skill-card__title {
+            flex: 1;
+        }
+        
+        .skill-card__name {
+            font-size: var(--nx-text-base);
+            font-weight: var(--nx-font-semibold);
+            color: var(--ns-dark);
+            margin: 0;
+        }
+        
+        .skill-card__id {
+            font-size: var(--nx-text-xs);
+            color: var(--ns-secondary);
+        }
+        
+        .skill-card__status {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-2);
+            padding: var(--nx-space-1) var(--nx-space-2);
+            border-radius: var(--nx-radius-full);
+            font-size: var(--nx-text-xs);
+        }
+        
+        .skill-card__status--active {
+            background: var(--nx-success-light);
+            color: var(--ns-success);
+        }
+        
+        .skill-card__status--inactive {
+            background: var(--ns-bg-secondary);
+            color: var(--ns-secondary);
+        }
+        
+        .skill-card__status--error {
+            background: var(--nx-danger-light);
+            color: var(--ns-danger);
+        }
+        
+        .skill-card__meta {
+            display: flex;
+            gap: var(--nx-space-4);
+            margin-top: var(--nx-space-3);
+            padding-top: var(--nx-space-3);
+            border-top: 1px solid var(--ns-border);
+        }
+        
+        .skill-card__meta-item {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-1);
+            font-size: var(--nx-text-xs);
+            color: var(--ns-secondary);
+        }
+        
+        .skill-card__meta-item i {
+            font-size: 14px;
+        }
+        
+        /* 事件时间线 */
+        .event-timeline {
+            position: relative;
+            padding-left: 24px;
+        }
+        
+        .event-timeline::before {
+            content: '';
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: var(--ns-border);
+        }
+        
+        .event-item {
+            position: relative;
+            padding: var(--nx-space-3) 0;
+        }
+        
+        .event-item::before {
+            content: '';
+            position: absolute;
+            left: -20px;
+            top: 16px;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--ns-primary);
+            border: 2px solid var(--ns-card-bg);
+        }
+        
+        .event-item--success::before {
+            background: var(--ns-success);
+        }
+        
+        .event-item--error::before {
+            background: var(--ns-danger);
+        }
+        
+        .event-item--warning::before {
+            background: var(--ns-warning);
+        }
+        
+        .event-item__time {
+            font-size: var(--nx-text-xs);
+            color: var(--ns-secondary);
+        }
+        
+        .event-item__title {
+            font-size: var(--nx-text-sm);
+            color: var(--ns-dark);
+            margin: var(--nx-space-1) 0;
+        }
+        
+        .event-item__detail {
+            font-size: var(--nx-text-xs);
+            color: var(--ns-secondary);
+        }
+        
+        /* 统计卡片 */
+        .stat-card {
+            background: var(--ns-card-bg);
+            border: 1px solid var(--ns-border);
+            border-radius: var(--ns-radius);
+            padding: var(--ns-spacing);
+        }
+        
+        .stat-card__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--nx-space-3);
+        }
+        
+        .stat-card__label {
+            font-size: var(--nx-text-sm);
+            color: var(--ns-secondary);
+        }
+        
+        .stat-card__icon {
+            width: 32px;
+            height: 32px;
+            border-radius: var(--nx-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+        }
+        
+        .stat-card__icon--primary {
+            background: var(--nx-primary-light);
+            color: var(--ns-primary);
+        }
+        
+        .stat-card__icon--success {
+            background: var(--nx-success-light);
+            color: var(--ns-success);
+        }
+        
+        .stat-card__icon--warning {
+            background: var(--nx-warning-light);
+            color: var(--ns-warning);
+        }
+        
+        .stat-card__icon--danger {
+            background: var(--nx-danger-light);
+            color: var(--ns-danger);
+        }
+        
+        .stat-card__value {
+            font-size: var(--nx-text-3xl);
+            font-weight: var(--nx-font-bold);
+            color: var(--ns-dark);
+        }
+        
+        .stat-card__change {
+            font-size: var(--nx-text-xs);
+            margin-top: var(--nx-space-1);
+        }
+        
+        .stat-card__change--up {
+            color: var(--ns-success);
+        }
+        
+        .stat-card__change--down {
+            color: var(--ns-danger);
+        }
+        
+        /* 过滤器 */
+        .filter-bar {
+            display: flex;
+            gap: var(--nx-space-3);
+            margin-bottom: var(--ns-spacing);
+            flex-wrap: wrap;
+        }
+        
+        .filter-item {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-2);
+        }
+        
+        .filter-item__label {
+            font-size: var(--nx-text-sm);
+            color: var(--ns-secondary);
+        }
+        
+        /* 空状态 */
+        .empty-state {
+            text-align: center;
+            padding: var(--nx-space-12);
+            color: var(--ns-secondary);
+        }
+        
+        .empty-state__icon {
+            font-size: 48px;
+            margin-bottom: var(--nx-space-4);
+            opacity: 0.5;
+        }
+        
+        .empty-state__title {
+            font-size: var(--nx-text-lg);
+            margin-bottom: var(--nx-space-2);
+        }
+        
+        .empty-state__desc {
+            font-size: var(--nx-text-sm);
+        }
+        
+        /* 加载状态 */
+        .loading-state {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: var(--nx-space-12);
+            color: var(--ns-secondary);
+        }
+        
+        .loading-state__spinner {
+            animation: spin 1s linear infinite;
+            margin-right: var(--nx-space-2);
+        }
+        
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 详情面板 */
+        .detail-panel {
+            background: var(--ns-card-bg);
+            border: 1px solid var(--ns-border);
+            border-radius: var(--ns-radius);
+            padding: var(--ns-spacing);
+        }
+        
+        .detail-panel__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: var(--ns-spacing);
+            padding-bottom: var(--ns-spacing);
+            border-bottom: 1px solid var(--ns-border);
+        }
+        
+        .detail-panel__title {
+            font-size: var(--nx-text-lg);
+            font-weight: var(--nx-font-semibold);
+            color: var(--ns-dark);
+        }
+        
+        .detail-panel__close {
+            background: none;
+            border: none;
+            color: var(--ns-secondary);
+            cursor: pointer;
+            padding: var(--nx-space-1);
+            font-size: 20px;
+        }
+        
+        .detail-panel__close:hover {
+            color: var(--ns-dark);
+        }
+        
+        /* 标签页 */
+        .tabs {
+            display: flex;
+            gap: var(--nx-space-1);
+            border-bottom: 1px solid var(--ns-border);
+            margin-bottom: var(--ns-spacing);
+        }
+        
+        .tab {
+            padding: var(--nx-space-2) var(--nx-space-4);
+            font-size: var(--nx-text-sm);
+            color: var(--ns-secondary);
+            background: none;
+            border: none;
+            border-bottom: 2px solid transparent;
+            cursor: pointer;
+            transition: all var(--nx-transition-fast);
+        }
+        
+        .tab:hover {
+            color: var(--ns-dark);
+        }
+        
+        .tab--active {
+            color: var(--ns-primary);
+            border-bottom-color: var(--ns-primary);
+        }
+        
+        /* 代码块 */
+        .code-block {
+            background: var(--ns-input-bg);
+            border: 1px solid var(--ns-border);
+            border-radius: var(--nx-radius);
+            padding: var(--ns-spacing);
+            font-family: var(--nx-font-mono);
+            font-size: var(--nx-text-sm);
+            overflow-x: auto;
+        }
+        
+        .code-block pre {
+            margin: 0;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <!-- 侧边栏 -->
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <!-- 主内容区 -->
+        <main class="nx-page__content">
+            <!-- 顶部导航 -->
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-lg nx-font-semibold">Skill 生命周期管理</h2>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <i class="ri-sun-line"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <!-- 主内容 -->
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <!-- 统计卡片 -->
+                    <div class="nx-grid nx-grid-cols-4 nx-mb-6">
+                        <div class="stat-card">
+                            <div class="stat-card__header">
+                                <span class="stat-card__label">总 Skills</span>
+                                <div class="stat-card__icon stat-card__icon--primary">
+                                    <i class="ri-apps-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card__value" id="totalSkills">0</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-card__header">
+                                <span class="stat-card__label">运行中</span>
+                                <div class="stat-card__icon stat-card__icon--success">
+                                    <i class="ri-play-circle-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card__value" id="activeSkills">0</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-card__header">
+                                <span class="stat-card__label">异常</span>
+                                <div class="stat-card__icon stat-card__icon--danger">
+                                    <i class="ri-error-warning-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card__value" id="errorSkills">0</div>
+                        </div>
+                        
+                        <div class="stat-card">
+                            <div class="stat-card__header">
+                                <span class="stat-card__label">总事件</span>
+                                <div class="stat-card__icon stat-card__icon--warning">
+                                    <i class="ri-flashlight-line"></i>
+                                </div>
+                            </div>
+                            <div class="stat-card__value" id="totalEvents">0</div>
+                        </div>
+                    </div>
+                    
+                    <!-- 过滤器 -->
+                    <div class="filter-bar">
+                        <div class="filter-item">
+                            <span class="filter-item__label">状态:</span>
+                            <select class="nx-select" id="statusFilter" onchange="filterSkills()">
+                                <option value="">全部</option>
+                                <option value="active">运行中</option>
+                                <option value="inactive">已停止</option>
+                                <option value="error">异常</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-item__label">类型:</span>
+                            <select class="nx-select" id="typeFilter" onchange="filterSkills()">
+                                <option value="">全部</option>
+                                <option value="system">系统服务</option>
+                                <option value="application">应用能力</option>
+                            </select>
+                        </div>
+                        <div class="filter-item">
+                            <span class="filter-item__label">搜索:</span>
+                            <input type="text" class="nx-input" id="searchInput" placeholder="输入 Skill ID 或名称" oninput="filterSkills()">
+                        </div>
+                        <div class="nx-flex-1"></div>
+                        <button class="nx-btn nx-btn--primary" onclick="refreshData()">
+                            <i class="ri-refresh-line"></i> 刷新
+                        </button>
+                    </div>
+                    
+                    <!-- 主内容区 -->
+                    <div class="nx-grid" style="grid-template-columns: 2fr 1fr; gap: var(--ns-spacing);">
+                        <!-- Skill 列表 -->
+                        <div>
+                            <div class="nx-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-list-check"></i> Skill 列表
+                                    </h3>
+                                    <span class="nx-text-secondary" id="skillCount">0 个 Skill</span>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div id="skillList" class="skill-status-grid">
+                                        <!-- Skill 卡片将动态插入 -->
+                                    </div>
+                                    <div id="emptyState" class="empty-state" style="display: none;">
+                                        <div class="empty-state__icon">
+                                            <i class="ri-inbox-line"></i>
+                                        </div>
+                                        <div class="empty-state__title">暂无 Skill</div>
+                                        <div class="empty-state__desc">没有找到符合条件的 Skill</div>
+                                    </div>
+                                    <div id="loadingState" class="loading-state">
+                                        <i class="ri-loader-4-line loading-state__spinner"></i>
+                                        加载中...
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- 侧边面板 -->
+                        <div>
+                            <!-- 实时事件 -->
+                            <div class="nx-card nx-mb-4">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-time-line"></i> 实时事件
+                                    </h3>
+                                    <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="clearEvents()">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div id="eventTimeline" class="event-timeline">
+                                        <!-- 事件将动态插入 -->
+                                    </div>
+                                    <div id="noEvents" class="empty-state" style="display: none; padding: var(--nx-space-6);">
+                                        <div class="empty-state__icon">
+                                            <i class="ri-notification-off-line"></i>
+                                        </div>
+                                        <div class="empty-state__desc">暂无事件</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 快速操作 -->
+                            <div class="nx-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-tools-line"></i> 快速操作
+                                    </h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="nx-flex nx-flex-col nx-gap-2">
+                                        <button class="nx-btn nx-btn--secondary nx-btn--block" onclick="showAnalysisReport()">
+                                            <i class="ri-bar-chart-box-line"></i> 查看分析报告
+                                        </button>
+                                        <button class="nx-btn nx-btn--secondary nx-btn--block" onclick="showRequirementsSpec()">
+                                            <i class="ri-file-list-3-line"></i> 需求规格书
+                                        </button>
+                                        <button class="nx-btn nx-btn--secondary nx-btn--block" onclick="exportData()">
+                                            <i class="ri-download-line"></i> 导出数据
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Skill 详情模态框 -->
+    <div id="skillDetailModal" class="nx-modal">
+        <div class="nx-modal__backdrop" onclick="closeModal()"></div>
+        <div class="nx-modal__content" style="max-width: 800px;">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title" id="modalTitle">Skill 详情</h3>
+                <button class="nx-modal__close" onclick="closeModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <!-- 标签页 -->
+                <div class="tabs">
+                    <button class="tab tab--active" data-tab="overview" onclick="switchTab('overview')">概览</button>
+                    <button class="tab" data-tab="config" onclick="switchTab('config')">配置</button>
+                    <button class="tab" data-tab="runtime" onclick="switchTab('runtime')">运行时</button>
+                    <button class="tab" data-tab="capabilities" onclick="switchTab('capabilities')">能力</button>
+                    <button class="tab" data-tab="events" onclick="switchTab('events')">事件</button>
+                </div>
+                
+                <!-- 标签内容 -->
+                <div id="tabContent">
+                    <!-- 动态内容 -->
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal()">关闭</button>
+                <button class="nx-btn nx-btn--primary" id="modalActionBtn" onclick="performAction()">
+                    <i class="ri-play-line"></i> 启动
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 脚本 -->
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        // Skill 生命周期管理器
+        class SkillLifecycleManager {
+            constructor() {
+                this.skills = [];
+                this.filteredSkills = [];
+                this.events = [];
+                this.selectedSkill = null;
+                this.currentTab = 'overview';
+                this.refreshInterval = null;
+            }
+            
+            async init() {
+                this.bindEvents();
+                await this.loadData();
+                this.startAutoRefresh();
+            }
+            
+            bindEvents() {
+                // 键盘快捷键
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'Escape') {
+                        closeModal();
+                    }
+                    if (e.key === 'r' && e.ctrlKey) {
+                        e.preventDefault();
+                        this.refreshData();
+                    }
+                });
+            }
+            
+            async loadData() {
+                this.showLoading(true);
+                
+                try {
+                    // 并行加载数据
+                    const [skillsRes, eventsRes] = await Promise.all([
+                        this.fetchSkills(),
+                        this.fetchEvents()
+                    ]);
+                    
+                    if (skillsRes.status === 'success' && skillsRes.data) {
+                        this.skills = skillsRes.data.skills || [];
+                        this.filterSkills();
+                        this.updateStats();
+                    }
+                    
+                    if (eventsRes.status === 'success' && eventsRes.data) {
+                        this.events = eventsRes.data.events || [];
+                        this.renderEvents();
+                    }
+                } catch (error) {
+                    console.error('加载数据失败:', error);
+                    this.showError('加载数据失败，请稍后重试');
+                } finally {
+                    this.showLoading(false);
+                }
+            }
+            
+            async fetchSkills() {
+                return await fetchData('/api/analysis/lifecycle/data', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({})
+                });
+            }
+            
+            async fetchEvents() {
+                return await fetchData('/api/test/sdk-native/events', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ limit: 20 })
+                });
+            }
+            
+            filterSkills() {
+                const statusFilter = document.getElementById('statusFilter').value;
+                const typeFilter = document.getElementById('typeFilter').value;
+                const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+                
+                this.filteredSkills = this.skills.filter(skill => {
+                    // 状态过滤
+                    if (statusFilter) {
+                        const status = this.getSkillStatus(skill);
+                        if (status !== statusFilter) return false;
+                    }
+                    
+                    // 类型过滤
+                    if (typeFilter && skill.skillType !== typeFilter) {
+                        return false;
+                    }
+                    
+                    // 搜索过滤
+                    if (searchQuery) {
+                        const matchId = skill.skillId?.toLowerCase().includes(searchQuery);
+                        const matchName = skill.skillName?.toLowerCase().includes(searchQuery);
+                        if (!matchId && !matchName) return false;
+                    }
+                    
+                    return true;
+                });
+                
+                this.renderSkills();
+            }
+            
+            getSkillStatus(skill) {
+                const runtimeStatus = skill.runtimeStatus?.status;
+                if (runtimeStatus === 'STARTED' || runtimeStatus === 'active') {
+                    return 'active';
+                } else if (runtimeStatus === 'ERROR_OCCURRED' || skill.errorCount > 0) {
+                    return 'error';
+                } else {
+                    return 'inactive';
+                }
+            }
+            
+            renderSkills() {
+                const container = document.getElementById('skillList');
+                const emptyState = document.getElementById('emptyState');
+                const countLabel = document.getElementById('skillCount');
+                
+                countLabel.textContent = `${this.filteredSkills.length} 个 Skill`;
+                
+                if (this.filteredSkills.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('nx-hidden');
+                    return;
+                }
+                
+                emptyState.classList.add('nx-hidden');
+                
+                container.innerHTML = this.filteredSkills.map(skill => {
+                    const status = this.getSkillStatus(skill);
+                    const statusClass = `skill-card--${status}`;
+                    const statusBadgeClass = `skill-card__status--${status}`;
+                    const statusText = status === 'active' ? '运行中' : status === 'error' ? '异常' : '已停止';
+                    const iconClass = skill.skillType === 'system' ? 'skill-card__icon--system' : 'skill-card__icon--app';
+                    const icon = skill.skillType === 'system' ? 'ri-server-line' : 'ri-apps-line';
+                    
+                    return `
+                        <div class="skill-card ${statusClass}" onclick="skillManager.showDetail('${skill.skillId}')">
+                            <div class="skill-card__header">
+                                <div class="skill-card__icon ${iconClass}">
+                                    <i class="${icon}"></i>
+                                </div>
+                                <div class="skill-card__title">
+                                    <h4 class="skill-card__name">${skill.skillName || skill.skillId}</h4>
+                                    <div class="skill-card__id">${skill.skillId}</div>
+                                </div>
+                                <span class="skill-card__status ${statusBadgeClass}">
+                                    <i class="ri-circle-fill" style="font-size: 8px;"></i>
+                                    ${statusText}
+                                </span>
+                            </div>
+                            <div class="skill-card__meta">
+                                <div class="skill-card__meta-item">
+                                    <i class="ri-code-box-line"></i>
+                                    ${skill.capabilities?.length || 0} 个能力
+                                </div>
+                                <div class="skill-card__meta-item">
+                                    <i class="ri-time-line"></i>
+                                    ${this.formatDuration(skill.firstSeen)}
+                                </div>
+                                <div class="skill-card__meta-item">
+                                    <i class="ri-error-warning-line"></i>
+                                    ${skill.errorCount || 0} 个错误
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            renderEvents() {
+                const container = document.getElementById('eventTimeline');
+                const noEvents = document.getElementById('noEvents');
+                
+                if (this.events.length === 0) {
+                    container.innerHTML = '';
+                    noEvents.classList.remove('nx-hidden');
+                    return;
+                }
+                
+                noEvents.classList.add('nx-hidden');
+                
+                container.innerHTML = this.events.slice(0, 10).map(event => {
+                    const typeClass = this.getEventTypeClass(event.eventType);
+                    const time = new Date(event.receiveTime).toLocaleTimeString();
+                    
+                    return `
+                        <div class="event-item ${typeClass}">
+                            <div class="event-item__time">${time}</div>
+                            <div class="event-item__title">${event.eventDescription}</div>
+                            <div class="event-item__detail">${event.skillId} - 延迟 ${event.latency}ms</div>
+                        </div>
+                    `;
+                }).join('');
+            }
+            
+            getEventTypeClass(eventType) {
+                if (eventType.includes('ERROR') || eventType.includes('FAILED')) {
+                    return 'event-item--error';
+                } else if (eventType.includes('WARNING')) {
+                    return 'event-item--warning';
+                } else {
+                    return 'event-item--success';
+                }
+            }
+            
+            updateStats() {
+                const total = this.skills.length;
+                const active = this.skills.filter(s => this.getSkillStatus(s) === 'active').length;
+                const error = this.skills.filter(s => this.getSkillStatus(s) === 'error').length;
+                
+                document.getElementById('totalSkills').textContent = total;
+                document.getElementById('activeSkills').textContent = active;
+                document.getElementById('errorSkills').textContent = error;
+                document.getElementById('totalEvents').textContent = this.events.length;
+            }
+            
+            showDetail(skillId) {
+                this.selectedSkill = this.skills.find(s => s.skillId === skillId);
+                if (!this.selectedSkill) return;
+                
+                document.getElementById('modalTitle').textContent = this.selectedSkill.skillName || skillId;
+                document.getElementById('skillDetailModal').classList.add('nx-modal--open');
+                
+                this.switchTab('overview');
+            }
+            
+            switchTab(tab) {
+                this.currentTab = tab;
+                
+                // 更新标签样式
+                document.querySelectorAll('.tab').forEach(t => {
+                    t.classList.toggle('tab--active', t.dataset.tab === tab);
+                });
+                
+                // 渲染内容
+                const content = document.getElementById('tabContent');
+                
+                switch (tab) {
+                    case 'overview':
+                        content.innerHTML = this.renderOverviewTab();
+                        break;
+                    case 'config':
+                        content.innerHTML = this.renderConfigTab();
+                        break;
+                    case 'runtime':
+                        content.innerHTML = this.renderRuntimeTab();
+                        break;
+                    case 'capabilities':
+                        content.innerHTML = this.renderCapabilitiesTab();
+                        break;
+                    case 'events':
+                        content.innerHTML = this.renderEventsTab();
+                        break;
+                }
+            }
+            
+            renderOverviewTab() {
+                const skill = this.selectedSkill;
+                return `
+                    <div class="nx-grid nx-grid-cols-2 nx-gap-4">
+                        <div>
+                            <h4 class="nx-text-sm nx-font-semibold nx-mb-2">基本信息</h4>
+                            <div class="nx-space-y-2">
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">Skill ID:</span>
+                                    <span>${skill.skillId}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">名称:</span>
+                                    <span>${skill.skillName || '-'}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">类型:</span>
+                                    <span>${skill.skillType || '-'}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">版本:</span>
+                                    <span>${skill.staticConfig?.spec?.version || '-'}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div>
+                            <h4 class="nx-text-sm nx-font-semibold nx-mb-2">状态信息</h4>
+                            <div class="nx-space-y-2">
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">当前状态:</span>
+                                    <span>${skill.runtimeStatus?.status || '未知'}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">首次发现:</span>
+                                    <span>${new Date(skill.firstSeen).toLocaleString()}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">最后更新:</span>
+                                    <span>${new Date(skill.lastUpdated).toLocaleString()}</span>
+                                </div>
+                                <div class="nx-flex nx-justify-between">
+                                    <span class="nx-text-secondary">状态转换次数:</span>
+                                    <span>${skill.stateTransitions?.length || 0}</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderConfigTab() {
+                const config = JSON.stringify(this.selectedSkill?.staticConfig || {}, null, 2);
+                return `
+                    <h4 class="nx-text-sm nx-font-semibold nx-mb-2">YAML 配置</h4>
+                    <div class="code-block">
+                        <pre>${config}</pre>
+                    </div>
+                `;
+            }
+            
+            renderRuntimeTab() {
+                const runtime = this.selectedSkill?.runtimeStatus || {};
+                return `
+                    <div class="nx-grid nx-grid-cols-2 nx-gap-4">
+                        <div>
+                            <h4 class="nx-text-sm nx-font-semibold nx-mb-2">运行时状态</h4>
+                            <div class="nx-space-y-2">
+                                ${Object.entries(runtime).map(([key, value]) => `
+                                    <div class="nx-flex nx-justify-between">
+                                        <span class="nx-text-secondary">${key}:</span>
+                                        <span>${value}</span>
+                                    </div>
+                                `).join('')}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            renderCapabilitiesTab() {
+                const capabilities = this.selectedSkill?.capabilities || [];
+                if (capabilities.length === 0) {
+                    return '<div class="empty-state"><div class="empty-state__desc">暂无能力</div></div>';
+                }
+                
+                return `
+                    <div class="nx-space-y-2">
+                        ${capabilities.map(cap => `
+                            <div class="nx-flex nx-justify-between nx-items-center nx-p-3 nx-bg-secondary nx-rounded">
+                                <div>
+                                    <div class="nx-font-medium">${cap.capabilityName || cap.capabilityId}</div>
+                                    <div class="nx-text-xs nx-text-secondary">${cap.capabilityId}</div>
+                                </div>
+                                <div class="nx-text-right">
+                                    <div class="nx-text-sm">${cap.invocationCount || 0} 次调用</div>
+                                    <div class="nx-text-xs nx-text-secondary">成功率 ${(cap.successRate || 0).toFixed(1)}%</div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                `;
+            }
+            
+            renderEventsTab() {
+                const skillEvents = this.events.filter(e => e.skillId === this.selectedSkill?.skillId);
+                if (skillEvents.length === 0) {
+                    return '<div class="empty-state"><div class="empty-state__desc">暂无事件</div></div>';
+                }
+                
+                return `
+                    <div class="event-timeline">
+                        ${skillEvents.map(event => {
+                            const typeClass = this.getEventTypeClass(event.eventType);
+                            const time = new Date(event.receiveTime).toLocaleString();
+                            return `
+                                <div class="event-item ${typeClass}">
+                                    <div class="event-item__time">${time}</div>
+                                    <div class="event-item__title">${event.eventDescription}</div>
+                                    <div class="event-item__detail">延迟 ${event.latency}ms</div>
+                                </div>
+                            `;
+                        }).join('')}
+                    </div>
+                `;
+            }
+            
+            formatDuration(timestamp) {
+                if (!timestamp) return '-';
+                const diff = Date.now() - timestamp;
+                const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                
+                if (days > 0) return `${days}天${hours}小时`;
+                if (hours > 0) return `${hours}小时`;
+                return '刚刚';
+            }
+            
+            showLoading(show) {
+                const loadingState = document.getElementById('loadingState');
+                const skillList = document.getElementById('skillList');
+                if (show) {
+                    loadingState.classList.remove('nx-hidden');
+                    skillList.classList.add('nx-hidden');
+                } else {
+                    loadingState.classList.add('nx-hidden');
+                    skillList.classList.remove('nx-hidden');
+                }
+            }
+            
+            showError(message) {
+                if (typeof showErrorToast === 'function') {
+                    showErrorToast(message);
+                } else {
+                    alert(message);
+                }
+            }
+            
+            startAutoRefresh() {
+                this.refreshInterval = setInterval(() => {
+                    this.loadData();
+                }, 30000); // 30秒刷新
+            }
+            
+            stopAutoRefresh() {
+                if (this.refreshInterval) {
+                    clearInterval(this.refreshInterval);
+                }
+            }
+            
+            refreshData() {
+                this.loadData();
+            }
+            
+            clearEvents() {
+                this.events = [];
+                this.renderEvents();
+                this.updateStats();
+            }
+        }
+        
+        // 全局实例
+        let skillManager;
+        
+        // 初始化
+        document.addEventListener('DOMContentLoaded', () => {
+            skillManager = new SkillLifecycleManager();
+            skillManager.init();
+        });
+        
+        // 全局函数
+        function filterSkills() {
+            skillManager.filterSkills();
+        }
+        
+        function refreshData() {
+            skillManager.refreshData();
+        }
+        
+        function clearEvents() {
+            skillManager.clearEvents();
+        }
+        
+        function closeModal() {
+            document.getElementById('skillDetailModal').classList.remove('nx-modal--open');
+        }
+        
+        function switchTab(tab) {
+            skillManager.switchTab(tab);
+        }
+        
+        function performAction() {
+            // 执行启动/停止操作
+            console.log('执行操作:', skillManager.selectedSkill?.skillId);
+        }
+        
+        function showAnalysisReport() {
+            window.open('/api/analysis/lifecycle/loops', '_blank');
+        }
+        
+        function showRequirementsSpec() {
+            window.open('/api/analysis/requirements/spec', '_blank');
+        }
+        
+        function exportData() {
+            const data = {
+                skills: skillManager.skills,
+                events: skillManager.events,
+                exportTime: new Date().toISOString()
+            };
+            
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `skill-lifecycle-data-${Date.now()}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+        
+        // 页面卸载时清理
+        window.addEventListener('beforeunload', () => {
+            if (skillManager) {
+                skillManager.stopAutoRefresh();
+            }
+        });
+    </script>
+</body>
+</html>

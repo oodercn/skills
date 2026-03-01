@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>趋势预测 - AI智能介入 - eNexus Enterprise</title>
+    <link rel="stylesheet" href="/console/css/common.css">
+    <link rel="stylesheet" href="/console/css/dashboard.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <h2>eNexus Enterprise</h2>
+                <span class="version">SDK 2.3</span>
+            </div>
+            <nav id="nav-menu"></nav>
+        </div>
+        <div class="main-content">
+            <header class="top-bar">
+                <div class="breadcrumb">
+                    <span>AI智能介入</span>
+                    <span class="separator">/</span>
+                    <span>趋势预测</span>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">管理员</span>
+                    <i class="ri-user-line"></i>
+                </div>
+            </header>
+            <div class="content-area">
+                <div class="page-header">
+                    <h1><i class="ri-line-chart-line"></i> 趋势预测</h1>
+                    <p class="page-description">基于历史数据和AI模型，预测业务趋势和市场变化</p>
+                </div>
+                
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="ri-chart-line"></i> 销售趋势预测</h3>
+                    </div>
+                    <div class="panel-body">
+                        <div id="trend-chart" style="height: 300px;"></div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-header">
+                        <h3><i class="ri-list-check"></i> 预测结果</h3>
+                    </div>
+                    <div class="panel-body">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>预测项目</th>
+                                    <th>预测值</th>
+                                    <th>置信度</th>
+                                    <th>时间范围</th>
+                                    <th>趋势</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>月销售额</td>
+                                    <td>¥85.6M</td>
+                                    <td>92%</td>
+                                    <td>下月</td>
+                                    <td><i class="ri-arrow-up-line text-success"></i> +15%</td>
+                                </tr>
+                                <tr>
+                                    <td>客户流量</td>
+                                    <td>45,000</td>
+                                    <td>88%</td>
+                                    <td>下周</td>
+                                    <td><i class="ri-arrow-up-line text-success"></i> +8%</td>
+                                </tr>
+                                <tr>
+                                    <td>库存周转率</td>
+                                    <td>4.2次</td>
+                                    <td>85%</td>
+                                    <td>下月</td>
+                                    <td><i class="ri-arrow-down-line text-danger"></i> -5%</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', async function() {
+            await initMenu();
+        });
+    </script>
+</body>
+</html>

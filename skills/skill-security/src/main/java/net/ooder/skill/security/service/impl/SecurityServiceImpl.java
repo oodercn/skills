@@ -21,6 +21,7 @@ public class SecurityServiceImpl implements SecurityService {
     private final AtomicLong threatsResolved = new AtomicLong(0);
     private final AtomicLong blockedConnections = new AtomicLong(0);
     private final AtomicLong auditLogs = new AtomicLong(0);
+    private SecurityConfig config = new SecurityConfig();
 
     public SecurityServiceImpl() {
         initDefaultPolicies();
@@ -66,6 +67,17 @@ public class SecurityServiceImpl implements SecurityService {
         stats.setAuditLogs(auditLogs.get());
         stats.setAverageScanTime(150.0);
         return stats;
+    }
+    
+    @Override
+    public SecurityConfig getConfig() {
+        return config;
+    }
+    
+    @Override
+    public void saveConfig(SecurityConfig newConfig) {
+        this.config = newConfig;
+        auditLogs.incrementAndGet();
     }
 
     @Override

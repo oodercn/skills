@@ -1,0 +1,37 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+metadata:
+  name: skill-llm-config-manager
+  version: "1.0.0"
+  description: LLM配置管理 - 多级配置、加密存储、配置解析
+  author: ooder Team
+  
+spec:
+  type: SYSTEM_SERVICE
+  category: llm
+  
+  capabilities:
+    - id: multi-level-config
+      name: 多级配置
+      description: 支持企业级、部门级、场景级、个人级配置
+      category: config
+      
+    - id: config-resolution
+      name: 配置解析
+      description: 按优先级自动解析最终配置
+      category: config
+      
+    - id: key-encryption
+      name: 密钥加密
+      description: API Key加密存储
+      category: security
+
+  config:
+    llm:
+      config:
+        encryption:
+          enabled: true
+          algorithm: AES
+        default:
+          provider: qianwen
+          model: qwen-plus

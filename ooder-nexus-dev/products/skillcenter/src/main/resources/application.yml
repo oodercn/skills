@@ -1,0 +1,58 @@
+server:
+  port: 8083
+
+spring:
+  application:
+    name: skillcenter
+  resources:
+    static-locations: classpath:/static/,file:./ui/
+
+nexus:
+  product:
+    id: skillcenter
+    name: SkillCenter
+    version: 2.3.0
+  p2p:
+    enabled: true
+  push:
+    enabled: false
+  llm:
+    enabled: false
+  skill:
+    dynamic: true
+    k8s:
+      enabled: true
+    hosting:
+      enabled: true
+  features:
+    skill-market: true
+    k8s: true
+    hosting: true
+
+nexus.skills:
+  path: ./skills
+  source:
+    path: ../skills
+
+k8s:
+  mock-enabled: true
+  master-url: ""
+  token: ""
+  namespace: default
+
+hosting:
+  mock-enabled: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder: DEBUG
+    org.springframework: INFO

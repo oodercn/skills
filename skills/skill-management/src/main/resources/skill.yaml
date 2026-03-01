@@ -1,0 +1,86 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+metadata:
+  name: skill-management
+  version: 0.1.0
+  description: Skill Management Module - Unified skill registration, lifecycle, and marketplace management
+  author: Ooder Team
+  category: system
+  tags:
+    - skill
+    - management
+    - lifecycle
+    - marketplace
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skill-management
+  repository: https://gitee.com/ooderCN/skill-management.git
+
+spec:
+  type: infrastructure-skill
+  capabilities:
+    - skill-registration
+    - skill-lifecycle
+    - skill-marketplace
+    - skill-execution
+    - skill-rating
+  
+  scenes:
+    - skill-management
+    - system-administration
+  
+  endpoints:
+    - path: /api/skill/list
+      method: GET
+      description: List all skills
+    - path: /api/skill/{skillId}
+      method: GET
+      description: Get skill details
+    - path: /api/skill/add
+      method: POST
+      description: Add a new skill
+    - path: /api/skill/update
+      method: PUT
+      description: Update skill
+    - path: /api/skill/{skillId}
+      method: DELETE
+      description: Delete skill
+    - path: /api/skill/{skillId}/start
+      method: POST
+      description: Start skill
+    - path: /api/skill/{skillId}/stop
+      method: POST
+      description: Stop skill
+    - path: /api/skill/{skillId}/execute
+      method: POST
+      description: Execute skill
+    - path: /api/skill/market/list
+      method: GET
+      description: List market skills
+    - path: /api/skill/market/{skillId}/rate
+      method: POST
+      description: Rate skill
+
+  configSchema:
+    type: object
+    properties:
+      maxConcurrentExecutions:
+        type: integer
+        default: 10
+        description: Maximum concurrent skill executions
+      defaultTimeout:
+        type: integer
+        default: 30000
+        description: Default execution timeout in milliseconds
+      enableMarketplace:
+        type: boolean
+        default: true
+        description: Enable skill marketplace features
+
+  ui:
+    pages:
+      - path: /console/pages/skill/index.html
+        name: Skill Management
+        icon: ri-apps-line
+        menu:
+          parent: System
+          order: 1

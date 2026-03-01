@@ -1,0 +1,48 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+metadata:
+  name: skill-document-processor
+  version: "1.0.0"
+  description: 文档处理器 - 文档解析、分块、元数据提取
+  author: ooder Team
+  
+spec:
+  type: SYSTEM_SERVICE
+  category: knowledge
+  
+  capabilities:
+    - id: document-parsing
+      name: 文档解析
+      description: 支持多种格式文档解析
+      category: document
+      
+    - id: text-chunking
+      name: 文本分块
+      description: 智能分块，支持重叠
+      category: document
+      
+    - id: metadata-extraction
+      name: 元数据提取
+      description: 提取标题、关键词等元数据
+      category: document
+      
+    - id: token-estimation
+      name: Token估算
+      description: 估算文本Token数量
+      category: document
+
+  config:
+    document:
+      processor:
+        default:
+          chunkSize: 500
+          chunkOverlap: 50
+          minChunkSize: 100
+        supportedFormats:
+          - .txt
+          - .md
+          - .json
+          - .yaml
+          - .xml
+          - .html
+          - .csv

@@ -1,0 +1,72 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-assistant-ui
+  name: LLM智能助手
+  version: 1.0.0
+  description: LLM智能助手悬浮组件，提供上下文感知的智能对话和辅助功能
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: LLM助手
+      icon: ri-robot-line
+      
+    menu:
+      position: none
+      category: llm
+      order: 1
+      
+    layout:
+      type: floating
+      sidebar: false
+      header: false
+      
+    floating:
+      enabled: true
+      position: bottom-right
+      trigger: button
+      width: 420
+      height: 600
+      
+  capabilities:
+    - id: llm-chat
+      name: 智能对话
+      description: 与LLM进行智能对话
+      category: llm
+    - id: context-aware
+      name: 上下文感知
+      description: 自动收集当前页面上下文
+      category: llm
+    - id: smart-suggest
+      name: 智能建议
+      description: 基于上下文提供智能建议
+      category: llm
+      
+  apis:
+    - path: /api/llm/chat
+      method: POST
+      description: LLM对话
+    - path: /api/llm/chat/stream
+      method: POST
+      description: 流式LLM对话
+    - path: /api/v1/llm/context/build
+      method: POST
+      description: 构建上下文
+    - path: /api/v1/nlp/classify
+      method: POST
+      description: 意图分类
+    - path: /api/v1/form/assist
+      method: POST
+      description: 表单辅助
+      
+  dependencies:
+    - skill-llm-core
+    - skill-llm-context-builder
+    - skill-local-knowledge

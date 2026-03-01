@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>net.ooder.nexus</groupId>
+    <artifactId>ooder-nexus-dev</artifactId>
+    <version>2.3.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <name>Ooder Nexus Development Platform</name>
+    <description>Ooder Nexus 统一开发平台 - 支持个人版、企业版、技能中心三种产品组装</description>
+    <url>https://github.com/ooderCN/ooder-nexus-dev</url>
+
+    <licenses>
+        <license>
+            <name>Apache License, Version 2.0</name>
+            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+        </license>
+    </licenses>
+
+    <developers>
+        <developer>
+            <id>ooder</id>
+            <name>Ooder Team</name>
+            <email>team@ooder.net</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/ooderCN/ooder-nexus-dev.git</connection>
+        <developerConnection>scm:git:ssh://github.com/ooderCN/ooder-nexus-dev.git</developerConnection>
+        <url>https://github.com/ooderCN/ooder-nexus-dev</url>
+    </scm>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <java.version>1.8</java.version>
+        <maven.compiler.source>1.8</maven.compiler.source>
+        <maven.compiler.target>1.8</maven.compiler.target>
+        
+        <spring-boot.version>2.7.0</spring-boot.version>
+        <agent-sdk.version>2.3.0</agent-sdk.version>
+        <lombok.version>1.18.24</lombok.version>
+        <jackson.version>2.13.3</jackson.version>
+        <slf4j.version>1.7.36</slf4j.version>
+    </properties>
+
+    <modules>
+        <module>modules/nexus-common</module>
+        <module>modules/nexus-protocol</module>
+        <module>modules/nexus-sdk-adapter</module>
+        <module>products/nexus-lite</module>
+        <module>products/nexus-enterprise</module>
+        <module>products/skillcenter</module>
+    </modules>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring-boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>agent-sdk</artifactId>
+                <version>${agent-sdk.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.ooder.nexus</groupId>
+                <artifactId>nexus-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.ooder.nexus</groupId>
+                <artifactId>nexus-protocol</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>net.ooder.nexus</groupId>
+                <artifactId>nexus-sdk-adapter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>${lombok.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>com.fasterxml.jackson.dataformat</groupId>
+                <artifactId>jackson-dataformat-yaml</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${slf4j.version}</version>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.springframework.boot</groupId>
+                    <artifactId>spring-boot-maven-plugin</artifactId>
+                    <version>${spring-boot.version}</version>
+                </plugin>
+                
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>3.8.1</version>
+                    <configuration>
+                        <source>${java.version}</source>
+                        <target>${java.version}</target>
+                        <encoding>UTF-8</encoding>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <repositories>
+        <repository>
+            <id>central</id>
+            <url>https://repo.maven.apache.org/maven2</url>
+        </repository>
+        <repository>
+            <id>ooder-releases</id>
+            <url>https://gitee.com/ooderCN/maven-repo/raw/master/releases</url>
+        </repository>
+    </repositories>
+
+</project>

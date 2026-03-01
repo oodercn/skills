@@ -1,5 +1,5 @@
 server:
-  port: 8082
+  port: 8087
 
 spring:
   application:
@@ -14,8 +14,18 @@ management:
     health:
       show-details: always
 
-skill:
-  network:
-    scan-interval: 300000
-    dhcp-lease-file: /var/lib/dhcp/dhcpd.leases
-    arp-cache-file: /proc/net/arp
+logging:
+  level:
+    net.ooder.skill.network: DEBUG
+    org.springframework: INFO
+
+network:
+  discovery:
+    port: 8888
+    enabled: true
+  heartbeat:
+    interval: 30000
+    timeout: 60000
+  p2p:
+    enabled: true
+    auto-start: true

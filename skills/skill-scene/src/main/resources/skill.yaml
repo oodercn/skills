@@ -1,0 +1,92 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-scene
+  name: 场景管理
+  version: 1.0.0
+  description: 场景管理技能 - 场景定义、会话管理、能力验证
+  author: ooder Team
+  license: Apache-2.0
+  type: service-skill
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.scene.SceneSkillApplication
+  
+  capabilities:
+    - id: scene-definition
+      name: 场景定义
+      description: 创建、更新、删除场景定义
+      category: orchestration
+      
+    - id: scene-session
+      name: 会话管理
+      description: 启动、结束场景会话
+      category: orchestration
+      
+    - id: scene-validation
+      name: 能力验证
+      description: 验证场景所需能力
+      category: orchestration
+      
+    - id: scene-role
+      name: 角色管理
+      description: 管理场景角色和权限
+      category: orchestration
+  
+  scenes:
+    - name: scene-management
+      description: 场景管理主场景
+      capabilities:
+        - scene-definition
+        - scene-session
+        - scene-validation
+        - scene-role
+  
+  config:
+    optional:
+      - name: SCENE_MAX_PARTICIPANTS
+        type: integer
+        default: 100
+        description: 最大参与者数量
+        
+      - name: SCENE_DEFAULT_TIMEOUT
+        type: integer
+        default: 30000
+        description: 默认超时时间(毫秒)
+  
+  endpoints:
+    - path: /api/v1/scenes
+      method: GET
+      description: 获取场景列表
+      capability: scene-definition
+      
+    - path: /api/v1/scenes
+      method: POST
+      description: 创建场景
+      capability: scene-definition
+      
+    - path: /api/v1/scenes/{sceneId}
+      method: GET
+      description: 获取场景详情
+      capability: scene-definition
+      
+    - path: /api/v1/scenes/{sceneId}/start
+      method: POST
+      description: 启动场景会话
+      capability: scene-session
+      
+    - path: /api/v1/scenes/{sceneId}/validate
+      method: POST
+      description: 验证能力
+      capability: scene-validation
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"

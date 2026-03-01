@@ -1,0 +1,10 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: skill-knowledge-base
+
+logging:
+  level:
+    net.ooder.skill.knowledge: DEBUG

@@ -38,6 +38,9 @@ public class SkillDiscoveryService {
     @Value("${nexus.skill-index.path:./skill-index.yaml}")
     private String skillIndexPath;
     
+    @Value("${nexus.skills.source.path:../skills}")
+    private String skillsSourcePath;
+    
     private final Map<String, SkillMetadata> localSkills = new ConcurrentHashMap<>();
     private SkillIndex skillIndex;
     
@@ -152,36 +155,64 @@ public class SkillDiscoveryService {
             return false;
         }
         
-        String downloadUrl = entry.getDownloadUrl();
-        if (downloadUrl == null || downloadUrl.isEmpty()) {
-            downloadUrl = entry.getGiteeDownloadUrl();
-        }
-        
-        if (downloadUrl == null || downloadUrl.isEmpty()) {
-            log.error("No download URL for skill: {}", skillId);
-            return false;
-        }
-        
         try {
             Path targetDir = Paths.get(skillsPath, skillId);
             Files.createDirectories(targetDir);
             
-            if (downloadUrl.endsWith(".zip")) {
-                downloadAndExtractZip(downloadUrl, skillId, targetDir);
-            } else if (downloadUrl.endsWith(".jar")) {
-                downloadJar(downloadUrl, skillId, targetDir);
+            boolean installed = false;
+            
+            Path sourceDir = Paths.get(skillsSourcePath, skillId);
+            if (Files.exists(sourceDir)) {
+                log.info("Copying skill from local source: {}", sourceDir);
+                copyDirectory(sourceDir, targetDir);
+                installed = true;
             } else {
-                log.error("Unsupported download format: {}", downloadUrl);
-                return false;
+                String downloadUrl = entry.getDownloadUrl();
+                if (downloadUrl == null || downloadUrl.isEmpty()) {
+                    downloadUrl = entry.getGiteeDownloadUrl();
+                }
+                
+                if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                    if (downloadUrl.endsWith(".zip")) {
+                        downloadAndExtractZip(downloadUrl, skillId, targetDir);
+                        installed = true;
+                    } else if (downloadUrl.endsWith(".jar")) {
+                        downloadJar(downloadUrl, skillId, targetDir);
+                        installed = true;
+                    } else {
+                        log.error("Unsupported download format: {}", downloadUrl);
+                    }
+                }
             }
             
-            scanLocalSkills();
-            log.info("Installed skill: {}", skillId);
-            return true;
+            if (installed) {
+                scanLocalSkills();
+                log.info("Installed skill: {}", skillId);
+                return true;
+            } else {
+                log.error("Failed to install skill: {}", skillId);
+                return false;
+            }
         } catch (Exception e) {
             log.error("Failed to install skill: {}", skillId, e);
             return false;
         }
+    }
+    
+    private void copyDirectory(Path source, Path target) throws IOException {
+        Files.walk(source).forEach(s -> {
+            try {
+                Path t = target.resolve(source.relativize(s));
+                if (Files.isDirectory(s)) {
+                    Files.createDirectories(t);
+                } else {
+                    Files.copy(s, t, StandardCopyOption.REPLACE_EXISTING);
+                }
+            } catch (IOException e) {
+                log.warn("Failed to copy: {}", s, e);
+            }
+        });
+        log.info("Copied directory from {} to {}", source, target);
     }
     
     private void downloadAndExtractZip(String url, String skillId, Path targetDir) throws IOException {

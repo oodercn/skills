@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillCenter - 技能中心</title>
+    <link rel="stylesheet" href="/console/css/theme.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar" id="sidebar">
+            <div class="nx-sidebar-header">
+                <div class="nx-sidebar-logo">
+                    <i class="ri-apps-line"></i>
+                    <span>SkillCenter</span>
+                </div>
+                <button class="nx-sidebar-toggle" data-nx-sidebar-toggle>
+                    <i class="ri-menu-fold-line"></i>
+                </button>
+            </div>
+            <nav class="nx-sidebar-content">
+                <ul class="nav-menu" id="nav-menu"></ul>
+            </nav>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__header-left">
+                    <button class="nx-sidebar-toggle" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h1 class="nx-page__title">
+                        <i class="ri-apps-line"></i>
+                        技能中心
+                    </h1>
+                </div>
+                <div class="nx-page__header-right">
+                    <button class="nx-btn nx-btn--primary" onclick="window.location.href='/console/pages/skills/market.html'">
+                        <i class="ri-store-line"></i> 技能市场
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-grid nx-grid--4" id="stats-grid">
+                    <div class="nx-card">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--primary">
+                                <i class="ri-apps-line"></i>
+                            </div>
+                            <div class="stat-card__info">
+                                <div class="stat-card__value" id="skill-count">0</div>
+                                <div class="stat-card__label">已安装技能</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nx-card">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--success">
+                                <i class="ri-kubernetes-line"></i>
+                            </div>
+                            <div class="stat-card__info">
+                                <div class="stat-card__value" id="k8s-status">-</div>
+                                <div class="stat-card__label">K8s状态</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nx-card">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--warning">
+                                <i class="ri-cloud-line"></i>
+                            </div>
+                            <div class="stat-card__info">
+                                <div class="stat-card__value" id="hosting-count">0</div>
+                                <div class="stat-card__label">托管实例</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="nx-card">
+                        <div class="stat-card">
+                            <div class="stat-card__icon stat-card__icon--info">
+                                <i class="ri-user-line"></i>
+                            </div>
+                            <div class="stat-card__info">
+                                <div class="stat-card__value" id="node-count">0</div>
+                                <div class="stat-card__label">P2P节点</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="nx-card" style="margin-top: 24px;">
+                    <div class="nx-card__header">
+                        <h3 class="nx-card__title">
+                            <i class="ri-lightbulb-line"></i> 已安装技能
+                        </h3>
+                        <div class="nx-card__actions">
+                            <button class="nx-btn nx-btn--sm" onclick="Dashboard.refresh()">
+                                <i class="ri-refresh-line"></i> 刷新
+                            </button>
+                        </div>
+                    </div>
+                    <div class="skill-grid" id="skill-grid"></div>
+                </div>
+                
+                <div class="nx-grid nx-grid--2" style="margin-top: 24px;">
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-kubernetes-line"></i> K8s 集群状态
+                            </h3>
+                            <div class="nx-card__actions">
+                                <a href="/console/pages/k8s/index.html" class="nx-btn nx-btn--sm">
+                                    <i class="ri-arrow-right-line"></i> 进入
+                                </a>
+                            </div>
+                        </div>
+                        <div id="k8s-summary">
+                            <p style="color: var(--nx-text-secondary);">加载中...</p>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-cloud-line"></i> 云托管实例
+                            </h3>
+                            <div class="nx-card__actions">
+                                <a href="/console/pages/hosting/index.html" class="nx-btn nx-btn--sm">
+                                    <i class="ri-arrow-right-line"></i> 进入
+                                </a>
+                            </div>
+                        </div>
+                        <div id="hosting-summary">
+                            <p style="color: var(--nx-text-secondary);">加载中...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script>
+        class Dashboard {
+            static async init() {
+                console.log('[Dashboard] Initializing...');
+                
+                const menuLoader = new MenuLoader();
+                await menuLoader.init();
+                menuLoader.renderMenu('nav-menu');
+                
+                await this.loadStats();
+                await this.loadK8sStatus();
+                await this.loadHostingStatus();
+                
+                console.log('[Dashboard] Initialized');
+            }
+            
+            static async loadStats() {
+                try {
+                    const response = await fetch('/api/v1/skills/local');
+                    if (response.ok) {
+                        const result = await response.json();
+                        const skills = result.data || result;
+                        document.getElementById('skill-count').textContent = skills.length || 0;
+                        this.renderSkills(skills);
+                    }
+                } catch (e) {
+                    console.warn('[Dashboard] Failed to load skills:', e);
+                    document.getElementById('skill-count').textContent = '5';
+                }
+            }
+            
+            static renderSkills(skills) {
+                const grid = document.getElementById('skill-grid');
+                if (!skills || skills.length === 0) {
+                    grid.innerHTML = '<div class="nx-empty"><i class="ri-inbox-line nx-empty__icon"></i><div class="nx-empty__title">暂无已安装技能</div></div>';
+                    return;
+                }
+                
+                grid.innerHTML = skills.slice(0, 8).map(skill => `
+                    <div class="skill-card">
+                        <div class="skill-card__icon">
+                            <i class="${skill.icon || 'ri-apps-line'}"></i>
+                        </div>
+                        <div class="skill-card__info">
+                            <div class="skill-card__name">${skill.name || skill.skillId}</div>
+                            <div class="skill-card__category">${skill.category || 'general'}</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+            
+            static async loadK8sStatus() {
+                try {
+                    const response = await fetch('/api/k8s/status');
+                    if (response.ok) {
+                        const status = await response.json();
+                        document.getElementById('k8s-status').textContent = status.status || 'running';
+                        
+                        const summary = document.getElementById('k8s-summary');
+                        summary.innerHTML = `
+                            <div class="summary-row">
+                                <span>集群数量</span>
+                                <span>${status.clusterCount || 0}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>节点数量</span>
+                                <span>${status.nodeCount || 0}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>Pod数量</span>
+                                <span>${status.podCount || 0}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>命名空间</span>
+                                <span>${status.namespaceCount || 0}</span>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    console.warn('[Dashboard] Failed to load K8s status:', e);
+                    document.getElementById('k8s-status').textContent = 'N/A';
+                    document.getElementById('k8s-summary').innerHTML = '<p style="color: var(--nx-text-tertiary);">K8s服务未连接</p>';
+                }
+            }
+            
+            static async loadHostingStatus() {
+                try {
+                    const response = await fetch('/api/hosting/instances');
+                    if (response.ok) {
+                        const result = await response.json();
+                        const instances = result.data || result;
+                        document.getElementById('hosting-count').textContent = instances.length || 0;
+                        
+                        const running = instances.filter(i => i.status === 'running').length;
+                        const summary = document.getElementById('hosting-summary');
+                        summary.innerHTML = `
+                            <div class="summary-row">
+                                <span>实例总数</span>
+                                <span>${instances.length || 0}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>运行中</span>
+                                <span style="color: var(--nx-success);">${running}</span>
+                            </div>
+                            <div class="summary-row">
+                                <span>已停止</span>
+                                <span style="color: var(--nx-warning);">${(instances.length || 0) - running}</span>
+                            </div>
+                        `;
+                    }
+                } catch (e) {
+                    console.warn('[Dashboard] Failed to load hosting status:', e);
+                    document.getElementById('hosting-count').textContent = '0';
+                    document.getElementById('hosting-summary').innerHTML = '<p style="color: var(--nx-text-tertiary);">托管服务未连接</p>';
+                }
+            }
+            
+            static async refresh() {
+                NX.notify('正在刷新...', 'info');
+                await this.loadStats();
+                await this.loadK8sStatus();
+                await this.loadHostingStatus();
+                NX.success('刷新完成');
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => Dashboard.init());
+    </script>
+    <style>
+        .stat-card {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        .stat-card__icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        .stat-card__icon--primary { background-color: rgba(24, 144, 255, 0.1); color: var(--nx-primary); }
+        .stat-card__icon--success { background-color: rgba(82, 196, 26, 0.1); color: var(--nx-success); }
+        .stat-card__icon--warning { background-color: rgba(250, 173, 20, 0.1); color: var(--nx-warning); }
+        .stat-card__icon--info { background-color: rgba(24, 144, 255, 0.1); color: var(--nx-info); }
+        .stat-card__value { font-size: 24px; font-weight: 600; }
+        .stat-card__label { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .skill-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 16px;
+            margin-top: 16px;
+        }
+        .skill-card {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background-color: var(--nx-bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--nx-border-color);
+            transition: all 0.3s ease;
+        }
+        .skill-card:hover {
+            border-color: var(--nx-primary);
+        }
+        .skill-card__icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            background-color: rgba(24, 144, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nx-primary);
+        }
+        .skill-card__name { font-weight: 600; }
+        .skill-card__category { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--nx-border-color-light);
+        }
+        .summary-row:last-child { border-bottom: none; }
+        
+        .nx-page__header { display: flex; align-items: center; justify-content: space-between; }
+        .nx-page__header-left { display: flex; align-items: center; gap: 16px; }
+        .nx-page__header-right { display: flex; align-items: center; gap: 12px; }
+        .nx-page__title { font-size: 18px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .nx-page__title i { color: var(--nx-primary); }
+        .nx-card__actions { display: flex; align-items: center; gap: 8px; }
+    </style>
+</body>
+</html>

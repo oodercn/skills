@@ -14,7 +14,6 @@
 </head>
 <body>
     <div class="container">
-        <!-- 主内容区 -->
         <div class="main-content">
             <div class="welcome-section">
                 <div class="welcome-header">
@@ -25,9 +24,7 @@
                 </div>
                 <p>请选择您要使用的页面类型</p>
                 
-                <!-- 页面类型选择 -->
                 <div class="page-type-selection">
-                    <!-- 家庭页面 -->
                     <div class="page-type-card" onclick="selectPageType('home')">
                         <div class="icon"><i class="ri-home-smile-line"></i></div>
                         <h3>家庭管理中心</h3>
@@ -35,7 +32,6 @@
                         <button class="btn btn-primary">选择家庭页面</button>
                     </div>
                     
-                    <!-- 局域网页面 -->
                     <div class="page-type-card" onclick="selectPageType('lan')">
                         <div class="icon"><i class="ri-wifi-line"></i></div>
                         <h3>局域网管理中心</h3>
@@ -43,7 +39,6 @@
                         <button class="btn btn-primary">选择局域网页面</button>
                     </div>
                     
-                    <!-- 企业网页面 -->
                     <div class="page-type-card" style="opacity: 0.6; cursor: not-allowed;">
                         <div class="icon"><i class="ri-building-line"></i></div>
                         <h3>企业网管理中心</h3>
@@ -52,9 +47,38 @@
                     </div>
                 </div>
                 
-                <!-- 最近访问记录 -->
-                <div style="margin-top: 64px;">
-                    <h3>最近访问</h3>
+                <div style="margin-top: 48px;">
+                    <h3><i class="ri-apps-line"></i> 已安装的页面</h3>
+                    <div class="installed-pages-grid" style="margin-top: 16px;">
+                        <a href="pages/home/index.html" class="installed-page-card">
+                            <i class="ri-home-smile-line"></i>
+                            <span>家庭管理</span>
+                        </a>
+                        <a href="pages/lan/index.html" class="installed-page-card">
+                            <i class="ri-wifi-line"></i>
+                            <span>局域网管理</span>
+                        </a>
+                        <a href="skills/skill-nexus-system-status-nexus-ui/ui/pages/index.html" class="installed-page-card">
+                            <i class="ri-server-line"></i>
+                            <span>系统状态</span>
+                        </a>
+                        <a href="skills/skill-nexus-health-check-nexus-ui/ui/pages/index.html" class="installed-page-card">
+                            <i class="ri-heart-pulse-line"></i>
+                            <span>健康检查</span>
+                        </a>
+                        <a href="skills/skill-personal-dashboard-nexus-ui/ui/pages/index.html" class="installed-page-card">
+                            <i class="ri-user-line"></i>
+                            <span>个人仪表盘</span>
+                        </a>
+                        <a href="skills/skill-storage-management-nexus-ui/ui/pages/index.html" class="installed-page-card">
+                            <i class="ri-hard-drive-2-line"></i>
+                            <span>存储管理</span>
+                        </a>
+                    </div>
+                </div>
+                
+                <div style="margin-top: 48px;">
+                    <h3><i class="ri-history-line"></i> 最近访问</h3>
                     <div id="recent-access" style="margin-top: 16px;"></div>
                 </div>
             </div>
@@ -67,5 +91,43 @@
     <script src="js/page-init.js" data-auto-init></script>
     <script src="js/theme-manager.js"></script>
     <script src="js/index.js"></script>
+    <style>
+        .installed-pages-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 16px;
+        }
+        
+        .installed-page-card {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            background: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            text-decoration: none;
+            color: var(--text-primary);
+            transition: all 0.2s ease;
+        }
+        
+        .installed-page-card:hover {
+            border-color: var(--primary-color);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        
+        .installed-page-card i {
+            font-size: 28px;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+        
+        .installed-page-card span {
+            font-size: 13px;
+            font-weight: 500;
+        }
+    </style>
 </body>
 </html>

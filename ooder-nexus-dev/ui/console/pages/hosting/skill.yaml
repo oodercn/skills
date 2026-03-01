@@ -1,0 +1,71 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-hosting-nexus-ui
+  name: 云托管管理
+  version: 1.0.0
+  description: 云托管实例管理界面
+  author: ooder Team
+  type: nexus-ui
+
+spec:
+  type: nexus-ui
+  
+  nexusUi:
+    entry:
+      page: index.html
+      title: 云托管管理
+      icon: ri-cloud-line
+      
+    menu:
+      position: sidebar
+      category: infrastructure
+      order: 20
+      permission: hosting:view
+      
+    layout:
+      type: default
+      sidebar: true
+      header: true
+      
+  capabilities:
+    - id: hosting-instance-view
+      name: 查看实例
+      description: 查看托管实例状态
+      category: infrastructure
+      
+    - id: hosting-instance-manage
+      name: 管理实例
+      description: 创建、启动、停止、删除实例
+      category: infrastructure
+      
+    - id: hosting-health-check
+      name: 健康检查
+      description: 查看实例健康状态
+      category: infrastructure
+      
+  apis:
+    - path: /api/hosting/instances
+      method: GET
+      description: 获取实例列表
+      
+    - path: /api/hosting/instances
+      method: POST
+      description: 创建实例
+      
+    - path: /api/hosting/instances/{instanceId}/start
+      method: POST
+      description: 启动实例
+      
+    - path: /api/hosting/instances/{instanceId}/stop
+      method: POST
+      description: 停止实例
+      
+    - path: /api/hosting/instances/{instanceId}/health
+      method: GET
+      description: 获取健康状态
+      
+  dependencies:
+    skills:
+      - skill-hosting: ">=0.7.3"
