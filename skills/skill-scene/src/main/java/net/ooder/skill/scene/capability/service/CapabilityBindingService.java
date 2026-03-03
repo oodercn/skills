@@ -21,6 +21,10 @@ public interface CapabilityBindingService {
     void updateStatus(String bindingId, String status);
 
     CapabilityBinding findByCapId(String sceneGroupId, String capId);
+    
+    CapabilityBinding getByCapId(String capId);
+    
+    void updateInvokeStats(String bindingId, boolean success);
 
     public static class CapabilityBindingRequest {
         private String capabilityId;

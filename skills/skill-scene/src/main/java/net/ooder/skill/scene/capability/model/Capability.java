@@ -24,6 +24,17 @@ public class Capability implements Serializable {
     private CapabilityStatus status;
     private long createTime;
     private long updateTime;
+    private String skillId;
+    
+    private List<String> capabilities;
+    private boolean mainFirst;
+    private MainFirstConfig mainFirstConfig;
+    private List<CollaborativeCapabilityRef> collaborativeCapabilities;
+    private DriverType driverType;
+    private String icon;
+    private Map<String, Object> metadata;
+    private List<String> dependencies;
+    private List<String> optionalCapabilities;
 
     public Capability() {
         this.version = "1.0.0";
@@ -33,6 +44,8 @@ public class Capability implements Serializable {
         this.status = CapabilityStatus.REGISTERED;
         this.createTime = System.currentTimeMillis();
         this.updateTime = this.createTime;
+        this.capabilities = new ArrayList<String>();
+        this.collaborativeCapabilities = new ArrayList<CollaborativeCapabilityRef>();
     }
 
     public String getCapabilityId() {
@@ -157,6 +170,134 @@ public class Capability implements Serializable {
 
     public boolean supportsSceneType(String sceneType) {
         return supportedSceneTypes != null && supportedSceneTypes.contains(sceneType);
+    }
+
+    public String getSkillId() {
+        return skillId;
+    }
+
+    public void setSkillId(String skillId) {
+        this.skillId = skillId;
+    }
+
+    public List<String> getCapabilities() {
+        return capabilities;
+    }
+
+    public void setCapabilities(List<String> capabilities) {
+        this.capabilities = capabilities;
+    }
+
+    public boolean isMainFirst() {
+        return mainFirst;
+    }
+
+    public void setMainFirst(boolean mainFirst) {
+        this.mainFirst = mainFirst;
+    }
+
+    public MainFirstConfig getMainFirstConfig() {
+        return mainFirstConfig;
+    }
+
+    public void setMainFirstConfig(MainFirstConfig mainFirstConfig) {
+        this.mainFirstConfig = mainFirstConfig;
+    }
+
+    public List<CollaborativeCapabilityRef> getCollaborativeCapabilities() {
+        return collaborativeCapabilities;
+    }
+
+    public void setCollaborativeCapabilities(List<CollaborativeCapabilityRef> collaborativeCapabilities) {
+        this.collaborativeCapabilities = collaborativeCapabilities;
+    }
+
+    public DriverType getDriverType() {
+        return driverType;
+    }
+
+    public void setDriverType(DriverType driverType) {
+        this.driverType = driverType;
+    }
+
+    public boolean isSceneCapability() {
+        return type == CapabilityType.SCENE;
+    }
+
+    public boolean isDriverCapability() {
+        return type == CapabilityType.DRIVER;
+    }
+
+    public boolean isInstalled() {
+        return status == CapabilityStatus.ENABLED || status == CapabilityStatus.REGISTERED;
+    }
+
+    public Map<String, Object> getConfig() {
+        Map<String, Object> config = new HashMap<String, Object>();
+        if (metadata != null) {
+            config.putAll(metadata);
+        }
+        return config;
+    }
+
+    public boolean hasMainFirst() {
+        return mainFirst && mainFirstConfig != null;
+    }
+
+    public Map<String, Object> getMetadata() {
+        Map<String, Object> result = new HashMap<String, Object>();
+        if (metadata != null) {
+            result.putAll(metadata);
+        }
+        result.put("version", version);
+        result.put("createTime", createTime);
+        result.put("updateTime", updateTime);
+        result.put("ownerId", ownerId);
+        result.put("skillId", skillId);
+        return result;
+    }
+
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
+    }
+
+    public String getIcon() {
+        if (icon != null) {
+            return icon;
+        }
+        return type != null ? type.getIcon() : "ri-flashlight-line";
+    }
+
+    public void setIcon(String icon) {
+        this.icon = icon;
+    }
+
+    public List<String> getDependencies() {
+        if (dependencies != null) {
+            return dependencies;
+        }
+        return capabilities;
+    }
+
+    public void setDependencies(List<String> dependencies) {
+        this.dependencies = dependencies;
+    }
+
+    public List<String> getOptionalCapabilities() {
+        if (optionalCapabilities != null) {
+            return optionalCapabilities;
+        }
+        List<String> optional = new ArrayList<String>();
+        if (collaborativeCapabilities != null) {
+            for (CollaborativeCapabilityRef ref : collaborativeCapabilities) {
+                optional.add(ref.getCapabilityId());
+            }
+        }
+        return optional;
+    }
+
+    public void setOptionalCapabilities(List<String> optionalCapabilities) {
+        this.optionalCapabilities = optionalCapabilities;
     }
 
     public static class ParameterDef implements Serializable {

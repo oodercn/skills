@@ -1,202 +1,103 @@
 package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.model.ResultModel;
-import net.ooder.skill.scene.dto.PageResult;
-import net.ooder.skill.scene.dto.scene.SceneTemplateDTO;
-import net.ooder.skill.scene.dto.scene.CapabilityDefDTO;
-import net.ooder.skill.scene.dto.scene.RoleDefinitionDTO;
-import net.ooder.skill.scene.service.SceneTemplateService;
+import net.ooder.skill.scene.template.SceneTemplate;
+import net.ooder.skill.scene.template.SceneTemplateService;
+import net.ooder.skill.scene.template.SceneTemplateService.DeployResult;
+import net.ooder.skill.scene.template.SceneTemplateService.InstallResult;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+
+import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/scene-templates")
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
-public class SceneTemplateController extends BaseController {
+@RequestMapping("/api/v1/templates")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+public class SceneTemplateController {
 
-    private final SceneTemplateService templateService;
+    private static final Logger log = LoggerFactory.getLogger(SceneTemplateController.class);
 
     @Autowired
-    public SceneTemplateController(SceneTemplateService templateService) {
-        this.templateService = templateService;
-    }
-
-    @PostMapping
-    public ResultModel<SceneTemplateDTO> create(@RequestBody SceneTemplateDTO template) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("create", template);
-
-        try {
-            SceneTemplateDTO result = templateService.create(template);
-            logRequestEnd("create", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("create", e);
-            return ResultModel.error(500, "创建场景模板失败: " + e.getMessage());
-        }
-    }
+    private SceneTemplateService templateService;
 
     @GetMapping
-    public ResultModel<PageResult<SceneTemplateDTO>> listAll(
-            @RequestParam(defaultValue = "1") int pageNum,
-            @RequestParam(defaultValue = "10") int pageSize,
-            @RequestParam(required = false) String category) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("listAll", "pageNum=" + pageNum + ", pageSize=" + pageSize);
-
-        try {
-            PageResult<SceneTemplateDTO> result = category != null && !category.isEmpty()
-                ? templateService.listByCategory(category, pageNum, pageSize)
-                : templateService.listAll(pageNum, pageSize);
-            logRequestEnd("listAll", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("listAll", e);
-            return ResultModel.error(500, "获取场景模板列表失败: " + e.getMessage());
-        }
+    public ResultModel<List<SceneTemplate>> listTemplates() {
+        log.info("[listTemplates] Listing all templates");
+        List<SceneTemplate> templates = templateService.listTemplates();
+        return ResultModel.success(templates);
     }
 
     @GetMapping("/{templateId}")
-    public ResultModel<SceneTemplateDTO> get(@PathVariable String templateId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("get", templateId);
+    public ResultModel<SceneTemplate> getTemplate(@PathVariable String templateId) {
+        log.info("[getTemplate] Getting template: {}", templateId);
+        SceneTemplate template = templateService.getTemplate(templateId);
+        if (template == null) {
+            return ResultModel.notFound("Template not found: " + templateId);
+        }
+        return ResultModel.success(template);
+    }
 
+    @PostMapping("/{templateId}/deploy")
+    public ResultModel<DeployResult> deployTemplate(
+            @PathVariable String templateId,
+            @RequestBody(required = false) DeployRequest request) {
+        
+        log.info("[deployTemplate] Deploying template: {}", templateId);
+        
         try {
-            SceneTemplateDTO result = templateService.get(templateId);
-            if (result == null) {
-                logRequestEnd("get", "Not found", System.currentTimeMillis() - startTime);
-                return ResultModel.notFound("场景模板不存在");
+            DeployResult result = templateService.deployTemplate(templateId);
+            
+            if (result.isSuccess()) {
+                log.info("[deployTemplate] Template {} deployed successfully, sceneId: {}", 
+                    templateId, result.getSceneId());
+                return ResultModel.success(result);
+            } else {
+                log.warn("[deployTemplate] Failed to deploy template {}: {}", templateId, result.getMessage());
+                return ResultModel.error(500, result.getMessage());
             }
-            logRequestEnd("get", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
         } catch (Exception e) {
-            logRequestError("get", e);
-            return ResultModel.error(500, "获取场景模板失败: " + e.getMessage());
+            log.error("[deployTemplate] Error deploying template: {}", templateId, e);
+            return ResultModel.error(500, "Failed to deploy template: " + e.getMessage());
         }
     }
 
-    @PutMapping("/{templateId}")
-    public ResultModel<SceneTemplateDTO> update(@PathVariable String templateId, @RequestBody SceneTemplateDTO template) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("update", templateId);
+    @GetMapping(value = "/{templateId}/deploy/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter deployTemplateWithProgress(@PathVariable String templateId) {
+        log.info("[deployTemplateWithProgress] Starting SSE deployment for template: {}", templateId);
+        return templateService.deployTemplateWithProgress(templateId);
+    }
 
+    @PostMapping("/{templateId}/install")
+    public ResultModel<InstallResult> installTemplate(@PathVariable String templateId) {
+        log.info("[installTemplate] Installing template dependencies: {}", templateId);
+        
         try {
-            template.setTemplateId(templateId);
-            SceneTemplateDTO existing = templateService.get(templateId);
-            if (existing == null) {
-                return ResultModel.notFound("场景模板不存在");
+            InstallResult result = templateService.installTemplateDependencies(templateId);
+            
+            if (result.isSuccess()) {
+                log.info("[installTemplate] Template {} dependencies installed successfully", templateId);
+                return ResultModel.success(result);
+            } else {
+                log.warn("[installTemplate] Failed to install template {} dependencies: {}", templateId, result.getMessage());
+                return ResultModel.error(500, result.getMessage());
             }
-            template.setUpdateTime(System.currentTimeMillis());
-            logRequestEnd("update", template, System.currentTimeMillis() - startTime);
-            return ResultModel.success(template);
         } catch (Exception e) {
-            logRequestError("update", e);
-            return ResultModel.error(500, "更新场景模板失败: " + e.getMessage());
+            log.error("[installTemplate] Error installing template dependencies: {}", templateId, e);
+            return ResultModel.error(500, "Failed to install dependencies: " + e.getMessage());
         }
     }
 
-    @DeleteMapping("/{templateId}")
-    public ResultModel<Boolean> delete(@PathVariable String templateId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("delete", templateId);
+    public static class DeployRequest {
+        private String name;
+        private java.util.Map<String, Object> overrides;
 
-        try {
-            boolean result = templateService.delete(templateId);
-            logRequestEnd("delete", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("delete", e);
-            return ResultModel.error(500, "删除场景模板失败: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/{templateId}/activate")
-    public ResultModel<Boolean> activate(@PathVariable String templateId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("activate", templateId);
-
-        try {
-            boolean result = templateService.activate(templateId);
-            logRequestEnd("activate", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("activate", e);
-            return ResultModel.error(500, "激活场景模板失败: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/{templateId}/deactivate")
-    public ResultModel<Boolean> deactivate(@PathVariable String templateId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("deactivate", templateId);
-
-        try {
-            boolean result = templateService.deactivate(templateId);
-            logRequestEnd("deactivate", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("deactivate", e);
-            return ResultModel.error(500, "停用场景模板失败: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/{templateId}/capabilities")
-    public ResultModel<Boolean> addCapability(@PathVariable String templateId, @RequestBody CapabilityDefDTO capability) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("addCapability", templateId);
-
-        try {
-            boolean result = templateService.addCapability(templateId, capability);
-            logRequestEnd("addCapability", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("addCapability", e);
-            return ResultModel.error(500, "添加能力失败: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{templateId}/capabilities/{capId}")
-    public ResultModel<Boolean> removeCapability(@PathVariable String templateId, @PathVariable String capId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("removeCapability", templateId + "/" + capId);
-
-        try {
-            boolean result = templateService.removeCapability(templateId, capId);
-            logRequestEnd("removeCapability", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("removeCapability", e);
-            return ResultModel.error(500, "移除能力失败: " + e.getMessage());
-        }
-    }
-
-    @PostMapping("/{templateId}/roles")
-    public ResultModel<Boolean> addRole(@PathVariable String templateId, @RequestBody RoleDefinitionDTO role) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("addRole", templateId);
-
-        try {
-            boolean result = templateService.addRole(templateId, role);
-            logRequestEnd("addRole", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("addRole", e);
-            return ResultModel.error(500, "添加角色失败: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{templateId}/roles/{roleId}")
-    public ResultModel<Boolean> removeRole(@PathVariable String templateId, @PathVariable String roleId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("removeRole", templateId + "/" + roleId);
-
-        try {
-            boolean result = templateService.removeRole(templateId, roleId);
-            logRequestEnd("removeRole", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("removeRole", e);
-            return ResultModel.error(500, "移除角色失败: " + e.getMessage());
-        }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public java.util.Map<String, Object> getOverrides() { return overrides; }
+        public void setOverrides(java.util.Map<String, Object> overrides) { this.overrides = overrides; }
     }
 }

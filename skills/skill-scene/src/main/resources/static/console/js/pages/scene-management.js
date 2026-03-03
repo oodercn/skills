@@ -20,12 +20,7 @@
 
         loadScenes: async function() {
             try {
-                var response = await fetch('/api/scenes/list', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ pageNum: 1, pageSize: 100 })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/list', { pageNum: 1, pageSize: 100 });
                 
                 if (result.status === 'success' && result.data) {
                     scenes = result.data.list || [];
@@ -127,12 +122,7 @@
             };
             
             try {
-                var response = await fetch('/api/scenes/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(sceneData)
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/create', sceneData);
                 
                 if (result.status === 'success') {
                     SceneManagement.closeModal();
@@ -155,12 +145,7 @@
             if (!confirm('确定要删除该场景吗？')) return;
             
             try {
-                var response = await fetch('/api/scenes/delete', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: sceneId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/delete', { sceneId: sceneId });
                 
                 if (result.status === 'success') {
                     SceneManagement.loadScenes();

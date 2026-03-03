@@ -27,8 +27,7 @@ async function loadKeys() {
     if (status) url += 'status=' + status;
     
     try {
-        var response = await fetch(url);
-        var result = await response.json();
+        var result = await ApiClient.get(url);
         
         if (result && result.code === 200) {
             keys = result.data || [];
@@ -132,15 +131,9 @@ async function createKey(e) {
     }
     
     try {
-        var response = await fetch('/api/v1/keys', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        });
+        var result = await ApiClient.post('/api/v1/keys', data);
         
-        var result = await response.json();
-        
-        if (response.ok && result) {
+        if (result) {
             hideCreateModal();
             loadKeys();
             alert('创建成功');
@@ -187,15 +180,9 @@ async function rotateKey(keyId) {
     if (!newValue) return;
     
     try {
-        var response = await fetch('/api/v1/keys/' + keyId + '/rotate', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(newValue)
-        });
+        var result = await ApiClient.post('/api/v1/keys/' + keyId + '/rotate', newValue);
         
-        var result = await response.json();
-        
-        if (response.ok && result) {
+        if (result) {
             loadKeys();
             alert('轮换成功');
         } else {
@@ -212,13 +199,9 @@ async function revokeKey(keyId) {
     if (!confirm('确定要撤销此密钥吗？此操作不可恢复！')) return;
     
     try {
-        var response = await fetch('/api/v1/keys/' + keyId + '/revoke', {
-            method: 'POST'
-        });
+        var result = await ApiClient.post('/api/v1/keys/' + keyId + '/revoke');
         
-        var result = await response.json();
-        
-        if (response.ok && result) {
+        if (result) {
             loadKeys();
             alert('撤销成功');
         } else {

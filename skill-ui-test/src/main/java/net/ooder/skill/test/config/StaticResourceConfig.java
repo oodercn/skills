@@ -24,6 +24,10 @@ public class StaticResourceConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/console/skills/**")
                 .addResourceLocations(skillsLocation)
                 .setCachePeriod(0);
+        
+        registry.addResourceHandler("/skills/**")
+                .addResourceLocations(skillsLocation)
+                .setCachePeriod(0);
     }
     
     @Override

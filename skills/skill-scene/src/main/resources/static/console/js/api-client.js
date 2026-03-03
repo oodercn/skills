@@ -85,16 +85,55 @@
     },
 
     /**
+     * 发送 DELETE 请求
+     * @param {string} url - 请求地址
+     * @param {Object} options - 请求选项
+     * @returns {Promise} 响应结果
+     */
+    async delete(url, options = {}) {
+      const fullUrl = this._buildUrl(url);
+      const requestOptions = {
+        method: 'DELETE',
+        headers: { ...config.headers, ...options.headers },
+        ...options
+      };
+
+      return this._request(fullUrl, requestOptions);
+    },
+
+    /**
+     * 发送 PUT 请求
+     * @param {string} url - 请求地址
+     * @param {Object} data - 请求数据
+     * @param {Object} options - 请求选项
+     * @returns {Promise} 响应结果
+     */
+    async put(url, data = {}, options = {}) {
+      const fullUrl = this._buildUrl(url);
+      const requestOptions = {
+        method: 'PUT',
+        headers: { ...config.headers, ...options.headers },
+        ...options
+      };
+
+      if (data && Object.keys(data).length > 0) {
+        requestOptions.body = JSON.stringify(data);
+      }
+
+      return this._request(fullUrl, requestOptions);
+    },
+
+    /**
      * 执行请求
      * @private
      */
     async _request(url, options) {
-      // 创建 AbortController 用于超时控制
+      const timeout = options.timeout || config.timeout;
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), config.timeout);
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       try {
-        console.log(`[ApiClient] 请求: ${options.method} ${url}`);
+        console.log(`[ApiClient] 请求: ${options.method} ${url} (timeout: ${timeout}ms)`);
 
         const response = await fetch(url, {
           ...options,
@@ -333,5 +372,30 @@
 
   // 暴露到全局
   window.ApiClient = ApiClient;
+
+  // NexusApi 别名（兼容旧代码）
+  window.NexusApi = {
+    async get(url, params) {
+      var result = await ApiClient.get(url, params);
+      return result;
+    },
+    async post(url, data) {
+      var result = await ApiClient.post(url, data);
+      return result;
+    },
+    async put(url, data) {
+      var fullUrl = url;
+      var response = await fetch(fullUrl, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      return response.json();
+    },
+    async delete(url) {
+      var result = await ApiClient.delete(url);
+      return result;
+    }
+  };
 
 })();

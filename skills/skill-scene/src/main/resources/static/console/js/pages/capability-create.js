@@ -134,24 +134,19 @@
                 endpoint: document.getElementById('endpoint').value
             };
 
-            fetch('/api/v1/capabilities', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
-                    alert('能力创建成功！');
+            ApiClient.post('/api/v1/capabilities', data)
+                .then(function(result) {
+                    if (result.code === 200) {
+                        alert('能力创建成功！');
+                        window.location.href = '/console/pages/my-capabilities.html';
+                    } else {
+                        alert('创建失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
+                    alert('创建成功！（本地模拟）');
                     window.location.href = '/console/pages/my-capabilities.html';
-                } else {
-                    alert('创建失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                alert('创建成功！（本地模拟）');
-                window.location.href = '/console/pages/my-capabilities.html';
-            });
+                });
         },
 
         reset: function() {

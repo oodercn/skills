@@ -2,17 +2,28 @@ package net.ooder.skill.security.service.impl;
 
 import net.ooder.skill.security.dto.*;
 import net.ooder.skill.security.service.SecurityService;
+
+import net.ooder.sdk.api.security.SecurityApi;
+import net.ooder.sdk.api.security.SecurityApi.SecurityPolicy;
+import net.ooder.sdk.api.security.SecurityApi.AuditLog;
+import net.ooder.sdk.api.security.SecurityApi.SecurityEvent;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
+import java.util.stream.Collectors;
 
 @Service
 public class SecurityServiceImpl implements SecurityService {
 
-    private final Map<String, SecurityPolicy> policies = new ConcurrentHashMap<>();
+    @Autowired
+    private SecurityApi securityApi;
+    
     private final Map<String, AccessControl> acls = new ConcurrentHashMap<>();
     private final Map<String, ThreatInfo> threats = new ConcurrentHashMap<>();
     private final AtomicBoolean firewallEnabled = new AtomicBoolean(true);
@@ -20,7 +31,6 @@ public class SecurityServiceImpl implements SecurityService {
     private final AtomicLong threatsDetected = new AtomicLong(0);
     private final AtomicLong threatsResolved = new AtomicLong(0);
     private final AtomicLong blockedConnections = new AtomicLong(0);
-    private final AtomicLong auditLogs = new AtomicLong(0);
     private SecurityConfig config = new SecurityConfig();
 
     public SecurityServiceImpl() {
@@ -30,19 +40,21 @@ public class SecurityServiceImpl implements SecurityService {
     private void initDefaultPolicies() {
         SecurityPolicy defaultPolicy = new SecurityPolicy();
         defaultPolicy.setPolicyId("policy-default-001");
-        defaultPolicy.setPolicyName("Default Security Policy");
-        defaultPolicy.setPolicyType("general");
+        defaultPolicy.setName("Default Security Policy");
         defaultPolicy.setDescription("Default security policy for basic protection");
-        defaultPolicy.setStatus("enabled");
-        defaultPolicy.setPriority(100);
-        defaultPolicy.setAction("allow");
-        policies.put(defaultPolicy.getPolicyId(), defaultPolicy);
+        defaultPolicy.setEnabled(true);
+        defaultPolicy.setResource("*");
+        defaultPolicy.setAction("*");
+        defaultPolicy.setAllowedRoles(Arrays.asList("admin", "user"));
+        securityApi.createPolicy(defaultPolicy);
     }
 
     @Override
     public SecurityStatus getStatus() {
+        List<SecurityPolicy> policies = securityApi.getPolicies();
+        
         SecurityStatus status = new SecurityStatus();
-        status.setActivePolicies((int) policies.values().stream().filter(p -> "enabled".equals(p.getStatus())).count());
+        status.setActivePolicies((int) policies.stream().filter(SecurityPolicy::isEnabled).count());
         status.setTotalPolicies(policies.size());
         status.setRecentAlerts((int) threats.values().stream().filter(t -> "open".equals(t.getStatus())).count());
         status.setBlockedAttempts((int) blockedConnections.get());
@@ -64,7 +76,9 @@ public class SecurityServiceImpl implements SecurityService {
         stats.setThreatsDetected(threatsDetected.get());
         stats.setResolvedThreats(threatsResolved.get());
         stats.setBlockedConnections(blockedConnections.get());
-        stats.setAuditLogs(auditLogs.get());
+        
+        AuditLog auditLog = securityApi.getAuditLog(null, 100);
+        stats.setAuditLogs(auditLog != null ? auditLog.getTotalCount() : 0);
         stats.setAverageScanTime(150.0);
         return stats;
     }
@@ -77,17 +91,20 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public void saveConfig(SecurityConfig newConfig) {
         this.config = newConfig;
-        auditLogs.incrementAndGet();
+        logSecurityEvent("CONFIG_UPDATE", "security-config", "update");
     }
 
     @Override
     public List<SecurityPolicy> listPolicies() {
-        return new ArrayList<>(policies.values());
+        return securityApi.getPolicies();
     }
 
     @Override
     public SecurityPolicy getPolicy(String policyId) {
-        return policies.get(policyId);
+        return securityApi.getPolicies().stream()
+            .filter(p -> policyId.equals(p.getPolicyId()))
+            .findFirst()
+            .orElse(null);
     }
 
     @Override
@@ -95,20 +112,18 @@ public class SecurityServiceImpl implements SecurityService {
         if (policy.getPolicyId() == null || policy.getPolicyId().isEmpty()) {
             policy.setPolicyId("policy-" + UUID.randomUUID().toString().substring(0, 8));
         }
-        policy.setCreatedAt(System.currentTimeMillis());
-        policy.setUpdatedAt(System.currentTimeMillis());
-        policies.put(policy.getPolicyId(), policy);
-        auditLogs.incrementAndGet();
+        securityApi.createPolicy(policy);
+        logSecurityEvent("POLICY_CREATE", policy.getPolicyId(), "create");
         return policy;
     }
 
     @Override
     public boolean enablePolicy(String policyId) {
-        SecurityPolicy policy = policies.get(policyId);
+        SecurityPolicy policy = getPolicy(policyId);
         if (policy != null) {
-            policy.setStatus("enabled");
-            policy.setUpdatedAt(System.currentTimeMillis());
-            auditLogs.incrementAndGet();
+            policy.setEnabled(true);
+            securityApi.updatePolicy(policyId, policy);
+            logSecurityEvent("POLICY_ENABLE", policyId, "enable");
             return true;
         }
         return false;
@@ -116,11 +131,11 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean disablePolicy(String policyId) {
-        SecurityPolicy policy = policies.get(policyId);
+        SecurityPolicy policy = getPolicy(policyId);
         if (policy != null) {
-            policy.setStatus("disabled");
-            policy.setUpdatedAt(System.currentTimeMillis());
-            auditLogs.incrementAndGet();
+            policy.setEnabled(false);
+            securityApi.updatePolicy(policyId, policy);
+            logSecurityEvent("POLICY_DISABLE", policyId, "disable");
             return true;
         }
         return false;
@@ -128,11 +143,9 @@ public class SecurityServiceImpl implements SecurityService {
 
     @Override
     public boolean deletePolicy(String policyId) {
-        if (policies.remove(policyId) != null) {
-            auditLogs.incrementAndGet();
-            return true;
-        }
-        return false;
+        securityApi.deletePolicy(policyId);
+        logSecurityEvent("POLICY_DELETE", policyId, "delete");
+        return true;
     }
 
     @Override
@@ -151,14 +164,14 @@ public class SecurityServiceImpl implements SecurityService {
         }
         acl.setGrantedAt(System.currentTimeMillis());
         acls.put(acl.getAclId(), acl);
-        auditLogs.incrementAndGet();
+        logSecurityEvent("ACL_CREATE", acl.getAclId(), "create");
         return acl;
     }
 
     @Override
     public boolean deleteAcl(String aclId) {
         if (acls.remove(aclId) != null) {
-            auditLogs.incrementAndGet();
+            logSecurityEvent("ACL_DELETE", aclId, "delete");
             return true;
         }
         return false;
@@ -180,7 +193,7 @@ public class SecurityServiceImpl implements SecurityService {
             threat.setStatus("resolved");
             threat.setResolvedAt(System.currentTimeMillis());
             threatsResolved.incrementAndGet();
-            auditLogs.incrementAndGet();
+            logSecurityEvent("THREAT_RESOLVE", threatId, "resolve");
             return true;
         }
         return false;
@@ -189,7 +202,7 @@ public class SecurityServiceImpl implements SecurityService {
     @Override
     public boolean runSecurityScan() {
         totalScans.incrementAndGet();
-        auditLogs.incrementAndGet();
+        logSecurityEvent("SECURITY_SCAN", "system", "scan");
         return true;
     }
 
@@ -197,7 +210,18 @@ public class SecurityServiceImpl implements SecurityService {
     public boolean toggleFirewall() {
         boolean newValue = !firewallEnabled.get();
         firewallEnabled.set(newValue);
-        auditLogs.incrementAndGet();
+        logSecurityEvent("FIREWALL_TOGGLE", "firewall", newValue ? "enable" : "disable");
         return newValue;
+    }
+    
+    private void logSecurityEvent(String eventType, String resource, String action) {
+        SecurityEvent event = new SecurityEvent();
+        event.setEventId(UUID.randomUUID().toString());
+        event.setEventType(eventType);
+        event.setResource(resource);
+        event.setAction(action);
+        event.setResult("success");
+        event.setTimestamp(Instant.now());
+        securityApi.logSecurityEvent(event);
     }
 }

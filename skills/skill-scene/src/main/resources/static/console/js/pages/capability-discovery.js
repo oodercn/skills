@@ -36,8 +36,8 @@
             color: '#6366f1',
             requiresConfig: true,
             configFields: [
-                { name: 'repoUrl', label: '仓库地址', type: 'text', placeholder: '如: https://github.com/user/skills' },
-                { name: 'branch', label: '分支', type: 'text', default: 'main' },
+                { name: 'repoUrl', label: '仓库地址', type: 'text', default: 'https://github.com/oodercn/skills' },
+                { name: 'branch', label: '分支', type: 'text', default: 'master' },
                 { name: 'token', label: '访问令牌(可选)', type: 'password' }
             ]
         },
@@ -49,7 +49,7 @@
             color: '#ef4444',
             requiresConfig: true,
             configFields: [
-                { name: 'repoUrl', label: '仓库地址', type: 'text', placeholder: '如: https://gitee.com/user/skills' },
+                { name: 'repoUrl', label: '仓库地址', type: 'text', default: 'https://gitee.com/ooderCN/skills' },
                 { name: 'branch', label: '分支', type: 'text', default: 'master' },
                 { name: 'token', label: '访问令牌(可选)', type: 'password' }
             ]
@@ -149,8 +149,7 @@
         },
 
         loadInstalled: function() {
-            fetch('/api/v1/capabilities')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         installedCapabilities = result.data;
@@ -239,84 +238,190 @@
             var method = DISCOVERY_METHODS.find(function(m) { return m.id === currentMethod; });
             
             if (currentMethod === 'GITHUB') {
-                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/github', method);
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/github', method, false);
             } else if (currentMethod === 'GITEE') {
-                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/gitee', method);
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/gitee', method, false);
             } else if (currentMethod === 'GIT_REPOSITORY') {
-                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/git', method);
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/git', method, false);
             } else {
                 var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
                 CapabilityDiscovery.discoverFromLocal(url);
             }
         },
 
-        discoverFromGitService: function(apiUrl, method) {
+        forceRefresh: function() {
+            if (!currentMethod) {
+                alert('请先选择发现方式');
+                return;
+            }
+
+            var method = DISCOVERY_METHODS.find(function(m) { return m.id === currentMethod; });
+            
+            discoveredCapabilities = [];
+            scanStats = { scanned: 0, found: 0, new: 0, installed: 0 };
+            isScanning = true;
+            CapabilityDiscovery.updateStats();
+            CapabilityDiscovery.addLog('info', '强制刷新: ' + currentMethod);
+
+            if (currentMethod === 'GITHUB') {
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/github', method, true);
+            } else if (currentMethod === 'GITEE') {
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/gitee', method, true);
+            } else if (currentMethod === 'GIT_REPOSITORY') {
+                CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/git', method, true);
+            } else {
+                var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
+                CapabilityDiscovery.discoverFromLocal(url);
+            }
+        },
+
+        discoverFromGitService: function(apiUrl, method, forceRefresh) {
             var config = {};
             if (method && method.configFields) {
                 method.configFields.forEach(function(field) {
                     var el = document.getElementById('config_' + field.name);
                     if (el) {
                         config[field.name] = el.value;
+                        console.log('[Discovery] config.' + field.name + ' =', el.value);
                     }
                 });
             }
 
-            fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(config)
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200 && result.data) {
-                    var data = result.data;
-                    var caps = data.capabilities || [];
-                    
-                    caps.forEach(function(cap) {
-                        var exists = installedCapabilities.find(function(i) { 
-                            return i.capabilityId === cap.id; 
-                        });
-                        if (!exists) {
-                            discoveredCapabilities.push({
-                                capabilityId: cap.id,
-                                name: cap.name,
-                                type: cap.type,
-                                description: cap.description,
-                                version: cap.version,
-                                source: currentMethod,
-                                dependencies: [],
-                                provider: null
-                            });
-                        }
-                    });
-
-                    scanStats.found = caps.length;
-                    scanStats.scanned = 100;
-
-                    CapabilityDiscovery.addLog('success', '从 ' + currentMethod + ' 发现 ' + caps.length + ' 个能力');
-                    if (data.repositories) {
-                        CapabilityDiscovery.addLog('info', '扫描了 ' + data.repositories.length + ' 个仓库');
-                    }
-                    CapabilityDiscovery.renderResults();
-                    CapabilityDiscovery.addRadarDots();
-                } else {
-                    CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
+            var cacheKey = 'discovery_cache_' + currentMethod + '_' + (config.repoUrl || '').replace(/[^a-zA-Z0-9]/g, '_');
+            
+            console.log('[Discovery] forceRefresh=', forceRefresh, 'cacheKey=', cacheKey);
+            
+            if (!forceRefresh) {
+                var cachedData = CapabilityDiscovery.getCache(cacheKey);
+                if (cachedData) {
+                    console.log('[Discovery] Using cached data, but will still call backend for fresh data');
                 }
-            })
-            .catch(function(error) {
-                console.error('Discovery error:', error);
-                CapabilityDiscovery.addLog('error', '扫描失败: ' + error.message);
-                CapabilityDiscovery.simulateDiscovery();
-            })
-            .finally(function() {
-                CapabilityDiscovery.finishScan();
+            } else {
+                CapabilityDiscovery.clearCache(cacheKey);
+                CapabilityDiscovery.addLog('info', '强制刷新，清除缓存');
+            }
+
+            console.log('[Discovery] Sending request to', apiUrl, 'with config:', JSON.stringify(config));
+
+            ApiClient.post(apiUrl, config, { timeout: 120000 })
+                .then(function(result) {
+                    console.log('[Discovery] Response received:', result);
+                    if (result.code === 200 && result.data) {
+                        CapabilityDiscovery.setCache(cacheKey, result.data);
+                        CapabilityDiscovery.processDiscoveryResult(result.data);
+                    } else {
+                        CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
+                        CapabilityDiscovery.showEmptyResult();
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Discovery error:', error);
+                    CapabilityDiscovery.addLog('error', '扫描失败: ' + error.message);
+                    CapabilityDiscovery.showEmptyResult();
+                })
+                .finally(function() {
+                    CapabilityDiscovery.finishScan();
+                });
+        },
+
+        processDiscoveryResult: function(data) {
+            var caps = data.capabilities || [];
+            
+            caps.forEach(function(cap) {
+                var exists = installedCapabilities.find(function(i) { 
+                    return i.capabilityId === cap.id; 
+                });
+                if (!exists) {
+                    discoveredCapabilities.push({
+                        capabilityId: cap.id,
+                        name: cap.name,
+                        type: cap.type,
+                        description: cap.description,
+                        version: cap.version,
+                        source: currentMethod,
+                        dependencies: [],
+                        provider: null
+                    });
+                }
             });
+
+            scanStats.found = caps.length;
+            scanStats.scanned = 100;
+
+            CapabilityDiscovery.addLog('success', '从 ' + currentMethod + ' 发现 ' + caps.length + ' 个能力');
+            if (data.repositories) {
+                CapabilityDiscovery.addLog('info', '扫描了 ' + data.repositories.length + ' 个仓库');
+            }
+            CapabilityDiscovery.renderResults();
+            CapabilityDiscovery.addRadarDots();
+        },
+
+        getCache: function(key) {
+            try {
+                var cached = localStorage.getItem(key);
+                if (cached) {
+                    var data = JSON.parse(cached);
+                    var now = Date.now();
+                    if (data.expireTime > now) {
+                        console.log('[Cache] Hit:', key);
+                        return data.value;
+                    } else {
+                        localStorage.removeItem(key);
+                        console.log('[Cache] Expired:', key);
+                    }
+                }
+            } catch (e) {
+                console.warn('[Cache] Read error:', e);
+            }
+            return null;
+        },
+
+        setCache: function(key, value) {
+            try {
+                var cacheExpireHours = 24;
+                var data = {
+                    value: value,
+                    expireTime: Date.now() + (cacheExpireHours * 60 * 60 * 1000),
+                    cachedAt: new Date().toISOString()
+                };
+                localStorage.setItem(key, JSON.stringify(data));
+                console.log('[Cache] Set:', key, 'expire in', cacheExpireHours, 'hours');
+            } catch (e) {
+                console.warn('[Cache] Write error:', e);
+            }
+        },
+
+        clearCache: function(key) {
+            try {
+                if (key) {
+                    localStorage.removeItem(key);
+                    console.log('[Cache] Cleared:', key);
+                } else {
+                    var keysToRemove = [];
+                    for (var i = 0; i < localStorage.length; i++) {
+                        var k = localStorage.key(i);
+                        if (k && k.startsWith('discovery_cache_')) {
+                            keysToRemove.push(k);
+                        }
+                    }
+                    keysToRemove.forEach(function(k) {
+                        localStorage.removeItem(k);
+                    });
+                    console.log('[Cache] Cleared all discovery caches:', keysToRemove.length);
+                }
+            } catch (e) {
+                console.warn('[Cache] Clear error:', e);
+            }
+        },
+
+        clearAllCaches: function() {
+            CapabilityDiscovery.clearCache();
+            CapabilityDiscovery.addLog('info', '已清除所有缓存');
         },
 
         discoverFromLocal: function(url) {
 
-            fetch(url)
-                .then(function(response) { return response.json(); })
+            ApiClient.get(url)
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         discoveredCapabilities = result.data;
@@ -337,12 +442,13 @@
                         CapabilityDiscovery.addRadarDots();
                     } else {
                         CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
+                        CapabilityDiscovery.showEmptyResult();
                     }
                 })
                 .catch(function(error) {
                     console.error('Scan error:', error);
                     CapabilityDiscovery.addLog('error', '扫描失败: ' + error.message);
-                    CapabilityDiscovery.simulateDiscovery();
+                    CapabilityDiscovery.showEmptyResult();
                 })
                 .finally(function() {
                     CapabilityDiscovery.finishScan();
@@ -360,21 +466,11 @@
             CapabilityDiscovery.updateStats();
         },
 
-        simulateDiscovery: function() {
-            var mockData = [
-                { id: 'report-analyze', name: '日志分析', type: 'AI', description: 'AI分析日志内容', version: '1.0.0', source: currentMethod },
-                { id: 'data-backup', name: '数据备份', type: 'STORAGE', description: '自动备份场景数据', version: '1.0.0', source: currentMethod },
-                { id: 'system-monitor', name: '系统监控', type: 'SERVICE', description: '监控系统运行状态', version: '1.0.0', source: currentMethod }
-            ];
-
-            discoveredCapabilities = mockData;
-            scanStats.found = mockData.length;
+        showEmptyResult: function() {
+            discoveredCapabilities = [];
+            scanStats.found = 0;
             scanStats.scanned = 100;
-            scanStats.new = mockData.length;
-
-            CapabilityDiscovery.addLog('warn', '使用模拟数据');
             CapabilityDiscovery.renderResults();
-            CapabilityDiscovery.addRadarDots();
         },
 
         addRadarDots: function() {
@@ -421,12 +517,16 @@
                     return i.capabilityId === cap.id; 
                 });
                 var typeIcon = CapabilityDiscovery.getTypeIcon(cap.type);
+                var isSceneCapability = cap.isSceneCapability === true || cap.type === 'SCENE';
+                var capabilityTypeLabel = isSceneCapability ? 
+                    '<span class="capability-type-badge scene"><i class="ri-layout-grid-line"></i> 场景能力</span>' : 
+                    '<span class="capability-type-badge collaboration"><i class="ri-team-line"></i> 协作能力</span>';
 
-                html += '<div class="result-item">' +
+                html += '<div class="result-item" data-scene="' + isSceneCapability + '">' +
                     '<div class="result-icon type-' + (cap.type || 'CUSTOM') + '">' +
                     '<i class="' + typeIcon + '"></i></div>' +
                     '<div class="result-info">' +
-                    '<div class="result-name">' + (cap.name || cap.id) + '</div>' +
+                    '<div class="result-name">' + (cap.name || cap.id) + capabilityTypeLabel + '</div>' +
                     '<div class="result-id">' + cap.id + '</div>' +
                     '<div class="result-desc">' + (cap.description || '暂无描述') + '</div>' +
                     '<div class="result-meta">' +
@@ -464,20 +564,200 @@
             return icons[type] || icons['CUSTOM'];
         },
 
+        currentInstallCap: null,
+        currentWizardStep: 1,
+        selectedDriverCondition: null,
+        collaborators: [],
+        installId: null,
+
         installCap: async function(capId) {
             var cap = discoveredCapabilities.find(function(c) { return c.id === capId; });
             if (!cap) return;
 
-            var modal = document.getElementById('installModal');
+            CapabilityDiscovery.currentInstallCap = cap;
+            CapabilityDiscovery.currentWizardStep = 1;
+            CapabilityDiscovery.selectedDriverCondition = null;
+            CapabilityDiscovery.collaborators = [];
+            CapabilityDiscovery.installId = null;
+
+            document.getElementById('installModalTitle').textContent = '安装能力: ' + (cap.name || cap.id);
+            
+            CapabilityDiscovery.loadDriverConditions(cap.id);
+            
+            document.getElementById('leaderInput').value = '';
+            document.getElementById('collaboratorList').innerHTML = '';
+            document.getElementById('collaboratorInput').value = '';
+            document.getElementById('pushType').value = 'SHARE';
+            
+            CapabilityDiscovery.showWizardStep(1);
+            document.getElementById('installModal').classList.add('show');
+        },
+
+        loadDriverConditions: function(capabilityId) {
+            var container = document.getElementById('driverConditionList');
+            
+            ApiClient.get('/api/v1/capabilities/' + capabilityId + '/driver-conditions')
+                .then(function(result) {
+                    if (result.code === 200 && result.data && result.data.length > 0) {
+                        var html = '';
+                        result.data.forEach(function(dc, i) {
+                            html += '<div class="driver-condition-item' + (i === 0 ? ' selected' : '') + '" data-id="' + dc.conditionId + '" onclick="selectDriverCondition(\'' + dc.conditionId + '\')">' +
+                                '<div class="driver-condition-radio"></div>' +
+                                '<div class="driver-condition-info">' +
+                                '<div class="driver-condition-name">' + dc.name + '</div>' +
+                                '<div class="driver-condition-desc">' + (dc.description || '默认驱动条件') + '</div>' +
+                                '</div></div>';
+                        });
+                        container.innerHTML = html;
+                        if (result.data.length > 0) {
+                            CapabilityDiscovery.selectedDriverCondition = result.data[0].conditionId;
+                        }
+                    } else {
+                        container.innerHTML = '<div class="driver-condition-item selected" data-id="default" onclick="selectDriverCondition(\'default\')">' +
+                            '<div class="driver-condition-radio"></div>' +
+                            '<div class="driver-condition-info">' +
+                            '<div class="driver-condition-name">默认条件</div>' +
+                            '<div class="driver-condition-desc">使用默认驱动条件</div>' +
+                            '</div></div>';
+                        CapabilityDiscovery.selectedDriverCondition = 'default';
+                    }
+                })
+                .catch(function(error) {
+                    container.innerHTML = '<div class="driver-condition-item selected" data-id="default" onclick="selectDriverCondition(\'default\')">' +
+                        '<div class="driver-condition-radio"></div>' +
+                        '<div class="driver-condition-info">' +
+                        '<div class="driver-condition-name">默认条件</div>' +
+                        '<div class="driver-condition-desc">使用默认驱动条件</div>' +
+                        '</div></div>';
+                    CapabilityDiscovery.selectedDriverCondition = 'default';
+                });
+        },
+
+        selectDriverCondition: function(conditionId) {
+            CapabilityDiscovery.selectedDriverCondition = conditionId;
+            document.querySelectorAll('.driver-condition-item').forEach(function(item) {
+                item.classList.toggle('selected', item.dataset.id === conditionId);
+            });
+        },
+
+        selectLeader: function() {
+            var userId = prompt('请输入主导者用户ID:');
+            if (userId) {
+                document.getElementById('leaderInput').value = userId;
+            }
+        },
+
+        addCollaborator: function() {
+            var input = document.getElementById('collaboratorInput');
+            var userId = input.value.trim();
+            if (!userId) return;
+            
+            if (CapabilityDiscovery.collaborators.indexOf(userId) >= 0) {
+                alert('该用户已添加');
+                return;
+            }
+            
+            CapabilityDiscovery.collaborators.push(userId);
+            CapabilityDiscovery.renderCollaborators();
+            input.value = '';
+        },
+
+        removeCollaborator: function(userId) {
+            CapabilityDiscovery.collaborators = CapabilityDiscovery.collaborators.filter(function(c) { return c !== userId; });
+            CapabilityDiscovery.renderCollaborators();
+        },
+
+        renderCollaborators: function() {
+            var container = document.getElementById('collaboratorList');
+            var html = '';
+            CapabilityDiscovery.collaborators.forEach(function(userId) {
+                html += '<span class="participant-tag">' + userId +
+                    '<i class="ri-close-line remove-btn" onclick="removeCollaborator(\'' + userId + '\')"></i></span>';
+            });
+            container.innerHTML = html;
+        },
+
+        showWizardStep: function(step) {
+            CapabilityDiscovery.currentWizardStep = step;
+            
+            document.querySelectorAll('.wizard-step').forEach(function(s, i) {
+                s.classList.toggle('active', i + 1 === step);
+            });
+            
+            document.getElementById('installPrev').style.display = step > 1 ? 'inline-flex' : 'none';
+            document.getElementById('installNext').style.display = step < 3 ? 'inline-flex' : 'none';
+            document.getElementById('installCancel').style.display = 'inline-flex';
+            document.getElementById('installDone').style.display = 'none';
+            
+            if (step === 2) {
+                CapabilityDiscovery.loadDependencies();
+            }
+        },
+
+        loadDependencies: function() {
+            var container = document.getElementById('dependencyList');
+            var cap = CapabilityDiscovery.currentInstallCap;
+            
+            if (!cap || !cap.dependencies || cap.dependencies.length === 0) {
+                container.innerHTML = '<div style="text-align: center; padding: 20px; color: var(--nx-text-secondary);">' +
+                    '<i class="ri-checkbox-circle-line" style="font-size: 24px; display: block; margin-bottom: 8px;"></i>' +
+                    '无依赖项，可直接安装</div>';
+                return;
+            }
+            
+            var html = '';
+            cap.dependencies.forEach(function(dep) {
+                var isInstalled = installedCapabilities.find(function(i) { return i.capabilityId === dep.id; });
+                html += '<div class="dependency-item">' +
+                    '<div class="dependency-icon"><i class="ri-puzzle-line"></i></div>' +
+                    '<div class="dependency-info">' +
+                    '<div class="dependency-name">' + (dep.name || dep.id) + '</div>' +
+                    '<div class="dependency-version">v' + (dep.version || '1.0.0') + '</div>' +
+                    '</div>' +
+                    '<span class="dependency-status ' + (isInstalled ? 'installed' : 'pending') + '">' +
+                    (isInstalled ? '已安装' : '待安装') + '</span></div>';
+            });
+            container.innerHTML = html;
+        },
+
+        nextStep: function() {
+            var step = CapabilityDiscovery.currentWizardStep;
+            
+            if (step === 1) {
+                var leader = document.getElementById('leaderInput').value.trim();
+                if (!leader) {
+                    alert('请指定主导者');
+                    return;
+                }
+                CapabilityDiscovery.showWizardStep(2);
+            } else if (step === 2) {
+                CapabilityDiscovery.executeInstall();
+            }
+        },
+
+        prevStep: function() {
+            var step = CapabilityDiscovery.currentWizardStep;
+            if (step > 1) {
+                CapabilityDiscovery.showWizardStep(step - 1);
+            }
+        },
+
+        executeInstall: async function() {
+            CapabilityDiscovery.showWizardStep(3);
+            
+            var cap = CapabilityDiscovery.currentInstallCap;
+            var leader = document.getElementById('leaderInput').value.trim();
+            var pushType = document.getElementById('pushType').value;
+            
             var steps = document.getElementById('installSteps');
             var progress = document.getElementById('installProgress');
 
             var installSteps = [
+                { name: '创建安装配置', status: 'pending' },
                 { name: '下载能力包', status: 'pending' },
-                { name: '验证完整性', status: 'pending' },
                 { name: '解析依赖', status: 'pending' },
                 { name: '安装能力', status: 'pending' },
-                { name: '注册服务', status: 'pending' }
+                { name: '推送通知', status: 'pending' }
             ];
 
             var html = '';
@@ -490,88 +770,103 @@
             });
             steps.innerHTML = html;
 
-            modal.classList.add('show');
-            document.getElementById('installCancel').style.display = 'inline-flex';
-            document.getElementById('installDone').style.display = 'none';
-
             var currentStep = 0;
-            var stepInterval = setInterval(function() {
-                if (currentStep < installSteps.length) {
-                    var stepEl = document.getElementById('step-' + currentStep);
-                    var icon = stepEl.querySelector('.step-icon');
-                    var status = stepEl.querySelector('.step-status');
-
-                    if (currentStep > 0) {
-                        var prevStepEl = document.getElementById('step-' + (currentStep - 1));
-                        prevStepEl.querySelector('.step-icon').className = 'step-icon done';
-                        prevStepEl.querySelector('.step-icon').innerHTML = '<i class="ri-check-line"></i>';
-                        prevStepEl.querySelector('.step-status').textContent = '完成';
-                    }
-
+            var updateStep = function(stepIdx, status, statusText) {
+                var stepEl = document.getElementById('step-' + stepIdx);
+                if (!stepEl) return;
+                var icon = stepEl.querySelector('.step-icon');
+                var statusEl = stepEl.querySelector('.step-status');
+                
+                if (status === 'running') {
                     icon.className = 'step-icon running';
                     icon.innerHTML = '<i class="ri-loader-4-line" style="animation: spin 1s linear infinite;"></i>';
-                    status.textContent = '处理中...';
-
-                    progress.style.width = ((currentStep + 1) / installSteps.length * 100) + '%';
-                    currentStep++;
+                } else if (status === 'done') {
+                    icon.className = 'step-icon done';
+                    icon.innerHTML = '<i class="ri-check-line"></i>';
+                } else if (status === 'error') {
+                    icon.className = 'step-icon error';
+                    icon.innerHTML = '<i class="ri-error-warning-line"></i>';
                 }
-            }, 600);
+                statusEl.textContent = statusText;
+                progress.style.width = ((stepIdx + 1) / installSteps.length * 100) + '%';
+            };
 
             try {
-                var response = await fetch('/api/v1/discovery/install', {
-                    method: 'POST',
-                    headers: {'Content-Type': 'application/json'},
-                    body: JSON.stringify({
-                        skillId: cap.id,
-                        name: cap.name,
-                        type: cap.type,
-                        description: cap.description,
-                        source: currentMethod
-                    })
+                updateStep(0, 'running', '创建中...');
+                
+                var createResult = await ApiClient.post('/api/v1/installs', {
+                    capabilityId: cap.id,
+                    driverCondition: CapabilityDiscovery.selectedDriverCondition,
+                    participants: {
+                        leader: leader,
+                        collaborators: CapabilityDiscovery.collaborators
+                    },
+                    pushType: pushType,
+                    name: cap.name,
+                    type: cap.type,
+                    description: cap.description,
+                    source: currentMethod
                 });
-                var result = await response.json();
 
-                clearInterval(stepInterval);
-
-                if (result.code === 200) {
-                    for (var i = 0; i < installSteps.length; i++) {
-                        var stepEl = document.getElementById('step-' + i);
-                        if (stepEl) {
-                            stepEl.querySelector('.step-icon').className = 'step-icon done';
-                            stepEl.querySelector('.step-icon').innerHTML = '<i class="ri-check-line"></i>';
-                            stepEl.querySelector('.step-status').textContent = '完成';
-                        }
-                    }
-                    progress.style.width = '100%';
-
-                    installedCapabilities.push({
-                        capabilityId: cap.id,
-                        name: cap.name,
-                        type: cap.type,
-                        description: cap.description
-                    });
-                    scanStats.installed = installedCapabilities.length;
-                    scanStats.new = Math.max(0, scanStats.new - 1);
-                    CapabilityDiscovery.updateStats();
-                    CapabilityDiscovery.renderResults();
-                } else {
-                    for (var i = 0; i < installSteps.length; i++) {
-                        var stepEl = document.getElementById('step-' + i);
-                        if (stepEl && stepEl.querySelector('.step-status')) {
-                            stepEl.querySelector('.step-status').textContent = '失败';
-                            stepEl.querySelector('.step-icon').className = 'step-icon error';
-                            stepEl.querySelector('.step-icon').innerHTML = '<i class="ri-error-warning-line"></i>';
-                        }
-                    }
-                    CapabilityDiscovery.addLog('error', '安装失败: ' + result.message);
+                if (createResult.code !== 200) {
+                    throw new Error(createResult.message || '创建安装配置失败');
                 }
+                
+                CapabilityDiscovery.installId = createResult.data.installId;
+                updateStep(0, 'done', '完成');
+                
+                updateStep(1, 'running', '下载中...');
+                await new Promise(function(r) { setTimeout(r, 500); });
+                updateStep(1, 'done', '完成');
+                
+                updateStep(2, 'running', '解析中...');
+                await new Promise(function(r) { setTimeout(r, 500); });
+                updateStep(2, 'done', '完成');
+                
+                updateStep(3, 'running', '安装中...');
+                
+                var execResult = await ApiClient.put('/api/v1/installs/' + CapabilityDiscovery.installId + '/execute');
+                
+                if (execResult.code !== 200) {
+                    throw new Error(execResult.message || '安装失败');
+                }
+                
+                updateStep(3, 'done', '完成');
+                
+                updateStep(4, 'running', '推送中...');
+                
+                if (CapabilityDiscovery.collaborators.length > 0 || pushType === 'DELEGATE') {
+                    var pushResult = await ApiClient.post('/api/v1/installs/' + CapabilityDiscovery.installId + '/push', {
+                        pushType: pushType,
+                        targetUsers: CapabilityDiscovery.collaborators
+                    });
+                }
+                
+                updateStep(4, 'done', '完成');
+                progress.style.width = '100%';
+
+                installedCapabilities.push({
+                    capabilityId: cap.id,
+                    name: cap.name,
+                    type: cap.type,
+                    description: cap.description
+                });
+                scanStats.installed = installedCapabilities.length;
+                scanStats.new = Math.max(0, scanStats.new - 1);
+                CapabilityDiscovery.updateStats();
+                CapabilityDiscovery.renderResults();
+                
+                CapabilityDiscovery.addLog('success', '安装成功: ' + (cap.name || cap.id));
+                
             } catch (error) {
-                clearInterval(stepInterval);
                 console.error('Install failed:', error);
+                updateStep(currentStep, 'error', '失败');
                 CapabilityDiscovery.addLog('error', '安装失败: ' + error.message);
             }
 
             document.getElementById('installCancel').style.display = 'none';
+            document.getElementById('installPrev').style.display = 'none';
+            document.getElementById('installNext').style.display = 'none';
             document.getElementById('installDone').style.display = 'inline-flex';
         },
 
@@ -624,6 +919,10 @@
                 } else if (filter === 'installed') {
                     var btn = item.querySelector('.nx-btn--primary');
                     item.style.display = btn ? 'none' : 'flex';
+                } else if (filter === 'scene') {
+                    item.style.display = item.dataset.scene === 'true' ? 'flex' : 'none';
+                } else if (filter === 'collaboration') {
+                    item.style.display = item.dataset.scene === 'false' ? 'flex' : 'none';
                 }
             });
         }
@@ -633,6 +932,8 @@
 
     global.selectMethod = CapabilityDiscovery.selectMethod;
     global.startDiscovery = CapabilityDiscovery.startScan;
+    global.forceRefresh = CapabilityDiscovery.forceRefresh;
+    global.clearAllCaches = CapabilityDiscovery.clearAllCaches;
     global.applyConfig = function() {
         CapabilityDiscovery.hideConfig();
         CapabilityDiscovery.startScan();
@@ -644,5 +945,11 @@
     global.toggleLogs = function() {
         document.getElementById('logsBody').classList.toggle('show');
     };
+    global.selectDriverCondition = CapabilityDiscovery.selectDriverCondition;
+    global.selectLeader = CapabilityDiscovery.selectLeader;
+    global.addCollaborator = CapabilityDiscovery.addCollaborator;
+    global.removeCollaborator = CapabilityDiscovery.removeCollaborator;
+    global.nextStep = CapabilityDiscovery.nextStep;
+    global.prevStep = CapabilityDiscovery.prevStep;
 
 })(typeof window !== 'undefined' ? window : this);

@@ -1,0 +1,108 @@
+apiVersion: scene.ooder.net/v1
+kind: SceneTemplate
+
+metadata:
+  id: llm-workspace
+  name: LLM工作空间
+  description: LLM智能工作空间，提供对话、上下文管理、知识增强等功能
+  category: llm
+  icon: ri-robot-line
+  version: 1.0.0
+  author: ooder Team
+
+spec:
+  skills:
+    - id: skill-local-knowledge
+      version: ">=1.0.0"
+      required: true
+      description: "本地知识服务"
+      
+    - id: skill-llm-context-builder
+      version: ">=1.0.0"
+      required: true
+      description: "上下文构建服务"
+      
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: true
+      description: "LLM对话服务"
+      
+    - id: skill-llm-assistant-ui
+      version: ">=1.0.0"
+      required: true
+      description: "LLM智能助手界面"
+      
+    - id: skill-llm-management-ui
+      version: ">=1.0.0"
+      required: false
+      description: "LLM管理界面（可选）"
+      
+    - id: skill-llm-openai
+      version: ">=1.0.0"
+      required: false
+      description: "OpenAI适配器（可选）"
+      
+    - id: skill-llm-deepseek
+      version: ">=1.0.0"
+      required: false
+      description: "DeepSeek适配器（可选）"
+      
+  capabilities:
+    - id: llm-chat
+      name: 智能对话
+      description: 与LLM进行智能对话
+      category: ai
+      
+    - id: context-aware
+      name: 上下文感知
+      description: 自动收集和管理上下文
+      category: ai
+      
+    - id: knowledge-augment
+      name: 知识增强
+      description: 基于知识库增强回答
+      category: ai
+      
+    - id: llm-manage
+      name: LLM管理
+      description: 管理LLM配置和模型
+      category: service
+      
+  scene:
+    type: llm
+    name: LLM工作空间
+    description: LLM智能工作空间
+    
+    config:
+      llm:
+        defaultProvider: "mock"
+        fallbackProvider: "mock"
+        models:
+          - id: "mock-gpt-4"
+            name: "Mock GPT-4"
+            contextWindow: 8192
+            
+      context:
+        maxTokens: 4096
+        includeHistory: true
+        historyLimit: 10
+        
+      knowledge:
+        enabled: true
+        maxDocuments: 5
+        
+  installOrder:
+    - skill-local-knowledge
+    - skill-llm-context-builder
+    - skill-llm-openai
+    - skill-llm-deepseek
+    - skill-llm-conversation
+    - skill-llm-assistant-ui
+    - skill-llm-management-ui
+    
+  estimatedResources:
+    cpu: "1000m"
+    memory: "1Gi"
+    storage: "500Mi"
+    
+  estimatedDuration: "10-15分钟"

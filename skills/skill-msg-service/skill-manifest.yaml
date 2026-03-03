@@ -1,5 +1,5 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillManifest
+kind: Skill
 
 metadata:
   id: skill-msg-service

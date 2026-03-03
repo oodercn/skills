@@ -34,6 +34,7 @@ public class DictService {
         }
         
         registerDictEnum(net.ooder.skill.scene.capability.model.CapabilityType.class);
+        registerDictEnum(net.ooder.skill.scene.capability.model.DriverType.class);
         registerDictEnum(net.ooder.skill.scene.dto.scene.ParticipantType.class);
         registerDictEnum(net.ooder.skill.scene.dto.scene.ParticipantRole.class);
         registerDictEnum(net.ooder.skill.scene.dto.scene.ParticipantStatus.class);

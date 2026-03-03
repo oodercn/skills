@@ -17,8 +17,7 @@ function initLlmAssistant() {
 
 async function loadTemplates() {
     try {
-        const response = await fetch('/api/v1/scene-templates?pageNum=1&pageSize=100');
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/scene-templates?pageNum=1&pageSize=100');
         
         if (result.code === 200 && result.data) {
             templates = result.data.list || [];
@@ -53,8 +52,7 @@ function populateTemplateSelects() {
 
 async function refreshSceneGroups() {
     try {
-        const response = await fetch('/api/v1/scene-groups?pageNum=' + currentPage + '&pageSize=' + pageSize);
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/scene-groups?pageNum=' + currentPage + '&pageSize=' + pageSize);
         
         if (result.code === 200 && result.data) {
             sceneGroups = result.data.list || [];
@@ -199,12 +197,7 @@ async function saveSceneGroup() {
     };
     
     try {
-        const response = await fetch('/api/v1/scene-groups', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(request)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups', request);
         
         if (result.code === 200) {
             closeModal();
@@ -229,11 +222,7 @@ async function toggleStatus(sceneGroupId, currentStatus) {
     if (!confirm(confirmMsg)) return;
     
     try {
-        const url = '/api/v1/scene-groups/' + sceneGroupId + '/' + action;
-        const response = await fetch(url, {
-            method: 'POST'
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/' + action);
         
         if (result.code === 200) {
             refreshSceneGroups();
@@ -250,10 +239,7 @@ async function deleteSceneGroup(sceneGroupId) {
     if (!confirm('确定要删除此场景组吗？此操作不可恢复。')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId);
         
         if (result.code === 200) {
             refreshSceneGroups();
@@ -266,17 +252,14 @@ async function deleteSceneGroup(sceneGroupId) {
     }
 }
 
-function filterByTemplate() {
+async function filterByTemplate() {
     const templateId = document.getElementById('templateFilter').value;
     if (templateId) {
-        fetch('/api/v1/scene-groups?pageNum=1&pageSize=10&templateId=' + templateId)
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    sceneGroups = result.data.list || [];
-                    renderSceneGroupTable();
-                }
-            });
+        const result = await ApiClient.get('/api/v1/scene-groups?pageNum=1&pageSize=10&templateId=' + templateId);
+        if (result.code === 200 && result.data) {
+            sceneGroups = result.data.list || [];
+            renderSceneGroupTable();
+        }
     } else {
         refreshSceneGroups();
     }

@@ -7,13 +7,13 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-protocol</artifactId>
-    <version>2.3.0</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
 
     <name>skill-protocol</name>
@@ -23,8 +23,7 @@
         <!-- SDK 2.3 核心 -->
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
-            <version>2.3</version>
+            <artifactId>agent-sdk-api</artifactId>
             <scope>provided</scope>
         </dependency>
         

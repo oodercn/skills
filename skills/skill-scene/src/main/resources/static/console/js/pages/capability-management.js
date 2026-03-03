@@ -116,17 +116,22 @@
     ];
 
     var CAPABILITY_TYPES = {
-        'DRIVER': { name: '驱动类型', icon: 'ri-hard-drive-2-line' },
-        'SERVICE': { name: '服务类型', icon: 'ri-server-line' },
-        'MANAGEMENT': { name: '管理类型', icon: 'ri-settings-3-line' },
-        'AI': { name: 'AI类型', icon: 'ri-brain-line' },
-        'STORAGE': { name: '存储类型', icon: 'ri-database-2-line' },
-        'COMMUNICATION': { name: '通信类型', icon: 'ri-message-3-line' },
-        'SECURITY': { name: '安全类型', icon: 'ri-shield-check-line' },
-        'MONITORING': { name: '监控类型', icon: 'ri-pulse-line' },
-        'SKILL': { name: '技能类型', icon: 'ri-flashlight-line' },
-        'SCENE': { name: '场景类型', icon: 'ri-layout-grid-line' },
-        'CUSTOM': { name: '自定义类型', icon: 'ri-tools-line' }
+        'ATOMIC': { name: '原子能力', icon: 'ri-flashlight-line', desc: '单一功能，不可分解' },
+        'COMPOSITE': { name: '组合能力', icon: 'ri-links-line', desc: '组合多个原子能力' },
+        'SCENE': { name: '场景能力', icon: 'ri-layout-grid-line', desc: '自驱型SuperAgent能力' },
+        'DRIVER': { name: '驱动能力', icon: 'ri-timer-line', desc: '意图/时间/事件驱动' },
+        'COLLABORATIVE': { name: '协作能力', icon: 'ri-team-line', desc: '跨场景协作能力' },
+        'SERVICE': { name: '服务能力', icon: 'ri-server-line', desc: '业务服务、API服务' },
+        'AI': { name: 'AI能力', icon: 'ri-brain-line', desc: 'LLM、机器学习' },
+        'TOOL': { name: '工具能力', icon: 'ri-tools-line', desc: '工具类功能' },
+        'CONNECTOR': { name: '连接器能力', icon: 'ri-plug-line', desc: '连接协议类' },
+        'DATA': { name: '数据能力', icon: 'ri-database-2-line', desc: '数据存储、处理' },
+        'MANAGEMENT': { name: '管理能力', icon: 'ri-settings-3-line', desc: '配置管理、监控管理' },
+        'COMMUNICATION': { name: '通信能力', icon: 'ri-message-3-line', desc: '消息、通知' },
+        'SECURITY': { name: '安全能力', icon: 'ri-shield-check-line', desc: '认证、加密' },
+        'MONITORING': { name: '监控能力', icon: 'ri-pulse-line', desc: '日志、指标' },
+        'SKILL': { name: '技能能力', icon: 'ri-flashlight-line', desc: '可安装的技能包' },
+        'CUSTOM': { name: '自定义能力', icon: 'ri-tools-line', desc: '用户自定义' }
     };
 
     var CapabilityManagement = {
@@ -167,8 +172,7 @@
         },
 
         loadInstalledCapabilities: function() {
-            fetch('/api/v1/capabilities')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         installedCapabilities = result.data;
@@ -424,8 +428,7 @@
 
             var url = '/api/v1/capabilities/discovery?method=' + methodId;
             
-            fetch(url)
-                .then(function(response) { return response.json(); })
+            ApiClient.get(url)
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         var discovered = result.data;
@@ -581,36 +584,31 @@
 
             CapabilityManagement.addLog('info', '正在安装: ' + capabilityId);
 
-            fetch('/api/v1/capabilities', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    capabilityId: cap.capabilityId,
-                    name: cap.name,
-                    type: cap.type,
-                    description: cap.description
-                })
+            ApiClient.post('/api/v1/capabilities', {
+                capabilityId: cap.capabilityId,
+                name: cap.name,
+                type: cap.type,
+                description: cap.description
             })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+                .then(function(result) {
+                    if (result.code === 200) {
+                        cap.status = 'installed';
+                        installedCapabilities.push(cap);
+                        CapabilityManagement.addLog('success', '安装成功: ' + capabilityId);
+                        CapabilityManagement.updateStats();
+                        CapabilityManagement.renderCapabilities();
+                        CapabilityManagement.showDetail(capabilityId);
+                    } else {
+                        CapabilityManagement.addLog('error', '安装失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
                     cap.status = 'installed';
                     installedCapabilities.push(cap);
-                    CapabilityManagement.addLog('success', '安装成功: ' + capabilityId);
+                    CapabilityManagement.addLog('success', '安装成功(本地): ' + capabilityId);
                     CapabilityManagement.updateStats();
                     CapabilityManagement.renderCapabilities();
-                    CapabilityManagement.showDetail(capabilityId);
-                } else {
-                    CapabilityManagement.addLog('error', '安装失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                cap.status = 'installed';
-                installedCapabilities.push(cap);
-                CapabilityManagement.addLog('success', '安装成功(本地): ' + capabilityId);
-                CapabilityManagement.updateStats();
-                CapabilityManagement.renderCapabilities();
-            });
+                });
         },
 
         uninstallCap: function(capabilityId) {
@@ -621,30 +619,27 @@
 
             CapabilityManagement.addLog('info', '正在卸载: ' + capabilityId);
 
-            fetch('/api/v1/capabilities/' + capabilityId, {
-                method: 'DELETE'
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+            ApiClient.delete('/api/v1/capabilities/' + capabilityId)
+                .then(function(result) {
+                    if (result.code === 200) {
+                        cap.status = 'available';
+                        installedCapabilities = installedCapabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
+                        CapabilityManagement.addLog('success', '卸载成功: ' + capabilityId);
+                        CapabilityManagement.updateStats();
+                        CapabilityManagement.renderCapabilities();
+                        CapabilityManagement.closeDetail();
+                    } else {
+                        CapabilityManagement.addLog('error', '卸载失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
                     cap.status = 'available';
                     installedCapabilities = installedCapabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
-                    CapabilityManagement.addLog('success', '卸载成功: ' + capabilityId);
+                    CapabilityManagement.addLog('success', '卸载成功(本地): ' + capabilityId);
                     CapabilityManagement.updateStats();
                     CapabilityManagement.renderCapabilities();
                     CapabilityManagement.closeDetail();
-                } else {
-                    CapabilityManagement.addLog('error', '卸载失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                cap.status = 'available';
-                installedCapabilities = installedCapabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
-                CapabilityManagement.addLog('success', '卸载成功(本地): ' + capabilityId);
-                CapabilityManagement.updateStats();
-                CapabilityManagement.renderCapabilities();
-                CapabilityManagement.closeDetail();
-            });
+                });
         },
 
         invokeCap: function(capabilityId) {
@@ -653,28 +648,23 @@
 
             CapabilityManagement.addLog('info', '正在调用: ' + capabilityId);
 
-            fetch('/api/v1/capabilities/discovery/invoke', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    capabilityId: capabilityId,
-                    params: {}
+            ApiClient.post('/api/v1/capabilities/discovery/invoke', {
+                capabilityId: capabilityId,
+                params: {}
+            })
+                .then(function(result) {
+                    if (result.code === 200) {
+                        CapabilityManagement.addLog('success', '调用成功: ' + JSON.stringify(result.data));
+                        alert('调用成功: ' + JSON.stringify(result.data, null, 2));
+                    } else {
+                        CapabilityManagement.addLog('error', '调用失败: ' + result.message);
+                        alert('调用失败: ' + result.message);
+                    }
                 })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
-                    CapabilityManagement.addLog('success', '调用成功: ' + JSON.stringify(result.data));
-                    alert('调用成功: ' + JSON.stringify(result.data, null, 2));
-                } else {
-                    CapabilityManagement.addLog('error', '调用失败: ' + result.message);
-                    alert('调用失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                CapabilityManagement.addLog('error', '调用失败: ' + error.message);
-                alert('调用失败: ' + error.message);
-            });
+                .catch(function(error) {
+                    CapabilityManagement.addLog('error', '调用失败: ' + error.message);
+                    alert('调用失败: ' + error.message);
+                });
         },
 
         refresh: function() {
@@ -767,42 +757,37 @@
             return;
         }
 
-        fetch('/api/v1/capabilities', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
+            ApiClient.post('/api/v1/capabilities', {
                 capabilityId: capabilityId,
                 name: name,
                 type: type,
                 description: desc
             })
-        })
-        .then(function(response) { return response.json(); })
-        .then(function(result) {
-            if (result.code === 200) {
-                capabilities.push({
-                    capabilityId: capabilityId,
-                    name: name,
-                    type: type,
-                    description: desc,
-                    status: 'installed',
-                    version: '1.0.0',
-                    source: 'local',
-                    dependencies: [],
-                    provider: null
+                .then(function(result) {
+                    if (result.code === 200) {
+                        capabilities.push({
+                            capabilityId: capabilityId,
+                            name: name,
+                            type: type,
+                            description: desc,
+                            status: 'installed',
+                            version: '1.0.0',
+                            source: 'local',
+                            dependencies: [],
+                            provider: null
+                        });
+                        installedCapabilities.push(capabilities[capabilities.length - 1]);
+                        CapabilityManagement.updateStats();
+                        CapabilityManagement.renderCapabilities();
+                        closeRegisterModal();
+                        alert('注册成功');
+                    } else {
+                        alert('注册失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
+                    alert('注册失败: ' + error.message);
                 });
-                installedCapabilities.push(capabilities[capabilities.length - 1]);
-                CapabilityManagement.updateStats();
-                CapabilityManagement.renderCapabilities();
-                closeRegisterModal();
-                alert('注册成功');
-            } else {
-                alert('注册失败: ' + result.message);
-            }
-        })
-        .catch(function(error) {
-            alert('注册失败: ' + error.message);
-        });
     };
 
 })(typeof window !== 'undefined' ? window : this);

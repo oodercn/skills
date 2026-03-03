@@ -1,11 +1,28 @@
 package net.ooder.skill.scene.controller;
 
+import javax.validation.Valid;
+import net.ooder.skill.scene.dto.discovery.*;
 import net.ooder.skill.scene.model.ResultModel;
+import net.ooder.scene.core.SceneEngine;
+import net.ooder.scene.core.service.UnifiedSceneService;
+import net.ooder.sdk.discovery.git.GitHubDiscoverer;
+import net.ooder.sdk.discovery.git.GiteeDiscoverer;
+import net.ooder.sdk.service.skill.SkillService;
+import net.ooder.skills.api.InstallResult;
+import net.ooder.skills.api.InstallResultWithDependencies;
+import net.ooder.skills.api.InstallRequest;
+import net.ooder.skills.api.InstalledSkill;
+import net.ooder.skills.api.SkillManifest;
+import net.ooder.skills.api.SkillPackage;
+import net.ooder.skills.api.SkillPackageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 @RestController
 @RequestMapping("/api/v1/discovery")
@@ -14,76 +31,197 @@ public class GitDiscoveryController {
 
     private static final Logger log = LoggerFactory.getLogger(GitDiscoveryController.class);
 
+    @Value("${ooder.mock.enabled:false}")
+    private boolean mockEnabled;
+
+    @Value("${ooder.gitee.token:}")
+    private String defaultGiteeToken;
+
+    @Value("${ooder.github.token:}")
+    private String defaultGithubToken;
+
+    @Autowired(required = false)
+    private UnifiedSceneService unifiedSceneService;
+
+    @Autowired(required = false)
+    private GitHubDiscoverer gitHubDiscoverer;
+
+    @Autowired(required = false)
+    private GiteeDiscoverer giteeDiscoverer;
+
+    @Autowired(required = false)
+    private SkillService skillService;
+
+    @Autowired(required = false)
+    private SkillPackageManager skillPackageManager;
+
     @PostMapping("/github")
-    public ResultModel<Map<String, Object>> discoverFromGitHub(@RequestBody Map<String, Object> config) {
-        String repoUrl = (String) config.get("repoUrl");
-        String branch = (String) config.getOrDefault("branch", "main");
-        String token = (String) config.get("token");
+    public ResultModel<DiscoveryResultDTO> discoverFromGitHub(@RequestBody @Valid GitDiscoveryConfigDTO config) {
+        log.info("[discoverFromGitHub] repoUrl: {}, branch: {}, mockEnabled: {}", config.getRepoUrl(), config.getBranch(), mockEnabled);
         
-        log.info("[discoverFromGitHub] repoUrl: {}, branch: {}", repoUrl, branch);
+        DiscoveryResultDTO result = new DiscoveryResultDTO();
+        result.setMethod("GITHUB");
+        result.setRepoUrl(config.getRepoUrl());
+        result.setBranch(config.getBranch());
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("method", "GITHUB");
-        result.put("repoUrl", repoUrl);
-        result.put("branch", branch);
-        result.put("capabilities", getMockGitHubCapabilities(repoUrl));
-        result.put("scanTime", System.currentTimeMillis());
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        String errorMessage = null;
+        
+        if (gitHubDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()) {
+            try {
+                String[] parts = parseRepoUrl(config.getRepoUrl());
+                if (parts != null) {
+                    List<SkillPackage> packages = gitHubDiscoverer.discoverSkills(parts[0], parts[1]).get();
+                    capabilities = convertToCapabilities(packages, "GITHUB");
+                    log.info("[discoverFromGitHub] Found {} capabilities from GitHub", capabilities.size());
+                }
+            } catch (Exception e) {
+                log.error("[discoverFromGitHub] error: {}", e.getMessage());
+                errorMessage = e.getMessage();
+            }
+        } else if (gitHubDiscoverer == null) {
+            errorMessage = "GitHubDiscoverer not available";
+        }
+        
+        if (capabilities.isEmpty() && mockEnabled) {
+            log.info("[discoverFromGitHub] Using mock data (mockEnabled=true)");
+            capabilities = getMockGitHubCapabilities(config.getRepoUrl());
+        } else if (capabilities.isEmpty()) {
+            log.warn("[discoverFromGitHub] No capabilities found, mock disabled. Error: {}", errorMessage);
+            result.setErrorMessage(errorMessage != null ? errorMessage : "No capabilities found and mock is disabled");
+        }
+        
+        result.setCapabilities(capabilities);
+        result.setScanTime(System.currentTimeMillis());
         
         return ResultModel.success(result);
     }
 
     @PostMapping("/gitee")
-    public ResultModel<Map<String, Object>> discoverFromGitee(@RequestBody Map<String, Object> config) {
-        String repoUrl = (String) config.get("repoUrl");
-        String branch = (String) config.getOrDefault("branch", "master");
-        String token = (String) config.get("token");
+    public ResultModel<DiscoveryResultDTO> discoverFromGitee(@RequestBody @Valid GitDiscoveryConfigDTO config) {
+        String effectiveToken = config.getToken() != null && !config.getToken().isEmpty() 
+            ? config.getToken() : defaultGiteeToken;
         
-        log.info("[discoverFromGitee] repoUrl: {}, branch: {}", repoUrl, branch);
+        log.info("[discoverFromGitee] repoUrl: {}, branch: {}, token: {}, mockEnabled: {}", 
+            config.getRepoUrl(), config.getBranch(),
+            effectiveToken != null ? "***" : "null", mockEnabled);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("method", "GITEE");
-        result.put("repoUrl", repoUrl);
-        result.put("branch", branch);
-        result.put("capabilities", getMockGiteeCapabilities(repoUrl));
-        result.put("scanTime", System.currentTimeMillis());
+        log.info("[discoverFromGitee] unifiedSceneService: {}, giteeDiscoverer: {}", 
+            unifiedSceneService != null ? "available" : "null", 
+            giteeDiscoverer != null ? "available" : "null");
+        
+        DiscoveryResultDTO result = new DiscoveryResultDTO();
+        result.setMethod("GITEE");
+        result.setRepoUrl(config.getRepoUrl());
+        result.setBranch(config.getBranch());
+        
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        String errorMessage = null;
+        
+        if (unifiedSceneService != null) {
+            try {
+                String[] parts = parseRepoUrl(config.getRepoUrl());
+                if (parts != null && parts.length >= 2) {
+                    Map<String, Object> options = new HashMap<>();
+                    if (effectiveToken != null && !effectiveToken.isEmpty()) {
+                        options.put("token", effectiveToken);
+                    }
+                    if (config.getBranch() != null && !config.getBranch().isEmpty()) {
+                        options.put("branch", config.getBranch());
+                    }
+                    
+                    CompletableFuture<UnifiedSceneService.DiscoveryResult> future = 
+                        unifiedSceneService.discoverSkills(parts[0], parts[1], options);
+                    UnifiedSceneService.DiscoveryResult discoveryResult = future.get();
+                    
+                    if (discoveryResult != null && discoveryResult.getSkills() != null) {
+                        for (UnifiedSceneService.SkillInfo skill : discoveryResult.getSkills()) {
+                            CapabilityDTO cap = new CapabilityDTO();
+                            cap.setId(skill.getSkillId());
+                            cap.setName(skill.getName());
+                            cap.setDescription(skill.getDescription());
+                            cap.setVersion(skill.getVersion());
+                            cap.setSource("GITEE");
+                            cap.setStatus("available");
+                            capabilities.add(cap);
+                        }
+                        log.info("[discoverFromGitee] Found {} capabilities via UnifiedSceneService", capabilities.size());
+                    }
+                }
+            } catch (Exception e) {
+                log.error("[discoverFromGitee] UnifiedSceneService error: {}", e.getMessage());
+                errorMessage = e.getMessage();
+            }
+        } else if (giteeDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()){
+            try {
+                String[] parts = parseRepoUrl(config.getRepoUrl());
+                if (parts != null) {
+                    List<SkillPackage> packages = giteeDiscoverer.discoverSkills(parts[0]).get();
+                    capabilities = convertToCapabilities(packages, "GITEE");
+                    log.info("[discoverFromGitee] Found {} capabilities from Gitee", capabilities.size());
+                }
+            } catch (Exception e) {
+                log.error("[discoverFromGitee] error: {}", e.getMessage());
+                errorMessage = e.getMessage();
+            }
+        } else if (giteeDiscoverer == null && unifiedSceneService == null) {
+            errorMessage = "Neither UnifiedSceneService nor GiteeDiscoverer available";
+        }
+        
+        if (capabilities.isEmpty() && mockEnabled) {
+            log.info("[discoverFromGitee] Using mock data (mockEnabled=true)");
+            capabilities = getMockGiteeCapabilities(config.getRepoUrl());
+        } else if (capabilities.isEmpty()) {
+            log.warn("[discoverFromGitee] No capabilities found, mock disabled. Error: {}", errorMessage);
+            result.setErrorMessage(errorMessage != null ? errorMessage : "No capabilities found and mock is disabled");
+        }
+        
+        result.setCapabilities(capabilities);
+        result.setScanTime(System.currentTimeMillis());
         
         return ResultModel.success(result);
     }
 
     @PostMapping("/git")
-    public ResultModel<Map<String, Object>> discoverFromGit(@RequestBody Map<String, Object> config) {
-        String repoUrl = (String) config.get("repoUrl");
-        String branch = (String) config.getOrDefault("branch", "main");
-        String username = (String) config.get("username");
-        String password = (String) config.get("password");
+    public ResultModel<DiscoveryResultDTO> discoverFromGit(@RequestBody @Valid GitDiscoveryConfigDTO config) {
+        log.info("[discoverFromGit] repoUrl: {}, branch: {}, mockEnabled: {}", config.getRepoUrl(), config.getBranch(), mockEnabled);
         
-        log.info("[discoverFromGit] repoUrl: {}, branch: {}", repoUrl, branch);
+        DiscoveryResultDTO result = new DiscoveryResultDTO();
+        result.setMethod("GIT_REPOSITORY");
+        result.setRepoUrl(config.getRepoUrl());
+        result.setBranch(config.getBranch());
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("method", "GIT_REPOSITORY");
-        result.put("repoUrl", repoUrl);
-        result.put("branch", branch);
-        result.put("capabilities", getMockGitCapabilities(repoUrl));
-        result.put("scanTime", System.currentTimeMillis());
+        if (mockEnabled) {
+            result.setCapabilities(getMockGitCapabilities(config.getRepoUrl()));
+        } else {
+            result.setCapabilities(new ArrayList<>());
+            result.setErrorMessage("Git repository discovery not implemented and mock is disabled");
+        }
+        result.setScanTime(System.currentTimeMillis());
         
         return ResultModel.success(result);
     }
 
     @GetMapping("/github/search")
-    public ResultModel<List<Map<String, Object>>> searchGitHub(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String topic) {
+    public ResultModel<List<RepositoryDTO>> searchGitHub(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String topic) {
         
-        log.info("[searchGitHub] keyword: {}, topic: {}", keyword, topic);
+        log.info("[searchGitHub] keyword: {}, topic: {}, mockEnabled: {}", keyword, topic, mockEnabled);
         
-        List<Map<String, Object>> results = new ArrayList<>();
+        if (!mockEnabled) {
+            log.warn("[searchGitHub] Search not implemented and mock is disabled");
+            return ResultModel.success(new ArrayList<>());
+        }
+        
+        List<RepositoryDTO> results = new ArrayList<>();
         
         results.add(createSkillRepo(
             "ooderCN/skill-daily-report",
             "日志汇报技能",
             "提供日志提醒、提交、汇总、分析能力，支持定时提醒、表单提交、数据汇总、AI分析等功能",
             "https://github.com/ooderCN/skill-daily-report",
-            128, 45, "v1.0.0"
+            128, 45, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -91,7 +229,7 @@ public class GitDiscoveryController {
             "通知技能",
             "邮件、短信、站内信通知能力，支持模板消息、批量发送、定时发送",
             "https://github.com/ooderCN/skill-notification",
-            256, 89, "v1.2.0"
+            256, 89, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -99,27 +237,183 @@ public class GitDiscoveryController {
             "会议管理技能",
             "会议预约、提醒、纪要能力，支持会议室预定、参会人员管理、会议记录生成",
             "https://github.com/ooderCN/skill-meeting",
-            96, 32, "v1.1.0"
+            96, 32, "v2.3"
         ));
         
         return ResultModel.success(results);
     }
 
     @GetMapping("/gitee/search")
-    public ResultModel<List<Map<String, Object>>> searchGitee(
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) String topic) {
+    public ResultModel<List<RepositoryDTO>> searchGitee(
+        @RequestParam(required = false) String keyword,
+        @RequestParam(required = false) String topic,
+        @RequestParam(required = false) String token)
+{
         
-        log.info("[searchGitee] keyword: {}, topic: {}", keyword, topic);
+        log.info("[searchGitee] keyword: {}, topic: {}, mockEnabled: {}", keyword, topic, mockEnabled);
         
-        List<Map<String, Object>> results = new ArrayList<>();
+        if (!mockEnabled) {
+            log.warn("[searchGitee] Search not implemented and mock is disabled");
+            return ResultModel.success(new ArrayList<>());
+        }
+        
+        List<RepositoryDTO> results = getDefaultGiteeRepos();
+        
+        return ResultModel.success(results);
+    }
+
+    @PostMapping("/install")
+    public ResultModel<InstallResultDTO> installSkill(@RequestBody @Valid InstallSkillRequestDTO request) {
+        log.info("[installSkill] skillId: {}, source: {}, repoUrl: {}", 
+            request.getSkillId(), request.getSource(),
+ request.getRepoUrl());
+        
+        InstallResultDTO result = new InstallResultDTO();
+        result.setSkillId(request.getSkillId());
+        result.setInstallTime(System.currentTimeMillis());
+        
+        if (skillPackageManager != null) {
+            try {
+                InstallRequest.InstallMode mode = InstallRequest.InstallMode.FULL_INSTALL;
+                InstallResultWithDependencies installResult = skillPackageManager
+                    .installWithDependencies(request.getSkillId(), mode)
+.get();
+                
+                if (installResult != null && installResult.isSuccess()){
+                    result.setStatus(installResult.getStatus());
+                    result.setMessage("Skill installed with " + 
+                        installResult.getInstalledDependencies().size() + " dependencies");
+                    
+                    SkillManifest manifest = skillPackageManager.getManifest(request.getSkillId()).get();
+                    if (manifest != null) {
+                        result.setCapabilities(convertManifestToCapabilities(manifest));
+                    }
+                    
+                    result.setInstalledDependencies(installResult.getInstalledDependencies());
+                    result.setExistingDependencies(installResult.getExistingDependencies());
+                    
+                    log.info("[installSkill] Skill {} installed successfully with {} dependencies", 
+                        request.getSkillId(), installResult.getInstalledDependencies().size());
+                } else {
+                    result.setStatus("failed");
+                    result.setMessage(installResult != null ? installResult.getError() : "Unknown error");
+                    result.setFailedDependencies(installResult != null ? installResult.getFailedDependencies() : new ArrayList<>());
+                    log.warn("[installSkill] Failed to install skill {}: {}", 
+                        request.getSkillId(), result.getMessage());
+                }
+            } catch (Exception e) {
+                log.error("[installSkill] Error installing skill {}: {}", request.getSkillId(), e.getMessage());
+                result.setStatus("error");
+                result.setMessage(e.getMessage());
+            }
+        } else if (skillService != null) {
+            try {
+                InstallResult installResult = skillService.installSkill(request.getSkillId()).get();
+                
+                if (installResult != null && installResult.isSuccess())
+{
+                    result.setStatus("installed");
+                    result.setMessage("Skill installed successfully");
+                    
+                    SkillManifest manifest = skillService.getSkillManifest(request.getSkillId()).get();
+                    if (manifest != null)
+{
+                        result.setCapabilities(convertManifestToCapabilities(manifest));
+                    }
+                    
+                    log.info("[installSkill] Skill {} installed successfully via SkillService", request.getSkillId());
+                } else {
+                    result.setStatus("failed");
+                    result.setMessage(installResult != null ? installResult.getError() : "Unknown error");
+                    log.warn("[installSkill] Failed to install skill {}: {}", 
+                        request.getSkillId(), result.getMessage());
+                }
+            } catch (Exception e) {
+                log.error("[installSkill] Error installing skill {}: {}", request.getSkillId(), e.getMessage());
+                result.setStatus("error");
+                result.setMessage(e.getMessage());
+            }
+        } else {
+            log.warn("[installSkill] SkillPackageManager not available, using mock data");
+            result.setStatus(mockEnabled ? "installed" : "unavailable");
+            if (mockEnabled) {
+                result.setCapabilities(getCapabilitiesForSkill(request.getSkillId()));
+            }
+        }
+        
+        return ResultModel.success(result);
+    }
+
+    private List<CapabilityDTO> convertManifestToCapabilities(SkillManifest manifest) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        if (manifest == null || manifest.getCapabilities() == null)
+{
+            return capabilities;
+        }
+        
+        for (Object capObj : manifest.getCapabilities())
+{
+            CapabilityDTO cap = new CapabilityDTO();
+            if (capObj instanceof Map)
+{
+                Map<?, ?> capMap = (Map<?, ?>) capObj;
+                cap.setId(String.valueOf(capMap.get("id")));
+                cap.setName(String.valueOf(capMap.get("name")));
+                cap.setDescription(String.valueOf(capMap.get("description")));
+                cap.setVersion(manifest.getVersion());
+                cap.setStatus("installed");
+            }
+            capabilities.add(cap);
+        }
+        return capabilities;
+    }
+
+    private String[] parseRepoUrl(String repoUrl) {
+        if (repoUrl == null || repoUrl.isEmpty())
+ return null;
+        
+        try {
+            String url = repoUrl.replaceAll("(https?://)?(github\\.com|gitee\\.com)/", "");
+            String[] parts = url.split("/");
+            if (parts.length >= 2)
+            {
+                return new String[]{parts[0], parts[1].replaceAll("\\.git$", "")};
+            }
+        } catch (Exception e)
+ {
+            log.error("[parseRepoUrl] error: {}", e.getMessage());
+        }
+        return null;
+    }
+
+    private List<CapabilityDTO> convertToCapabilities(List<SkillPackage> packages, String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        if (packages == null)
+ return capabilities;
+        
+        for (SkillPackage pkg : packages)
+{
+            CapabilityDTO cap = new CapabilityDTO();
+            cap.setId(pkg.getSkillId());
+            cap.setName(pkg.getName());
+            cap.setDescription(pkg.getDescription());
+            cap.setVersion(pkg.getVersion());
+            cap.setSource(source);
+            cap.setStatus("available");
+            capabilities.add(cap);
+        }
+        return capabilities;
+    }
+
+    private List<RepositoryDTO> getDefaultGiteeRepos() {
+        List<RepositoryDTO> results = new ArrayList<>();
         
         results.add(createSkillRepo(
             "ooderCN/skill-daily-report",
             "日志汇报技能",
             "提供日志提醒、提交、汇总、分析能力，支持定时提醒、表单提交、数据汇总、AI分析等功能",
             "https://gitee.com/ooderCN/skill-daily-report",
-            128, 45, "v1.0.0"
+            128, 45, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -127,7 +421,7 @@ public class GitDiscoveryController {
             "会议管理技能",
             "会议预约、提醒、纪要能力，支持会议室预定、参会人员管理、会议记录生成",
             "https://gitee.com/ooderCN/skill-meeting",
-            96, 32, "v1.1.0"
+            96, 32, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -135,7 +429,7 @@ public class GitDiscoveryController {
             "网络管理技能",
             "网络管理服务，支持网络配置、状态监控、故障诊断",
             "https://gitee.com/ooderCN/skill-network",
-            64, 23, "v0.9.0"
+            64, 23, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -143,7 +437,7 @@ public class GitDiscoveryController {
             "安全管理技能",
             "安全管理服务，支持权限控制、审计日志、安全扫描",
             "https://gitee.com/ooderCN/skill-security",
-            85, 28, "v1.0.0"
+            85, 28, "v2.3"
         ));
         
         results.add(createSkillRepo(
@@ -151,137 +445,122 @@ public class GitDiscoveryController {
             "即时通讯技能",
             "即时通讯服务，支持消息发送、群组管理、消息推送",
             "https://gitee.com/ooderCN/skill-im",
-            156, 67, "v1.3.0"
+            156, 67, "v2.3"
         ));
         
-        return ResultModel.success(results);
+        return results;
     }
 
-    @PostMapping("/install")
-    public ResultModel<Map<String, Object>> installSkill(@RequestBody Map<String, Object> request) {
-        String skillId = (String) request.get("skillId");
-        String source = (String) request.get("source");
-        String repoUrl = (String) request.get("repoUrl");
-        
-        log.info("[installSkill] skillId: {}, source: {}, repoUrl: {}", skillId, source, repoUrl);
-        
-        Map<String, Object> result = new HashMap<>();
-        result.put("skillId", skillId);
-        result.put("status", "installed");
-        result.put("installTime", System.currentTimeMillis());
-        result.put("capabilities", getCapabilitiesForSkill(skillId));
-        
-        return ResultModel.success(result);
-    }
-
-    private List<Map<String, Object>> getMockGitHubCapabilities(String repoUrl) {
-        List<Map<String, Object>> capabilities = new ArrayList<>();
+    private List<CapabilityDTO> getMockGitHubCapabilities(String repoUrl) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
             "report-remind", "日志提醒", "COMMUNICATION",
-            "定时提醒员工提交工作日志", "1.0.0", "GITHUB"
+            "定时提醒员工提交工作日志", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
             "report-submit", "日志提交", "SERVICE",
-            "员工提交工作日志的表单能力", "1.0.0", "GITHUB"
+            "员工提交工作日志的表单能力", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
             "report-aggregate", "日志汇总", "SERVICE",
-            "汇总所有员工提交的日志", "1.0.0", "GITHUB"
+            "汇总所有员工提交的日志", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
             "report-analyze", "日志分析", "AI",
-            "使用AI分析日志内容，提取关键信息", "1.0.0", "GITHUB"
+            "使用AI分析日志内容，提取关键信息", "2.3", "GITHUB"
         ));
         
         return capabilities;
     }
 
-    private List<Map<String, Object>> getMockGiteeCapabilities(String repoUrl) {
-        List<Map<String, Object>> capabilities = new ArrayList<>();
+    private List<CapabilityDTO> getMockGiteeCapabilities(String repoUrl) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
             "report-remind", "日志提醒", "COMMUNICATION",
-            "定时提醒员工提交工作日志", "1.0.0", "GITEE"
+            "定时提醒员工提交工作日志", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
             "report-submit", "日志提交", "SERVICE",
-            "员工提交工作日志的表单能力", "1.0.0", "GITEE"
+            "员工提交工作日志的表单能力", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
             "report-aggregate", "日志汇总", "SERVICE",
-            "汇总所有员工提交的日志", "1.0.0", "GITEE"
+            "汇总所有员工提交的日志", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
             "notification-email", "邮件通知", "COMMUNICATION",
-            "发送邮件通知", "2.1.0", "GITEE"
+            "发送邮件通知", "2.3", "GITEE"
         ));
         
         return capabilities;
     }
 
-    private List<Map<String, Object>> getMockGitCapabilities(String repoUrl) {
-        List<Map<String, Object>> capabilities = new ArrayList<>();
+    private List<CapabilityDTO> getMockGitCapabilities(String repoUrl) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
             "data-backup", "数据备份", "STORAGE",
-            "自动备份场景数据到云端或本地存储", "1.0.0", "GIT_REPOSITORY"
+            "自动备份场景数据到云端或本地存储", "2.3", "GIT_REPOSITORY"
         ));
         
         capabilities.add(createCapability(
             "system-monitor", "系统监控", "MONITORING",
-            "监控系统运行状态，包括CPU、内存、网络等", "1.0.0", "GIT_REPOSITORY"
+            "监控系统运行状态，包括CPU、内存、网络等", "2.3", "GIT_REPOSITORY"
         ));
         
         return capabilities;
     }
 
-    private Map<String, Object> createCapability(String id, String name, String type, 
+    private CapabilityDTO createCapability(String id, String name, String type, 
             String description, String version, String source) {
-        Map<String, Object> cap = new HashMap<>();
-        cap.put("id", id);
-        cap.put("name", name);
-        cap.put("type", type);
-        cap.put("description", description);
-        cap.put("version", version);
-        cap.put("source", source);
-        cap.put("status", "available");
+        CapabilityDTO cap = new CapabilityDTO();
+        cap.setId(id);
+        cap.setName(name);
+        cap.setType(type);
+        cap.setDescription(description);
+        cap.setVersion(version);
+        cap.setSource(source);
+        cap.setStatus("available");
         return cap;
     }
 
-    private Map<String, Object> createSkillRepo(String fullName, String name, String description,
+    private RepositoryDTO createSkillRepo(String fullName, String name, String description,
             String htmlUrl, int stars, int forks, String latestVersion) {
-        Map<String, Object> repo = new HashMap<>();
-        repo.put("fullName", fullName);
-        repo.put("name", name);
-        repo.put("description", description);
-        repo.put("htmlUrl", htmlUrl);
-        repo.put("stars", stars);
-        repo.put("forks", forks);
-        repo.put("latestVersion", latestVersion);
-        repo.put("installCount", stars * 10);
-        repo.put("rating", 4.5 + Math.random() * 0.5);
-        repo.put("updatedAt", System.currentTimeMillis() - (long)(Math.random() * 86400000 * 30));
+        RepositoryDTO repo = new RepositoryDTO();
+        repo.setFullName(fullName);
+        repo.setName(name);
+        repo.setDescription(description);
+        repo.setHtmlUrl(htmlUrl);
+        repo.setStars(stars);
+        repo.setForks(forks);
+        repo.setLatestVersion(latestVersion);
+        repo.setInstallCount(stars * 10);
+        repo.setRating(4.5 + Math.random() * 0.5);
         return repo;
     }
 
-    private List<Map<String, Object>> getCapabilitiesForSkill(String skillId) {
-        List<Map<String, Object>> capabilities = new ArrayList<>();
+    private List<CapabilityDTO> getCapabilitiesForSkill(String skillId) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
         
-        if ("skill-daily-report".equals(skillId)) {
-            capabilities.add(createCapability("report-remind", "日志提醒", "COMMUNICATION", "定时提醒", "1.0.0", "INSTALLED"));
-            capabilities.add(createCapability("report-submit", "日志提交", "SERVICE", "提交日志", "1.0.0", "INSTALLED"));
-            capabilities.add(createCapability("report-aggregate", "日志汇总", "SERVICE", "汇总日志", "1.0.0", "INSTALLED"));
-            capabilities.add(createCapability("report-analyze", "日志分析", "AI", "分析日志", "1.0.0", "INSTALLED"));
-        } else if ("skill-notification".equals(skillId)) {
-            capabilities.add(createCapability("notification-email", "邮件通知", "COMMUNICATION", "发送邮件", "2.1.0", "INSTALLED"));
-            capabilities.add(createCapability("notification-sms", "短信通知", "COMMUNICATION", "发送短信", "1.5.0", "INSTALLED"));
+        if ("skill-daily-report".equals(skillId))
+{
+            capabilities.add(createCapability("report-remind", "日志提醒", "COMMUNICATION", "定时提醒", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-submit", "日志提交", "SERVICE", "提交日志", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-aggregate", "日志汇总", "SERVICE", "汇总日志", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-analyze", "日志分析", "AI", "分析日志", "2.3", "INSTALLED"));
+        }
+ else if ("skill-notification".equals(skillId))
+        {
+            capabilities.add(createCapability("notification-email", "邮件通知", "COMMUNICATION", "发送邮件", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("notification-sms", "短信通知", "COMMUNICATION", "发送短信", "2.3", "INSTALLED"));
         }
         
         return capabilities;

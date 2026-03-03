@@ -14,3 +14,22 @@ management:
 logging:
   level:
     net.ooder: DEBUG
+
+ooder:
+  jds:
+    server:
+      home: ./
+    config:
+      name: scene
+  sdk:
+    enabled: true
+  gitee:
+    token: 4bb9dd63de689f07ed7cbad19248af3d
+    owner: ooderCN
+    skills-repo: skills
+  github:
+    token: 
+    owner: oodercn
+    skills-repo: skills
+  mock:
+    enabled: false

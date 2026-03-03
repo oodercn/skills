@@ -62,8 +62,7 @@ async function refreshAll() {
 
 async function refreshCreated() {
     try {
-        const response = await fetch('/api/v1/scene-groups/my/created?pageNum=1&pageSize=20');
-        const result = await response.json();
+        var result = await ApiClient.get('/api/v1/scene-groups/my/created?pageNum=1&pageSize=20');
         
         if (result.code === 200 && result.data) {
             createdScenes = result.data.list || [];
@@ -77,8 +76,7 @@ async function refreshCreated() {
 
 async function refreshStarted() {
     try {
-        const response = await fetch('/api/v1/workflows/my/started?pageNum=1&pageSize=20');
-        const result = await response.json();
+        var result = await ApiClient.get('/api/v1/workflows/my/started?pageNum=1&pageSize=20');
         
         if (result.code === 200 && result.data) {
             startedScenes = result.data.list || [];
@@ -92,8 +90,7 @@ async function refreshStarted() {
 
 async function refreshParticipated() {
     try {
-        const response = await fetch('/api/v1/scene-groups/my/participated?pageNum=1&pageSize=20');
-        const result = await response.json();
+        var result = await ApiClient.get('/api/v1/scene-groups/my/participated?pageNum=1&pageSize=20');
         
         if (result.code === 200 && result.data) {
             participatedScenes = result.data.list || [];
@@ -331,16 +328,13 @@ function manageScene(sceneGroupId) {
 }
 
 async function toggleSceneStatus(sceneGroupId, currentStatus) {
-    const action = currentStatus === 'ACTIVE' ? 'deactivate' : 'activate';
-    const confirmMsg = currentStatus === 'ACTIVE' ? '确定要暂停此场景吗？' : '确定要激活此场景吗？';
+    var action = currentStatus === 'ACTIVE' ? 'deactivate' : 'activate';
+    var confirmMsg = currentStatus === 'ACTIVE' ? '确定要暂停此场景吗？' : '确定要激活此场景吗？';
     
     if (!confirm(confirmMsg)) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/' + action, {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/' + action);
         
         if (result.code === 200) {
             refreshCreated();
@@ -357,10 +351,7 @@ async function leaveScene(sceneGroupId) {
     if (!confirm('确定要退出此场景吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/participants/me', {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        var result = await ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/participants/me');
         
         if (result.code === 200) {
             refreshParticipated();

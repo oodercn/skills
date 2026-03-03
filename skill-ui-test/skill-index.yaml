@@ -157,6 +157,14 @@ spec:
       icon: layout
       order: 9
       sceneDriver: null
+      
+    - id: knowledge
+      name: 知识服务
+      nameEn: Knowledge
+      description: 知识库管理、文档检索、智能问答
+      icon: book
+      order: 10
+      sceneDriver: null
   
   skills:
     - skillId: skill-a2ui
@@ -174,6 +182,45 @@ spec:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
       checksum: ""
+      
+    - skillId: skill-knowledge-qa
+      name: Knowledge QA Scene Capability
+      version: "2.3.0"
+      category: knowledge
+      subCategory: qa
+      tags:
+        - knowledge
+        - qa
+        - rag
+        - search
+        - scene-capability
+        - mainFirst
+      description: 知识问答场景能力，支持知识库管理、文档管理、语义检索、RAG智能问答
+      sceneId: knowledge-qa
+      path: skills/skill-knowledge-qa
+      downloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.0/skill-knowledge-qa-2.3.0.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.0/skill-knowledge-qa-2.3.0.jar
+      checksum: ""
+      mainFirst: true
+      capabilities:
+        - kb-management
+        - document-management
+        - kb-search
+        - rag-retrieval
+      driverCapabilities:
+        - intent-receiver
+        - event-listener
+        - capability-invoker
+      dependencies:
+        - skillId: skill-knowledge-base
+          version: ">=1.0.0"
+          required: true
+        - skillId: skill-indexing
+          version: ">=1.0.0"
+          required: true
+        - skillId: skill-rag
+          version: ">=1.0.0"
+          required: false
       
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
@@ -1438,6 +1485,26 @@ spec:
         - document-search
         - knowledge-share
       maxMembers: 1000
+      
+    - sceneId: knowledge-qa
+      name: Knowledge QA Scene
+      description: 知识问答场景能力，自驱型SuperAgent，支持知识库管理、文档管理、语义检索、RAG智能问答
+      version: "2.3.0"
+      category: SCENE
+      mainFirst: true
+      requiredCapabilities:
+        - kb-management
+        - document-management
+        - kb-search
+        - rag-retrieval
+      driverCapabilities:
+        - intent-receiver
+        - event-listener
+        - capability-invoker
+      collaborativeCapabilities:
+        - scene-indexing
+        - scene-llm-assistant
+      maxMembers: 100
       
     - sceneId: device
       name: Device Management

@@ -1,97 +1,155 @@
 package net.ooder.skill.scene.config;
 
+import net.ooder.sdk.OoderSdk;
+import net.ooder.sdk.OoderSdkBuilder;
+import net.ooder.sdk.a2a.capability.CapabilityRegistry;
+import net.ooder.sdk.service.skill.SkillService;
+import net.ooder.sdk.discovery.git.GiteeDiscoverer;
+import net.ooder.sdk.discovery.git.GitHubDiscoverer;
+import net.ooder.sdk.discovery.git.GitDiscoveryConfig;
+import net.ooder.skills.api.SkillInstaller;
+import net.ooder.skills.api.SkillPackageManager;
+import net.ooder.skills.api.SkillRegistry;
+import net.ooder.skills.core.impl.SkillPackageManagerImpl;
+import net.ooder.skills.core.impl.SkillRegistryImpl;
+import net.ooder.skills.core.installer.SkillInstallerImpl;
+import net.ooder.skills.core.discovery.LocalDiscoverer;
+import net.ooder.skills.api.SkillDiscoverer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 
 import javax.annotation.PreDestroy;
-import java.util.Optional;
 
 @Configuration
 public class SdkConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(SdkConfiguration.class);
 
-    @Value("${ooder.sdk.enabled:false}")
+    @Value("${ooder.sdk.enabled:true}")
     private boolean sdkEnabled;
 
     @Value("${ooder.sdk.node-id:skill-scene}")
     private String nodeId;
 
-    @Value("${ooder.sdk.skill-path:./skills}")
-    private String skillPath;
+    @Value("${ooder.skill.root-path:./skills}")
+    private String skillRootPath;
 
-    private Object sdk;
+    @Value("${ooder.gitee.token:}")
+    private String giteeToken;
+
+    @Value("${ooder.gitee.owner:ooderCN}")
+    private String giteeOwner;
+
+    @Value("${ooder.gitee.skills-repo:skills}")
+    private String giteeSkillsRepo;
+
+    @Value("${ooder.github.token:}")
+    private String githubToken;
+
+    @Value("${ooder.github.owner:oodercn}")
+    private String githubOwner;
+
+    @Value("${ooder.github.skills-repo:skills}")
+    private String githubSkillsRepo;
+
+    private OoderSdk sdk;
 
     @Bean
     @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public Object ooderSDK() throws Exception {
-        log.info("Initializing OoderSDK with agentId: {}", nodeId);
+    public OoderSdk ooderSDK() {
+        log.info("[ooderSDK] Initializing OoderSDK with agentId: {}", nodeId);
 
         try {
-            Class<?> configClass = Class.forName("net.ooder.sdk.infra.config.SDKConfiguration");
-            Object config = configClass.getDeclaredConstructor().newInstance();
-            
-            configClass.getMethod("setAgentId", String.class).invoke(config, nodeId);
-            configClass.getMethod("setAgentName", String.class).invoke(config, "Skill Scene Service");
-            configClass.getMethod("setAgentType", String.class).invoke(config, "SKILL");
-            configClass.getMethod("setSkillRootPath", String.class).invoke(config, skillPath);
+            sdk = OoderSdkBuilder.create()
+                .sdkId(nodeId)
+                .autoDiscoverDrivers(true)
+                .autoStartScenes(true)
+                .property("skillRootPath", skillRootPath)
+                .build();
 
-            Class<?> sdkClass = Class.forName("net.ooder.sdk.api.OoderSDK");
-            Object builder = sdkClass.getMethod("builder").invoke(null);
-            builder.getClass().getMethod("configuration", configClass).invoke(builder, config);
-            sdk = builder.getClass().getMethod("build").invoke(builder);
-            
-            sdkClass.getMethod("initialize").invoke(sdk);
-            sdkClass.getMethod("start").invoke(sdk);
-
-            log.info("OoderSDK initialized and started successfully");
+            log.info("[ooderSDK] OoderSDK initialized successfully");
             return sdk;
-        } catch (ClassNotFoundException e) {
-            log.warn("OoderSDK not found in classpath, using memory implementation");
-            return null;
         } catch (Exception e) {
-            log.error("Failed to initialize OoderSDK: {}", e.getMessage());
+            log.error("[ooderSDK] Failed to initialize OoderSDK: {}", e.getMessage(), e);
+            return null;
+        }
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillPackageManager skillPackageManager() {
+        log.info("[skillPackageManager] Creating SkillPackageManagerImpl with path: {}", skillRootPath);
+        SkillPackageManagerImpl manager = new SkillPackageManagerImpl();
+        manager.setSkillRootPath(skillRootPath);
+        return manager;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillInstaller skillInstaller() {
+        log.info("[skillInstaller] Creating SkillInstallerImpl");
+        return new SkillInstallerImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillRegistry skillRegistry() {
+        log.info("[skillRegistry] Creating SkillRegistryImpl");
+        return new SkillRegistryImpl();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillDiscoverer skillDiscoverer() {
+        log.info("[skillDiscoverer] Creating LocalDiscoverer");
+        return new LocalDiscoverer();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillService skillService(SkillPackageManager packageManager) {
+        log.info("[skillService] Creating SkillService");
+        return new SkillService(packageManager);
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public CapabilityRegistry capabilityRegistry() {
+        log.info("[capabilityRegistry] Creating CapabilityRegistry");
+        return new CapabilityRegistry();
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
+    public GitHubDiscoverer gitHubDiscoverer() {
+        log.info("[gitHubDiscoverer] Creating GitHubDiscoverer bean...");
+        try {
+            GitDiscoveryConfig config = GitDiscoveryConfig.forGitHub(githubToken, githubOwner, githubSkillsRepo);
+            GitHubDiscoverer discoverer = new GitHubDiscoverer(config);
+            log.info("[gitHubDiscoverer] GitHubDiscoverer bean created successfully with owner: {}", githubOwner);
+            return discoverer;
+        } catch (Exception e) {
+            log.error("[gitHubDiscoverer] Failed to create GitHubDiscoverer: {}", e.getMessage(), e);
             return null;
         }
     }
 
     @Bean
     @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public Object skillPackageManager(Object sdk) {
-        if (sdk == null) return null;
+    public GiteeDiscoverer giteeDiscoverer() {
+        log.info("[giteeDiscoverer] Creating GiteeDiscoverer bean...");
         try {
-            return sdk.getClass().getMethod("getSkillPackageManager").invoke(sdk);
+            GitDiscoveryConfig config = GitDiscoveryConfig.forGitee(giteeToken, giteeOwner, giteeSkillsRepo);
+            GiteeDiscoverer discoverer = new GiteeDiscoverer(config);
+            log.info("[giteeDiscoverer] GiteeDiscoverer bean created successfully");
+            return discoverer;
         } catch (Exception e) {
-            log.warn("Failed to get SkillPackageManager: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public Object sceneGroupManager(Object sdk) {
-        if (sdk == null) return null;
-        try {
-            return sdk.getClass().getMethod("getSceneGroupManager").invoke(sdk);
-        } catch (Exception e) {
-            log.warn("Failed to get SceneGroupManager: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    @Bean
-    @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public Object capabilityInvoker(Object sdk) {
-        if (sdk == null) return null;
-        try {
-            return sdk.getClass().getMethod("getCapabilityInvoker").invoke(sdk);
-        } catch (Exception e) {
-            log.warn("Failed to get CapabilityInvoker: {}", e.getMessage());
+            log.error("[giteeDiscoverer] Failed to create GiteeDiscoverer: {}", e.getMessage(), e);
             return null;
         }
     }
@@ -99,16 +157,16 @@ public class SdkConfiguration {
     @PreDestroy
     public void shutdown() {
         if (sdk != null) {
-            log.info("Shutting down OoderSDK");
+            log.info("[shutdown] Shutting down OoderSDK");
             try {
-                sdk.getClass().getMethod("shutdown").invoke(sdk);
+                sdk.shutdown();
             } catch (Exception e) {
-                log.warn("Failed to shutdown OoderSDK: {}", e.getMessage());
+                log.warn("[shutdown] Failed to shutdown OoderSDK: {}", e.getMessage());
             }
         }
     }
 
     public boolean isSdkAvailable() {
-        return sdk != null;
+        return sdk != null && sdk.isInitialized();
     }
 }

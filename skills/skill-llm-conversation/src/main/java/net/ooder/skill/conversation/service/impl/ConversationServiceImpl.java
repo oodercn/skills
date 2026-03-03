@@ -7,18 +7,18 @@ import net.ooder.skill.conversation.repository.ConversationRepository;
 import net.ooder.skill.conversation.repository.MessageRepository;
 import net.ooder.skill.conversation.service.ConversationService;
 
+import net.ooder.sdk.memory.ConversationMemory;
+import net.ooder.sdk.llm.LlmSdk;
+import net.ooder.sdk.llm.LlmSdkFactory;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ConversationServiceImpl implements ConversationService {
@@ -31,6 +31,13 @@ public class ConversationServiceImpl implements ConversationService {
     @Autowired
     private MessageRepository messageRepository;
     
+    private final Map<String, ConversationMemory> conversationMemoryCache = new ConcurrentHashMap<>();
+    private final LlmSdk llmSdk;
+    
+    public ConversationServiceImpl() {
+        this.llmSdk = LlmSdkFactory.create();
+    }
+
     @Override
     @Transactional
     public Conversation createConversation(CreateConversationRequest request) {
@@ -49,29 +56,62 @@ public class ConversationServiceImpl implements ConversationService {
             conversation.addMessage(systemMessage);
         }
         
-        return conversationRepository.save(conversation);
+        Conversation saved = conversationRepository.save(conversation);
+        initConversationMemory(saved.getId(), request.getSystemPrompt());
+        
+        return saved;
     }
     
+    private void initConversationMemory(String conversationId, String systemPrompt) {
+        ConversationMemory memory = llmSdk.getMemoryBridgeApi().createConversationMemory(conversationId);
+        if (systemPrompt != null && !systemPrompt.isEmpty()) {
+            memory.addMessage(conversationId, ConversationMemory.Message.system(systemPrompt));
+        }
+        conversationMemoryCache.put(conversationId, memory);
+    }
+    
+    private ConversationMemory getOrCreateMemory(String conversationId) {
+        return conversationMemoryCache.computeIfAbsent(conversationId, id -> {
+            ConversationMemory memory = llmSdk.getMemoryBridgeApi().createConversationMemory(id);
+            List<Message> messages = messageRepository.findByConversationId(id);
+            for (Message msg : messages) {
+                ConversationMemory.Message sdkMsg = convertToSdkMessage(msg);
+                memory.addMessage(id, sdkMsg);
+            }
+            return memory;
+        });
+    }
+    
+    private ConversationMemory.Message convertToSdkMessage(Message msg) {
+        ConversationMemory.Message sdkMsg = new ConversationMemory.Message();
+        sdkMsg.setMessageId(msg.getId());
+        sdkMsg.setConversationId(msg.getConversationId());
+        sdkMsg.setRole(msg.getRole().name().toLowerCase());
+        sdkMsg.setContent(msg.getContent());
+        sdkMsg.setTimestamp(msg.getCreateTime() != null ? msg.getCreateTime() : System.currentTimeMillis());
+        return sdkMsg;
+    }
+
     @Override
     public Optional<Conversation> getConversation(String id) {
         return conversationRepository.findById(id);
     }
-    
+
     @Override
     public Optional<Conversation> getConversation(String id, String userId) {
         return conversationRepository.findByIdAndUserId(id, userId);
     }
-    
+
     @Override
     public List<Conversation> getUserConversations(String userId) {
         return conversationRepository.findByUserIdAndStatus(userId, Conversation.ConversationStatus.ACTIVE);
     }
-    
+
     @Override
     public List<Conversation> getSceneConversations(String sceneId) {
         return conversationRepository.findBySceneIdOrderByUpdateTimeDesc(sceneId);
     }
-    
+
     @Override
     @Transactional
     public Conversation updateConversation(String id, Conversation updates) {
@@ -99,13 +139,14 @@ public class ConversationServiceImpl implements ConversationService {
         
         return conversationRepository.save(conversation);
     }
-    
+
     @Override
     @Transactional
     public void deleteConversation(String id) {
+        conversationMemoryCache.remove(id);
         conversationRepository.deleteById(id);
     }
-    
+
     @Override
     @Transactional
     public void archiveConversation(String id) {
@@ -115,9 +156,10 @@ public class ConversationServiceImpl implements ConversationService {
             conversation.setStatus(Conversation.ConversationStatus.ARCHIVED);
             conversation.setUpdateTime(System.currentTimeMillis());
             conversationRepository.save(conversation);
+            conversationMemoryCache.remove(id);
         }
     }
-    
+
     @Override
     @Transactional
     public Message addMessage(String conversationId, String role, String content, Integer tokenCount, String metadata) {
@@ -148,50 +190,103 @@ public class ConversationServiceImpl implements ConversationService {
         
         conversationRepository.save(conversation);
         
+        ConversationMemory memory = getOrCreateMemory(conversationId);
+        ConversationMemory.Message sdkMsg = new ConversationMemory.Message();
+        sdkMsg.setMessageId(message.getId());
+        sdkMsg.setConversationId(conversationId);
+        sdkMsg.setRole(role.toLowerCase());
+        sdkMsg.setContent(content);
+        sdkMsg.setTimestamp(System.currentTimeMillis());
+        memory.addMessage(conversationId, sdkMsg);
+        
         return message;
     }
-    
+
     @Override
     public List<Message> getMessages(String conversationId) {
         return messageRepository.findByConversationId(conversationId);
     }
-    
+
     @Override
     public List<Message> getRecentMessages(String conversationId, int limit) {
-        List<Message> allMessages = messageRepository.findByConversationId(conversationId);
+        ConversationMemory memory = conversationMemoryCache.get(conversationId);
+        if (memory != null) {
+            List<ConversationMemory.Message> sdkMessages = memory.getRecentMessages(conversationId, limit);
+            List<Message> messages = new ArrayList<>();
+            for (ConversationMemory.Message sdkMsg : sdkMessages) {
+                Message msg = convertFromSdkMessage(sdkMsg);
+                messages.add(msg);
+            }
+            return messages;
+        }
         
+        List<Message> allMessages = messageRepository.findByConversationId(conversationId);
         if (allMessages.size() <= limit) {
             return allMessages;
         }
-        
         return allMessages.subList(allMessages.size() - limit, allMessages.size());
     }
     
+    private Message convertFromSdkMessage(ConversationMemory.Message sdkMsg) {
+        Message.MessageRole role;
+        try {
+            role = Message.MessageRole.valueOf(sdkMsg.getRole().toUpperCase());
+        } catch (Exception e) {
+            role = Message.MessageRole.USER;
+        }
+        Message msg = new Message(role, sdkMsg.getContent());
+        msg.setId(sdkMsg.getMessageId());
+        msg.setCreateTime(sdkMsg.getTimestamp());
+        return msg;
+    }
+
     @Override
     public List<Map<String, Object>> getConversationContext(String conversationId, int maxTokens) {
+        ConversationMemory memory = conversationMemoryCache.get(conversationId);
+        if (memory != null) {
+            List<ConversationMemory.Message> messages = memory.getMessages(conversationId);
+            List<Map<String, Object>> context = new ArrayList<>();
+            int totalTokens = 0;
+            
+            for (ConversationMemory.Message msg : messages) {
+                int tokens = estimateTokens(msg.getContent());
+                if (totalTokens + tokens > maxTokens && !context.isEmpty()) {
+                    break;
+                }
+                Map<String, Object> msgMap = new HashMap<>();
+                msgMap.put("role", msg.getRole());
+                msgMap.put("content", msg.getContent());
+                context.add(msgMap);
+                totalTokens += tokens;
+            }
+            return context;
+        }
+        
         List<Message> messages = getMessages(conversationId);
         List<Map<String, Object>> context = new ArrayList<>();
-        
         int totalTokens = 0;
         
         for (Message message : messages) {
             int tokens = message.getTokenCount() != null ? message.getTokenCount() : estimateTokens(message.getContent());
-            
             if (totalTokens + tokens > maxTokens && !context.isEmpty()) {
                 break;
             }
-            
             context.add(message.toMap());
             totalTokens += tokens;
         }
         
         return context;
     }
-    
+
     @Override
     @Transactional
     public void clearMessages(String conversationId) {
         messageRepository.deleteByConversationId(conversationId);
+        
+        ConversationMemory memory = conversationMemoryCache.get(conversationId);
+        if (memory != null) {
+            memory.clearConversation(conversationId);
+        }
         
         Optional<Conversation> optional = conversationRepository.findById(conversationId);
         if (optional.isPresent()) {
@@ -203,12 +298,12 @@ public class ConversationServiceImpl implements ConversationService {
             conversationRepository.save(conversation);
         }
     }
-    
+
     @Override
     public long getConversationCount(String userId) {
         return conversationRepository.countByUserId(userId);
     }
-    
+
     @Override
     public long getTotalTokens(String userId) {
         Long total = conversationRepository.sumTokensByUserId(userId);

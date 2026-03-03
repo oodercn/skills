@@ -31,12 +31,7 @@
 
         loadSceneDetail: async function() {
             try {
-                var response = await fetch('/api/scenes/get', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/get', { sceneId: currentSceneId });
                 
                 if (result.status === 'success' && result.data) {
                     sceneData = result.data;
@@ -80,12 +75,7 @@
 
         loadCapabilities: async function() {
             try {
-                var response = await fetch('/api/scenes/capabilities/list', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId, pageNum: 1, pageSize: 100 })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/capabilities/list', { sceneId: currentSceneId, pageNum: 1, pageSize: 100 });
                 
                 if (result.status === 'success' && result.data) {
                     SceneDetail.renderCapabilities(result.data.list || []);
@@ -120,12 +110,7 @@
 
         loadCollaborativeScenes: async function() {
             try {
-                var response = await fetch('/api/scenes/collaborative/list', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId, pageNum: 1, pageSize: 100 })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/collaborative/list', { sceneId: currentSceneId, pageNum: 1, pageSize: 100 });
                 
                 if (result.status === 'success' && result.data) {
                     SceneDetail.renderCollaborativeScenes(result.data.list || []);
@@ -192,12 +177,7 @@
 
         activateScene: async function() {
             try {
-                var response = await fetch('/api/scenes/activate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/activate', { sceneId: currentSceneId });
                 
                 if (result.status === 'success') {
                     alert('场景已激活');
@@ -213,12 +193,7 @@
 
         deactivateScene: async function() {
             try {
-                var response = await fetch('/api/scenes/deactivate', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/deactivate', { sceneId: currentSceneId });
                 
                 if (result.status === 'success') {
                     alert('场景已停用');
@@ -254,19 +229,14 @@
             }
             
             try {
-                var response = await fetch('/api/scenes/capabilities/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sceneId: currentSceneId,
-                        capability: {
-                            capId: capId,
-                            name: capName,
-                            description: capDesc
-                        }
-                    })
+                var result = await ApiClient.post('/api/scenes/capabilities/add', {
+                    sceneId: currentSceneId,
+                    capability: {
+                        capId: capId,
+                        name: capName,
+                        description: capDesc
+                    }
                 });
-                var result = await response.json();
                 
                 if (result.status === 'success') {
                     SceneDetail.hideAddCapabilityModal();
@@ -285,12 +255,7 @@
             if (!confirm('确定要移除该能力吗？')) return;
             
             try {
-                var response = await fetch('/api/scenes/capabilities/remove', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId, capId: capId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/capabilities/remove', { sceneId: currentSceneId, capId: capId });
                 
                 if (result.status === 'success') {
                     SceneDetail.loadCapabilities();
@@ -322,15 +287,10 @@
             }
             
             try {
-                var response = await fetch('/api/scenes/collaborative/add', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sceneId: currentSceneId,
-                        collaborativeSceneId: collabSceneId
-                    })
+                var result = await ApiClient.post('/api/scenes/collaborative/add', {
+                    sceneId: currentSceneId,
+                    collaborativeSceneId: collabSceneId
                 });
-                var result = await response.json();
                 
                 if (result.status === 'success') {
                     SceneDetail.hideAddCollabModal();
@@ -349,15 +309,10 @@
             if (!confirm('确定要移除该协作场景吗？')) return;
             
             try {
-                var response = await fetch('/api/scenes/collaborative/remove', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        sceneId: currentSceneId,
-                        collaborativeSceneId: collabSceneId
-                    })
+                var result = await ApiClient.post('/api/scenes/collaborative/remove', {
+                    sceneId: currentSceneId,
+                    collaborativeSceneId: collabSceneId
                 });
-                var result = await response.json();
                 
                 if (result.status === 'success') {
                     SceneDetail.loadCollaborativeScenes();
@@ -373,12 +328,7 @@
 
         createSnapshot: async function() {
             try {
-                var response = await fetch('/api/scenes/snapshot/create', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/snapshot/create', { sceneId: currentSceneId });
                 
                 if (result.status === 'success') {
                     alert('快照创建成功');
@@ -394,12 +344,7 @@
 
         loadSnapshots: async function() {
             try {
-                var response = await fetch('/api/scenes/snapshot/list', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ sceneId: currentSceneId, pageNum: 1, pageSize: 100 })
-                });
-                var result = await response.json();
+                var result = await ApiClient.post('/api/scenes/snapshot/list', { sceneId: currentSceneId, pageNum: 1, pageSize: 100 });
                 
                 if (result.status === 'success' && result.data) {
                     SceneDetail.renderSnapshots(result.data.list || []);
@@ -440,15 +385,10 @@
             if (!confirm('确定要恢复到该快照吗？当前配置将被覆盖。')) return;
             
             try {
-                var response = await fetch('/api/scenes/snapshot/restore', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        sceneId: currentSceneId,
-                        snapshot: { snapshotId: snapshotId, sceneId: currentSceneId }
-                    })
+                var result = await ApiClient.post('/api/scenes/snapshot/restore', { 
+                    sceneId: currentSceneId,
+                    snapshot: { snapshotId: snapshotId, sceneId: currentSceneId }
                 });
-                var result = await response.json();
                 
                 if (result.status === 'success') {
                     alert('快照恢复成功');
@@ -468,19 +408,14 @@
             var endTime = document.getElementById('logEndTime').value;
             
             try {
-                var response = await fetch('/api/scenes/logs', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        sceneId: currentSceneId, 
-                        level: level,
-                        startTime: startTime ? new Date(startTime).getTime() : null,
-                        endTime: endTime ? new Date(endTime).getTime() : null,
-                        pageNum: 1, 
-                        pageSize: 100 
-                    })
+                var result = await ApiClient.post('/api/scenes/logs', { 
+                    sceneId: currentSceneId, 
+                    level: level,
+                    startTime: startTime ? new Date(startTime).getTime() : null,
+                    endTime: endTime ? new Date(endTime).getTime() : null,
+                    pageNum: 1, 
+                    pageSize: 100 
                 });
-                var result = await response.json();
                 
                 if (result.status === 'success' && result.data) {
                     SceneDetail.renderLogs(result.data.list || []);

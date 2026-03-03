@@ -6,11 +6,11 @@
 
     <groupId>net.ooder.skill</groupId>
     <artifactId>skill-local-knowledge</artifactId>
-    <version>1.0.0</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
 
     <name>Skill Local Knowledge</name>
-    <description>本地知识能力 - 文档检索、意图分类、术语映射、表单辅助、查询构建</description>
+    <description>本地知识能力 - 文档检索、意图分类、术语映射、表单辅助、查询构�?/description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

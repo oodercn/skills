@@ -205,4 +205,29 @@ public class CapabilityBindingServiceImpl implements CapabilityBindingService {
         }
         return null;
     }
+
+    @Override
+    public CapabilityBinding getByCapId(String capId) {
+        for (CapabilityBinding binding : bindings.values()) {
+            if (capId.equals(binding.getCapId()) && 
+                binding.getStatus() != CapabilityBindingStatus.RELEASED) {
+                return binding;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void updateInvokeStats(String bindingId, boolean success) {
+        CapabilityBinding binding = bindings.get(bindingId);
+        if (binding != null) {
+            binding.setLastInvokeTime(System.currentTimeMillis());
+            if (success) {
+                binding.setSuccessCount(binding.getSuccessCount() + 1);
+            } else {
+                binding.setFailureCount(binding.getFailureCount() + 1);
+            }
+            saveToStorage();
+        }
+    }
 }

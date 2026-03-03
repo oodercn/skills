@@ -1,5 +1,5 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillManifest
+kind: Skill
 
 metadata:
   id: skill-agent
@@ -8,8 +8,8 @@ metadata:
   description: Provides terminal agent registration, management and command execution capabilities
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/skills
-  repository: https://github.com/ooderCN/skills.git
+  homepage: https://gitee.com/ooderCN/skills
+  repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - agent
     - terminal

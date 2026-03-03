@@ -1,121 +1,97 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillManifest
+kind: Skill
 
 metadata:
   id: skill-security
-  name: Security Management Skill
-  version: 0.7.3
-  description: Provides user management, permission control, and security audit capabilities
-  author: Ooder Team
+  name: 安全服务
+  version: 1.0.0
+  description: 安全服务，提供认证、授权、加密、审计功�?  author: ooder Team
+  type: system-service
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/skills
-  repository: https://github.com/ooderCN/skills.git
+  homepage: https://gitee.com/ooderCN/skills
   keywords:
     - security
-    - user
-    - permission
     - auth
+    - encryption
     - audit
 
 spec:
-  type: tool-skill
+  type: system-service
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: authentication
+      version: "1.0"
+      description: "认证接口"
+    - id: authorization
+      version: "1.0"
+      description: "授权接口"
+    - id: encryption
+      version: "1.0"
+      description: "加密接口"
+  
+  capabilities:
+    - id: authentication
+      name: 用户认证
+      description: 用户身份认证
+      category: security
+    - id: authorization
+      name: 权限授权
+      description: 用户权限管理
+      category: security
+    - id: encryption
+      name: 数据加密
+      description: 数据加密解密
+      category: security
+    - id: audit-log
+      name: 审计日志
+      description: 操作审计记录
+      category: security
+  
+  endpoints:
+    - path: /api/security/auth
+      method: POST
+      description: 用户认证
+      capability: authentication
+    - path: /api/security/permissions
+      method: GET
+      description: 获取权限列表
+      capability: authorization
+    - path: /api/security/encrypt
+      method: POST
+      description: 数据加密
+      capability: encryption
+    - path: /api/security/decrypt
+      method: POST
+      description: 数据解密
+      capability: encryption
+    - path: /api/security/audit
+      method: GET
+      description: 获取审计日志
+      capability: audit-log
   
   runtime:
     language: java
     javaVersion: "8"
     framework: spring-boot
-    mainClass: net.ooder.skill.security.SecuritySkillApplication
-  
-  capabilities:
-    - id: user-management
-      name: User Management
-      description: Manage users and their profiles
-      category: security
-    - id: permission-control
-      name: Permission Control
-      description: Control user permissions and roles
-      category: security
-    - id: security-audit
-      name: Security Audit
-      description: Audit security events
-      category: security
-  
-  scenes:
-    - name: security
-      description: Security management scene
-      capabilities:
-        - user-management
-        - permission-control
-        - security-audit
-  
-  dependencies:
-    skills: []
-    libraries: []
   
   config:
-    required: []
     optional:
-      - name: SECURITY_SESSION_TIMEOUT
+      - name: TOKEN_EXPIRY
         type: integer
-        default: 1800000
-        description: Session timeout in milliseconds
-      - name: SECURITY_MAX_LOGIN_ATTEMPTS
-        type: integer
-        default: 5
-        description: Maximum login attempts
-      - name: SECURITY_LOCKOUT_DURATION
-        type: integer
-        default: 1800000
-        description: Lockout duration in milliseconds
-  
-  endpoints:
-    - path: /api/security/status
-      method: GET
-      description: Get security status
-      capability: security-audit
-    - path: /api/security/users
-      method: GET
-      description: Get user list
-      capability: user-management
-    - path: /api/security/users
-      method: POST
-      description: Add user
-      capability: user-management
-    - path: /api/security/users/{id}
-      method: PUT
-      description: Edit user
-      capability: user-management
-    - path: /api/security/users/{id}
-      method: DELETE
-      description: Delete user
-      capability: user-management
-    - path: /api/security/users/{id}/enable
-      method: POST
-      description: Enable user
-      capability: user-management
-    - path: /api/security/users/{id}/disable
-      method: POST
-      description: Disable user
-      capability: user-management
-    - path: /api/security/permissions
-      method: GET
-      description: Get permissions
-      capability: permission-control
-    - path: /api/security/permissions
-      method: POST
-      description: Save permissions
-      capability: permission-control
-    - path: /api/security/logs
-      method: GET
-      description: Get security logs
-      capability: security-audit
+        default: 7200
+        description: Token过期时间（秒�?      - name: ENCRYPTION_ALGORITHM
+        type: string
+        default: "AES-256"
+        description: 加密算法
   
   resources:
-    cpu: "200m"
-    memory: "256Mi"
-    storage: "100Mi"
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
   
   offline:
     enabled: true
-    cacheStrategy: "local"
+    cacheStrategy: local
     syncOnReconnect: true

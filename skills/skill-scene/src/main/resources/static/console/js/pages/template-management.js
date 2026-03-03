@@ -15,8 +15,7 @@ function initLlmAssistant() {
 
 async function refreshTemplates() {
     try {
-        const response = await fetch('/api/v1/scene-templates?pageNum=' + currentPage + '&pageSize=' + pageSize);
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/scene-templates?pageNum=' + currentPage + '&pageSize=' + pageSize);
         
         if (result.code === 200 && result.data) {
             templates = result.data.list || [];
@@ -33,7 +32,7 @@ function loadMockData() {
     templates = [
         {
             templateId: 'tpl-enterprise-standard',
-            name: '企业标准模板',
+            name: '企业标准场景能力',
             category: 'enterprise',
             version: '1.0.0',
             status: 'published',
@@ -42,7 +41,7 @@ function loadMockData() {
         },
         {
             templateId: 'tpl-personal-basic',
-            name: '个人基础模板',
+            name: '个人基础场景能力',
             category: 'personal',
             version: '1.0.0',
             status: 'published',
@@ -51,7 +50,7 @@ function loadMockData() {
         },
         {
             templateId: 'tpl-test-environment',
-            name: '测试环境模板',
+            name: '测试环境场景能力',
             category: 'test',
             version: '0.9.0',
             status: 'draft',
@@ -144,12 +143,7 @@ async function saveTemplate() {
     };
     
     try {
-        const response = await fetch('/api/v1/scene-templates', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(template)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-templates', template);
         
         if (result.code === 200) {
             closeModal();
@@ -175,10 +169,7 @@ async function deleteTemplate(templateId) {
     if (!confirm('确定要删除此模板吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + templateId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId);
         
         if (result.code === 200) {
             refreshTemplates();
@@ -191,17 +182,14 @@ async function deleteTemplate(templateId) {
     }
 }
 
-function filterByCategory() {
+async function filterByCategory() {
     const category = document.getElementById('categoryFilter').value;
     if (category) {
-        fetch('/api/v1/scene-templates?pageNum=1&pageSize=10&category=' + category)
-            .then(res => res.json())
-            .then(result => {
-                if (result.code === 200 && result.data) {
-                    templates = result.data.list || [];
-                    renderTemplateTable();
-                }
-            });
+        const result = await ApiClient.get('/api/v1/scene-templates?pageNum=1&pageSize=10&category=' + category);
+        if (result.code === 200 && result.data) {
+            templates = result.data.list || [];
+            renderTemplateTable();
+        }
     } else {
         refreshTemplates();
     }

@@ -1,5 +1,9 @@
 package net.ooder.skill.vector.sqlite;
 
+import net.ooder.scene.skill.vector.VectorStore;
+import net.ooder.scene.skill.vector.VectorData;
+import net.ooder.scene.skill.vector.SearchResult;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,11 +28,10 @@ public class SqliteVectorStore implements VectorStore {
     private int embeddingDimension;
     
     private Connection connection;
-    private final Map<String, VectorEntry> cache = new ConcurrentHashMap<>();
+    private final Map<String, VectorData> cache = new ConcurrentHashMap<>();
     
     @PostConstruct
-    @Override
-    public void initialize() {
+    public void init() {
         try {
             File dbFile = new File(dbPath);
             File parentDir = dbFile.getParentFile();
@@ -42,7 +45,7 @@ public class SqliteVectorStore implements VectorStore {
             createTables();
             loadCache();
             
-            log.info("SqliteVectorStore initialized with dbPath: {}", dbPath);
+            log.info("SqliteVectorStore initialized with dbPath: {}, SDK VectorStore interface enabled", dbPath);
         } catch (SQLException e) {
             log.error("Failed to initialize SqliteVectorStore", e);
             throw new RuntimeException("Failed to initialize vector store", e);
@@ -50,8 +53,7 @@ public class SqliteVectorStore implements VectorStore {
     }
     
     @PreDestroy
-    @Override
-    public void shutdown() {
+    public void destroy() {
         try {
             if (connection != null && !connection.isClosed()) {
                 connection.close();
@@ -92,17 +94,12 @@ public class SqliteVectorStore implements VectorStore {
             while (rs.next()) {
                 String id = rs.getString("id");
                 byte[] blob = rs.getBytes("embedding");
-                long createdAt = rs.getLong("created_at");
                 
-                double[] embedding = bytesToEmbedding(blob);
+                float[] embedding = bytesToEmbedding(blob);
+                Map<String, Object> metadata = loadMetadata(id);
                 
-                VectorEntry entry = new VectorEntry();
-                entry.setId(id);
-                entry.setEmbedding(embedding);
-                entry.setCreatedAt(createdAt);
-                entry.setMetadata(loadMetadata(id));
-                
-                cache.put(id, entry);
+                VectorData data = new VectorData(id, embedding, metadata);
+                cache.put(id, data);
             }
         }
         
@@ -164,46 +161,45 @@ public class SqliteVectorStore implements VectorStore {
         
         return value.toString();
     }
-    
+
     @Override
-    public String addVector(String id, double[] embedding, Map<String, Object> metadata) {
+    public void insert(String id, float[] vector, Map<String, Object> metadata) {
         try {
             String insertVector = "INSERT OR REPLACE INTO vectors (id, embedding, created_at) VALUES (?, ?, ?)";
             
             try (PreparedStatement stmt = connection.prepareStatement(insertVector)) {
                 stmt.setString(1, id);
-                stmt.setBytes(2, embeddingToBytes(embedding));
+                stmt.setBytes(2, embeddingToBytes(vector));
                 stmt.setLong(3, System.currentTimeMillis());
                 stmt.executeUpdate();
             }
             
             saveMetadata(id, metadata);
             
-            VectorEntry entry = new VectorEntry(id, embedding, metadata != null ? metadata : new HashMap<>());
-            cache.put(id, entry);
+            VectorData data = new VectorData(id, vector, metadata != null ? metadata : new HashMap<>());
+            cache.put(id, data);
             
-            log.debug("Added vector: {}", id);
-            return id;
+            log.debug("Inserted vector: {}", id);
             
         } catch (SQLException e) {
-            log.error("Failed to add vector: {}", id, e);
-            throw new RuntimeException("Failed to add vector", e);
+            log.error("Failed to insert vector: {}", id, e);
+            throw new RuntimeException("Failed to insert vector", e);
         }
     }
     
     @Override
-    public void addVectors(List<VectorEntry> entries) {
+    public void batchInsert(List<VectorData> vectors) {
         try {
             connection.setAutoCommit(false);
             
-            for (VectorEntry entry : entries) {
-                addVector(entry.getId(), entry.getEmbedding(), entry.getMetadata());
+            for (VectorData data : vectors) {
+                insert(data.getId(), data.getVector(), data.getMetadata());
             }
             
             connection.commit();
             connection.setAutoCommit(true);
             
-            log.info("Added {} vectors", entries.size());
+            log.info("Batch inserted {} vectors", vectors.size());
             
         } catch (SQLException e) {
             try {
@@ -212,44 +208,72 @@ public class SqliteVectorStore implements VectorStore {
             } catch (SQLException ex) {
                 log.error("Failed to rollback transaction", ex);
             }
-            log.error("Failed to add vectors", e);
-            throw new RuntimeException("Failed to add vectors", e);
+            log.error("Failed to batch insert vectors", e);
+            throw new RuntimeException("Failed to batch insert vectors", e);
         }
     }
     
     @Override
-    public void updateVector(String id, double[] embedding, Map<String, Object> metadata) {
-        addVector(id, embedding, metadata);
-    }
-    
-    @Override
-    public void deleteVector(String id) {
-        try {
-            String deleteMetadata = "DELETE FROM metadata WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(deleteMetadata)) {
-                stmt.setString(1, id);
-                stmt.executeUpdate();
+    public List<SearchResult> search(float[] queryVector, int topK, Map<String, Object> filters) {
+        List<SearchResult> results = new ArrayList<>();
+        
+        for (VectorData data : cache.values()) {
+            if (filters != null && !matchesFilter(data.getMetadata(), filters)) {
+                continue;
             }
             
-            String deleteVector = "DELETE FROM vectors WHERE id = ?";
-            try (PreparedStatement stmt = connection.prepareStatement(deleteVector)) {
-                stmt.setString(1, id);
-                stmt.executeUpdate();
-            }
+            float similarity = cosineSimilarity(queryVector, data.getVector());
             
-            cache.remove(id);
-            
-            log.debug("Deleted vector: {}", id);
-            
-        } catch (SQLException e) {
-            log.error("Failed to delete vector: {}", id, e);
-            throw new RuntimeException("Failed to delete vector", e);
+            SearchResult result = new SearchResult();
+            result.setId(data.getId());
+            result.setScore(similarity);
+            result.setMetadata(data.getMetadata());
+            results.add(result);
         }
+        
+        results.sort((a, b) -> Float.compare(b.getScore(), a.getScore()));
+        
+        if (results.size() > topK) {
+            results = results.subList(0, topK);
+        }
+        
+        return results;
     }
     
-    @Override
-    public VectorEntry getVector(String id) {
-        return cache.get(id);
+    private boolean matchesFilter(Map<String, Object> metadata, Map<String, Object> filters) {
+        if (filters == null || filters.isEmpty()) return true;
+        if (metadata == null) return false;
+        
+        for (Map.Entry<String, Object> entry : filters.entrySet()) {
+            Object value = metadata.get(entry.getKey());
+            if (!Objects.equals(value, entry.getValue())) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    private float cosineSimilarity(float[] a, float[] b) {
+        if (a.length != b.length) {
+            throw new IllegalArgumentException("Vectors must have same dimension");
+        }
+        
+        float dotProduct = 0.0f;
+        float normA = 0.0f;
+        float normB = 0.0f;
+        
+        for (int i = 0; i < a.length; i++) {
+            dotProduct += a[i] * b[i];
+            normA += a[i] * a[i];
+            normB += b[i] * b[i];
+        }
+        
+        if (normA == 0 || normB == 0) {
+            return 0.0f;
+        }
+        
+        return dotProduct / (float) (Math.sqrt(normA) * Math.sqrt(normB));
     }
     
     private void saveMetadata(String id, Map<String, Object> metadata) throws SQLException {
@@ -274,125 +298,54 @@ public class SqliteVectorStore implements VectorStore {
     }
     
     @Override
-    public List<SearchResult> searchSimilar(double[] queryEmbedding, int topK) {
-        List<SearchResult> results = new ArrayList<>();
-        
-        for (VectorEntry entry : cache.values()) {
-            double similarity = cosineSimilarity(queryEmbedding, entry.getEmbedding());
+    public void delete(String id) {
+        try {
+            String deleteMetadata = "DELETE FROM metadata WHERE id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(deleteMetadata)) {
+                stmt.setString(1, id);
+                stmt.executeUpdate();
+            }
             
-            SearchResult result = new SearchResult();
-            result.setId(entry.getId());
-            result.setScore(similarity);
-            result.setMetadata(entry.getMetadata());
-            results.add(result);
+            String deleteVector = "DELETE FROM vectors WHERE id = ?";
+            try (PreparedStatement stmt = connection.prepareStatement(deleteVector)) {
+                stmt.setString(1, id);
+                stmt.executeUpdate();
+            }
+            
+            cache.remove(id);
+            
+            log.debug("Deleted vector: {}", id);
+            
+        } catch (SQLException e) {
+            log.error("Failed to delete vector: {}", id, e);
+            throw new RuntimeException("Failed to delete vector", e);
         }
-        
-        results.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-        
-        if (results.size() > topK) {
-            results = results.subList(0, topK);
-        }
-        
-        return results;
     }
     
     @Override
-    public List<SearchResult> searchSimilarWithFilter(double[] queryEmbedding, int topK, Map<String, Object> filter) {
-        List<SearchResult> results = new ArrayList<>();
+    public void deleteByMetadata(Map<String, Object> filters) {
+        List<String> toDelete = new ArrayList<>();
         
-        for (VectorEntry entry : cache.values()) {
-            if (!matchesFilter(entry.getMetadata(), filter)) {
-                continue;
-            }
-            
-            double similarity = cosineSimilarity(queryEmbedding, entry.getEmbedding());
-            
-            SearchResult result = new SearchResult();
-            result.setId(entry.getId());
-            result.setScore(similarity);
-            result.setMetadata(entry.getMetadata());
-            results.add(result);
-        }
-        
-        results.sort((a, b) -> Double.compare(b.getScore(), a.getScore()));
-        
-        if (results.size() > topK) {
-            results = results.subList(0, topK);
-        }
-        
-        return results;
-    }
-    
-    private boolean matchesFilter(Map<String, Object> metadata, Map<String, Object> filter) {
-        if (filter == null || filter.isEmpty()) return true;
-        if (metadata == null) return false;
-        
-        for (Map.Entry<String, Object> entry : filter.entrySet()) {
-            Object value = metadata.get(entry.getKey());
-            if (!Objects.equals(value, entry.getValue())) {
-                return false;
+        for (Map.Entry<String, VectorData> entry : cache.entrySet()) {
+            if (matchesFilter(entry.getValue().getMetadata(), filters)) {
+                toDelete.add(entry.getKey());
             }
         }
         
-        return true;
-    }
-    
-    private double cosineSimilarity(double[] a, double[] b) {
-        if (a.length != b.length) {
-            throw new IllegalArgumentException("Vectors must have same dimension");
+        for (String id : toDelete) {
+            delete(id);
         }
         
-        double dotProduct = 0.0;
-        double normA = 0.0;
-        double normB = 0.0;
-        
-        for (int i = 0; i < a.length; i++) {
-            dotProduct += a[i] * b[i];
-            normA += a[i] * a[i];
-            normB += b[i] * b[i];
-        }
-        
-        if (normA == 0 || normB == 0) {
-            return 0.0;
-        }
-        
-        return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-    }
-    
-    private byte[] embeddingToBytes(double[] embedding) {
-        byte[] bytes = new byte[embedding.length * 8];
-        for (int i = 0; i < embedding.length; i++) {
-            long bits = Double.doubleToLongBits(embedding[i]);
-            bytes[i * 8] = (byte) (bits >> 56);
-            bytes[i * 8 + 1] = (byte) (bits >> 48);
-            bytes[i * 8 + 2] = (byte) (bits >> 40);
-            bytes[i * 8 + 3] = (byte) (bits >> 32);
-            bytes[i * 8 + 4] = (byte) (bits >> 24);
-            bytes[i * 8 + 5] = (byte) (bits >> 16);
-            bytes[i * 8 + 6] = (byte) (bits >> 8);
-            bytes[i * 8 + 7] = (byte) bits;
-        }
-        return bytes;
-    }
-    
-    private double[] bytesToEmbedding(byte[] bytes) {
-        double[] embedding = new double[bytes.length / 8];
-        for (int i = 0; i < embedding.length; i++) {
-            long bits = ((long) (bytes[i * 8] & 0xFF) << 56) |
-                        ((long) (bytes[i * 8 + 1] & 0xFF) << 48) |
-                        ((long) (bytes[i * 8 + 2] & 0xFF) << 40) |
-                        ((long) (bytes[i * 8 + 3] & 0xFF) << 32) |
-                        ((long) (bytes[i * 8 + 4] & 0xFF) << 24) |
-                        ((long) (bytes[i * 8 + 5] & 0xFF) << 16) |
-                        ((long) (bytes[i * 8 + 6] & 0xFF) << 8) |
-                        ((long) (bytes[i * 8 + 7] & 0xFF));
-            embedding[i] = Double.longBitsToDouble(bits);
-        }
-        return embedding;
+        log.info("Deleted {} vectors by metadata filter", toDelete.size());
     }
     
     @Override
-    public int getCount() {
+    public int getDimension() {
+        return embeddingDimension;
+    }
+    
+    @Override
+    public long count() {
         return cache.size();
     }
     
@@ -415,5 +368,29 @@ public class SqliteVectorStore implements VectorStore {
             log.error("Failed to clear vectors", e);
             throw new RuntimeException("Failed to clear vectors", e);
         }
+    }
+    
+    private byte[] embeddingToBytes(float[] embedding) {
+        byte[] bytes = new byte[embedding.length * 4];
+        for (int i = 0; i < embedding.length; i++) {
+            int bits = Float.floatToIntBits(embedding[i]);
+            bytes[i * 4] = (byte) (bits >> 24);
+            bytes[i * 4 + 1] = (byte) (bits >> 16);
+            bytes[i * 4 + 2] = (byte) (bits >> 8);
+            bytes[i * 4 + 3] = (byte) bits;
+        }
+        return bytes;
+    }
+    
+    private float[] bytesToEmbedding(byte[] bytes) {
+        float[] embedding = new float[bytes.length / 4];
+        for (int i = 0; i < embedding.length; i++) {
+            int bits = ((bytes[i * 4] & 0xFF) << 24) |
+                       ((bytes[i * 4 + 1] & 0xFF) << 16) |
+                       ((bytes[i * 4 + 2] & 0xFF) << 8) |
+                       (bytes[i * 4 + 3] & 0xFF);
+            embedding[i] = Float.intBitsToFloat(bits);
+        }
+        return embedding;
     }
 }

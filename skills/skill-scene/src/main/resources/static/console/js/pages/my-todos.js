@@ -5,7 +5,9 @@ const TODO_TYPES = {
     INVITATION: 'invitation',
     DELEGATION: 'delegation',
     REMINDER: 'reminder',
-    APPROVAL: 'approval'
+    APPROVAL: 'approval',
+    ACTIVATION: 'activation',
+    SCENE_NOTIFICATION: 'scene-notification'
 };
 
 document.addEventListener('DOMContentLoaded', async function() {
@@ -45,8 +47,7 @@ function formatDeadline(timestamp) {
 
 async function refreshAll() {
     try {
-        const response = await fetch('/api/v1/my/todos?pageNum=1&pageSize=50');
-        const result = await response.json();
+        var result = await ApiClient.get('/api/v1/my/todos?pageNum=1&pageSize=50');
         
         if (result.code === 200 && result.data) {
             todos = result.data.list || [];
@@ -166,16 +167,22 @@ function renderTodos() {
     const delegations = filteredTodos.filter(t => t.type === TODO_TYPES.DELEGATION);
     const reminders = filteredTodos.filter(t => t.type === TODO_TYPES.REMINDER);
     const approvals = filteredTodos.filter(t => t.type === TODO_TYPES.APPROVAL);
+    const activations = filteredTodos.filter(t => t.type === TODO_TYPES.ACTIVATION);
+    const sceneNotifications = filteredTodos.filter(t => t.type === TODO_TYPES.SCENE_NOTIFICATION);
     
     renderTodoList('invitationList', invitations, 'invitation');
     renderTodoList('delegationList', delegations, 'delegation');
     renderTodoList('reminderList', reminders, 'reminder');
     renderTodoList('approvalList', approvals, 'approval');
+    renderTodoList('activationList', activations, 'activation');
+    renderTodoList('sceneNotificationList', sceneNotifications, 'scene-notification');
     
     document.getElementById('invitationSection').style.display = invitations.length ? 'block' : 'none';
     document.getElementById('delegationSection').style.display = delegations.length ? 'block' : 'none';
     document.getElementById('reminderSection').style.display = reminders.length ? 'block' : 'none';
     document.getElementById('approvalSection').style.display = approvals.length ? 'block' : 'none';
+    document.getElementById('activationSection').style.display = activations.length ? 'block' : 'none';
+    document.getElementById('sceneNotificationSection').style.display = sceneNotifications.length ? 'block' : 'none';
 }
 
 function renderTodoList(containerId, items, type) {
@@ -220,7 +227,9 @@ function getTypeIcon(type) {
         [TODO_TYPES.INVITATION]: '<i class="ri-user-add-line" style="color: var(--nx-info);"></i>',
         [TODO_TYPES.DELEGATION]: '<i class="ri-user-star-line" style="color: var(--nx-warning);"></i>',
         [TODO_TYPES.REMINDER]: '<i class="ri-alarm-line" style="color: var(--nx-success);"></i>',
-        [TODO_TYPES.APPROVAL]: '<i class="ri-checkbox-circle-line" style="color: var(--nx-error);"></i>'
+        [TODO_TYPES.APPROVAL]: '<i class="ri-checkbox-circle-line" style="color: var(--nx-error);"></i>',
+        [TODO_TYPES.ACTIVATION]: '<i class="ri-key-2-line" style="color: #8b5cf6;"></i>',
+        [TODO_TYPES.SCENE_NOTIFICATION]: '<i class="ri-notification-3-line" style="color: #06b6d4;"></i>'
     };
     return icons[type] || '<i class="ri-notification-3-line"></i>';
 }
@@ -230,7 +239,9 @@ function getTypeText(type) {
         [TODO_TYPES.INVITATION]: '协作邀请',
         [TODO_TYPES.DELEGATION]: '领导委派',
         [TODO_TYPES.REMINDER]: '待办提醒',
-        [TODO_TYPES.APPROVAL]: '审批请求'
+        [TODO_TYPES.APPROVAL]: '审批请求',
+        [TODO_TYPES.ACTIVATION]: '待激活能力',
+        [TODO_TYPES.SCENE_NOTIFICATION]: '场景通知'
     };
     return texts[type] || '待办';
 }
@@ -296,6 +307,28 @@ function renderPendingActions(item) {
                     </button>
                 </div>
             `;
+        case TODO_TYPES.ACTIVATION:
+            return `
+                <div class="todo-card-actions">
+                    <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="goToActivation('${item.installId}')">
+                        <i class="ri-key-2-line"></i> 前往激活
+                    </button>
+                    <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="viewCapability('${item.capabilityId}')">
+                        <i class="ri-eye-line"></i> 查看能力
+                    </button>
+                </div>
+            `;
+        case TODO_TYPES.SCENE_NOTIFICATION:
+            return `
+                <div class="todo-card-actions">
+                    <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="viewScene('${item.sceneGroupId}')">
+                        <i class="ri-eye-line"></i> 查看场景
+                    </button>
+                    <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="completeTodo('${item.id}')">
+                        <i class="ri-check-line"></i> 已知晓
+                    </button>
+                </div>
+            `;
         default:
             return `
                 <div class="todo-card-actions">
@@ -334,13 +367,10 @@ function updateStats() {
 
 async function acceptTodo(todoId) {
     try {
-        const response = await fetch('/api/v1/my/todos/' + todoId + '/accept', {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/accept');
         
         if (result.code === 200) {
-            const todo = todos.find(t => t.id === todoId);
+            var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
                 todo.completedTime = Date.now();
@@ -352,7 +382,7 @@ async function acceptTodo(todoId) {
         }
     } catch (error) {
         console.error('Failed to accept todo:', error);
-        const todo = todos.find(t => t.id === todoId);
+        var todo = todos.find(t => t.id === todoId);
         if (todo) {
             todo.status = 'completed';
             todo.completedTime = Date.now();
@@ -366,13 +396,10 @@ async function rejectTodo(todoId) {
     if (!confirm('确定要拒绝吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/my/todos/' + todoId + '/reject', {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/reject');
         
         if (result.code === 200) {
-            const todo = todos.find(t => t.id === todoId);
+            var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
                 todo.completedTime = Date.now();
@@ -384,7 +411,7 @@ async function rejectTodo(todoId) {
         }
     } catch (error) {
         console.error('Failed to reject todo:', error);
-        const todo = todos.find(t => t.id === todoId);
+        var todo = todos.find(t => t.id === todoId);
         if (todo) {
             todo.status = 'completed';
             todo.completedTime = Date.now();
@@ -396,13 +423,10 @@ async function rejectTodo(todoId) {
 
 async function completeTodo(todoId) {
     try {
-        const response = await fetch('/api/v1/my/todos/' + todoId + '/complete', {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/complete');
         
         if (result.code === 200) {
-            const todo = todos.find(t => t.id === todoId);
+            var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
                 todo.completedTime = Date.now();
@@ -414,7 +438,7 @@ async function completeTodo(todoId) {
         }
     } catch (error) {
         console.error('Failed to complete todo:', error);
-        const todo = todos.find(t => t.id === todoId);
+        var todo = todos.find(t => t.id === todoId);
         if (todo) {
             todo.status = 'completed';
             todo.completedTime = Date.now();
@@ -426,13 +450,10 @@ async function completeTodo(todoId) {
 
 async function approveTodo(todoId) {
     try {
-        const response = await fetch('/api/v1/my/todos/' + todoId + '/approve', {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/approve');
         
         if (result.code === 200) {
-            const todo = todos.find(t => t.id === todoId);
+            var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
                 todo.completedTime = Date.now();
@@ -444,7 +465,7 @@ async function approveTodo(todoId) {
         }
     } catch (error) {
         console.error('Failed to approve todo:', error);
-        const todo = todos.find(t => t.id === todoId);
+        var todo = todos.find(t => t.id === todoId);
         if (todo) {
             todo.status = 'completed';
             todo.completedTime = Date.now();
@@ -471,4 +492,12 @@ function viewTodo(todoId) {
     if (todo && todo.sceneGroupId) {
         viewScene(todo.sceneGroupId);
     }
+}
+
+function goToActivation(installId) {
+    window.location.href = '/console/pages/capability-activation.html?installId=' + installId;
+}
+
+function viewCapability(capabilityId) {
+    window.location.href = '/console/pages/my-capabilities.html?capabilityId=' + capabilityId;
 }

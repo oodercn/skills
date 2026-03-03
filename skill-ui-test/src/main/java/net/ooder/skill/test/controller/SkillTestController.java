@@ -5,6 +5,10 @@ import net.ooder.skill.test.model.SkillIndex.SkillEntry;
 import net.ooder.skill.test.model.SkillMetadata;
 import net.ooder.skill.test.service.MenuRegistry;
 import net.ooder.skill.test.service.SkillDiscoveryService;
+import net.ooder.sdk.a2a.capability.CapabilityRegistry;
+import net.ooder.sdk.service.skill.SkillService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,16 +16,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 @RestController
 @RequestMapping("/api/test")
 public class SkillTestController {
+    
+    private static final Logger log = LoggerFactory.getLogger(SkillTestController.class);
     
     @Autowired
     private SkillDiscoveryService discoveryService;
     
     @Autowired
     private MenuRegistry menuRegistry;
+    
+    @Autowired(required = false)
+    private SkillService skillService;
+    
+    @Autowired(required = false)
+    private CapabilityRegistry capabilityRegistry;
     
     @GetMapping("/categories")
     public ResponseEntity<List<SkillIndex.Category>> getCategories() {
@@ -138,6 +151,8 @@ public class SkillTestController {
         health.put("remoteSkills", discoveryService.getRemoteSkills().size());
         health.put("nexusUiSkills", discoveryService.getNexusUiSkills().size());
         health.put("localNexusUiSkills", discoveryService.getLocalNexusUiSkills().size());
+        health.put("skillServiceReady", skillService != null);
+        health.put("capabilityRegistryReady", capabilityRegistry != null);
         return ResponseEntity.ok(health);
     }
     
@@ -168,5 +183,26 @@ public class SkillTestController {
         result.put("skills", nexusUiSkills);
         
         return ResponseEntity.ok(result);
+    }
+    
+    @GetMapping("/stats")
+    public ResponseEntity<Map<String, Object>> getStats() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        stats.put("skillServiceReady", skillService != null);
+        stats.put("capabilityRegistryReady", capabilityRegistry != null);
+        
+        List<SkillMetadata> localSkills = discoveryService.getLocalSkills();
+        List<Map<String, Object>> skills = new ArrayList<>();
+        for (SkillMetadata skill : localSkills) {
+            Map<String, Object> skillMap = new HashMap<>();
+            skillMap.put("id", skill.getId());
+            skillMap.put("name", skill.getName());
+            skillMap.put("type", skill.getType());
+            skills.add(skillMap);
+        }
+        stats.put("skills", skills);
+        
+        return ResponseEntity.ok(stats);
     }
 }

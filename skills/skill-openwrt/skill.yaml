@@ -1,15 +1,15 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillManifest
+kind: Skill
 
 metadata:
   id: skill-openwrt
   name: OpenWrt Router Driver
   version: 0.7.3
-  description: Provides OpenWrt router connection, configuration and command execution capabilities
+  description: OpenWrt路由器驱动，提供路由器连接、配置管理和命令执行功能
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/skills
-  repository: https://github.com/ooderCN/skills.git
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-openwrt
+  repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - openwrt
     - router
@@ -29,28 +29,28 @@ spec:
   capabilities:
     - id: router-connection
       name: Router Connection
-      description: Connect to OpenWrt router via SSH/HTTP
-      category: openwrt
+      description: 通过SSH/HTTP连接OpenWrt路由器
+      category: connection
     - id: uci-config
       name: UCI Configuration
-      description: Manage UCI configuration
-      category: openwrt
+      description: 管理UCI配置
+      category: configuration
     - id: command-execution
       name: Command Execution
-      description: Execute commands on router
-      category: openwrt
+      description: 在路由器上执行命令
+      category: execution
     - id: wifi-management
       name: WiFi Management
-      description: Manage WiFi settings
-      category: openwrt
+      description: 管理WiFi设置
+      category: network
     - id: dhcp-management
       name: DHCP Management
-      description: Manage DHCP settings
-      category: openwrt
+      description: 管理DHCP设置
+      category: network
   
   scenes:
     - name: openwrt
-      description: OpenWrt management scene
+      description: OpenWrt管理场景
       capabilities:
         - router-connection
         - uci-config
@@ -58,83 +58,83 @@ spec:
         - wifi-management
         - dhcp-management
   
-  dependencies:
-    skills: []
-    libraries: []
+  dependencies: []
   
   config:
-    required: []
     optional:
       - name: CONNECTION_TIMEOUT
-        type: integer
+        type: number
         default: 30000
-        description: Connection timeout in milliseconds
+        description: 连接超时时间（毫秒）
       - name: SSH_PORT
-        type: integer
+        type: number
         default: 22
-        description: SSH port
+        description: SSH端口
       - name: HTTP_PORT
-        type: integer
+        type: number
         default: 80
-        description: HTTP port
+        description: HTTP端口
   
   endpoints:
     - path: /api/openwrt/connect
       method: POST
-      description: Connect to router
+      description: 连接路由器
       capability: router-connection
     - path: /api/openwrt/disconnect
       method: POST
-      description: Disconnect from router
+      description: 断开路由器连接
       capability: router-connection
     - path: /api/openwrt/status
       method: GET
-      description: Get connection status
+      description: 获取连接状态
       capability: router-connection
     - path: /api/openwrt/info
       method: GET
-      description: Get router info
+      description: 获取路由器信息
       capability: router-connection
     - path: /api/openwrt/uci/get
       method: GET
-      description: Get UCI config
+      description: 获取UCI配置
       capability: uci-config
     - path: /api/openwrt/uci/set
       method: POST
-      description: Set UCI config
+      description: 设置UCI配置
       capability: uci-config
     - path: /api/openwrt/uci/commit
       method: POST
-      description: Commit UCI changes
+      description: 提交UCI更改
       capability: uci-config
     - path: /api/openwrt/command
       method: POST
-      description: Execute command
+      description: 执行命令
       capability: command-execution
     - path: /api/openwrt/wifi/list
       method: GET
-      description: List WiFi networks
+      description: 列出WiFi网络
       capability: wifi-management
     - path: /api/openwrt/wifi/update
       method: POST
-      description: Update WiFi config
+      description: 更新WiFi配置
       capability: wifi-management
     - path: /api/openwrt/wifi/scan
       method: POST
-      description: Scan WiFi networks
+      description: 扫描WiFi网络
       capability: wifi-management
     - path: /api/openwrt/dhcp/leases
       method: GET
-      description: Get DHCP leases
+      description: 获取DHCP租约
       capability: dhcp-management
     - path: /api/openwrt/packages
       method: GET
-      description: List packages
+      description: 列出软件包
       capability: command-execution
     - path: /api/openwrt/reboot
       method: POST
-      description: Reboot router
+      description: 重启路由器
       capability: command-execution
+    - path: /api/health
+      method: GET
+      description: 健康检查
   
   resources:
     cpu: "200m"
@@ -143,5 +143,5 @@ spec:
   
   offline:
     enabled: true
-    cacheStrategy: "local"
+    cacheStrategy: local
     syncOnReconnect: true

@@ -30,7 +30,7 @@
 
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
+            <artifactId>agent-sdk-core</artifactId>
         </dependency>
     </dependencies>
 

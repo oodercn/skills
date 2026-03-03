@@ -69,6 +69,12 @@
         .todo-card.approval {
             border-left-color: var(--nx-error);
         }
+        .todo-card.activation {
+            border-left-color: #8b5cf6;
+        }
+        .todo-card.scene-notification {
+            border-left-color: #06b6d4;
+        }
         .todo-card-header {
             display: flex;
             align-items: flex-start;
@@ -232,6 +238,22 @@
                             </div>
                             <div id="approvalList"></div>
                         </div>
+                        
+                        <div class="todo-section" id="activationSection">
+                            <div class="todo-section-header">
+                                <i class="ri-key-2-line" style="color: #8b5cf6;"></i>
+                                待激活能力
+                            </div>
+                            <div id="activationList"></div>
+                        </div>
+                        
+                        <div class="todo-section" id="sceneNotificationSection">
+                            <div class="todo-section-header">
+                                <i class="ri-notification-3-line" style="color: #06b6d4;"></i>
+                                场景通知
+                            </div>
+                            <div id="sceneNotificationList"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -239,6 +261,7 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/utils/dict-cache.js"></script>

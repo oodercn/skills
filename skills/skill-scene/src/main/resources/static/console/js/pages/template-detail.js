@@ -64,8 +64,7 @@ function initTabs() {
 
 async function loadAvailableCapabilities() {
     try {
-        const response = await fetch('/api/v1/capabilities');
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/capabilities');
         
         if (result.code === 200 && result.data) {
             availableCapabilities = result.data;
@@ -78,8 +77,7 @@ async function loadAvailableCapabilities() {
 
 async function loadOrgTree() {
     try {
-        const response = await fetch('/api/v1/org/tree');
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/org/tree');
         
         if (result.code === 200 && result.data) {
             orgTree = result.data;
@@ -92,8 +90,7 @@ async function loadOrgTree() {
 
 async function loadRoles() {
     try {
-        const response = await fetch('/api/v1/org/roles');
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/org/roles');
         
         if (result.code === 200 && result.data) {
             roles = result.data;
@@ -128,8 +125,7 @@ function getDefaultRoles() {
 
 async function loadTemplate(id) {
     try {
-        const response = await fetch('/api/v1/scene-templates/' + id);
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/scene-templates/' + id);
         
         if (result.code === 200 && result.data) {
             currentTemplate = result.data;
@@ -146,7 +142,7 @@ async function loadTemplate(id) {
 function loadMockTemplate() {
     currentTemplate = {
         templateId: templateId || 'tpl-daily-report',
-        name: '日志汇报场景模板',
+        name: '日志汇报场景能力',
         version: '1.0.0',
         description: '日志汇报场景，支持日志提交、提醒、汇总和分析。适用于团队日常日志管理，支持定时提醒、AI分析等功能。',
         category: 'business',
@@ -497,12 +493,7 @@ async function saveCapability() {
     }
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + templateId + '/capabilities', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(capability)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/capabilities', capability);
         
         if (result.code === 200) {
             if (!currentTemplate.capabilities) currentTemplate.capabilities = [];
@@ -543,10 +534,7 @@ async function deleteCapability(capId) {
     if (!confirm('确定要删除此能力吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + templateId + '/capabilities/' + capId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/capabilities/' + capId);
         
         if (result.code === 200) {
             currentTemplate.capabilities = currentTemplate.capabilities?.filter(c => c.capId !== capId);
@@ -634,12 +622,7 @@ async function saveRole() {
     }
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + templateId + '/roles', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(role)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/roles', role);
         
         if (result.code === 200) {
             if (!currentTemplate.roles) currentTemplate.roles = [];
@@ -688,10 +671,7 @@ async function deleteRole(roleName) {
     if (!confirm('确定要删除此角色吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + templateId + '/roles/' + encodeURIComponent(roleName), {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/roles/' + encodeURIComponent(roleName));
         
         if (result.code === 200) {
             currentTemplate.roles = currentTemplate.roles?.filter(r => r.name !== roleName);
@@ -725,12 +705,7 @@ async function saveTemplate() {
     }
     
     try {
-        const response = await fetch('/api/v1/scene-templates/' + currentTemplate.templateId, {
-            method: 'PUT',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(currentTemplate)
-        });
-        const result = await response.json();
+        const result = await ApiClient.put('/api/v1/scene-templates/' + currentTemplate.templateId, currentTemplate);
         
         if (result.code === 200) {
             alert('保存成功');
@@ -770,12 +745,7 @@ async function saveSceneGroup() {
     };
     
     try {
-        const response = await fetch('/api/v1/scene-groups', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(request)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups', request);
         
         if (result.code === 200) {
             closeSceneGroupModal();

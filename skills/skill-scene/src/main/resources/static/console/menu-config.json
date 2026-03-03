@@ -97,24 +97,24 @@
             ]
         },
         {
-            "id": "template-management",
-            "name": "模板管理",
-            "icon": "ri-file-copy-line",
+            "id": "scene-capability-management",
+            "name": "场景能力",
+            "icon": "ri-layout-grid-line",
             "url": "/console/pages/template-management.html",
             "roles": ["enterprise", "admin"],
             "status": "implemented",
             "children": [
                 {
-                    "id": "template-list",
-                    "name": "模板列表",
+                    "id": "scene-capability-list",
+                    "name": "场景能力列表",
                     "icon": "ri-list-check",
                     "url": "/console/pages/template-management.html",
                     "roles": ["enterprise", "admin"],
                     "status": "implemented"
                 },
                 {
-                    "id": "template-detail",
-                    "name": "模板详情",
+                    "id": "scene-capability-detail",
+                    "name": "场景能力详情",
                     "icon": "ri-file-list-3-line",
                     "url": "/console/pages/template-detail.html",
                     "roles": ["enterprise", "admin"],

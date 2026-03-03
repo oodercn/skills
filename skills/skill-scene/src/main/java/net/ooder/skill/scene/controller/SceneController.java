@@ -7,13 +7,19 @@ import net.ooder.skill.scene.dto.SceneStateDTO;
 import net.ooder.skill.scene.dto.scene.SceneSnapshotDTO;
 import net.ooder.skill.scene.dto.CapabilityDTO;
 import net.ooder.skill.scene.service.SceneService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/scenes")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS})
 public class SceneController extends BaseController {
+
+    private static final Logger log = LoggerFactory.getLogger(SceneController.class);
 
     private final SceneService sceneService;
 

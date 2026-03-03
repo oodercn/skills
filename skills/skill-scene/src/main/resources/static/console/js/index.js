@@ -4,9 +4,30 @@
  */
 
 window.onload = function() {
+    initThemeToggle();
     checkSavedPageType();
     loadRecentAccess();
 };
+
+function initThemeToggle() {
+    const themeToggle = document.getElementById('theme-toggle');
+    if (themeToggle) {
+        themeToggle.addEventListener('click', function() {
+            document.documentElement.classList.toggle('light-theme');
+            const isLight = document.documentElement.classList.contains('light-theme');
+            this.innerHTML = isLight 
+                ? '<i class="ri-moon-line"></i> 深色模式'
+                : '<i class="ri-sun-line"></i> 浅色模式';
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+        });
+        
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme === 'light') {
+            document.documentElement.classList.add('light-theme');
+            themeToggle.innerHTML = '<i class="ri-moon-line"></i> 深色模式';
+        }
+    }
+}
 
 function checkSavedPageType() {
     const savedPageType = localStorage.getItem('skillcenter_page_type');
@@ -24,7 +45,7 @@ function checkSavedPageType() {
         }
         localStorage.setItem('currentRole', role);
         
-        if (confirm(`检测到您上次使用的是${getPageTypeName(savedPageType)}页面，是否直接进入？`)) {
+        if (confirm('检测到您上次使用的是' + getPageTypeName(savedPageType) + '页面，是否直接进入？')) {
             navigateToPage(savedPageType);
         }
     }
@@ -34,22 +55,24 @@ function loadRecentAccess() {
     const recentAccess = localStorage.getItem('skillcenter_recent_access');
     const recentAccessEl = document.getElementById('recent-access');
     
+    if (!recentAccessEl) return;
+    
     if (recentAccess) {
         const recentPages = JSON.parse(recentAccess);
-        let html = '<div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">';
+        let html = '<div class="recent-access-list">';
         
-        recentPages.forEach(page => {
-            html += `
-                <div style="padding: 8px 16px; background-color: var(--nexus-input-bg); border-radius: 20px; font-size: 14px; color: var(--nexus-secondary); border: 1px solid var(--nexus-border);">
-                    <i class="${getPageTypeIcon(page.type)}"></i> ${getPageTypeName(page.type)} (${page.time})
-                </div>
-            `;
+        recentPages.forEach(function(page) {
+            html += '<div class="recent-access-item" onclick="selectPageType(\'' + page.type + '\')">';
+            html += '<i class="' + getPageTypeIcon(page.type) + '"></i>';
+            html += '<span>' + getPageTypeName(page.type) + '</span>';
+            html += '<span class="recent-time">' + page.time + '</span>';
+            html += '</div>';
         });
         
         html += '</div>';
         recentAccessEl.innerHTML = html;
     } else {
-        recentAccessEl.innerHTML = '<p style="color: var(--nexus-secondary);">暂无最近访问记录</p>';
+        recentAccessEl.innerHTML = '<p class="no-recent">暂无最近访问记录</p>';
     }
 }
 
@@ -102,16 +125,16 @@ function updateRecentAccess(pageType) {
 function navigateToPage(pageType) {
     switch(pageType) {
         case 'dashboard':
-            window.location.href = '/skillcenter/console/pages/dashboard.html';
+            window.location.href = '/console/pages/dashboard.html';
             break;
         case 'personal':
-            window.location.href = '/skillcenter/console/pages/personal/dashboard.html';
+            window.location.href = '/console/pages/my-scenes.html';
             break;
         case 'market':
-            window.location.href = '/skillcenter/console/pages/market.html';
+            window.location.href = '/console/pages/capability-discovery.html';
             break;
         case 'admin':
-            window.location.href = '/skillcenter/console/pages/admin/dashboard.html';
+            window.location.href = '/console/pages/scene-management.html';
             break;
     }
 }

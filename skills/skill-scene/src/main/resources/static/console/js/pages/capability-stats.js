@@ -24,14 +24,12 @@
 
         loadStats: async function() {
             try {
-                var responses = await Promise.all([
-                    fetch('/api/v1/capabilities/stats/overview'),
-                    fetch('/api/v1/capabilities/stats/rank?sortBy=invokeCount&limit=10'),
-                    fetch('/api/v1/capabilities/stats/errors?limit=5'),
-                    fetch('/api/v1/capabilities/stats/logs?limit=20')
+                var results = await Promise.all([
+                    ApiClient.get('/api/v1/capabilities/stats/overview'),
+                    ApiClient.get('/api/v1/capabilities/stats/rank?sortBy=invokeCount&limit=10'),
+                    ApiClient.get('/api/v1/capabilities/stats/errors?limit=5'),
+                    ApiClient.get('/api/v1/capabilities/stats/logs?limit=20')
                 ]);
-
-                var results = await Promise.all(responses.map(function(r) { return r.json(); }));
 
                 if (results[0].code === 200) {
                     overviewData = results[0].data;

@@ -6,11 +6,11 @@
 
     <groupId>net.ooder.skill</groupId>
     <artifactId>skill-document-processor</artifactId>
-    <version>1.0.0</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
 
     <name>Skill Document Processor</name>
-    <description>文档处理器 - 文档解析、分块、元数据提取</description>
+    <description>文档处理�?- 文档解析、分块、元数据提取</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

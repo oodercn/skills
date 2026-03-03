@@ -47,7 +47,7 @@ spec:
     - name: OSS_BUCKET_NAME
       type: string
       required: true
-      description: OSS桶名称
+      description: OSS桶名�?
 
   execution:
     timeout: 30000

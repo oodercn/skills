@@ -1,49 +1,92 @@
 apiVersion: skill.ooder.net/v1
 kind: Skill
+
 metadata:
-  name: skill-local-knowledge
-  version: "1.0.0"
-  description: 本地知识能力 - 文档检索、意图分类、术语映射、表单辅助、查询构建
+  id: skill-local-knowledge
+  name: 本地知识服务
+  version: 1.0.0
+  description: 本地知识存储和检索服务，支持本地文档索引和快速检索
   author: ooder Team
-  
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - knowledge
+    - local
+    - storage
+    - index
+
 spec:
-  type: SYSTEM_SERVICE
-  category: intelligence
+  type: system-service
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: local-knowledge-storage
+      version: "1.0"
+      description: "本地知识存储接口"
+    - id: local-knowledge-index
+      version: "1.0"
+      description: "本地知识索引接口"
   
   capabilities:
+    - id: local-storage
+      name: 本地存储
+      description: 本地知识存储
+      category: storage
+    - id: local-index
+      name: 本地索引
+      description: 本地文档索引
+      category: ai
     - id: local-search
-      name: 本地文档检索
-      description: 检索本地文档，支持关键词匹配和自动分类
-      category: search
-      
-    - id: intent-classify
-      name: 意图分类
-      description: 识别用户自然语言的操作意图
-      category: nlp
-      
-    - id: term-mapping
-      name: 术语映射
-      description: 将用户术语映射到系统概念
-      category: nlp
-      
-    - id: form-assist
-      name: 表单辅助
-      description: 通过自然语言辅助表单填写
-      category: ui
-      
-    - id: query-build
-      name: 查询构建
-      description: 将自然语言转换为查询条件
-      category: search
-
+      name: 本地检索
+      description: 本地知识检索
+      category: ai
+  
+  endpoints:
+    - path: /api/v1/local-kb
+      method: POST
+      description: 创建本地知识库
+      capability: local-storage
+    - path: /api/v1/local-kb/{id}
+      method: GET
+      description: 获取本地知识库
+      capability: local-storage
+    - path: /api/v1/local-kb/{id}/index
+      method: POST
+      description: 构建索引
+      capability: local-index
+    - path: /api/v1/local-kb/{id}/search
+      method: POST
+      description: 检索本地知识
+      capability: local-search
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
   config:
-    knowledge:
-      local:
-        enabled: true
-        docPath: ./docs
-      index:
-        type: memory
-        algorithm: bm25
-      term:
-        builtin: true
-        userDefined: true
+    optional:
+      - name: STORAGE_PATH
+        type: string
+        default: "./data/local-kb"
+        description: 本地存储路径
+      - name: INDEX_TYPE
+        type: string
+        default: "lucene"
+        description: 索引类型
+      - name: MAX_INDEX_SIZE
+        type: integer
+        default: 104857600
+        description: 最大索引大小
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

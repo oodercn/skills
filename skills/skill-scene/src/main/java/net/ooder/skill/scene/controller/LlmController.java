@@ -1,10 +1,13 @@
 package net.ooder.skill.scene.controller;
 
+import javax.validation.Valid;
 import net.ooder.config.ResultModel;
 import net.ooder.scene.skill.LlmProvider;
+import net.ooder.skill.scene.dto.llm.*;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
@@ -26,6 +29,9 @@ public class LlmController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(LlmController.class);
     private static final long SSE_TIMEOUT = 120000L;
+    
+    @Value("${ooder.mock.enabled:false}")
+    private boolean mockEnabled;
     
     private final ExecutorService executor = Executors.newCachedThreadPool();
     
@@ -63,18 +69,14 @@ public class LlmController extends BaseController {
 
     @PostMapping("/chat")
     @ResponseBody
-    public ResultModel<Map<String, Object>> chat(@RequestBody Map<String, Object> request) {
+    public ResultModel<Map<String, Object>> chat(@RequestBody @Valid ChatRequestDTO request) {
         log.info("Chat API called with provider: {}, model: {}", currentProviderType, currentModel);
         ResultModel<Map<String, Object>> result = new ResultModel<Map<String, Object>>();
 
         try {
-            String prompt = (String) request.get("prompt");
-            String systemPrompt = (String) request.get("systemPrompt");
-            String model = (String) request.getOrDefault("model", currentModel);
-            String providerType = (String) request.getOrDefault("provider", currentProviderType);
-            
-            Double temperature = (Double) request.get("temperature");
-            Integer maxTokens = (Integer) request.get("maxTokens");
+            String prompt = request.getMessage();
+            String model = request.getModel() != null ? request.getModel() : currentModel;
+            String providerType = currentProviderType;
             
             LlmProvider provider = providers.get(providerType);
             
@@ -82,33 +84,31 @@ public class LlmController extends BaseController {
             if (provider != null) {
                 List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
                 
-                if (systemPrompt != null && !systemPrompt.isEmpty()) {
-                    Map<String, Object> systemMessage = new HashMap<String, Object>();
-                    systemMessage.put("role", "system");
-                    systemMessage.put("content", systemPrompt);
-                    messages.add(systemMessage);
-                }
-                
                 Map<String, Object> userMessage = new HashMap<String, Object>();
                 userMessage.put("role", "user");
                 userMessage.put("content", prompt);
                 messages.add(userMessage);
                 
                 Map<String, Object> options = new HashMap<String, Object>();
-                if (temperature != null) {
-                    options.put("temperature", temperature);
+                if (request.getTemperature() != null) {
+                    options.put("temperature", request.getTemperature());
                 }
-                if (maxTokens != null) {
-                    options.put("max_tokens", maxTokens);
+                if (request.getMaxTokens() != null) {
+                    options.put("max_tokens", request.getMaxTokens());
                 }
                 
                 Map<String, Object> chatResult = provider.chat(model, messages, options);
                 response = (String) chatResult.get("content");
                 
                 log.info("LLM response received from provider: {}", providerType);
-            } else {
+            } else if (mockEnabled) {
                 response = getMockResponse(prompt);
-                log.info("Using mock response, provider not available: {}", providerType);
+                log.info("Using mock response (mockEnabled=true), provider not available: {}", providerType);
+            } else {
+                log.warn("No LLM provider available and mock is disabled");
+                result.setRequestStatus(503);
+                result.setMessage("No LLM provider available and mock is disabled");
+                return result;
             }
 
             Map<String, Object> data = new HashMap<String, Object>();
@@ -129,15 +129,12 @@ public class LlmController extends BaseController {
     }
 
     @PostMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
-    public SseEmitter chatStream(@RequestBody Map<String, Object> request) {
+    public SseEmitter chatStream(@RequestBody @Valid ChatRequestDTO request) {
         log.info("Stream Chat API called");
         
-        final String prompt = (String) request.get("prompt");
-        final String systemPrompt = (String) request.get("systemPrompt");
-        final String model = (String) request.getOrDefault("model", currentModel);
-        final String providerType = (String) request.getOrDefault("provider", currentProviderType);
-        final Double temperature = (Double) request.get("temperature");
-        final Integer maxTokens = (Integer) request.get("maxTokens");
+        final String prompt = request.getMessage();
+        final String model = request.getModel() != null ? request.getModel() : currentModel;
+        final String providerType = currentProviderType;
         
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
         
@@ -151,30 +148,28 @@ public class LlmController extends BaseController {
                     if (provider != null) {
                         List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
                         
-                        if (systemPrompt != null && !systemPrompt.isEmpty()) {
-                            Map<String, Object> systemMessage = new HashMap<String, Object>();
-                            systemMessage.put("role", "system");
-                            systemMessage.put("content", systemPrompt);
-                            messages.add(systemMessage);
-                        }
-                        
                         Map<String, Object> userMessage = new HashMap<String, Object>();
                         userMessage.put("role", "user");
                         userMessage.put("content", prompt);
                         messages.add(userMessage);
                         
                         Map<String, Object> options = new HashMap<String, Object>();
-                        if (temperature != null) {
-                            options.put("temperature", temperature);
+                        if (request.getTemperature() != null) {
+                            options.put("temperature", request.getTemperature());
                         }
-                        if (maxTokens != null) {
-                            options.put("max_tokens", maxTokens);
+                        if (request.getMaxTokens() != null) {
+                            options.put("max_tokens", request.getMaxTokens());
                         }
                         
                         Map<String, Object> chatResult = provider.chat(model, messages, options);
                         fullResponse = (String) chatResult.get("content");
-                    } else {
+                    } else if (mockEnabled) {
                         fullResponse = getMockResponse(prompt);
+                    } else {
+                        fullResponse = "Error: No LLM provider available and mock is disabled";
+                        emitter.send(SseEmitter.event().name("error").data(fullResponse));
+                        emitter.complete();
+                        return;
                     }
                     
                     int chunkSize = 8;
@@ -313,13 +308,13 @@ public class LlmController extends BaseController {
 
     @PostMapping("/models/set")
     @ResponseBody
-    public ResultModel<Boolean> setModel(@RequestBody Map<String, String> request) {
-        log.info("Set Model API called: {}", request);
+    public ResultModel<Boolean> setModel(@RequestBody SetModelRequestDTO request) {
+        log.info("Set Model API called: modelId={}, provider={}", request.getModelId(), request.getProvider());
         ResultModel<Boolean> result = new ResultModel<Boolean>();
 
         try {
-            String modelId = request.get("modelId");
-            String providerType = request.get("provider");
+            String modelId = request.getModelId();
+            String providerType = request.getProvider();
             
             if (providerType != null && providers.containsKey(providerType)) {
                 currentProviderType = providerType;
@@ -370,20 +365,27 @@ public class LlmController extends BaseController {
 
     @PostMapping("/complete")
     @ResponseBody
-    public ResultModel<String> complete(@RequestBody Map<String, Object> request) {
+    public ResultModel<String> complete(@RequestBody @Valid CompleteRequestDTO request) {
         log.info("Complete API called");
         ResultModel<String> result = new ResultModel<String>();
 
         try {
-            String prompt = (String) request.get("prompt");
-            String model = (String) request.getOrDefault("model", currentModel);
-            String providerType = (String) request.getOrDefault("provider", currentProviderType);
+            String prompt = request.getPrompt();
+            String model = request.getModel() != null ? request.getModel() : currentModel;
+            String providerType = currentProviderType;
             
             LlmProvider provider = providers.get(providerType);
             
             String response;
             if (provider != null) {
-                response = provider.complete(model, prompt, new HashMap<String, Object>());
+                Map<String, Object> options = new HashMap<String, Object>();
+                if (request.getTemperature() != null) {
+                    options.put("temperature", request.getTemperature());
+                }
+                if (request.getMaxTokens() != null) {
+                    options.put("max_tokens", request.getMaxTokens());
+                }
+                response = provider.complete(model, prompt, options);
             } else {
                 response = getMockResponse(prompt);
             }
@@ -402,16 +404,16 @@ public class LlmController extends BaseController {
 
     @PostMapping("/translate")
     @ResponseBody
-    public ResultModel<String> translate(@RequestBody Map<String, Object> request) {
+    public ResultModel<String> translate(@RequestBody @Valid TranslateRequestDTO request) {
         log.info("Translate API called");
         ResultModel<String> result = new ResultModel<String>();
 
         try {
-            String text = (String) request.get("text");
-            String targetLanguage = (String) request.get("targetLanguage");
-            String sourceLanguage = (String) request.get("sourceLanguage");
-            String model = (String) request.getOrDefault("model", currentModel);
-            String providerType = (String) request.getOrDefault("provider", currentProviderType);
+            String text = request.getText();
+            String targetLanguage = request.getTargetLang();
+            String sourceLanguage = request.getSourceLang();
+            String model = request.getModel() != null ? request.getModel() : currentModel;
+            String providerType = currentProviderType;
             
             LlmProvider provider = providers.get(providerType);
             
@@ -436,15 +438,15 @@ public class LlmController extends BaseController {
 
     @PostMapping("/summarize")
     @ResponseBody
-    public ResultModel<String> summarize(@RequestBody Map<String, Object> request) {
+    public ResultModel<String> summarize(@RequestBody @Valid SummarizeRequestDTO request) {
         log.info("Summarize API called");
         ResultModel<String> result = new ResultModel<String>();
 
         try {
-            String text = (String) request.get("text");
-            Integer maxLength = (Integer) request.getOrDefault("maxLength", 200);
-            String model = (String) request.getOrDefault("model", currentModel);
-            String providerType = (String) request.getOrDefault("provider", currentProviderType);
+            String text = request.getText();
+            Integer maxLength = request.getMaxLength() != null ? request.getMaxLength() : 200;
+            String model = request.getModel() != null ? request.getModel() : currentModel;
+            String providerType = currentProviderType;
             
             LlmProvider provider = providers.get(providerType);
             

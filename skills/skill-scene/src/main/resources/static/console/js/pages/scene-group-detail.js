@@ -80,8 +80,7 @@ function initTabs() {
 
 async function loadAvailableCapabilities() {
     try {
-        const response = await fetch('/api/v1/capabilities');
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/capabilities');
         
         if (result.code === 200 && result.data) {
             availableCapabilities = result.data;
@@ -97,13 +96,10 @@ async function loadAvailableCapabilities() {
 
 async function loadOrgData() {
     try {
-        const [usersRes, treeRes] = await Promise.all([
-            fetch('/api/v1/org/users'),
-            fetch('/api/v1/org/tree')
+        const [usersResult, treeResult] = await Promise.all([
+            ApiClient.get('/api/v1/org/users'),
+            ApiClient.get('/api/v1/org/tree')
         ]);
-        
-        const usersResult = await usersRes.json();
-        const treeResult = await treeRes.json();
         
         if (usersResult.code === 200) {
             users = usersResult.data || [];
@@ -168,8 +164,7 @@ function getDefaultOrgTree() {
 
 async function loadSceneGroup(id) {
     try {
-        const response = await fetch('/api/v1/scene-groups/' + id);
-        const result = await response.json();
+        const result = await ApiClient.get('/api/v1/scene-groups/' + id);
         
         if (result.code === 200 && result.data) {
             currentGroup = result.data;
@@ -650,12 +645,7 @@ async function saveParticipant() {
     }
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/participants', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(participant)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/participants', participant);
         
         if (result.code === 200) {
             closeParticipantModal();
@@ -673,10 +663,7 @@ async function removeParticipant(participantId) {
     if (!confirm('确定要移除此参与者吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/participants/' + participantId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/participants/' + participantId);
         
         if (result.code === 200) {
             loadSceneGroup(sceneGroupId);
@@ -812,12 +799,7 @@ async function saveCapabilityBinding() {
     };
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/capabilities', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(binding)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/capabilities', binding);
         
         if (result.code === 200) {
             closeCapabilityModal();
@@ -835,10 +817,7 @@ async function unbindCapability(bindingId) {
     if (!confirm('确定要解绑此能力吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/capabilities/' + bindingId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/capabilities/' + bindingId);
         
         if (result.code === 200) {
             loadSceneGroup(sceneGroupId);
@@ -860,12 +839,7 @@ async function createSnapshot() {
     const description = prompt('请输入快照描述（可选）:');
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/snapshots', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({ description: description || '手动创建' })
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/snapshots', { description: description || '手动创建' });
         
         if (result.code === 200) {
             loadSceneGroup(sceneGroupId);
@@ -883,12 +857,7 @@ async function restoreSnapshot(snapshotId) {
     
     try {
         const snapshot = currentGroup.snapshots?.find(s => s.snapshotId === snapshotId);
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/snapshots/' + snapshotId + '/restore', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify(snapshot)
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/snapshots/' + snapshotId + '/restore', snapshot);
         
         if (result.code === 200) {
             loadSceneGroup(sceneGroupId);
@@ -906,10 +875,7 @@ async function deleteSnapshot(snapshotId) {
     if (!confirm('确定要删除此快照吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/snapshots/' + snapshotId, {
-            method: 'DELETE'
-        });
-        const result = await response.json();
+        const result = await ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/snapshots/' + snapshotId);
         
         if (result.code === 200) {
             loadSceneGroup(sceneGroupId);
@@ -932,10 +898,7 @@ async function toggleStatus() {
     if (!confirm(confirmMsg)) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/' + action, {
-            method: 'POST'
-        });
-        const result = await response.json();
+        const result = await ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/' + action);
         
         if (result.code === 200) {
             currentGroup.status = action === 'activate' ? 'ACTIVE' : 'SUSPENDED';

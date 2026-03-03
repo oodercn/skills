@@ -632,15 +632,23 @@
             </div>
             <div class="form-group">
                 <label class="form-label">能力类型</label>
-                <select class="form-input" id="regCapabilityType">
-                    <option value="SERVICE">服务类型</option>
-                    <option value="SKILL">技能类型</option>
-                    <option value="AI">AI类型</option>
-                    <option value="COMMUNICATION">通信类型</option>
-                    <option value="STORAGE">存储类型</option>
-                    <option value="MONITORING">监控类型</option>
-                    <option value="SECURITY">安全类型</option>
-                    <option value="CUSTOM">自定义类型</option>
+                <select class="form-input" id="regType">
+                    <option value="ATOMIC">原子能力 - 单一功能，不可分解</option>
+                    <option value="COMPOSITE">组合能力 - 组合多个原子能力</option>
+                    <option value="SCENE">场景能力 - 自驱型SuperAgent能力</option>
+                    <option value="DRIVER">驱动能力 - 意图/时间/事件驱动</option>
+                    <option value="COLLABORATIVE">协作能力 - 跨场景协作</option>
+                    <option value="SERVICE">服务能力 - 业务服务、API服务</option>
+                    <option value="AI">AI能力 - LLM、机器学习</option>
+                    <option value="TOOL">工具能力 - 工具类功能</option>
+                    <option value="CONNECTOR">连接器能力 - 连接协议类</option>
+                    <option value="DATA">数据能力 - 数据存储、处理</option>
+                    <option value="MANAGEMENT">管理能力 - 配置管理、监控管理</option>
+                    <option value="COMMUNICATION">通信能力 - 消息、通知</option>
+                    <option value="SECURITY">安全能力 - 认证、加密</option>
+                    <option value="MONITORING">监控能力 - 日志、指标</option>
+                    <option value="SKILL">技能能力 - 可安装的技能包</option>
+                    <option value="CUSTOM">自定义能力 - 用户自定义</option>
                 </select>
             </div>
             <div class="form-group">
@@ -655,6 +663,7 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/llm-assistant.js"></script>

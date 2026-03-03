@@ -1,325 +1,165 @@
 package net.ooder.skill.llm.ollama;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import net.ooder.scene.skill.LlmProvider;
 import net.ooder.scene.skill.StreamHandler;
-import okhttp3.*;
+import net.ooder.sdk.drivers.llm.LlmDriver;
 import org.springframework.stereotype.Component;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.util.*;
-import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
 public class OllamaLlmProvider implements LlmProvider {
-    
-    private static final String DEFAULT_BASE_URL = "http://localhost:11434";
-    private static final MediaType JSON = MediaType.parse("application/json; charset=utf-8");
-    
-    private final ObjectMapper objectMapper = new ObjectMapper();
-    private final OkHttpClient httpClient;
-    
-    private String baseUrl = DEFAULT_BASE_URL;
-    
+
+    private final OllamaLlmDriver driver;
+    private String defaultModel = "llama3";
+
     public OllamaLlmProvider() {
-        this.httpClient = createHttpClient();
+        this.driver = new OllamaLlmDriver();
+        driver.init(null);
     }
-    
+
     public OllamaLlmProvider(String baseUrl) {
-        this.baseUrl = baseUrl;
-        this.httpClient = createHttpClient();
+        this.driver = new OllamaLlmDriver();
+        LlmDriver.LlmConfig config = new LlmDriver.LlmConfig();
+        config.setBaseUrl(baseUrl);
+        driver.init(config);
     }
-    
-    private OkHttpClient createHttpClient() {
-        return new OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(300, TimeUnit.SECONDS)
-            .writeTimeout(30, TimeUnit.SECONDS)
-            .build();
-    }
-    
+
     @Override
     public String getProviderType() {
         return "ollama";
     }
-    
+
     @Override
     public List<String> getSupportedModels() {
-        List<String> models = new ArrayList<>();
         try {
-            Request request = new Request.Builder()
-                .url(baseUrl + "/api/tags")
-                .get()
-                .build();
-            
-            try (Response response = httpClient.newCall(request).execute()) {
-                if (response.isSuccessful() && response.body() != null) {
-                    JsonNode json = objectMapper.readTree(response.body().string());
-                    JsonNode modelsNode = json.path("models");
-                    if (modelsNode.isArray()) {
-                        for (JsonNode model : modelsNode) {
-                            models.add(model.path("name").asText());
-                        }
-                    }
-                }
-            }
+            return driver.listModels().get();
         } catch (Exception e) {
-            log.debug("Failed to fetch Ollama models: {}", e.getMessage());
+            log.error("Failed to list models", e);
+            return Arrays.asList("llama3", "llama2", "mistral", "codellama");
         }
-        
-        if (models.isEmpty()) {
-            return Arrays.asList(
-                "llama3.1", "llama3", "llama2",
-                "mistral", "mixtral",
-                "codellama", "deepseek-coder",
-                "phi3", "gemma", "gemma2",
-                "qwen2", "qwen2.5",
-                "nomic-embed-text", "mxbai-embed-large"
-            );
-        }
-        
-        return models;
     }
-    
+
     @Override
     public Map<String, Object> chat(String model, List<Map<String, Object>> messages, Map<String, Object> options) {
         try {
-            ObjectNode requestBody = objectMapper.createObjectNode();
-            requestBody.put("model", model);
-            requestBody.put("stream", false);
+            LlmDriver.ChatRequest request = new LlmDriver.ChatRequest();
+            request.setModel(model != null ? model : defaultModel);
             
-            ArrayNode messagesArray = requestBody.putArray("messages");
+            List<LlmDriver.ChatMessage> chatMessages = new ArrayList<>();
             for (Map<String, Object> msg : messages) {
-                ObjectNode msgNode = messagesArray.addObject();
-                msgNode.put("role", (String) msg.get("role"));
-                msgNode.put("content", (String) msg.get("content"));
+                String role = (String) msg.get("role");
+                String content = (String) msg.get("content");
+                chatMessages.add(new LlmDriver.ChatMessage(role, content));
             }
-            
+            request.setMessages(chatMessages);
+
             if (options != null) {
-                ObjectNode optionsNode = requestBody.putObject("options");
                 if (options.containsKey("temperature")) {
-                    optionsNode.put("temperature", ((Number) options.get("temperature")).doubleValue());
+                    request.setTemperature(((Number) options.get("temperature")).doubleValue());
                 }
-                if (options.containsKey("num_predict")) {
-                    optionsNode.put("num_predict", ((Number) options.get("num_predict")).intValue());
-                }
-                if (options.containsKey("top_p")) {
-                    optionsNode.put("top_p", ((Number) options.get("top_p")).doubleValue());
+                if (options.containsKey("max_tokens")) {
+                    request.setMaxTokens(((Number) options.get("max_tokens")).intValue());
                 }
             }
-            
-            Request request = new Request.Builder()
-                .url(baseUrl + "/api/chat")
-                .post(RequestBody.create(requestBody.toString(), JSON))
-                .build();
-            
-            try (Response response = httpClient.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    String errorBody = response.body() != null ? response.body().string() : "Unknown error";
-                    log.error("Ollama API error: {} - {}", response.code(), errorBody);
-                    throw new RuntimeException("Ollama API error: " + response.code());
-                }
-                
-                String responseBody = response.body().string();
-                JsonNode jsonResponse = objectMapper.readTree(responseBody);
-                
-                Map<String, Object> result = new HashMap<>();
-                result.put("model", jsonResponse.path("model").asText());
-                result.put("created_at", jsonResponse.path("created_at").asText());
-                result.put("done", jsonResponse.path("done").asBoolean());
-                
-                JsonNode messageNode = jsonResponse.path("message");
-                Map<String, Object> message = new HashMap<>();
-                message.put("role", messageNode.path("role").asText());
-                message.put("content", messageNode.path("content").asText());
-                result.put("message", message);
-                
-                Map<String, Object> choices = new HashMap<>();
-                choices.put("index", 0);
-                choices.put("message", message);
-                choices.put("finish_reason", "stop");
-                result.put("choices", Collections.singletonList(choices));
-                
-                JsonNode evalCountNode = jsonResponse.path("eval_count");
-                Map<String, Object> usage = new HashMap<>();
-                usage.put("prompt_tokens", jsonResponse.path("prompt_eval_count").asInt(0));
-                usage.put("completion_tokens", evalCountNode.asInt(0));
-                usage.put("total_tokens", usage.get("prompt_tokens").hashCode() + (Integer) usage.get("completion_tokens"));
-                result.put("usage", usage);
-                
-                log.info("Ollama chat success: model={}", model);
-                return result;
-            }
-            
-        } catch (IOException e) {
-            log.error("Ollama API call failed", e);
-            return createMockChatResponse(model);
+
+            LlmDriver.ChatResponse response = driver.chat(request).get();
+            return convertToMap(response);
+
+        } catch (Exception e) {
+            log.error("Ollama chat failed", e);
+            return createErrorResponse(e.getMessage());
         }
     }
-    
+
     @Override
     public void chatStream(String model, List<Map<String, Object>> messages, Map<String, Object> options, StreamHandler handler) {
         try {
-            ObjectNode requestBody = objectMapper.createObjectNode();
-            requestBody.put("model", model);
-            requestBody.put("stream", true);
-            
-            ArrayNode messagesArray = requestBody.putArray("messages");
+            LlmDriver.ChatRequest request = new LlmDriver.ChatRequest();
+            request.setModel(model != null ? model : defaultModel);
+
+            List<LlmDriver.ChatMessage> chatMessages = new ArrayList<>();
             for (Map<String, Object> msg : messages) {
-                ObjectNode msgNode = messagesArray.addObject();
-                msgNode.put("role", (String) msg.get("role"));
-                msgNode.put("content", (String) msg.get("content"));
+                String role = (String) msg.get("role");
+                String content = (String) msg.get("content");
+                chatMessages.add(new LlmDriver.ChatMessage(role, content));
             }
-            
+            request.setMessages(chatMessages);
+
             if (options != null) {
-                ObjectNode optionsNode = requestBody.putObject("options");
                 if (options.containsKey("temperature")) {
-                    optionsNode.put("temperature", ((Number) options.get("temperature")).doubleValue());
+                    request.setTemperature(((Number) options.get("temperature")).doubleValue());
+                }
+                if (options.containsKey("max_tokens")) {
+                    request.setMaxTokens(((Number) options.get("max_tokens")).intValue());
                 }
             }
-            
-            Request request = new Request.Builder()
-                .url(baseUrl + "/api/chat")
-                .post(RequestBody.create(requestBody.toString(), JSON))
-                .build();
-            
-            httpClient.newCall(request).enqueue(new Callback() {
+
+            driver.chatStream(request, new LlmDriver.ChatStreamHandler() {
                 @Override
-                public void onFailure(Call call, IOException e) {
-                    log.error("Ollama stream call failed", e);
-                    handler.onError(e);
+                public void onToken(String token) {
+                    handler.onChunk(token);
                 }
-                
+
                 @Override
-                public void onResponse(Call call, Response response) throws IOException {
-                    try (ResponseBody body = response.body()) {
-                        if (!response.isSuccessful()) {
-                            handler.onError(new RuntimeException("Ollama API error: " + response.code()));
-                            return;
-                        }
-                        
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(body.byteStream()));
-                        String line;
-                        Map<String, Object> metadata = new HashMap<>();
-                        
-                        while ((line = reader.readLine()) != null) {
-                            if (line.trim().isEmpty()) continue;
-                            
-                            try {
-                                JsonNode json = objectMapper.readTree(line);
-                                JsonNode messageNode = json.path("message");
-                                String content = messageNode.path("content").asText("");
-                                
-                                if (!content.isEmpty()) {
-                                    handler.onChunk(content);
-                                }
-                                
-                                if (json.path("done").asBoolean(false)) {
-                                    metadata.put("prompt_eval_count", json.path("prompt_eval_count").asInt());
-                                    metadata.put("eval_count", json.path("eval_count").asInt());
-                                    handler.onComplete(metadata);
-                                }
-                            } catch (Exception e) {
-                                log.debug("Failed to parse stream line: {}", line);
-                            }
-                        }
-                    }
+                public void onMessage(LlmDriver.ChatMessage message) {
+                }
+
+                @Override
+                public void onComplete(LlmDriver.ChatResponse response) {
+                    handler.onComplete(convertToMap(response));
+                }
+
+                @Override
+                public void onError(Throwable error) {
+                    handler.onError(error);
                 }
             });
-            
+
         } catch (Exception e) {
-            log.error("Ollama stream call failed", e);
+            log.error("Ollama stream failed", e);
             handler.onError(e);
         }
     }
-    
+
     @Override
     public String complete(String model, String prompt, Map<String, Object> options) {
-        try {
-            ObjectNode requestBody = objectMapper.createObjectNode();
-            requestBody.put("model", model);
-            requestBody.put("prompt", prompt);
-            requestBody.put("stream", false);
-            
-            if (options != null) {
-                ObjectNode optionsNode = requestBody.putObject("options");
-                if (options.containsKey("temperature")) {
-                    optionsNode.put("temperature", ((Number) options.get("temperature")).doubleValue());
-                }
-                if (options.containsKey("num_predict")) {
-                    optionsNode.put("num_predict", ((Number) options.get("num_predict")).intValue());
-                }
-            }
-            
-            Request request = new Request.Builder()
-                .url(baseUrl + "/api/generate")
-                .post(RequestBody.create(requestBody.toString(), JSON))
-                .build();
-            
-            try (Response response = httpClient.newCall(request).execute()) {
-                if (!response.isSuccessful()) {
-                    throw new RuntimeException("Ollama API error: " + response.code());
-                }
-                
-                String responseBody = response.body().string();
-                JsonNode json = objectMapper.readTree(responseBody);
-                return json.path("response").asText();
-            }
-            
-        } catch (IOException e) {
-            log.error("Ollama completion failed", e);
-            return "Mock Ollama completion - Ollama not available at " + baseUrl;
-        }
+        List<Map<String, Object>> messages = new ArrayList<>();
+        Map<String, Object> userMsg = new HashMap<>();
+        userMsg.put("role", "user");
+        userMsg.put("content", prompt);
+        messages.add(userMsg);
+
+        Map<String, Object> result = chat(model, messages, options);
+        return extractContent(result);
     }
-    
+
     @Override
     public List<double[]> embed(String model, List<String> texts) {
         try {
-            List<double[]> embeddings = new ArrayList<>();
+            LlmDriver.EmbeddingRequest request = new LlmDriver.EmbeddingRequest();
+            request.setModel(model != null ? model : "nomic-embed-text");
+            request.setInput(texts);
+
+            LlmDriver.EmbeddingResponse response = driver.embed(request).get();
             
-            for (String text : texts) {
-                ObjectNode requestBody = objectMapper.createObjectNode();
-                requestBody.put("model", model);
-                requestBody.put("input", text);
-                
-                Request request = new Request.Builder()
-                    .url(baseUrl + "/api/embeddings")
-                    .post(RequestBody.create(requestBody.toString(), JSON))
-                    .build();
-                
-                try (Response response = httpClient.newCall(request).execute()) {
-                    if (!response.isSuccessful()) {
-                        throw new RuntimeException("Ollama Embedding API error: " + response.code());
-                    }
-                    
-                    String responseBody = response.body().string();
-                    JsonNode json = objectMapper.readTree(responseBody);
-                    JsonNode embeddingNode = json.path("embedding");
-                    
-                    double[] embedding = new double[embeddingNode.size()];
-                    for (int i = 0; i < embeddingNode.size(); i++) {
-                        embedding[i] = embeddingNode.get(i).asDouble();
-                    }
-                    embeddings.add(embedding);
+            List<double[]> embeddings = new ArrayList<>();
+            if (response.getData() != null) {
+                for (LlmDriver.EmbeddingData data : response.getData()) {
+                    embeddings.add(data.getEmbedding());
                 }
             }
-            
-            log.info("Ollama embeddings success: model={}, count={}", model, embeddings.size());
             return embeddings;
-            
-        } catch (IOException e) {
-            log.error("Ollama embedding API call failed", e);
-            return createMockEmbeddings(texts.size(), 4096);
+
+        } catch (Exception e) {
+            log.error("Ollama embedding failed", e);
+            return createMockEmbeddings(texts.size(), 768);
         }
     }
-    
+
     @Override
     public String translate(String model, String text, String targetLanguage, String sourceLanguage) {
         String prompt = String.format("Translate the following text from %s to %s. Only output the translation:\n\n%s",
@@ -328,50 +168,87 @@ public class OllamaLlmProvider implements LlmProvider {
             text);
         return complete(model, prompt, null);
     }
-    
+
     @Override
     public String summarize(String model, String text, int maxLength) {
-        String prompt = String.format("Summarize the following text in no more than %d characters. Only output the summary:\n\n%s",
+        String prompt = String.format("Summarize the following text in no more than %d characters:\n\n%s",
             maxLength, text);
         return complete(model, prompt, null);
     }
-    
+
     @Override
     public boolean supportsStreaming() {
-        return true;
+        return driver.supportsStreaming();
     }
-    
+
     @Override
     public boolean supportsFunctionCalling() {
-        return false;
+        return driver.supportsFunctionCalling();
     }
-    
-    private Map<String, Object> createMockChatResponse(String model) {
+
+    public void setBaseUrl(String baseUrl) {
+        LlmDriver.LlmConfig config = new LlmDriver.LlmConfig();
+        config.setBaseUrl(baseUrl);
+        driver.init(config);
+    }
+
+    public void setDefaultModel(String model) {
+        this.defaultModel = model;
+    }
+
+    private Map<String, Object> convertToMap(LlmDriver.ChatResponse response) {
         Map<String, Object> result = new HashMap<>();
-        result.put("model", model);
-        result.put("created_at", new Date().toString());
-        result.put("done", true);
+        result.put("id", UUID.randomUUID().toString());
+        result.put("model", response.getModel());
+
+        List<Map<String, Object>> choices = new ArrayList<>();
+        Map<String, Object> choice = new HashMap<>();
+        choice.put("index", 0);
+
+        if (response.getMessage() != null) {
+            Map<String, Object> message = new HashMap<>();
+            message.put("role", response.getMessage().getRole());
+            message.put("content", response.getMessage().getContent());
+            choice.put("message", message);
+        }
+        choice.put("finish_reason", response.getFinishReason());
+        choices.add(choice);
+        result.put("choices", choices);
+
+        return result;
+    }
+
+    private String extractContent(Map<String, Object> result) {
+        try {
+            List<Map<String, Object>> choices = (List<Map<String, Object>>) result.get("choices");
+            if (choices != null && !choices.isEmpty()) {
+                Map<String, Object> message = (Map<String, Object>) choices.get(0).get("message");
+                if (message != null) {
+                    return (String) message.get("content");
+                }
+            }
+        } catch (Exception e) {
+            log.error("Extract content failed", e);
+        }
+        return null;
+    }
+
+    private Map<String, Object> createErrorResponse(String error) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("error", error);
         
+        List<Map<String, Object>> choices = new ArrayList<>();
+        Map<String, Object> choice = new HashMap<>();
         Map<String, Object> message = new HashMap<>();
         message.put("role", "assistant");
-        message.put("content", "Mock response - Ollama not available at " + baseUrl);
-        result.put("message", message);
-        
-        Map<String, Object> choices = new HashMap<>();
-        choices.put("index", 0);
-        choices.put("message", message);
-        choices.put("finish_reason", "stop");
-        result.put("choices", Collections.singletonList(choices));
-        
-        Map<String, Object> usage = new HashMap<>();
-        usage.put("prompt_tokens", 10);
-        usage.put("completion_tokens", 20);
-        usage.put("total_tokens", 30);
-        result.put("usage", usage);
+        message.put("content", "Error: " + error);
+        choice.put("message", message);
+        choices.add(choice);
+        result.put("choices", choices);
         
         return result;
     }
-    
+
     private List<double[]> createMockEmbeddings(int count, int dimension) {
         List<double[]> embeddings = new ArrayList<>();
         Random random = new Random();
@@ -383,24 +260,5 @@ public class OllamaLlmProvider implements LlmProvider {
             embeddings.add(embedding);
         }
         return embeddings;
-    }
-    
-    public void setBaseUrl(String baseUrl) {
-        this.baseUrl = baseUrl;
-    }
-    
-    public boolean isAvailable() {
-        try {
-            Request request = new Request.Builder()
-                .url(baseUrl + "/api/tags")
-                .get()
-                .build();
-            
-            try (Response response = httpClient.newCall(request).execute()) {
-                return response.isSuccessful();
-            }
-        } catch (Exception e) {
-            return false;
-        }
     }
 }

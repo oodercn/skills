@@ -47,7 +47,7 @@ spec:
       type: string
       required: true
       secret: true
-      description: LDAP管理员密码
+      description: LDAP管理员密�?
     - name: LDAP_USER_SEARCH_BASE
       type: string
       required: false

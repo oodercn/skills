@@ -6,6 +6,7 @@ import net.ooder.skill.scene.service.SceneTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class SceneEngineIntegration {
 
     private static final Logger log = LoggerFactory.getLogger(SceneEngineIntegration.class);
+
+    @Value("${ooder.mock.enabled:false}")
+    private boolean mockEnabled;
 
     @Autowired(required = false)
     @Lazy
@@ -110,8 +114,17 @@ public class SceneEngineIntegration {
             }
         }
         
-        log.warn("SDK not available, returning mock result for capability: {}", capabilityId);
-        return createMockResult(capabilityId, params);
+        if (mockEnabled) {
+            log.warn("SDK not available, returning mock result for capability: {} (mockEnabled=true)", capabilityId);
+            return createMockResult(capabilityId, params);
+        } else {
+            log.error("SDK not available and mock is disabled for capability: {}", capabilityId);
+            Map<String, Object> errorResult = new HashMap<>();
+            errorResult.put("success", false);
+            errorResult.put("error", "SDK not available and mock is disabled");
+            errorResult.put("capabilityId", capabilityId);
+            return errorResult;
+        }
     }
 
     public String getProviderSkill(String capabilityId) {

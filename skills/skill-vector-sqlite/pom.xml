@@ -7,19 +7,25 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
     
     <groupId>net.ooder</groupId>
     <artifactId>skill-vector-sqlite</artifactId>
-    <version>2.3.0</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
     
     <name>skill-vector-sqlite</name>
-    <description>SQLite-based vector store for semantic search</description>
+    <description>SQLite-based vector store for semantic search - SDK 2.3 Optimized</description>
     
     <dependencies>
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>scene-engine</artifactId>
+            <version>${agent-sdk.version}</version>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.xerial</groupId>
             <artifactId>sqlite-jdbc</artifactId>

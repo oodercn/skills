@@ -8,12 +8,12 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>0.7.3</version>
+        <version>2.3</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <artifactId>skill-command-shortcut</artifactId>
-    <version>1.0.0</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
 
     <name>Command Shortcut Skill</name>
@@ -23,12 +23,11 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>0.7.3</version>
+            <version>2.3</version>
         </dependency>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
-            <version>2.3.0</version>
+            <artifactId>agent-sdk-api</artifactId>
             <scope>provided</scope>
         </dependency>
         <dependency>

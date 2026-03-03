@@ -39,15 +39,11 @@ async function loadLogs() {
     if (endTime) params.append('endTime', new Date(endTime).getTime());
     
     try {
-        var response = await fetch('/api/v1/audit/logs?' + params.toString());
-        var result = await response.json();
+        var res = await ApiClient.get('/api/v1/audit/logs?' + params.toString());
         
-        if (result && result.code === 200) {
-            logs = result.data || [];
-            total = result.total || logs.length;
-        } else if (response.ok) {
-            logs = result || [];
-            total = logs.length;
+        if (res && res.code === 200) {
+            logs = res.data || [];
+            total = res.total || logs.length;
         } else {
             logs = [];
         }
@@ -61,14 +57,11 @@ async function loadLogs() {
 
 async function loadStats() {
     try {
-        var response = await fetch('/api/v1/audit/stats');
-        var result = await response.json();
+        var result = await ApiClient.get('/api/v1/audit/stats');
         
         var stats;
         if (result && result.code === 200) {
             stats = result.data || {};
-        } else if (response.ok) {
-            stats = result || {};
         } else {
             stats = {};
         }

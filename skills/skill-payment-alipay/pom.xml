@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-payment-alipay</artifactId>
-    <version>0.7.3</version>
+    <version>2.3</version>
     <packaging>jar</packaging>
 
     <name>skill-payment-alipay</name>

@@ -1,15 +1,15 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillManifest
+kind: Skill
 
 metadata:
   id: skill-network
   name: Network Management Skill
   version: 0.7.3
-  description: Provides network configuration, IP management, and device scanning capabilities
+  description: 网络管理技能，提供网络配置、IP管理、设备扫描等功能
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/skills
-  repository: https://github.com/ooderCN/skills.git
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-network
+  repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - network
     - ip
@@ -30,86 +30,86 @@ spec:
   capabilities:
     - id: network-config
       name: Network Configuration
-      description: Manage network settings including DNS, DHCP, WiFi
+      description: 管理网络设置，包括DNS、DHCP、WiFi
       category: network
     - id: ip-management
       name: IP Address Management
-      description: Manage IP addresses and blacklists
+      description: 管理IP地址和黑名单
       category: network
     - id: device-scanning
       name: Network Device Scanning
-      description: Scan and discover network devices
+      description: 扫描和发现网络设备
       category: network
   
   scenes:
     - name: network
-      description: Network management scene
+      description: 网络管理场景
       capabilities:
         - network-config
         - ip-management
         - device-scanning
   
-  dependencies:
-    skills: []
-    libraries: []
+  dependencies: []
   
   config:
-    required: []
     optional:
       - name: NETWORK_SCAN_INTERVAL
-        type: integer
+        type: number
         default: 300000
-        description: Network scan interval in milliseconds
+        description: 网络扫描间隔（毫秒）
       - name: DHCP_LEASE_FILE
         type: string
         default: /var/lib/dhcp/dhcpd.leases
-        description: DHCP lease file path
+        description: DHCP租约文件路径
       - name: ARP_CACHE_FILE
         type: string
         default: /proc/net/arp
-        description: ARP cache file path
+        description: ARP缓存文件路径
   
   endpoints:
     - path: /api/network/settings
       method: GET
-      description: Get all network settings
+      description: 获取所有网络设置
       capability: network-config
     - path: /api/network/settings/{type}
       method: GET
-      description: Get network setting by type
+      description: 按类型获取网络设置
       capability: network-config
     - path: /api/network/settings/{type}
       method: PUT
-      description: Update network setting
+      description: 更新网络设置
       capability: network-config
     - path: /api/network/ips
       method: GET
-      description: Get IP address list
+      description: 获取IP地址列表
       capability: ip-management
     - path: /api/network/ips
       method: POST
-      description: Add static IP address
+      description: 添加静态IP地址
       capability: ip-management
     - path: /api/network/ips/{id}
       method: DELETE
-      description: Delete IP address
+      description: 删除IP地址
       capability: ip-management
     - path: /api/network/blacklist
       method: GET
-      description: Get IP blacklist
+      description: 获取IP黑名单
       capability: ip-management
     - path: /api/network/blacklist
       method: POST
-      description: Add IP to blacklist
+      description: 添加IP到黑名单
       capability: ip-management
     - path: /api/network/blacklist/{id}
       method: DELETE
-      description: Remove IP from blacklist
+      description: 从黑名单移除IP
       capability: ip-management
     - path: /api/network/devices
       method: GET
-      description: Get network devices
+      description: 获取网络设备
       capability: device-scanning
+    - path: /api/health
+      method: GET
+      description: 健康检查
   
   resources:
     cpu: "200m"
@@ -118,5 +118,5 @@ spec:
   
   offline:
     enabled: true
-    cacheStrategy: "local"
+    cacheStrategy: local
     syncOnReconnect: true

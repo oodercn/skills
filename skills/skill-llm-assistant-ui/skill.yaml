@@ -8,9 +8,83 @@ metadata:
   description: LLM智能助手悬浮组件，提供上下文感知的智能对话和辅助功能
   author: ooder Team
   type: nexus-ui
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - assistant
+    - chat
+    - ai
 
 spec:
   type: nexus-ui
+  
+  dependencies:
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: true
+      description: "LLM对话服务"
+      
+    - id: skill-llm-context-builder
+      version: ">=1.0.0"
+      required: true
+      description: "上下文构建服务"
+      
+    - id: skill-local-knowledge
+      version: ">=1.0.0"
+      required: false
+      description: "本地知识增强（可选）"
+  
+  providedInterfaces:
+    - id: llm-assistant-ui
+      version: "1.0"
+      description: "LLM助手界面"
+  
+  requiredInterfaces:
+    - id: llm-chat
+      version: ">=1.0"
+      optional: false
+      description: "LLM对话接口"
+    - id: context-builder
+      version: ">=1.0"
+      optional: false
+      description: "上下文构建接口"
+  
+  capabilities:
+    - id: llm-chat
+      name: 智能对话
+      description: 与LLM进行智能对话
+      category: ai
+    - id: context-aware
+      name: 上下文感知
+      description: 自动收集当前页面上下文
+      category: ai
+    - id: smart-suggest
+      name: 智能建议
+      description: 基于上下文提供智能建议
+      category: ai
+  
+  endpoints:
+    - path: /api/llm/chat
+      method: POST
+      description: LLM对话
+      capability: llm-chat
+    - path: /api/llm/chat/stream
+      method: POST
+      description: 流式LLM对话
+      capability: llm-chat
+    - path: /api/v1/llm/context/build
+      method: POST
+      description: 构建上下文
+      capability: context-aware
+    - path: /api/v1/nlp/classify
+      method: POST
+      description: 意图分类
+      capability: smart-suggest
+    - path: /api/v1/form/assist
+      method: POST
+      description: 表单辅助
+      capability: smart-suggest
   
   nexusUi:
     entry:
@@ -34,39 +108,16 @@ spec:
       trigger: button
       width: 420
       height: 600
-      
-  capabilities:
-    - id: llm-chat
-      name: 智能对话
-      description: 与LLM进行智能对话
-      category: llm
-    - id: context-aware
-      name: 上下文感知
-      description: 自动收集当前页面上下文
-      category: llm
-    - id: smart-suggest
-      name: 智能建议
-      description: 基于上下文提供智能建议
-      category: llm
-      
-  apis:
-    - path: /api/llm/chat
-      method: POST
-      description: LLM对话
-    - path: /api/llm/chat/stream
-      method: POST
-      description: 流式LLM对话
-    - path: /api/v1/llm/context/build
-      method: POST
-      description: 构建上下文
-    - path: /api/v1/nlp/classify
-      method: POST
-      description: 意图分类
-    - path: /api/v1/form/assist
-      method: POST
-      description: 表单辅助
-      
-  dependencies:
-    - skill-llm-core
-    - skill-llm-context-builder
-    - skill-local-knowledge
+  
+  sceneBindings:
+    - sceneType: llm
+      autoBind: true
+      capabilities:
+        - llm-chat
+        - context-aware
+        - smart-suggest
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

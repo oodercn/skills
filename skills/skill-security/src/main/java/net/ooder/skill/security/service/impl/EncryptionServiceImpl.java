@@ -1,6 +1,8 @@
 package net.ooder.skill.security.service.impl;
 
 import net.ooder.skill.security.service.EncryptionService;
+import net.ooder.sdk.service.security.crypto.KeyManager;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -9,28 +11,31 @@ import javax.annotation.PostConstruct;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
 import java.util.Base64;
 
 @Service
 public class EncryptionServiceImpl implements EncryptionService {
     
     private static final Logger log = LoggerFactory.getLogger(EncryptionServiceImpl.class);
-    private static final String ALGORITHM = "AES";
-    private static final int KEY_SIZE = 256;
+    private static final String DEFAULT_KEY_ID = "skill-security-default";
     
-    private SecureRandom secureRandom;
-    private String masterKey;
+    private KeyManager keyManager;
+    private String masterKeyId;
     
     @PostConstruct
     public void init() {
-        this.secureRandom = new SecureRandom();
-        this.masterKey = System.getenv("OODER_MASTER_KEY");
-        if (this.masterKey == null || this.masterKey.isEmpty()) {
-            this.masterKey = "default-master-key-for-development";
-            log.warn("OODER_MASTER_KEY not set, using default key for development");
+        this.keyManager = new KeyManager();
+        
+        String masterKey = System.getenv("OODER_MASTER_KEY");
+        if (masterKey != null && !masterKey.isEmpty()) {
+            keyManager.importKey(DEFAULT_KEY_ID, masterKey);
+            this.masterKeyId = DEFAULT_KEY_ID;
+            log.info("EncryptionService initialized with custom master key");
+        } else {
+            this.masterKeyId = DEFAULT_KEY_ID;
+            keyManager.generateKey(DEFAULT_KEY_ID);
+            log.warn("OODER_MASTER_KEY not set, generated new key for development");
         }
-        log.info("EncryptionService initialized");
     }
     
     @Override
@@ -40,19 +45,9 @@ public class EncryptionServiceImpl implements EncryptionService {
         }
         
         try {
-            byte[] iv = new byte[16];
-            secureRandom.nextBytes(iv);
-            
-            byte[] keyBytes = deriveKey(masterKey);
-            
             byte[] plainBytes = plainText.getBytes(StandardCharsets.UTF_8);
-            byte[] encrypted = xorEncrypt(plainBytes, keyBytes, iv);
-            
-            byte[] combined = new byte[iv.length + encrypted.length];
-            System.arraycopy(iv, 0, combined, 0, iv.length);
-            System.arraycopy(encrypted, 0, combined, iv.length, encrypted.length);
-            
-            return Base64.getEncoder().encodeToString(combined);
+            byte[] encrypted = keyManager.encrypt(masterKeyId, plainBytes);
+            return Base64.getEncoder().encodeToString(encrypted);
         } catch (Exception e) {
             log.error("Encryption failed", e);
             throw new RuntimeException("Encryption failed", e);
@@ -66,17 +61,8 @@ public class EncryptionServiceImpl implements EncryptionService {
         }
         
         try {
-            byte[] combined = Base64.getDecoder().decode(cipherText);
-            
-            byte[] iv = new byte[16];
-            byte[] encrypted = new byte[combined.length - 16];
-            System.arraycopy(combined, 0, iv, 0, 16);
-            System.arraycopy(combined, 16, encrypted, 0, encrypted.length);
-            
-            byte[] keyBytes = deriveKey(masterKey);
-            
-            byte[] decrypted = xorEncrypt(encrypted, keyBytes, iv);
-            
+            byte[] cipherBytes = Base64.getDecoder().decode(cipherText);
+            byte[] decrypted = keyManager.decrypt(masterKeyId, cipherBytes);
             return new String(decrypted, StandardCharsets.UTF_8);
         } catch (Exception e) {
             log.error("Decryption failed", e);
@@ -86,9 +72,8 @@ public class EncryptionServiceImpl implements EncryptionService {
     
     @Override
     public String generateKey() {
-        byte[] key = new byte[32];
-        secureRandom.nextBytes(key);
-        return Base64.getEncoder().encodeToString(key);
+        String newKeyId = "key-" + System.currentTimeMillis();
+        return keyManager.generateKey(newKeyId);
     }
     
     @Override
@@ -115,20 +100,21 @@ public class EncryptionServiceImpl implements EncryptionService {
         return hash.equals(hash(plainText));
     }
     
-    private byte[] deriveKey(String masterKey) {
-        try {
-            MessageDigest digest = MessageDigest.getInstance("SHA-256");
-            return digest.digest(masterKey.getBytes(StandardCharsets.UTF_8));
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException("Key derivation failed", e);
-        }
+    public void importKey(String keyId, String keyData) {
+        keyManager.importKey(keyId, keyData);
+        log.info("Imported key: {}", keyId);
     }
     
-    private byte[] xorEncrypt(byte[] data, byte[] key, byte[] iv) {
-        byte[] result = new byte[data.length];
-        for (int i = 0; i < data.length; i++) {
-            result[i] = (byte) (data[i] ^ key[i % key.length] ^ iv[i % iv.length]);
-        }
-        return result;
+    public String exportKey(String keyId) {
+        return keyManager.exportKey(keyId);
+    }
+    
+    public void deleteKey(String keyId) {
+        keyManager.deleteKey(keyId);
+        log.info("Deleted key: {}", keyId);
+    }
+    
+    public boolean hasKey(String keyId) {
+        return keyManager.hasKey(keyId);
     }
 }

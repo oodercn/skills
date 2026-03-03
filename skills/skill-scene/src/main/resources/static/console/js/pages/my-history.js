@@ -50,19 +50,18 @@ async function refreshHistory() {
     pageNum = 1;
     hasMore = true;
     
-    const timeRange = document.getElementById('timeRange').value;
-    const sceneType = document.getElementById('sceneType').value;
-    const execStatus = document.getElementById('execStatus').value;
-    const keyword = document.getElementById('searchKeyword').value;
+    var timeRange = document.getElementById('timeRange').value;
+    var sceneType = document.getElementById('sceneType').value;
+    var execStatus = document.getElementById('execStatus').value;
+    var keyword = document.getElementById('searchKeyword').value;
     
     try {
-        let url = `/api/v1/my/history/scenes?pageNum=${pageNum}&pageSize=${pageSize}&days=${timeRange}`;
-        if (sceneType) url += `&category=${sceneType}`;
-        if (execStatus) url += `&status=${execStatus}`;
-        if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+        var url = '/api/v1/my/history/scenes?pageNum=' + pageNum + '&pageSize=' + pageSize + '&days=' + timeRange;
+        if (sceneType) url += '&category=' + sceneType;
+        if (execStatus) url += '&status=' + execStatus;
+        if (keyword) url += '&keyword=' + encodeURIComponent(keyword);
         
-        const response = await fetch(url);
-        const result = await response.json();
+        var result = await ApiClient.get(url);
         
         if (result.code === 200 && result.data) {
             historyData = result.data.list || [];
@@ -81,8 +80,7 @@ async function refreshHistory() {
 
 async function loadStatistics() {
     try {
-        const response = await fetch('/api/v1/my/history/statistics');
-        const result = await response.json();
+        var result = await ApiClient.get('/api/v1/my/history/statistics');
         
         if (result.code === 200 && result.data) {
             statistics = result.data;
@@ -281,12 +279,11 @@ async function loadMore() {
     pageNum++;
     
     try {
-        const timeRange = document.getElementById('timeRange').value;
-        const response = await fetch(`/api/v1/my/history/scenes?pageNum=${pageNum}&pageSize=${pageSize}&days=${timeRange}`);
-        const result = await response.json();
+        var timeRange = document.getElementById('timeRange').value;
+        var result = await ApiClient.get('/api/v1/my/history/scenes?pageNum=' + pageNum + '&pageSize=' + pageSize + '&days=' + timeRange);
         
         if (result.code === 200 && result.data) {
-            const newData = result.data.list || [];
+            var newData = result.data.list || [];
             historyData = historyData.concat(newData);
             hasMore = newData.length === pageSize;
             renderHistory();
@@ -305,10 +302,7 @@ async function rerunScene(sceneGroupId) {
     if (!confirm('确定要重新执行此场景吗？')) return;
     
     try {
-        const response = await fetch('/api/v1/my/history/' + sceneGroupId + '/rerun', {
-            method: 'POST'
-        });
-        const result = await response.json();
+        var result = await ApiClient.post('/api/v1/my/history/' + sceneGroupId + '/rerun');
         
         if (result.code === 200) {
             alert('场景已开始执行');
@@ -323,23 +317,23 @@ async function rerunScene(sceneGroupId) {
 }
 
 async function exportHistory() {
-    const timeRange = document.getElementById('timeRange').value;
-    const sceneType = document.getElementById('sceneType').value;
-    const execStatus = document.getElementById('execStatus').value;
+    var timeRange = document.getElementById('timeRange').value;
+    var sceneType = document.getElementById('sceneType').value;
+    var execStatus = document.getElementById('execStatus').value;
     
     try {
-        let url = `/api/v1/my/history/export?days=${timeRange}`;
-        if (sceneType) url += `&category=${sceneType}`;
-        if (execStatus) url += `&status=${execStatus}`;
+        var url = '/api/v1/my/history/export?days=' + timeRange;
+        if (sceneType) url += '&category=' + sceneType;
+        if (execStatus) url += '&status=' + execStatus;
         
-        const response = await fetch(url);
+        var response = await fetch(url);
         
         if (response.ok) {
-            const blob = await response.blob();
-            const downloadUrl = window.URL.createObjectURL(blob);
-            const a = document.createElement('a');
+            var blob = await response.blob();
+            var downloadUrl = window.URL.createObjectURL(blob);
+            var a = document.createElement('a');
             a.href = downloadUrl;
-            a.download = `场景历史记录_${new Date().toISOString().split('T')[0]}.csv`;
+            a.download = '场景历史记录_' + new Date().toISOString().split('T')[0] + '.csv';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

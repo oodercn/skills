@@ -342,6 +342,27 @@
         .filter-chip:hover { border-color: var(--nx-primary); }
         .filter-chip.active { background: var(--nx-primary); color: white; border-color: var(--nx-primary); }
         
+        .capability-type-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .capability-type-badge.scene {
+            background: #dbeafe;
+            color: #2563eb;
+        }
+        
+        .capability-type-badge.collaboration {
+            background: #fef3c7;
+            color: #d97706;
+        }
+        
         .results-body {
             max-height: 400px;
             overflow-y: auto;
@@ -591,6 +612,9 @@
                                 </div>
                                 <div class="radar-status">
                                     <span id="radarStatusText">就绪</span>
+                                    <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="forceRefresh()" title="强制刷新（清除缓存）">
+                                        <i class="ri-refresh-line"></i>
+                                    </button>
                                     <button class="nx-btn nx-btn--primary nx-btn--sm" id="startBtn" onclick="startDiscovery()">
                                         <i class="ri-search-line"></i> 开始扫描
                                     </button>
@@ -649,6 +673,8 @@
                                 </div>
                                 <div class="results-filter">
                                     <span class="filter-chip active" data-filter="all">全部</span>
+                                    <span class="filter-chip" data-filter="scene">场景能力</span>
+                                    <span class="filter-chip" data-filter="collaboration">协作能力</span>
                                     <span class="filter-chip" data-filter="new">新能力</span>
                                     <span class="filter-chip" data-filter="installed">已安装</span>
                                 </div>
@@ -678,29 +704,230 @@
     </div>
     
     <div class="install-modal" id="installModal">
-        <div class="install-dialog">
+        <div class="install-dialog" style="width: 640px;">
             <div class="install-header">
                 <i class="ri-download-line"></i>
-                安装能力
+                <span id="installModalTitle">安装能力</span>
             </div>
             <div class="install-body">
-                <div class="install-progress">
-                    <div class="install-progress-bar" id="installProgress" style="width: 0%"></div>
-                </div>
-                <div class="install-steps" id="installSteps">
+                <div class="install-wizard" id="installWizard">
+                    <div class="wizard-step active" id="wizardStep1">
+                        <div class="wizard-step-title">
+                            <i class="ri-settings-3-line"></i>
+                            配置安装参数
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-route-line"></i>
+                                    驱动条件
+                                </div>
+                                <div class="driver-condition-list" id="driverConditionList">
+                                </div>
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-user-settings-line"></i>
+                                    参与者配置
+                                </div>
+                                <div class="participant-config">
+                                    <div class="participant-role">
+                                        <label>主导者（启动者）</label>
+                                        <div class="participant-input">
+                                            <input type="text" id="leaderInput" placeholder="输入用户ID或选择用户" class="form-input">
+                                            <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="selectLeader()">
+                                                <i class="ri-user-search-line"></i>
+                                            </button>
+                                        </div>
+                                        <div class="participant-hint">主导者拥有激活权限</div>
+                                    </div>
+                                    <div class="participant-role">
+                                        <label>协作者</label>
+                                        <div class="participant-list" id="collaboratorList">
+                                        </div>
+                                        <div class="participant-input">
+                                            <input type="text" id="collaboratorInput" placeholder="输入用户ID" class="form-input">
+                                            <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addCollaborator()">
+                                                <i class="ri-add-line"></i> 添加
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-share-line"></i>
+                                    推送设置
+                                </div>
+                                <div class="push-config">
+                                    <select id="pushType" class="form-input">
+                                        <option value="SHARE">分享（可选接受）</option>
+                                        <option value="INVITE">邀请（需确认）</option>
+                                        <option value="DELEGATE">委派（强制使用）</option>
+                                    </select>
+                                    <div class="push-hint" id="pushHint">分享给参与者，对方可选择是否接受</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wizard-step" id="wizardStep2">
+                        <div class="wizard-step-title">
+                            <i class="ri-list-check"></i>
+                            确认依赖
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="dependency-list" id="dependencyList">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="wizard-step" id="wizardStep3">
+                        <div class="wizard-step-title">
+                            <i class="ri-download-2-line"></i>
+                            安装进度
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="install-progress">
+                                <div class="install-progress-bar" id="installProgress" style="width: 0%"></div>
+                            </div>
+                            <div class="install-steps" id="installSteps">
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="install-footer">
                 <button class="nx-btn nx-btn--secondary" id="installCancel" onclick="cancelInstall()">取消</button>
+                <button class="nx-btn nx-btn--secondary" id="installPrev" onclick="prevStep()" style="display: none;">上一步</button>
+                <button class="nx-btn nx-btn--primary" id="installNext" onclick="nextStep()">下一步</button>
                 <button class="nx-btn nx-btn--primary" id="installDone" onclick="closeInstall()" style="display: none;">完成</button>
             </div>
         </div>
     </div>
     
+    <style>
+        .install-wizard { min-height: 300px; }
+        .wizard-step { display: none; }
+        .wizard-step.active { display: block; }
+        .wizard-step-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .wizard-step-title i { color: var(--nx-primary); }
+        .config-section {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--nx-bg);
+            border-radius: 8px;
+        }
+        .config-section-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--nx-text-secondary);
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .driver-condition-list { display: flex; flex-direction: column; gap: 8px; }
+        .driver-condition-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .driver-condition-item:hover { border-color: var(--nx-primary); }
+        .driver-condition-item.selected { border-color: var(--nx-primary); background: var(--nx-primary-light); }
+        .driver-condition-radio {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            border: 2px solid var(--nx-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .driver-condition-item.selected .driver-condition-radio {
+            border-color: var(--nx-primary);
+        }
+        .driver-condition-item.selected .driver-condition-radio::after {
+            content: '';
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: var(--nx-primary);
+        }
+        .driver-condition-info { flex: 1; }
+        .driver-condition-name { font-weight: 500; font-size: 14px; }
+        .driver-condition-desc { font-size: 12px; color: var(--nx-text-secondary); margin-top: 2px; }
+        .participant-config { display: flex; flex-direction: column; gap: 16px; }
+        .participant-role label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
+        .participant-input { display: flex; gap: 8px; }
+        .participant-input .form-input { flex: 1; }
+        .participant-hint { font-size: 12px; color: var(--nx-text-secondary); margin-top: 4px; }
+        .participant-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+        .participant-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+            border-radius: 16px;
+            font-size: 12px;
+        }
+        .participant-tag .remove-btn {
+            cursor: pointer;
+            opacity: 0.7;
+        }
+        .participant-tag .remove-btn:hover { opacity: 1; }
+        .push-config select { width: 100%; }
+        .push-hint { font-size: 12px; color: var(--nx-text-secondary); margin-top: 8px; }
+        .dependency-list { display: flex; flex-direction: column; gap: 8px; }
+        .dependency-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--nx-bg);
+            border: 1px solid var(--nx-border);
+            border-radius: 6px;
+        }
+        .dependency-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+        }
+        .dependency-info { flex: 1; }
+        .dependency-name { font-weight: 500; font-size: 14px; }
+        .dependency-version { font-size: 12px; color: var(--nx-text-secondary); }
+        .dependency-status {
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+        }
+        .dependency-status.installed { background: #d1fae5; color: #059669; }
+        .dependency-status.pending { background: #fef3c7; color: #d97706; }
+    </style>
+    
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/llm-assistant.js"></script>
-    <script src="/console/js/pages/capability-discovery.js"></script>
+    <script src="/console/js/pages/capability-discovery.js?v=20260303b"></script>
 </body>
 </html>

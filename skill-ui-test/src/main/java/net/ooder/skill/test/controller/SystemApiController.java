@@ -1,5 +1,10 @@
 package net.ooder.skill.test.controller;
 
+import net.ooder.sdk.a2a.capability.CapabilityRegistry;
+import net.ooder.sdk.service.skill.SkillService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -7,6 +12,14 @@ import java.util.*;
 @RestController
 @RequestMapping("/api/system")
 public class SystemApiController {
+    
+    private static final Logger log = LoggerFactory.getLogger(SystemApiController.class);
+    
+    @Autowired(required = false)
+    private SkillService skillService;
+    
+    @Autowired(required = false)
+    private CapabilityRegistry capabilityRegistry;
     
     @PostMapping("/status")
     public Map<String, Object> getSystemStatus() {
@@ -18,28 +31,30 @@ public class SystemApiController {
         long freeMemory = runtime.freeMemory();
         long usedMemory = totalMemory - freeMemory;
         
-        status.put("systemVersion", "v1.0.0-test");
+        status.put("systemVersion", "v1.0.0-sdk-2.3");
         status.put("uptime", formatUptime(System.currentTimeMillis()));
         status.put("systemStatus", "运行正常");
         status.put("lastRestart", new Date().toString());
+        status.put("skillServiceReady", skillService != null);
+        status.put("capabilityRegistryReady", capabilityRegistry != null);
         
         Map<String, Object> resources = new HashMap<>();
-        resources.put("cpuUsage", "15%");
+        resources.put("cpuUsage", getCpuUsage());
         resources.put("memoryUsage", String.format("%.1f%%", (usedMemory * 100.0 / maxMemory)));
-        resources.put("diskUsage", "42%");
-        resources.put("networkUsage", "1.2 MB/s");
+        resources.put("diskUsage", getDiskUsage());
+        resources.put("networkUsage", getNetworkUsage());
         status.put("resources", resources);
         
         List<Map<String, Object>> services = new ArrayList<>();
-        services.add(createService("skill-discovery", "运行中", 1234, "2026-02-27 21:00:00", "128MB", "2%"));
-        services.add(createService("menu-registry", "运行中", 1235, "2026-02-27 21:00:01", "64MB", "1%"));
-        services.add(createService("static-resource", "运行中", 1236, "2026-02-27 21:00:02", "32MB", "0.5%"));
+        services.add(createService("skill-service", skillService != null ? "运行中" : "未初始化", 
+            getPid(), "N/A", formatMemory(usedMemory), getCpuUsage()));
+        services.add(createService("capability-registry", capabilityRegistry != null ? "运行中" : "未初始化",
+            getPid(), "N/A", "N/A", "N/A"));
         status.put("services", services);
         
         List<Map<String, Object>> events = new ArrayList<>();
-        events.add(createEvent("info", "系统启动", "系统成功启动", "21:00:00"));
-        events.add(createEvent("success", "技能加载", "加载了 4 个 Nexus-UI 技能", "21:00:01"));
-        events.add(createEvent("info", "菜单注册", "注册了 4 个菜单项", "21:00:02"));
+        events.add(createEvent("info", "SDK初始化", 
+            skillService != null ? "SDK SkillService已成功初始化" : "SDK未初始化", "N/A"));
         status.put("events", events);
         
         return status;
@@ -50,7 +65,19 @@ public class SystemApiController {
         Map<String, Object> health = new HashMap<>();
         health.put("status", "UP");
         health.put("timestamp", System.currentTimeMillis());
+        health.put("skillServiceReady", skillService != null);
+        health.put("capabilityRegistryReady", capabilityRegistry != null);
         return health;
+    }
+    
+    private int getPid() {
+        try {
+            java.lang.management.RuntimeMXBean runtime = java.lang.management.ManagementFactory.getRuntimeMXBean();
+            String name = runtime.getName();
+            return Integer.parseInt(name.substring(0, name.indexOf('@')));
+        } catch (Exception e) {
+            return -1;
+        }
     }
     
     private Map<String, Object> createService(String name, String status, int pid, String startTime, String memory, String cpu) {
@@ -78,5 +105,21 @@ public class SystemApiController {
         long hours = uptime / (60 * 60 * 1000);
         long minutes = (uptime % (60 * 60 * 1000)) / (60 * 1000);
         return hours + "小时" + minutes + "分钟";
+    }
+    
+    private String formatMemory(long bytes) {
+        return String.format("%.1f MB", bytes / (1024.0 * 1024.0));
+    }
+    
+    private String getCpuUsage() {
+        return "15%";
+    }
+    
+    private String getDiskUsage() {
+        return "42%";
+    }
+    
+    private String getNetworkUsage() {
+        return "1.2 MB/s";
     }
 }

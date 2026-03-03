@@ -9,16 +9,13 @@ async function init() {
 
 async function loadConfig() {
     try {
-        var response = await fetch('/api/security/config');
-        var result = await response.json();
+        var result = await ApiClient.get('/api/security/config');
         
         var configData;
         if (result && result.code === 200) {
             configData = result.data || {};
-        } else if (response.ok) {
-            configData = result || {};
         } else {
-            configData = {};
+            configData = result || {};
         }
         config = configData;
         
@@ -43,15 +40,12 @@ async function loadConfig() {
 
 async function loadPolicies() {
     try {
-        var response = await fetch('/api/security/policies');
-        var result = await response.json();
+        var result = await ApiClient.get('/api/security/policies');
         
         if (result && result.code === 200) {
             policies = result.data || [];
-        } else if (response.ok) {
-            policies = result || [];
         } else {
-            policies = [];
+            policies = result || [];
         }
         renderPolicies();
     } catch (e) {
@@ -66,16 +60,13 @@ async function loadPolicies() {
 
 async function loadStats() {
     try {
-        var response = await fetch('/api/v1/keys');
-        var result = await response.json();
+        var result = await ApiClient.get('/api/v1/keys');
         
         var keys;
         if (result && result.code === 200) {
             keys = result.data || [];
-        } else if (response.ok) {
-            keys = result || [];
         } else {
-            keys = [];
+            keys = result || [];
         }
         document.getElementById('activeKeys').textContent = keys ? keys.filter(function(k) { return k.status === 'ACTIVE'; }).length : 0;
     } catch (e) {
@@ -83,16 +74,13 @@ async function loadStats() {
     }
     
     try {
-        var response = await fetch('/api/security/stats');
-        var result = await response.json();
+        var result = await ApiClient.get('/api/security/stats');
         
         var stats;
         if (result && result.code === 200) {
             stats = result.data || {};
-        } else if (response.ok) {
-            stats = result || {};
         } else {
-            stats = {};
+            stats = result || {};
         }
         document.getElementById('threatCount').textContent = stats.threatCount || 0;
         document.getElementById('policyCount').textContent = policies.length;
@@ -151,15 +139,9 @@ async function saveConfig() {
     };
     
     try {
-        var response = await fetch('/api/security/config', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(configData)
-        });
+        var result = await ApiClient.post('/api/security/config', configData);
         
-        var result = await response.json();
-        
-        if (response.ok && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.code === 200 || result.code === undefined)) {
             alert('配置保存成功');
         } else {
             var errorMsg = result.message || result.error || '配置保存失败';
@@ -192,15 +174,9 @@ async function createPolicy(e) {
     };
     
     try {
-        var response = await fetch('/api/security/policies', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(policy)
-        });
+        var result = await ApiClient.post('/api/security/policies', policy);
         
-        var result = await response.json();
-        
-        if (response.ok && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.code === 200 || result.code === undefined)) {
             hideCreatePolicyModal();
             loadPolicies();
             alert('策略创建成功');
@@ -226,13 +202,9 @@ async function togglePolicy(policyId) {
             ? '/api/security/policies/' + policyId + '/disable'
             : '/api/security/policies/' + policyId + '/enable';
         
-        var response = await fetch(url, {
-            method: 'POST'
-        });
+        var result = await ApiClient.post(url);
         
-        var result = await response.json();
-        
-        if (response.ok && (result === true || result.code === 200)) {
+        if (result && (result === true || result.code === 200)) {
             loadPolicies();
             alert('策略已' + action);
         } else {
@@ -249,13 +221,9 @@ async function deletePolicy(policyId) {
     if (!confirm('确定要删除此策略吗？')) return;
     
     try {
-        var response = await fetch('/api/security/policies/' + policyId, {
-            method: 'DELETE'
-        });
+        var result = await ApiClient.delete('/api/security/policies/' + policyId);
         
-        var result = await response.json();
-        
-        if (response.ok && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.code === 200 || result.code === undefined)) {
             loadPolicies();
             alert('策略删除成功');
         } else {

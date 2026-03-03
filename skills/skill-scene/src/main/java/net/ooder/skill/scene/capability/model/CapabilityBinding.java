@@ -25,6 +25,11 @@ public class CapabilityBinding implements Serializable {
     private CapabilityBindingStatus status;
     private long createTime;
     private long lastInvokeTime;
+    private int successCount;
+    private int failureCount;
+    private String endpoint;
+    private int timeout;
+    private String method;
 
     public CapabilityBinding() {
         this.connectorConfig = new HashMap<String, Object>();
@@ -176,5 +181,45 @@ public class CapabilityBinding implements Serializable {
 
     public void setLastInvokeTime(long lastInvokeTime) {
         this.lastInvokeTime = lastInvokeTime;
+    }
+
+    public int getSuccessCount() {
+        return successCount;
+    }
+
+    public void setSuccessCount(int successCount) {
+        this.successCount = successCount;
+    }
+
+    public int getFailureCount() {
+        return failureCount;
+    }
+
+    public void setFailureCount(int failureCount) {
+        this.failureCount = failureCount;
+    }
+
+    public String getEndpoint() {
+        return endpoint;
+    }
+
+    public void setEndpoint(String endpoint) {
+        this.endpoint = endpoint;
+    }
+
+    public int getTimeout() {
+        return timeout;
+    }
+
+    public void setTimeout(int timeout) {
+        this.timeout = timeout;
+    }
+
+    public String getMethod() {
+        return method;
+    }
+
+    public void setMethod(String method) {
+        this.method = method;
     }
 }

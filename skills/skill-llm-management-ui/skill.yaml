@@ -3,19 +3,55 @@ kind: Skill
 
 metadata:
   id: skill-llm-management-ui
-  name: LLM配置管理
+  name: LLM管理界面
   version: 1.0.0
-  description: LLM配置管理界面，支持企业/个人/场景级LLM配置管理
+  description: LLM管理界面，提供模型配置、Provider管理、对话监控功能
   author: ooder Team
   type: nexus-ui
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - management
+    - ui
+    - config
 
 spec:
   type: nexus-ui
   
+  dependencies:
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: true
+      description: "LLM对话服务"
+    - id: skill-llm-config-manager
+      version: ">=1.0.0"
+      required: false
+      description: "LLM配置管理（可选）"
+  
+  providedInterfaces:
+    - id: llm-management-ui
+      version: "1.0"
+      description: "LLM管理界面"
+  
+  capabilities:
+    - id: llm-config
+      name: 模型配置
+      description: 配置LLM模型参数
+      category: ui
+    - id: provider-manage
+      name: Provider管理
+      description: 管理LLM Provider
+      category: ui
+    - id: chat-monitor
+      name: 对话监控
+      description: 监控对话状态
+      category: ui
+  
   nexusUi:
     entry:
       page: index.html
-      title: LLM配置
+      title: LLM管理
       icon: ri-settings-4-line
       
     menu:
@@ -27,40 +63,16 @@ spec:
       type: default
       sidebar: true
       header: true
-      
-  capabilities:
-    - id: llm-config-view
-      name: 查看配置
-      description: 查看LLM配置
-      category: ui
-    - id: llm-config-edit
-      name: 编辑配置
-      description: 编辑LLM配置
-      category: ui
-    - id: provider-manage
-      name: Provider管理
-      description: 管理LLM Provider
-      category: ui
-      
-  apis:
-    - path: /api/v1/llm/config
-      method: GET
-      description: 获取所有配置
-    - path: /api/v1/llm/config
-      method: POST
-      description: 创建配置
-    - path: /api/v1/llm/config/{id}
-      method: PUT
-      description: 更新配置
-    - path: /api/v1/llm/config/{id}
-      method: DELETE
-      description: 删除配置
-    - path: /api/llm/providers
-      method: POST
-      description: 获取Provider列表
-    - path: /api/llm/models
-      method: POST
-      description: 获取模型列表
-      
-  dependencies:
-    - skill-llm-config-manager
+  
+  sceneBindings:
+    - sceneType: llm
+      autoBind: true
+      capabilities:
+        - llm-config
+        - provider-manage
+        - chat-monitor
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

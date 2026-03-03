@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识资料库API测试用例</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f5f7fa;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        h1 {
+            color: #1a1a2e;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .test-section {
+            background: white;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .test-section h2 {
+            color: #4a6cf7;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #eee;
+        }
+        .test-case {
+            background: #f8f9fa;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
+        }
+        .test-case h3 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+        .test-case .description {
+            color: #666;
+            font-size: 13px;
+            margin-bottom: 10px;
+        }
+        .test-case .params {
+            background: #e9ecef;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+        .btn {
+            background: #4a6cf7;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            margin-right: 10px;
+            margin-bottom: 5px;
+        }
+        .btn:hover {
+            background: #3a5ce5;
+        }
+        .btn.success {
+            background: #28a745;
+        }
+        .btn.danger {
+            background: #dc3545;
+        }
+        .btn.warning {
+            background: #ffc107;
+            color: #333;
+        }
+        .result {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 12px;
+            max-height: 300px;
+            overflow: auto;
+        }
+        .result.success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        .result.error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+        .result.pending {
+            background: #fff3cd;
+            border: 1px solid #ffeeba;
+            color: #856404;
+        }
+        .status-badge {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+        .status-badge.pass {
+            background: #28a745;
+            color: white;
+        }
+        .status-badge.fail {
+            background: #dc3545;
+            color: white;
+        }
+        .status-badge.pending {
+            background: #6c757d;
+            color: white;
+        }
+        .summary {
+            background: #1a1a2e;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .summary .stat {
+            display: inline-block;
+            margin-right: 30px;
+        }
+        .summary .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+        }
+        .summary .stat-label {
+            font-size: 12px;
+            opacity: 0.8;
+        }
+        .run-all-btn {
+            background: #28a745;
+            padding: 12px 30px;
+            font-size: 16px;
+            display: block;
+            margin: 0 auto 20px;
+        }
+        .run-all-btn:hover {
+            background: #218838;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>知识资料库API测试用例</h1>
+        
+        <div class="summary">
+            <div class="stat">
+                <div class="stat-value" id="totalTests">12</div>
+                <div class="stat-label">总测试数</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="passedTests">0</div>
+                <div class="stat-label">通过</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="failedTests">0</div>
+                <div class="stat-label">失败</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value" id="pendingTests">12</div>
+                <div class="stat-label">待执行</div>
+            </div>
+        </div>
+        
+        <button class="btn run-all-btn" onclick="runAllTests()">运行所有测试</button>
+        
+        <!-- 知识库管理测试 -->
+        <div class="test-section">
+            <h2>1. 知识库管理测试</h2>
+            
+            <div class="test-case" id="tc-1-1">
+                <h3>TC-1.1: 获取知识库列表 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试获取所有知识库列表功能</div>
+                <div class="params">GET /api/kb/list</div>
+                <button class="btn" onclick="runTest('tc-1-1', 'GET', '/api/kb/list')">执行测试</button>
+                <div class="result" id="result-tc-1-1"></div>
+            </div>
+            
+            <div class="test-case" id="tc-1-2">
+                <h3>TC-1.2: 创建知识库 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试创建新知识库功能</div>
+                <div class="params">POST /api/kb/create<br>Body: {"name":"测试知识库","description":"这是一个测试知识库"}</div>
+                <button class="btn" onclick="runTest('tc-1-2', 'POST', '/api/kb/create', {name:'测试知识库_'+Date.now(),description:'这是一个测试知识库'})">执行测试</button>
+                <div class="result" id="result-tc-1-2"></div>
+            </div>
+            
+            <div class="test-case" id="tc-1-3">
+                <h3>TC-1.3: 删除知识库 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试删除指定知识库功能</div>
+                <div class="params">DELETE /api/kb/{id}</div>
+                <button class="btn danger" onclick="runTest('tc-1-3', 'DELETE', '/api/kb/test-kb-'+Date.now())">执行测试</button>
+                <div class="result" id="result-tc-1-3"></div>
+            </div>
+        </div>
+        
+        <!-- 文档管理测试 -->
+        <div class="test-section">
+            <h2>2. 文档管理测试</h2>
+            
+            <div class="test-case" id="tc-2-1">
+                <h3>TC-2.1: 获取文档列表 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试获取知识库文档列表功能</div>
+                <div class="params">GET /api/kb/docs?kbId=kb-default</div>
+                <button class="btn" onclick="runTest('tc-2-1', 'GET', '/api/kb/docs?kbId=kb-default')">执行测试</button>
+                <div class="result" id="result-tc-2-1"></div>
+            </div>
+            
+            <div class="test-case" id="tc-2-2">
+                <h3>TC-2.2: 删除文档 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试删除指定文档功能</div>
+                <div class="params">DELETE /api/kb/docs/{id}</div>
+                <button class="btn danger" onclick="runTest('tc-2-2', 'DELETE', '/api/kb/docs/doc-test-'+Date.now())">执行测试</button>
+                <div class="result" id="result-tc-2-2"></div>
+            </div>
+        </div>
+        
+        <!-- 搜索功能测试 -->
+        <div class="test-section">
+            <h2>3. 搜索功能测试</h2>
+            
+            <div class="test-case" id="tc-3-1">
+                <h3>TC-3.1: 知识库搜索 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试知识库内容搜索功能</div>
+                <div class="params">POST /api/kb/search<br>Body: {"query":"产品使用","topK":10,"threshold":0.7}</div>
+                <button class="btn" onclick="runTest('tc-3-1', 'POST', '/api/kb/search', {query:'产品使用',topK:10,threshold:0.7})">执行测试</button>
+                <div class="result" id="result-tc-3-1"></div>
+            </div>
+            
+            <div class="test-case" id="tc-3-2">
+                <h3>TC-3.2: 空查询搜索 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试空查询条件下的搜索行为</div>
+                <div class="params">POST /api/kb/search<br>Body: {"query":"","topK":10,"threshold":0.7}</div>
+                <button class="btn warning" onclick="runTest('tc-3-2', 'POST', '/api/kb/search', {query:'',topK:10,threshold:0.7})">执行测试</button>
+                <div class="result" id="result-tc-3-2"></div>
+            </div>
+            
+            <div class="test-case" id="tc-3-3">
+                <h3>TC-3.3: 特殊字符搜索 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试包含特殊字符的搜索功能</div>
+                <div class="params">POST /api/kb/search<br>Body: {"query":"API接口@#$%","topK":5,"threshold":0.5}</div>
+                <button class="btn warning" onclick="runTest('tc-3-3', 'POST', '/api/kb/search', {query:'API接口@#$%',topK:5,threshold:0.5})">执行测试</button>
+                <div class="result" id="result-tc-3-3"></div>
+            </div>
+        </div>
+        
+        <!-- 问答功能测试 -->
+        <div class="test-section">
+            <h2>4. 问答功能测试</h2>
+            
+            <div class="test-case" id="tc-4-1">
+                <h3>TC-4.1: 基础问答 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试基础问答功能</div>
+                <div class="params">POST /api/kb/qa<br>Body: {"question":"如何使用产品?","kbId":"kb-default","topK":5,"threshold":0.7}</div>
+                <button class="btn" onclick="runTest('tc-4-1', 'POST', '/api/kb/qa', {question:'如何使用产品?',kbId:'kb-default',topK:5,threshold:0.7})">执行测试</button>
+                <div class="result" id="result-tc-4-1"></div>
+            </div>
+            
+            <div class="test-case" id="tc-4-2">
+                <h3>TC-4.2: 长问题问答 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试较长问题的问答功能</div>
+                <div class="params">POST /api/kb/qa<br>Body: {"question":"请详细说明产品的安装步骤和注意事项是什么?","kbId":"kb-default"}</div>
+                <button class="btn" onclick="runTest('tc-4-2', 'POST', '/api/kb/qa', {question:'请详细说明产品的安装步骤和注意事项是什么?',kbId:'kb-default'})">执行测试</button>
+                <div class="result" id="result-tc-4-2"></div>
+            </div>
+            
+            <div class="test-case" id="tc-4-3">
+                <h3>TC-4.3: 英文问题问答 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试英文问题的问答功能</div>
+                <div class="params">POST /api/kb/qa<br>Body: {"question":"How to use this product?","kbId":"kb-default"}</div>
+                <button class="btn" onclick="runTest('tc-4-3', 'POST', '/api/kb/qa', {question:'How to use this product?',kbId:'kb-default'})">执行测试</button>
+                <div class="result" id="result-tc-4-3"></div>
+            </div>
+        </div>
+        
+        <!-- SDK状态测试 -->
+        <div class="test-section">
+            <h2>5. SDK状态测试</h2>
+            
+            <div class="test-case" id="tc-5-1">
+                <h3>TC-5.1: 获取SDK状态 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试获取SDK服务状态功能</div>
+                <div class="params">GET /api/kb/sdk/status</div>
+                <button class="btn" onclick="runTest('tc-5-1', 'GET', '/api/kb/sdk/status')">执行测试</button>
+                <div class="result" id="result-tc-5-1"></div>
+            </div>
+            
+            <div class="test-case" id="tc-5-2">
+                <h3>TC-5.2: 发现技能 <span class="status-badge pending">待执行</span></h3>
+                <div class="description">测试发现所有可用技能功能</div>
+                <div class="params">GET /api/kb/discover</div>
+                <button class="btn" onclick="runTest('tc-5-2', 'GET', '/api/kb/discover')">执行测试</button>
+                <div class="result" id="result-tc-5-2"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        const testResults = {
+            passed: 0,
+            failed: 0,
+            pending: 12
+        };
+        
+        function updateStats() {
+            document.getElementById('passedTests').textContent = testResults.passed;
+            document.getElementById('failedTests').textContent = testResults.failed;
+            document.getElementById('pendingTests').textContent = testResults.pending;
+        }
+        
+        async function runTest(testId, method, url, body) {
+            const resultDiv = document.getElementById('result-' + testId);
+            const testCase = document.getElementById(testId);
+            const badge = testCase.querySelector('.status-badge');
+            
+            resultDiv.className = 'result pending';
+            resultDiv.textContent = '执行中...';
+            badge.className = 'status-badge pending';
+            badge.textContent = '执行中';
+            
+            try {
+                const options = {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                };
+                
+                if (body && (method === 'POST' || method === 'PUT')) {
+                    options.body = JSON.stringify(body);
+                }
+                
+                const response = await fetch(url, options);
+                const data = await response.json();
+                
+                if (response.ok && data.status === 'success') {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = '✓ 测试通过\n\n' + JSON.stringify(data, null, 2);
+                    badge.className = 'status-badge pass';
+                    badge.textContent = '通过';
+                    testResults.passed++;
+                    testResults.pending--;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = '✗ 测试失败\n\n' + JSON.stringify(data, null, 2);
+                    badge.className = 'status-badge fail';
+                    badge.textContent = '失败';
+                    testResults.failed++;
+                    testResults.pending--;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = '✗ 请求错误\n\n' + error.message;
+                badge.className = 'status-badge fail';
+                badge.textContent = '错误';
+                testResults.failed++;
+                testResults.pending--;
+            }
+            
+            updateStats();
+        }
+        
+        async function runAllTests() {
+            const tests = [
+                { id: 'tc-1-1', method: 'GET', url: '/api/kb/list' },
+                { id: 'tc-1-2', method: 'POST', url: '/api/kb/create', body: {name:'批量测试知识库_'+Date.now(),description:'批量测试创建'} },
+                { id: 'tc-1-3', method: 'DELETE', url: '/api/kb/test-batch-'+Date.now() },
+                { id: 'tc-2-1', method: 'GET', url: '/api/kb/docs?kbId=kb-default' },
+                { id: 'tc-2-2', method: 'DELETE', url: '/api/kb/docs/doc-test-'+Date.now() },
+                { id: 'tc-3-1', method: 'POST', url: '/api/kb/search', body: {query:'产品使用',topK:10,threshold:0.7} },
+                { id: 'tc-3-2', method: 'POST', url: '/api/kb/search', body: {query:'',topK:10,threshold:0.7} },
+                { id: 'tc-3-3', method: 'POST', url: '/api/kb/search', body: {query:'API接口@#$%',topK:5,threshold:0.5} },
+                { id: 'tc-4-1', method: 'POST', url: '/api/kb/qa', body: {question:'如何使用产品?',kbId:'kb-default'} },
+                { id: 'tc-4-2', method: 'POST', url: '/api/kb/qa', body: {question:'请详细说明产品的安装步骤?',kbId:'kb-default'} },
+                { id: 'tc-4-3', method: 'POST', url: '/api/kb/qa', body: {question:'How to use this product?',kbId:'kb-default'} },
+                { id: 'tc-5-1', method: 'GET', url: '/api/kb/sdk/status' },
+                { id: 'tc-5-2', method: 'GET', url: '/api/kb/discover' }
+            ];
+            
+            for (const test of tests) {
+                await runTest(test.id, test.method, test.url, test.body);
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+        }
+    </script>
+</body>
+</html>

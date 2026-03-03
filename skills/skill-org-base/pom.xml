@@ -20,8 +20,7 @@
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk</artifactId>
-            <version>${agent-sdk.version}</version>
+            <artifactId>agent-sdk-api</artifactId>
             <scope>provided</scope>
         </dependency>
     </dependencies>

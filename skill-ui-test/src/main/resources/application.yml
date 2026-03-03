@@ -9,6 +9,31 @@ spring:
       charset: UTF-8
       enabled: true
       force: true
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+ooder:
+  agent:
+    id: skill-test-agent
+    name: Skill Test Agent
+    type: mcp
+  sdk:
+    id: skill-test-sdk
+    auto-discover-drivers: true
+    auto-start-scenes: true
+  skill:
+    root-path: ./skills
+    kb:
+      storage-path: ./kb-storage
+      index-path: ./kb-index
+  llm:
+    provider: baidu
+    api-key: bce-v3/ALTAK-yi8AGKtncaadiXvVC5eeC/8e43b5a2b59c288231ed53c97d9fa684bf1a2d4f
+    base-url: https://qianfan.baidubce.com/v2
+    model: ernie-4.0-8k
+    embedding-model: embedding-v1
 
 nexus:
   skills:

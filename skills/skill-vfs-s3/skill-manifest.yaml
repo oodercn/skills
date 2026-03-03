@@ -47,7 +47,7 @@ spec:
     - name: S3_BUCKET_NAME
       type: string
       required: true
-      description: S3桶名称
+      description: S3桶名�?
     - name: S3_REGION
       type: string
       required: false

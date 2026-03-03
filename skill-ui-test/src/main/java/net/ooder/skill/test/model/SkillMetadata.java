@@ -48,6 +48,12 @@ public class SkillMetadata {
             if (specData.containsKey("nexusUi")) {
                 uiData.put("nexusUi", specData.get("nexusUi"));
             }
+            if (specData.containsKey("ui")) {
+                Map<String, Object> uiSpec = (Map<String, Object>) specData.get("ui");
+                if (uiSpec != null && uiSpec.containsKey("nexusUi")) {
+                    uiData.put("nexusUi", uiSpec.get("nexusUi"));
+                }
+            }
             if (!uiData.isEmpty()) {
                 metadata.ui = uiData;
             }

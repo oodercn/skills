@@ -21,17 +21,22 @@
     };
 
     var TYPE_NAMES = {
-        'DRIVER': '驱动类型',
-        'SERVICE': '服务类型',
-        'MANAGEMENT': '管理类型',
-        'AI': 'AI类型',
-        'STORAGE': '存储类型',
-        'COMMUNICATION': '通信类型',
-        'SECURITY': '安全类型',
-        'MONITORING': '监控类型',
-        'SKILL': '技能类型',
-        'SCENE': '场景类型',
-        'CUSTOM': '自定义类型'
+        'ATOMIC': '原子能力',
+        'COMPOSITE': '组合能力',
+        'SCENE': '场景能力',
+        'DRIVER': '驱动能力',
+        'COLLABORATIVE': '协作能力',
+        'SERVICE': '服务能力',
+        'AI': 'AI能力',
+        'TOOL': '工具能力',
+        'CONNECTOR': '连接器能力',
+        'DATA': '数据能力',
+        'MANAGEMENT': '管理能力',
+        'COMMUNICATION': '通信能力',
+        'SECURITY': '安全能力',
+        'MONITORING': '监控能力',
+        'SKILL': '技能能力',
+        'CUSTOM': '自定义能力'
     };
 
     var MyCapabilities = {
@@ -51,8 +56,7 @@
         },
 
         loadCapabilities: function() {
-            fetch('/api/v1/capabilities')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         capabilities = result.data;
@@ -67,8 +71,7 @@
         },
 
         loadBindings: function() {
-            fetch('/api/v1/capabilities/bindings')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities/bindings')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         bindings = result.data;
@@ -162,7 +165,7 @@
             });
 
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="7" style="text-align: center; padding: 40px; color: var(--nx-text-secondary);">' +
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--nx-text-secondary);">' +
                     '<i class="ri-inbox-line" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>' +
                     '暂无能力数据</td></tr>';
                 return;
@@ -176,6 +179,10 @@
                 var statusText = cap.status === 'ENABLED' ? '已启用' : cap.status === 'DISABLED' ? '已停用' : '异常';
                 var lastInvoke = cap.lastInvokeTime ? MyCapabilities.formatTime(cap.lastInvokeTime) : '-';
                 var bindingCount = bindings.filter(function(b) { return b.capabilityId === cap.capabilityId; }).length;
+                
+                var activationStatus = cap.activationStatus || 'INACTIVE';
+                var activationClass = activationStatus === 'ACTIVATED' ? 'activated' : activationStatus === 'PENDING' ? 'pending' : 'inactive';
+                var activationText = activationStatus === 'ACTIVATED' ? '已激活' : activationStatus === 'PENDING' ? '待激活' : '未激活';
 
                 html += '<tr>' +
                     '<td><div class="cap-info">' +
@@ -184,11 +191,18 @@
                     '<div class="cap-id">' + cap.capabilityId + '</div></div></div></td>' +
                     '<td>' + typeName + '</td>' +
                     '<td><span class="status-badge ' + statusClass + '"><span class="status-dot"></span>' + statusText + '</span></td>' +
+                    '<td><span class="activation-badge ' + activationClass + '">' + activationText + '</span></td>' +
                     '<td>v' + (cap.version || '1.0.0') + '</td>' +
                     '<td>' + bindingCount + ' 个场景</td>' +
                     '<td>' + lastInvoke + '</td>' +
-                    '<td><div class="action-btns">' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="showDetail(\'' + cap.capabilityId + '\')" title="详情">' +
+                    '<td><div class="action-btns">';
+                
+                if (activationStatus === 'PENDING') {
+                    html += '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="goToActivation(\'' + cap.installId + '\')" title="激活">' +
+                        '<i class="ri-key-2-line"></i></button>';
+                }
+                
+                html += '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="showDetail(\'' + cap.capabilityId + '\')" title="详情">' +
                     '<i class="ri-eye-line"></i></button>' +
                     '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="toggleStatus(\'' + cap.capabilityId + '\')" title="' + (cap.status === 'ENABLED' ? '停用' : '启用') + '">' +
                     '<i class="ri-' + (cap.status === 'ENABLED' ? 'pause' : 'play') + '-line"></i></button>' +
@@ -300,24 +314,19 @@
 
             var newStatus = cap.status === 'ENABLED' ? 'DISABLED' : 'ENABLED';
 
-            fetch('/api/v1/capabilities/' + capabilityId + '/status', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ status: newStatus })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+            ApiClient.post('/api/v1/capabilities/' + capabilityId + '/status', { status: newStatus })
+                .then(function(result) {
+                    if (result.code === 200) {
+                        cap.status = newStatus;
+                        MyCapabilities.renderTable();
+                        MyCapabilities.updateStats();
+                    }
+                })
+                .catch(function(error) {
                     cap.status = newStatus;
                     MyCapabilities.renderTable();
                     MyCapabilities.updateStats();
-                }
-            })
-            .catch(function(error) {
-                cap.status = newStatus;
-                MyCapabilities.renderTable();
-                MyCapabilities.updateStats();
-            });
+                });
         },
 
         invokeCap: function(capabilityId) {
@@ -335,52 +344,44 @@
                 }
             }
             
-            fetch('/api/v1/capabilities/discovery/invoke', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    capabilityId: capabilityId,
-                    params: params
+            ApiClient.post('/api/v1/capabilities/discovery/invoke', {
+                capabilityId: capabilityId,
+                params: params
+            })
+                .then(function(result) {
+                    if (result.code === 200) {
+                        alert('调用成功!\n\n结果: ' + JSON.stringify(result.data, null, 2));
+                        cap.invokeCount = (cap.invokeCount || 0) + 1;
+                        cap.lastInvokeTime = Date.now();
+                        MyCapabilities.renderTable();
+                        MyCapabilities.updateStats();
+                    } else {
+                        alert('调用失败: ' + result.message);
+                    }
                 })
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
-                    alert('调用成功!\n\n结果: ' + JSON.stringify(result.data, null, 2));
-                    cap.invokeCount = (cap.invokeCount || 0) + 1;
-                    cap.lastInvokeTime = Date.now();
-                    MyCapabilities.renderTable();
-                    MyCapabilities.updateStats();
-                } else {
-                    alert('调用失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                alert('调用失败: ' + error.message);
-            });
+                .catch(function(error) {
+                    alert('调用失败: ' + error.message);
+                });
         },
 
         uninstallCap: function(capabilityId) {
             if (!confirm('确定要卸载能力 "' + capabilityId + '" 吗？')) return;
 
-            fetch('/api/v1/capabilities/' + capabilityId, {
-                method: 'DELETE'
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+            ApiClient.delete('/api/v1/capabilities/' + capabilityId)
+                .then(function(result) {
+                    if (result.code === 200) {
+                        capabilities = capabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
+                        MyCapabilities.renderTable();
+                        MyCapabilities.updateStats();
+                        MyCapabilities.closeDetail();
+                    }
+                })
+                .catch(function(error) {
                     capabilities = capabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
                     MyCapabilities.renderTable();
                     MyCapabilities.updateStats();
                     MyCapabilities.closeDetail();
-                }
-            })
-            .catch(function(error) {
-                capabilities = capabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
-                MyCapabilities.renderTable();
-                MyCapabilities.updateStats();
-                MyCapabilities.closeDetail();
-            });
+                });
         },
 
         filter: function() {
@@ -406,6 +407,9 @@
     global.filterCapabilities = MyCapabilities.filter;
     global.filterByStatus = MyCapabilities.filterByStatus;
     global.refreshCapabilities = MyCapabilities.loadCapabilities;
+    global.goToActivation = function(installId) {
+        window.location.href = '/console/pages/capability-activation.html?installId=' + installId;
+    };
     global.showBindingModal = function(capabilityId) {
         window.location.href = '/console/pages/capability-binding.html?capabilityId=' + capabilityId;
     };

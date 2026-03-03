@@ -1,0 +1,107 @@
+apiVersion: scene.ooder.net/v1
+kind: SceneTemplate
+
+metadata:
+  id: storage-management
+  name: 存储管理场景
+  description: 文件存储管理，支持本地存储、云存储、数据库存储
+  category: storage
+  icon: ri-folder-line
+  version: 1.0.0
+  author: ooder Team
+
+spec:
+  skills:
+    - id: skill-vfs-local
+      version: ">=1.0.0"
+      required: true
+      description: "本地文件存储"
+      
+    - id: skill-vfs-database
+      version: ">=1.0.0"
+      required: false
+      description: "数据库存储（可选）"
+      
+    - id: skill-vfs-minio
+      version: ">=1.0.0"
+      required: false
+      description: "MinIO对象存储（可选）"
+      
+    - id: skill-vfs-oss
+      version: ">=1.0.0"
+      required: false
+      description: "阿里云OSS（可选）"
+      
+    - id: skill-vfs-s3
+      version: ">=1.0.0"
+      required: false
+      description: "AWS S3（可选）"
+      
+    - id: skill-storage-management-nexus-ui
+      version: ">=1.0.0"
+      required: true
+      description: "存储管理界面"
+      
+  capabilities:
+    - id: file-upload
+      name: 文件上传
+      description: 上传文件到存储
+      category: storage
+      
+    - id: file-download
+      name: 文件下载
+      description: 从存储下载文件
+      category: storage
+      
+    - id: file-manage
+      name: 文件管理
+      description: 管理存储中的文件
+      category: storage
+      
+    - id: storage-monitor
+      name: 存储监控
+      description: 监控存储使用情况
+      category: monitoring
+      
+  scene:
+    type: storage
+    name: 存储管理
+    description: 文件存储管理场景
+    
+    config:
+      storage:
+        defaultProvider: "local"
+        providers:
+          - id: "local"
+            type: "local"
+            path: "./data/storage"
+            enabled: true
+          - id: "database"
+            type: "database"
+            enabled: false
+          - id: "minio"
+            type: "s3"
+            enabled: false
+            
+      limits:
+        maxFileSize: "100MB"
+        maxTotalSize: "10GB"
+        allowedTypes:
+          - "image/*"
+          - "application/pdf"
+          - "text/*"
+          
+  installOrder:
+    - skill-vfs-local
+    - skill-vfs-database
+    - skill-vfs-minio
+    - skill-vfs-oss
+    - skill-vfs-s3
+    - skill-storage-management-nexus-ui
+    
+  estimatedResources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "10Gi"
+    
+  estimatedDuration: "3-5分钟"

@@ -37,8 +37,7 @@
         },
 
         loadSceneGroups: function() {
-            fetch('/api/v1/scene-groups')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/scene-groups')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         sceneGroups = result.data.list || result.data;
@@ -61,8 +60,7 @@
         },
 
         loadCapabilities: function() {
-            fetch('/api/v1/capabilities')
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         capabilities = result.data;
@@ -127,8 +125,7 @@
         },
 
         loadBindings: function(sceneGroupId) {
-            fetch('/api/v1/capabilities/bindings?sceneGroupId=' + sceneGroupId)
-                .then(function(response) { return response.json(); })
+            ApiClient.get('/api/v1/capabilities/bindings?sceneGroupId=' + sceneGroupId)
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
                         bindings = result.data;
@@ -277,16 +274,31 @@
                 connectorType: connectorType
             };
 
-            fetch('/api/v1/capabilities/bindings', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(request)
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+            ApiClient.post('/api/v1/capabilities/bindings', request)
+                .then(function(result) {
+                    if (result.code === 200) {
+                        bindings.push({
+                            bindingId: result.data ? result.data.bindingId : 'bind-' + Date.now(),
+                            sceneGroupId: currentSceneGroup,
+                            capabilityId: capabilityId,
+                            capabilityName: cap ? cap.name : capabilityId,
+                            capabilityType: cap ? cap.type : 'CUSTOM',
+                            providerType: providerType,
+                            priority: parseInt(priority) || 1,
+                            status: 'ACTIVE',
+                            lastInvokeTime: null
+                        });
+                        CapabilityBinding.renderBindings();
+                        CapabilityBinding.renderRelationGraph();
+                        CapabilityBinding.hideAddModal();
+                        CapabilityBinding.renderSceneGroups();
+                    } else {
+                        alert('创建绑定失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
                     bindings.push({
-                        bindingId: result.data ? result.data.bindingId : 'bind-' + Date.now(),
+                        bindingId: 'bind-' + Date.now(),
                         sceneGroupId: currentSceneGroup,
                         capabilityId: capabilityId,
                         capabilityName: cap ? cap.name : capabilityId,
@@ -300,50 +312,27 @@
                     CapabilityBinding.renderRelationGraph();
                     CapabilityBinding.hideAddModal();
                     CapabilityBinding.renderSceneGroups();
-                } else {
-                    alert('创建绑定失败: ' + result.message);
-                }
-            })
-            .catch(function(error) {
-                bindings.push({
-                    bindingId: 'bind-' + Date.now(),
-                    sceneGroupId: currentSceneGroup,
-                    capabilityId: capabilityId,
-                    capabilityName: cap ? cap.name : capabilityId,
-                    capabilityType: cap ? cap.type : 'CUSTOM',
-                    providerType: providerType,
-                    priority: parseInt(priority) || 1,
-                    status: 'ACTIVE',
-                    lastInvokeTime: null
                 });
-                CapabilityBinding.renderBindings();
-                CapabilityBinding.renderRelationGraph();
-                CapabilityBinding.hideAddModal();
-                CapabilityBinding.renderSceneGroups();
-            });
         },
 
         deleteBindingRequest: function(bindingId) {
             if (!confirm('确定要解绑此能力吗？')) return;
 
-            fetch('/api/v1/capabilities/bindings/' + bindingId, {
-                method: 'DELETE'
-            })
-            .then(function(response) { return response.json(); })
-            .then(function(result) {
-                if (result.code === 200) {
+            ApiClient.delete('/api/v1/capabilities/bindings/' + bindingId)
+                .then(function(result) {
+                    if (result.code === 200) {
+                        bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
+                        CapabilityBinding.renderBindings();
+                        CapabilityBinding.renderRelationGraph();
+                        CapabilityBinding.renderSceneGroups();
+                    }
+                })
+                .catch(function(error) {
                     bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
                     CapabilityBinding.renderBindings();
                     CapabilityBinding.renderRelationGraph();
                     CapabilityBinding.renderSceneGroups();
-                }
-            })
-            .catch(function(error) {
-                bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
-                CapabilityBinding.renderBindings();
-                CapabilityBinding.renderRelationGraph();
-                CapabilityBinding.renderSceneGroups();
-            });
+                });
         },
 
         editBindingRequest: function(bindingId) {
