@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM智能对话 - Nexus Console</title>
+    <link href="/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/index.css">
+    <link rel="stylesheet" href="../css/skill-llm-chat.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-xl nx-font-semibold">
+                        <i class="ri-robot-line"></i> LLM智能对话
+                    </h2>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" id="settingsBtn" title="设置">
+                        <i class="ri-settings-4-line"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="llm-chat-page">
+                        <div class="llm-chat-main">
+                            <div class="llm-chat-header">
+                                <div class="llm-provider-select">
+                                    <label>Provider:</label>
+                                    <select id="providerSelect" class="nx-select nx-select--sm">
+                                        <option value="">选择Provider</option>
+                                    </select>
+                                </div>
+                                <div class="llm-model-select">
+                                    <label>Model:</label>
+                                    <select id="modelSelect" class="nx-select nx-select--sm">
+                                        <option value="">选择模型</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="llm-chat-messages" id="chatMessages">
+                                <div class="llm-welcome">
+                                    <div class="llm-welcome__icon">
+                                        <i class="ri-robot-2-line"></i>
+                                    </div>
+                                    <h3>欢迎使用 LLM 智能对话</h3>
+                                    <p>我是您的智能助手，可以帮助您：</p>
+                                    <ul class="llm-welcome__features">
+                                        <li><i class="ri-chat-3-line"></i> 进行自然语言对话</li>
+                                        <li><i class="ri-lightbulb-line"></i> 回答问题和提供建议</li>
+                                        <li><i class="ri-code-line"></i> 生成代码和文档</li>
+                                        <li><i class="ri-file-text-line"></i> 分析和处理文本</li>
+                                    </ul>
+                                </div>
+                            </div>
+                            
+                            <div class="llm-chat-input-area">
+                                <div class="llm-quick-actions" id="quickActions">
+                                    <button class="llm-quick-btn" data-prompt="请介绍一下你自己">
+                                        <i class="ri-user-line"></i> 自我介绍
+                                    </button>
+                                    <button class="llm-quick-btn" data-prompt="帮我生成一段代码示例">
+                                        <i class="ri-code-line"></i> 代码示例
+                                    </button>
+                                    <button class="llm-quick-btn" data-prompt="请帮我分析这个问题">
+                                        <i class="ri-search-line"></i> 问题分析
+                                    </button>
+                                    <button class="llm-quick-btn" data-prompt="给我一些创意建议">
+                                        <i class="ri-lightbulb-line"></i> 创意建议
+                                    </button>
+                                </div>
+                                <div class="llm-input-wrapper">
+                                    <textarea 
+                                        class="llm-textarea" 
+                                        id="messageInput" 
+                                        placeholder="输入您的问题，按 Enter 发送，Shift+Enter 换行..."
+                                        rows="1"
+                                    ></textarea>
+                                    <div class="llm-input-actions">
+                                        <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" id="clearBtn" title="清空对话">
+                                            <i class="ri-delete-bin-line"></i>
+                                        </button>
+                                        <button class="nx-btn nx-btn--primary nx-btn--sm" id="sendBtn">
+                                            <i class="ri-send-plane-line"></i> 发送
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="llm-status-bar">
+                                    <span id="tokenCount">Token: 0</span>
+                                    <span id="streamStatus"></span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="llm-chat-sidebar">
+                            <div class="llm-sidebar-section">
+                                <h3><i class="ri-history-line"></i> 会话历史</h3>
+                                <div class="llm-session-list" id="sessionList">
+                                    <div class="llm-session-empty">
+                                        <i class="ri-chat-off-line"></i>
+                                        <span>暂无历史会话</span>
+                                    </div>
+                                </div>
+                                <button class="nx-btn nx-btn--secondary nx-btn--block" id="newSessionBtn">
+                                    <i class="ri-add-line"></i> 新建会话
+                                </button>
+                            </div>
+                            
+                            <div class="llm-sidebar-section">
+                                <h3><i class="ri-context-line"></i> 当前上下文</h3>
+                                <div class="llm-context-info" id="contextInfo">
+                                    <div class="llm-context-item">
+                                        <span class="llm-context-label">会话ID</span>
+                                        <span class="llm-context-value" id="ctxSessionId">-</span>
+                                    </div>
+                                    <div class="llm-context-item">
+                                        <span class="llm-context-label">消息数</span>
+                                        <span class="llm-context-value" id="ctxMessageCount">0</span>
+                                    </div>
+                                    <div class="llm-context-item">
+                                        <span class="llm-context-label">总Token</span>
+                                        <span class="llm-context-value" id="ctxTotalTokens">0</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="llm-sidebar-section">
+                                <h3><i class="ri-pie-chart-line"></i> 使用统计</h3>
+                                <div class="llm-stats">
+                                    <div class="llm-stat-item">
+                                        <div class="llm-stat-value" id="statMessages">0</div>
+                                        <div class="llm-stat-label">消息数</div>
+                                    </div>
+                                    <div class="llm-stat-item">
+                                        <div class="llm-stat-value" id="statTokens">0</div>
+                                        <div class="llm-stat-label">Token消耗</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="nx-modal" id="settingsModal">
+        <div class="nx-modal__content nx-modal__content--sm">
+            <div class="nx-modal__header">
+                <h3 class="nx-modal__title"><i class="ri-settings-4-line"></i> 对话设置</h3>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon nx-btn--sm" id="closeSettingsBtn">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="nx-form-group">
+                    <label class="nx-label">温度 (Temperature)</label>
+                    <div class="nx-flex nx-items-center nx-gap-2">
+                        <input type="range" class="nx-range" id="temperatureSlider" min="0" max="1" step="0.1" value="0.7">
+                        <span class="nx-text-secondary" id="temperatureValue">0.7</span>
+                    </div>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-label">最大Token数</label>
+                    <input type="number" class="nx-input" id="maxTokensInput" value="4096" min="100" max="32000">
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-label">系统提示词</label>
+                    <textarea class="nx-textarea" id="systemPromptInput" rows="4" placeholder="自定义系统提示词..."></textarea>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-checkbox">
+                        <input type="checkbox" id="streamEnabled" checked>
+                        <span class="nx-checkbox__label">启用流式输出</span>
+                    </label>
+                </div>
+                <div class="nx-form-group">
+                    <label class="nx-checkbox">
+                        <input type="checkbox" id="autoScroll" checked>
+                        <span class="nx-checkbox__label">自动滚动到底部</span>
+                    </label>
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" id="cancelSettingsBtn">取消</button>
+                <button class="nx-btn nx-btn--primary" id="saveSettingsBtn">
+                    <i class="ri-check-line"></i> 保存
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="/console/common/index.js"></script>
+    <script src="../js/skill-llm-chat.js"></script>
+</body>
+</html>

@@ -12,6 +12,31 @@
       ]
     },
     {
+      "id": "knowledge-qa",
+      "name": "知识问答",
+      "icon": "ri-book-3-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "kb-management", "name": "知识库管理", "icon": "ri-database-2-line", "url": "/console/skills/skill-knowledge-qa/ui/pages/index.html#kb", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "doc-management", "name": "文档管理", "icon": "ri-file-text-line", "url": "/console/skills/skill-knowledge-qa/ui/pages/index.html#docs", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "kb-search", "name": "知识检索", "icon": "ri-search-line", "url": "/console/skills/skill-knowledge-qa/ui/pages/index.html#search", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "rag-qa", "name": "智能问答", "icon": "ri-chat-3-line", "url": "/console/skills/skill-knowledge-qa/ui/pages/index.html#qa", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
+      "id": "llm-chat",
+      "name": "LLM智能对话",
+      "icon": "ri-robot-line",
+      "status": "implemented",
+      "roles": ["personal", "mcp"],
+      "children": [
+        {"id": "llm-chat-main", "name": "智能对话", "icon": "ri-chat-3-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "llm-sessions", "name": "会话管理", "icon": "ri-history-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html#sessions", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "llm-settings", "name": "模型设置", "icon": "ri-settings-4-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html#settings", "status": "implemented", "roles": ["personal", "mcp"]}
+      ]
+    },
+    {
       "id": "personal-center",
       "name": "个人中心",
       "icon": "ri-user-line",

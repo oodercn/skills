@@ -337,6 +337,52 @@ document.addEventListener('DOMContentLoaded', () => {
    - 将内嵌样式内容移入该文件
    - HTML中替换为 `<link rel="stylesheet" href="/console/css/components/{component-name}.css">`
 
+### 14. Use Unified ApiClient SDK (Required)
+
+**禁止直接使用原生 `fetch()` 调用API**
+
+所有API调用必须使用统一的 `ApiClient` SDK：
+
+```javascript
+// ❌ Wrong - Using native fetch
+const response = await fetch('/api/v1/capabilities');
+const result = await response.json();
+
+// ✅ Correct - Using ApiClient SDK
+const result = await ApiClient.get('/api/v1/capabilities');
+```
+
+**ApiClient SDK 方法**：
+
+| 方法 | 用途 | 示例 |
+|------|------|------|
+| `ApiClient.get(url)` | GET请求 | `ApiClient.get('/api/v1/capabilities')` |
+| `ApiClient.post(url, data)` | POST请求 | `ApiClient.post('/api/scenes/create', sceneData)` |
+| `ApiClient.put(url, data)` | PUT请求 | `ApiClient.put('/api/v1/templates/' + id, template)` |
+| `ApiClient.delete(url)` | DELETE请求 | `ApiClient.delete('/api/v1/scenes/' + id)` |
+
+**迁移示例**：
+
+```javascript
+// ❌ Wrong - Native fetch with POST
+const response = await fetch('/api/v1/capabilities', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+});
+const result = await response.json();
+
+// ✅ Correct - ApiClient POST
+const result = await ApiClient.post('/api/v1/capabilities', data);
+```
+
+**ApiClient 优势**：
+- 统一错误处理
+- 自动超时控制（默认30秒）
+- ResultModel格式验证
+- 简洁的API设计
+- 统一的Loading状态管理
+
 ## Checklist for New Pages
 
 - [ ] Script references correct (nexus.js, menu.js, page-init.js, api.js)
@@ -349,6 +395,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - [ ] Menu entry added to menu-config.json
 - [ ] No inline `<script>` tags (use external JS files)
 - [ ] No inline `<style>` tags (use external CSS files)
+- [ ] Use ApiClient SDK instead of native fetch()
 
 ## Checklist for Backend APIs
 
@@ -410,4 +457,43 @@ response.code === 200  ->  response.status === 'success' && response.data
 </style>
 <!-- With -->
 <link rel="stylesheet" href="/console/css/components/my-component.css">
+```
+
+### Fix Native Fetch to ApiClient
+```javascript
+// Replace native fetch with ApiClient SDK
+
+// GET request
+const response = await fetch('/api/v1/data');
+const result = await response.json();
+// With
+const result = await ApiClient.get('/api/v1/data');
+
+// POST request
+const response = await fetch('/api/v1/data', {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+});
+const result = await response.json();
+// With
+const result = await ApiClient.post('/api/v1/data', data);
+
+// PUT request
+const response = await fetch('/api/v1/data/' + id, {
+    method: 'PUT',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify(data)
+});
+const result = await response.json();
+// With
+const result = await ApiClient.put('/api/v1/data/' + id, data);
+
+// DELETE request
+const response = await fetch('/api/v1/data/' + id, {
+    method: 'DELETE'
+});
+const result = await response.json();
+// With
+const result = await ApiClient.delete('/api/v1/data/' + id);
 ```
