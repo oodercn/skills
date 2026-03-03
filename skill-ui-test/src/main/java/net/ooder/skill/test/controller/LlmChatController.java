@@ -86,16 +86,19 @@ public class LlmChatController {
             session.addMessage("assistant", response);
             session.addTokens(tokensUsed);
             
+            final int finalTokensUsed = tokensUsed;
+            final String finalMessage = message;
+            Map<String, Object> usage = new HashMap<>();
+            usage.put("promptTokens", finalMessage.length());
+            usage.put("completionTokens", finalTokensUsed);
+            usage.put("totalTokens", finalMessage.length() + finalTokensUsed);
+            
             Map<String, Object> data = new HashMap<>();
             data.put("response", response);
             data.put("sessionId", session.id);
             data.put("model", model);
             data.put("provider", provider);
-            data.put("usage", new HashMap<String, Object>() {{
-                put("promptTokens", message.length());
-                put("completionTokens", tokensUsed);
-                put("totalTokens", message.length() + tokensUsed);
-            }});
+            data.put("usage", usage);
             
             result.put("status", "success");
             result.put("data", data);

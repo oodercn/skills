@@ -61,6 +61,41 @@ spec:
       required: false
       autoInstall: false
       description: "DeepSeek适配器（可选）"
+      
+    - id: skill-llm-baidu
+      version: ">=1.0.0"
+      required: false
+      autoInstall: false
+      description: "百度千帆适配器（可选）"
+      capabilities:
+        - llm-chat
+        - llm-embed
+      configMapping:
+        apiKey: "${BAIDU_API_KEY}"
+        baseUrl: "${BAIDU_BASE_URL}"
+        model: "${BAIDU_MODEL}"
+
+  providerRegistry:
+    defaultProvider: "${LLM_DEFAULT_PROVIDER:baidu}"
+    providers:
+      - id: baidu
+        skillId: skill-llm-baidu
+        endpoints:
+          chat: /api/llm/baidu/chat
+          embed: /api/llm/baidu/embed
+          models: /api/llm/baidu/models
+        healthCheck: /api/llm/baidu/health
+        
+      - id: openai
+        skillId: skill-llm-openai
+        endpoints:
+          chat: /api/llm/openai/chat
+          embed: /api/llm/openai/embed
+          
+      - id: deepseek
+        skillId: skill-llm-deepseek
+        endpoints:
+          chat: /api/llm/deepseek/chat
 
   sceneCapabilities:
     - id: scene-llm-chat

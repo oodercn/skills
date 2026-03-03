@@ -33,3 +33,9 @@ ooder:
     skills-repo: skills
   mock:
     enabled: false
+  llm:
+    provider: baidu
+    model: bce-v3
+    baidu:
+      api-key: ALTAK-y3mXQFRWjd26xOkkewFpB
+      secret-key: e67462d98404432921816438d1a9e66528562839

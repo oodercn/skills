@@ -6,7 +6,7 @@
     "parentId" : null,
     "managerId" : "user-manager-001",
     "memberIds" : [ "user-manager-001", "user-employee-001", "user-employee-002", "user-employee-003" ],
-    "createTime" : 1772543037066,
+    "createTime" : 1772546882885,
     "updateTime" : 0
   },
   "dept-hr" : {
@@ -16,7 +16,7 @@
     "parentId" : null,
     "managerId" : "user-hr-001",
     "memberIds" : [ "user-hr-001" ],
-    "createTime" : 1772543037066,
+    "createTime" : 1772546882885,
     "updateTime" : 0
   }
 }

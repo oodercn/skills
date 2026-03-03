@@ -66,6 +66,9 @@ public class LLMService {
     }
     
     private boolean checkApiConnection() {
+        if ("baidu".equals(provider)) {
+            return checkBaiduApiConnection();
+        }
         try {
             URL url = new URL(baseUrl + "/models");
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
@@ -84,6 +87,24 @@ public class LLMService {
         } catch (IOException e) {
             log.warn("API connection check failed: {}", e.getMessage());
             return false;
+        }
+    }
+    
+    private boolean checkBaiduApiConnection() {
+        try {
+            URL url = new URL(baseUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("GET");
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(5000);
+            
+            int responseCode = conn.getResponseCode();
+            conn.disconnect();
+            
+            return responseCode < 500;
+        } catch (IOException e) {
+            log.warn("Baidu API connection check failed: {}", e.getMessage());
+            return true;
         }
     }
     
@@ -150,7 +171,8 @@ public class LLMService {
         }
         
         try {
-            URL url = new URL(baseUrl + "/chat/completions");
+            String endpoint = "/chat/completions";
+            URL url = new URL(baseUrl + endpoint);
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setRequestMethod("POST");
             conn.setRequestProperty("Content-Type", "application/json");
@@ -173,19 +195,25 @@ public class LLMService {
                 messages.toString()
             );
             
+            log.info("[chat] Calling LLM API: {}{}", baseUrl, endpoint);
+            log.debug("[chat] Request body: {}", requestBody);
+            
             try (java.io.OutputStream os = conn.getOutputStream()) {
                 os.write(requestBody.getBytes("UTF-8"));
             }
             
             int responseCode = conn.getResponseCode();
+            log.info("[chat] Response code: {}", responseCode);
             
             if (responseCode == 200) {
                 String response = readResponse(conn.getInputStream());
+                log.debug("[chat] Response: {}", response);
                 result.put("status", "success");
                 result.put("response", response);
                 result.put("answer", extractAnswer(response));
             } else {
                 String errorResponse = readResponse(conn.getErrorStream());
+                log.warn("[chat] API error: {} - {}", responseCode, errorResponse);
                 result.put("status", "error");
                 result.put("error", "API返回错误: " + responseCode);
                 result.put("details", errorResponse);
@@ -195,6 +223,7 @@ public class LLMService {
             
             conn.disconnect();
         } catch (Exception e) {
+            log.error("[chat] Exception: {}", e.getMessage(), e);
             result.put("status", "error");
             result.put("error", e.getMessage());
             result.put("fallback", "使用本地模拟回答");
@@ -283,5 +312,68 @@ public class LLMService {
     
     public String getModel() {
         return model;
+    }
+    
+    public String chat(String prompt, List<Map<String, Object>> history) {
+        if (apiKey == null || apiKey.trim().isEmpty()) {
+            return generateLocalAnswer(prompt);
+        }
+        
+        try {
+            String endpoint = "/chat/completions";
+            URL url = new URL(baseUrl + endpoint);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(60000);
+            conn.setReadTimeout(60000);
+            
+            StringBuilder messages = new StringBuilder();
+            messages.append("[");
+            
+            if (history != null && !history.isEmpty()) {
+                for (int i = 0; i < history.size(); i++) {
+                    Map<String, Object> msg = history.get(i);
+                    if (i > 0) messages.append(",");
+                    messages.append("{\"role\":\"")
+                             .append(msg.get("role"))
+                             .append("\",\"content\":")
+                             .append(escapeJson((String) msg.get("content")))
+                             .append("}");
+                }
+                messages.append(",");
+            }
+            
+            messages.append("{\"role\":\"user\",\"content\":").append(escapeJson(prompt)).append("}");
+            messages.append("]");
+            
+            String requestBody = String.format(
+                "{\"model\":\"%s\",\"messages\":%s,\"temperature\":0.7}",
+                model,
+                messages.toString()
+            );
+            
+            try (java.io.OutputStream os = conn.getOutputStream()) {
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+            
+            int responseCode = conn.getResponseCode();
+            
+            if (responseCode == 200) {
+                String response = readResponse(conn.getInputStream());
+                conn.disconnect();
+                return extractAnswer(response);
+            } else {
+                String errorResponse = readResponse(conn.getErrorStream());
+                log.warn("LLM API error: {} - {}", responseCode, errorResponse);
+                conn.disconnect();
+                return generateLocalAnswer(prompt);
+            }
+        } catch (Exception e) {
+            log.error("LLM chat error", e);
+            return generateLocalAnswer(prompt);
+        }
     }
 }

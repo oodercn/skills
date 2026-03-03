@@ -57,6 +57,18 @@ public class SdkConfiguration {
     @Value("${ooder.github.skills-repo:skills}")
     private String githubSkillsRepo;
 
+    @Value("${ooder.llm.provider:mock}")
+    private String llmProvider;
+
+    @Value("${ooder.llm.model:default}")
+    private String llmModel;
+
+    @Value("${ooder.llm.baidu.api-key:}")
+    private String baiduApiKey;
+
+    @Value("${ooder.llm.baidu.secret-key:}")
+    private String baiduSecretKey;
+
     private OoderSdk sdk;
 
     @Bean
@@ -70,6 +82,10 @@ public class SdkConfiguration {
                 .autoDiscoverDrivers(true)
                 .autoStartScenes(true)
                 .property("skillRootPath", skillRootPath)
+                .property("llm.provider", llmProvider)
+                .property("llm.model", llmModel)
+                .property("llm.baidu.apiKey", baiduApiKey)
+                .property("llm.baidu.secretKey", baiduSecretKey)
                 .build();
 
             log.info("[ooderSDK] OoderSDK initialized successfully");

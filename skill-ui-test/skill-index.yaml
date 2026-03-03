@@ -818,6 +818,21 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-llm-baidu
+      name: Baidu Qianfan LLM Provider
+      version: "1.0.0"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - baidu
+        - qianfan
+        - ernie
+        - provider
+      description: 百度千帆LLM Provider - 提供ERNIE系列模型对话、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-baidu
+      
     - skillId: skill-payment-alipay
       name: Alipay Payment Provider
       version: "0.7.3"

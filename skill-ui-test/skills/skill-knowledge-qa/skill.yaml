@@ -50,20 +50,28 @@ spec:
       autoInstall: false
       description: "RAG检索增强（可选）"
       
-    - id: skill-llm-assistant
+    - id: skill-llm-chat
+      version: ">=2.0.0"
+      required: false
+      autoInstall: false
+      description: "LLM智能对话场景能力（可选）"
+      capabilities:
+        - llm-chat
+        - session-manage
+        - context-extraction
+        
+    - id: skill-llm-baidu
       version: ">=1.0.0"
       required: false
       autoInstall: false
+      description: "百度千帆LLM Provider（可选）"
+      capabilities:
+        - llm-chat
+        - llm-embed
       configMapping:
-        apiKey: "${ooder.llm.api-key}"
-        baseUrl: "${ooder.llm.base-url}"
-        model: "${ooder.llm.model}"
-        embeddingModel: "${ooder.llm.embedding-model}"
-      healthCheck:
-        enabled: true
-        endpoint: /api/llm/health
-        interval: 30s
-      description: "LLM智能助手（可选）"
+        apiKey: "${BAIDU_API_KEY:-${ooder.llm.api-key}}"
+        baseUrl: "${BAIDU_BASE_URL:-${ooder.llm.base-url}}"
+        model: "${BAIDU_MODEL:-${ooder.llm.model}}"
 
   sceneCapabilities:
     - id: scene-knowledge-qa

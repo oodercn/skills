@@ -4,6 +4,7 @@ import javax.validation.Valid;
 import net.ooder.config.ResultModel;
 import net.ooder.scene.skill.LlmProvider;
 import net.ooder.skill.scene.dto.llm.*;
+import net.ooder.skill.scene.llm.BaiduLlmProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,18 @@ public class LlmController extends BaseController {
     @Value("${ooder.mock.enabled:false}")
     private boolean mockEnabled;
     
+    @Value("${ooder.llm.provider:mock}")
+    private String configProvider;
+    
+    @Value("${ooder.llm.model:default}")
+    private String configModel;
+    
+    @Value("${ooder.llm.baidu.api-key:}")
+    private String baiduApiKey;
+    
+    @Value("${ooder.llm.baidu.secret-key:}")
+    private String baiduSecretKey;
+    
     private final ExecutorService executor = Executors.newCachedThreadPool();
     
     private final Map<String, LlmProvider> providers = new ConcurrentHashMap<String, LlmProvider>();
@@ -41,6 +54,32 @@ public class LlmController extends BaseController {
 
     public LlmController() {
         loadProviders();
+    }
+    
+    @javax.annotation.PostConstruct
+    public void init() {
+        initBaiduProvider();
+        
+        if (configProvider != null && !configProvider.isEmpty() && !configProvider.equals("mock")) {
+            currentProviderType = configProvider;
+        }
+        if (configModel != null && !configModel.isEmpty() && !configModel.equals("default")) {
+            currentModel = configModel;
+        }
+        log.info("LLM initialized with provider: {}, model: {}", currentProviderType, currentModel);
+        if ("baidu".equals(currentProviderType)) {
+            log.info("Baidu LLM API Key configured: {}", baiduApiKey != null && !baiduApiKey.isEmpty() ? "yes" : "no");
+        }
+    }
+    
+    private void initBaiduProvider() {
+        if (baiduApiKey != null && !baiduApiKey.isEmpty() && baiduSecretKey != null && !baiduSecretKey.isEmpty()) {
+            BaiduLlmProvider baiduProvider = new BaiduLlmProvider();
+            baiduProvider.setAccessKey(baiduApiKey);
+            baiduProvider.setSecretKey(baiduSecretKey);
+            providers.put("baidu", baiduProvider);
+            log.info("Baidu LLM Provider registered with models: {}", baiduProvider.getSupportedModels());
+        }
     }
 
     private void loadProviders() {

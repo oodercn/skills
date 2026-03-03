@@ -30,7 +30,7 @@ ooder:
       index-path: ./kb-index
   llm:
     provider: baidu
-    api-key: bce-v3/ALTAK-yi8AGKtncaadiXvVC5eeC/8e43b5a2b59c288231ed53c97d9fa684bf1a2d4f
+    api-key: bce-v3/ALTAK-y3mXQFRWjd26xOkkewFpB/e67462d98404432921816438d1a9e66528562839
     base-url: https://qianfan.baidubce.com/v2
     model: ernie-4.0-8k
     embedding-model: embedding-v1
