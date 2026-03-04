@@ -31,7 +31,17 @@ public class LLMService {
     @Value("${ooder.llm.embedding-model:text-embedding-ada-002}")
     private String embeddingModel;
     
+    @Value("${deepseek.api-key:}")
+    private String deepseekApiKey;
+    
+    @Value("${deepseek.base-url:https://api.deepseek.com}")
+    private String deepseekBaseUrl;
+    
+    @Value("${deepseek.model:deepseek-chat}")
+    private String deepseekModel;
+    
     private final Map<String, Object> llmCache = new ConcurrentHashMap<>();
+    private String lastUsedModel = "";
     
     public Map<String, Object> checkDependencies() {
         Map<String, Object> result = new LinkedHashMap<>();
@@ -48,19 +58,26 @@ public class LLMService {
             result.put("apiKeyPreview", apiKey.substring(0, Math.min(8, apiKey.length())) + "...");
         }
         
+        boolean hasDeepseekKey = deepseekApiKey != null && !deepseekApiKey.trim().isEmpty();
+        result.put("deepseekConfigured", hasDeepseekKey);
+        
+        if (hasDeepseekKey) {
+            result.put("deepseekKeyPreview", deepseekApiKey.substring(0, Math.min(8, deepseekApiKey.length())) + "...");
+        }
+        
         boolean apiAccessible = checkApiConnection();
         result.put("apiAccessible", apiAccessible);
         
         List<String> issues = new ArrayList<>();
-        if (!hasApiKey) {
-            issues.add("API Key未配置，请设置ooder.llm.api-key");
+        if (!hasApiKey && !hasDeepseekKey) {
+            issues.add("未配置任何LLM API Key，请设置ooder.llm.api-key或deepseek.api-key");
         }
         if (!apiAccessible) {
-            issues.add("API服务不可达，请检查网络连接或base-url配置");
+            issues.add("主API服务不可达，请检查网络连接或base-url配置");
         }
         result.put("issues", issues);
         
-        result.put("ready", hasApiKey && apiAccessible);
+        result.put("ready", (hasApiKey && apiAccessible) || hasDeepseekKey);
         
         return result;
     }
@@ -280,7 +297,7 @@ public class LLMService {
             + "\"";
     }
     
-    public String generateAnswer(String question, List<Map<String, Object>> sources) {
+    public String generateAnswer(String question, List<Map<String, Object>> sources, String model) {
         if (!isReady()) {
             return generateLocalAnswer(question);
         }
@@ -294,16 +311,158 @@ public class LLMService {
         String systemPrompt = "你是一个知识库问答助手，请根据提供的参考文档回答用户问题。";
         String prompt = context.toString() + "\n\n用户问题：" + question;
         
+        boolean hasBaiduKey = apiKey != null && !apiKey.trim().isEmpty();
+        boolean hasDeepseekKey = deepseekApiKey != null && !deepseekApiKey.trim().isEmpty();
+        
+        if (model != null && model.startsWith("deepseek") && hasDeepseekKey) {
+            lastUsedModel = model;
+            return callDeepSeek(prompt, systemPrompt, model);
+        } else if (model != null && model.startsWith("ernie") && hasBaiduKey) {
+            lastUsedModel = model;
+            return callBaidu(prompt, systemPrompt, model);
+        } else if (hasDeepseekKey) {
+            log.info("[llm] Model {} not available, fallback to DeepSeek", model);
+            lastUsedModel = deepseekModel;
+            return callDeepSeek(prompt, systemPrompt, deepseekModel);
+        } else if (hasBaiduKey) {
+            log.info("[llm] Model {} not available, fallback to Baidu", model);
+            lastUsedModel = this.model;
+            return callBaidu(prompt, systemPrompt, this.model);
+        }
+        
         Map<String, Object> result = chat(prompt, systemPrompt);
         if ("success".equals(result.get("status"))) {
+            lastUsedModel = this.model;
             return (String) result.get("answer");
         } else {
             return generateLocalAnswer(question);
         }
     }
     
+    public String generateAnswer(String question, List<Map<String, Object>> sources) {
+        return generateAnswer(question, sources, null);
+    }
+    
+    public String getLastUsedModel() {
+        return lastUsedModel;
+    }
+    
+    private String callBaidu(String prompt, String systemPrompt, String model) {
+        try {
+            URL url = new URL(baseUrl + "/chat/completions");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(60000);
+            conn.setReadTimeout(60000);
+            
+            String requestBody = String.format(
+                "{\"model\":\"%s\",\"messages\":[{\"role\":\"system\",\"content\":%s},{\"role\":\"user\",\"content\":%s}],\"temperature\":0.7,\"max_completion_tokens\":2048}",
+                model,
+                escapeJson(systemPrompt),
+                escapeJson(prompt)
+            );
+            
+            log.info("[baidu] Calling Baidu API with model: {}", model);
+            log.debug("[baidu] Request: {}", requestBody);
+            
+            try (java.io.OutputStream os = conn.getOutputStream()) {
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+            
+            int responseCode = conn.getResponseCode();
+            log.info("[baidu] Response code: {}", responseCode);
+            
+            if (responseCode == 200) {
+                String response = readResponse(conn.getInputStream());
+                conn.disconnect();
+                return extractContent(response);
+            } else {
+                String errorResponse = readResponse(conn.getErrorStream());
+                log.warn("[baidu] API error: {} - {}", responseCode, errorResponse);
+                conn.disconnect();
+                return generateLocalAnswer(prompt);
+            }
+        } catch (Exception e) {
+            log.error("[baidu] Error calling Baidu API", e);
+            return generateLocalAnswer(prompt);
+        }
+    }
+    
+    private String callDeepSeek(String prompt, String systemPrompt, String model) {
+        try {
+            URL url = new URL(deepseekBaseUrl + "/chat/completions");
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + deepseekApiKey);
+            conn.setDoOutput(true);
+            conn.setConnectTimeout(60000);
+            conn.setReadTimeout(60000);
+            
+            String useModel = model != null ? model : deepseekModel;
+            String requestBody = String.format(
+                "{\"model\":\"%s\",\"messages\":[{\"role\":\"system\",\"content\":%s},{\"role\":\"user\",\"content\":%s}],\"temperature\":0.7}",
+                useModel,
+                escapeJson(systemPrompt),
+                escapeJson(prompt)
+            );
+            
+            log.info("[deepseek] Calling DeepSeek API for QA with model: {}", useModel);
+            log.debug("[deepseek] Request: {}", requestBody);
+            
+            try (java.io.OutputStream os = conn.getOutputStream()) {
+                os.write(requestBody.getBytes("UTF-8"));
+            }
+            
+            int responseCode = conn.getResponseCode();
+            log.info("[deepseek] Response code: {}", responseCode);
+            
+            if (responseCode == 200) {
+                String response = readResponse(conn.getInputStream());
+                conn.disconnect();
+                return extractContent(response);
+            } else {
+                String errorResponse = readResponse(conn.getErrorStream());
+                log.warn("[deepseek] API error: {} - {}", responseCode, errorResponse);
+                conn.disconnect();
+                return generateLocalAnswer(prompt);
+            }
+        } catch (Exception e) {
+            log.error("[deepseek] Error calling DeepSeek API", e);
+            return generateLocalAnswer(prompt);
+        }
+    }
+    
+    private String callDeepSeek(String prompt, String systemPrompt) {
+        return callDeepSeek(prompt, systemPrompt, null);
+    }
+    
+    private String extractContent(String response) {
+        try {
+            int contentStart = response.indexOf("\"content\":\"");
+            if (contentStart > 0) {
+                contentStart += 11;
+                int contentEnd = response.indexOf("\"", contentStart);
+                if (contentEnd > contentStart) {
+                    String content = response.substring(contentStart, contentEnd);
+                    return content
+                        .replace("\\n", "\n")
+                        .replace("\\\"", "\"")
+                        .replace("\\\\", "\\");
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to extract content", e);
+        }
+        return response;
+    }
+    
     public boolean isReady() {
-        return apiKey != null && !apiKey.trim().isEmpty();
+        return (apiKey != null && !apiKey.trim().isEmpty()) || 
+               (deepseekApiKey != null && !deepseekApiKey.trim().isEmpty());
     }
     
     public String getProvider() {

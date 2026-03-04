@@ -96,6 +96,8 @@ spec:
         skillId: skill-llm-deepseek
         endpoints:
           chat: /api/llm/deepseek/chat
+          models: /api/llm/deepseek/models
+        healthCheck: /api/llm/deepseek/health
 
   sceneCapabilities:
     - id: scene-llm-chat

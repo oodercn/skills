@@ -1,17 +1,16 @@
 package net.ooder.skill.scene.snapshot;
 
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.JSONWriter;
 import net.ooder.skill.scene.dto.scene.SceneSnapshotDTO;
 import net.ooder.skill.scene.dto.scene.SceneGroupDTO;
 import net.ooder.skill.scene.dto.scene.SceneParticipantDTO;
 import net.ooder.skill.scene.dto.scene.CapabilityBindingDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import javax.annotation.PostConstruct;
 import java.io.File;
@@ -33,13 +32,7 @@ public class SnapshotService {
     @Value("${app.snapshot.max-count:100}")
     private int maxSnapshotCount;
 
-    private final ObjectMapper objectMapper;
     private final Map<String, List<SceneSnapshotDTO>> snapshotCache = new ConcurrentHashMap<>();
-
-    public SnapshotService() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
-    }
 
     @PostConstruct
     public void init() {
@@ -149,7 +142,8 @@ public class SnapshotService {
     private void saveSnapshotToFile(SceneSnapshotDTO snapshot) {
         try {
             File file = new File(snapshotPath, snapshot.getSnapshotId() + ".snapshot");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, snapshot);
+            String json = JSON.toJSONString(snapshot, JSONWriter.Feature.PrettyFormat);
+            Files.write(file.toPath(), json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             log.debug("Saved snapshot to file: {}", file.getName());
         } catch (IOException e) {
             log.error("Failed to save snapshot to file", e);
@@ -158,7 +152,8 @@ public class SnapshotService {
 
     private SceneSnapshotDTO loadSnapshotFromFile(File file) {
         try {
-            return objectMapper.readValue(file, SceneSnapshotDTO.class);
+            String json = new String(Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+            return JSON.parseObject(json, SceneSnapshotDTO.class, JSONReader.Feature.FieldBased);
         } catch (IOException e) {
             log.error("Failed to load snapshot from file: {}", file.getName(), e);
             return null;
@@ -192,8 +187,9 @@ public class SnapshotService {
             }
         
         try {
-            return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(snapshot);
-        } catch (IOException e) {
+            return JSON.toJSONString(snapshot, JSONWriter.Feature.PrettyFormat)
+                .getBytes(java.nio.charset.StandardCharsets.UTF_8);
+        } catch (Exception e) {
             log.error("Failed to export snapshot", e);
             return null;
         }
@@ -201,7 +197,8 @@ public class SnapshotService {
 
     public boolean importSnapshot(byte[] data) {
         try {
-            SceneSnapshotDTO snapshot = objectMapper.readValue(data, SceneSnapshotDTO.class);
+            String json = new String(data, java.nio.charset.StandardCharsets.UTF_8);
+            SceneSnapshotDTO snapshot = JSON.parseObject(json, SceneSnapshotDTO.class, JSONReader.Feature.FieldBased);
             String sceneGroupId = snapshot.getSceneGroupId();
             
             snapshotCache.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(snapshot);
@@ -209,7 +206,7 @@ public class SnapshotService {
             
             log.info("Imported snapshot {} for group {}", snapshot.getSnapshotId(), sceneGroupId);
             return true;
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.error("Failed to import snapshot", e);
             return false;
         }

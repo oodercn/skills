@@ -3,24 +3,19 @@ kind: Skill
 
 metadata:
   id: skill-org-dingding
-  name: DingTalk Organization Service
-  version: 0.7.1
-  description: Provides organization data integration with DingTalk, including org structure sync and user authentication
+  name: DingTalk Organization
+  version: 0.7.3
+  description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/guper-Agent/tree/main/skill-org-dingding
-  repository: https://github.com/ooderCN/guper-Agent.git
-  documentation: https://github.com/ooderCN/guper-Agent/blob/main/skill-org-dingding/SKILLS.md
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-dingding
+  repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - dingding
     - dingtalk
     - organization
     - enterprise
     - authentication
-  maintainers:
-    - name: Ooder Team
-      email: team@ooder.net
-      github: ooderCN
 
 spec:
   type: enterprise-skill
@@ -29,219 +24,65 @@ spec:
     language: java
     javaVersion: "8"
     framework: spring-boot
-    mainClass: net.ooder.skill.org.dingding.DingTalkOrgApplication
-    jvmOpts: "-Xms256m -Xmx512m"
-  
-  orgCapabilities:
-    supported:
-      - id: org-query
-        name: Organization Query
-        description: Query organization structure from DingTalk
-        fallback: none
-      - id: person-query
-        name: Person Query
-        description: Query person info from DingTalk
-        fallback: none
-      - id: person-sync
-        name: Person Sync
-        description: Sync person data from DingTalk
-        fallback: none
-      - id: org-sync
-        name: Organization Sync
-        description: Sync organization structure from DingTalk
-        fallback: none
-    notSupported:
-      - id: org-level
-        name: Organization Level
-        description: Organization level management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for org levels
-      - id: org-role
-        name: Organization Role
-        description: Organization role management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for org roles
-      - id: person-duty
-        name: Person Duty
-        description: Person duty management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for person duties
-      - id: person-group
-        name: Person Group
-        description: Person group management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for person groups
-      - id: person-level
-        name: Person Level
-        description: Person level management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for person levels
-      - id: person-position
-        name: Person Position
-        description: Person position management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for person positions
-      - id: person-role
-        name: Person Role
-        description: Person role management
-        fallback: json-fallback
-        fallbackDescription: Use JSON fallback for person roles
-      - id: user-auth
-        name: User Authentication
-        description: Local user authentication
-        fallback: none
-        fallbackDescription: DingTalk uses OAuth, no local auth
+    mainClass: net.ooder.skill.org.dingding.DingTalkOrgSkillApplication
   
   capabilities:
     - id: org-data-read
-      name: Organization Data Read
-      description: Read organization structure and member data from DingTalk
-      category: data-access
-      parameters:
-        - name: orgId
-          type: string
-          required: false
-          description: Organization ID (optional, uses default if not provided)
-        - name: includeInactive
-          type: boolean
-          required: false
-          default: false
-          description: Whether to include inactive members
-      returns:
-        type: object
-        description: Organization tree with members
+      name: Org Data Read
+      description: 组织数据读取
+      category: organization
     - id: user-auth
       name: User Authentication
-      description: Authenticate users via DingTalk OAuth
+      description: 用户认证
       category: authentication
-      parameters:
-        - name: code
-          type: string
-          required: true
-          description: DingTalk authorization code
-      returns:
-        type: object
-        description: Authentication result with user info and access token
   
   scenes:
     - name: auth
-      description: Authentication scene with organization data support
+      description: 认证场景
       capabilities:
         - org-data-read
         - user-auth
-      roles:
-        - roleId: org-provider
-          name: Organization Provider
-          required: true
-          capabilities: [org-data-read, user-auth]
-        - roleId: org-consumer
-          name: Organization Consumer
-          required: false
-          capabilities: [org-data-read]
-      communicationProtocol: http
-      securityPolicy: api-key
-      allowParallel: true
   
-  dependencies:
-    skills: []
-    libraries:
-      - group: org.springframework.boot
-        artifact: spring-boot-starter-web
-        version: "2.7.0"
-        scope: compile
-      - group: org.springframework.boot
-        artifact: spring-boot-starter-actuator
-        version: "2.7.0"
-        scope: compile
-      - group: com.alibaba
-        artifact: fastjson
-        version: "1.2.83"
-        scope: compile
+  dependencies: []
   
   config:
     required:
       - name: DINGTALK_APP_KEY
         type: string
-        description: DingTalk application key
-        secret: false
+        description: 钉钉应用Key
       - name: DINGTALK_APP_SECRET
         type: string
-        description: DingTalk application secret
         secret: true
+        description: 钉钉应用Secret
     optional:
       - name: DINGTALK_API_BASE_URL
         type: string
-        description: DingTalk API base URL
         default: https://oapi.dingtalk.com
-        secret: false
-      - name: DINGTALK_TIMEOUT
-        type: number
-        description: API request timeout in milliseconds
-        default: 30000
-        secret: false
-      - name: DINGTALK_CACHE_ENABLED
-        type: boolean
-        description: Enable response caching
-        default: true
-        secret: false
-      - name: DINGTALK_CACHE_TTL
-        type: number
-        description: Cache expiration time in milliseconds
-        default: 300000
-        secret: false
+        description: 钉钉API基础URL
   
   endpoints:
-    - path: /api/org/tree
+    - path: /api/org/departments
       method: GET
-      description: Get organization tree
+      description: 获取部门列表
       capability: org-data-read
-      authentication: true
-      rateLimit: 60
-    - path: /api/org/person/{id}
+    - path: /api/org/users
       method: GET
-      description: Get person by ID
+      description: 获取用户列表
       capability: org-data-read
-      authentication: true
-    - path: /api/org/department/{id}
-      method: GET
-      description: Get department by ID
-      capability: org-data-read
-      authentication: true
-    - path: /api/auth/verify
+    - path: /api/auth/login
       method: POST
-      description: Verify user authentication
+      description: 用户登录
       capability: user-auth
-      authentication: true
-    - path: /api/auth/token
-      method: POST
-      description: Get access token
-      capability: user-auth
-      authentication: true
-    - path: /api/org/capabilities
+    - path: /api/health
       method: GET
-      description: Get supported org capabilities
-      authentication: false
+      description: 健康检查
   
   resources:
-    cpu: "500m"
+    cpu: "200m"
     memory: "512Mi"
-    storage: "1Gi"
-    network:
-      ingress: true
-      egress: true
-      ports:
-        - 8080
+    storage: "100Mi"
   
-  deployment:
-    modes:
-      - remote-hosted
-      - local-deployed
-    singleton: true
-    requiresAuth: true
-    healthCheck:
-      path: /actuator/health
-      interval: 30
-      timeout: 10
-    startup:
-      timeout: 60
-      order: 10
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

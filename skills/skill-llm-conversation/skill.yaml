@@ -17,7 +17,7 @@ metadata:
     - ai
 
 spec:
-  type: llm-service
+  type: service-skill
   
   dependencies:
     - id: skill-llm-context-builder

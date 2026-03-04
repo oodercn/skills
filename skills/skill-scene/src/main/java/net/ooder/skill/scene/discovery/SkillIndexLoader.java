@@ -102,6 +102,22 @@ public class SkillIndexLoader {
                 cap.setCapabilities((List<String>) caps);
             }
             
+            String skillId = (String) skill.get("skillId");
+            Object typeObj = skill.get("type");
+            String type = typeObj != null ? String.valueOf(typeObj) : null;
+            
+            boolean isScene = false;
+            if ("SCENE".equals(type) || "scene".equals(type)) {
+                isScene = true;
+            } else if (skillId != null && 
+                (skillId.contains("-scene") || skillId.endsWith("-scene") || 
+                 "daily-log-scene".equals(skillId))) {
+                isScene = true;
+            }
+            
+            cap.setType(isScene ? "SCENE" : (type != null ? type : "SKILL"));
+            cap.setSceneCapability(isScene);
+            
             capabilities.add(cap);
         }
         
@@ -138,5 +154,37 @@ public class SkillIndexLoader {
 
     public List<Map<String, Object>> getCategories() {
         return categories;
+    }
+
+    public List<CapabilityDTO> getScenesFromIndex(String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        for (Map<String, Object> scene : scenes) {
+            CapabilityDTO cap = new CapabilityDTO();
+            cap.setId((String) scene.get("sceneId"));
+            cap.setName((String) scene.get("name"));
+            cap.setDescription((String) scene.get("description"));
+            cap.setVersion((String) scene.get("version"));
+            cap.setSource(source);
+            cap.setStatus("available");
+            cap.setType("SCENE");
+            cap.setSceneCapability(true);
+            
+            Object caps = scene.get("capabilities");
+            if (caps instanceof List) {
+                cap.setCapabilities((List<String>) caps);
+            }
+            
+            capabilities.add(cap);
+        }
+        
+        return capabilities;
+    }
+
+    public List<CapabilityDTO> getAllCapabilities(String source) {
+        List<CapabilityDTO> all = new ArrayList<>();
+        all.addAll(getSkillsFromIndex(source));
+        all.addAll(getScenesFromIndex(source));
+        return all;
     }
 }

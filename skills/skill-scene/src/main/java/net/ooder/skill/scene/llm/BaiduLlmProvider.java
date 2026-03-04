@@ -4,8 +4,6 @@ import net.ooder.scene.skill.LlmProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.crypto.Mac;
-import javax.crypto.spec.SecretKeySpec;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -13,8 +11,6 @@ import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class BaiduLlmProvider implements LlmProvider {
@@ -22,10 +18,9 @@ public class BaiduLlmProvider implements LlmProvider {
     private static final Logger log = LoggerFactory.getLogger(BaiduLlmProvider.class);
 
     private static final String PROVIDER_TYPE = "baidu";
-    private static final String DEFAULT_MODEL = "ernie-bot";
+    private static final String DEFAULT_MODEL = "ernie-3.5-8k";
     
-    private static final String QIANFAN_API_HOST = "qianfan.baidubce.com";
-    private static final String QIANFAN_API_URL = "https://qianfan.baidubce.com/v2/app/conversation/runs";
+    private static final String QIANFAN_API_URL = "https://qianfan.baidubce.com/v2/chat/completions";
     
     private String accessKey;
     private String secretKey;
@@ -33,9 +28,9 @@ public class BaiduLlmProvider implements LlmProvider {
     private final List<String> supportedModels = new ArrayList<String>();
     
     public BaiduLlmProvider() {
-        supportedModels.add("ernie-bot");
-        supportedModels.add("ernie-bot-4");
-        supportedModels.add("ernie-bot-turbo");
+        supportedModels.add("ernie-3.5-8k");
+        supportedModels.add("ernie-4.0-8k");
+        supportedModels.add("ernie-3.5-8k-preview");
         supportedModels.add("bce-v3");
     }
     
@@ -80,29 +75,11 @@ public class BaiduLlmProvider implements LlmProvider {
         Map<String, Object> result = new HashMap<String, Object>();
         
         try {
-            String apiUrl = QIANFAN_API_URL;
-            
             Map<String, Object> requestBody = new HashMap<String, Object>();
+            requestBody.put("model", getModelId(model));
+            requestBody.put("messages", messages);
             
-            StringBuilder contentBuilder = new StringBuilder();
-            for (Map<String, Object> msg : messages) {
-                String role = (String) msg.get("role");
-                String msgContent = (String) msg.get("content");
-                if ("user".equals(role)) {
-                    contentBuilder.append(msgContent);
-                }
-            }
-            
-            Map<String, Object> payload = new HashMap<String, Object>();
-            payload.put("query", contentBuilder.toString());
-            
-            Map<String, Object> conversationConfig = new HashMap<String, Object>();
-            conversationConfig.put("model", getModelId(model));
-            payload.put("conversation_config", conversationConfig);
-            
-            requestBody.put("payload", payload);
-            
-            String response = sendRequestWithBceAuth(apiUrl, requestBody);
+            String response = sendRequest(QIANFAN_API_URL, requestBody);
             
             result.put("content", response);
             result.put("model", model);
@@ -123,11 +100,11 @@ public class BaiduLlmProvider implements LlmProvider {
         }
         
         switch (model) {
-            case "ernie-bot-4":
+            case "ernie-4.0-8k":
                 return "ernie-4.0-8k";
-            case "ernie-bot-turbo":
-                return "ernie-3.5-8k";
-            case "ernie-bot":
+            case "ernie-3.5-8k-preview":
+                return "ernie-3.5-8k-preview";
+            case "ernie-3.5-8k":
             case "bce-v3":
             default:
                 return "ernie-3.5-8k";
@@ -173,32 +150,27 @@ public class BaiduLlmProvider implements LlmProvider {
         log.info("Baidu LLM embed called with model: {}, text count: {}", model, texts.size());
         
         List<double[]> result = new ArrayList<double[]>();
-        log.info("Embedding not implemented for BCE auth");
+        log.info("Embedding not implemented for Baidu");
         
         return result;
     }
     
-    private String sendRequestWithBceAuth(String apiUrl, Map<String, Object> requestBody) throws Exception {
+    private String sendRequest(String apiUrl, Map<String, Object> requestBody) throws Exception {
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
         
-        String timestamp = getTimestamp();
-        String jsonBody = mapToJson(requestBody);
-        
-        String authorization = generateBceAuth("POST", url.getPath(), timestamp, jsonBody);
-        
-        conn.setRequestProperty("x-bce-date", timestamp);
-        conn.setRequestProperty("Authorization", authorization);
-        conn.setRequestProperty("Host", QIANFAN_API_HOST);
+        String authHeader = "Bearer " + accessKey + ":" + secretKey;
+        conn.setRequestProperty("Authorization", authHeader);
         
         conn.setConnectTimeout(60000);
         conn.setReadTimeout(60000);
         conn.setDoOutput(true);
         
+        String jsonBody = mapToJson(requestBody);
         log.debug("Request body: {}", jsonBody);
-        log.debug("Authorization: {}", authorization);
+        log.debug("Authorization: {}", authHeader.substring(0, Math.min(30, authHeader.length())) + "...");
         
         try (OutputStream os = conn.getOutputStream()) {
             byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
@@ -235,7 +207,7 @@ public class BaiduLlmProvider implements LlmProvider {
             return "Error (HTTP " + responseCode + "): " + responseBody;
         }
         
-        String content = extractJsonValue(responseBody, "answer");
+        String content = extractNestedJsonValue(responseBody, "choices", "message", "content");
         if (content == null) {
             content = extractJsonValue(responseBody, "result");
         }
@@ -243,69 +215,45 @@ public class BaiduLlmProvider implements LlmProvider {
         return content != null ? content : responseBody;
     }
     
-    private String getTimestamp() {
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'");
-        sdf.setTimeZone(TimeZone.getTimeZone("UTC"));
-        return sdf.format(new Date());
-    }
-    
-    private String generateBceAuth(String method, String path, String timestamp, String body) {
-        try {
-            String canonicalUri = path;
-            String canonicalQueryString = "";
-            
-            String canonicalHeaders = "host:" + QIANFAN_API_HOST + "\n" +
-                                      "x-bce-date:" + timestamp + "\n";
-            String signedHeaders = "host;x-bce-date";
-            
-            String bodyHash = sha256Hex(body);
-            
-            String canonicalRequest = method + "\n" +
-                                      canonicalUri + "\n" +
-                                      canonicalQueryString + "\n" +
-                                      canonicalHeaders + "\n" +
-                                      signedHeaders + "\n" +
-                                      bodyHash;
-            
-            String authStringPrefix = "bce-auth-v1/" + accessKey + "/" + timestamp + "/3600";
-            String signingKey = hmacSha256Hex(secretKey, authStringPrefix);
-            String signature = hmacSha256Hex(signingKey, canonicalRequest);
-            
-            return authStringPrefix + "/" + signedHeaders + "/" + signature;
-            
-        } catch (Exception e) {
-            log.error("Error generating BCE auth", e);
-            return "";
-        }
-    }
-    
-    private String sha256Hex(String data) throws Exception {
-        MessageDigest digest = MessageDigest.getInstance("SHA-256");
-        byte[] hash = digest.digest(data.getBytes(StandardCharsets.UTF_8));
-        return bytesToHex(hash);
-    }
-    
-    private byte[] hmacSha256(String key, String data) throws Exception {
-        Mac mac = Mac.getInstance("HmacSHA256");
-        SecretKeySpec secretKeySpec = new SecretKeySpec(key.getBytes(StandardCharsets.UTF_8), "HmacSHA256");
-        mac.init(secretKeySpec);
-        return mac.doFinal(data.getBytes(StandardCharsets.UTF_8));
-    }
-    
-    private String hmacSha256Hex(String key, String data) throws Exception {
-        return bytesToHex(hmacSha256(key, data));
-    }
-    
-    private String bytesToHex(byte[] bytes) {
-        StringBuilder hexString = new StringBuilder();
-        for (byte b : bytes) {
-            String hex = Integer.toHexString(0xff & b);
-            if (hex.length() == 1) {
-                hexString.append('0');
+    private String extractNestedJsonValue(String json, String... keys) {
+        String current = json;
+        for (int i = 0; i < keys.length - 1; i++) {
+            String key = keys[i];
+            String searchKey = "\"" + key + "\":";
+            int startIndex = current.indexOf(searchKey);
+            if (startIndex == -1) {
+                return null;
             }
-            hexString.append(hex);
+            startIndex += searchKey.length();
+            while (startIndex < current.length() && (current.charAt(startIndex) == ' ' || current.charAt(startIndex) == '\t')) {
+                startIndex++;
+            }
+            if (startIndex >= current.length()) {
+                return null;
+            }
+            if (current.charAt(startIndex) == '[') {
+                startIndex++;
+                int bracketCount = 1;
+                int endIndex = startIndex;
+                while (endIndex < current.length() && bracketCount > 0) {
+                    if (current.charAt(endIndex) == '[') bracketCount++;
+                    else if (current.charAt(endIndex) == ']') bracketCount--;
+                    endIndex++;
+                }
+                current = current.substring(startIndex, endIndex - 1);
+            } else if (current.charAt(startIndex) == '{') {
+                startIndex++;
+                int braceCount = 1;
+                int endIndex = startIndex;
+                while (endIndex < current.length() && braceCount > 0) {
+                    if (current.charAt(endIndex) == '{') braceCount++;
+                    else if (current.charAt(endIndex) == '}') braceCount--;
+                    endIndex++;
+                }
+                current = current.substring(startIndex, endIndex - 1);
+            }
         }
-        return hexString.toString();
+        return extractJsonValue(current, keys[keys.length - 1]);
     }
     
     private String extractJsonValue(String json, String key) {
@@ -326,9 +274,12 @@ public class BaiduLlmProvider implements LlmProvider {
         
         if (json.charAt(startIndex) == '"') {
             startIndex++;
-            int endIndex = json.indexOf("\"", startIndex);
-            if (endIndex == -1) {
-                return null;
+            int endIndex = startIndex;
+            while (endIndex < json.length()) {
+                if (json.charAt(endIndex) == '"' && json.charAt(endIndex - 1) != '\\') {
+                    break;
+                }
+                endIndex++;
             }
             return json.substring(startIndex, endIndex);
         } else {

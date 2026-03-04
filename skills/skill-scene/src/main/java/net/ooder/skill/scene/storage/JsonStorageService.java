@@ -1,7 +1,8 @@
 package net.ooder.skill.scene.storage;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
+import com.alibaba.fastjson2.JSONWriter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -10,6 +11,7 @@ import org.springframework.stereotype.Component;
 import javax.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -21,13 +23,7 @@ public class JsonStorageService {
     @Value("${app.storage.path:./data}")
     private String storagePath;
 
-    private final ObjectMapper objectMapper;
     private final Map<String, Object> cache = new ConcurrentHashMap<>();
-
-    public JsonStorageService() {
-        this.objectMapper = new ObjectMapper();
-        this.objectMapper.registerModule(new JavaTimeModule());
-    }
 
     @PostConstruct
     public void init() {
@@ -81,7 +77,8 @@ public class JsonStorageService {
     private void saveToFile(String collection, Map<String, Object> data) {
         try {
             File file = new File(storagePath, collection + ".json");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, data);
+            String json = JSON.toJSONString(data, JSONWriter.Feature.PrettyFormat);
+            Files.write(file.toPath(), json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             log.debug("Saved {} to {}", collection, file.getName());
         } catch (IOException e) {
             log.error("Failed to save collection: {}", collection, e);
@@ -93,7 +90,8 @@ public class JsonStorageService {
         File file = new File(storagePath, collection + ".json");
         if (file.exists()) {
             try {
-                Map<String, Object> data = objectMapper.readValue(file, Map.class);
+                String json = new String(Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                Map<String, Object> data = JSON.parseObject(json, Map.class, JSONReader.Feature.FieldBased);
                 cache.put(collection, data);
                 log.info("Loaded {} records from {}", data.size(), collection);
             } catch (IOException e) {
@@ -107,8 +105,8 @@ public class JsonStorageService {
         File file = new File(storagePath, collection + ".json");
         if (file.exists()) {
             try {
-                return objectMapper.readValue(file, 
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, clazz));
+                String json = new String(Files.readAllBytes(file.toPath()), java.nio.charset.StandardCharsets.UTF_8);
+                return JSON.parseArray(json, clazz, JSONReader.Feature.FieldBased);
             } catch (IOException e) {
                 log.warn("Failed to load list: {}", collection);
             }
@@ -119,7 +117,8 @@ public class JsonStorageService {
     public <T> void saveList(String collection, List<T> list) {
         try {
             File file = new File(storagePath, collection + ".json");
-            objectMapper.writerWithDefaultPrettyPrinter().writeValue(file, list);
+            String json = JSON.toJSONString(list, JSONWriter.Feature.PrettyFormat);
+            Files.write(file.toPath(), json.getBytes(java.nio.charset.StandardCharsets.UTF_8));
             log.debug("Saved {} items to {}", list.size(), collection);
         } catch (IOException e) {
             log.error("Failed to save list: {}", collection, e);

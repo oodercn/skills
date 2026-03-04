@@ -1,48 +1,62 @@
 apiVersion: skill.ooder.net/v1
 kind: Skill
+
 metadata:
-  name: skill-document-processor
-  version: "1.0.0"
+  id: skill-document-processor
+  name: Document Processor
+  version: 1.0.0
   description: 文档处理器 - 文档解析、分块、元数据提取
-  author: ooder Team
-  
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - document
+    - parsing
+    - chunking
+
 spec:
-  type: SYSTEM_SERVICE
-  category: knowledge
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
   
   capabilities:
     - id: document-parsing
-      name: 文档解析
+      name: Document Parsing
       description: 支持多种格式文档解析
       category: document
-      
     - id: text-chunking
-      name: 文本分块
+      name: Text Chunking
       description: 智能分块，支持重叠
       category: document
-      
     - id: metadata-extraction
-      name: 元数据提取
+      name: Metadata Extraction
       description: 提取标题、关键词等元数据
       category: document
-      
     - id: token-estimation
-      name: Token估算
+      name: Token Estimation
       description: 估算文本Token数量
       category: document
-
+  
   config:
-    document:
-      processor:
-        default:
-          chunkSize: 500
-          chunkOverlap: 50
-          minChunkSize: 100
-        supportedFormats:
-          - .txt
-          - .md
-          - .json
-          - .yaml
-          - .xml
-          - .html
-          - .csv
+    optional:
+      - name: CHUNK_SIZE
+        type: integer
+        default: 500
+        description: 分块大小
+      - name: CHUNK_OVERLAP
+        type: integer
+        default: 50
+        description: 分块重叠
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

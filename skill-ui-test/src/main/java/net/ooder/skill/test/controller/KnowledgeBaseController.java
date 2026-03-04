@@ -334,8 +334,9 @@ public class KnowledgeBaseController {
         String kbId = (String) request.get("kbId");
         Integer topK = (Integer) request.getOrDefault("topK", 10);
         Double threshold = (Double) request.getOrDefault("threshold", 0.7);
+        String model = (String) request.get("model");
         
-        log.info("[qa] Question: {}, kbId: {}", question, kbId);
+        log.info("[qa] Question: {}, kbId: {}, model: {}", question, kbId, model);
         
         Map<String, Object> result = new HashMap<>();
         result.put("status", "success");
@@ -358,8 +359,10 @@ public class KnowledgeBaseController {
         boolean llmReady = (Boolean) llmStatus.get("ready");
         
         String answer;
+        String usedModel = model;
         if (llmReady) {
-            answer = llmService.generateAnswer(question, sources);
+            answer = llmService.generateAnswer(question, sources, model);
+            usedModel = llmService.getLastUsedModel();
         } else {
             answer = "根据知识库检索结果，关于\"" + question + "\"的相关信息如下：\n\n";
             if (!sources.isEmpty()) {
@@ -377,6 +380,7 @@ public class KnowledgeBaseController {
         data.put("answer", answer);
         data.put("sources", sources);
         data.put("llmReady", llmReady);
+        data.put("model", usedModel);
         result.put("data", data);
         
         return ResponseEntity.ok(result);

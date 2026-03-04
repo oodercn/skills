@@ -35,6 +35,13 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
                 .collect(Collectors.toList());
         }
         
+        if (request.getSceneType() != null && !request.getSceneType().isEmpty()) {
+            final String sceneType = request.getSceneType();
+            allCapabilities = allCapabilities.stream()
+                .filter(c -> c.getSupportedSceneTypes() != null && c.getSupportedSceneTypes().contains(sceneType))
+                .collect(Collectors.toList());
+        }
+        
         if (request.getQuery() != null && !request.getQuery().isEmpty()) {
             String query = request.getQuery().toLowerCase();
             allCapabilities = allCapabilities.stream()

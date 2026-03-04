@@ -21,6 +21,10 @@ public class CapabilityDTO {
     private String skillId;
     
     private List<String> capabilities;
+    
+    private List<String> supportedSceneTypes;
+    
+    private boolean isSceneCapability;
 
     public CapabilityDTO() {}
 
@@ -94,5 +98,21 @@ public class CapabilityDTO {
 
     public void setCapabilities(List<String> capabilities) {
         this.capabilities = capabilities;
+    }
+
+    public List<String> getSupportedSceneTypes() {
+        return supportedSceneTypes;
+    }
+
+    public void setSupportedSceneTypes(List<String> supportedSceneTypes) {
+        this.supportedSceneTypes = supportedSceneTypes;
+    }
+
+    public boolean isSceneCapability() {
+        return isSceneCapability;
+    }
+
+    public void setSceneCapability(boolean sceneCapability) {
+        isSceneCapability = sceneCapability;
     }
 }

@@ -1,10 +1,12 @@
 package net.ooder.skill.scene.skill;
 
 import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.dailyreport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -53,12 +55,13 @@ public class DailyReportSkill {
     }
 
     @PostMapping("/remind")
-    public Map<String, Object> sendReminder(@RequestBody Map<String, Object> params) {
-        log.info("Sending reminder with params: {}", params);
+    public DailyReportResponseDTO sendReminder(@RequestBody @Valid ReminderRequestDTO request) {
+        log.info("Sending reminder with params: sceneGroupId={}, targetUsers={}", 
+                request.getSceneGroupId(), request.getTargetUsers());
         
-        String sceneGroupId = (String) params.get("sceneGroupId");
-        List<String> targetUsers = (List<String>) params.get("targetUsers");
-        String message = (String) params.getOrDefault("message", "请及时提交今日工作日志");
+        String sceneGroupId = request.getSceneGroupId();
+        List<String> targetUsers = request.getTargetUsers();
+        String message = request.getMessage() != null ? request.getMessage() : "请及时提交今日工作日志";
         
         Reminder reminder = new Reminder();
         reminder.setReminderId("remind-" + System.currentTimeMillis());
@@ -70,94 +73,80 @@ public class DailyReportSkill {
         
         reminders.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(reminder);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("reminderId", reminder.getReminderId());
-        result.put("sentCount", targetUsers != null ? targetUsers.size() : 0);
-        result.put("message", "提醒已发送");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("提醒已发送");
+        response.setReminderId(reminder.getReminderId());
+        response.setSentCount(targetUsers != null ? targetUsers.size() : 0);
         
-        return result;
+        return response;
     }
 
     @PostMapping("/submit")
-    public Map<String, Object> submitReport(@RequestBody Map<String, Object> params) {
-        log.info("Submitting report with params: {}", params);
-        
-        String sceneGroupId = (String) params.get("sceneGroupId");
-        String userId = (String) params.get("userId");
-        String content = (String) params.get("content");
-        List<String> attachments = (List<String>) params.get("attachments");
+    public DailyReportResponseDTO submitReport(@RequestBody @Valid ReportSubmitRequestDTO request) {
+        log.info("Submitting report with params: sceneGroupId={}, userId={}", 
+                request.getSceneGroupId(), request.getUserId());
         
         Report report = new Report();
         report.setReportId("report-" + System.currentTimeMillis());
-        report.setSceneGroupId(sceneGroupId);
-        report.setUserId(userId);
-        report.setContent(content);
-        report.setAttachments(attachments);
+        report.setSceneGroupId(request.getSceneGroupId());
+        report.setUserId(request.getUserId());
+        report.setContent(request.getContent());
+        report.setAttachments(request.getAttachments());
         report.setSubmitTime(System.currentTimeMillis());
         report.setDate(new Date());
         
-        reports.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(report);
+        reports.computeIfAbsent(request.getSceneGroupId(), k -> new ArrayList<>()).add(report);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("reportId", report.getReportId());
-        result.put("message", "日志提交成功");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("日志提交成功");
+        response.setReportId(report.getReportId());
         
-        return result;
+        return response;
     }
 
     @PostMapping("/aggregate")
-    public Map<String, Object> aggregateReports(@RequestBody Map<String, Object> params) {
-        log.info("Aggregating reports with params: {}", params);
+    public DailyReportResponseDTO aggregateReports(@RequestBody @Valid AggregateRequestDTO request) {
+        log.info("Aggregating reports with params: sceneGroupId={}", request.getSceneGroupId());
         
-        String sceneGroupId = (String) params.get("sceneGroupId");
-        Map<String, Object> dateRange = (Map<String, Object>) params.get("dateRange");
-        List<String> userFilter = (List<String>) params.get("userFilter");
+        String sceneGroupId = request.getSceneGroupId();
+        List<String> userIds = request.getUserIds();
         
         List<Report> sceneReports = reports.getOrDefault(sceneGroupId, new ArrayList<>());
         
         List<Report> filteredReports = new ArrayList<>();
         for (Report report : sceneReports) {
-            if (userFilter == null || userFilter.isEmpty() || userFilter.contains(report.getUserId())) {
+            if (userIds == null || userIds.isEmpty() || userIds.contains(report.getUserId())) {
                 filteredReports.add(report);
             }
         }
         
         Map<String, Integer> userReportCount = new HashMap<>();
-        Map<String, StringBuilder> userContentSummary = new HashMap<>();
         
         for (Report report : filteredReports) {
             String userId = report.getUserId();
             userReportCount.merge(userId, 1, Integer::sum);
-            userContentSummary.computeIfAbsent(userId, k -> new StringBuilder())
-                .append(report.getContent()).append("\n");
         }
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("totalReports", filteredReports.size());
-        result.put("userReportCount", userReportCount);
-        result.put("reports", filteredReports);
-        result.put("aggregateTime", System.currentTimeMillis());
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("汇总完成");
+        response.setTotalReports(filteredReports.size());
+        response.setUserReportCount(userReportCount);
+        response.setReports(filteredReports);
+        response.setAggregateTime(System.currentTimeMillis());
         
-        return result;
+        return response;
     }
 
     @PostMapping("/analyze")
-    public Map<String, Object> analyzeReports(@RequestBody Map<String, Object> params) {
-        log.info("Analyzing reports with params: {}", params);
+    public DailyReportResponseDTO analyzeReports(@RequestBody @Valid AnalyzeRequestDTO request) {
+        log.info("Analyzing reports with params: sceneGroupId={}", request.getSceneGroupId());
         
-        String sceneGroupId = (String) params.get("sceneGroupId");
-        List<Map<String, Object>> reportList = (List<Map<String, Object>>) params.get("reports");
-        String analyzeType = (String) params.getOrDefault("analyzeType", "summary");
+        String analyzeType = request.getAnalyzeType() != null ? request.getAnalyzeType() : "summary";
         
         Map<String, Object> analysis = new HashMap<>();
         analysis.put("analyzeType", analyzeType);
         analysis.put("analyzeTime", System.currentTimeMillis());
         
         if ("summary".equals(analyzeType)) {
-            analysis.put("summary", "今日团队整体工作进展顺利，共完成" + (reportList != null ? reportList.size() : 0) + "项任务。");
+            analysis.put("summary", "今日团队整体工作进展顺利，共完成" + 
+                    (request.getReports() != null ? request.getReports().size() : 0) + "项任务。");
             analysis.put("highlights", Arrays.asList("项目进度正常", "团队协作良好", "无重大问题"));
             analysis.put("suggestions", Arrays.asList("继续保持良好的工作节奏", "关注项目关键节点"));
         } else if ("sentiment".equals(analyzeType)) {
@@ -166,23 +155,21 @@ public class DailyReportSkill {
             analysis.put("keywords", Arrays.asList("完成", "进展", "顺利", "协作"));
         }
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("analysis", analysis);
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("分析完成");
+        response.setAnalysis(analysis);
         
-        return result;
+        return response;
     }
 
     @GetMapping("/reports/{sceneGroupId}")
-    public Map<String, Object> getReports(@PathVariable String sceneGroupId) {
+    public DailyReportResponseDTO getReports(@PathVariable String sceneGroupId) {
         List<Report> sceneReports = reports.getOrDefault(sceneGroupId, new ArrayList<>());
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
-        result.put("reports", sceneReports);
-        result.put("total", sceneReports.size());
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("查询成功");
+        response.setReports(sceneReports);
+        response.setTotal(sceneReports.size());
         
-        return result;
+        return response;
     }
 
     public static class Report {

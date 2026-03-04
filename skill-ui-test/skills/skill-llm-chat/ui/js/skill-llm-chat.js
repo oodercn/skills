@@ -124,18 +124,19 @@ var LlmChat = {
         var self = this;
         NexusAPI.get('/api/llm/providers', function(res) {
             if (res.status === 'success' && res.data) {
+                var providers = Array.isArray(res.data) ? res.data : [];
                 var select = document.getElementById('providerSelect');
                 select.innerHTML = '<option value="">选择Provider</option>';
                 
-                res.data.forEach(function(provider) {
+                providers.forEach(function(provider) {
                     var option = document.createElement('option');
                     option.value = provider.id || provider.name;
                     option.textContent = provider.name || provider.id;
                     select.appendChild(option);
                 });
                 
-                if (res.data.length > 0) {
-                    select.value = res.data[0].id || res.data[0].name;
+                if (providers.length > 0) {
+                    select.value = providers[0].id || providers[0].name;
                     self.onProviderChange(select.value);
                 }
             }

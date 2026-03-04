@@ -143,6 +143,14 @@ public class GitDiscoveryController {
                             cap.setVersion(skill.getVersion());
                             cap.setSource("GITEE");
                             cap.setStatus("available");
+                            
+                            String skillId = skill.getSkillId();
+                            boolean isScene = skillId != null && 
+                                (skillId.contains("-scene") || skillId.endsWith("-scene") || 
+                                 "daily-log-scene".equals(skillId));
+                            cap.setType(isScene ? "SCENE" : "SKILL");
+                            cap.setSceneCapability(isScene);
+                            
                             capabilities.add(cap);
                         }
                         log.info("[discoverFromGitee] Found {} capabilities via UnifiedSceneService", capabilities.size());
@@ -400,6 +408,14 @@ public class GitDiscoveryController {
             cap.setVersion(pkg.getVersion());
             cap.setSource(source);
             cap.setStatus("available");
+            
+            String skillId = pkg.getSkillId();
+            boolean isScene = skillId != null && 
+                (skillId.contains("-scene") || skillId.endsWith("-scene") || 
+                 "daily-log-scene".equals(skillId));
+            cap.setType(isScene ? "SCENE" : "SKILL");
+            cap.setSceneCapability(isScene);
+            
             capabilities.add(cap);
         }
         return capabilities;
@@ -455,6 +471,11 @@ public class GitDiscoveryController {
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
+            "daily-log-scene", "日志汇报场景", "SCENE",
+            "完整的日志汇报场景能力，包含提醒、提交、汇总、分析等闭环流程", "2.3", "GITHUB"
+        ));
+        
+        capabilities.add(createCapability(
             "report-remind", "日志提醒", "COMMUNICATION",
             "定时提醒员工提交工作日志", "2.3", "GITHUB"
         ));
@@ -479,6 +500,11 @@ public class GitDiscoveryController {
 
     private List<CapabilityDTO> getMockGiteeCapabilities(String repoUrl) {
         List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        capabilities.add(createCapability(
+            "daily-log-scene", "日志汇报场景", "SCENE",
+            "完整的日志汇报场景能力，包含提醒、提交、汇总、分析等闭环流程", "2.3", "GITEE"
+        ));
         
         capabilities.add(createCapability(
             "report-remind", "日志提醒", "COMMUNICATION",
@@ -529,6 +555,7 @@ public class GitDiscoveryController {
         cap.setVersion(version);
         cap.setSource(source);
         cap.setStatus("available");
+        cap.setSceneCapability("SCENE".equals(type));
         return cap;
     }
 
@@ -564,5 +591,69 @@ public class GitDiscoveryController {
         }
         
         return capabilities;
+    }
+
+    @PostMapping("/local")
+    public ResultModel<DiscoveryResultDTO> discoverFromLocal(@RequestBody(required = false) LocalDiscoveryConfigDTO config) {
+        log.info("[discoverFromLocal] Scanning local installed skills");
+        
+        DiscoveryResultDTO result = new DiscoveryResultDTO();
+        result.setMethod("LOCAL_FS");
+        
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        if (skillPackageManager != null) {
+            try {
+                java.nio.file.Path skillsPath = java.nio.file.Paths.get("./skills");
+                if (config != null && config.getSkillsPath() != null && !config.getSkillsPath().isEmpty()) {
+                    skillsPath = java.nio.file.Paths.get(config.getSkillsPath());
+                }
+                
+                log.info("[discoverFromLocal] Scanning path: {}", skillsPath.toAbsolutePath());
+                
+                if (java.nio.file.Files.exists(skillsPath)) {
+                    java.nio.file.Files.list(skillsPath)
+                        .filter(java.nio.file.Files::isDirectory)
+                        .forEach(dir -> {
+                            String skillId = dir.getFileName().toString();
+                            try {
+                                SkillManifest manifest = skillPackageManager.getManifest(skillId).get();
+                                if (manifest != null) {
+                                    CapabilityDTO cap = new CapabilityDTO();
+                                    cap.setId(skillId);
+                                    cap.setName(manifest.getName() != null ? manifest.getName() : skillId);
+                                    cap.setDescription(manifest.getDescription());
+                                    cap.setVersion(manifest.getVersion());
+                                    cap.setSource("LOCAL_FS");
+                                    cap.setStatus("installed");
+                                    
+                                    boolean isScene = skillId.contains("-scene") || 
+                                        "daily-log-scene".equals(skillId);
+                                    cap.setType(isScene ? "SCENE" : "SKILL");
+                                    cap.setSceneCapability(isScene);
+                                    
+                                    capabilities.add(cap);
+                                    log.debug("[discoverFromLocal] Found installed skill: {}", skillId);
+                                }
+                            } catch (Exception e) {
+                                log.debug("[discoverFromLocal] Could not load manifest for {}: {}", skillId, e.getMessage());
+                            }
+                        });
+                }
+                
+                log.info("[discoverFromLocal] Found {} installed capabilities", capabilities.size());
+            } catch (Exception e) {
+                log.error("[discoverFromLocal] Error scanning local skills: {}", e.getMessage());
+                result.setErrorMessage(e.getMessage());
+            }
+        } else {
+            log.warn("[discoverFromLocal] SkillPackageManager not available");
+            result.setErrorMessage("SkillPackageManager not available");
+        }
+        
+        result.setCapabilities(capabilities);
+        result.setScanTime(System.currentTimeMillis());
+        
+        return ResultModel.success(result);
     }
 }

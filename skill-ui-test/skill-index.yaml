@@ -814,9 +814,6 @@ spec:
       description: DeepSeek LLM Provider - 提供DeepSeek模型对话、代码生成、推理能力
       sceneId: llm
       path: skills/skill-llm-deepseek
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
-      checksum: ""
       
     - skillId: skill-llm-baidu
       name: Baidu Qianfan LLM Provider
@@ -832,6 +829,34 @@ spec:
       description: 百度千帆LLM Provider - 提供ERNIE系列模型对话、嵌入能力
       sceneId: llm
       path: skills/skill-llm-baidu
+      
+    - skillId: skill-llm-config-manager
+      name: LLM Config Manager
+      version: "1.0.0"
+      category: util
+      subCategory: llm
+      tags:
+        - llm
+        - config
+        - security
+        - management
+      description: LLM配置管理 - 多级配置、加密存储、配置解析
+      sceneId: llm
+      path: skills/skill-llm-config-manager
+      
+    - skillId: skill-llm-management-ui
+      name: LLM Management UI
+      version: "1.0.0"
+      category: nexus-ui
+      subCategory: llm
+      tags:
+        - llm
+        - management
+        - ui
+        - config
+      description: LLM管理界面 - 提供模型配置、Provider管理、对话监控功能
+      sceneId: nexus-ui
+      path: skills/skill-llm-management-ui
       
     - skillId: skill-payment-alipay
       name: Alipay Payment Provider
@@ -1820,4 +1845,15 @@ spec:
         - ui-rendering
         - menu-integration
         - data-display
+      maxMembers: 100
+      
+    - sceneId: llm
+      name: LLM Service
+      description: LLM服务场景，提供多模型对话、配置管理、Provider管理能力
+      version: "1.0.0"
+      category: SYSTEM
+      requiredCapabilities:
+        - llm-chat
+        - llm-config
+        - provider-management
       maxMembers: 100

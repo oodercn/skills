@@ -243,6 +243,8 @@
                 CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/gitee', method, false);
             } else if (currentMethod === 'GIT_REPOSITORY') {
                 CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/git', method, false);
+            } else if (currentMethod === 'LOCAL_FS') {
+                CapabilityDiscovery.discoverFromLocalFs(false);
             } else {
                 var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
                 CapabilityDiscovery.discoverFromLocal(url);
@@ -269,6 +271,8 @@
                 CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/gitee', method, true);
             } else if (currentMethod === 'GIT_REPOSITORY') {
                 CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/git', method, true);
+            } else if (currentMethod === 'LOCAL_FS') {
+                CapabilityDiscovery.discoverFromLocalFs(true);
             } else {
                 var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
                 CapabilityDiscovery.discoverFromLocal(url);
@@ -294,7 +298,11 @@
             if (!forceRefresh) {
                 var cachedData = CapabilityDiscovery.getCache(cacheKey);
                 if (cachedData) {
-                    console.log('[Discovery] Using cached data, but will still call backend for fresh data');
+                    console.log('[Discovery] Using cached data, skip backend call');
+                    CapabilityDiscovery.addLog('info', '使用缓存数据（' + cachedData.capabilities.length + ' 个能力）');
+                    CapabilityDiscovery.processDiscoveryResult(cachedData);
+                    CapabilityDiscovery.finishScan();
+                    return;
                 }
             } else {
                 CapabilityDiscovery.clearCache(cacheKey);
@@ -332,13 +340,17 @@
                     return i.capabilityId === cap.id; 
                 });
                 if (!exists) {
+                    var isScene = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
                     discoveredCapabilities.push({
                         capabilityId: cap.id,
+                        id: cap.id,
                         name: cap.name,
                         type: cap.type,
                         description: cap.description,
                         version: cap.version,
                         source: currentMethod,
+                        isSceneCapability: isScene,
+                        sceneCapability: isScene,
                         dependencies: [],
                         provider: null
                     });
@@ -455,6 +467,60 @@
                 });
         },
 
+        discoverFromLocalFs: function(forceRefresh) {
+            var cacheKey = 'discovery_cache_LOCAL_FS';
+            
+            console.log('[Discovery LOCAL_FS] forceRefresh=', forceRefresh);
+            
+            if (!forceRefresh) {
+                var cachedData = CapabilityDiscovery.getCache(cacheKey);
+                if (cachedData) {
+                    console.log('[Discovery LOCAL_FS] Using cached data');
+                    CapabilityDiscovery.addLog('info', '使用缓存数据（' + cachedData.capabilities.length + ' 个能力）');
+                    CapabilityDiscovery.processDiscoveryResult(cachedData);
+                    CapabilityDiscovery.finishScan();
+                    return;
+                }
+            } else {
+                CapabilityDiscovery.clearCache(cacheKey);
+                CapabilityDiscovery.addLog('info', '强制刷新，清除缓存');
+            }
+
+            var config = {};
+            var skillsPathInput = document.getElementById('localSkillsPath');
+            if (skillsPathInput && skillsPathInput.value) {
+                config.skillsPath = skillsPathInput.value;
+            }
+
+            ApiClient.post('/api/v1/discovery/local', config, { timeout: 60000 })
+                .then(function(result) {
+                    console.log('[Discovery LOCAL_FS] Response:', result);
+                    
+                    if (result.code === 200 && result.data) {
+                        var data = result.data;
+                        if (data.capabilities && data.capabilities.length > 0) {
+                            CapabilityDiscovery.setCache(cacheKey, data);
+                            CapabilityDiscovery.processDiscoveryResult(data);
+                            CapabilityDiscovery.addLog('success', '本地发现 ' + data.capabilities.length + ' 个已安装能力');
+                        } else {
+                            CapabilityDiscovery.addLog('warn', '本地未发现已安装的能力');
+                            CapabilityDiscovery.showEmptyResult();
+                        }
+                    } else {
+                        CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
+                        CapabilityDiscovery.showEmptyResult();
+                    }
+                })
+                .catch(function(error) {
+                    console.error('LOCAL_FS scan error:', error);
+                    CapabilityDiscovery.addLog('error', '本地扫描失败: ' + error.message);
+                    CapabilityDiscovery.showEmptyResult();
+                })
+                .finally(function() {
+                    CapabilityDiscovery.finishScan();
+                });
+        },
+
         finishScan: function() {
             isScanning = false;
             var sweep = document.getElementById('radarSweep');
@@ -517,7 +583,7 @@
                     return i.capabilityId === cap.id; 
                 });
                 var typeIcon = CapabilityDiscovery.getTypeIcon(cap.type);
-                var isSceneCapability = cap.isSceneCapability === true || cap.type === 'SCENE';
+                var isSceneCapability = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
                 var capabilityTypeLabel = isSceneCapability ? 
                     '<span class="capability-type-badge scene"><i class="ri-layout-grid-line"></i> 场景能力</span>' : 
                     '<span class="capability-type-badge collaboration"><i class="ri-team-line"></i> 协作能力</span>';

@@ -13,6 +13,8 @@ public class ChatRequestDTO {
     
     private String model;
     
+    private String provider;
+    
     private Double temperature;
     
     private Integer maxTokens;
@@ -45,6 +47,14 @@ public class ChatRequestDTO {
 
     public void setModel(String model) {
         this.model = model;
+    }
+
+    public String getProvider() {
+        return provider;
+    }
+
+    public void setProvider(String provider) {
+        this.provider = provider;
     }
 
     public Double getTemperature() {

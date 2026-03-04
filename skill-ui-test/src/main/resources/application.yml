@@ -29,11 +29,17 @@ ooder:
       storage-path: ./kb-storage
       index-path: ./kb-index
   llm:
-    provider: baidu
-    api-key: bce-v3/ALTAK-y3mXQFRWjd26xOkkewFpB/e67462d98404432921816438d1a9e66528562839
-    base-url: https://qianfan.baidubce.com/v2
-    model: ernie-4.0-8k
-    embedding-model: embedding-v1
+    provider: ${LLM_PROVIDER:baidu}
+    api-key: ${LLM_API_KEY:}
+    base-url: ${LLM_BASE_URL:https://qianfan.baidubce.com/v2}
+    model: ${LLM_MODEL:ernie-4.0-8k}
+    embedding-model: ${LLM_EMBEDDING_MODEL:embedding-v1}
+
+deepseek:
+  api-key: ${DEEPSEEK_API_KEY:}
+  base-url: ${DEEPSEEK_BASE_URL:https://api.deepseek.com}
+  model: ${DEEPSEEK_MODEL:deepseek-chat}
+  timeout: 60000
 
 nexus:
   skills:

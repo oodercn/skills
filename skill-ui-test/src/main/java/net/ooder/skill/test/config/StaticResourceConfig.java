@@ -28,6 +28,10 @@ public class StaticResourceConfig implements WebMvcConfigurer {
         registry.addResourceHandler("/skills/**")
                 .addResourceLocations(skillsLocation)
                 .setCachePeriod(0);
+        
+        registry.addResourceHandler("/console/skill-*/**")
+                .addResourceLocations(skillsLocation)
+                .setCachePeriod(0);
     }
     
     @Override
@@ -37,5 +41,35 @@ public class StaticResourceConfig implements WebMvcConfigurer {
         
         registry.addViewController("/")
                 .setViewName("forward:/console/index.html");
+        
+        registry.addViewController("/console/skill-knowledge-qa/")
+                .setViewName("forward:/console/skills/skill-knowledge-qa/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-knowledge-qa")
+                .setViewName("forward:/console/skills/skill-knowledge-qa/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-chat/")
+                .setViewName("forward:/console/skills/skill-llm-chat/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-chat")
+                .setViewName("forward:/console/skills/skill-llm-chat/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-baidu/")
+                .setViewName("forward:/console/skills/skill-llm-baidu/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-baidu")
+                .setViewName("forward:/console/skills/skill-llm-baidu/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-deepseek/")
+                .setViewName("forward:/console/skills/skill-llm-deepseek/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-deepseek")
+                .setViewName("forward:/console/skills/skill-llm-deepseek/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-management/")
+                .setViewName("forward:/console/skills/skill-llm-management-ui/ui/pages/index.html");
+        
+        registry.addViewController("/console/skill-llm-management")
+                .setViewName("forward:/console/skills/skill-llm-management-ui/ui/pages/index.html");
     }
 }

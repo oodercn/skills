@@ -6,7 +6,7 @@
     <title>知识问答 - Knowledge QA</title>
     <link href="/console/css/remixicon/remixicon.css" rel="stylesheet">
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <link rel="stylesheet" href="../css/skill-knowledge-qa.css">
+    <link rel="stylesheet" href="/console/skills/skill-knowledge-qa/ui/css/skill-knowledge-qa.css">
 </head>
 <body>
     <div class="nx-page">
@@ -93,7 +93,16 @@
                                         <select class="kb-select" id="kbSelect">
                                             <option value="">全部知识库</option>
                                         </select>
-                                        <h3>检索设置</h3>
+                                        <h3 style="margin-top: 16px;">选择模型</h3>
+                                        <select class="kb-select" id="modelSelect">
+                                            <option value="deepseek-chat">DeepSeek Chat</option>
+                                            <option value="deepseek-coder">DeepSeek Coder</option>
+                                            <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+                                            <option value="ernie-4.0-8k">百度 ERNIE 4.0</option>
+                                            <option value="ernie-3.5-8k">百度 ERNIE 3.5</option>
+                                        </select>
+                                        <div id="modelStatus" style="margin-top: 8px; font-size: 12px;"></div>
+                                        <h3 style="margin-top: 16px;">检索设置</h3>
                                         <p style="font-size: 12px; color: var(--ns-secondary); margin-bottom: 8px;">返回结果数量: <span id="topKValue">10</span></p>
                                         <input type="range" min="1" max="20" value="10" id="topKSlider" style="width: 100%;">
                                         <p style="font-size: 12px; color: var(--ns-secondary); margin-top: 16px;">相似度阈值: <span id="thresholdValue">70%</span></p>
@@ -200,6 +209,6 @@
     <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/api.js"></script>
-    <script src="../js/skill-knowledge-qa.js"></script>
+    <script src="/console/skills/skill-knowledge-qa/ui/js/skill-knowledge-qa.js"></script>
 </body>
 </html>

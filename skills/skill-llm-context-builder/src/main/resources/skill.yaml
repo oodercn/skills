@@ -1,45 +1,54 @@
 apiVersion: skill.ooder.net/v1
 kind: Skill
+
 metadata:
-  name: skill-llm-context-builder
-  version: "1.0.0"
+  id: skill-llm-context-builder
+  name: LLM Context Builder
+  version: 1.0.0
   description: LLM上下文构建器 - 上下文提取、合并、Token裁剪
-  author: ooder Team
-  
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - context
+    - token
+
 spec:
-  type: SYSTEM_SERVICE
-  category: llm
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
   
   capabilities:
     - id: context-extraction
-      name: 上下文提取
+      name: Context Extraction
       description: 从多种来源提取上下文信息
       category: context
-      
     - id: context-merging
-      name: 上下文合并
+      name: Context Merging
       description: 按优先级合并多个上下文
       category: context
-      
     - id: token-management
-      name: Token管理
+      name: Token Management
       description: Token计数和裁剪
       category: context
-
+  
   config:
-    context:
-      default:
-        maxTokens: 4096
-      extractors:
-        - type: system
-          priority: 10
-          enabled: true
-        - type: user
-          priority: 20
-          enabled: true
-        - type: scene
-          priority: 30
-          enabled: true
-        - type: query
-          priority: 100
-          enabled: true
+    optional:
+      - name: MAX_TOKENS
+        type: integer
+        default: 4096
+        description: 最大Token数
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

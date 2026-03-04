@@ -1,1 +1,109 @@
-      order: 5
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-vfs-database
+  name: Database VFS
+  version: 0.7.3
+  description: 数据库存储服务 - 将文件存储在数据库中，支持元数据管理
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-vfs-database
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - database
+    - vfs
+    - storage
+    - mysql
+    - postgresql
+
+spec:
+  type: enterprise-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.vfs.database.DatabaseVfsApplication
+  
+  capabilities:
+    - id: vfs-storage
+      name: VFS Storage
+      description: 虚拟文件系统存储
+      category: storage
+    - id: file-read
+      name: File Read
+      description: 文件读取
+      category: storage
+    - id: file-write
+      name: File Write
+      description: 文件写入
+      category: storage
+    - id: file-delete
+      name: File Delete
+      description: 文件删除
+      category: storage
+    - id: metadata
+      name: Metadata Management
+      description: 元数据管理
+      category: storage
+  
+  scenes:
+    - name: vfs-database
+      description: 数据库存储场景
+      capabilities:
+        - vfs-storage
+        - file-read
+        - file-write
+        - file-delete
+        - metadata
+  
+  dependencies: []
+  
+  config:
+    required:
+      - name: DB_URL
+        type: string
+        description: 数据库连接URL
+      - name: DB_USERNAME
+        type: string
+        description: 数据库用户名
+      - name: DB_PASSWORD
+        type: string
+        secret: true
+        description: 数据库密码
+  
+  endpoints:
+    - path: /api/vfs/upload
+      method: POST
+      description: 上传文件
+      capability: file-write
+    - path: /api/vfs/download/{fileId}
+      method: GET
+      description: 下载文件
+      capability: file-read
+    - path: /api/vfs/files
+      method: GET
+      description: 获取文件列表
+      capability: vfs-storage
+    - path: /api/vfs/files/{fileId}
+      method: DELETE
+      description: 删除文件
+      capability: file-delete
+    - path: /api/vfs/metadata/{fileId}
+      method: GET
+      description: 获取文件元数据
+      capability: metadata
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "10Gi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

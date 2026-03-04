@@ -5,6 +5,7 @@ import net.ooder.config.ResultModel;
 import net.ooder.scene.skill.LlmProvider;
 import net.ooder.skill.scene.dto.llm.*;
 import net.ooder.skill.scene.llm.BaiduLlmProvider;
+import net.ooder.skill.scene.llm.DeepSeekLlmProvider;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,6 +47,9 @@ public class LlmController extends BaseController {
     @Value("${ooder.llm.baidu.secret-key:}")
     private String baiduSecretKey;
     
+    @Value("${ooder.llm.deepseek.api-key:}")
+    private String deepseekApiKey;
+    
     private final ExecutorService executor = Executors.newCachedThreadPool();
     
     private final Map<String, LlmProvider> providers = new ConcurrentHashMap<String, LlmProvider>();
@@ -59,6 +63,7 @@ public class LlmController extends BaseController {
     @javax.annotation.PostConstruct
     public void init() {
         initBaiduProvider();
+        initDeepSeekProvider();
         
         if (configProvider != null && !configProvider.isEmpty() && !configProvider.equals("mock")) {
             currentProviderType = configProvider;
@@ -70,6 +75,9 @@ public class LlmController extends BaseController {
         if ("baidu".equals(currentProviderType)) {
             log.info("Baidu LLM API Key configured: {}", baiduApiKey != null && !baiduApiKey.isEmpty() ? "yes" : "no");
         }
+        if ("deepseek".equals(currentProviderType)) {
+            log.info("DeepSeek LLM API Key configured: {}", deepseekApiKey != null && !deepseekApiKey.isEmpty() ? "yes" : "no");
+        }
     }
     
     private void initBaiduProvider() {
@@ -79,6 +87,15 @@ public class LlmController extends BaseController {
             baiduProvider.setSecretKey(baiduSecretKey);
             providers.put("baidu", baiduProvider);
             log.info("Baidu LLM Provider registered with models: {}", baiduProvider.getSupportedModels());
+        }
+    }
+    
+    private void initDeepSeekProvider() {
+        if (deepseekApiKey != null && !deepseekApiKey.isEmpty()) {
+            DeepSeekLlmProvider deepseekProvider = new DeepSeekLlmProvider();
+            deepseekProvider.setApiKey(deepseekApiKey);
+            providers.put("deepseek", deepseekProvider);
+            log.info("DeepSeek LLM Provider registered with models: {}", deepseekProvider.getSupportedModels());
         }
     }
 
@@ -108,14 +125,20 @@ public class LlmController extends BaseController {
 
     @PostMapping("/chat")
     @ResponseBody
-    public ResultModel<Map<String, Object>> chat(@RequestBody @Valid ChatRequestDTO request) {
-        log.info("Chat API called with provider: {}, model: {}", currentProviderType, currentModel);
-        ResultModel<Map<String, Object>> result = new ResultModel<Map<String, Object>>();
+    public ResultModel<ChatResponseDTO> chat(@RequestBody @Valid ChatRequestDTO request) {
+        String providerType = request.getProvider() != null ? request.getProvider() : currentProviderType;
+        String model = request.getModel() != null ? request.getModel() : currentModel;
+        log.info("Chat API called with provider: {}, model: {}", providerType, model);
+        ResultModel<ChatResponseDTO> result = new ResultModel<ChatResponseDTO>();
 
         try {
             String prompt = request.getMessage();
-            String model = request.getModel() != null ? request.getModel() : currentModel;
-            String providerType = currentProviderType;
+            
+            if (prompt == null || prompt.trim().isEmpty()) {
+                result.setRequestStatus(400);
+                result.setMessage("Message cannot be empty");
+                return result;
+            }
             
             LlmProvider provider = providers.get(providerType);
             
@@ -150,12 +173,9 @@ public class LlmController extends BaseController {
                 return result;
             }
 
-            Map<String, Object> data = new HashMap<String, Object>();
-            data.put("response", response);
-            data.put("model", model);
-            data.put("provider", providerType);
+            ChatResponseDTO responseDTO = ChatResponseDTO.success(response, model, providerType);
             
-            result.setData(data);
+            result.setData(responseDTO);
             result.setRequestStatus(200);
             result.setMessage("Success");
         } catch (Exception e) {

@@ -1,22 +1,20 @@
 {
-  "dept-rd" : {
-    "departmentId" : "dept-rd",
-    "name" : "研发部",
-    "description" : "负责产品研发和技术创新",
-    "parentId" : null,
-    "managerId" : "user-manager-001",
-    "memberIds" : [ "user-manager-001", "user-employee-001", "user-employee-002", "user-employee-003" ],
-    "createTime" : 1772546882885,
-    "updateTime" : 0
-  },
-  "dept-hr" : {
-    "departmentId" : "dept-hr",
-    "name" : "人力资源部",
-    "description" : "负责人才招聘和员工管理",
-    "parentId" : null,
-    "managerId" : "user-hr-001",
-    "memberIds" : [ "user-hr-001" ],
-    "createTime" : 1772546882885,
-    "updateTime" : 0
-  }
+	"dept-rd":{
+		"createTime":1772587059975,
+		"departmentId":"dept-rd",
+		"description":"负责产品研发和技术创新",
+		"managerId":"user-manager-001",
+		"memberIds":["user-manager-001","user-employee-001","user-employee-002","user-employee-003"],
+		"name":"研发部",
+		"updateTime":0
+	},
+	"dept-hr":{
+		"createTime":1772587059975,
+		"departmentId":"dept-hr",
+		"description":"负责人才招聘和员工管理",
+		"managerId":"user-hr-001",
+		"memberIds":["user-hr-001"],
+		"name":"人力资源部",
+		"updateTime":0
+	}
 }

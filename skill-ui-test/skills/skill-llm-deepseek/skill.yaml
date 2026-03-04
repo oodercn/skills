@@ -1,0 +1,130 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-deepseek
+  name: DeepSeek LLM Provider
+  version: 1.0.0
+  description: DeepSeek大模型Provider，提供DeepSeek-Chat、DeepSeek-Coder模型对话、代码生成能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - llm
+    - deepseek
+    - coder
+    - reasoning
+    - provider
+
+spec:
+  type: provider-skill
+  
+  provider:
+    type: llm
+    vendor: deepseek
+    models:
+      - id: deepseek-chat
+        name: DeepSeek Chat
+        type: chat
+        maxTokens: 64000
+      - id: deepseek-coder
+        name: DeepSeek Coder
+        type: chat
+        maxTokens: 16000
+      - id: deepseek-reasoner
+        name: DeepSeek Reasoner
+        type: chat
+        maxTokens: 64000
+
+  capabilities:
+    - id: llm-chat
+      name: 智能对话
+      description: 调用DeepSeek模型进行对话
+      category: ai
+      type: ATOMIC
+      
+    - id: llm-code
+      name: 代码生成
+      description: 调用DeepSeek Coder模型生成代码
+      category: ai
+      type: ATOMIC
+      
+    - id: llm-reasoning
+      name: 深度推理
+      description: 调用DeepSeek Reasoner进行复杂推理
+      category: ai
+      type: ATOMIC
+
+  config:
+    required:
+      - name: API_KEY
+        type: string
+        description: DeepSeek API Key
+        secret: true
+        
+    optional:
+      - name: BASE_URL
+        type: string
+        default: "https://api.deepseek.com"
+        description: API基础URL
+        
+      - name: MODEL
+        type: string
+        default: "deepseek-chat"
+        description: 默认模型
+        
+      - name: MAX_TOKENS
+        type: integer
+        default: 4096
+        description: 最大Token数
+        
+      - name: TEMPERATURE
+        type: number
+        default: 0.7
+        description: 温度参数
+        
+      - name: TIMEOUT
+        type: integer
+        default: 60000
+        description: 请求超时时间(ms)
+
+  endpoints:
+    - path: /api/llm/deepseek/chat
+      method: POST
+      description: 发送对话消息
+      capability: llm-chat
+      
+    - path: /api/llm/deepseek/code
+      method: POST
+      description: 代码生成
+      capability: llm-code
+      
+    - path: /api/llm/deepseek/models
+      method: GET
+      description: 获取可用模型列表
+      capability: llm-chat
+      
+    - path: /api/llm/deepseek/health
+      method: GET
+      description: 健康检查
+      capability: llm-chat
+
+  healthCheck:
+    enabled: true
+    endpoint: /api/llm/deepseek/health
+    interval: 30s
+    timeout: 10s
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+
+  offline:
+    enabled: true

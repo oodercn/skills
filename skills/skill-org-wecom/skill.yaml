@@ -3,25 +3,19 @@ kind: Skill
 
 metadata:
   id: skill-org-wecom
-  name: WeCom (Enterprise WeChat) Organization Service
-  version: 0.7.0
-  description: Provides organization data integration with WeCom (Enterprise WeChat), including org structure sync and user authentication
+  name: WeCom Organization
+  version: 0.7.3
+  description: 企业微信组织服务 - 提供企业微信组织架构同步和用户认证能力
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://github.com/ooderCN/guper-Agent/tree/main/skill-org-wecom
-  repository: https://github.com/ooderCN/guper-Agent.git
-  documentation: https://github.com/ooderCN/guper-Agent/blob/main/skill-org-wecom/SKILLS.md
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-wecom
+  repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - wecom
     - enterprise-wechat
-    - qywx
-    - organization
-    - enterprise
+    - org
     - authentication
-  maintainers:
-    - name: Ooder Team
-      email: team@ooder.net
-      github: ooderCN
+    - organization
 
 spec:
   type: enterprise-skill
@@ -31,158 +25,98 @@ spec:
     javaVersion: "8"
     framework: spring-boot
     mainClass: net.ooder.skill.org.wecom.WeComOrgApplication
-    jvmOpts: "-Xms256m -Xmx512m"
   
   capabilities:
     - id: org-data-read
-      name: Organization Data Read
-      description: Read organization structure and member data from WeCom
-      category: data-access
-      parameters:
-        - name: orgId
-          type: string
-          required: false
-          description: Department ID (optional, uses root if not provided)
-        - name: includeInactive
-          type: boolean
-          required: false
-          default: false
-          description: Whether to include inactive members
-      returns:
-        type: object
-        description: Organization tree with members
+      name: Org Data Read
+      description: 组织数据读取
+      category: organization
+    - id: org-data-sync
+      name: Org Data Sync
+      description: 组织数据同步
+      category: organization
     - id: user-auth
       name: User Authentication
-      description: Authenticate users via WeCom OAuth
+      description: 用户认证
       category: authentication
-      parameters:
-        - name: code
-          type: string
-          required: true
-          description: WeCom authorization code
-      returns:
-        type: object
-        description: Authentication result with user info and access token
+    - id: department-query
+      name: Department Query
+      description: 部门查询
+      category: organization
+    - id: user-query
+      name: User Query
+      description: 用户查询
+      category: organization
   
   scenes:
     - name: auth
-      description: Authentication scene with organization data support
+      description: 认证场景
       capabilities:
         - org-data-read
+        - org-data-sync
         - user-auth
-      roles:
-        - roleId: org-provider
-          name: Organization Provider
-          required: true
-          capabilities: [org-data-read, user-auth]
-        - roleId: org-consumer
-          name: Organization Consumer
-          required: false
-          capabilities: [org-data-read]
-      communicationProtocol: http
-      securityPolicy: api-key
-      allowParallel: true
+        - department-query
+        - user-query
   
-  dependencies:
-    skills: []
-    libraries:
-      - group: org.springframework.boot
-        artifact: spring-boot-starter-web
-        version: "2.7.0"
-        scope: compile
-      - group: org.springframework.boot
-        artifact: spring-boot-starter-actuator
-        version: "2.7.0"
-        scope: compile
-      - group: com.alibaba
-        artifact: fastjson
-        version: "1.2.83"
-        scope: compile
+  dependencies: []
   
   config:
     required:
       - name: WECOM_CORP_ID
         type: string
-        description: WeCom corporation ID
-        secret: false
+        description: 企业微信CorpId
       - name: WECOM_AGENT_ID
         type: string
-        description: WeCom application agent ID
-        secret: false
+        description: 企业微信AgentId
       - name: WECOM_SECRET
         type: string
-        description: WeCom application secret
         secret: true
+        description: 企业微信Secret
     optional:
       - name: WECOM_API_BASE_URL
         type: string
-        description: WeCom API base URL
         default: https://qyapi.weixin.qq.com
-        secret: false
+        description: 企业微信API基础URL
       - name: WECOM_TIMEOUT
         type: number
-        description: API request timeout in milliseconds
         default: 30000
-        secret: false
+        description: 请求超时时间(毫秒)
       - name: WECOM_CACHE_ENABLED
         type: boolean
-        description: Enable response caching
         default: true
-        secret: false
+        description: 是否启用缓存
       - name: WECOM_CACHE_TTL
         type: number
-        description: Cache expiration time in milliseconds
         default: 300000
-        secret: false
+        description: 缓存过期时间(毫秒)
   
   endpoints:
-    - path: /api/org/tree
+    - path: /api/org/departments
       method: GET
-      description: Get organization tree
-      capability: org-data-read
-      authentication: true
-      rateLimit: 60
-    - path: /api/org/person/{id}
+      description: 获取部门列表
+      capability: department-query
+    - path: /api/org/users
       method: GET
-      description: Get person by ID
-      capability: org-data-read
-      authentication: true
-    - path: /api/org/department/{id}
-      method: GET
-      description: Get department by ID
-      capability: org-data-read
-      authentication: true
-    - path: /api/auth/verify
+      description: 获取用户列表
+      capability: user-query
+    - path: /api/org/sync
       method: POST
-      description: Verify user authentication
-      capability: user-auth
-      authentication: true
-    - path: /api/auth/token
+      description: 同步组织数据
+      capability: org-data-sync
+    - path: /api/auth/login
       method: POST
-      description: Get access token
+      description: 用户登录
       capability: user-auth
-      authentication: true
+    - path: /api/health
+      method: GET
+      description: 健康检查
   
   resources:
-    cpu: "500m"
+    cpu: "200m"
     memory: "512Mi"
-    storage: "1Gi"
-    network:
-      ingress: true
-      egress: true
-      ports:
-        - 8080
+    storage: "100Mi"
   
-  deployment:
-    modes:
-      - remote-hosted
-      - local-deployed
-    singleton: true
-    requiresAuth: true
-    healthCheck:
-      path: /actuator/health
-      interval: 30
-      timeout: 10
-    startup:
-      timeout: 60
-      order: 10
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

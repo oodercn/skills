@@ -12,8 +12,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883095,
-  "updateTime" : 1772546883095,
+  "createTime" : 1772584582109,
+  "updateTime" : 1772584582109,
   "skillId" : "skill-llm-conversation",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -23,17 +23,17 @@
   "icon" : "ri-server-line",
   "metadata" : {
     "skillId" : "skill-llm-conversation",
-    "createTime" : 1772546883095,
-    "updateTime" : 1772546883095,
+    "createTime" : 1772584582109,
+    "updateTime" : 1772584582109,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "email-send",
   "name" : "邮件发送",
@@ -48,8 +48,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883077,
-  "updateTime" : 1772546883077,
+  "createTime" : 1772584582095,
+  "updateTime" : 1772584582095,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -59,17 +59,17 @@
   "icon" : "ri-message-3-line",
   "metadata" : {
     "skillId" : null,
-    "createTime" : 1772546883077,
-    "updateTime" : 1772546883077,
+    "createTime" : 1772584582095,
+    "updateTime" : 1772584582095,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "report-remind",
   "name" : "日志提醒",
@@ -84,8 +84,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883064,
-  "updateTime" : 1772546883064,
+  "createTime" : 1772584582085,
+  "updateTime" : 1772584582085,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -95,17 +95,17 @@
   "icon" : "ri-message-3-line",
   "metadata" : {
     "skillId" : null,
-    "createTime" : 1772546883064,
-    "updateTime" : 1772546883064,
+    "createTime" : 1772584582085,
+    "updateTime" : 1772584582085,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "user-management",
   "name" : "用户管理",
@@ -120,8 +120,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883083,
-  "updateTime" : 1772546883083,
+  "createTime" : 1772584582101,
+  "updateTime" : 1772584582101,
   "skillId" : "skill-security",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -131,17 +131,17 @@
   "icon" : "ri-shield-check-line",
   "metadata" : {
     "skillId" : "skill-security",
-    "createTime" : 1772546883083,
-    "updateTime" : 1772546883083,
+    "createTime" : 1772584582101,
+    "updateTime" : 1772584582101,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "report-analyze",
   "name" : "日志分析",
@@ -156,8 +156,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883074,
-  "updateTime" : 1772546883074,
+  "createTime" : 1772584582094,
+  "updateTime" : 1772584582094,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -167,17 +167,17 @@
   "icon" : "ri-brain-line",
   "metadata" : {
     "skillId" : null,
-    "createTime" : 1772546883074,
-    "updateTime" : 1772546883074,
+    "createTime" : 1772584582094,
+    "updateTime" : 1772584582094,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "permission-control",
   "name" : "权限控制",
@@ -192,8 +192,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883087,
-  "updateTime" : 1772546883087,
+  "createTime" : 1772584582103,
+  "updateTime" : 1772584582103,
   "skillId" : "skill-security",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -203,17 +203,17 @@
   "icon" : "ri-shield-check-line",
   "metadata" : {
     "skillId" : "skill-security",
-    "createTime" : 1772546883087,
-    "updateTime" : 1772546883087,
+    "createTime" : 1772584582103,
+    "updateTime" : 1772584582103,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "security-audit",
   "name" : "安全审计",
@@ -228,8 +228,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883091,
-  "updateTime" : 1772546883091,
+  "createTime" : 1772584582105,
+  "updateTime" : 1772584582105,
   "skillId" : "skill-security",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -239,17 +239,17 @@
   "icon" : "ri-shield-check-line",
   "metadata" : {
     "skillId" : "skill-security",
-    "createTime" : 1772546883091,
-    "updateTime" : 1772546883091,
+    "createTime" : 1772584582105,
+    "updateTime" : 1772584582105,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "daily-log-scene",
   "name" : "日志汇报场景",
@@ -264,8 +264,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883048,
-  "updateTime" : 1772546883048,
+  "createTime" : 1772584582076,
+  "updateTime" : 1772584582076,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -276,21 +276,21 @@
   "metadata" : {
     "skillId" : null,
     "provider" : "ooder",
-    "createTime" : 1772546883048,
-    "updateTime" : 1772546883048,
+    "createTime" : 1772584582076,
+    "updateTime" : 1772584582076,
     "category" : "办公协作",
     "ownerId" : null,
     "version" : "2.3.0"
   },
   "dependencies" : [ "report-remind", "report-submit", "report-aggregate" ],
   "optionalCapabilities" : [ "report-analyze", "email-send" ],
-  "sceneCapability" : true,
-  "driverCapability" : false,
   "installed" : true,
   "config" : {
     "category" : "办公协作",
     "provider" : "ooder"
-  }
+  },
+  "driverCapability" : false,
+  "sceneCapability" : true
 }, {
   "capabilityId" : "llm-chat",
   "name" : "LLM对话",
@@ -305,8 +305,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883093,
-  "updateTime" : 1772546883093,
+  "createTime" : 1772584582107,
+  "updateTime" : 1772584582107,
   "skillId" : "skill-llm-conversation",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -316,17 +316,17 @@
   "icon" : "ri-brain-line",
   "metadata" : {
     "skillId" : "skill-llm-conversation",
-    "createTime" : 1772546883093,
-    "updateTime" : 1772546883093,
+    "createTime" : 1772584582107,
+    "updateTime" : 1772584582107,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "knowledge-qa-scene",
   "name" : "知识问答场景",
@@ -341,8 +341,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883059,
-  "updateTime" : 1772546883059,
+  "createTime" : 1772584582083,
+  "updateTime" : 1772584582083,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -353,21 +353,21 @@
   "metadata" : {
     "skillId" : null,
     "provider" : "ooder",
-    "createTime" : 1772546883059,
-    "updateTime" : 1772546883059,
+    "createTime" : 1772584582083,
+    "updateTime" : 1772584582083,
     "category" : "知识管理",
     "ownerId" : null,
     "version" : "2.3.0"
   },
   "dependencies" : [ "kb-management", "kb-search" ],
   "optionalCapabilities" : [ "llm-chat" ],
-  "sceneCapability" : true,
-  "driverCapability" : false,
   "installed" : true,
   "config" : {
     "category" : "知识管理",
     "provider" : "ooder"
-  }
+  },
+  "driverCapability" : false,
+  "sceneCapability" : true
 }, {
   "capabilityId" : "report-aggregate",
   "name" : "日志汇总",
@@ -382,8 +382,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883068,
-  "updateTime" : 1772546883068,
+  "createTime" : 1772584582088,
+  "updateTime" : 1772584582088,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -393,17 +393,17 @@
   "icon" : "ri-server-line",
   "metadata" : {
     "skillId" : null,
-    "createTime" : 1772546883068,
-    "updateTime" : 1772546883068,
+    "createTime" : 1772584582088,
+    "updateTime" : 1772584582088,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "kb-management",
   "name" : "知识库管理",
@@ -418,8 +418,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883078,
-  "updateTime" : 1772546883078,
+  "createTime" : 1772584582097,
+  "updateTime" : 1772584582097,
   "skillId" : "skill-knowledge-base",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -429,17 +429,17 @@
   "icon" : "ri-database-2-line",
   "metadata" : {
     "skillId" : "skill-knowledge-base",
-    "createTime" : 1772546883078,
-    "updateTime" : 1772546883078,
+    "createTime" : 1772584582097,
+    "updateTime" : 1772584582097,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "report-submit",
   "name" : "日志提交",
@@ -454,8 +454,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883067,
-  "updateTime" : 1772546883067,
+  "createTime" : 1772584582087,
+  "updateTime" : 1772584582087,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -465,17 +465,17 @@
   "icon" : "ri-server-line",
   "metadata" : {
     "skillId" : null,
-    "createTime" : 1772546883067,
-    "updateTime" : 1772546883067,
+    "createTime" : 1772584582087,
+    "updateTime" : 1772584582087,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 }, {
   "capabilityId" : "llm-workspace-scene",
   "name" : "LLM工作空间",
@@ -490,8 +490,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883061,
-  "updateTime" : 1772546883062,
+  "createTime" : 1772584582084,
+  "updateTime" : 1772584582084,
   "skillId" : null,
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -502,21 +502,21 @@
   "metadata" : {
     "skillId" : null,
     "provider" : "ooder",
-    "createTime" : 1772546883061,
-    "updateTime" : 1772546883062,
+    "createTime" : 1772584582084,
+    "updateTime" : 1772584582084,
     "category" : "AI助手",
     "ownerId" : null,
     "version" : "2.3.0"
   },
   "dependencies" : [ "llm-chat", "conversation-manage" ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : true,
-  "driverCapability" : false,
   "installed" : true,
   "config" : {
     "category" : "AI助手",
     "provider" : "ooder"
-  }
+  },
+  "driverCapability" : false,
+  "sceneCapability" : true
 }, {
   "capabilityId" : "kb-search",
   "name" : "知识搜索",
@@ -531,8 +531,8 @@
   "parameters" : [ ],
   "returns" : null,
   "status" : "REGISTERED",
-  "createTime" : 1772546883080,
-  "updateTime" : 1772546883080,
+  "createTime" : 1772584582098,
+  "updateTime" : 1772584582098,
   "skillId" : "skill-knowledge-base",
   "capabilities" : [ ],
   "mainFirst" : false,
@@ -542,15 +542,15 @@
   "icon" : "ri-brain-line",
   "metadata" : {
     "skillId" : "skill-knowledge-base",
-    "createTime" : 1772546883080,
-    "updateTime" : 1772546883080,
+    "createTime" : 1772584582098,
+    "updateTime" : 1772584582098,
     "ownerId" : null,
     "version" : "1.0.0"
   },
   "dependencies" : [ ],
   "optionalCapabilities" : [ ],
-  "sceneCapability" : false,
-  "driverCapability" : false,
   "installed" : true,
-  "config" : { }
+  "config" : { },
+  "driverCapability" : false,
+  "sceneCapability" : false
 } ]

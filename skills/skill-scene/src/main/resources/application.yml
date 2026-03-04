@@ -34,8 +34,10 @@ ooder:
   mock:
     enabled: false
   llm:
-    provider: baidu
-    model: bce-v3
+    provider: deepseek
+    model: deepseek-chat
+    deepseek:
+      api-key: sk-0bcb80730d544cc99a2c8ad3863f71ed
     baidu:
-      api-key: ALTAK-y3mXQFRWjd26xOkkewFpB
-      secret-key: e67462d98404432921816438d1a9e66528562839
+      api-key: ALTAK-I9uJAzQtIwq0gPhdKKgap
+      secret-key: c92980b6fcee33cc8e19da2e8347395e2ef9ec43

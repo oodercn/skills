@@ -1,6 +1,7 @@
 package net.ooder.skill.scene.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONReader;
 import net.ooder.skill.scene.dto.menu.MenuItemDTO;
 import net.ooder.skill.scene.dto.menu.MenuRequestDTO;
 import net.ooder.skill.scene.model.ResultModel;
@@ -18,8 +19,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/menu")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.OPTIONS})
 public class MenuController {
-
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
     @PostMapping
     public ResultModel<List<MenuItemDTO>> getMenu(@RequestBody(required = false) MenuRequestDTO request) {
@@ -45,7 +44,7 @@ public class MenuController {
     @SuppressWarnings("unchecked")
     private List<MenuItemDTO> parseMenuData(String jsonContent) {
         try {
-            Map<String, Object> config = objectMapper.readValue(jsonContent, Map.class);
+            Map<String, Object> config = JSON.parseObject(jsonContent, Map.class, JSONReader.Feature.FieldBased);
             List<Map<String, Object>> menuList = (List<Map<String, Object>>) config.get("navigation");
             if (menuList == null) {
                 menuList = (List<Map<String, Object>>) config.get("menu");

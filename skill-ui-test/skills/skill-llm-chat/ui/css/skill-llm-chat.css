@@ -414,3 +414,131 @@
         display: none;
     }
 }
+
+.nx-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+}
+
+.nx-modal--open {
+    display: flex;
+}
+
+.nx-modal__content {
+    background: var(--nx-card-bg, #fff);
+    border-radius: var(--nx-radius-lg, 8px);
+    max-width: 500px;
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.nx-modal__content--sm {
+    max-width: 400px;
+}
+
+.nx-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    border-bottom: 1px solid var(--nx-border-color, #e5e7eb);
+}
+
+.nx-modal__title {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+    color: var(--ns-text, #1f2937);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.nx-modal__body {
+    padding: 16px;
+}
+
+.nx-modal__footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    padding: 16px;
+    border-top: 1px solid var(--nx-border-color, #e5e7eb);
+}
+
+.nx-form-group {
+    margin-bottom: 16px;
+}
+
+.nx-label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--ns-text, #1f2937);
+}
+
+.nx-input,
+.nx-select,
+.nx-textarea {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 14px;
+    color: var(--ns-text, #1f2937);
+    background: var(--nx-card-bg, #fff);
+    border: 1px solid var(--nx-border-color, #e5e7eb);
+    border-radius: var(--nx-radius, 6px);
+    transition: border-color 0.2s;
+}
+
+.nx-input:focus,
+.nx-select:focus,
+.nx-textarea:focus {
+    outline: none;
+    border-color: var(--nx-primary, #3b82f6);
+}
+
+.nx-textarea {
+    resize: vertical;
+    min-height: 80px;
+}
+
+.nx-range {
+    width: 100%;
+}
+
+.nx-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.nx-checkbox input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.nx-checkbox__label {
+    font-size: 14px;
+    color: var(--ns-text, #1f2937);
+}
+
+.nx-text-danger {
+    color: var(--ns-danger, #ef4444);
+}
+
+.nx-text-secondary {
+    color: var(--ns-secondary, #6b7280);
+}

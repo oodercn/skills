@@ -3,16 +3,19 @@
     
     var KnowledgeQA = {
         currentKb: '',
+        currentModel: 'deepseek-chat',
         topK: 10,
         threshold: 0.7,
         knowledgeBases: [],
         selectedFiles: [],
+        availableModels: [],
         
         init: function() {
             this.initTabs();
             this.initTheme();
             this.loadKnowledgeBases();
             this.loadDocuments();
+            this.loadAvailableModels();
             this.bindEvents();
         },
         
@@ -149,6 +152,82 @@
             });
         },
         
+        loadAvailableModels: function() {
+            var self = this;
+            var models = [];
+            
+            NexusAPI.get('/api/llm/deepseek/models', function(response) {
+                if (response.status === 'success' && response.models) {
+                    response.models.forEach(function(m) {
+                        models.push({
+                            id: m.id,
+                            name: m.name,
+                            provider: 'deepseek',
+                            type: m.type
+                        });
+                    });
+                }
+                
+                NexusAPI.get('/api/llm/baidu/models', function(response2) {
+                    if (response2.status === 'success' && response2.models) {
+                        response2.models.forEach(function(m) {
+                            models.push({
+                                id: m.id,
+                                name: m.name,
+                                provider: 'baidu',
+                                type: m.type
+                            });
+                        });
+                    }
+                    
+                    self.availableModels = models;
+                    self.renderModelSelect(models);
+                    self.updateModelStatus();
+                });
+            });
+        },
+        
+        renderModelSelect: function(models) {
+            var select = document.getElementById('modelSelect');
+            if (!select) return;
+            
+            var deepseekModels = models.filter(function(m) { return m.provider === 'deepseek'; });
+            var baiduModels = models.filter(function(m) { return m.provider === 'baidu'; });
+            
+            var html = '';
+            
+            if (deepseekModels.length > 0) {
+                html += '<optgroup label="DeepSeek">';
+                deepseekModels.forEach(function(m) {
+                    var selected = m.id === this.currentModel ? ' selected' : '';
+                    html += '<option value="' + m.id + '"' + selected + '>' + m.name + '</option>';
+                }.bind(this));
+                html += '</optgroup>';
+            }
+            
+            if (baiduModels.length > 0) {
+                html += '<optgroup label="百度千帆">';
+                baiduModels.forEach(function(m) {
+                    var selected = m.id === this.currentModel ? ' selected' : '';
+                    html += '<option value="' + m.id + '"' + selected + '>' + m.name + '</option>';
+                }.bind(this));
+                html += '</optgroup>';
+            }
+            
+            select.innerHTML = html;
+        },
+        
+        updateModelStatus: function() {
+            var statusDiv = document.getElementById('modelStatus');
+            if (!statusDiv) return;
+            
+            var model = this.availableModels.find(function(m) { return m.id === this.currentModel; }.bind(this));
+            if (model) {
+                var providerName = model.provider === 'deepseek' ? 'DeepSeek' : '百度千帆';
+                statusDiv.innerHTML = '<span style="color: var(--ns-success);">●</span> ' + providerName + ' - ' + model.name;
+            }
+        },
+        
         renderDocList: function(docs) {
             var list = document.getElementById('docList');
             if (!docs.length) {
@@ -214,6 +293,9 @@
                 return;
             }
             
+            var modelSelect = document.getElementById('modelSelect');
+            var selectedModel = modelSelect ? modelSelect.value : this.currentModel;
+            
             var messages = document.getElementById('chatMessages');
             messages.innerHTML += '<div class="message user"><div class="message-avatar"><i class="ri-user-line"></i></div><div class="message-content">' + this.escapeHtml(question) + '</div></div>';
             input.value = '';
@@ -226,7 +308,8 @@
                 question: question, 
                 kbId: kbId, 
                 topK: this.topK, 
-                threshold: this.threshold 
+                threshold: this.threshold,
+                model: selectedModel
             }, function(response) {
                 var typing = document.getElementById('typing-indicator');
                 if (typing) typing.remove();
@@ -234,8 +317,10 @@
                 if (response.status === 'success' && response.data) {
                     var answer = response.data.answer;
                     var sources = response.data.sources || [];
+                    var model = response.data.model || selectedModel;
                     var sourceHtml = sources.length ? '<br><br><small style="opacity: 0.7">来源: ' + sources.map(function(s) { return s.title + ' (' + Math.round(s.score * 100) + '%)'; }).join(', ') + '</small>' : '';
-                    messages.innerHTML += '<div class="message"><div class="message-avatar"><i class="ri-robot-line"></i></div><div class="message-content">' + self.escapeHtml(answer) + sourceHtml + '</div></div>';
+                    var modelHtml = '<br><small style="opacity: 0.5; font-size: 11px;">模型: ' + model + '</small>';
+                    messages.innerHTML += '<div class="message"><div class="message-avatar"><i class="ri-robot-line"></i></div><div class="message-content">' + self.escapeHtml(answer) + sourceHtml + modelHtml + '</div></div>';
                 } else {
                     messages.innerHTML += '<div class="message"><div class="message-avatar"><i class="ri-robot-line"></i></div><div class="message-content">抱歉，处理您的问题时出现错误：' + (response.message || '请稍后重试') + '</div></div>';
                 }
@@ -456,6 +541,12 @@
             document.getElementById('thresholdSlider').addEventListener('input', function() {
                 self.threshold = parseInt(this.value) / 100;
                 document.getElementById('thresholdValue').textContent = this.value + '%';
+            });
+            
+            document.getElementById('modelSelect').addEventListener('change', function() {
+                self.currentModel = this.value;
+                self.updateModelStatus();
+                self.showToast('已切换模型: ' + this.options[this.selectedIndex].text, 'success');
             });
         }
     };
