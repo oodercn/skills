@@ -707,40 +707,121 @@
         },
 
         selectLeader: function() {
-            var userId = prompt('请输入主导者用户ID:');
-            if (userId) {
-                document.getElementById('leaderInput').value = userId;
+            var leaderInput = document.getElementById('leaderInput');
+            var currentValue = leaderInput.value.trim();
+            
+            var users = [
+                { id: 'user001', name: '张三' },
+                { id: 'user002', name: '李四' },
+                { id: 'user003', name: '王五' },
+                { id: 'admin', name: '管理员' },
+                { id: 'manager', name: '经理' }
+            ];
+            
+            var existingSelector = document.getElementById('leaderSelector');
+            if (existingSelector) {
+                existingSelector.remove();
             }
+            
+            var selector = document.createElement('div');
+            selector.id = 'leaderSelector';
+            selector.style.cssText = 'position: absolute; background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 200px; overflow-y: auto; min-width: 200px;';
+            
+            var rect = leaderInput.getBoundingClientRect();
+            selector.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+            selector.style.left = (rect.left + window.scrollX) + 'px';
+            
+            var html = '';
+            users.forEach(function(user) {
+                html += '<div class="leader-option" data-id="' + user.id + '" style="padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">' +
+                    '<i class="ri-user-line" style="color: var(--nx-text-secondary);"></i>' +
+                    '<span>' + user.name + '</span>' +
+                    '<span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: auto;">' + user.id + '</span>' +
+                    '</div>';
+            });
+            selector.innerHTML = html;
+            
+            document.body.appendChild(selector);
+            
+            selector.querySelectorAll('.leader-option').forEach(function(option) {
+                option.addEventListener('click', function() {
+                    var userId = this.dataset.id;
+                    leaderInput.value = userId;
+                    CapabilityDiscovery.addLog('info', '已选择主导者: ' + userId);
+                    selector.remove();
+                });
+                option.addEventListener('mouseenter', function() {
+                    this.style.background = 'var(--nx-primary-light)';
+                });
+                option.addEventListener('mouseleave', function() {
+                    this.style.background = 'transparent';
+                });
+            });
+            
+            var closeSelector = function(e) {
+                if (!selector.contains(e.target) && e.target !== leaderInput) {
+                    selector.remove();
+                    document.removeEventListener('click', closeSelector);
+                }
+            };
+            
+            setTimeout(function() {
+                document.addEventListener('click', closeSelector);
+            }, 10);
         },
 
         addCollaborator: function() {
             var input = document.getElementById('collaboratorInput');
+            if (!input) {
+                console.error('[addCollaborator] collaboratorInput element not found');
+                return;
+            }
+            
             var userId = input.value.trim();
-            if (!userId) return;
+            console.log('[addCollaborator] userId:', userId, 'collaborators:', CapabilityDiscovery.collaborators);
+            
+            if (!userId) {
+                CapabilityDiscovery.addLog('warn', '请输入协作者用户ID');
+                input.focus();
+                return;
+            }
             
             if (CapabilityDiscovery.collaborators.indexOf(userId) >= 0) {
-                alert('该用户已添加');
+                CapabilityDiscovery.addLog('warn', '该用户已添加: ' + userId);
                 return;
             }
             
             CapabilityDiscovery.collaborators.push(userId);
+            console.log('[addCollaborator] After push, collaborators:', CapabilityDiscovery.collaborators);
+            
             CapabilityDiscovery.renderCollaborators();
             input.value = '';
+            CapabilityDiscovery.addLog('info', '已添加协作者: ' + userId);
         },
 
         removeCollaborator: function(userId) {
+            console.log('[removeCollaborator] userId:', userId, 'before:', CapabilityDiscovery.collaborators);
             CapabilityDiscovery.collaborators = CapabilityDiscovery.collaborators.filter(function(c) { return c !== userId; });
+            console.log('[removeCollaborator] after:', CapabilityDiscovery.collaborators);
             CapabilityDiscovery.renderCollaborators();
         },
 
         renderCollaborators: function() {
             var container = document.getElementById('collaboratorList');
+            if (!container) {
+                console.error('[renderCollaborators] collaboratorList element not found');
+                return;
+            }
+            
+            console.log('[renderCollaborators] Rendering', CapabilityDiscovery.collaborators.length, 'collaborators');
+            
             var html = '';
             CapabilityDiscovery.collaborators.forEach(function(userId) {
                 html += '<span class="participant-tag">' + userId +
                     '<i class="ri-close-line remove-btn" onclick="removeCollaborator(\'' + userId + '\')"></i></span>';
             });
             container.innerHTML = html;
+            console.log('[renderCollaborators] HTML set:', html);
         },
 
         showWizardStep: function(step) {
