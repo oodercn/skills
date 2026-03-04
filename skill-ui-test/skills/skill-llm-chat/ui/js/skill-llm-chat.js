@@ -149,18 +149,20 @@ var LlmChat = {
         
         NexusAPI.get('/api/llm/models?provider=' + providerId, function(res) {
             if (res.status === 'success' && res.data) {
+                var models = Array.isArray(res.data.models) ? res.data.models : (Array.isArray(res.data) ? res.data : []);
                 var select = document.getElementById('modelSelect');
                 select.innerHTML = '<option value="">选择模型</option>';
                 
-                res.data.forEach(function(model) {
+                models.forEach(function(model) {
                     var option = document.createElement('option');
-                    option.value = model.id || model.name;
-                    option.textContent = model.name || model.id;
+                    option.value = model.id || model.name || model;
+                    option.textContent = model.name || model.id || model;
                     select.appendChild(option);
                 });
                 
-                if (res.data.length > 0) {
-                    select.value = res.data[0].id || res.data[0].name;
+                if (models.length > 0) {
+                    var firstModel = models[0];
+                    select.value = firstModel.id || firstModel.name || firstModel;
                     self.currentModel = select.value;
                 }
             }
@@ -171,7 +173,8 @@ var LlmChat = {
         var self = this;
         NexusAPI.get('/api/llm/sessions', function(res) {
             if (res.status === 'success' && res.data) {
-                self.renderSessions(res.data);
+                var sessions = Array.isArray(res.data) ? res.data : [];
+                self.renderSessions(sessions);
             }
         });
     },
@@ -210,7 +213,7 @@ var LlmChat = {
         
         NexusAPI.get('/api/llm/sessions/' + sessionId + '/history', function(res) {
             if (res.status === 'success' && res.data) {
-                self.messages = res.data;
+                self.messages = Array.isArray(res.data) ? res.data : [];
                 self.renderMessages();
                 self.updateContextInfo();
             }

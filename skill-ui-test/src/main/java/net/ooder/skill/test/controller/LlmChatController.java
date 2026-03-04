@@ -1,5 +1,8 @@
 package net.ooder.skill.test.controller;
 
+import net.ooder.skill.test.model.ChatRequest;
+import net.ooder.skill.test.model.SetModelRequest;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -47,13 +50,13 @@ public class LlmChatController {
     }
     
     @PostMapping("/chat")
-    public ResponseEntity<Map<String, Object>> chat(@RequestBody Map<String, Object> request) {
-        String message = (String) request.get("message");
-        String sessionId = (String) request.get("sessionId");
-        String provider = (String) request.getOrDefault("provider", currentProvider);
-        String model = (String) request.getOrDefault("model", currentModel);
-        Double temperature = (Double) request.getOrDefault("temperature", 0.7);
-        Integer maxTokens = (Integer) request.getOrDefault("maxTokens", 4096);
+    public ResponseEntity<Map<String, Object>> chat(@RequestBody ChatRequest request) {
+        String message = request.getMessage();
+        String sessionId = request.getSessionId();
+        String provider = request.getProvider() != null ? request.getProvider() : currentProvider;
+        String model = request.getModel() != null ? request.getModel() : currentModel;
+        Double temperature = request.getTemperature() != null ? request.getTemperature() : 0.7;
+        Integer maxTokens = request.getMaxTokens() != null ? request.getMaxTokens() : 4096;
         
         log.info("[chat] message: {}, sessionId: {}, provider: {}, model: {}", 
             message, sessionId, provider, model);
@@ -247,9 +250,9 @@ public class LlmChatController {
     }
     
     @PostMapping("/models/set")
-    public ResponseEntity<Map<String, Object>> setModel(@RequestBody Map<String, Object> request) {
-        String modelId = (String) request.get("modelId");
-        String providerId = (String) request.get("provider");
+    public ResponseEntity<Map<String, Object>> setModel(@RequestBody SetModelRequest request) {
+        String modelId = request.getModelId();
+        String providerId = request.getProvider();
         
         log.info("[setModel] modelId: {}, provider: {}", modelId, providerId);
         
