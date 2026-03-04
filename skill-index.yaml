@@ -175,6 +175,38 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
       checksum: ""
       
+    - skillId: skill-llm-chat
+      name: LLM智能对话场景能力
+      version: "2.3.0"
+      category: llm
+      subCategory: chat
+      tags:
+        - llm
+        - chat
+        - ai
+        - conversation
+        - scene-capability
+        - mainFirst
+      description: LLM智能对话场景能力，支持多轮对话、上下文感知、流式输出
+      sceneId: llm-chat
+      path: skills/skill-llm-chat
+      mainFirst: true
+      capabilities:
+        - llm-chat
+        - session-manage
+        - history-record
+        - context-extraction
+        - context-merging
+      driverCapabilities:
+        - intent-receiver
+      dependencies:
+        - skillId: skill-llm-conversation
+          version: ">=1.0.0"
+          required: true
+        - skillId: skill-llm-context-builder
+          version: ">=1.0.0"
+          required: true
+      
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
       version: "0.7.3"
@@ -1438,6 +1470,24 @@ spec:
         - document-search
         - knowledge-share
       maxMembers: 1000
+      
+    - sceneId: llm-chat
+      name: LLM智能对话场景
+      description: LLM智能对话场景能力，自驱型SuperAgent，支持多轮对话、上下文感知、流式输出
+      version: "2.3.0"
+      category: SCENE
+      mainFirst: true
+      requiredCapabilities:
+        - llm-chat
+        - session-manage
+        - history-record
+        - context-extraction
+        - context-merging
+      driverCapabilities:
+        - intent-receiver
+      collaborativeCapabilities:
+        - scene-knowledge-qa
+      maxMembers: 100
       
     - sceneId: device
       name: Device Management
