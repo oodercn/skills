@@ -662,7 +662,7 @@
         loadDriverConditions: function(capabilityId) {
             var container = document.getElementById('driverConditionList');
             
-            ApiClient.get('/api/v1/capabilities/' + capabilityId + '/driver-conditions')
+            ApiClient.get('/api/v1/capabilities/detail/' + capabilityId + '/driver-conditions')
                 .then(function(result) {
                     if (result.code === 200 && result.data && result.data.length > 0) {
                         var html = '';
@@ -972,7 +972,7 @@
                 
                 updateStep(3, 'running', '安装中...');
                 
-                var execResult = await ApiClient.put('/api/v1/installs/' + CapabilityDiscovery.installId + '/execute');
+                var execResult = await ApiClient.post('/api/v1/installs/' + CapabilityDiscovery.installId + '/execute');
                 
                 if (execResult.code !== 200) {
                     throw new Error(execResult.message || '安装失败');
