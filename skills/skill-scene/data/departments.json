@@ -1,6 +1,6 @@
 {
 	"dept-rd":{
-		"createTime":1772655200480,
+		"createTime":1772669401504,
 		"departmentId":"dept-rd",
 		"description":"负责产品研发和技术创新",
 		"managerId":"user-manager-001",
@@ -9,7 +9,7 @@
 		"updateTime":0
 	},
 	"dept-hr":{
-		"createTime":1772655200480,
+		"createTime":1772669401504,
 		"departmentId":"dept-hr",
 		"description":"负责人才招聘和员工管理",
 		"managerId":"user-hr-001",

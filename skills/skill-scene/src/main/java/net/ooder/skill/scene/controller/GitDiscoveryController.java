@@ -55,6 +55,9 @@ public class GitDiscoveryController {
     @Autowired(required = false)
     private SkillPackageManager skillPackageManager;
 
+    @Autowired(required = false)
+    private net.ooder.skill.scene.capability.service.CapabilityService capabilityService;
+
     @PostMapping("/github")
     public ResultModel<DiscoveryResultDTO> discoverFromGitHub(@RequestBody @Valid GitDiscoveryConfigDTO config) {
         log.info("[discoverFromGitHub] repoUrl: {}, branch: {}, mockEnabled: {}", config.getRepoUrl(), config.getBranch(), mockEnabled);
@@ -602,53 +605,63 @@ public class GitDiscoveryController {
         
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
-        if (skillPackageManager != null) {
+        if (capabilityService != null) {
             try {
-                java.nio.file.Path skillsPath = java.nio.file.Paths.get("./skills");
-                if (config != null && config.getSkillsPath() != null && !config.getSkillsPath().isEmpty()) {
-                    skillsPath = java.nio.file.Paths.get(config.getSkillsPath());
+                List<net.ooder.skill.scene.capability.model.Capability> registeredCaps = capabilityService.findAll();
+                log.info("[discoverFromLocal] Found {} registered capabilities", registeredCaps.size());
+                
+                for (net.ooder.skill.scene.capability.model.Capability cap : registeredCaps) {
+                    CapabilityDTO dto = new CapabilityDTO();
+                    dto.setId(cap.getCapabilityId());
+                    dto.setName(cap.getName());
+                    dto.setDescription(cap.getDescription());
+                    dto.setVersion(cap.getVersion() != null ? cap.getVersion() : "1.0.0");
+                    dto.setType(cap.getType() != null ? cap.getType().name() : "SERVICE");
+                    dto.setSource("LOCAL_FS");
+                    dto.setStatus("installed");
+                    dto.setSceneCapability(cap.isSceneCapability());
+                    dto.setSkillId(cap.getSkillId());
+                    capabilities.add(dto);
                 }
-                
-                log.info("[discoverFromLocal] Scanning path: {}", skillsPath.toAbsolutePath());
-                
-                if (java.nio.file.Files.exists(skillsPath)) {
-                    java.nio.file.Files.list(skillsPath)
-                        .filter(java.nio.file.Files::isDirectory)
-                        .forEach(dir -> {
-                            String skillId = dir.getFileName().toString();
-                            try {
-                                SkillManifest manifest = skillPackageManager.getManifest(skillId).get();
-                                if (manifest != null) {
-                                    CapabilityDTO cap = new CapabilityDTO();
-                                    cap.setId(skillId);
-                                    cap.setName(manifest.getName() != null ? manifest.getName() : skillId);
-                                    cap.setDescription(manifest.getDescription());
-                                    cap.setVersion(manifest.getVersion());
-                                    cap.setSource("LOCAL_FS");
-                                    cap.setStatus("installed");
-                                    
-                                    boolean isScene = skillId.contains("-scene") || 
-                                        "daily-log-scene".equals(skillId);
-                                    cap.setType(isScene ? "SCENE" : "SKILL");
-                                    cap.setSceneCapability(isScene);
-                                    
-                                    capabilities.add(cap);
-                                    log.debug("[discoverFromLocal] Found installed skill: {}", skillId);
-                                }
-                            } catch (Exception e) {
-                                log.debug("[discoverFromLocal] Could not load manifest for {}: {}", skillId, e.getMessage());
-                            }
-                        });
-                }
-                
-                log.info("[discoverFromLocal] Found {} installed capabilities", capabilities.size());
             } catch (Exception e) {
-                log.error("[discoverFromLocal] Error scanning local skills: {}", e.getMessage());
-                result.setErrorMessage(e.getMessage());
+                log.error("[discoverFromLocal] Error loading registered capabilities: {}", e.getMessage());
             }
-        } else {
-            log.warn("[discoverFromLocal] SkillPackageManager not available");
-            result.setErrorMessage("SkillPackageManager not available");
+        }
+        
+        try {
+            java.nio.file.Path skillsPath = null;
+            
+            if (config != null && config.getSkillsPath() != null && !config.getSkillsPath().isEmpty()) {
+                skillsPath = java.nio.file.Paths.get(config.getSkillsPath());
+            } else {
+                skillsPath = java.nio.file.Paths.get(".").toAbsolutePath();
+            }
+            
+            log.info("[discoverFromLocal] Scanning path: {}", skillsPath.toAbsolutePath());
+            
+            java.nio.file.Path skillYaml = skillsPath.resolve("src/main/resources/skill.yaml");
+            if (java.nio.file.Files.exists(skillYaml)) {
+                log.info("[discoverFromLocal] Found skill.yaml in current service");
+                
+                boolean exists = capabilities.stream().anyMatch(c -> "skill-scene".equals(c.getId()));
+                if (!exists) {
+                    CapabilityDTO selfCap = new CapabilityDTO();
+                    selfCap.setId("skill-scene");
+                    selfCap.setName("场景管理");
+                    selfCap.setDescription("场景管理技能 - 场景定义、会话管理、能力验证");
+                    selfCap.setVersion("1.0.0");
+                    selfCap.setSource("LOCAL_FS");
+                    selfCap.setStatus("installed");
+                    selfCap.setType("SKILL");
+                    selfCap.setSceneCapability(true);
+                    capabilities.add(selfCap);
+                }
+            }
+            
+            log.info("[discoverFromLocal] Found {} total capabilities", capabilities.size());
+        } catch (Exception e) {
+            log.error("[discoverFromLocal] Error scanning local skills: {}", e.getMessage());
+            result.setErrorMessage(e.getMessage());
         }
         
         result.setCapabilities(capabilities);

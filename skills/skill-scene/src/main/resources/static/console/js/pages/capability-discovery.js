@@ -706,97 +706,158 @@
             });
         },
 
-        selectLeader: function() {
-            var leaderInput = document.getElementById('leaderInput');
-            var currentValue = leaderInput.value.trim();
-            
-            var users = [
-                { id: 'user001', name: '张三' },
-                { id: 'user002', name: '李四' },
-                { id: 'user003', name: '王五' },
-                { id: 'admin', name: '管理员' },
-                { id: 'manager', name: '经理' }
-            ];
-            
-            var existingSelector = document.getElementById('leaderSelector');
-            if (existingSelector) {
-                existingSelector.remove();
+        cachedUsers: null,
+        
+        loadUsers: function(callback) {
+            if (CapabilityDiscovery.cachedUsers) {
+                callback(CapabilityDiscovery.cachedUsers);
+                return;
             }
             
-            var selector = document.createElement('div');
-            selector.id = 'leaderSelector';
-            selector.style.cssText = 'position: absolute; background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 200px; overflow-y: auto; min-width: 200px;';
-            
-            var rect = leaderInput.getBoundingClientRect();
-            selector.style.top = (rect.bottom + window.scrollY + 4) + 'px';
-            selector.style.left = (rect.left + window.scrollX) + 'px';
-            
-            var html = '';
-            users.forEach(function(user) {
-                html += '<div class="leader-option" data-id="' + user.id + '" style="padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">' +
-                    '<i class="ri-user-line" style="color: var(--nx-text-secondary);"></i>' +
-                    '<span>' + user.name + '</span>' +
-                    '<span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: auto;">' + user.id + '</span>' +
-                    '</div>';
-            });
-            selector.innerHTML = html;
-            
-            document.body.appendChild(selector);
-            
-            selector.querySelectorAll('.leader-option').forEach(function(option) {
-                option.addEventListener('click', function() {
-                    var userId = this.dataset.id;
-                    leaderInput.value = userId;
-                    CapabilityDiscovery.addLog('info', '已选择主导者: ' + userId);
-                    selector.remove();
+            ApiClient.get('/api/v1/org/users')
+                .then(function(result) {
+                    if (result.code === 200 && result.data) {
+                        CapabilityDiscovery.cachedUsers = result.data;
+                        callback(result.data);
+                    } else {
+                        callback([]);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[loadUsers] Error:', error);
+                    callback([]);
                 });
-                option.addEventListener('mouseenter', function() {
-                    this.style.background = 'var(--nx-primary-light)';
-                });
-                option.addEventListener('mouseleave', function() {
-                    this.style.background = 'transparent';
-                });
-            });
+        },
+
+        selectLeader: function() {
+            var leaderInput = document.getElementById('leaderInput');
             
-            var closeSelector = function(e) {
-                if (!selector.contains(e.target) && e.target !== leaderInput) {
-                    selector.remove();
-                    document.removeEventListener('click', closeSelector);
+            CapabilityDiscovery.loadUsers(function(users) {
+                var existingSelector = document.getElementById('leaderSelector');
+                if (existingSelector) {
+                    existingSelector.remove();
                 }
-            };
+                
+                var selector = document.createElement('div');
+                selector.id = 'leaderSelector';
+                selector.style.cssText = 'position: absolute; background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 200px; overflow-y: auto; min-width: 240px;';
+                
+                var rect = leaderInput.getBoundingClientRect();
+                selector.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                selector.style.left = (rect.left + window.scrollX) + 'px';
+                
+                if (users.length === 0) {
+                    selector.innerHTML = '<div style="padding: 12px; color: var(--nx-text-secondary); text-align: center;">暂无用户数据</div>';
+                } else {
+                    var html = '';
+                    users.forEach(function(user) {
+                        html += '<div class="leader-option" data-id="' + user.userId + '" style="padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">' +
+                            '<i class="ri-user-line" style="color: var(--nx-text-secondary);"></i>' +
+                            '<span>' + (user.name || user.userId) + '</span>' +
+                            '<span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: auto;">' + user.userId + '</span>' +
+                            '</div>';
+                    });
+                    selector.innerHTML = html;
+                    
+                    selector.querySelectorAll('.leader-option').forEach(function(option) {
+                        option.addEventListener('click', function() {
+                            var userId = this.dataset.id;
+                            leaderInput.value = userId;
+                            CapabilityDiscovery.addLog('info', '已选择主导者: ' + userId);
+                            selector.remove();
+                        });
+                        option.addEventListener('mouseenter', function() {
+                            this.style.background = 'var(--nx-primary-light)';
+                        });
+                        option.addEventListener('mouseleave', function() {
+                            this.style.background = 'transparent';
+                        });
+                    });
+                }
+                
+                document.body.appendChild(selector);
+                
+                var closeSelector = function(e) {
+                    if (!selector.contains(e.target) && e.target !== leaderInput) {
+                        selector.remove();
+                        document.removeEventListener('click', closeSelector);
+                    }
+                };
+                
+                setTimeout(function() {
+                    document.addEventListener('click', closeSelector);
+                }, 10);
+            });
+        },
+
+        showCollaboratorSelector: function() {
+            var input = document.getElementById('collaboratorInput');
             
-            setTimeout(function() {
-                document.addEventListener('click', closeSelector);
-            }, 10);
+            CapabilityDiscovery.loadUsers(function(users) {
+                var filteredUsers = users.filter(function(u) {
+                    return CapabilityDiscovery.collaborators.indexOf(u.userId) < 0;
+                });
+                
+                var existingSelector = document.getElementById('collaboratorSelector');
+                if (existingSelector) {
+                    existingSelector.remove();
+                }
+                
+                var selector = document.createElement('div');
+                selector.id = 'collaboratorSelector';
+                selector.style.cssText = 'position: absolute; background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 6px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); z-index: 1000; max-height: 200px; overflow-y: auto; min-width: 240px;';
+                
+                var rect = input.getBoundingClientRect();
+                selector.style.top = (rect.bottom + window.scrollY + 4) + 'px';
+                selector.style.left = (rect.left + window.scrollX) + 'px';
+                
+                if (filteredUsers.length === 0) {
+                    selector.innerHTML = '<div style="padding: 12px; color: var(--nx-text-secondary); text-align: center;">暂无可选用户</div>';
+                } else {
+                    var html = '';
+                    filteredUsers.forEach(function(user) {
+                        html += '<div class="collaborator-option" data-id="' + user.userId + '" style="padding: 8px 12px; cursor: pointer; display: flex; align-items: center; gap: 8px;">' +
+                            '<i class="ri-user-line" style="color: var(--nx-text-secondary);"></i>' +
+                            '<span>' + (user.name || user.userId) + '</span>' +
+                            '<span style="color: var(--nx-text-secondary); font-size: 12px; margin-left: auto;">' + user.userId + '</span>' +
+                            '</div>';
+                    });
+                    selector.innerHTML = html;
+                    
+                    selector.querySelectorAll('.collaborator-option').forEach(function(option) {
+                        option.addEventListener('click', function() {
+                            var userId = this.dataset.id;
+                            CapabilityDiscovery.collaborators.push(userId);
+                            CapabilityDiscovery.renderCollaborators();
+                            CapabilityDiscovery.addLog('info', '已添加协作者: ' + userId);
+                            selector.remove();
+                        });
+                        option.addEventListener('mouseenter', function() {
+                            this.style.background = 'var(--nx-primary-light)';
+                        });
+                        option.addEventListener('mouseleave', function() {
+                            this.style.background = 'transparent';
+                        });
+                    });
+                }
+                
+                document.body.appendChild(selector);
+                
+                var closeSelector = function(e) {
+                    if (!selector.contains(e.target) && e.target !== input) {
+                        selector.remove();
+                        document.removeEventListener('click', closeSelector);
+                    }
+                };
+                
+                setTimeout(function() {
+                    document.addEventListener('click', closeSelector);
+                }, 10);
+            });
         },
 
         addCollaborator: function() {
-            var input = document.getElementById('collaboratorInput');
-            if (!input) {
-                console.error('[addCollaborator] collaboratorInput element not found');
-                return;
-            }
-            
-            var userId = input.value.trim();
-            console.log('[addCollaborator] userId:', userId, 'collaborators:', CapabilityDiscovery.collaborators);
-            
-            if (!userId) {
-                CapabilityDiscovery.addLog('warn', '请输入协作者用户ID');
-                input.focus();
-                return;
-            }
-            
-            if (CapabilityDiscovery.collaborators.indexOf(userId) >= 0) {
-                CapabilityDiscovery.addLog('warn', '该用户已添加: ' + userId);
-                return;
-            }
-            
-            CapabilityDiscovery.collaborators.push(userId);
-            console.log('[addCollaborator] After push, collaborators:', CapabilityDiscovery.collaborators);
-            
-            CapabilityDiscovery.renderCollaborators();
-            input.value = '';
-            CapabilityDiscovery.addLog('info', '已添加协作者: ' + userId);
+            CapabilityDiscovery.showCollaboratorSelector();
         },
 
         removeCollaborator: function(userId) {
@@ -941,13 +1002,17 @@
             try {
                 updateStep(0, 'running', '创建中...');
                 
+                var participantsData = {
+                    leader: leader ? { userId: leader, role: 'LEADER' } : null,
+                    collaborators: CapabilityDiscovery.collaborators.map(function(userId) {
+                        return { userId: userId, role: 'COLLABORATOR' };
+                    })
+                };
+                
                 var createResult = await ApiClient.post('/api/v1/installs', {
                     capabilityId: cap.id,
                     driverCondition: CapabilityDiscovery.selectedDriverCondition,
-                    participants: {
-                        leader: leader,
-                        collaborators: CapabilityDiscovery.collaborators
-                    },
+                    participants: participantsData,
                     pushType: pushType,
                     name: cap.name,
                     type: cap.type,
