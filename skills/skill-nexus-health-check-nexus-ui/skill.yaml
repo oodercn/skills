@@ -4,14 +4,152 @@ kind: Skill
 metadata:
   id: skill-nexus-health-check-nexus-ui
   name: 健康检查
-  version: 1.0.0
-  description: Nexus系统健康检查，显示健康状态、健康评分、组件状态、服务状态等
+  version: 2.3.0
+  description: 健康检查场景能力，显示健康状态、健康评分、组件状态、服务状态等
   author: ooder Team
-  type: nexus-ui
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - health
+    - check
+    - monitor
+    - scene-capability
 
 spec:
-  type: nexus-ui
+  type: scene-skill
   
+  dependencies:
+    - id: skill-health
+      version: ">=2.3.0"
+      required: true
+      autoInstall: true
+      description: "健康检查服务"
+      capabilities:
+        - health-check
+        - service-check
+        - health-report
+        - health-schedule
+        - health-status
+
+  sceneCapabilities:
+    - id: scene-health-check
+      name: 健康检查场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [health-check-view, health-check-run]
+          - checkDriverCapabilities: [intent-receiver, scheduler]
+          - checkDependencies: [skill-health]
+          - onCheckFailed:
+              action: degrade
+              degradedCapabilities: []
+              retry:
+                maxAttempts: 3
+                delay: 5s
+          
+        selfStart:
+          - installDependencies: auto
+          - initDriverCapabilities: [intent-receiver, scheduler]
+          - initCapabilities: [health-check-view, health-check-run]
+          - bindAddresses: auto
+          
+        selfDrive:
+          scheduleRules:
+            - trigger: "0 * * * * ?"
+              action: health-check-flow
+            - trigger: "0 0 * * * ?"
+              action: health-report-flow
+              
+          eventRules:
+            - event: user.check.request
+              action: health-check-flow
+            - event: service.status.changed
+              action: service-alert-flow
+              
+          capabilityChains:
+            health-check-flow:
+              - capability: health-check-run
+                input:
+                  fullCheck: true
+              - capability: health-check-view
+                input:
+                  action: display
+                  
+            health-report-flow:
+              - capability: health-check-run
+                input:
+                  action: report
+                  
+            service-alert-flow:
+              - capability: health-check-view
+                input:
+                  action: alert
+
+      capabilities:
+        - health-check-view
+        - health-check-run
+        
+      collaborativeCapabilities:
+        - capabilityId: scene-monitoring
+          role: CONSUMER
+          interface: monitoring-service
+          autoStart: false
+          optional: true
+
+  capabilities:
+    - id: health-check-view
+      name: 查看健康状态
+      description: 查看系统健康状态
+      category: ui
+      type: ATOMIC
+      
+    - id: health-check-run
+      name: 运行健康检查
+      description: 执行系统健康检查
+      category: monitoring
+      type: ATOMIC
+      
+    - id: intent-receiver
+      name: 意图接收
+      description: 接收用户操作意图
+      category: driver
+      type: DRIVER
+      driverType: INTENT_RECEIVER
+      
+    - id: scheduler
+      name: 调度器
+      description: 定时健康检查调度
+      category: driver
+      type: DRIVER
+      driverType: SCHEDULER
+
+  capabilityBindings:
+    - sceneCapabilityType: health
+      autoBind: true
+      capabilities:
+        - health-check-view
+        - health-check-run
+
+  endpoints:
+    - path: /api/nexus/health
+      method: GET
+      description: 获取健康状态
+      capability: health-check-view
+      
+    - path: /api/nexus/health/run
+      method: POST
+      description: 运行健康检查
+      capability: health-check-run
+      
+    - path: /api/nexus/health/services
+      method: GET
+      description: 获取服务健康状态
+      capability: health-check-view
+
   nexusUi:
     entry:
       page: index.html
@@ -27,24 +165,31 @@ spec:
       type: default
       sidebar: true
       header: true
-      
-  capabilities:
-    - id: health-check-view
-      name: 查看健康状态
-      description: 查看Nexus系统健康状态
-      category: ui
-    - id: health-check-run
-      name: 运行健康检查
-      description: 执行系统健康检查
-      category: ui
-      
-  apis:
-    - path: /api/nexus/health
-      method: GET
-      description: 获取健康状态
-    - path: /api/nexus/health/run
-      method: POST
-      description: 运行健康检查
-    - path: /api/nexus/health/services
-      method: GET
-      description: 获取服务健康状态
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  config:
+    optional:
+      - name: CHECK_INTERVAL
+        type: integer
+        default: 60000
+        description: 检查间隔（毫秒）
+      - name: AUTO_CHECK
+        type: boolean
+        default: true
+        description: 启用自动检查
+      - name: ALERT_ENABLED
+        type: boolean
+        default: true
+        description: 启用告警
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+
+  offline:
+    enabled: false

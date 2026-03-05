@@ -4,88 +4,180 @@ kind: Skill
 metadata:
   id: skill-llm-assistant-ui
   name: LLM智能助手
-  version: 1.0.0
-  description: LLM智能助手悬浮组件，提供上下文感知的智能对话和辅助功能
+  version: 2.3.0
+  description: LLM智能助手场景能力，提供上下文感知的智能对话和辅助功能
   author: ooder Team
-  type: nexus-ui
+  type: scene-skill
   license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
   keywords:
     - llm
     - assistant
     - chat
     - ai
+    - scene-capability
 
 spec:
-  type: nexus-ui
+  type: scene-skill
   
   dependencies:
     - id: skill-llm-conversation
       version: ">=1.0.0"
       required: true
+      autoInstall: true
       description: "LLM对话服务"
+      capabilities:
+        - llm-chat
+        - session-manage
+        - history-record
       
     - id: skill-llm-context-builder
       version: ">=1.0.0"
       required: true
+      autoInstall: true
       description: "上下文构建服务"
+      capabilities:
+        - context-extraction
+        - context-merging
       
     - id: skill-local-knowledge
       version: ">=1.0.0"
       required: false
+      autoInstall: false
       description: "本地知识增强（可选）"
-  
-  providedInterfaces:
-    - id: llm-assistant-ui
-      version: "1.0"
-      description: "LLM助手界面"
-  
-  requiredInterfaces:
-    - id: llm-chat
-      version: ">=1.0"
-      optional: false
-      description: "LLM对话接口"
-    - id: context-builder
-      version: ">=1.0"
-      optional: false
-      description: "上下文构建接口"
-  
+
+  sceneCapabilities:
+    - id: scene-llm-assistant
+      name: LLM智能助手场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [llm-chat, context-aware]
+          - checkDriverCapabilities: [intent-receiver]
+          - checkDependencies: [skill-llm-conversation, skill-llm-context-builder]
+          - onCheckFailed:
+              action: degrade
+              degradedCapabilities: [smart-suggest]
+              retry:
+                maxAttempts: 3
+                delay: 5s
+          
+        selfStart:
+          - installDependencies: auto
+          - initDriverCapabilities: [intent-receiver]
+          - initCapabilities: [llm-chat, context-aware]
+          - bindAddresses: auto
+          
+        startCollaboration:
+          - startScene: scene-knowledge-qa
+            optional: true
+            timeout: 10s
+            bindInterface: knowledge-service
+          
+        selfDrive:
+          eventRules:
+            - event: user.message
+              action: chat-flow
+            - event: context.change
+              action: context-flow
+            - event: form.assist.request
+              action: form-assist-flow
+              
+          capabilityChains:
+            chat-flow:
+              - capability: context-aware
+                input:
+                  action: collect
+              - capability: llm-chat
+                input:
+                  context: "${previous.context}"
+                  stream: true
+                  
+            context-flow:
+              - capability: context-aware
+                input:
+                  action: update
+                  
+            form-assist-flow:
+              - capability: smart-suggest
+                input:
+                  action: form-assist
+
+      capabilities:
+        - llm-chat
+        - context-aware
+        - smart-suggest
+        
+      collaborativeCapabilities:
+        - capabilityId: scene-knowledge-qa
+          role: PROVIDER
+          interface: knowledge-service
+          autoStart: false
+          optional: true
+
   capabilities:
     - id: llm-chat
       name: 智能对话
       description: 与LLM进行智能对话
       category: ai
+      type: ATOMIC
+      
     - id: context-aware
       name: 上下文感知
       description: 自动收集当前页面上下文
       category: ai
+      type: ATOMIC
+      
     - id: smart-suggest
       name: 智能建议
       description: 基于上下文提供智能建议
       category: ai
-  
+      type: ATOMIC
+      
+    - id: intent-receiver
+      name: 意图接收
+      description: 接收用户对话意图
+      category: driver
+      type: DRIVER
+      driverType: INTENT_RECEIVER
+
+  capabilityBindings:
+    - sceneCapabilityType: llm
+      autoBind: true
+      capabilities:
+        - llm-chat
+        - context-aware
+        - smart-suggest
+
   endpoints:
     - path: /api/llm/chat
       method: POST
       description: LLM对话
       capability: llm-chat
+      
     - path: /api/llm/chat/stream
       method: POST
       description: 流式LLM对话
       capability: llm-chat
+      
     - path: /api/v1/llm/context/build
       method: POST
       description: 构建上下文
       capability: context-aware
+      
     - path: /api/v1/nlp/classify
       method: POST
       description: 意图分类
       capability: smart-suggest
+      
     - path: /api/v1/form/assist
       method: POST
       description: 表单辅助
       capability: smart-suggest
-  
+
   nexusUi:
     entry:
       page: index.html
@@ -108,16 +200,35 @@ spec:
       trigger: button
       width: 420
       height: 600
-  
-  sceneBindings:
-    - sceneType: llm
-      autoBind: true
-      capabilities:
-        - llm-chat
-        - context-aware
-        - smart-suggest
-  
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  config:
+    optional:
+      - name: DEFAULT_PROVIDER
+        type: string
+        default: "baidu"
+        description: 默认LLM Provider
+      - name: MAX_TOKENS
+        type: integer
+        default: 4096
+        description: 最大Token数
+      - name: TEMPERATURE
+        type: number
+        default: 0.7
+        description: 温度参数
+      - name: STREAM_ENABLED
+        type: boolean
+        default: true
+        description: 启用流式输出
+
   resources:
     cpu: "50m"
     memory: "64Mi"
     storage: "10Mi"
+
+  offline:
+    enabled: false
