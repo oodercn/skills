@@ -18,7 +18,7 @@ public class BaiduLlmProvider implements LlmProvider {
     private static final Logger log = LoggerFactory.getLogger(BaiduLlmProvider.class);
 
     private static final String PROVIDER_TYPE = "baidu";
-    private static final String DEFAULT_MODEL = "ernie-3.5-8k";
+    private static final String DEFAULT_MODEL = "ernie-4.5-8k-preview";
     
     private static final String QIANFAN_API_URL = "https://qianfan.baidubce.com/v2/chat/completions";
     private static final String TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
@@ -31,10 +31,11 @@ public class BaiduLlmProvider implements LlmProvider {
     private final List<String> supportedModels = new ArrayList<String>();
     
     public BaiduLlmProvider() {
-        supportedModels.add("ernie-3.5-8k");
-        supportedModels.add("ernie-4.0-8k");
-        supportedModels.add("ernie-3.5-8k-preview");
-        supportedModels.add("bce-v3");
+        supportedModels.add("ernie-4.5-8k-preview");
+        supportedModels.add("ernie-4.5-turbo-vl-32k");
+        supportedModels.add("ernie-x1-turbo-32k");
+        supportedModels.add("ernie-speed-8k");
+        supportedModels.add("ernie-lite-8k");
     }
     
     public BaiduLlmProvider(String accessKey, String secretKey) {
@@ -99,21 +100,9 @@ public class BaiduLlmProvider implements LlmProvider {
     
     private String getModelId(String model) {
         if (model == null || model.isEmpty()) {
-            model = DEFAULT_MODEL;
+            return DEFAULT_MODEL;
         }
-        
-        switch (model) {
-            case "ernie-4.0-8k":
-                return "ernie-4.0-8k-latest";
-            case "ernie-3.5-8k-preview":
-                return "ernie-3.5-8k-preview";
-            case "ernie-3.5-8k":
-                return "ernie-3.5-8k-latest";
-            case "bce-v3":
-                return "bce-v3";
-            default:
-                return "ernie-3.5-8k-latest";
-        }
+        return model;
     }
 
     @Override
