@@ -21,9 +21,12 @@ public class BaiduLlmProvider implements LlmProvider {
     private static final String DEFAULT_MODEL = "ernie-3.5-8k";
     
     private static final String QIANFAN_API_URL = "https://qianfan.baidubce.com/v2/chat/completions";
+    private static final String TOKEN_URL = "https://aip.baidubce.com/oauth/2.0/token";
     
     private String accessKey;
     private String secretKey;
+    private String cachedAccessToken;
+    private long tokenExpireTime;
     
     private final List<String> supportedModels = new ArrayList<String>();
     
@@ -101,13 +104,15 @@ public class BaiduLlmProvider implements LlmProvider {
         
         switch (model) {
             case "ernie-4.0-8k":
-                return "ernie-4.0-8k";
+                return "ernie-4.0-8k-latest";
             case "ernie-3.5-8k-preview":
                 return "ernie-3.5-8k-preview";
             case "ernie-3.5-8k":
+                return "ernie-3.5-8k-latest";
             case "bce-v3":
+                return "bce-v3";
             default:
-                return "ernie-3.5-8k";
+                return "ernie-3.5-8k-latest";
         }
     }
 
@@ -155,14 +160,62 @@ public class BaiduLlmProvider implements LlmProvider {
         return result;
     }
     
+    private String getAccessToken() {
+        if (cachedAccessToken != null && System.currentTimeMillis() < tokenExpireTime) {
+            return cachedAccessToken;
+        }
+        
+        try {
+            String urlStr = TOKEN_URL + "?grant_type=client_credentials&client_id=" + accessKey + "&client_secret=" + secretKey;
+            URL url = new URL(urlStr);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setConnectTimeout(30000);
+            conn.setReadTimeout(30000);
+            
+            int responseCode = conn.getResponseCode();
+            if (responseCode == 200) {
+                BufferedReader reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+                StringBuilder response = new StringBuilder();
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    response.append(line);
+                }
+                reader.close();
+                
+                String responseBody = response.toString();
+                String accessToken = extractJsonValue(responseBody, "access_token");
+                String expiresIn = extractJsonValue(responseBody, "expires_in");
+                
+                if (accessToken != null) {
+                    cachedAccessToken = accessToken;
+                    if (expiresIn != null) {
+                        tokenExpireTime = System.currentTimeMillis() + (Long.parseLong(expiresIn) - 300) * 1000;
+                    } else {
+                        tokenExpireTime = System.currentTimeMillis() + 24 * 60 * 60 * 1000;
+                    }
+                    log.info("Successfully obtained Baidu access token, expires in {} seconds", expiresIn);
+                    return accessToken;
+                }
+            }
+            log.error("Failed to get access token, response code: {}", responseCode);
+        } catch (Exception e) {
+            log.error("Error getting Baidu access token", e);
+        }
+        return null;
+    }
+    
     private String sendRequest(String apiUrl, Map<String, Object> requestBody) throws Exception {
+        String accessToken = getAccessToken();
+        if (accessToken == null) {
+            return "Error: Failed to get access token";
+        }
+        
         URL url = new URL(apiUrl);
         HttpURLConnection conn = (HttpURLConnection) url.openConnection();
         conn.setRequestMethod("POST");
         conn.setRequestProperty("Content-Type", "application/json");
-        
-        String authHeader = "Bearer " + accessKey + ":" + secretKey;
-        conn.setRequestProperty("Authorization", authHeader);
+        conn.setRequestProperty("Authorization", "Bearer " + accessToken);
         
         conn.setConnectTimeout(60000);
         conn.setReadTimeout(60000);
@@ -170,7 +223,6 @@ public class BaiduLlmProvider implements LlmProvider {
         
         String jsonBody = mapToJson(requestBody);
         log.debug("Request body: {}", jsonBody);
-        log.debug("Authorization: {}", authHeader.substring(0, Math.min(30, authHeader.length())) + "...");
         
         try (OutputStream os = conn.getOutputStream()) {
             byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);

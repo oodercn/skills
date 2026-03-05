@@ -824,8 +824,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt: message,
-                        systemPrompt: this.settings.systemPrompt,
+                        message: message,
                         model: this.currentModel,
                         provider: this.currentProvider,
                         temperature: this.settings.temperature,
@@ -865,8 +864,7 @@
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
-                        prompt: message,
-                        systemPrompt: this.settings.systemPrompt,
+                        message: message,
                         model: this.currentModel,
                         provider: this.currentProvider,
                         temperature: this.settings.temperature,
@@ -874,18 +872,28 @@
                     })
                 });
 
+                if (!response.ok) {
+                    throw new Error('HTTP ' + response.status + ': ' + response.statusText);
+                }
+
+                if (!response.body) {
+                    throw new Error('Response body is null');
+                }
+
                 var reader = response.body.getReader();
                 var decoder = new TextDecoder();
 
+                var buffer = '';
                 while (true) {
                     var result = await reader.read();
                     if (result.done) break;
 
-                    var chunk = decoder.decode(result.value);
-                    var lines = chunk.split('\n');
+                    buffer += decoder.decode(result.value, { stream: true });
+                    var lines = buffer.split('\n');
+                    buffer = lines.pop() || '';
 
                     for (var i = 0; i < lines.length; i++) {
-                        var line = lines[i];
+                        var line = lines[i].trim();
                         if (line.startsWith('data:')) {
                             var data = line.substring(5).trim();
                             if (data === '[DONE]') {
@@ -903,7 +911,7 @@
                 this.updateStatus('ready');
             } catch (error) {
                 console.error('Stream error:', error);
-                contentDiv.innerHTML = '抱歉，流式输出发生错误';
+                contentDiv.innerHTML = '抱歉，流式输出发生错误: ' + (error.message || '未知错误');
                 this.updateStatus('error');
             } finally {
                 this.isStreaming = false;
@@ -946,6 +954,7 @@
             if (!content) return '';
             
             return content
+                .replace(/\\n/g, '\n')
                 .replace(/```(\w+)?\n([\s\S]*?)```/g, '<pre><code>$2</code></pre>')
                 .replace(/`([^`]+)`/g, '<code>$1</code>')
                 .replace(/\n/g, '<br>');
