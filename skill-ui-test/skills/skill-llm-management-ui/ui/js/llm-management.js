@@ -9,9 +9,19 @@ const LLMManagement = {
         await this.loadConfigs();
     },
     
+    promisify(obj, method, url, data) {
+        return new Promise((resolve, reject) => {
+            if (data) {
+                obj[method](url, data, (res) => resolve(res));
+            } else {
+                obj[method](url, (res) => resolve(res));
+            }
+        });
+    },
+    
     async loadProviders() {
         try {
-            const response = await NexusApi.post('/api/llm/providers');
+            const response = await this.promisify(NexusAPI, 'get', '/api/llm/providers');
             if (response.status === 'success' && response.data) {
                 this.providers = response.data;
                 this.renderProviders();
@@ -24,7 +34,7 @@ const LLMManagement = {
     
     async loadConfigs() {
         try {
-            const response = await NexusApi.get('/api/v1/llm/config');
+            const response = await this.promisify(NexusAPI, 'get', '/api/v1/llm/config');
             if (response.status === 'success' && response.data) {
                 this.configs = response.data.configs || [];
                 this.renderConfigs();
@@ -306,9 +316,9 @@ const LLMManagement = {
         try {
             let response;
             if (id) {
-                response = await NexusApi.put(`/api/v1/llm/config/${id}`, config);
+                response = await this.promisify(NexusAPI, 'put', `/api/v1/llm/config/${id}`, config);
             } else {
-                response = await NexusApi.post('/api/v1/llm/config', config);
+                response = await this.promisify(NexusAPI, 'post', '/api/v1/llm/config', config);
             }
             
             if (response.status === 'success') {
@@ -338,7 +348,7 @@ const LLMManagement = {
         if (!this.deleteConfigId) return;
         
         try {
-            const response = await NexusApi.delete(`/api/v1/llm/config/${this.deleteConfigId}`);
+            const response = await this.promisify(NexusAPI, 'delete', `/api/v1/llm/config/${this.deleteConfigId}`);
             if (response.status === 'success') {
                 this.closeDeleteModal();
                 await this.loadConfigs();

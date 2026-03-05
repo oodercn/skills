@@ -62,6 +62,22 @@ public class SkillIndexLoader {
                 }
             }
             
+            if (is == null) {
+                File repoRootPath = new File("../../skill-index.yaml");
+                if (repoRootPath.exists()) {
+                    is = new FileInputStream(repoRootPath);
+                    log.info("[loadSkillIndex] Loading from repo root: {}", repoRootPath.getAbsolutePath());
+                }
+            }
+            
+            if (is == null) {
+                File absolutePath = new File("e:/github/ooder-skills/skill-index.yaml");
+                if (absolutePath.exists()) {
+                    is = new FileInputStream(absolutePath);
+                    log.info("[loadSkillIndex] Loading from absolute path: {}", absolutePath.getAbsolutePath());
+                }
+            }
+            
             if (is != null) {
                 skillIndex = yaml.load(is);
                 is.close();
@@ -88,6 +104,14 @@ public class SkillIndexLoader {
     public List<CapabilityDTO> getSkillsFromIndex(String source) {
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
+        Set<String> sceneIds = new HashSet<>();
+        for (Map<String, Object> scene : scenes) {
+            String sceneId = (String) scene.get("sceneId");
+            if (sceneId != null) {
+                sceneIds.add(sceneId);
+            }
+        }
+        
         for (Map<String, Object> skill : skills) {
             CapabilityDTO cap = new CapabilityDTO();
             cap.setId((String) skill.get("skillId"));
@@ -106,16 +130,9 @@ public class SkillIndexLoader {
             Object typeObj = skill.get("type");
             String type = typeObj != null ? String.valueOf(typeObj) : null;
             
-            boolean isScene = false;
-            if ("SCENE".equals(type) || "scene".equals(type)) {
-                isScene = true;
-            } else if (skillId != null && 
-                (skillId.contains("-scene") || skillId.endsWith("-scene") || 
-                 "daily-log-scene".equals(skillId))) {
-                isScene = true;
-            }
+            boolean isScene = "SCENE".equals(type) || "scene".equals(type);
             
-            cap.setType(isScene ? "SCENE" : (type != null ? type : "SKILL"));
+            cap.setType(isScene ? "SCENE" : "SKILL");
             cap.setSceneCapability(isScene);
             
             capabilities.add(cap);

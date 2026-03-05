@@ -66,7 +66,9 @@
                 })
                 .catch(function(error) {
                     console.error('加载能力失败:', error);
-                    MyCapabilities.loadMockData();
+                    capabilities = [];
+                    MyCapabilities.renderTable();
+                    MyCapabilities.updateStats();
                 });
         },
 
@@ -79,62 +81,12 @@
                 })
                 .catch(function(error) {
                     console.error('加载绑定失败:', error);
+                    bindings = [];
                 });
         },
 
         loadMockData: function() {
-            capabilities = [
-                {
-                    capabilityId: 'report-remind',
-                    name: '日志提醒',
-                    type: 'COMMUNICATION',
-                    status: 'ENABLED',
-                    version: '1.0.0',
-                    description: '定时提醒员工提交工作日志',
-                    lastInvokeTime: Date.now() - 3600000,
-                    invokeCount: 156
-                },
-                {
-                    capabilityId: 'report-submit',
-                    name: '日志提交',
-                    type: 'SERVICE',
-                    status: 'ENABLED',
-                    version: '1.0.0',
-                    description: '员工提交工作日志的表单能力',
-                    lastInvokeTime: Date.now() - 7200000,
-                    invokeCount: 89
-                },
-                {
-                    capabilityId: 'report-aggregate',
-                    name: '日志汇总',
-                    type: 'SERVICE',
-                    status: 'ENABLED',
-                    version: '1.0.0',
-                    description: '汇总所有员工提交的日志',
-                    lastInvokeTime: Date.now() - 86400000,
-                    invokeCount: 45
-                },
-                {
-                    capabilityId: 'notification-email',
-                    name: '邮件通知',
-                    type: 'COMMUNICATION',
-                    status: 'ENABLED',
-                    version: '2.1.0',
-                    description: '发送邮件通知',
-                    lastInvokeTime: Date.now() - 1800000,
-                    invokeCount: 234
-                },
-                {
-                    capabilityId: 'notification-sms',
-                    name: '短信通知',
-                    type: 'COMMUNICATION',
-                    status: 'DISABLED',
-                    version: '1.5.0',
-                    description: '发送短信通知',
-                    lastInvokeTime: Date.now() - 172800000,
-                    invokeCount: 12
-                }
-            ];
+            capabilities = [];
             MyCapabilities.renderTable();
             MyCapabilities.updateStats();
         },

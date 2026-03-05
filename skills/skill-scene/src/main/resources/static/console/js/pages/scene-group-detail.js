@@ -180,38 +180,23 @@ async function loadSceneGroup(id) {
 
 function loadMockSceneGroup() {
     currentGroup = {
-        sceneGroupId: sceneGroupId || 'sg-project-alpha',
-        templateId: 'tpl-daily-report',
-        name: '研发部日志汇报组',
-        description: '研发部团队的日常日志汇报场景组，支持日志提交、提醒、汇总和分析。',
-        status: 'ACTIVE',
-        creatorId: 'user-manager-001',
+        sceneGroupId: sceneGroupId || 'sg-new',
+        templateId: '',
+        name: '新场景组',
+        description: '',
+        status: 'INACTIVE',
+        creatorId: '',
         creatorType: 'USER',
         config: {
-            minMembers: 2,
-            maxMembers: 20
+            minMembers: 1,
+            maxMembers: 100
         },
-        memberCount: 5,
-        createTime: Date.now() - 86400000 * 5,
-        participants: [
-            { participantId: 'user-manager-001', participantType: 'USER', role: 'manager', status: 'ACTIVE', joinTime: Date.now() - 86400000 * 5, name: '张经理' },
-            { participantId: 'user-employee-001', participantType: 'USER', role: 'employee', status: 'ACTIVE', joinTime: Date.now() - 86400000 * 4, name: '李员工' },
-            { participantId: 'user-employee-002', participantType: 'USER', role: 'employee', status: 'ACTIVE', joinTime: Date.now() - 86400000 * 3, name: '王员工' },
-            { participantId: 'agent-llm-001', participantType: 'AGENT', role: 'llm-assistant', status: 'ACTIVE', joinTime: Date.now() - 86400000 * 5, name: 'LLM分析助手' },
-            { participantId: 'agent-coord-001', participantType: 'AGENT', role: 'coordinator', status: 'ACTIVE', joinTime: Date.now() - 86400000 * 5, name: '协调Agent' }
-        ],
-        capabilityBindings: [
-            { bindingId: 'cb-001', capId: 'report-remind', capName: '日志提醒', providerType: 'AGENT', providerId: 'agent-coord-001', connectorType: 'INTERNAL', status: 'ACTIVE', priority: 1 },
-            { bindingId: 'cb-002', capId: 'report-submit', capName: '日志提交', providerType: 'SKILL', providerId: 'skill-daily-report', connectorType: 'HTTP', status: 'ACTIVE', priority: 1 },
-            { bindingId: 'cb-003', capId: 'report-aggregate', capName: '日志汇总', providerType: 'AGENT', providerId: 'agent-coord-001', connectorType: 'INTERNAL', status: 'ACTIVE', priority: 1 },
-            { bindingId: 'cb-004', capId: 'report-analyze', capName: '日志分析', providerType: 'AGENT', providerId: 'agent-llm-001', connectorType: 'INTERNAL', status: 'ACTIVE', priority: 1 }
-        ],
-        workflows: [
-            { workflowId: 'wf-001', triggerType: 'schedule', status: 'completed', startTime: Date.now() - 86400000, endTime: Date.now() - 86400000 + 3600000 }
-        ],
-        snapshots: [
-            { snapshotId: 'snap-001', createTime: Date.now() - 86400000 * 2, status: 'valid', description: '每日自动快照' }
-        ]
+        memberCount: 0,
+        createTime: Date.now(),
+        participants: [],
+        capabilityBindings: [],
+        workflows: [],
+        snapshots: []
     };
     renderSceneGroup();
 }

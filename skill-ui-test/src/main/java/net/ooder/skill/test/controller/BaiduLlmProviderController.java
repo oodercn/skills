@@ -179,17 +179,52 @@ public class BaiduLlmProviderController {
         
         Map<String, Object> ernie4 = new HashMap<>();
         ernie4.put("id", "ernie-4.0-8k");
-        ernie4.put("name", "ERNIE 4.0 8K");
+        ernie4.put("name", "ERNIE 4.0 (8K)");
         ernie4.put("type", "chat");
         ernie4.put("maxTokens", 8192);
         models.add(ernie4);
         
+        Map<String, Object> ernie4Turbo = new HashMap<>();
+        ernie4Turbo.put("id", "ernie-4.0-turbo-8k");
+        ernie4Turbo.put("name", "ERNIE 4.0 Turbo (8K)");
+        ernie4Turbo.put("type", "chat");
+        ernie4Turbo.put("maxTokens", 8192);
+        models.add(ernie4Turbo);
+        
         Map<String, Object> ernie35 = new HashMap<>();
         ernie35.put("id", "ernie-3.5-8k");
-        ernie35.put("name", "ERNIE 3.5 8K");
+        ernie35.put("name", "ERNIE 3.5 (8K)");
         ernie35.put("type", "chat");
         ernie35.put("maxTokens", 8192);
         models.add(ernie35);
+        
+        Map<String, Object> ernie35Turbo = new HashMap<>();
+        ernie35Turbo.put("id", "ernie-3.5-turbo-8k");
+        ernie35Turbo.put("name", "ERNIE 3.5 Turbo (8K)");
+        ernie35Turbo.put("type", "chat");
+        ernie35Turbo.put("maxTokens", 8192);
+        models.add(ernie35Turbo);
+        
+        Map<String, Object> ernieSpeed = new HashMap<>();
+        ernieSpeed.put("id", "ernie-speed-8k");
+        ernieSpeed.put("name", "ERNIE Speed (8K)");
+        ernieSpeed.put("type", "chat");
+        ernieSpeed.put("maxTokens", 8192);
+        models.add(ernieSpeed);
+        
+        Map<String, Object> ernieLite = new HashMap<>();
+        ernieLite.put("id", "ernie-lite-8k");
+        ernieLite.put("name", "ERNIE Lite (8K)");
+        ernieLite.put("type", "chat");
+        ernieLite.put("maxTokens", 8192);
+        models.add(ernieLite);
+        
+        Map<String, Object> ernieTiny = new HashMap<>();
+        ernieTiny.put("id", "ernie-tiny-8k");
+        ernieTiny.put("name", "ERNIE Tiny (8K)");
+        ernieTiny.put("type", "chat");
+        ernieTiny.put("maxTokens", 8192);
+        models.add(ernieTiny);
         
         Map<String, Object> embed = new HashMap<>();
         embed.put("id", "embedding-v1");

@@ -24,40 +24,14 @@ async function refreshTemplates() {
         }
     } catch (error) {
         console.error('Failed to load templates:', error);
-        loadMockData();
+        templates = [];
+        renderTemplateTable();
+        updateStats();
     }
 }
 
 function loadMockData() {
-    templates = [
-        {
-            templateId: 'tpl-enterprise-standard',
-            name: '企业标准场景能力',
-            category: 'enterprise',
-            version: '1.0.0',
-            status: 'published',
-            capabilityCount: 5,
-            createTime: Date.now() - 86400000 * 7
-        },
-        {
-            templateId: 'tpl-personal-basic',
-            name: '个人基础场景能力',
-            category: 'personal',
-            version: '1.0.0',
-            status: 'published',
-            capabilityCount: 3,
-            createTime: Date.now() - 86400000 * 3
-        },
-        {
-            templateId: 'tpl-test-environment',
-            name: '测试环境场景能力',
-            category: 'test',
-            version: '0.9.0',
-            status: 'draft',
-            capabilityCount: 2,
-            createTime: Date.now() - 86400000
-        }
-    ];
+    templates = [];
     renderTemplateTable();
     updateStats();
 }

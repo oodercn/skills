@@ -1,6 +1,7 @@
 package net.ooder.skill.scene.controller;
 
 import javax.validation.Valid;
+import net.ooder.skill.scene.discovery.SkillIndexLoader;
 import net.ooder.skill.scene.dto.discovery.*;
 import net.ooder.skill.scene.model.ResultModel;
 import net.ooder.scene.core.SceneEngine;
@@ -39,6 +40,9 @@ public class GitDiscoveryController {
 
     @Value("${ooder.github.token:}")
     private String defaultGithubToken;
+    
+    @Value("${ooder.discovery.use-index-first:true}")
+    private boolean useIndexFirst;
 
     @Autowired(required = false)
     private UnifiedSceneService unifiedSceneService;
@@ -57,10 +61,14 @@ public class GitDiscoveryController {
 
     @Autowired(required = false)
     private net.ooder.skill.scene.capability.service.CapabilityService capabilityService;
+    
+    @Autowired
+    private SkillIndexLoader skillIndexLoader;
 
     @PostMapping("/github")
     public ResultModel<DiscoveryResultDTO> discoverFromGitHub(@RequestBody @Valid GitDiscoveryConfigDTO config) {
-        log.info("[discoverFromGitHub] repoUrl: {}, branch: {}, mockEnabled: {}", config.getRepoUrl(), config.getBranch(), mockEnabled);
+        log.info("[discoverFromGitHub] repoUrl: {}, branch: {}, mockEnabled: {}, useIndexFirst: {}", 
+            config.getRepoUrl(), config.getBranch(), mockEnabled, useIndexFirst);
         
         DiscoveryResultDTO result = new DiscoveryResultDTO();
         result.setMethod("GITHUB");
@@ -69,26 +77,36 @@ public class GitDiscoveryController {
         
         List<CapabilityDTO> capabilities = new ArrayList<>();
         String errorMessage = null;
+        boolean fromCache = false;
         
-        if (gitHubDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()) {
+        if (useIndexFirst && skillIndexLoader != null) {
+            log.info("[discoverFromGitHub] Using skill-index.yaml (useIndexFirst=true)");
+            capabilities = skillIndexLoader.getSkillsFromIndex("GITHUB");
+            fromCache = true;
+            log.info("[discoverFromGitHub] Found {} capabilities from skill-index.yaml", capabilities.size());
+        }
+        
+        if (capabilities.isEmpty() && gitHubDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()) {
             try {
                 String[] parts = parseRepoUrl(config.getRepoUrl());
                 if (parts != null) {
                     List<SkillPackage> packages = gitHubDiscoverer.discoverSkills(parts[0], parts[1]).get();
                     capabilities = convertToCapabilities(packages, "GITHUB");
+                    fromCache = false;
                     log.info("[discoverFromGitHub] Found {} capabilities from GitHub", capabilities.size());
                 }
             } catch (Exception e) {
                 log.error("[discoverFromGitHub] error: {}", e.getMessage());
                 errorMessage = e.getMessage();
             }
-        } else if (gitHubDiscoverer == null) {
+        } else if (capabilities.isEmpty() && gitHubDiscoverer == null) {
             errorMessage = "GitHubDiscoverer not available";
         }
         
         if (capabilities.isEmpty() && mockEnabled) {
             log.info("[discoverFromGitHub] Using mock data (mockEnabled=true)");
             capabilities = getMockGitHubCapabilities(config.getRepoUrl());
+            fromCache = false;
         } else if (capabilities.isEmpty()) {
             log.warn("[discoverFromGitHub] No capabilities found, mock disabled. Error: {}", errorMessage);
             result.setErrorMessage(errorMessage != null ? errorMessage : "No capabilities found and mock is disabled");
@@ -96,6 +114,7 @@ public class GitDiscoveryController {
         
         result.setCapabilities(capabilities);
         result.setScanTime(System.currentTimeMillis());
+        result.setFromCache(fromCache);
         
         return ResultModel.success(result);
     }
@@ -105,13 +124,14 @@ public class GitDiscoveryController {
         String effectiveToken = config.getToken() != null && !config.getToken().isEmpty() 
             ? config.getToken() : defaultGiteeToken;
         
-        log.info("[discoverFromGitee] repoUrl: {}, branch: {}, token: {}, mockEnabled: {}", 
+        log.info("[discoverFromGitee] repoUrl: {}, branch: {}, token: {}, mockEnabled: {}, useIndexFirst: {}", 
             config.getRepoUrl(), config.getBranch(),
-            effectiveToken != null ? "***" : "null", mockEnabled);
+            effectiveToken != null ? "***" : "null", mockEnabled, useIndexFirst);
         
-        log.info("[discoverFromGitee] unifiedSceneService: {}, giteeDiscoverer: {}", 
+        log.info("[discoverFromGitee] unifiedSceneService: {}, giteeDiscoverer: {}, skillIndexLoader: {}", 
             unifiedSceneService != null ? "available" : "null", 
-            giteeDiscoverer != null ? "available" : "null");
+            giteeDiscoverer != null ? "available" : "null",
+            skillIndexLoader != null ? "available" : "null");
         
         DiscoveryResultDTO result = new DiscoveryResultDTO();
         result.setMethod("GITEE");
@@ -120,8 +140,16 @@ public class GitDiscoveryController {
         
         List<CapabilityDTO> capabilities = new ArrayList<>();
         String errorMessage = null;
+        boolean fromCache = false;
         
-        if (unifiedSceneService != null) {
+        if (useIndexFirst && skillIndexLoader != null) {
+            log.info("[discoverFromGitee] Using skill-index.yaml (useIndexFirst=true)");
+            capabilities = skillIndexLoader.getAllCapabilities("GITEE");
+            fromCache = true;
+            log.info("[discoverFromGitee] Found {} capabilities (skills + scenes) from skill-index.yaml", capabilities.size());
+        }
+        
+        if (capabilities.isEmpty() && unifiedSceneService != null) {
             try {
                 String[] parts = parseRepoUrl(config.getRepoUrl());
                 if (parts != null && parts.length >= 2) {
@@ -156,6 +184,7 @@ public class GitDiscoveryController {
                             
                             capabilities.add(cap);
                         }
+                        fromCache = false;
                         log.info("[discoverFromGitee] Found {} capabilities via UnifiedSceneService", capabilities.size());
                     }
                 }
@@ -163,25 +192,27 @@ public class GitDiscoveryController {
                 log.error("[discoverFromGitee] UnifiedSceneService error: {}", e.getMessage());
                 errorMessage = e.getMessage();
             }
-        } else if (giteeDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()){
+        } else if (capabilities.isEmpty() && giteeDiscoverer != null && config.getRepoUrl() != null && !config.getRepoUrl().isEmpty()){
             try {
                 String[] parts = parseRepoUrl(config.getRepoUrl());
                 if (parts != null) {
                     List<SkillPackage> packages = giteeDiscoverer.discoverSkills(parts[0]).get();
                     capabilities = convertToCapabilities(packages, "GITEE");
+                    fromCache = false;
                     log.info("[discoverFromGitee] Found {} capabilities from Gitee", capabilities.size());
                 }
             } catch (Exception e) {
                 log.error("[discoverFromGitee] error: {}", e.getMessage());
                 errorMessage = e.getMessage();
             }
-        } else if (giteeDiscoverer == null && unifiedSceneService == null) {
+        } else if (capabilities.isEmpty() && giteeDiscoverer == null && unifiedSceneService == null) {
             errorMessage = "Neither UnifiedSceneService nor GiteeDiscoverer available";
         }
         
         if (capabilities.isEmpty() && mockEnabled) {
             log.info("[discoverFromGitee] Using mock data (mockEnabled=true)");
             capabilities = getMockGiteeCapabilities(config.getRepoUrl());
+            fromCache = false;
         } else if (capabilities.isEmpty()) {
             log.warn("[discoverFromGitee] No capabilities found, mock disabled. Error: {}", errorMessage);
             result.setErrorMessage(errorMessage != null ? errorMessage : "No capabilities found and mock is disabled");
@@ -189,6 +220,7 @@ public class GitDiscoveryController {
         
         result.setCapabilities(capabilities);
         result.setScanTime(System.currentTimeMillis());
+        result.setFromCache(fromCache);
         
         return ResultModel.success(result);
     }
@@ -412,16 +444,39 @@ public class GitDiscoveryController {
             cap.setSource(source);
             cap.setStatus("available");
             
-            String skillId = pkg.getSkillId();
-            boolean isScene = skillId != null && 
-                (skillId.contains("-scene") || skillId.endsWith("-scene") || 
-                 "daily-log-scene".equals(skillId));
+            boolean isScene = checkSceneCapability(pkg);
+            
             cap.setType(isScene ? "SCENE" : "SKILL");
             cap.setSceneCapability(isScene);
             
             capabilities.add(cap);
         }
         return capabilities;
+    }
+    
+    private boolean checkSceneCapability(SkillPackage pkg) {
+        try {
+            java.lang.reflect.Method getSceneCapability = pkg.getClass().getMethod("getSceneCapability");
+            Boolean sceneCapability = (Boolean) getSceneCapability.invoke(pkg);
+            if (sceneCapability != null && sceneCapability) {
+                return true;
+            }
+        } catch (Exception ignored) {
+        }
+        
+        try {
+            java.lang.reflect.Method getSceneId = pkg.getClass().getMethod("getSceneId");
+            String sceneId = (String) getSceneId.invoke(pkg);
+            if (sceneId != null && !sceneId.isEmpty()) {
+                return true;
+            }
+        } catch (Exception ignored) {
+        }
+        
+        String skillId = pkg.getSkillId();
+        return skillId != null && 
+            (skillId.contains("-scene") || skillId.endsWith("-scene") || 
+             "daily-log-scene".equals(skillId));
     }
 
     private List<RepositoryDTO> getDefaultGiteeRepos() {

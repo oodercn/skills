@@ -184,102 +184,15 @@
                 })
                 .catch(function(error) {
                     console.error('加载能力失败:', error);
-                    CapabilityManagement.loadMockCapabilities();
+                    capabilities = [];
+                    CapabilityManagement.updateStats();
+                    CapabilityManagement.renderCapabilities();
+                    CapabilityManagement.renderTypeFilters();
                 });
         },
 
         loadMockCapabilities: function() {
-            capabilities = [
-                {
-                    capabilityId: 'report-remind',
-                    name: '日志提醒',
-                    type: 'COMMUNICATION',
-                    description: '定时提醒员工提交工作日志，支持多种通知渠道',
-                    status: 'installed',
-                    version: '1.0.0',
-                    source: 'local',
-                    dependencies: ['notification-email', 'notification-sms'],
-                    provider: 'skill-daily-report'
-                },
-                {
-                    capabilityId: 'report-submit',
-                    name: '日志提交',
-                    type: 'SERVICE',
-                    description: '员工提交工作日志的表单能力，支持文本、图片、附件',
-                    status: 'installed',
-                    version: '1.0.0',
-                    source: 'local',
-                    dependencies: [],
-                    provider: 'skill-daily-report'
-                },
-                {
-                    capabilityId: 'report-aggregate',
-                    name: '日志汇总',
-                    type: 'SERVICE',
-                    description: '汇总所有员工提交的日志，生成统计报表',
-                    status: 'installed',
-                    version: '1.0.0',
-                    source: 'local',
-                    dependencies: ['report-submit'],
-                    provider: 'skill-daily-report'
-                },
-                {
-                    capabilityId: 'report-analyze',
-                    name: '日志分析',
-                    type: 'AI',
-                    description: '使用AI分析日志内容，提取关键信息和洞察',
-                    status: 'available',
-                    version: '1.0.0',
-                    source: 'skill_center',
-                    dependencies: ['report-aggregate'],
-                    provider: null
-                },
-                {
-                    capabilityId: 'notification-email',
-                    name: '邮件通知',
-                    type: 'COMMUNICATION',
-                    description: '发送邮件通知，支持模板和附件',
-                    status: 'installed',
-                    version: '2.1.0',
-                    source: 'local',
-                    dependencies: [],
-                    provider: 'skill-notification'
-                },
-                {
-                    capabilityId: 'notification-sms',
-                    name: '短信通知',
-                    type: 'COMMUNICATION',
-                    description: '发送短信通知，支持验证码和营销短信',
-                    status: 'installed',
-                    version: '1.5.0',
-                    source: 'local',
-                    dependencies: [],
-                    provider: 'skill-notification'
-                },
-                {
-                    capabilityId: 'data-backup',
-                    name: '数据备份',
-                    type: 'STORAGE',
-                    description: '自动备份场景数据到云端或本地存储',
-                    status: 'available',
-                    version: '1.0.0',
-                    source: 'github',
-                    dependencies: [],
-                    provider: null
-                },
-                {
-                    capabilityId: 'system-monitor',
-                    name: '系统监控',
-                    type: 'MONITORING',
-                    description: '监控系统运行状态，包括CPU、内存、网络等',
-                    status: 'available',
-                    version: '1.0.0',
-                    source: 'gitee',
-                    dependencies: [],
-                    provider: null
-                }
-            ];
-            installedCapabilities = capabilities.filter(function(c) { return c.status === 'installed'; });
+            capabilities = [];
             CapabilityManagement.updateStats();
             CapabilityManagement.renderCapabilities();
             CapabilityManagement.renderTypeFilters();
@@ -462,24 +375,7 @@
                     console.error('Discovery error:', error);
                     discoveryStatus[methodId] = 'error';
                     CapabilityManagement.addLog('error', '发现失败: ' + error.message);
-
-                    var mockDiscovered = [
-                        { id: 'cap-' + Date.now(), name: '示例能力 ' + methodId, type: 'SERVICE', description: '通过' + methodId + '发现的能力' }
-                    ];
-                    mockDiscovered.forEach(function(cap) {
-                        capabilities.push({
-                            capabilityId: cap.id,
-                            name: cap.name,
-                            type: cap.type,
-                            description: cap.description,
-                            status: 'available',
-                            version: '1.0.0',
-                            source: methodId,
-                            dependencies: [],
-                            provider: null
-                        });
-                    });
-                    CapabilityManagement.addLog('warn', '使用模拟数据');
+                    CapabilityManagement.addLog('warn', '未发现新能力');
                     CapabilityManagement.updateStats();
                     CapabilityManagement.renderCapabilities();
                 })

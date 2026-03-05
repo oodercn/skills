@@ -17,6 +17,8 @@ public class DiscoveryResultDTO {
     private List<RepositoryDTO> repositories;
     
     private String errorMessage;
+    
+    private boolean fromCache;
 
     public DiscoveryResultDTO() {}
 
@@ -74,5 +76,13 @@ public class DiscoveryResultDTO {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public boolean isFromCache() {
+        return fromCache;
+    }
+
+    public void setFromCache(boolean fromCache) {
+        this.fromCache = fromCache;
     }
 }

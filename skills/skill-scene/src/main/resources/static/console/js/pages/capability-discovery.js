@@ -222,6 +222,9 @@
 
             if (isScanning) return;
             isScanning = true;
+            
+            discoveredCapabilities = [];
+            scanStats = { scanned: 0, found: 0, new: 0, installed: installedCapabilities.length };
 
             var sweep = document.getElementById('radarSweep');
             sweep.classList.remove('idle');
@@ -231,7 +234,6 @@
             document.getElementById('badge-' + currentMethod).textContent = '扫描中';
             document.getElementById('badge-' + currentMethod).className = 'method-badge running';
 
-            scanStats = { scanned: 0, found: 0, new: 0, installed: installedCapabilities.length };
             CapabilityDiscovery.updateStats();
             CapabilityDiscovery.addLog('info', '开始扫描: ' + currentMethod);
 
@@ -336,10 +338,14 @@
             var caps = data.capabilities || [];
             
             caps.forEach(function(cap) {
-                var exists = installedCapabilities.find(function(i) { 
+                var existsInInstalled = installedCapabilities.find(function(i) { 
                     return i.capabilityId === cap.id; 
                 });
-                if (!exists) {
+                var existsInDiscovered = discoveredCapabilities.find(function(d) { 
+                    return d.id === cap.id; 
+                });
+                
+                if (!existsInInstalled && !existsInDiscovered) {
                     var isScene = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
                     discoveredCapabilities.push({
                         capabilityId: cap.id,
@@ -354,6 +360,7 @@
                         dependencies: [],
                         provider: null
                     });
+                    scanStats.new++;
                 }
             });
 

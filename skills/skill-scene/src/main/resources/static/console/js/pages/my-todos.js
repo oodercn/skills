@@ -50,99 +50,22 @@ async function refreshAll() {
         var result = await ApiClient.get('/api/v1/my/todos?pageNum=1&pageSize=50');
         
         if (result.code === 200 && result.data) {
-            todos = result.data.list || [];
-        } else {
-            loadMockTodos();
+            todos = result.data.list || result.data;
+            renderTodos();
+            updateStats();
         }
     } catch (error) {
         console.error('Failed to load todos:', error);
-        loadMockTodos();
+        todos = [];
+        renderTodos();
+        updateStats();
     }
-    
-    renderTodos();
-    updateStats();
 }
 
 function loadMockTodos() {
-    todos = [
-        {
-            id: 'todo-001',
-            type: TODO_TYPES.INVITATION,
-            title: '张经理 邀请您加入 "研发部日志汇报组"',
-            sceneGroupId: 'sg-dev-log',
-            sceneGroupName: '研发部日志汇报组',
-            fromUser: '张经理',
-            role: 'employee',
-            createTime: Date.now() - 3600000,
-            status: 'pending'
-        },
-        {
-            id: 'todo-002',
-            type: TODO_TYPES.INVITATION,
-            title: '李总监 邀请您加入 "项目Alpha协作组"',
-            sceneGroupId: 'sg-project-alpha',
-            sceneGroupName: '项目Alpha协作组',
-            fromUser: '李总监',
-            role: 'manager',
-            createTime: Date.now() - 86400000,
-            status: 'pending'
-        },
-        {
-            id: 'todo-003',
-            type: TODO_TYPES.DELEGATION,
-            title: '完成项目周报汇总',
-            sceneGroupId: 'sg-weekly-report',
-            sceneGroupName: '项目周报汇报组',
-            fromUser: '李总监',
-            deadline: Date.now() + 86400000 * 2,
-            createTime: Date.now() - 7200000,
-            status: 'pending'
-        },
-        {
-            id: 'todo-004',
-            type: TODO_TYPES.DELEGATION,
-            title: '整理本月考勤数据',
-            sceneGroupId: 'sg-hr-team',
-            sceneGroupName: 'HR团队组',
-            fromUser: '王部长',
-            deadline: Date.now() + 3600000 * 5,
-            createTime: Date.now() - 86400000,
-            status: 'pending'
-        },
-        {
-            id: 'todo-005',
-            type: TODO_TYPES.REMINDER,
-            title: '提交日志提醒',
-            sceneGroupId: 'sg-dev-log',
-            sceneGroupName: '研发部日志汇报组',
-            deadline: Date.now() + 3600000 * 3,
-            createTime: Date.now(),
-            status: 'pending'
-        },
-        {
-            id: 'todo-006',
-            type: TODO_TYPES.APPROVAL,
-            title: '请假申请审批',
-            sceneGroupId: 'sg-hr-team',
-            sceneGroupName: 'HR团队组',
-            fromUser: '员工小王',
-            deadline: Date.now() + 86400000,
-            createTime: Date.now() - 1800000,
-            status: 'pending'
-        },
-        {
-            id: 'todo-007',
-            type: TODO_TYPES.INVITATION,
-            title: '赵主管 邀请您加入 "测试团队组"',
-            sceneGroupId: 'sg-test-team',
-            sceneGroupName: '测试团队组',
-            fromUser: '赵主管',
-            role: 'employee',
-            createTime: Date.now() - 86400000 * 2,
-            status: 'completed',
-            completedTime: Date.now() - 86400000
-        }
-    ];
+    todos = [];
+    renderTodos();
+    updateStats();
 }
 
 function switchTab(tab) {

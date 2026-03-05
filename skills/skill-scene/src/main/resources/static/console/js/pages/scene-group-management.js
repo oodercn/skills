@@ -25,10 +25,7 @@ async function loadTemplates() {
         }
     } catch (error) {
         console.error('Failed to load templates:', error);
-        templates = [
-            {templateId: 'tpl-enterprise-standard', name: '企业标准模板'},
-            {templateId: 'tpl-personal-basic', name: '个人基础模板'}
-        ];
+        templates = [];
         populateTemplateSelects();
     }
 }
@@ -61,43 +58,17 @@ async function refreshSceneGroups() {
         }
     } catch (error) {
         console.error('Failed to load scene groups:', error);
-        loadMockData();
+        sceneGroups = [];
+        renderSceneGroupTable();
+        updateStats();
     }
 }
 
 function loadMockData() {
-    sceneGroups = [
-        {
-            sceneGroupId: 'sg-project-alpha',
-            name: '项目Alpha协作组',
-            templateId: 'tpl-enterprise-standard',
-            templateName: '企业标准模板',
-            status: 'ACTIVE',
-            memberCount: 5,
-            creatorId: 'user-001',
-            createTime: Date.now() - 86400000 * 5
-        },
-        {
-            sceneGroupId: 'sg-dev-team',
-            name: '开发团队组',
-            templateId: 'tpl-enterprise-standard',
-            templateName: '企业标准模板',
-            status: 'ACTIVE',
-            memberCount: 8,
-            creatorId: 'user-002',
-            createTime: Date.now() - 86400000 * 3
-        },
-        {
-            sceneGroupId: 'sg-test-env',
-            name: '测试环境组',
-            templateId: 'tpl-test-environment',
-            templateName: '测试环境模板',
-            status: 'SUSPENDED',
-            memberCount: 2,
-            creatorId: 'user-001',
-            createTime: Date.now() - 86400000
-        }
-    ];
+    sceneGroups = [];
+    renderSceneGroupTable();
+    updateStats();
+}
     renderSceneGroupTable();
     updateStats();
 }

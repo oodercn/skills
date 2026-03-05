@@ -33,7 +33,8 @@
       "children": [
         {"id": "llm-chat-main", "name": "智能对话", "icon": "ri-chat-3-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]},
         {"id": "llm-sessions", "name": "会话管理", "icon": "ri-history-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html#sessions", "status": "implemented", "roles": ["personal", "mcp"]},
-        {"id": "llm-settings", "name": "模型设置", "icon": "ri-settings-4-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html#settings", "status": "implemented", "roles": ["personal", "mcp"]}
+        {"id": "llm-settings", "name": "模型设置", "icon": "ri-settings-4-line", "url": "/console/skills/skill-llm-chat/ui/pages/index.html#settings", "status": "implemented", "roles": ["personal", "mcp"]},
+        {"id": "llm-config", "name": "LLM配置管理", "icon": "ri-settings-3-line", "url": "/console/skills/skill-llm-management-ui/ui/pages/index.html", "status": "implemented", "roles": ["personal", "mcp"]}
       ]
     },
     {

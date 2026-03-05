@@ -53,7 +53,7 @@ function formatTime(timestamp) {
 
 async function refreshAll() {
     await Promise.all([
-                refreshCreated(),
+        refreshCreated(),
         refreshStarted(),
         refreshParticipated()
     ]);
@@ -70,7 +70,8 @@ async function refreshCreated() {
         }
     } catch (error) {
         console.error('Failed to load created scenes:', error);
-        loadMockCreatedScenes();
+        createdScenes = [];
+        renderCreatedScenes();
     }
 }
 
@@ -84,7 +85,8 @@ async function refreshStarted() {
         }
     } catch (error) {
         console.error('Failed to load started scenes:', error);
-        loadMockStartedScenes();
+        startedScenes = [];
+        renderStartedScenes();
     }
 }
 
@@ -98,76 +100,23 @@ async function refreshParticipated() {
         }
     } catch (error) {
         console.error('Failed to load participated scenes:', error);
-        loadMockParticipatedScenes();
+        participatedScenes = [];
+        renderParticipatedScenes();
     }
 }
 
 function loadMockCreatedScenes() {
-    createdScenes = [
-        {
-            sceneGroupId: 'sg-project-alpha',
-            name: '项目Alpha协作组',
-            templateId: 'tpl-enterprise-standard',
-            templateName: '企业标准模板',
-            status: 'ACTIVE',
-            memberCount: 5,
-            createTime: Date.now() - 86400000 * 5,
-            lastUpdateTime: Date.now() - 3600000
-        },
-        {
-            sceneGroupId: 'sg-dev-team',
-            name: '开发团队组',
-            templateId: 'tpl-enterprise-standard',
-            templateName: '企业标准模板',
-            status: 'SUSPENDED',
-            memberCount: 8,
-            createTime: Date.now() - 86400000 * 3,
-            lastUpdateTime: Date.now() - 86400000
-        }
-    ];
+    createdScenes = [];
     renderCreatedScenes();
 }
 
 function loadMockStartedScenes() {
-    startedScenes = [
-        {
-            workflowId: 'wf-001',
-            sceneGroupId: 'sg-project-alpha',
-            sceneGroupName: '项目Alpha协作组',
-            triggerType: 'schedule',
-            status: 'running',
-            progress: 80,
-            startTime: Date.now() - 3600000,
-            estimatedEndTime: Date.now() + 1800000
-        },
-        {
-            workflowId: 'wf-002',
-            sceneGroupId: 'sg-dev-team',
-            sceneGroupName: '开发团队组',
-            triggerType: 'manual',
-            status: 'completed',
-            progress: 100,
-            startTime: Date.now() - 86400000,
-            endTime: Date.now() - 86400000 + 7200000
-        }
-    ];
+    startedScenes = [];
     renderStartedScenes();
 }
 
 function loadMockParticipatedScenes() {
-    participatedScenes = [
-        {
-            sceneGroupId: 'sg-hr-team',
-            name: 'HR团队组',
-            templateId: 'tpl-hr-standard',
-            templateName: 'HR标准模板',
-            status: 'ACTIVE',
-            memberCount: 4,
-            myRole: 'hr',
-            createTime: Date.now() - 86400000 * 10,
-            joinTime: Date.now() - 86400000 * 8
-        }
-    ];
+    participatedScenes = [];
     renderParticipatedScenes();
 }
 

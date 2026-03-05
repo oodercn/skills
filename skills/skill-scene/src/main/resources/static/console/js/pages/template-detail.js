@@ -141,48 +141,19 @@ async function loadTemplate(id) {
 
 function loadMockTemplate() {
     currentTemplate = {
-        templateId: templateId || 'tpl-daily-report',
-        name: '日志汇报场景能力',
+        templateId: templateId || 'tpl-new',
+        name: '新模板',
         version: '1.0.0',
-        description: '日志汇报场景，支持日志提交、提醒、汇总和分析。适用于团队日常日志管理，支持定时提醒、AI分析等功能。',
+        description: '',
         category: 'business',
         type: 'PRIMARY',
-        status: 'published',
-        createTime: Date.now() - 86400000 * 7,
-        updateTime: Date.now() - 86400000,
-        capabilities: [
-            { capId: 'report-remind', name: '日志提醒', description: '定时提醒员工提交日志', category: 'notification', llmHint: '在每天下午5点向所有未提交日志的员工发送提醒通知' },
-            { capId: 'report-submit', name: '日志提交', description: '员工提交工作日志', category: 'data-input', llmHint: '接收员工提交的日志内容，包括今日完成工作、遇到的问题、明日计划' },
-            { capId: 'report-aggregate', name: '日志汇总', description: '汇总所有员工日志', category: 'data-processing', llmHint: '将所有员工提交的日志按部门汇总，生成汇总报告' },
-            { capId: 'report-analyze', name: '日志分析', description: 'AI分析日志内容', category: 'intelligence', llmHint: '分析日志内容，识别工作亮点、风险点和改进建议' }
-        ],
-        roles: [
-            { name: 'manager', description: '场景管理者（领导）', required: true, minCount: 1, maxCount: 1, capabilities: ['report-remind', 'report-aggregate', 'report-analyze', 'report-submit'], orgBinding: { type: 'role', value: 'manager' } },
-            { name: 'employee', description: '普通员工', required: true, minCount: 1, maxCount: 100, capabilities: ['report-submit'], orgBinding: { type: 'department', value: 'dept-rd' } },
-            { name: 'llm-assistant', description: 'LLM分析助手', required: false, minCount: 0, maxCount: 5, capabilities: ['report-analyze', 'report-remind'], orgBinding: null },
-            { name: 'coordinator', description: '协调Agent', required: false, minCount: 0, maxCount: 1, capabilities: ['report-remind', 'report-aggregate'], orgBinding: null }
-        ],
-        workflow: {
-            triggers: [
-                { type: 'schedule', cron: '0 17 * * 1-5', action: 'remind-flow' },
-                { type: 'schedule', cron: '0 18 * * 1-5', action: 'aggregate-flow' }
-            ],
-            steps: [
-                { id: 'remind', name: '发送提醒', capability: 'report-remind', executor: 'coordinator' },
-                { id: 'wait-submit', name: '等待提交', type: 'wait', timeout: 3600000 },
-                { id: 'aggregate', name: '汇总日志', capability: 'report-aggregate', executor: 'coordinator', dependsOn: ['wait-submit'] },
-                { id: 'analyze', name: 'AI分析', capability: 'report-analyze', executor: 'llm-assistant', dependsOn: ['aggregate'] },
-                { id: 'notify-manager', name: '通知领导', capability: 'report-remind', executor: 'coordinator', dependsOn: ['analyze'] }
-            ]
-        },
-        securityPolicy: {
-            dataIsolation: [
-                { domain: 'employee-logs', access: ['manager', 'employee'], description: '员工日志数据' },
-                { domain: 'analysis-reports', access: ['manager'], description: '分析报告数据' }
-            ],
-            auditLogging: { level: 'detailed', retention: 365, events: ['read', 'write', 'delete', 'invoke'] },
-            accessControl: { type: 'rbac', defaultDeny: true }
-        }
+        status: 'draft',
+        createTime: Date.now(),
+        updateTime: Date.now(),
+        capabilities: [],
+        roles: [],
+        workflow: { triggers: [], steps: [] },
+        securityPolicy: { dataIsolation: [], auditLogging: null, accessControl: null }
     };
     renderTemplate();
 }

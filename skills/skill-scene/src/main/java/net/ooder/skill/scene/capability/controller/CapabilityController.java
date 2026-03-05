@@ -4,6 +4,7 @@ import net.ooder.skill.scene.capability.dto.StatusUpdateRequest;
 import net.ooder.skill.scene.capability.model.*;
 import net.ooder.skill.scene.capability.service.CapabilityService;
 import net.ooder.skill.scene.capability.service.CapabilityBindingService;
+import net.ooder.skill.scene.integration.SceneEngineIntegration;
 import net.ooder.skill.scene.model.ResultModel;
 
 import org.slf4j.Logger;
@@ -25,6 +26,9 @@ public class CapabilityController {
 
     @Autowired
     private CapabilityBindingService bindingService;
+    
+    @Autowired(required = false)
+    private SceneEngineIntegration sceneEngineIntegration;
 
     @GetMapping
     public ResultModel<List<Capability>> listCapabilities(
@@ -140,5 +144,63 @@ public class CapabilityController {
             @RequestBody StatusUpdateRequest request) {
         bindingService.updateStatus(bindingId, request.getStatus());
         return ResultModel.success(true);
+    }
+
+    @PostMapping("/bindings/{bindingId}/test")
+    public ResultModel<Map<String, Object>> testBinding(
+            @PathVariable String bindingId,
+            @RequestBody(required = false) Map<String, Object> params) {
+        log.info("Test binding: {}", bindingId);
+        
+        CapabilityBinding binding = bindingService.findById(bindingId);
+        if (binding == null) {
+            return ResultModel.notFound("Binding not found: " + bindingId);
+        }
+        
+        if (binding.getStatus() != CapabilityBindingStatus.ACTIVE) {
+            Map<String, Object> errorResult = new HashMap<>();
+            errorResult.put("success", false);
+            errorResult.put("error", "Binding is not active");
+            errorResult.put("status", binding.getStatus());
+            return ResultModel.success(errorResult);
+        }
+        
+        String capabilityId = binding.getCapabilityId();
+        if (params == null) {
+            params = new HashMap<>();
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("bindingId", bindingId);
+        result.put("capabilityId", capabilityId);
+        result.put("testTime", System.currentTimeMillis());
+        
+        try {
+            if (sceneEngineIntegration != null) {
+                Object invokeResult = sceneEngineIntegration.invokeCapability(capabilityId, params);
+                result.put("success", true);
+                result.put("result", invokeResult);
+                result.put("message", "Capability invoked successfully");
+            } else {
+                result.put("success", true);
+                result.put("result", createMockTestResult(capabilityId));
+                result.put("message", "SceneEngineIntegration not available, returning mock result");
+            }
+        } catch (Exception e) {
+            log.error("Failed to test binding {}: {}", bindingId, e.getMessage());
+            result.put("success", false);
+            result.put("error", e.getMessage());
+        }
+        
+        return ResultModel.success(result);
+    }
+    
+    private Map<String, Object> createMockTestResult(String capabilityId) {
+        Map<String, Object> mockResult = new HashMap<>();
+        mockResult.put("mock", true);
+        mockResult.put("capabilityId", capabilityId);
+        mockResult.put("message", "This is a mock test result");
+        mockResult.put("timestamp", System.currentTimeMillis());
+        return mockResult;
     }
 }

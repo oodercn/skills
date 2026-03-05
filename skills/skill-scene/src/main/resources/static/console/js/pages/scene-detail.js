@@ -420,11 +420,11 @@
                 if (result.status === 'success' && result.data) {
                     SceneDetail.renderLogs(result.data.list || []);
                 } else {
-                    SceneDetail.renderMockLogs();
+                    SceneDetail.renderLogs([]);
                 }
             } catch (error) {
                 console.error('加载日志失败:', error);
-                SceneDetail.renderMockLogs();
+                SceneDetail.renderLogs([]);
             }
         },
 
@@ -453,14 +453,7 @@
         },
 
         renderMockLogs: function() {
-            var mockLogs = [
-                { time: Date.now(), level: 'INFO', source: 'scene-manager', message: '场景状态更新: 活跃' },
-                { time: Date.now() - 60000, level: 'INFO', source: 'capability-exec', message: '能力执行完成: user-login' },
-                { time: Date.now() - 120000, level: 'WARN', source: 'session', message: '会话即将过期' },
-                { time: Date.now() - 180000, level: 'ERROR', source: 'auth', message: '认证失败: 无效令牌' },
-                { time: Date.now() - 240000, level: 'DEBUG', source: 'config', message: '配置加载完成' }
-            ];
-            SceneDetail.renderLogs(mockLogs);
+            SceneDetail.renderLogs([]);
         },
 
         refreshLogs: function() {

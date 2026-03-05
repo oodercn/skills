@@ -34,15 +34,17 @@
         
         .binding-layout {
             display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 24px;
+            grid-template-columns: 280px 1fr 320px;
+            gap: 20px;
+            height: calc(100vh - 180px);
         }
         
         .scene-group-panel {
             background: var(--nx-bg-elevated);
             border: 1px solid var(--nx-border);
             border-radius: 12px;
-            overflow: hidden;
+            display: flex;
+            flex-direction: column;
         }
         
         .panel-header {
@@ -57,7 +59,7 @@
         .panel-header i { color: var(--nx-primary); }
         
         .scene-group-list {
-            max-height: 500px;
+            flex: 1;
             overflow-y: auto;
         }
         
@@ -68,11 +70,14 @@
             padding: 12px 16px;
             border-bottom: 1px solid var(--nx-border);
             cursor: pointer;
-            transition: background 0.2s;
+            transition: all 0.2s;
         }
         
         .scene-group-item:hover { background: var(--nx-bg-hover); }
-        .scene-group-item.active { background: var(--nx-primary-light); border-left: 3px solid var(--nx-primary); }
+        .scene-group-item.active { 
+            background: var(--nx-primary-light); 
+            border-left: 3px solid var(--nx-primary); 
+        }
         .scene-group-item:last-child { border-bottom: none; }
         
         .group-icon {
@@ -93,21 +98,21 @@
         .binding-main {
             display: flex;
             flex-direction: column;
-            gap: 20px;
+            gap: 16px;
         }
         
         .binding-header {
             background: var(--nx-bg-elevated);
             border: 1px solid var(--nx-border);
             border-radius: 12px;
-            padding: 20px;
+            padding: 16px 20px;
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
         
         .binding-title {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -125,6 +130,8 @@
             border-radius: 12px;
             overflow: hidden;
             flex: 1;
+            display: flex;
+            flex-direction: column;
         }
         
         .binding-table {
@@ -134,27 +141,31 @@
         
         .binding-table th {
             background: var(--nx-bg);
-            padding: 14px 16px;
+            padding: 12px 16px;
             text-align: left;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 12px;
             color: var(--nx-text-secondary);
             border-bottom: 1px solid var(--nx-border);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
         
         .binding-table td {
-            padding: 16px;
+            padding: 14px 16px;
             border-bottom: 1px solid var(--nx-border);
             vertical-align: middle;
         }
         
         .binding-table tr:last-child td { border-bottom: none; }
         .binding-table tr:hover td { background: var(--nx-bg-hover); }
+        .binding-table tr.selected td { background: var(--nx-primary-light); }
         
         .cap-info {
             display: flex;
             align-items: center;
             gap: 12px;
+            cursor: pointer;
         }
         
         .cap-icon {
@@ -170,10 +181,12 @@
         .cap-icon.type-SERVICE { background: #dbeafe; color: #2563eb; }
         .cap-icon.type-AI { background: #fce7f3; color: #db2777; }
         .cap-icon.type-COMMUNICATION { background: #d1fae5; color: #059669; }
+        .cap-icon.type-SKILL { background: #fef3c7; color: #d97706; }
+        .cap-icon.type-SCENE { background: #e0e7ff; color: #4f46e5; }
         .cap-icon.type-CUSTOM { background: #f1f5f9; color: #64748b; }
         
         .cap-name { font-weight: 500; }
-        .cap-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
+        .cap-id { font-size: 11px; color: var(--nx-text-secondary); font-family: monospace; }
         
         .status-badge {
             display: inline-flex;
@@ -194,6 +207,135 @@
             border-radius: 6px;
             font-size: 12px;
             font-weight: 500;
+        }
+        
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            border: none;
+            background: transparent;
+            color: var(--nx-text-secondary);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover { background: var(--nx-bg-hover); color: var(--nx-primary); }
+        .action-btn.danger:hover { color: #dc2626; }
+        
+        .detail-panel {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        
+        .detail-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .detail-title-group { flex: 1; }
+        .detail-title { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .detail-subtitle { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
+        
+        .detail-status {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-section:last-child { margin-bottom: 0; }
+        
+        .section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--nx-text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+        
+        .info-item {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            padding: 12px;
+        }
+        
+        .info-label {
+            font-size: 11px;
+            color: var(--nx-text-secondary);
+            margin-bottom: 4px;
+        }
+        
+        .info-value {
+            font-size: 14px;
+            font-weight: 500;
+        }
+        
+        .info-value.mono { font-family: monospace; font-size: 12px; }
+        
+        .tag-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+        }
+        
+        .tag {
+            background: var(--nx-bg);
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+        
+        .description-text {
+            font-size: 13px;
+            line-height: 1.6;
+            color: var(--nx-text-secondary);
+        }
+        
+        .detail-actions {
+            padding: 16px 20px;
+            border-top: 1px solid var(--nx-border);
+            display: flex;
+            gap: 8px;
         }
         
         .add-binding-modal {
@@ -270,56 +412,24 @@
         .empty-state {
             text-align: center;
             padding: 60px 20px;
-            color: var(--nx-text-secondary);
+            color: var(--nx-text-secondary;
         }
         
         .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
         .empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
         .empty-state-desc { font-size: 14px; }
         
-        .relation-graph {
-            background: var(--nx-bg);
-            border-radius: 8px;
-            padding: 20px;
-            min-height: 200px;
-            margin-top: 20px;
-        }
-        
-        .relation-title {
-            font-weight: 600;
-            margin-bottom: 16px;
+        .empty-detail {
             display: flex;
+            flex-direction: column;
             align-items: center;
-            gap: 8px;
-        }
-        
-        .relation-nodes {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 12px;
-            align-items: center;
-        }
-        
-        .relation-node {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            padding: 8px 16px;
-            background: var(--nx-bg-elevated);
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            font-size: 13px;
-        }
-        
-        .relation-node.primary {
-            border-color: var(--nx-primary);
-            background: var(--nx-primary-light);
-        }
-        
-        .relation-arrow {
+            justify-content: center;
+            height: 100%;
             color: var(--nx-text-secondary);
-            font-size: 20px;
         }
+        
+        .empty-detail i { font-size: 48px; margin-bottom: 16px; opacity: 0.3; }
+        .empty-detail-text { font-size: 14px; }
     </style>
 </head>
 <body>
@@ -358,8 +468,8 @@
                 <div class="binding-layout">
                     <div class="scene-group-panel">
                         <div class="panel-header">
-                            <i class="ri-group-line"></i>
-                            场景组列表
+                            <i class="ri-folder-line"></i>
+                            场景组
                         </div>
                         <div class="scene-group-list" id="sceneGroupList">
                         </div>
@@ -383,10 +493,9 @@
                                 <thead>
                                     <tr>
                                         <th>能力</th>
-                                        <th>提供者类型</th>
+                                        <th>类型</th>
                                         <th>优先级</th>
                                         <th>状态</th>
-                                        <th>最后调用</th>
                                         <th>操作</th>
                                     </tr>
                                 </thead>
@@ -394,13 +503,88 @@
                                 </tbody>
                             </table>
                         </div>
-                        
-                        <div class="relation-graph" id="relationGraph" style="display: none;">
-                            <div class="relation-title">
-                                <i class="ri-mind-map"></i>
-                                关联关系图
+                    </div>
+                    
+                    <div class="detail-panel" id="detailPanel">
+                        <div class="empty-detail" id="emptyDetail">
+                            <i class="ri-flashlight-line"></i>
+                            <div class="empty-detail-text">选择一个能力查看详情</div>
+                        </div>
+                        <div id="detailContent" style="display: none; height: 100%; display: flex; flex-direction: column;">
+                            <div class="detail-header">
+                                <div class="detail-icon" id="detailIcon">
+                                    <i class="ri-flashlight-line"></i>
+                                </div>
+                                <div class="detail-title-group">
+                                    <div class="detail-title" id="detailTitle">能力名称</div>
+                                    <div class="detail-subtitle" id="detailId">capability-id</div>
+                                </div>
+                                <div class="detail-status">
+                                    <span class="status-badge active" id="detailStatus">
+                                        <i class="ri-checkbox-circle-line"></i> 已激活
+                                    </span>
+                                </div>
                             </div>
-                            <div class="relation-nodes" id="relationNodes">
+                            <div class="detail-body">
+                                <div class="detail-section">
+                                    <div class="section-title">
+                                        <i class="ri-information-line"></i> 基本信息
+                                    </div>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">提供者类型</div>
+                                            <div class="info-value" id="detailProviderType">SKILL</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">优先级</div>
+                                            <div class="info-value" id="detailPriority">P1</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">连接器</div>
+                                            <div class="info-value" id="detailConnector">INTERNAL</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">最后调用</div>
+                                            <div class="info-value" id="detailLastInvoke">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <div class="section-title">
+                                        <i class="ri-file-text-line"></i> 描述
+                                    </div>
+                                    <div class="description-text" id="detailDescription">
+                                        暂无描述信息
+                                    </div>
+                                </div>
+                                
+                                <div class="detail-section">
+                                    <div class="section-title">
+                                        <i class="ri-time-line"></i> 时间信息
+                                    </div>
+                                    <div class="info-grid">
+                                        <div class="info-item">
+                                            <div class="info-label">创建时间</div>
+                                            <div class="info-value" id="detailCreateTime">-</div>
+                                        </div>
+                                        <div class="info-item">
+                                            <div class="info-label">更新时间</div>
+                                            <div class="info-value" id="detailUpdateTime">-</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="detail-actions">
+                                <button class="nx-btn nx-btn--secondary" onclick="testSelectedBinding()">
+                                    <i class="ri-play-line"></i> 测试调用
+                                </button>
+                                <button class="nx-btn nx-btn--secondary" onclick="editSelectedBinding()">
+                                    <i class="ri-edit-line"></i> 编辑
+                                </button>
+                                <button class="nx-btn nx-btn--danger" onclick="deleteSelectedBinding()">
+                                    <i class="ri-delete-bin-line"></i> 解绑
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -457,10 +641,10 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
-        <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/api-client.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/llm-assistant.js"></script>
-    <script src="/console/js/pages/capability-binding.js"></script>
+    <script src="/console/js/pages/capability-binding.js?v=20260305d"></script>
 </body>
 </html>

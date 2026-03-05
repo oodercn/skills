@@ -5,6 +5,7 @@
     var capabilities = [];
     var bindings = [];
     var currentSceneGroup = null;
+    var selectedBinding = null;
 
     var TYPE_ICONS = {
         'DRIVER': 'ri-hard-drive-2-line',
@@ -20,6 +21,20 @@
         'CUSTOM': 'ri-tools-line'
     };
 
+    var TYPE_COLORS = {
+        'DRIVER': 'type-SERVICE',
+        'SERVICE': 'type-SERVICE',
+        'MANAGEMENT': 'type-CUSTOM',
+        'AI': 'type-AI',
+        'STORAGE': 'type-SERVICE',
+        'COMMUNICATION': 'type-COMMUNICATION',
+        'SECURITY': 'type-CUSTOM',
+        'MONITORING': 'type-CUSTOM',
+        'SKILL': 'type-SKILL',
+        'SCENE': 'type-SCENE',
+        'CUSTOM': 'type-CUSTOM'
+    };
+
     var CapabilityBinding = {
         init: function() {
             window.onPageInit = function() {
@@ -27,7 +42,17 @@
                 CapabilityBinding.loadSceneGroups();
                 CapabilityBinding.loadCapabilities();
                 CapabilityBinding.initLlmAssistant();
+                CapabilityBinding.handleUrlParams();
             };
+        },
+
+        handleUrlParams: function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var capabilityId = urlParams.get('capabilityId');
+            if (capabilityId) {
+                console.log('[handleUrlParams] capabilityId from URL:', capabilityId);
+                CapabilityBinding.highlightCapability = capabilityId;
+            }
         },
 
         initLlmAssistant: function() {
@@ -37,25 +62,29 @@
         },
 
         loadSceneGroups: function() {
-            ApiClient.get('/api/v1/scene-groups')
+            ApiClient.get('/api/selector/scene-groups')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
-                        sceneGroups = result.data.list || result.data;
+                        sceneGroups = result.data.map(function(item) {
+                            return {
+                                sceneGroupId: item.id,
+                                name: item.name,
+                                description: item.description,
+                                status: item.status || 'ACTIVE'
+                            };
+                        });
                         CapabilityBinding.renderSceneGroups();
                     }
                 })
                 .catch(function(error) {
                     console.error('加载场景组失败:', error);
-                    CapabilityBinding.loadMockSceneGroups();
+                    sceneGroups = [];
+                    CapabilityBinding.renderSceneGroups();
                 });
         },
 
         loadMockSceneGroups: function() {
-            sceneGroups = [
-                { sceneGroupId: 'sg-daily-report', name: '日志汇报组', description: '日常工作日志汇报', status: 'ACTIVE' },
-                { sceneGroupId: 'sg-project-alpha', name: '项目Alpha组', description: 'Alpha项目管理', status: 'ACTIVE' },
-                { sceneGroupId: 'sg-meeting', name: '会议管理组', description: '会议安排与记录', status: 'INACTIVE' }
-            ];
+            sceneGroups = [];
             CapabilityBinding.renderSceneGroups();
         },
 
@@ -63,19 +92,20 @@
             ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
-                        capabilities = result.data;
+                        capabilities = result.data.map(function(item) {
+                            return {
+                                capabilityId: item.capabilityId || item.id,
+                                name: item.name,
+                                type: item.type,
+                                description: item.description
+                            };
+                        });
                         CapabilityBinding.renderCapabilitySelect();
                     }
                 })
                 .catch(function(error) {
                     console.error('加载能力失败:', error);
-                    capabilities = [
-                        { capabilityId: 'report-remind', name: '日志提醒', type: 'COMMUNICATION' },
-                        { capabilityId: 'report-submit', name: '日志提交', type: 'SERVICE' },
-                        { capabilityId: 'report-aggregate', name: '日志汇总', type: 'SERVICE' },
-                        { capabilityId: 'notification-email', name: '邮件通知', type: 'COMMUNICATION' },
-                        { capabilityId: 'notification-sms', name: '短信通知', type: 'COMMUNICATION' }
-                    ];
+                    capabilities = [];
                     CapabilityBinding.renderCapabilitySelect();
                 });
         },
@@ -86,7 +116,7 @@
 
             if (sceneGroups.length === 0) {
                 container.innerHTML = '<div class="empty-state" style="padding: 40px 20px;">' +
-                    '<i class="ri-group-line"></i>' +
+                    '<i class="ri-folder-line"></i>' +
                     '<div class="empty-state-title">暂无场景组</div></div>';
                 return;
             }
@@ -98,10 +128,10 @@
                 }).length;
 
                 html += '<div class="scene-group-item" data-id="' + group.sceneGroupId + '" onclick="selectSceneGroup(\'' + group.sceneGroupId + '\')">' +
-                    '<div class="group-icon"><i class="ri-group-line"></i></div>' +
+                    '<div class="group-icon"><i class="ri-folder-line"></i></div>' +
                     '<div class="group-info">' +
                     '<div class="group-name">' + (group.name || group.sceneGroupId) + '</div>' +
-                    '<div class="group-count">' + bindingCount + ' 个能力绑定</div>' +
+                    '<div class="group-count">' + bindingCount + ' 个绑定</div>' +
                     '</div></div>';
             });
             container.innerHTML = html;
@@ -109,6 +139,8 @@
 
         selectSceneGroup: function(sceneGroupId) {
             currentSceneGroup = sceneGroupId;
+            selectedBinding = null;
+            CapabilityBinding.hideDetailPanel();
 
             document.querySelectorAll('.scene-group-item').forEach(function(item) {
                 item.classList.remove('active');
@@ -128,41 +160,34 @@
             ApiClient.get('/api/v1/capabilities/bindings?sceneGroupId=' + sceneGroupId)
                 .then(function(result) {
                     if (result.code === 200 && result.data) {
-                        bindings = result.data;
+                        bindings = result.data.map(function(item) {
+                            return {
+                                bindingId: item.bindingId || item.id,
+                                sceneGroupId: item.sceneGroupId,
+                                capabilityId: item.capabilityId,
+                                capabilityName: item.capabilityName || item.name,
+                                capabilityType: item.capabilityType || item.type || 'CUSTOM',
+                                providerType: item.providerType || 'SKILL',
+                                priority: item.priority || 1,
+                                status: item.status || 'ACTIVE',
+                                lastInvokeTime: item.lastInvokeTime,
+                                description: item.description,
+                                connectorType: item.connectorType || 'INTERNAL',
+                                createTime: item.createTime,
+                                updateTime: item.updateTime
+                            };
+                        });
                     } else {
                         bindings = [];
                     }
                     CapabilityBinding.renderBindings();
-                    CapabilityBinding.renderRelationGraph();
+                    CapabilityBinding.renderSceneGroups();
                 })
                 .catch(function(error) {
                     console.error('加载绑定失败:', error);
-                    bindings = [
-                        {
-                            bindingId: 'bind-001',
-                            sceneGroupId: sceneGroupId,
-                            capabilityId: 'report-remind',
-                            capabilityName: '日志提醒',
-                            capabilityType: 'COMMUNICATION',
-                            providerType: 'SKILL',
-                            priority: 1,
-                            status: 'ACTIVE',
-                            lastInvokeTime: Date.now() - 3600000
-                        },
-                        {
-                            bindingId: 'bind-002',
-                            sceneGroupId: sceneGroupId,
-                            capabilityId: 'report-submit',
-                            capabilityName: '日志提交',
-                            capabilityType: 'SERVICE',
-                            providerType: 'SKILL',
-                            priority: 2,
-                            status: 'ACTIVE',
-                            lastInvokeTime: Date.now() - 7200000
-                        }
-                    ];
+                    bindings = [];
                     CapabilityBinding.renderBindings();
-                    CapabilityBinding.renderRelationGraph();
+                    CapabilityBinding.renderSceneGroups();
                 });
         },
 
@@ -173,7 +198,7 @@
             });
 
             if (filteredBindings.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; padding: 40px; color: var(--nx-text-secondary);">' +
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 60px 20px; color: var(--nx-text-secondary);">' +
                     '<i class="ri-link" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>' +
                     '暂无能力绑定，点击"添加绑定"开始配置</td></tr>';
                 return;
@@ -182,52 +207,65 @@
             var html = '';
             filteredBindings.forEach(function(binding) {
                 var typeIcon = TYPE_ICONS[binding.capabilityType] || TYPE_ICONS['CUSTOM'];
+                var typeClass = TYPE_COLORS[binding.capabilityType] || 'type-CUSTOM';
                 var statusClass = binding.status === 'ACTIVE' ? 'active' : 'inactive';
                 var statusText = binding.status === 'ACTIVE' ? '已激活' : '未激活';
-                var lastInvoke = binding.lastInvokeTime ? CapabilityBinding.formatTime(binding.lastInvokeTime) : '-';
+                var isSelected = selectedBinding && selectedBinding.bindingId === binding.bindingId;
 
-                html += '<tr>' +
+                html += '<tr class="' + (isSelected ? 'selected' : '') + '" onclick="selectBinding(\'' + binding.bindingId + '\')">' +
                     '<td><div class="cap-info">' +
-                    '<div class="cap-icon type-' + (binding.capabilityType || 'CUSTOM') + '"><i class="' + typeIcon + '"></i></div>' +
+                    '<div class="cap-icon ' + typeClass + '"><i class="' + typeIcon + '"></i></div>' +
                     '<div><div class="cap-name">' + (binding.capabilityName || binding.capabilityId) + '</div>' +
                     '<div class="cap-id">' + binding.capabilityId + '</div></div></div></td>' +
                     '<td>' + (binding.providerType || 'SKILL') + '</td>' +
                     '<td><span class="priority-badge">P' + (binding.priority || 1) + '</span></td>' +
                     '<td><span class="status-badge ' + statusClass + '">' + statusText + '</span></td>' +
-                    '<td>' + lastInvoke + '</td>' +
-                    '<td><div style="display: flex; gap: 8px;">' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="editBinding(\'' + binding.bindingId + '\')" title="编辑">' +
-                    '<i class="ri-edit-line"></i></button>' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm nx-text-danger" onclick="deleteBinding(\'' + binding.bindingId + '\')" title="解绑">' +
+                    '<td>' +
+                    '<button class="action-btn" onclick="event.stopPropagation(); testBinding(\'' + binding.bindingId + '\')" title="测试">' +
+                    '<i class="ri-play-line"></i></button>' +
+                    '<button class="action-btn danger" onclick="event.stopPropagation(); deleteBinding(\'' + binding.bindingId + '\')" title="解绑">' +
                     '<i class="ri-link-unlink"></i></button>' +
-                    '</div></td></tr>';
+                    '</td></tr>';
             });
             tbody.innerHTML = html;
         },
 
-        renderRelationGraph: function() {
-            var container = document.getElementById('relationGraph');
-            var nodesContainer = document.getElementById('relationNodes');
-            var filteredBindings = bindings.filter(function(b) { 
-                return b.sceneGroupId === currentSceneGroup; 
-            });
+        selectBinding: function(bindingId) {
+            var binding = bindings.find(function(b) { return b.bindingId === bindingId; });
+            if (!binding) return;
 
-            if (filteredBindings.length === 0) {
-                container.style.display = 'none';
-                return;
-            }
+            selectedBinding = binding;
+            CapabilityBinding.renderBindings();
+            CapabilityBinding.showDetailPanel(binding);
+        },
 
-            container.style.display = 'block';
+        showDetailPanel: function(binding) {
+            document.getElementById('emptyDetail').style.display = 'none';
+            document.getElementById('detailContent').style.display = 'flex';
 
-            var group = sceneGroups.find(function(g) { return g.sceneGroupId === currentSceneGroup; });
-            var html = '<div class="relation-node primary"><i class="ri-group-line"></i> ' + (group ? group.name : currentSceneGroup) + '</div>';
+            var typeIcon = TYPE_ICONS[binding.capabilityType] || TYPE_ICONS['CUSTOM'];
+            var typeClass = TYPE_COLORS[binding.capabilityType] || 'type-CUSTOM';
+            var statusClass = binding.status === 'ACTIVE' ? 'active' : 'inactive';
+            var statusText = binding.status === 'ACTIVE' ? '已激活' : '未激活';
 
-            filteredBindings.forEach(function(binding, i) {
-                html += '<span class="relation-arrow"><i class="ri-arrow-right-line"></i></span>';
-                html += '<div class="relation-node"><i class="ri-flashlight-line"></i> ' + (binding.capabilityName || binding.capabilityId) + '</div>';
-            });
+            document.getElementById('detailIcon').className = 'detail-icon ' + typeClass;
+            document.getElementById('detailIcon').innerHTML = '<i class="' + typeIcon + '"></i>';
+            document.getElementById('detailTitle').textContent = binding.capabilityName || binding.capabilityId;
+            document.getElementById('detailId').textContent = binding.capabilityId;
+            document.getElementById('detailStatus').className = 'status-badge ' + statusClass;
+            document.getElementById('detailStatus').innerHTML = '<i class="ri-checkbox-circle-line"></i> ' + statusText;
+            document.getElementById('detailProviderType').textContent = binding.providerType || 'SKILL';
+            document.getElementById('detailPriority').textContent = 'P' + (binding.priority || 1);
+            document.getElementById('detailConnector').textContent = binding.connectorType || 'INTERNAL';
+            document.getElementById('detailLastInvoke').textContent = binding.lastInvokeTime ? CapabilityBinding.formatTime(binding.lastInvokeTime) : '-';
+            document.getElementById('detailDescription').textContent = binding.description || '暂无描述信息';
+            document.getElementById('detailCreateTime').textContent = binding.createTime ? CapabilityBinding.formatDateTime(binding.createTime) : '-';
+            document.getElementById('detailUpdateTime').textContent = binding.updateTime ? CapabilityBinding.formatDateTime(binding.updateTime) : '-';
+        },
 
-            nodesContainer.innerHTML = html;
+        hideDetailPanel: function() {
+            document.getElementById('emptyDetail').style.display = 'flex';
+            document.getElementById('detailContent').style.display = 'none';
         },
 
         renderCapabilitySelect: function() {
@@ -289,7 +327,6 @@
                             lastInvokeTime: null
                         });
                         CapabilityBinding.renderBindings();
-                        CapabilityBinding.renderRelationGraph();
                         CapabilityBinding.hideAddModal();
                         CapabilityBinding.renderSceneGroups();
                     } else {
@@ -298,7 +335,7 @@
                 })
                 .catch(function(error) {
                     bindings.push({
-                        bindingId: 'bind-' + Date.now(),
+                        bindingBindingId: 'bind-' + Date.now(),
                         sceneGroupId: currentSceneGroup,
                         capabilityId: capabilityId,
                         capabilityName: cap ? cap.name : capabilityId,
@@ -309,7 +346,6 @@
                         lastInvokeTime: null
                     });
                     CapabilityBinding.renderBindings();
-                    CapabilityBinding.renderRelationGraph();
                     CapabilityBinding.hideAddModal();
                     CapabilityBinding.renderSceneGroups();
                 });
@@ -322,21 +358,119 @@
                 .then(function(result) {
                     if (result.code === 200) {
                         bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
+                        if (selectedBinding && selectedBinding.bindingId === bindingId) {
+                            selectedBinding = null;
+                            CapabilityBinding.hideDetailPanel();
+                        }
                         CapabilityBinding.renderBindings();
-                        CapabilityBinding.renderRelationGraph();
                         CapabilityBinding.renderSceneGroups();
                     }
                 })
                 .catch(function(error) {
                     bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
+                    if (selectedBinding && selectedBinding.bindingId === bindingId) {
+                        selectedBinding = null;
+                        CapabilityBinding.hideDetailPanel();
+                    }
                     CapabilityBinding.renderBindings();
-                    CapabilityBinding.renderRelationGraph();
                     CapabilityBinding.renderSceneGroups();
                 });
         },
 
         editBindingRequest: function(bindingId) {
-            alert('编辑绑定: ' + bindingId + '\n\n此功能需要实现编辑弹窗');
+            var binding = bindings.find(function(b) { return b.bindingId === bindingId; });
+            if (!binding) {
+                alert('绑定不存在');
+                return;
+            }
+            
+            var newPriority = prompt('请输入新的优先级 (1-100):', binding.priority || 1);
+            if (newPriority === null) return;
+            
+            var priority = parseInt(newPriority);
+            if (isNaN(priority) || priority < 1 || priority > 100) {
+                alert('优先级必须是 1-100 之间的数字');
+                return;
+            }
+            
+            ApiClient.put('/api/v1/capabilities/bindings/' + bindingId + '/priority', { priority: priority })
+                .then(function(result) {
+                    if (result.code === 200) {
+                        binding.priority = priority;
+                        CapabilityBinding.renderBindings();
+                        if (selectedBinding && selectedBinding.bindingId === bindingId) {
+                            CapabilityBinding.showDetailPanel(binding);
+                        }
+                    } else {
+                        alert('更新失败: ' + result.message);
+                    }
+                })
+                .catch(function(error) {
+                    binding.priority = priority;
+                    CapabilityBinding.renderBindings();
+                    if (selectedBinding && selectedBinding.bindingId === bindingId) {
+                        CapabilityBinding.showDetailPanel(binding);
+                    }
+                });
+        },
+
+        testBindingRequest: function(bindingId) {
+            var binding = bindings.find(function(b) { return b.bindingId === bindingId; });
+            if (!binding) {
+                alert('绑定不存在');
+                return;
+            }
+            
+            if (binding.status !== 'ACTIVE') {
+                alert('此绑定未激活，无法测试');
+                return;
+            }
+            
+            var paramsStr = prompt('请输入测试参数 (JSON格式，留空则使用空参数):', '{}');
+            if (paramsStr === null) return;
+            
+            var params = {};
+            if (paramsStr.trim()) {
+                try {
+                    params = JSON.parse(paramsStr);
+                } catch (e) {
+                    alert('JSON格式错误: ' + e.message);
+                    return;
+                }
+            }
+            
+            var btn = event.target.closest('button') || event.target;
+            var originalHtml = btn.innerHTML;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i>';
+            btn.disabled = true;
+            
+            ApiClient.post('/api/v1/capabilities/bindings/' + bindingId + '/test', params)
+                .then(function(result) {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    
+                    if (result.code === 200 && result.data) {
+                        var data = result.data;
+                        var message = '测试调用结果\n\n';
+                        message += '能力ID: ' + data.capabilityId + '\n';
+                        message += '成功: ' + (data.success ? '是' : '否') + '\n';
+                        message += '消息: ' + (data.message || '-') + '\n';
+                        if (data.result) {
+                            message += '\n返回数据:\n' + JSON.stringify(data.result, null, 2);
+                        }
+                        if (data.error) {
+                            message += '\n错误: ' + data.error;
+                        }
+                        alert(message);
+                    } else {
+                        alert('测试失败: ' + (result.message || '未知错误'));
+                    }
+                })
+                .catch(function(error) {
+                    btn.innerHTML = originalHtml;
+                    btn.disabled = false;
+                    alert('测试失败: ' + error.message);
+                });
         },
 
         formatTime: function(timestamp) {
@@ -347,16 +481,48 @@
             if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
             if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
             return Math.floor(diff / 86400000) + '天前';
+        },
+
+        formatDateTime: function(timestamp) {
+            var date = new Date(timestamp);
+            return date.getFullYear() + '-' + 
+                   String(date.getMonth() + 1).padStart(2, '0') + '-' + 
+                   String(date.getDate()).padStart(2, '0') + ' ' +
+                   String(date.getHours()).padStart(2, '0') + ':' +
+                   String(date.getMinutes()).padStart(2, '0');
+        },
+
+        testSelectedBinding: function() {
+            if (selectedBinding) {
+                CapabilityBinding.testBindingRequest(selectedBinding.bindingId);
+            }
+        },
+
+        editSelectedBinding: function() {
+            if (selectedBinding) {
+                CapabilityBinding.editBindingRequest(selectedBinding.bindingId);
+            }
+        },
+
+        deleteSelectedBinding: function() {
+            if (selectedBinding) {
+                CapabilityBinding.deleteBindingRequest(selectedBinding.bindingId);
+            }
         }
     };
 
     CapabilityBinding.init();
 
     global.selectSceneGroup = CapabilityBinding.selectSceneGroup;
+    global.selectBinding = CapabilityBinding.selectBinding;
     global.showAddBindingModal = CapabilityBinding.showAddModal;
     global.hideAddBindingModal = CapabilityBinding.hideAddModal;
     global.createBinding = CapabilityBinding.createBindingRequest;
     global.deleteBinding = CapabilityBinding.deleteBindingRequest;
     global.editBinding = CapabilityBinding.editBindingRequest;
+    global.testBinding = CapabilityBinding.testBindingRequest;
+    global.testSelectedBinding = CapabilityBinding.testSelectedBinding;
+    global.editSelectedBinding = CapabilityBinding.editSelectedBinding;
+    global.deleteSelectedBinding = CapabilityBinding.deleteSelectedBinding;
 
 })(typeof window !== 'undefined' ? window : this);

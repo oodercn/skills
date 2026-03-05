@@ -67,11 +67,11 @@ async function refreshHistory() {
             historyData = result.data.list || [];
             hasMore = historyData.length === pageSize;
         } else {
-            loadMockHistory();
+            historyData = [];
         }
     } catch (error) {
         console.error('Failed to load history:', error);
-        loadMockHistory();
+        historyData = [];
     }
     
     await loadStatistics();
@@ -85,96 +85,22 @@ async function loadStatistics() {
         if (result.code === 200 && result.data) {
             statistics = result.data;
         } else {
-            statistics = calculateMockStatistics();
+            statistics = { totalCount: 0, successCount: 0, partialCount: 0, failedCount: 0 };
         }
     } catch (error) {
         console.error('Failed to load statistics:', error);
-        statistics = calculateMockStatistics();
+        statistics = { totalCount: 0, successCount: 0, partialCount: 0, failedCount: 0 };
     }
     
     updateStatsDisplay();
 }
 
 function loadMockHistory() {
-    const now = Date.now();
-    historyData = [
-        {
-            executionId: 'exec-001',
-            sceneGroupId: 'sg-dev-log',
-            sceneGroupName: '研发部日志汇报 - 第12周',
-            category: 'business',
-            status: 'success',
-            participantCount: 5,
-            duration: 900000,
-            startTime: now - 86400000,
-            endTime: now - 86400000 + 900000,
-            triggerType: 'schedule'
-        },
-        {
-            executionId: 'exec-002',
-            sceneGroupId: 'sg-weekly-report',
-            sceneGroupName: '项目周报汇总 - 第12周',
-            category: 'collaboration',
-            status: 'success',
-            participantCount: 8,
-            duration: 1320000,
-            startTime: now - 86400000 * 2,
-            endTime: now - 86400000 * 2 + 1320000,
-            triggerType: 'manual'
-        },
-        {
-            executionId: 'exec-003',
-            sceneGroupId: 'sg-project-alpha',
-            sceneGroupName: '项目Alpha协作组 - 需求评审',
-            category: 'business',
-            status: 'partial',
-            participantCount: 6,
-            duration: 3600000,
-            startTime: now - 86400000 * 3,
-            endTime: now - 86400000 * 3 + 3600000,
-            triggerType: 'manual',
-            errorMessage: '2人未完成提交'
-        },
-        {
-            executionId: 'exec-004',
-            sceneGroupId: 'sg-hr-team',
-            sceneGroupName: 'HR团队组 - 月度考勤统计',
-            category: 'governance',
-            status: 'success',
-            participantCount: 4,
-            duration: 1800000,
-            startTime: now - 86400000 * 5,
-            endTime: now - 86400000 * 5 + 1800000,
-            triggerType: 'schedule'
-        },
-        {
-            executionId: 'exec-005',
-            sceneGroupId: 'sg-iot-monitor',
-            sceneGroupName: '物联网设备监控 - 日报',
-            category: 'iot',
-            status: 'failed',
-            participantCount: 3,
-            duration: 600000,
-            startTime: now - 86400000 * 7,
-            endTime: now - 86400000 * 7 + 600000,
-            triggerType: 'schedule',
-            errorMessage: '设备连接超时'
-        }
-    ];
-    hasMore = false;
+    historyData = [];
 }
 
 function calculateMockStatistics() {
-    const successCount = historyData.filter(h => h.status === 'success').length;
-    const totalCount = historyData.length;
-    const totalDuration = historyData.reduce((sum, h) => sum + (h.duration || 0), 0);
-    
-    return {
-        totalScenes: totalCount,
-        participateCount: historyData.reduce((sum, h) => sum + (h.participantCount || 0), 0),
-        successRate: totalCount > 0 ? Math.round(successCount / totalCount * 100) : 0,
-        avgDuration: totalCount > 0 ? Math.round(totalDuration / totalCount / 60000) : 0
-    };
+    return { totalCount: 0, successCount: 0, partialCount: 0, failedCount: 0 };
 }
 
 function updateStatsDisplay() {
