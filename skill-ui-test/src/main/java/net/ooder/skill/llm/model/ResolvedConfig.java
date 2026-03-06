@@ -1,4 +1,4 @@
-package net.ooder.skill.llm.config.model;
+package net.ooder.skill.llm.model;
 
 import java.util.Map;
 

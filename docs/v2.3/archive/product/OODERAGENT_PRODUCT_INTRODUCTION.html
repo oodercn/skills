@@ -1,0 +1,1911 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OoderAgent：知识库+LLM+安全架构深度融合的智能场景平台</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            line-height: 1.8;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            background: #fff;
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            overflow: hidden;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            color: #fff;
+            padding: 60px 40px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(102,126,234,0.1) 0%, transparent 50%);
+            animation: pulse 15s ease-in-out infinite;
+        }
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, #00d2ff, #3a7bd5, #667eea);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+            z-index: 1;
+        }
+        .header .subtitle {
+            font-size: 1.2em;
+            color: #a0aec0;
+            position: relative;
+            z-index: 1;
+        }
+        .content {
+            padding: 40px;
+        }
+        h2 {
+            font-size: 1.8em;
+            color: #1a1a2e;
+            margin: 50px 0 25px;
+            padding-bottom: 12px;
+            border-bottom: 3px solid;
+            border-image: linear-gradient(90deg, #667eea, #764ba2) 1;
+            display: flex;
+            align-items: center;
+        }
+        h3 {
+            font-size: 1.4em;
+            color: #2d3748;
+            margin: 35px 0 18px;
+        }
+        h4 {
+            font-size: 1.2em;
+            color: #4a5568;
+            margin: 25px 0 12px;
+        }
+        p {
+            margin-bottom: 15px;
+            text-align: justify;
+        }
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            font-size: 0.95em;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 14px 18px;
+            text-align: left;
+        }
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            font-weight: 600;
+            text-transform: uppercase;
+            font-size: 0.85em;
+            letter-spacing: 0.5px;
+        }
+        tr:nth-child(even) {
+            background: #f7fafc;
+        }
+        tr:hover {
+            background: #edf2f7;
+            transition: background 0.3s ease;
+        }
+        pre {
+            background: #1a1a2e;
+            color: #e2e8f0;
+            padding: 25px;
+            border-radius: 12px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            line-height: 1.7;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        code {
+            background: #edf2f7;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Monaco', monospace;
+            font-size: 0.9em;
+            color: #e53e3e;
+        }
+        pre code {
+            background: none;
+            padding: 0;
+            color: inherit;
+        }
+        
+        .section-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            margin-right: 12px;
+            font-size: 0.95em;
+            font-weight: 600;
+            box-shadow: 0 4px 10px rgba(102,126,234,0.4);
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #e6fffa 0%, #ebf8ff 100%);
+            border-left: 4px solid #38b2ac;
+            padding: 25px;
+            margin: 25px 0;
+            border-radius: 0 12px 12px 0;
+            box-shadow: 0 4px 15px rgba(56,178,172,0.15);
+        }
+        .highlight-box.warning {
+            background: linear-gradient(135deg, #fffaf0 0%, #fef5e7 100%);
+            border-left-color: #ed8936;
+        }
+        .highlight-box.info {
+            background: linear-gradient(135deg, #ebf8ff 0%, #e6fffa 100%);
+            border-left-color: #4299e1;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 5px 14px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            margin: 5px 5px 5px 0;
+        }
+        
+        .footer {
+            background: #1a1a2e;
+            color: #a0aec0;
+            padding: 40px;
+            text-align: center;
+        }
+        .footer a {
+            color: #667eea;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+        .footer a:hover {
+            color: #a0aec0;
+            text-decoration: underline;
+        }
+        
+        .architecture-box {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .arch-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px dashed #e2e8f0;
+        }
+        
+        .arch-layer {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border: 1px solid #e2e8f0;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .arch-layer:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+        }
+        
+        .arch-layer-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .arch-layer-title::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+        }
+        
+        .arch-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .arch-item {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .arch-item::before {
+            content: '▸';
+            opacity: 0.7;
+        }
+        
+        .arch-item.secondary {
+            background: linear-gradient(135deg, #38b2ac 0%, #319795 100%);
+        }
+        
+        .arch-item.tertiary {
+            background: linear-gradient(135deg, #ed8936 0%, #dd6b20 100%);
+        }
+        
+        .flow-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .flow-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        
+        .flow-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .flow-step {
+            display: flex;
+            align-items: center;
+            position: relative;
+        }
+        
+        .flow-step-number {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.1em;
+            flex-shrink: 0;
+            box-shadow: 0 4px 15px rgba(102,126,234,0.4);
+            z-index: 2;
+        }
+        
+        .flow-step-content {
+            flex: 1;
+            background: #fff;
+            margin-left: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .flow-step-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .flow-step-desc {
+            font-size: 0.9em;
+            color: #718096;
+        }
+        
+        .flow-connector {
+            width: 2px;
+            height: 20px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            margin-left: 19px;
+        }
+        
+        .compare-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .compare-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .compare-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 2px solid;
+            transition: transform 0.3s ease;
+        }
+        
+        .compare-box:hover {
+            transform: translateY(-5px);
+        }
+        
+        .compare-box.old {
+            border-color: #fc8181;
+            background: linear-gradient(135deg, #fff5f5 0%, #fff 100%);
+        }
+        
+        .compare-box.new {
+            border-color: #68d391;
+            background: linear-gradient(135deg, #f0fff4 0%, #fff 100%);
+        }
+        
+        .compare-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .compare-box.old .compare-title {
+            color: #c53030;
+        }
+        
+        .compare-box.new .compare-title {
+            color: #276749;
+        }
+        
+        .compare-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2em;
+            color: #667eea;
+            margin: 0 -10px;
+        }
+        
+        .priority-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .priority-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 10px;
+        }
+        
+        .priority-subtitle {
+            text-align: center;
+            color: #718096;
+            margin-bottom: 25px;
+            font-size: 0.95em;
+        }
+        
+        .priority-levels {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .priority-level {
+            background: #fff;
+            border-radius: 12px;
+            padding: 15px 20px;
+            text-align: center;
+            min-width: 120px;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .priority-level:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+        }
+        
+        .priority-level.high {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+        }
+        
+        .priority-level.medium {
+            border-color: #38b2ac;
+        }
+        
+        .priority-level.low {
+            border-color: #ed8936;
+        }
+        
+        .priority-name {
+            font-weight: 600;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        
+        .priority-value {
+            font-size: 1.5em;
+            font-weight: 700;
+        }
+        
+        .priority-base {
+            background: #1a1a2e;
+            color: #fff;
+            border-radius: 12px;
+            padding: 15px;
+            text-align: center;
+            max-width: 200px;
+            margin: 0 auto;
+        }
+        
+        .security-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .security-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .security-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px 20px;
+            text-align: center;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .security-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .security-icon {
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 15px;
+            font-size: 1.5em;
+        }
+        
+        .security-name {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 5px;
+        }
+        
+        .security-desc {
+            font-size: 0.85em;
+            color: #718096;
+        }
+        
+        .loop-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .loop-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        
+        .loop-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 0;
+        }
+        
+        .loop-step {
+            display: flex;
+            align-items: flex-start;
+            position: relative;
+        }
+        
+        .loop-step-marker {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-right: 20px;
+        }
+        
+        .loop-step-dot {
+            width: 16px;
+            height: 16px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 50%;
+            box-shadow: 0 0 0 4px rgba(102,126,234,0.2);
+        }
+        
+        .loop-step-line {
+            width: 2px;
+            flex: 1;
+            min-height: 40px;
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            margin-top: 5px;
+        }
+        
+        .loop-step:last-child .loop-step-line {
+            display: none;
+        }
+        
+        .loop-step-content {
+            flex: 1;
+            background: #fff;
+            padding: 15px 20px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .loop-step-title {
+            font-weight: 600;
+            color: #2d3748;
+        }
+        
+        .loop-step-note {
+            font-size: 0.85em;
+            color: #667eea;
+            margin-top: 5px;
+        }
+        
+        .cap-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .cap-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        
+        .cap-section {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid;
+        }
+        
+        .cap-section.system {
+            border-left-color: #667eea;
+        }
+        
+        .cap-section.common {
+            border-left-color: #38b2ac;
+        }
+        
+        .cap-section.extension {
+            border-left-color: #ed8936;
+        }
+        
+        .cap-section-title {
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .cap-section.system .cap-section-title {
+            color: #667eea;
+        }
+        
+        .cap-section.common .cap-section-title {
+            color: #38b2ac;
+        }
+        
+        .cap-section.extension .cap-section-title {
+            color: #ed8936;
+        }
+        
+        .cap-badge {
+            background: currentColor;
+            color: #fff;
+            padding: 3px 10px;
+            border-radius: 15px;
+            font-size: 0.8em;
+        }
+        
+        .cap-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+        
+        .cap-item {
+            background: #f7fafc;
+            padding: 8px 12px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .cap-item-code {
+            background: #1a1a2e;
+            color: #a0aec0;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-family: monospace;
+            font-size: 0.85em;
+        }
+        
+        .summary-cards {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin: 30px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .summary-cards {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        .summary-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 25px;
+            border: 1px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .summary-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+        
+        .summary-card-number {
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #fff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .summary-card-title {
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 10px;
+        }
+        
+        .summary-card-desc {
+            font-size: 0.9em;
+            color: #718096;
+            line-height: 1.6;
+        }
+        
+        .driver-grid {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 12px;
+            margin: 25px 0;
+        }
+        
+        @media (max-width: 768px) {
+            .driver-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        .driver-card {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px 15px;
+            text-align: center;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .driver-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            border-color: #667eea;
+        }
+        
+        .driver-icon {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 12px;
+            font-size: 1.3em;
+        }
+        
+        .driver-name {
+            font-weight: 600;
+            color: #2d3748;
+            font-size: 0.85em;
+            margin-bottom: 5px;
+        }
+        
+        .driver-desc {
+            font-size: 0.75em;
+            color: #718096;
+        }
+        
+        .lifecycle-diagram {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .lifecycle-states {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .lifecycle-state {
+            background: #fff;
+            border-radius: 8px;
+            padding: 10px 16px;
+            font-size: 0.85em;
+            font-weight: 600;
+            border: 2px solid #e2e8f0;
+            transition: all 0.3s ease;
+        }
+        
+        .lifecycle-state:hover {
+            transform: scale(1.05);
+        }
+        
+        .lifecycle-state.created { border-color: #a0aec0; color: #718096; }
+        .lifecycle-state.installing { border-color: #ed8936; color: #c05621; }
+        .lifecycle-state.installed { border-color: #38b2ac; color: #285e61; }
+        .lifecycle-state.starting { border-color: #667eea; color: #5a67d8; }
+        .lifecycle-state.active { border-color: #48bb78; color: #276749; background: #f0fff4; }
+        .lifecycle-state.stopping { border-color: #ed8936; color: #c05621; }
+        .lifecycle-state.stopped { border-color: #a0aec0; color: #718096; }
+        .lifecycle-state.error { border-color: #fc8181; color: #c53030; background: #fff5f5; }
+        
+        .lifecycle-arrow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #667eea;
+            font-size: 1.2em;
+        }
+        
+        .layer-interface {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+            border-radius: 16px;
+            padding: 30px;
+            margin: 30px 0;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+        }
+        
+        .layer-title {
+            text-align: center;
+            font-size: 1.1em;
+            font-weight: 600;
+            color: #1a1a2e;
+            margin-bottom: 25px;
+        }
+        
+        .layer-boxes {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .layer-box {
+            background: #fff;
+            border-radius: 12px;
+            padding: 20px;
+            border-left: 4px solid;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+        
+        .layer-box.layer1 { border-left-color: #667eea; }
+        .layer-box.layer2 { border-left-color: #38b2ac; }
+        .layer-box.layer3 { border-left-color: #ed8936; }
+        
+        .layer-box-title {
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .layer-box.layer1 .layer-box-title { color: #667eea; }
+        .layer-box.layer2 .layer-box-title { color: #38b2ac; }
+        .layer-box.layer3 .layer-box-title { color: #ed8936; }
+        
+        .layer-box-content {
+            font-size: 0.9em;
+            color: #718096;
+        }
+        
+        .layer-box-content code {
+            background: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 0.85em;
+        }
+        
+        @media (max-width: 768px) {
+            body {
+                padding: 20px 10px;
+            }
+            .header {
+                padding: 40px 20px;
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .content {
+                padding: 25px;
+            }
+            h2 {
+                font-size: 1.4em;
+            }
+            pre {
+                padding: 15px;
+                font-size: 0.8em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>OoderAgent</h1>
+            <p class="subtitle">知识库+LLM+安全架构深度融合的智能场景平台</p>
+        </div>
+        
+        <div class="content">
+            <h2><span class="section-number">1</span>产品定位与核心理念</h2>
+            
+            <h3>1.1 场景驱动架构：重新定义智能应用</h3>
+            <p>OoderAgent 是一个基于<strong>能力驱动架构</strong>的智能场景平台，其核心创新在于将"场景即技能"的理念贯彻到系统设计的每一个层面。与传统模板驱动模式不同，OoderAgent 采用场景驱动模式：</p>
+            
+            <div class="compare-container">
+                <div class="compare-box old">
+                    <div class="compare-title">传统模式</div>
+                    <p>开发时定义模板 → 用户选择模板 → 系统安装</p>
+                </div>
+                <div class="compare-box new">
+                    <div class="compare-title">场景驱动模式</div>
+                    <p>场景即技能 → 管理员发现场景 → 配置分发 → 用户使用</p>
+                </div>
+            </div>
+            
+            <p>这种设计使得场景成为可发现、可分发、可自驱的智能实体，而非静态的配置模板。</p>
+            
+            <h3>1.2 Scene = Agent：场景即智能体</h3>
+            <p>在 OoderAgent 中，场景是特殊的智能体，具备以下核心属性：</p>
+            
+            <table>
+                <tr>
+                    <th>属性</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td><code>AgentID</code></td>
+                    <td>scene-{sceneName}-{uuid}</td>
+                </tr>
+                <tr>
+                    <td><code>类型</code></td>
+                    <td>PRIMARY / BACKUP / COLLABORATIVE</td>
+                </tr>
+                <tr>
+                    <td><code>自动启动</code></td>
+                    <td>支持 mainFirst 自驱机制</td>
+                </tr>
+                <tr>
+                    <td><code>高可用</code></td>
+                    <td>支持 HA 模式故障切换</td>
+                </tr>
+                <tr>
+                    <td><code>离线支持</code></td>
+                    <td>完整的离线降级能力</td>
+                </tr>
+            </table>
+            
+            <h2><span class="section-number">2</span>能力驱动架构：mainFirst 自驱机制</h2>
+            
+            <h3>2.1 场景能力的本质定位</h3>
+            <p>OoderAgent 的核心创新在于将"场景"重新定义为一种特殊的<strong>能力(Capability)</strong>，而非简单的容器：</p>
+            
+            <div class="compare-container">
+                <div class="compare-box old">
+                    <div class="compare-title">传统理解：场景是容器</div>
+                    <p>场景包含能力 → 外部驱动场景 → 场景调用能力</p>
+                    <p style="margin-top:10px;color:#718096;font-size:0.9em;">场景是被动的，等待外部创建和驱动</p>
+                </div>
+                <div class="compare-box new">
+                    <div class="compare-title">新理解：场景是能力</div>
+                    <p>场景能力自驱 → 协调子能力 → 涌现新行为</p>
+                    <p style="margin-top:10px;color:#718096;font-size:0.9em;">场景是主动的，知道自己如何启动和运行</p>
+                </div>
+            </div>
+            
+            <h3>2.2 mainFirst：场景自驱入口</h3>
+            <p>每个 SceneCapability 都可以通过 <code>mainFirst: true</code> 声明自己具有自驱能力：</p>
+            
+            <div class="architecture-box">
+                <div class="arch-title">mainFirst 自驱生命周期</div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">Phase 1: selfCheck 自检</div>
+                    <div class="arch-items">
+                        <span class="arch-item">检查业务能力就绪</span>
+                        <span class="arch-item">检查驱动能力就绪</span>
+                        <span class="arch-item secondary">检查协作能力可用</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">Phase 2: selfStart 自启</div>
+                    <div class="arch-items">
+                        <span class="arch-item">初始化驱动能力</span>
+                        <span class="arch-item">初始化业务能力</span>
+                        <span class="arch-item secondary">绑定能力地址</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">Phase 3: startCollaboration 启动协作</div>
+                    <div class="arch-items">
+                        <span class="arch-item">启动协作场景</span>
+                        <span class="arch-item secondary">建立协作链路</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">Phase 4: selfDrive 自驱运行</div>
+                    <div class="arch-items">
+                        <span class="arch-item">时间驱动</span>
+                        <span class="arch-item">事件驱动</span>
+                        <span class="arch-item secondary">能力链调用</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>2.3 DRIVER_CAPABILITY：五大驱动能力</h3>
+            <p>所有启动源头都可以抽象为内置的驱动能力：</p>
+            
+            <div class="driver-grid">
+                <div class="driver-card">
+                    <div class="driver-icon">🎯</div>
+                    <div class="driver-name">intent-receiver</div>
+                    <div class="driver-desc">接收用户意图<br>解析需求</div>
+                </div>
+                <div class="driver-card">
+                    <div class="driver-icon">⏰</div>
+                    <div class="driver-name">scheduler</div>
+                    <div class="driver-desc">时间驱动<br>定时任务</div>
+                </div>
+                <div class="driver-card">
+                    <div class="driver-icon">📡</div>
+                    <div class="driver-name">event-listener</div>
+                    <div class="driver-desc">事件监听<br>条件触发</div>
+                </div>
+                <div class="driver-card">
+                    <div class="driver-icon">⚡</div>
+                    <div class="driver-name">capability-invoker</div>
+                    <div class="driver-desc">能力调用链<br>顺序管理</div>
+                </div>
+                <div class="driver-card">
+                    <div class="driver-icon">🤝</div>
+                    <div class="driver-name">collaboration-coordinator</div>
+                    <div class="driver-desc">协作协调<br>状态同步</div>
+                </div>
+            </div>
+            
+            <h3>2.4 能力类型体系</h3>
+            
+            <table>
+                <tr>
+                    <th>能力类型</th>
+                    <th>特点</th>
+                    <th>示例</th>
+                </tr>
+                <tr>
+                    <td><code>ATOMIC_CAPABILITY</code></td>
+                    <td>单一功能，不可分解</td>
+                    <td>email-send, file-read</td>
+                </tr>
+                <tr>
+                    <td><code>COMPOSITE_CAPABILITY</code></td>
+                    <td>组合多个原子能力</td>
+                    <td>notification-chain, data-pipeline</td>
+                </tr>
+                <tr>
+                    <td><code>SCENE_CAPABILITY</code></td>
+                    <td>自驱型SuperAgent，mainFirst入口</td>
+                    <td>scene-daily-report, scene-smart-home</td>
+                </tr>
+                <tr>
+                    <td><code>DRIVER_CAPABILITY</code></td>
+                    <td>内置驱动能力</td>
+                    <td>scheduler, event-listener</td>
+                </tr>
+            </table>
+            
+            <h2><span class="section-number">3</span>Skills 应用体系</h2>
+            
+            <h3>3.1 Skill 配置规范</h3>
+            <p>每个 Skill 通过 <code>skill.yaml</code> 声明其完整配置：</p>
+            
+            <pre><code>skill:
+  id: com.ooder.skills.example
+  name:
+    zh_CN: "示例Skill"
+    en_US: "Example Skill"
+  version: 1.2.3
+  category: "data-processing"
+  tags: ["example", "demo", "data"]
+
+dependencies:
+  skills:
+    - id: "com.ooder.skills.base"
+      version: "^1.0.0"
+      optional: false
+  system:
+    java: ">=1.8"
+    memory: ">=512MB"
+
+lifecycle:
+  startupOrder: 50
+  startupTimeout: 30000
+  healthCheck:
+    enabled: true
+    interval: 30000
+
+routing:
+  basePath: "/api/v1/skills/${skill.id}"
+  endpoints:
+    - path: "/agent-card"
+      method: "GET"
+    - path: "/tasks"
+      method: "POST"
+
+capabilities:
+  types: ["task", "notification", "streaming"]
+  formats:
+    input: ["text", "json", "file"]
+    output: ["text", "json", "stream"]</code></pre>
+            
+            <h3>3.2 Skill 生命周期管理</h3>
+            <p>Skill 从创建到卸载经历完整的状态转换：</p>
+            
+            <div class="lifecycle-diagram">
+                <div class="lifecycle-states">
+                    <span class="lifecycle-state created">CREATED</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state installing">INSTALLING</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state installed">INSTALLED</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state starting">STARTING</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state active">ACTIVE</span>
+                </div>
+                <div class="lifecycle-states">
+                    <span class="lifecycle-state active">ACTIVE</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state stopping">STOPPING</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state stopped">STOPPED</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state error">UNINSTALLING</span>
+                    <span class="lifecycle-arrow">→</span>
+                    <span class="lifecycle-state created">UNINSTALLED</span>
+                </div>
+                <div style="text-align:center;margin-top:15px;">
+                    <span class="lifecycle-state error">ERROR</span>
+                    <span style="color:#718096;font-size:0.9em;margin-left:10px;">(任意阶段可能进入错误状态)</span>
+                </div>
+            </div>
+            
+            <h3>3.3 热插拔事务模型</h3>
+            <p>Skill 安装/卸载采用<strong>两阶段提交(2PC)</strong>模型，确保原子性：</p>
+            
+            <div class="flow-container">
+                <div class="flow-title">热插拔事务流程</div>
+                <div class="flow-steps">
+                    <div class="flow-step">
+                        <div class="flow-step-number">P1</div>
+                        <div class="flow-step-content">
+                            <div class="flow-step-title">Phase 1: 准备阶段 (Prepare)</div>
+                            <div class="flow-step-desc">开始事务 → 资源预留 → 依赖检查 → 预加载 → 准备就绪</div>
+                        </div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">P2</div>
+                        <div class="flow-step-content">
+                            <div class="flow-step-title">Phase 2: 提交阶段 (Commit)</div>
+                            <div class="flow-step-desc">提交事务 → 注册服务 → 启动组件 → 状态更新</div>
+                        </div>
+                    </div>
+                    <div class="flow-connector"></div>
+                    <div class="flow-step">
+                        <div class="flow-step-number">R</div>
+                        <div class="flow-step-content">
+                            <div class="flow-step-title">失败时: 回滚阶段 (Rollback)</div>
+                            <div class="flow-step-desc">回滚事务 → 释放资源 → 清理状态 → 通知失败</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>3.4 三层协作接口</h3>
+            <p>Skill 与 Nexus 前端通过三层接口协议协作：</p>
+            
+            <div class="layer-interface">
+                <div class="layer-title">三层协作接口架构</div>
+                <div class="layer-boxes">
+                    <div class="layer-box layer1">
+                        <div class="layer-box-title">
+                            <span style="background:#667eea;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.8em;">Layer 1</span>
+                            JavaScript API (Nexus UI ↔ Skill UI)
+                        </div>
+                        <div class="layer-box-content">
+                            <code>window.parent.postMessage()</code> 主题切换通知、布局调整通知、消息传递
+                        </div>
+                    </div>
+                    <div class="layer-box layer2">
+                        <div class="layer-box-title">
+                            <span style="background:#38b2ac;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.8em;">Layer 2</span>
+                            WebSocket (实时通信)
+                        </div>
+                        <div class="layer-box-content">
+                            <code>/ws/skills/{skillId}</code> 状态变更推送、实时数据流、双向通知
+                        </div>
+                    </div>
+                    <div class="layer-box layer3">
+                        <div class="layer-box-title">
+                            <span style="background:#ed8936;color:#fff;padding:2px 8px;border-radius:4px;font-size:0.8em;">Layer 3</span>
+                            RESTful API (HTTP请求)
+                        </div>
+                        <div class="layer-box-content">
+                            <code>/api/v1/skills/{skillId}/...</code> 配置管理、生命周期控制、数据查询
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2><span class="section-number">4</span>知识库架构：从个人端到企业级的渐进式建设</h2>
+            
+            <h3>4.1 三级知识库架构</h3>
+            <p>OoderAgent 采用"个人端优先、企业级渐进"的知识库建设策略：</p>
+            
+            <div class="architecture-box">
+                <div class="arch-title">知识库分级架构</div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">轻量级 (个人端)</div>
+                    <div class="arch-items">
+                        <span class="arch-item">本地文件系统存储</span>
+                        <span class="arch-item">BM25/TF-IDF 关键词检索</span>
+                        <span class="arch-item">无需外部数据库/向量库</span>
+                        <span class="arch-item secondary">适用：个人PC、离线使用</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">标准级 (小团队)</div>
+                    <div class="arch-items">
+                        <span class="arch-item">SQLite-Vec 向量存储</span>
+                        <span class="arch-item">RAG 语义检索引擎</span>
+                        <span class="arch-item">单机部署、零依赖</span>
+                        <span class="arch-item secondary">适用：小团队、基础RAG</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">企业级 (大型组织)</div>
+                    <div class="arch-items">
+                        <span class="arch-item">PostgreSQL/Milvus 分布式向量库</span>
+                        <span class="arch-item">知识库治理体系</span>
+                        <span class="arch-item">多租户隔离、高可用</span>
+                        <span class="arch-item tertiary">适用：大型企业、分布式</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>4.2 SQLite-Vec 集成方案</h3>
+            <p>作为默认的向量存储方案，SQLite-Vec 具有以下优势：</p>
+            
+            <table>
+                <tr>
+                    <th>特性</th>
+                    <th>说明</th>
+                </tr>
+                <tr>
+                    <td>零依赖</td>
+                    <td>无需部署独立的向量数据库服务</td>
+                </tr>
+                <tr>
+                    <td>轻量级</td>
+                    <td>嵌入式存储，资源占用极低</td>
+                </tr>
+                <tr>
+                    <td>离线优先</td>
+                    <td>完全支持离线环境运行</td>
+                </tr>
+                <tr>
+                    <td>性能优化</td>
+                    <td>支持缓存、批量插入、异步预加载</td>
+                </tr>
+            </table>
+            
+            <h3>4.3 RAG 引擎设计</h3>
+            <p>OoderAgent 的 RAG 引擎支持多种检索策略：</p>
+            
+            <pre><code>检索策略:
+  语义检索:
+    - 向量相似度计算
+    - Top-K 结果返回
+    - 分数阈值过滤
+    
+  混合检索:
+    - 语义权重: 0.7
+    - 关键词权重: 0.3
+    - 重排序优化
+    
+  跨库检索:
+    - 多知识库合并
+    - 按分数排序合并</code></pre>
+            
+            <h2><span class="section-number">5</span>LLM 集成架构：多级配置与上下文感知</h2>
+            
+            <h3>5.1 多级 LLM 配置体系</h3>
+            <p>OoderAgent 实现了灵活的多级 LLM 配置，支持从系统级到场景步骤级的精细控制：</p>
+            
+            <div class="priority-container">
+                <div class="priority-title">LLM 配置优先级</div>
+                <div class="priority-subtitle">优先级：高 ◄────────────────────────────► 低</div>
+                
+                <div class="priority-levels">
+                    <div class="priority-level high">
+                        <div class="priority-name">SCENE_STEP</div>
+                        <div class="priority-value">100</div>
+                    </div>
+                    <div class="priority-level high">
+                        <div class="priority-name">SCENE</div>
+                        <div class="priority-value">80</div>
+                    </div>
+                    <div class="priority-level medium">
+                        <div class="priority-name">SCENE_GROUP</div>
+                        <div class="priority-value">60</div>
+                    </div>
+                    <div class="priority-level medium">
+                        <div class="priority-name">PERSONAL</div>
+                        <div class="priority-value">40</div>
+                    </div>
+                    <div class="priority-level low">
+                        <div class="priority-name">ENTERPRISE</div>
+                        <div class="priority-value">20</div>
+                    </div>
+                </div>
+                
+                <div class="priority-base">
+                    <div class="priority-name">SYSTEM</div>
+                    <div class="priority-value" style="font-size: 1.2em;">0</div>
+                </div>
+            </div>
+            
+            <h3>5.2 LLM Provider 生态</h3>
+            <p>系统通过 SPI 机制支持多厂商 LLM 接入：</p>
+            
+            <table>
+                <tr>
+                    <th>Provider</th>
+                    <th>模块</th>
+                    <th>支持模型</th>
+                </tr>
+                <tr>
+                    <td>OpenAI</td>
+                    <td><code>skill-llm-openai</code></td>
+                    <td>gpt-4, gpt-4-turbo, gpt-4o</td>
+                </tr>
+                <tr>
+                    <td>通义千问</td>
+                    <td><code>skill-llm-qianwen</code></td>
+                    <td>qwen-turbo, qwen-plus, qwen-max</td>
+                </tr>
+                <tr>
+                    <td>DeepSeek</td>
+                    <td><code>skill-llm-deepseek</code></td>
+                    <td>deepseek-chat, deepseek-coder</td>
+                </tr>
+                <tr>
+                    <td>火山引擎</td>
+                    <td><code>skill-llm-volcengine</code></td>
+                    <td>豆包系列模型</td>
+                </tr>
+                <tr>
+                    <td>Ollama</td>
+                    <td><code>skill-llm-ollama</code></td>
+                    <td>llama3, mistral 等本地模型</td>
+                </tr>
+            </table>
+            
+            <h3>5.3 上下文构建器</h3>
+            <p>LLM 的智能响应依赖于丰富的上下文信息，OoderAgent 设计了完整的上下文构建体系：</p>
+            
+            <div class="architecture-box">
+                <div class="arch-title">LLM 上下文构建器</div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">ContextSource (上下文源)</div>
+                    <div class="arch-items">
+                        <span class="arch-item">PAGE 页面</span>
+                        <span class="arch-item">SKILL 技能</span>
+                        <span class="arch-item">SCENE 场景</span>
+                        <span class="arch-item">USER 用户</span>
+                        <span class="arch-item">KNOWLEDGE 知识库</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">ContextExtractor (提取器)</div>
+                    <div class="arch-items">
+                        <span class="arch-item secondary">提取结构化数据</span>
+                        <span class="arch-item secondary">过滤敏感信息</span>
+                        <span class="arch-item secondary">计算相关性</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">ContextMerger (合并器)</div>
+                    <div class="arch-items">
+                        <span class="arch-item tertiary">按优先级排序</span>
+                        <span class="arch-item tertiary">去重和压缩</span>
+                        <span class="arch-item tertiary">Token 限制裁剪</span>
+                    </div>
+                </div>
+                
+                <div class="arch-layer">
+                    <div class="arch-layer-title">ContextFormatter (格式化器)</div>
+                    <div class="arch-items">
+                        <span class="arch-item">生成结构化 Prompt</span>
+                    </div>
+                </div>
+            </div>
+            
+            <h2><span class="section-number">6</span>安全架构：嵌入式安全设计</h2>
+            
+            <h3>6.1 安全控制模块架构</h3>
+            <p>安全控制模块是 OoderAgent 的核心安全基础设施，提供四大核心能力：</p>
+            
+            <div class="security-grid">
+                <div class="security-card">
+                    <div class="security-icon">🔐</div>
+                    <div class="security-name">密钥管理</div>
+                    <div class="security-desc">KeyManager</div>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon">🛡️</div>
+                    <div class="security-name">访问控制</div>
+                    <div class="security-desc">AccessCtrl</div>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon">🔒</div>
+                    <div class="security-name">通讯安全</div>
+                    <div class="security-desc">CommSec</div>
+                </div>
+                <div class="security-card">
+                    <div class="security-icon">📋</div>
+                    <div class="security-name">审计追踪</div>
+                    <div class="security-desc">Audit</div>
+                </div>
+            </div>
+            
+            <h3>6.2 密钥管理体系</h3>
+            <p>支持多种密钥类型和完整的生命周期管理：</p>
+            
+            <table>
+                <tr>
+                    <th>密钥类型</th>
+                    <th>用途</th>
+                    <th>安全措施</th>
+                </tr>
+                <tr>
+                    <td>LLM_API_KEY</td>
+                    <td>大语言模型 API 密钥</td>
+                    <td>AES-256 加密存储</td>
+                </tr>
+                <tr>
+                    <td>CLOUD_API_KEY</td>
+                    <td>云服务 API 密钥</td>
+                    <td>访问权限控制</td>
+                </tr>
+                <tr>
+                    <td>DATABASE_KEY</td>
+                    <td>数据库连接密钥</td>
+                    <td>定期轮换</td>
+                </tr>
+                <tr>
+                    <td>AGENT_KEY</td>
+                    <td>Agent 身份密钥</td>
+                    <td>挑战-响应认证</td>
+                </tr>
+                <tr>
+                    <td>ENCRYPTION_KEY</td>
+                    <td>数据加密密钥</td>
+                    <td>主密钥保护</td>
+                </tr>
+            </table>
+            
+            <h3>6.3 场景安全嵌入式设计</h3>
+            <p>安全能力深度嵌入场景生命周期的每个阶段：</p>
+            
+            <table>
+                <tr>
+                    <th>场景生命周期</th>
+                    <th>安全钩子</th>
+                    <th>操作</th>
+                </tr>
+                <tr>
+                    <td>创建场景</td>
+                    <td><code>setupSceneSecurity()</code></td>
+                    <td>初始化安全策略、授权必要密钥</td>
+                </tr>
+                <tr>
+                    <td>激活场景</td>
+                    <td><code>checkSceneAccess()</code></td>
+                    <td>验证启动权限</td>
+                </tr>
+                <tr>
+                    <td>加入参与者</td>
+                    <td><code>checkParticipantAccess()</code></td>
+                    <td>验证参与者权限</td>
+                </tr>
+                <tr>
+                    <td>绑定能力</td>
+                    <td><code>checkCapabilityBinding()</code></td>
+                    <td>验证能力访问权限</td>
+                </tr>
+                <tr>
+                    <td>使用密钥</td>
+                    <td><code>getSceneKey()</code></td>
+                    <td>获取并记录密钥使用</td>
+                </tr>
+                <tr>
+                    <td>销毁场景</td>
+                    <td><code>cleanupSceneSecurity()</code></td>
+                    <td>清理安全配置、撤销授权</td>
+                </tr>
+            </table>
+            
+            <h2><span class="section-number">7</span>三闭环设计：完整的业务闭环</h2>
+            
+            <h3>7.1 闭环一：系统初始化</h3>
+            <p>系统初始化闭环确保基础能力就绪：</p>
+            
+            <div class="loop-container">
+                <div class="loop-title">系统初始化闭环</div>
+                <div class="loop-steps">
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">安装基础技能包</div>
+                            <div class="loop-step-note">skill-scene, skill-capability, skill-health</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">系统自检</div>
+                            <div class="loop-step-note">检查核心能力是否就绪</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">进入就绪状态</div>
+                            <div class="loop-step-note">可以发现和安装场景技能</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">系统就绪，等待场景安装</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>7.2 闭环二：管理员场景分发</h3>
+            <p>管理员通过场景驱动模式发现和分发场景：</p>
+            
+            <div class="loop-container">
+                <div class="loop-title">管理员场景分发闭环</div>
+                <div class="loop-steps">
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">发现场景技能</div>
+                            <div class="loop-step-note">GET /api/v1/capabilities/discover?type=SCENE</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">选择场景技能</div>
+                            <div class="loop-step-note">查看场景详情、驱动条件、所需能力</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">配置场景安装</div>
+                            <div class="loop-step-note">选择驱动条件分支 / 配置参与者 / 选择协作能力</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">安装场景技能</div>
+                            <div class="loop-step-note">自动解析依赖、创建场景实例</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">场景激活，协作者可见，业务就绪</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>7.3 闭环三：业务流转</h3>
+            <p>实际用户通过场景自驱能力完成业务目标：</p>
+            
+            <div class="loop-container">
+                <div class="loop-title">业务流转闭环</div>
+                <div class="loop-steps">
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">用户查看待办</div>
+                            <div class="loop-step-note">GET /api/v1/todos</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">进入场景</div>
+                            <div class="loop-step-note">主导者：配置场景/分配任务/监控进度 | 协作者：查看任务/执行任务/提交结果</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                            <div class="loop-step-line"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">场景自驱执行</div>
+                            <div class="loop-step-note">selfDrive 配置定时/事件触发</div>
+                        </div>
+                    </div>
+                    <div class="loop-step">
+                        <div class="loop-step-marker">
+                            <div class="loop-step-dot"></div>
+                        </div>
+                        <div class="loop-step-content">
+                            <div class="loop-step-title">业务目标达成</div>
+                            <div class="loop-step-note">DRAFT → ACTIVE → SUSPENDED → COMPLETED</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h2><span class="section-number">8</span>场景能力类型与应用场景</h2>
+            
+            <h3>8.1 场景类型对比</h3>
+            
+            <table>
+                <tr>
+                    <th>类型</th>
+                    <th>驱动方式</th>
+                    <th>典型场景</th>
+                    <th>关键驱动能力</th>
+                </tr>
+                <tr>
+                    <td>流程驱动型</td>
+                    <td><code>scheduler</code></td>
+                    <td>日志汇报、定时任务</td>
+                    <td>scheduler, capability-invoker</td>
+                </tr>
+                <tr>
+                    <td>事件驱动型</td>
+                    <td><code>event-listener</code></td>
+                    <td>智能家居、监控告警</td>
+                    <td>event-listener, capability-invoker</td>
+                </tr>
+                <tr>
+                    <td>协作型</td>
+                    <td><code>collaboration-coordinator</code></td>
+                    <td>知识问答、多Agent协作</td>
+                    <td>collaboration-coordinator</td>
+                </tr>
+                <tr>
+                    <td>混合型</td>
+                    <td>多驱动能力</td>
+                    <td>复杂业务场景</td>
+                    <td>scheduler + event-listener + collaboration-coordinator</td>
+                </tr>
+            </table>
+            
+            <h3>8.2 典型场景示例：日志汇报场景能力</h3>
+            
+            <pre><code>sceneCapabilities:
+  - id: scene-daily-report
+    name: 日志汇报场景能力
+    mainFirst: true
+    
+    mainFirstConfig:
+      selfDrive:
+        scheduleRules:
+          - trigger: "0 17 * * 1-5"
+            action: remind-flow
+            
+        capabilityChains:
+          remind-flow:
+            - capability: report-remind
+              input: { targetUsers: "${role.employee}" }</code></pre>
+            
+            <h2><span class="section-number">9</span>技术架构总结</h2>
+            
+            <h3>9.1 CAP 地址空间</h3>
+            <p>OoderAgent 定义了标准化的能力地址空间：</p>
+            
+            <div class="cap-container">
+                <div class="cap-title">CAP 地址空间 (256 = 00-FF)</div>
+                
+                <div class="cap-section system">
+                    <div class="cap-section-title">
+                        <span class="cap-badge">64个</span>
+                        系统层 (00-3F)
+                    </div>
+                    <div class="cap-items">
+                        <div class="cap-item"><span class="cap-item-code">00-0F</span> 核心系统能力</div>
+                        <div class="cap-item"><span class="cap-item-code">10-1F</span> Agent 核心能力</div>
+                        <div class="cap-item"><span class="cap-item-code">20-2F</span> 场景组能力</div>
+                        <div class="cap-item"><span class="cap-item-code">30-3F</span> VFS 核心能力</div>
+                    </div>
+                </div>
+                
+                <div class="cap-section common">
+                    <div class="cap-section-title">
+                        <span class="cap-badge">96个</span>
+                        通用层 (40-9F)
+                    </div>
+                    <div class="cap-items">
+                        <div class="cap-item"><span class="cap-item-code">40-4F</span> 消息通讯能力</div>
+                        <div class="cap-item"><span class="cap-item-code">50-5F</span> 组织管理能力</div>
+                        <div class="cap-item"><span class="cap-item-code">60-6F</span> 存储能力</div>
+                        <div class="cap-item"><span class="cap-item-code">70-7F</span> 监控能力</div>
+                        <div class="cap-item"><span class="cap-item-code">80-8F</span> 安全能力</div>
+                        <div class="cap-item"><span class="cap-item-code">90-9F</span> 支付能力</div>
+                    </div>
+                </div>
+                
+                <div class="cap-section extension">
+                    <div class="cap-section-title">
+                        <span class="cap-badge">96个</span>
+                        扩展层 (A0-FF)
+                    </div>
+                    <div class="cap-items">
+                        <div class="cap-item"><span class="cap-item-code">A0-AF</span> 媒体发布能力</div>
+                        <div class="cap-item"><span class="cap-item-code">B0-BF</span> AI/LLM 能力</div>
+                        <div class="cap-item"><span class="cap-item-code">C0-FF</span> 预留扩展区</div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>9.2 离线优先设计</h3>
+            <p>所有能力必须支持离线降级实现：</p>
+            
+            <table>
+                <tr>
+                    <th>功能</th>
+                    <th>在线实现</th>
+                    <th>离线降级</th>
+                </tr>
+                <tr>
+                    <td>向量检索</td>
+                    <td>专业向量库</td>
+                    <td>BM25/TF-IDF 关键词检索</td>
+                </tr>
+                <tr>
+                    <td>语义理解</td>
+                    <td>云端 LLM</td>
+                    <td>本地 Ollama 模型或规则匹配</td>
+                </tr>
+                <tr>
+                    <td>向量嵌入</td>
+                    <td>云端 Embedding API</td>
+                    <td>跳过或使用本地模型</td>
+                </tr>
+                <tr>
+                    <td>RAG 查询</td>
+                    <td>完整 RAG 流程</td>
+                    <td>纯检索 + 本地生成</td>
+                </tr>
+            </table>
+            
+            <h2><span class="section-number">10</span>总结</h2>
+            
+            <p>OoderAgent 通过<strong>知识库+LLM+安全架构</strong>的深度融合，构建了一个真正智能化的场景驱动平台：</p>
+            
+            <div class="summary-cards">
+                <div class="summary-card">
+                    <div class="summary-card-number">1</div>
+                    <div class="summary-card-title">能力驱动架构</div>
+                    <div class="summary-card-desc">mainFirst 自驱机制 + DRIVER_CAPABILITY 五大驱动能力，场景从被动容器变为主动智能体</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-number">2</div>
+                    <div class="summary-card-title">Skills 应用体系</div>
+                    <div class="summary-card-desc">完整的 skill.yaml 配置规范、生命周期管理、热插拔事务模型、三层协作接口</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-number">3</div>
+                    <div class="summary-card-title">知识库 + LLM</div>
+                    <div class="summary-card-desc">从个人端到企业级的渐进式建设路径，多级 LLM 配置体系，智能上下文构建</div>
+                </div>
+                <div class="summary-card">
+                    <div class="summary-card-number">4</div>
+                    <div class="summary-card-title">安全与闭环</div>
+                    <div class="summary-card-desc">嵌入式安全设计深度集成场景生命周期，三闭环设计确保从系统部署到业务落地全流程可控</div>
+                </div>
+            </div>
+            
+            <div class="highlight-box">
+                <p>这种架构设计使得 OoderAgent 能够适应从个人开发者到大型企业的不同规模需求，同时保持<strong>离线优先</strong>、<strong>安全可控</strong>、<strong>能力自驱</strong>的核心特性。</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p style="font-size: 1.2em; font-weight: 600; margin-bottom: 10px;">OoderAgent - 智能场景驱动平台</p>
+            <p>
+                <a href="https://gitee.com/ooderCN" target="_blank">Gitee 官方地址</a> | 
+                <a href="https://github.com/ooderCN" target="_blank">GitHub 镜像</a>
+            </p>
+            <p style="margin-top: 20px; font-size: 0.9em;">© 2026 Ooder Team. All rights reserved.</p>
+        </div>
+    </div>
+</body>
+</html>

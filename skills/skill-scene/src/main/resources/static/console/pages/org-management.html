@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>组织管理 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <h1><i class="ri-organization-chart"></i> 组织管理</h1>
+                    <p>管理组织架构和用户</p>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-row">
+                        <div class="nx-col-6">
+                            <div class="nx-card">
+                                <div class="nx-card__header">
+                                    <h3>部门列表</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div id="department-list">
+                                        <p class="nx-text-secondary">加载中...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-col-6">
+                            <div class="nx-card">
+                                <div class="nx-card__header">
+                                    <h3>用户列表</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div id="user-list">
+                                        <p class="nx-text-secondary">加载中...</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        async function loadOrgData() {
+            try {
+                const response = await fetch('/api/v1/org/users');
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    renderUsers(result.data);
+                }
+            } catch (e) {
+                console.error('Failed to load org data:', e);
+            }
+        }
+        
+        function renderUsers(users) {
+            const list = document.getElementById('user-list');
+            
+            if (!users || users.length === 0) {
+                list.innerHTML = '<p class="nx-text-secondary">暂无用户</p>';
+                return;
+            }
+            
+            list.innerHTML = users.map(user => `
+                <div class="nx-flex nx-items-center nx-justify-between nx-p-3 nx-border-b nx-border-[var(--nx-border)]">
+                    <div>
+                        <h4 class="nx-font-medium">${user.name || user.username}</h4>
+                        <p class="nx-text-sm nx-text-secondary">${user.email || ''}</p>
+                    </div>
+                    <span class="nx-badge">${user.role || 'user'}</span>
+                </div>
+            `).join('');
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadOrgData);
+    </script>
+</body>
+</html>

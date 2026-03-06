@@ -11,6 +11,7 @@ public class OrgUserDTO {
     private String role;
     private String title;
     private String avatar;
+    private String password;
     private List<String> permissions;
     private long createTime;
     private long updateTime;
@@ -32,6 +33,8 @@ public class OrgUserDTO {
     public void setTitle(String title) { this.title = title; }
     public String getAvatar() { return avatar; }
     public void setAvatar(String avatar) { this.avatar = avatar; }
+    public String getPassword() { return password; }
+    public void setPassword(String password) { this.password = password; }
     public List<String> getPermissions() { return permissions; }
     public void setPermissions(List<String> permissions) { this.permissions = permissions; }
     public long getCreateTime() { return createTime; }

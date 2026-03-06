@@ -159,6 +159,20 @@ spec:
       sceneDriver: null
   
   skills:
+    - skillId: skill-capability
+      name: 能力管理服务
+      version: "1.0.0"
+      category: sys
+      subCategory: capability
+      tags:
+        - capability
+        - register
+        - discover
+        - validate
+      description: 能力管理服务 - 提供能力注册、发现、验证、统计能力
+      sceneId: capability
+      path: skills/skill-capability
+      
     - skillId: skill-a2ui
       name: A2UI Skill
       version: "0.7.3"
@@ -206,6 +220,228 @@ spec:
         - skillId: skill-llm-context-builder
           version: ">=1.0.0"
           required: true
+      
+    - skillId: skill-llm-conversation
+      name: LLM对话服务
+      version: "1.0.0"
+      category: llm
+      subCategory: conversation
+      tags:
+        - llm
+        - conversation
+        - chat
+        - ai
+      description: LLM对话服务，提供智能对话、会话管理、历史记录功能
+      sceneId: llm
+      path: skills/skill-llm-conversation
+      dependencies:
+        - skillId: skill-llm-context-builder
+          version: ">=1.0.0"
+          required: true
+      
+    - skillId: skill-llm-context-builder
+      name: 上下文构建服务
+      version: "1.0.0"
+      category: llm
+      subCategory: context
+      tags:
+        - llm
+        - context
+        - builder
+      description: 上下文构建服务，提供上下文提取、合并、压缩功能
+      sceneId: llm
+      path: skills/skill-llm-context-builder
+      
+    - skillId: skill-llm-config-manager
+      name: LLM配置管理
+      version: "1.0.0"
+      category: llm
+      subCategory: config
+      tags:
+        - llm
+        - config
+        - manager
+      description: LLM配置管理，提供Provider配置、模型管理功能
+      sceneId: llm
+      path: skills/skill-llm-config-manager
+      
+    - skillId: skill-knowledge-base
+      name: 知识库核心服务
+      version: "1.0.0"
+      category: knowledge
+      subCategory: base
+      tags:
+        - knowledge
+        - kb
+        - document
+      description: 知识库核心服务，提供知识库管理、文档管理、检索功能
+      sceneId: knowledge
+      path: skills/skill-knowledge-base
+      
+    - skillId: skill-rag
+      name: RAG检索增强
+      version: "1.0.0"
+      category: knowledge
+      subCategory: rag
+      tags:
+        - rag
+        - retrieval
+        - semantic
+      description: RAG检索增强生成服务，支持关键词检索、语义检索、混合检索策略
+      sceneId: knowledge
+      path: skills/skill-rag
+      dependencies:
+        - skillId: skill-knowledge-base
+          version: ">=1.0.0"
+          required: false
+      
+    - skillId: skill-local-knowledge
+      name: 本地知识服务
+      version: "1.0.0"
+      category: knowledge
+      subCategory: local
+      tags:
+        - knowledge
+        - local
+        - document
+      description: 本地知识服务，提供本地文档索引和检索功能
+      sceneId: knowledge
+      path: skills/skill-local-knowledge
+      
+    - skillId: skill-vector-sqlite
+      name: SQLite向量存储
+      version: "1.0.0"
+      category: knowledge
+      subCategory: vector
+      tags:
+        - vector
+        - sqlite
+        - embedding
+      description: SQLite向量存储服务，提供向量存储和相似度检索功能
+      sceneId: knowledge
+      path: skills/skill-vector-sqlite
+      
+    - skillId: skill-knowledge-qa
+      name: 知识问答场景能力
+      version: "2.3.0"
+      category: knowledge
+      subCategory: qa
+      tags:
+        - knowledge
+        - qa
+        - rag
+        - scene-capability
+        - mainFirst
+      description: 知识问答场景能力，支持知识库管理、文档管理、语义检索、RAG智能问答
+      sceneId: knowledge-qa
+      path: skills/skill-knowledge-qa
+      mainFirst: true
+      dependencies:
+        - skillId: skill-knowledge-base
+          version: ">=1.0.0"
+          required: true
+        - skillId: skill-rag
+          version: ">=1.0.0"
+          required: false
+      
+    - skillId: skill-knowledge-ui
+      name: 知识库管理界面
+      version: "2.3.0"
+      category: nexus-ui
+      subCategory: knowledge
+      tags:
+        - knowledge
+        - ui
+        - management
+        - scene-capability
+        - mainFirst
+      description: 知识库管理场景能力，支持知识库创建、文档上传、检索测试
+      sceneId: knowledge-ui
+      path: skills/skill-knowledge-ui
+      mainFirst: true
+      dependencies:
+        - skillId: skill-knowledge-base
+          version: ">=1.0.0"
+          required: true
+      
+    - skillId: skill-llm-assistant-ui
+      name: LLM智能助手界面
+      version: "2.3.0"
+      category: nexus-ui
+      subCategory: llm
+      tags:
+        - llm
+        - assistant
+        - ui
+        - scene-capability
+        - mainFirst
+      description: LLM智能助手场景能力，提供上下文感知的智能对话和辅助功能
+      sceneId: llm-assistant
+      path: skills/skill-llm-assistant-ui
+      mainFirst: true
+      dependencies:
+        - skillId: skill-llm-conversation
+          version: ">=1.0.0"
+          required: true
+        - skillId: skill-llm-context-builder
+          version: ">=1.0.0"
+          required: true
+      
+    - skillId: skill-llm-management-ui
+      name: LLM管理界面
+      version: "1.0.0"
+      category: nexus-ui
+      subCategory: llm
+      tags:
+        - llm
+        - management
+        - ui
+      description: LLM管理界面，提供模型配置、Provider管理、对话监控功能
+      sceneId: llm-management
+      path: skills/skill-llm-management-ui
+      dependencies:
+        - skillId: skill-llm-conversation
+          version: ">=1.0.0"
+          required: true
+      
+    - skillId: skill-org-base
+      name: 组织基础服务
+      version: "1.0.0"
+      category: org
+      subCategory: base
+      tags:
+        - org
+        - base
+        - organization
+      description: 组织基础服务，提供组织架构、部门管理基础功能
+      sceneId: org
+      path: skills/skill-org-base
+      
+    - skillId: skill-vfs-base
+      name: VFS基础服务
+      version: "1.0.0"
+      category: vfs
+      subCategory: base
+      tags:
+        - vfs
+        - base
+        - storage
+      description: VFS基础服务，提供文件操作基础接口
+      sceneId: vfs
+      path: skills/skill-vfs-base
+      
+    - skillId: skill-document-processor
+      name: 文档处理服务
+      version: "1.0.0"
+      category: util
+      subCategory: document
+      tags:
+        - document
+        - processor
+        - parse
+      description: 文档处理服务，提供文档解析、转换、提取功能
+      sceneId: document
+      path: skills/skill-document-processor
       
     - skillId: skill-org-dingding
       name: DingTalk Organization Service

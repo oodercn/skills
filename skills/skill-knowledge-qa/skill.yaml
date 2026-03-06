@@ -36,15 +36,17 @@ spec:
       required: false
       description: "RAG检索增强（可选）"
       
-    - id: skill-llm-assistant
-      version: ">=1.0.0"
+    - id: skill-llm-assistant-ui
+      version: ">=2.3.0"
       required: false
+      autoInstall: false
       description: "LLM智能助手（可选）"
       
-    - id: skill-indexing
+    - id: skill-vector-sqlite
       version: ">=1.0.0"
-      required: true
-      description: "文档索引服务"
+      required: false
+      autoInstall: false
+      description: "向量存储服务（可选）"
 
   sceneCapabilities:
     - id: scene-knowledge-qa

@@ -1,5 +1,7 @@
 package net.ooder.skill.scene.capability.model;
 
+import net.ooder.skill.scene.capability.driver.DriverCondition;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +37,11 @@ public class Capability implements Serializable {
     private Map<String, Object> metadata;
     private List<String> dependencies;
     private List<String> optionalCapabilities;
+    
+    private SceneSkillCategory category;
+    private String visibility;
+    private List<DriverCondition> driverConditions;
+    private List<Participant> participants;
 
     public Capability() {
         this.version = "1.0.0";
@@ -298,6 +305,73 @@ public class Capability implements Serializable {
 
     public void setOptionalCapabilities(List<String> optionalCapabilities) {
         this.optionalCapabilities = optionalCapabilities;
+    }
+
+    public SceneSkillCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(SceneSkillCategory category) {
+        this.category = category;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public List<DriverCondition> getDriverConditions() {
+        return driverConditions != null ? driverConditions : new ArrayList<DriverCondition>();
+    }
+
+    public void setDriverConditions(List<DriverCondition> driverConditions) {
+        this.driverConditions = driverConditions;
+    }
+
+    public List<Participant> getParticipants() {
+        return participants != null ? participants : new ArrayList<Participant>();
+    }
+
+    public void setParticipants(List<Participant> participants) {
+        this.participants = participants;
+    }
+
+    public boolean hasBusinessSemantics() {
+        return (driverConditions != null && !driverConditions.isEmpty()) 
+            && (participants != null && !participants.isEmpty());
+    }
+
+    public boolean isPublicVisible() {
+        return "public".equals(visibility) || (category != null && category.isPublicVisible());
+    }
+
+    public boolean isInternalVisible() {
+        return "internal".equals(visibility) || (category != null && category.isInternalVisible());
+    }
+
+    public static class Participant implements Serializable {
+        private static final long serialVersionUID = 1L;
+        
+        private String role;
+        private String name;
+        private String userId;
+        private List<String> permissions;
+
+        public Participant() {
+            this.permissions = new ArrayList<String>();
+        }
+
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
+        public List<String> getPermissions() { return permissions; }
+        public void setPermissions(List<String> permissions) { this.permissions = permissions; }
     }
 
     public static class ParameterDef implements Serializable {

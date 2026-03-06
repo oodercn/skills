@@ -307,20 +307,61 @@ public class GitDiscoveryController {
 
     @PostMapping("/install")
     public ResultModel<InstallResultDTO> installSkill(@RequestBody @Valid InstallSkillRequestDTO request) {
-        log.info("[installSkill] skillId: {}, source: {}, repoUrl: {}", 
-            request.getSkillId(), request.getSource(),
- request.getRepoUrl());
+        log.info("[installSkill] skillId: {}, source: {}, repoUrl: {}, mockEnabled: {}", 
+            request.getSkillId(), request.getSource(), request.getRepoUrl(), mockEnabled);
         
         InstallResultDTO result = new InstallResultDTO();
         result.setSkillId(request.getSkillId());
         result.setInstallTime(System.currentTimeMillis());
         
-        if (skillPackageManager != null) {
+        if (mockEnabled) {
+            log.info("[installSkill] Mock mode enabled, returning success for {}", request.getSkillId());
+            skillIndexLoader.markAsInstalled(request.getSkillId());
+            result.setStatus("installed");
+            result.setMessage("Skill installed successfully (mock mode)");
+            result.setCapabilities(getCapabilitiesForSkill(request.getSkillId()));
+            return ResultModel.success(result);
+        }
+        
+        String downloadUrl = skillIndexLoader.getDownloadUrl(request.getSkillId());
+        log.info("[installSkill] Download URL for {}: {}", request.getSkillId(), downloadUrl);
+        
+        if (skillPackageManager != null && downloadUrl != null) {
+            try {
+                InstallRequest installRequest = new InstallRequest();
+                installRequest.setSkillId(request.getSkillId());
+                installRequest.setDownloadUrl(downloadUrl);
+                installRequest.setMode(InstallRequest.InstallMode.FULL_INSTALL);
+                
+                InstallResult installResult = skillPackageManager.install(installRequest).get();
+                
+                if (installResult != null && installResult.isSuccess()){
+                    result.setStatus("installed");
+                    result.setMessage("Skill installed successfully");
+                    
+                    SkillManifest manifest = skillPackageManager.getManifest(request.getSkillId()).get();
+                    if (manifest != null) {
+                        result.setCapabilities(convertManifestToCapabilities(manifest));
+                    }
+                    
+                    log.info("[installSkill] Skill {} installed successfully from URL", request.getSkillId());
+                } else {
+                    result.setStatus("failed");
+                    result.setMessage(installResult != null ? installResult.getError() : "Unknown error");
+                    log.warn("[installSkill] Failed to install skill {}: {}", 
+                        request.getSkillId(), result.getMessage());
+                }
+            } catch (Exception e) {
+                log.error("[installSkill] Error installing skill {}: {}", request.getSkillId(), e.getMessage());
+                result.setStatus("error");
+                result.setMessage(e.getMessage());
+            }
+        } else if (skillPackageManager != null) {
             try {
                 InstallRequest.InstallMode mode = InstallRequest.InstallMode.FULL_INSTALL;
                 InstallResultWithDependencies installResult = skillPackageManager
                     .installWithDependencies(request.getSkillId(), mode)
-.get();
+                    .get();
                 
                 if (installResult != null && installResult.isSuccess()){
                     result.setStatus(installResult.getStatus());

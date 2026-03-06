@@ -2,6 +2,7 @@ package net.ooder.skill.scene.capability.service;
 
 import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.model.CapabilityType;
+import net.ooder.skill.scene.capability.model.SceneSkillCategory;
 import net.ooder.skill.scene.capability.driver.DriverCondition;
 
 import java.util.List;
@@ -22,6 +23,9 @@ public interface CapabilityDiscoveryService {
         private String sceneType;
         private int page;
         private int size;
+        private SceneSkillCategory category;
+        private Boolean mainFirst;
+        private String visibility;
         
         public DiscoveryMethod getMethod() { return method; }
         public void setMethod(DiscoveryMethod method) { this.method = method; }
@@ -35,6 +39,12 @@ public interface CapabilityDiscoveryService {
         public void setPage(int page) { this.page = page; }
         public int getSize() { return size; }
         public void setSize(int size) { this.size = size; }
+        public SceneSkillCategory getCategory() { return category; }
+        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public Boolean getMainFirst() { return mainFirst; }
+        public void setMainFirst(Boolean mainFirst) { this.mainFirst = mainFirst; }
+        public String getVisibility() { return visibility; }
+        public void setVisibility(String visibility) { this.visibility = visibility; }
     }
     
     public static class DiscoveryResult {
@@ -72,6 +82,10 @@ public interface CapabilityDiscoveryService {
         private List<DriverConditionInfo> driverConditions;
         private List<String> supportedSceneTypes;
         private Map<String, Object> metadata;
+        private SceneSkillCategory category;
+        private boolean mainFirst;
+        private String visibility;
+        private List<ParticipantInfo> participants;
         
         public String getCapabilityId() { return capabilityId; }
         public void setCapabilityId(String capabilityId) { this.capabilityId = capabilityId; }
@@ -93,6 +107,30 @@ public interface CapabilityDiscoveryService {
         public void setSupportedSceneTypes(List<String> supportedSceneTypes) { this.supportedSceneTypes = supportedSceneTypes; }
         public Map<String, Object> getMetadata() { return metadata; }
         public void setMetadata(Map<String, Object> metadata) { this.metadata = metadata; }
+        public SceneSkillCategory getCategory() { return category; }
+        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public boolean isMainFirst() { return mainFirst; }
+        public void setMainFirst(boolean mainFirst) { this.mainFirst = mainFirst; }
+        public String getVisibility() { return visibility; }
+        public void setVisibility(String visibility) { this.visibility = visibility; }
+        public List<ParticipantInfo> getParticipants() { return participants; }
+        public void setParticipants(List<ParticipantInfo> participants) { this.participants = participants; }
+    }
+    
+    public static class ParticipantInfo {
+        private String role;
+        private String name;
+        private String userId;
+        private List<String> permissions;
+        
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
+        public List<String> getPermissions() { return permissions; }
+        public void setPermissions(List<String> permissions) { this.permissions = permissions; }
     }
     
     public static class DriverConditionInfo {
@@ -123,6 +161,10 @@ public interface CapabilityDiscoveryService {
         private List<String> dependencies;
         private List<String> optionalCapabilities;
         private Map<String, Object> config;
+        private SceneSkillCategory category;
+        private boolean mainFirst;
+        private String visibility;
+        private List<ParticipantInfo> participants;
         
         public String getCapabilityId() { return capabilityId; }
         public void setCapabilityId(String capabilityId) { this.capabilityId = capabilityId; }
@@ -146,6 +188,14 @@ public interface CapabilityDiscoveryService {
         public void setOptionalCapabilities(List<String> optionalCapabilities) { this.optionalCapabilities = optionalCapabilities; }
         public Map<String, Object> getConfig() { return config; }
         public void setConfig(Map<String, Object> config) { this.config = config; }
+        public SceneSkillCategory getCategory() { return category; }
+        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public boolean isMainFirst() { return mainFirst; }
+        public void setMainFirst(boolean mainFirst) { this.mainFirst = mainFirst; }
+        public String getVisibility() { return visibility; }
+        public void setVisibility(String visibility) { this.visibility = visibility; }
+        public List<ParticipantInfo> getParticipants() { return participants; }
+        public void setParticipants(List<ParticipantInfo> participants) { this.participants = participants; }
     }
     
     public enum DiscoveryMethod {

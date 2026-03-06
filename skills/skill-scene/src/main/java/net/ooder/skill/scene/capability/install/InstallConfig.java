@@ -1,5 +1,7 @@
 package net.ooder.skill.scene.capability.install;
 
+import net.ooder.skill.scene.capability.model.SceneSkillCategory;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -30,6 +32,10 @@ public class InstallConfig {
     private boolean pushed;
     private long pushTime;
     
+    private SceneSkillCategory category;
+    private String visibility;
+    private List<String> nextSteps;
+    
     public enum InstallStatus {
         DRAFT,
         PENDING,
@@ -38,7 +44,13 @@ public class InstallConfig {
         PENDING_ACTIVATION,
         ACTIVATED,
         FAILED,
-        CANCELLED
+        CANCELLED,
+        SCHEDULED,
+        RUNNING,
+        PAUSED,
+        WAITING,
+        COMPLETED,
+        ARCHIVED
     }
     
     public enum PushType {
@@ -161,4 +173,10 @@ public class InstallConfig {
     public void setPushTime(long pushTime) { this.pushTime = pushTime; }
     public String getDriverConditionConfig() { return driverConditionConfig; }
     public void setDriverConditionConfig(String driverConditionConfig) { this.driverConditionConfig = driverConditionConfig; }
+    public SceneSkillCategory getCategory() { return category; }
+    public void setCategory(SceneSkillCategory category) { this.category = category; }
+    public String getVisibility() { return visibility; }
+    public void setVisibility(String visibility) { this.visibility = visibility; }
+    public List<String> getNextSteps() { return nextSteps != null ? nextSteps : new ArrayList<String>(); }
+    public void setNextSteps(List<String> nextSteps) { this.nextSteps = nextSteps; }
 }

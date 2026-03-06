@@ -30,8 +30,8 @@ public class LlmChatController {
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<String, SessionInfo>();
     private final Map<String, ProviderInfo> providers = new ConcurrentHashMap<String, ProviderInfo>();
     
-    private String currentProvider = "mock";
-    private String currentModel = "default";
+    private String currentProvider = "deepseek";
+    private String currentModel = "deepseek-chat";
     
     @Autowired(required = false)
     private net.ooder.skill.test.service.LLMService llmService;
@@ -41,12 +41,17 @@ public class LlmChatController {
     }
     
     private void initProviders() {
-        providers.put("mock", new ProviderInfo("mock", "Mock Provider", 
-            Arrays.asList("default", "mock-v1", "mock-v2"), true, false));
-        providers.put("openai", new ProviderInfo("openai", "OpenAI", 
-            Arrays.asList("gpt-3.5-turbo", "gpt-4", "gpt-4-turbo"), true, true));
         providers.put("deepseek", new ProviderInfo("deepseek", "DeepSeek", 
-            Arrays.asList("deepseek-chat", "deepseek-coder"), true, true));
+            Arrays.asList("deepseek-chat", "deepseek-coder", "deepseek-reasoner"), true, true));
+        providers.put("baidu", new ProviderInfo("baidu", "百度千帆", 
+            Arrays.asList("ernie-4.0-8k", "ernie-4.0-turbo-8k", "ernie-3.5-8k", "ernie-3.5-turbo-8k", 
+                "ernie-speed-8k", "ernie-lite-8k", "ernie-tiny-8k"), true, true));
+        providers.put("openai", new ProviderInfo("openai", "OpenAI", 
+            Arrays.asList("gpt-4o", "gpt-4-turbo", "gpt-3.5-turbo"), true, true));
+        providers.put("qianwen", new ProviderInfo("qianwen", "通义千问", 
+            Arrays.asList("qwen-max", "qwen-plus", "qwen-turbo"), true, true));
+        providers.put("ollama", new ProviderInfo("ollama", "Ollama", 
+            Arrays.asList("llama3", "llama2", "mistral", "codellama", "qwen2"), true, true));
     }
     
     @PostMapping("/chat")
@@ -75,14 +80,14 @@ public class LlmChatController {
                 boolean llmReady = (Boolean) llmStatus.get("ready");
                 
                 if (llmReady) {
-                    response = llmService.chat(message, session.getHistory());
+                    response = llmService.generateAnswer(message, null, model);
                     tokensUsed = response.length();
                 } else {
-                    response = generateMockResponse(message);
+                    response = "LLM服务未配置，请检查API Key设置。";
                     tokensUsed = response.length();
                 }
             } else {
-                response = generateMockResponse(message);
+                response = "LLM服务不可用，请检查服务配置。";
                 tokensUsed = response.length();
             }
             
@@ -141,12 +146,12 @@ public class LlmChatController {
                         boolean llmReady = (Boolean) llmStatus.get("ready");
                         
                         if (llmReady) {
-                            fullResponse = llmService.chat(message, session.getHistory());
+                            fullResponse = llmService.generateAnswer(message, null, model);
                         } else {
-                            fullResponse = generateMockResponse(message);
+                            fullResponse = "LLM服务未配置，请检查API Key设置。";
                         }
                     } else {
-                        fullResponse = generateMockResponse(message);
+                        fullResponse = "LLM服务不可用，请检查服务配置。";
                     }
                     
                     int chunkSize = 8;
@@ -369,55 +374,6 @@ public class LlmChatController {
         return session;
     }
     
-    private String generateMockResponse(String prompt) {
-        StringBuilder response = new StringBuilder();
-        
-        if (prompt == null) {
-            prompt = "";
-        }
-        
-        if (prompt.contains("配置") || prompt.contains("设置")) {
-            response.append("我可以帮助您进行配置。\n\n");
-            response.append("请告诉我您想要配置的具体内容，例如：\n");
-            response.append("- 场景配置\n");
-            response.append("- 能力绑定\n");
-            response.append("- 参与者管理\n");
-        } else if (prompt.contains("分析")) {
-            response.append("我可以帮助您分析数据。\n\n");
-            response.append("请提供需要分析的数据或选择要分析的内容。");
-        } else if (prompt.contains("代码") || prompt.contains("生成")) {
-            response.append("我可以帮助您生成代码。\n\n");
-            response.append("```java\n");
-            response.append("// 示例代码\n");
-            response.append("public class Example {\n");
-            response.append("    public void execute() {\n");
-            response.append("        System.out.println(\"Hello, Ooder!\");\n");
-            response.append("    }\n");
-            response.append("}\n");
-            response.append("```\n");
-        } else if (prompt.contains("帮助") || prompt.contains("使用")) {
-            response.append("## Ooder 智能助手使用指南\n\n");
-            response.append("### 功能列表\n");
-            response.append("1. **自动配置** - 根据当前页面内容提供配置建议\n");
-            response.append("2. **数据分析** - 分析当前页面的数据\n");
-            response.append("3. **代码生成** - 生成相关代码片段\n");
-            response.append("4. **使用帮助** - 提供功能使用说明\n\n");
-            response.append("### 快捷操作\n");
-            response.append("- 点击快捷按钮快速开始对话\n");
-            response.append("- 支持上下文感知，自动获取当前页面信息\n");
-        } else {
-            response.append("您好！我是 Ooder 智能助手。\n\n");
-            response.append("我可以帮助您：\n");
-            response.append("- 进行自然语言对话\n");
-            response.append("- 回答问题和提供建议\n");
-            response.append("- 生成代码和文档\n");
-            response.append("- 分析和处理文本\n\n");
-            response.append("请问有什么可以帮您的？");
-        }
-        
-        return response.toString();
-    }
-    
     private static class SessionInfo {
         String id;
         String title;
@@ -463,6 +419,7 @@ public class LlmChatController {
         List<String> models;
         boolean supportsStreaming;
         boolean supportsFunctionCalling;
+        Map<String, ModelInfo> modelDetails;
         
         ProviderInfo(String id, String name, List<String> models, boolean supportsStreaming, boolean supportsFunctionCalling) {
             this.id = id;
@@ -470,6 +427,206 @@ public class LlmChatController {
             this.models = models;
             this.supportsStreaming = supportsStreaming;
             this.supportsFunctionCalling = supportsFunctionCalling;
+            this.modelDetails = new HashMap<>();
+            initModelDetails();
         }
+        
+        private void initModelDetails() {
+            for (String modelId : models) {
+                ModelInfo info = new ModelInfo(modelId, id);
+                modelDetails.put(modelId, info);
+            }
+        }
+    }
+    
+    private static class ModelInfo {
+        String id;
+        String providerId;
+        String displayName;
+        String description;
+        int contextWindow;
+        int maxOutputTokens;
+        boolean supportsVision;
+        boolean supportsFunctionCall;
+        boolean supportsStreaming;
+        boolean supportsRAG;
+        double inputPrice;
+        double outputPrice;
+        String[] capabilities;
+        
+        ModelInfo(String id, String providerId) {
+            this.id = id;
+            this.providerId = providerId;
+            this.displayName = getDisplayName(id, providerId);
+            this.description = getDescription(id, providerId);
+            this.contextWindow = getContextWindow(id, providerId);
+            this.maxOutputTokens = getMaxOutputTokens(id, providerId);
+            this.supportsVision = supportsVision(id, providerId);
+            this.supportsFunctionCall = supportsFunctionCall(id, providerId);
+            this.supportsStreaming = true;
+            this.supportsRAG = supportsRAG(id, providerId);
+            this.inputPrice = getInputPrice(id, providerId);
+            this.outputPrice = getOutputPrice(id, providerId);
+            this.capabilities = getCapabilities(id, providerId);
+        }
+        
+        private static String getDisplayName(String id, String providerId) {
+            Map<String, String> names = new HashMap<>();
+            names.put("deepseek-chat", "DeepSeek Chat");
+            names.put("deepseek-coder", "DeepSeek Coder");
+            names.put("deepseek-reasoner", "DeepSeek Reasoner");
+            names.put("gpt-4o", "GPT-4o");
+            names.put("gpt-4-turbo", "GPT-4 Turbo");
+            names.put("gpt-3.5-turbo", "GPT-3.5 Turbo");
+            names.put("qwen-max", "通义千问-Max");
+            names.put("qwen-plus", "通义千问-Plus");
+            names.put("qwen-turbo", "通义千问-Turbo");
+            names.put("ernie-4.0-8k", "ERNIE 4.0 (8K)");
+            names.put("ernie-4.0-turbo-8k", "ERNIE 4.0 Turbo (8K)");
+            names.put("ernie-3.5-8k", "ERNIE 3.5 (8K)");
+            names.put("ernie-3.5-turbo-8k", "ERNIE 3.5 Turbo (8K)");
+            names.put("ernie-speed-8k", "ERNIE Speed (8K)");
+            names.put("ernie-lite-8k", "ERNIE Lite (8K)");
+            names.put("ernie-tiny-8k", "ERNIE Tiny (8K)");
+            names.put("llama3", "Llama 3");
+            names.put("llama2", "Llama 2");
+            names.put("mistral", "Mistral");
+            names.put("codellama", "Code Llama");
+            names.put("qwen2", "Qwen 2");
+            return names.getOrDefault(id, id);
+        }
+        
+        private static String getDescription(String id, String providerId) {
+            if (id.contains("coder")) return "专为代码生成和理解优化的模型";
+            if (id.contains("reasoner")) return "深度推理模型，适合复杂逻辑分析";
+            if (id.contains("gpt-4o")) return "OpenAI最新多模态模型，支持视觉和文本";
+            if (id.contains("gpt-4")) return "OpenAI最强大的语言模型";
+            if (id.contains("gpt-3.5")) return "OpenAI快速高效的语言模型";
+            if (id.contains("qwen-max")) return "通义千问最强模型，适合复杂任务";
+            if (id.contains("qwen-plus")) return "通义千问平衡性能与成本的模型";
+            if (id.contains("qwen-turbo")) return "通义千问快速响应模型";
+            if (id.contains("ernie-4")) return "百度最新大语言模型，能力最强";
+            if (id.contains("ernie-3.5")) return "百度高性能语言模型";
+            if (id.contains("speed")) return "百度高速模型，响应快速";
+            if (id.contains("lite")) return "百度轻量级模型，成本优化";
+            if (id.contains("tiny")) return "百度超轻量模型，极致性价比";
+            if (id.contains("llama3")) return "Meta开源大语言模型最新版本";
+            if (id.contains("mistral")) return "Mistral AI高性能开源模型";
+            if (id.contains("deepseek")) return "DeepSeek智能对话模型";
+            return "通用大语言模型";
+        }
+        
+        private static int getContextWindow(String id, String providerId) {
+            if (id.contains("gpt-4o")) return 128000;
+            if (id.contains("gpt-4-turbo")) return 128000;
+            if (id.contains("gpt-3.5")) return 16385;
+            if (id.contains("qwen-max")) return 32000;
+            if (id.contains("qwen")) return 8192;
+            if (id.contains("8k")) return 8192;
+            if (id.contains("llama3")) return 8192;
+            if (id.contains("deepseek")) return 64000;
+            return 4096;
+        }
+        
+        private static int getMaxOutputTokens(String id, String providerId) {
+            if (id.contains("gpt-4")) return 4096;
+            if (id.contains("gpt-3.5")) return 4096;
+            if (id.contains("qwen-max")) return 8192;
+            if (id.contains("deepseek-reasoner")) return 8192;
+            return 4096;
+        }
+        
+        private static boolean supportsVision(String id, String providerId) {
+            return id.contains("gpt-4o") || id.contains("qwen-vl") || id.contains("ernie-4");
+        }
+        
+        private static boolean supportsFunctionCall(String id, String providerId) {
+            return !id.contains("tiny") && !id.contains("lite");
+        }
+        
+        private static boolean supportsRAG(String id, String providerId) {
+            return true;
+        }
+        
+        private static double getInputPrice(String id, String providerId) {
+            if (id.contains("gpt-4o")) return 0.005;
+            if (id.contains("gpt-4-turbo")) return 0.01;
+            if (id.contains("gpt-3.5")) return 0.0005;
+            if (id.contains("qwen-max")) return 0.02;
+            if (id.contains("qwen-plus")) return 0.004;
+            if (id.contains("qwen-turbo")) return 0.002;
+            if (id.contains("ernie-4")) return 0.03;
+            if (id.contains("ernie-3.5")) return 0.012;
+            if (id.contains("deepseek")) return 0.001;
+            return 0.0;
+        }
+        
+        private static double getOutputPrice(String id, String providerId) {
+            if (id.contains("gpt-4o")) return 0.015;
+            if (id.contains("gpt-4-turbo")) return 0.03;
+            if (id.contains("gpt-3.5")) return 0.0015;
+            if (id.contains("qwen-max")) return 0.06;
+            if (id.contains("qwen-plus")) return 0.012;
+            if (id.contains("qwen-turbo")) return 0.006;
+            if (id.contains("ernie-4")) return 0.06;
+            if (id.contains("ernie-3.5")) return 0.012;
+            if (id.contains("deepseek")) return 0.002;
+            return 0.0;
+        }
+        
+        private static String[] getCapabilities(String id, String providerId) {
+            List<String> caps = new ArrayList<>();
+            caps.add("文本生成");
+            caps.add("对话问答");
+            if (supportsFunctionCall(id, providerId)) caps.add("函数调用");
+            if (supportsVision(id, providerId)) caps.add("视觉理解");
+            if (id.contains("coder") || id.contains("code")) caps.add("代码生成");
+            if (id.contains("reasoner")) caps.add("深度推理");
+            caps.add("RAG检索增强");
+            return caps.toArray(new String[0]);
+        }
+    }
+    
+    @GetMapping("/model/{providerId}/{modelId}")
+    public ResponseEntity<Map<String, Object>> getModelDetail(
+            @PathVariable String providerId, 
+            @PathVariable String modelId) {
+        log.info("[getModelDetail] provider: {}, model: {}", providerId, modelId);
+        
+        Map<String, Object> result = new HashMap<>();
+        
+        ProviderInfo provider = providers.get(providerId);
+        if (provider == null) {
+            result.put("status", "error");
+            result.put("message", "Provider not found: " + providerId);
+            return ResponseEntity.ok(result);
+        }
+        
+        ModelInfo model = provider.modelDetails.get(modelId);
+        if (model == null) {
+            result.put("status", "error");
+            result.put("message", "Model not found: " + modelId);
+            return ResponseEntity.ok(result);
+        }
+        
+        Map<String, Object> data = new HashMap<>();
+        data.put("id", model.id);
+        data.put("providerId", model.providerId);
+        data.put("displayName", model.displayName);
+        data.put("description", model.description);
+        data.put("contextWindow", model.contextWindow);
+        data.put("maxOutputTokens", model.maxOutputTokens);
+        data.put("supportsVision", model.supportsVision);
+        data.put("supportsFunctionCall", model.supportsFunctionCall);
+        data.put("supportsStreaming", model.supportsStreaming);
+        data.put("supportsRAG", model.supportsRAG);
+        data.put("inputPrice", model.inputPrice);
+        data.put("outputPrice", model.outputPrice);
+        data.put("capabilities", model.capabilities);
+        
+        result.put("status", "success");
+        result.put("data", data);
+        
+        return ResponseEntity.ok(result);
     }
 }

@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>审批表单系统</title>
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="../css/approval-form.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-file-list-3-line"></i> 审批表单
+                </h1>
+            </div>
+            
+            <!-- 审批流程导航菜单 -->
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">审批流程</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item active" onclick="ApprovalForm.switchTab('pending')">
+                        <i class="ri-time-line" style="color: #f59e0b;"></i>
+                        <span>待办审批</span>
+                        <span class="sidebar-menu__badge" id="menu-pending-count">0</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.switchTab('submitted')">
+                        <i class="ri-send-plane-line" style="color: #3b82f6;"></i>
+                        <span>我发起的</span>
+                        <span class="sidebar-menu__badge" id="menu-submitted-count">0</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.switchTab('templates')">
+                        <i class="ri-stack-line" style="color: #22c55e;"></i>
+                        <span>审批模板</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.switchTab('records')">
+                        <i class="ri-history-line" style="color: #8b5cf6;"></i>
+                        <span>审批记录</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">数据分析</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.switchTab('dashboard')">
+                        <i class="ri-dashboard-line" style="color: #06b6d4;"></i>
+                        <span>统计看板</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.exportReport()">
+                        <i class="ri-download-line" style="color: #ec4899;"></i>
+                        <span>导出报表</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">快捷操作</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.openCreateModal()">
+                        <i class="ri-add-circle-line" style="color: #3b82f6;"></i>
+                        <span>发起审批</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="ApprovalForm.openBatchApproval()">
+                        <i class="ri-checkbox-multiple-line" style="color: #22c55e;"></i>
+                        <span>批量审批</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu" style="display: none;"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <i class="ri-file-list-3-line"></i>
+                    <span>审批表单系统</span>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--primary" onclick="ApprovalForm.openCreateModal()">
+                        <i class="ri-add-line"></i> 发起审批
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <!-- 统计卡片 -->
+                    <div class="stats-row">
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                <i class="ri-time-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-pending">0</div>
+                                <div class="stat-card__label">待处理</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                <i class="ri-send-plane-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-submitted">0</div>
+                                <div class="stat-card__label">我发起的</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                                <i class="ri-check-double-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-approved">0</div>
+                                <div class="stat-card__label">已通过</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(239, 68, 68, 0.1); color: #ef4444;">
+                                <i class="ri-close-circle-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-rejected">0</div>
+                                <div class="stat-card__label">已拒绝</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 标签页导航 -->
+                    <div class="nx-card nx-mb-4">
+                        <div class="nx-card__body">
+                            <div class="tab-nav">
+                                <button class="tab-btn active" data-tab="pending" onclick="ApprovalForm.switchTab('pending')">
+                                    <i class="ri-time-line"></i> 待办审批
+                                </button>
+                                <button class="tab-btn" data-tab="submitted" onclick="ApprovalForm.switchTab('submitted')">
+                                    <i class="ri-send-plane-line"></i> 我发起的
+                                </button>
+                                <button class="tab-btn" data-tab="templates" onclick="ApprovalForm.switchTab('templates')">
+                                    <i class="ri-stack-line"></i> 审批模板
+                                </button>
+                                <button class="tab-btn" data-tab="records" onclick="ApprovalForm.switchTab('records')">
+                                    <i class="ri-history-line"></i> 审批记录
+                                </button>
+                                <button class="tab-btn" data-tab="dashboard" onclick="ApprovalForm.switchTab('dashboard')">
+                                    <i class="ri-dashboard-line"></i> 统计看板
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 待办审批 -->
+                    <div class="tab-content active" id="tab-pending">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">待办审批</h3>
+                                <div class="filter-group">
+                                    <select class="nx-select" id="pending-filter-type" onchange="ApprovalForm.filterPending()">
+                                        <option value="">全部类型</option>
+                                        <option value="leave">请假申请</option>
+                                        <option value="expense">费用报销</option>
+                                        <option value="purchase">采购申请</option>
+                                        <option value="contract">合同审批</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>审批单号</th>
+                                            <th>审批类型</th>
+                                            <th>申请人</th>
+                                            <th>申请时间</th>
+                                            <th>当前节点</th>
+                                            <th>优先级</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="pending-table-body">
+                                        <tr>
+                                            <td colspan="7" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 我发起的 -->
+                    <div class="tab-content" id="tab-submitted">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">我发起的审批</h3>
+                                <div class="filter-group">
+                                    <select class="nx-select" id="submitted-filter-status" onchange="ApprovalForm.filterSubmitted()">
+                                        <option value="">全部状态</option>
+                                        <option value="pending">审批中</option>
+                                        <option value="approved">已通过</option>
+                                        <option value="rejected">已拒绝</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>审批单号</th>
+                                            <th>审批类型</th>
+                                            <th>申请时间</th>
+                                            <th>当前状态</th>
+                                            <th>当前审批人</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="submitted-table-body">
+                                        <tr>
+                                            <td colspan="6" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 审批模板 -->
+                    <div class="tab-content" id="tab-templates">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">审批模板</h3>
+                                <button class="nx-btn nx-btn--primary" onclick="ApprovalForm.openTemplateModal()">
+                                    <i class="ri-add-line"></i> 新建模板
+                                </button>
+                            </div>
+                            <div class="nx-card__body">
+                                <div class="template-grid" id="template-grid">
+                                    <!-- 动态生成 -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 审批记录 -->
+                    <div class="tab-content" id="tab-records">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">审批记录</h3>
+                                <div class="filter-group">
+                                    <input type="date" class="nx-input" id="record-start-date" placeholder="开始日期">
+                                    <input type="date" class="nx-input" id="record-end-date" placeholder="结束日期">
+                                    <button class="nx-btn nx-btn--secondary" onclick="ApprovalForm.filterRecords()">
+                                        <i class="ri-search-line"></i> 查询
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>审批单号</th>
+                                            <th>审批类型</th>
+                                            <th>申请人</th>
+                                            <th>审批人</th>
+                                            <th>操作</th>
+                                            <th>审批时间</th>
+                                            <th>审批意见</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="records-table-body">
+                                        <tr>
+                                            <td colspan="7" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 统计看板 -->
+                    <div class="tab-content" id="tab-dashboard">
+                        <div class="dashboard-grid">
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">审批趋势</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="trend-chart" id="trend-chart">
+                                        <div class="trend-bars">
+                                            <div class="trend-bar-group">
+                                                <div class="trend-bar approved" style="height: 60%;"></div>
+                                                <div class="trend-bar rejected" style="height: 20%;"></div>
+                                                <span class="trend-label">周一</span>
+                                            </div>
+                                            <div class="trend-bar-group">
+                                                <div class="trend-bar approved" style="height: 80%;"></div>
+                                                <div class="trend-bar rejected" style="height: 15%;"></div>
+                                                <span class="trend-label">周二</span>
+                                            </div>
+                                            <div class="trend-bar-group">
+                                                <div class="trend-bar approved" style="height: 45%;"></div>
+                                                <div class="trend-bar rejected" style="height: 30%;"></div>
+                                                <span class="trend-label">周三</span>
+                                            </div>
+                                            <div class="trend-bar-group">
+                                                <div class="trend-bar approved" style="height: 70%;"></div>
+                                                <div class="trend-bar rejected" style="height: 10%;"></div>
+                                                <span class="trend-label">周四</span>
+                                            </div>
+                                            <div class="trend-bar-group">
+                                                <div class="trend-bar approved" style="height: 90%;"></div>
+                                                <div class="trend-bar rejected" style="height: 5%;"></div>
+                                                <span class="trend-label">周五</span>
+                                            </div>
+                                        </div>
+                                        <div class="trend-legend">
+                                            <span class="legend-item"><i class="ri-checkbox-blank-circle-fill" style="color: #22c55e;"></i> 已通过</span>
+                                            <span class="legend-item"><i class="ri-checkbox-blank-circle-fill" style="color: #ef4444;"></i> 已拒绝</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">审批类型分布</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="type-distribution" id="type-distribution">
+                                        <!-- 动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="nx-card dashboard-card wide">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">审批效率排行</h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="efficiency-list" id="efficiency-list">
+                                        <!-- 动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 发起审批模态框 -->
+    <div class="modal" id="create-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-add-circle-line"></i>
+                    <span>发起审批</span>
+                </h3>
+                <button class="modal-close" onclick="ApprovalForm.closeCreateModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="approval-form">
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">审批类型 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="approval-type" onchange="ApprovalForm.onTypeChange()">
+                                <option value="">请选择审批类型</option>
+                                <option value="leave">请假申请</option>
+                                <option value="expense">费用报销</option>
+                                <option value="purchase">采购申请</option>
+                                <option value="contract">合同审批</option>
+                                <option value="overtime">加班申请</option>
+                                <option value="business">出差申请</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">优先级</label>
+                            <select class="nx-select" id="approval-priority">
+                                <option value="normal">普通</option>
+                                <option value="urgent">紧急</option>
+                                <option value="high">特急</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <!-- 请假申请表单 -->
+                    <div class="form-section" id="section-leave" style="display: none;">
+                        <div class="nx-form-row">
+                            <div class="nx-form-group">
+                                <label class="nx-label">请假类型 <span class="nx-text-danger">*</span></label>
+                                <select class="nx-select" id="leave-type">
+                                    <option value="annual">年假</option>
+                                    <option value="sick">病假</option>
+                                    <option value="personal">事假</option>
+                                    <option value="marriage">婚假</option>
+                                    <option value="maternity">产假</option>
+                                </select>
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-label">请假天数 <span class="nx-text-danger">*</span></label>
+                                <input type="number" class="nx-input" id="leave-days" placeholder="请输入天数" min="0.5" step="0.5">
+                            </div>
+                        </div>
+                        <div class="nx-form-row">
+                            <div class="nx-form-group">
+                                <label class="nx-label">开始时间 <span class="nx-text-danger">*</span></label>
+                                <input type="datetime-local" class="nx-input" id="leave-start">
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-label">结束时间 <span class="nx-text-danger">*</span></label>
+                                <input type="datetime-local" class="nx-input" id="leave-end">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 费用报销表单 -->
+                    <div class="form-section" id="section-expense" style="display: none;">
+                        <div class="nx-form-row">
+                            <div class="nx-form-group">
+                                <label class="nx-label">报销金额 <span class="nx-text-danger">*</span></label>
+                                <input type="number" class="nx-input" id="expense-amount" placeholder="请输入金额" min="0" step="0.01">
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-label">费用类型 <span class="nx-text-danger">*</span></label>
+                                <select class="nx-select" id="expense-category">
+                                    <option value="travel">差旅费</option>
+                                    <option value="entertainment">招待费</option>
+                                    <option value="office">办公费</option>
+                                    <option value="transport">交通费</option>
+                                    <option value="other">其他</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">费用明细</label>
+                            <textarea class="nx-textarea" id="expense-detail" rows="3" placeholder="请详细描述费用用途" style="width: 100%;"></textarea>
+                        </div>
+                    </div>
+                    
+                    <!-- 采购申请表单 -->
+                    <div class="form-section" id="section-purchase" style="display: none;">
+                        <div class="nx-form-row">
+                            <div class="nx-form-group">
+                                <label class="nx-label">采购物品 <span class="nx-text-danger">*</span></label>
+                                <input type="text" class="nx-input" id="purchase-item" placeholder="请输入物品名称">
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-label">采购数量 <span class="nx-text-danger">*</span></label>
+                                <input type="number" class="nx-input" id="purchase-quantity" placeholder="请输入数量" min="1">
+                            </div>
+                        </div>
+                        <div class="nx-form-row">
+                            <div class="nx-form-group">
+                                <label class="nx-label">预估单价 <span class="nx-text-danger">*</span></label>
+                                <input type="number" class="nx-input" id="purchase-price" placeholder="请输入单价" min="0" step="0.01">
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-label">预估总价</label>
+                                <input type="text" class="nx-input" id="purchase-total" readonly placeholder="自动计算">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 通用字段 -->
+                    <div class="nx-form-group">
+                        <label class="nx-label">审批事由 <span class="nx-text-danger">*</span></label>
+                        <textarea class="nx-textarea" id="approval-reason" rows="4" placeholder="请详细描述审批事由" style="width: 100%;"></textarea>
+                    </div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">附件</label>
+                        <div class="file-upload" id="file-upload">
+                            <i class="ri-upload-cloud-2-line"></i>
+                            <span>点击或拖拽文件到此处上传</span>
+                            <input type="file" id="approval-attachments" multiple style="display: none;">
+                        </div>
+                        <div class="file-list" id="file-list"></div>
+                    </div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">审批人 <span class="nx-text-danger">*</span></label>
+                        <select class="nx-select" id="approval-approver">
+                            <option value="">请选择审批人</option>
+                            <option value="manager">部门经理</option>
+                            <option value="director">总监</option>
+                            <option value="ceo">总经理</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="ApprovalForm.closeCreateModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="ApprovalForm.submitApproval()">提交审批</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 审批详情模态框 -->
+    <div class="modal" id="detail-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-file-text-line"></i>
+                    <span>审批详情</span>
+                </h3>
+                <button class="modal-close" onclick="ApprovalForm.closeDetailModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="approval-timeline" id="approval-timeline">
+                    <!-- 动态生成审批流程 -->
+                </div>
+                <div class="approval-detail-content" id="approval-detail-content">
+                    <!-- 动态生成详情 -->
+                </div>
+            </div>
+            <div class="modal-footer" id="detail-modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="ApprovalForm.closeDetailModal()">关闭</button>
+                <button class="nx-btn nx-btn--danger" onclick="ApprovalForm.rejectApproval()">拒绝</button>
+                <button class="nx-btn nx-btn--primary" onclick="ApprovalForm.approveApproval()">通过</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 审批意见模态框 -->
+    <div class="modal" id="comment-modal">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-chat-1-line"></i>
+                    <span id="comment-modal-title">审批意见</span>
+                </h3>
+                <button class="modal-close" onclick="ApprovalForm.closeCommentModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="nx-form-group">
+                    <label class="nx-label">审批意见 <span class="nx-text-danger">*</span></label>
+                    <textarea class="nx-textarea" id="approval-comment" rows="4" placeholder="请输入审批意见" style="width: 100%;"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="ApprovalForm.closeCommentModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" id="comment-submit-btn" onclick="ApprovalForm.submitComment()">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="../js/approval-form.js"></script>
+</body>
+</html>

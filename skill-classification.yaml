@@ -1,0 +1,289 @@
+apiVersion: ooder.io/v1
+kind: SkillClassificationConfig
+
+metadata:
+  name: skill-classification
+  version: "2.3"
+  description: Skills场景分类配置 - 支持ABS/ASS/TBS/SVC四大分类
+  author: Ooder Team
+  createdAt: "2026-03-06T00:00:00Z"
+
+spec:
+  sceneCategories:
+    - id: abs
+      name: 自驱业务场景
+      nameEn: Auto Business Scene
+      shortName: ABS
+      description: 自动启动、业务闭环的场景技能，具备完整的业务语义和自驱能力
+      icon: auto-scene
+      order: 1
+      type: scene-skill
+      criteria:
+        mainFirst: true
+        hasSceneCapabilities: true
+        businessSemanticsScoreMin: 8
+      features:
+        - autoStart
+        - businessLoop
+        - driverCapability
+        - collaborationSupport
+      lifecycle:
+        initPhase: selfCheck
+        startPhase: selfStart
+        runPhase: selfDrive
+        stopPhase: gracefulShutdown
+      examples:
+        - skill-llm-chat
+        - skill-knowledge-qa
+        - skill-daily-report
+        - skill-llm-workspace
+
+    - id: ass
+      name: 自驱系统场景
+      nameEn: Auto System Scene
+      shortName: ASS
+      description: 自动启动、系统功能的场景技能，具备系统级自驱能力但无业务语义
+      icon: auto-system
+      order: 2
+      type: scene-skill
+      criteria:
+        mainFirst: true
+        hasSceneCapabilities: true
+        businessSemanticsScoreMax: 7
+      features:
+        - autoStart
+        - systemFunction
+        - driverCapability
+      lifecycle:
+        initPhase: selfCheck
+        startPhase: selfStart
+        runPhase: scheduledTask
+        stopPhase: gracefulShutdown
+      examples:
+        - skill-health
+        - skill-monitor
+        - skill-scheduler-quartz
+        - skill-update-checker
+        - skill-failover-manager
+        - skill-load-balancer
+        - skill-capability-coordinator
+        - skill-agent
+
+    - id: tbs
+      name: 触发业务场景
+      nameEn: Trigger Business Scene
+      shortName: TBS
+      description: 人工触发、被动响应的场景技能，具备业务语义但无自驱能力
+      icon: trigger-scene
+      order: 3
+      type: scene-skill
+      criteria:
+        mainFirst: false
+        hasSceneCapabilities: true
+        businessSemanticsScoreMin: 8
+      features:
+        - triggerStart
+        - businessFunction
+        - passiveResponse
+      lifecycle:
+        initPhase: register
+        startPhase: waitForTrigger
+        runPhase: execute
+        stopPhase: cleanup
+      examples:
+        - skill-business
+        - skill-collaboration
+        - skill-report
+        - skill-task
+        - skill-market
+        - skill-share
+
+    - id: svc
+      name: 服务技能
+      nameEn: Service Skill
+      shortName: SVC
+      description: 纯服务提供的技能，无场景特性，作为能力提供者被其他技能依赖
+      icon: service
+      order: 4
+      type: service-skill
+      criteria:
+        hasSceneCapabilities: false
+      features:
+        - serviceProvider
+        - capabilityProvider
+        - dependency
+      lifecycle:
+        initPhase: register
+        startPhase: ready
+        runPhase: serve
+        stopPhase: cleanup
+      subCategories:
+        - id: org
+          name: 组织服务
+          description: 企业组织架构、用户认证相关服务
+          skills:
+            - skill-user-auth
+            - skill-org-dingding
+            - skill-org-feishu
+            - skill-org-wecom
+            - skill-org-ldap
+            - skill-org-base
+            - skill-access-control
+            - skill-security
+            - skill-audit
+            
+        - id: vfs
+          name: 存储服务
+          description: 文件存储、对象存储相关服务
+          skills:
+            - skill-vfs-local
+            - skill-vfs-database
+            - skill-vfs-minio
+            - skill-vfs-oss
+            - skill-vfs-s3
+            - skill-vfs-base
+            
+        - id: msg
+          name: 消息通讯
+          description: 消息队列、通讯协议服务
+          skills:
+            - skill-mqtt
+            - skill-msg
+            - skill-msg-service
+            - skill-im
+            - skill-group
+            - skill-email
+            - skill-notify
+            
+        - id: llm
+          name: LLM服务
+          description: 大语言模型相关服务
+          skills:
+            - skill-llm-conversation
+            - skill-llm-context-builder
+            - skill-llm-config-manager
+            - skill-llm-openai
+            - skill-llm-qianwen
+            - skill-llm-deepseek
+            - skill-llm-volcengine
+            - skill-llm-ollama
+            
+        - id: knowledge
+          name: 知识服务
+          description: 知识库、搜索、RAG相关服务
+          skills:
+            - skill-knowledge-base
+            - skill-local-knowledge
+            - skill-rag
+            - skill-vector-sqlite
+            - skill-search
+            
+        - id: sys
+          name: 系统服务
+          description: 系统监控、网络管理、安全审计
+          skills:
+            - skill-network
+            - skill-protocol
+            - skill-openwrt
+            - skill-hosting
+            - skill-k8s
+            - skill-cmd-service
+            - skill-res-service
+            - skill-remote-terminal
+            
+        - id: payment
+          name: 支付服务
+          description: 支付渠道、退款管理、交易处理
+          skills:
+            - skill-payment-alipay
+            - skill-payment-wechat
+            - skill-payment-unionpay
+            
+        - id: media
+          name: 媒体服务
+          description: 自媒体文章发布、内容管理、数据分析
+          skills:
+            - skill-media-wechat
+            - skill-media-weibo
+            - skill-media-zhihu
+            - skill-media-toutiao
+            - skill-media-xiaohongshu
+            
+        - id: util
+          name: 工具服务
+          description: 通用工具、辅助功能
+          skills:
+            - skill-a2ui
+            - skill-trae-solo
+            - skill-common
+            - skill-document-processor
+            - skill-command-shortcut
+            - skill-httpclient-okhttp
+
+  businessSemanticsScoring:
+    description: 业务语义评分标准（10分制）
+    criteria:
+      - item: driverConditions非空
+        score: 3
+        description: 有驱动条件定义
+      - item: participants非空
+        score: 3
+        description: 有参与者定义
+      - item: visibility为public
+        score: 2
+        description: 对外可见
+      - item: 有协作能力
+        score: 1
+        description: collaborativeCapabilities非空
+      - item: 有业务标签
+        score: 1
+        description: labels.scene.category存在
+    thresholds:
+      abs:
+        min: 8
+        description: ABS需要≥8分
+      ass:
+        max: 7
+        description: ASS需要<8分
+      tbs:
+        min: 8
+        description: TBS需要≥8分
+
+  detection:
+    autoDetect: true
+    detectionVersion: "2.3.0"
+    rules:
+      - name: scene-skill-check
+        priority: 1
+        condition: "spec.sceneCapabilities != null && spec.sceneCapabilities.size() > 0"
+        result: scene-skill
+        
+      - name: abs-check
+        priority: 2
+        condition: "scene-skill && mainFirst == true && businessSemanticsScore >= 8"
+        result: ABS
+        
+      - name: ass-check
+        priority: 3
+        condition: "scene-skill && mainFirst == true && businessSemanticsScore < 8"
+        result: ASS
+        
+      - name: tbs-check
+        priority: 4
+        condition: "scene-skill && mainFirst == false && businessSemanticsScore >= 8"
+        result: TBS
+        
+      - name: svc-check
+        priority: 5
+        condition: "spec.sceneCapabilities == null || spec.sceneCapabilities.size() == 0"
+        result: SVC
+
+  pathMapping:
+    enabled: true
+    structure:
+      abs: "skills/scene-skills/abs/{skillId}"
+      ass: "skills/scene-skills/ass/{skillId}"
+      tbs: "skills/scene-skills/tbs/{skillId}"
+      svc: "skills/service-skills/{subCategory}/{skillId}"
+    legacySupport: true
+    legacyPath: "skills/{skillId}"

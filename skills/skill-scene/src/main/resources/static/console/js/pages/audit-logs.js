@@ -11,7 +11,7 @@ async function init() {
 }
 
 async function loadEventTypeOptions() {
-    var items = await DictCache.getDictItems('audit_event_type');
+    var items = await DictCache.getDictItems(DictCache.DICT_CODES.AUDIT_EVENT_TYPE);
     var select = document.getElementById('eventTypeFilter');
     
     items.forEach(function(item) {

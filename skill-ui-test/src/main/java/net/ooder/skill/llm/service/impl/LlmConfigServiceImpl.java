@@ -1,17 +1,22 @@
-package net.ooder.skill.llm.config.service.impl;
+package net.ooder.skill.llm.service.impl;
 
-import net.ooder.skill.llm.config.model.LlmConfig;
-import net.ooder.skill.llm.config.model.ResolvedConfig;
-import net.ooder.skill.llm.config.service.LlmConfigService;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import net.ooder.skill.llm.model.LlmConfig;
+import net.ooder.skill.llm.model.ResolvedConfig;
+import net.ooder.skill.llm.service.LlmConfigService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
 import javax.crypto.Cipher;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -23,36 +28,96 @@ public class LlmConfigServiceImpl implements LlmConfigService {
     
     private static final String ENCRYPTION_ALGORITHM = "AES";
     private static final String ENCRYPTION_KEY = "ooder-llm-config-key-32byte";
+    private static final String CONFIG_FILE = "llm-configs.json";
     
-    private final Map<String, LlmConfig> configStore = new ConcurrentHashMap<>();
+    @Value("${ooder.llm.config-path:./data}")
+    private String configPath;
+    
+    private final Map<String, LlmConfig> configCache = new ConcurrentHashMap<>();
     private SecretKeySpec secretKey;
+    private ObjectMapper objectMapper;
+    private Path configFile;
     
     @PostConstruct
     public void init() {
         byte[] keyBytes = Arrays.copyOf(ENCRYPTION_KEY.getBytes(StandardCharsets.UTF_8), 32);
         secretKey = new SecretKeySpec(keyBytes, ENCRYPTION_ALGORITHM);
+        objectMapper = new ObjectMapper();
         
+        try {
+            Path configDir = Paths.get(configPath);
+            Files.createDirectories(configDir);
+            configFile = configDir.resolve(CONFIG_FILE);
+        } catch (Exception e) {
+            log.warn("Failed to create config directory: {}", e.getMessage());
+        }
+        
+        loadConfigsFromStorage();
         initDefaultConfigs();
-        log.info("LlmConfigService initialized with {} configs", configStore.size());
+        log.info("LlmConfigService initialized with {} configs, storage: {}", configCache.size(), configPath);
+    }
+    
+    private void loadConfigsFromStorage() {
+        if (configFile == null || !Files.exists(configFile)) {
+            log.info("No existing config file, starting fresh");
+            return;
+        }
+        
+        try {
+            String content = new String(Files.readAllBytes(configFile), StandardCharsets.UTF_8);
+            if (content != null && !content.trim().isEmpty()) {
+                List<LlmConfig> configs = objectMapper.readValue(content, 
+                    new TypeReference<List<LlmConfig>>() {});
+                for (LlmConfig config : configs) {
+                    configCache.put(config.getId(), config);
+                }
+                log.info("Loaded {} configs from storage", configs.size());
+            }
+        } catch (Exception e) {
+            log.warn("Failed to load configs from storage: {}", e.getMessage());
+        }
+    }
+    
+    private void saveConfigsToStorage() {
+        if (configFile == null) {
+            return;
+        }
+        
+        try {
+            List<LlmConfig> configs = new ArrayList<>(configCache.values());
+            String content = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(configs);
+            Files.write(configFile, content.getBytes(StandardCharsets.UTF_8), 
+                StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
+            log.debug("Saved {} configs to storage", configs.size());
+        } catch (Exception e) {
+            log.error("Failed to save configs to storage: {}", e.getMessage());
+        }
     }
     
     private void initDefaultConfigs() {
-        LlmConfig enterpriseConfig = new LlmConfig();
-        enterpriseConfig.setId("enterprise-default");
-        enterpriseConfig.setLevel(LlmConfig.ConfigLevel.ENTERPRISE);
-        enterpriseConfig.setScopeId("default");
-        enterpriseConfig.setProviderType("qianwen");
-        enterpriseConfig.setModel("qwen-plus");
-        enterpriseConfig.setEnabled(true);
-        enterpriseConfig.setCreatedAt(System.currentTimeMillis());
-        enterpriseConfig.setCreatedBy("system");
-        
-        Map<String, Object> options = new HashMap<>();
-        options.put("temperature", 0.7);
-        options.put("max_tokens", 2048);
-        enterpriseConfig.setOptions(options);
-        
-        configStore.put(enterpriseConfig.getId(), enterpriseConfig);
+        if (!configCache.values().stream()
+                .anyMatch(c -> c.getLevel() == LlmConfig.ConfigLevel.ENTERPRISE)) {
+            
+            LlmConfig enterpriseConfig = new LlmConfig();
+            enterpriseConfig.setId("enterprise-default");
+            enterpriseConfig.setName("企业默认配置");
+            enterpriseConfig.setLevel(LlmConfig.ConfigLevel.ENTERPRISE);
+            enterpriseConfig.setScopeId("default");
+            enterpriseConfig.setProviderType("deepseek");
+            enterpriseConfig.setModel("deepseek-chat");
+            enterpriseConfig.setEnabled(true);
+            enterpriseConfig.setCreatedAt(System.currentTimeMillis());
+            enterpriseConfig.setCreatedBy("system");
+            
+            Map<String, Object> options = new HashMap<>();
+            options.put("temperature", 0.7);
+            options.put("max_tokens", 4096);
+            enterpriseConfig.setOptions(options);
+            
+            configCache.put(enterpriseConfig.getId(), enterpriseConfig);
+            saveConfigsToStorage();
+            log.info("Created default enterprise config");
+        }
     }
 
     @Override
@@ -71,7 +136,9 @@ public class LlmConfigServiceImpl implements LlmConfigService {
             }
         }
         
-        configStore.put(config.getId(), config);
+        configCache.put(config.getId(), config);
+        saveConfigsToStorage();
+        
         log.info("Created LLM config: id={}, level={}, provider={}", 
             config.getId(), config.getLevel(), config.getProviderType());
         
@@ -80,7 +147,7 @@ public class LlmConfigServiceImpl implements LlmConfigService {
     
     @Override
     public LlmConfig updateConfig(String id, LlmConfig config) {
-        LlmConfig existing = configStore.get(id);
+        LlmConfig existing = configCache.get(id);
         if (existing == null) {
             throw new RuntimeException("Config not found: " + id);
         }
@@ -96,7 +163,8 @@ public class LlmConfigServiceImpl implements LlmConfigService {
             }
         }
         
-        configStore.put(id, config);
+        configCache.put(id, config);
+        saveConfigsToStorage();
         log.info("Updated LLM config: id={}", id);
         
         return config;
@@ -104,20 +172,21 @@ public class LlmConfigServiceImpl implements LlmConfigService {
     
     @Override
     public void deleteConfig(String id) {
-        LlmConfig removed = configStore.remove(id);
+        LlmConfig removed = configCache.remove(id);
         if (removed != null) {
+            saveConfigsToStorage();
             log.info("Deleted LLM config: id={}", id);
         }
     }
     
     @Override
     public LlmConfig getConfig(String id) {
-        return configStore.get(id);
+        return configCache.get(id);
     }
     
     @Override
     public LlmConfig getConfigByLevelAndScope(LlmConfig.ConfigLevel level, String scopeId) {
-        return configStore.values().stream()
+        return configCache.values().stream()
             .filter(c -> c.getLevel() == level && Objects.equals(c.getScopeId(), scopeId))
             .findFirst()
             .orElse(null);
@@ -125,14 +194,14 @@ public class LlmConfigServiceImpl implements LlmConfigService {
     
     @Override
     public List<LlmConfig> getConfigsByLevel(LlmConfig.ConfigLevel level) {
-        return configStore.values().stream()
+        return configCache.values().stream()
             .filter(c -> c.getLevel() == level)
             .collect(Collectors.toList());
     }
     
     @Override
     public List<LlmConfig> getAllConfigs() {
-        return new ArrayList<>(configStore.values());
+        return new ArrayList<>(configCache.values());
     }
     
     @Override
@@ -196,9 +265,13 @@ public class LlmConfigServiceImpl implements LlmConfigService {
             Map<String, Object> providerConfig = new HashMap<>(config.getProviderConfig());
             
             if (providerConfig.containsKey("apiKey")) {
-                String encryptedKey = (String) providerConfig.get("apiKey");
-                if (encryptedKey != null && encryptedKey.startsWith("enc:")) {
-                    resolved.setApiKey(decryptApiKey(encryptedKey));
+                String apiKey = (String) providerConfig.get("apiKey");
+                if (apiKey != null && !apiKey.isEmpty()) {
+                    if (apiKey.startsWith("enc:")) {
+                        resolved.setApiKey(decryptApiKey(apiKey));
+                    } else {
+                        resolved.setApiKey(apiKey);
+                    }
                     providerConfig.remove("apiKey");
                 }
             }
@@ -215,14 +288,14 @@ public class LlmConfigServiceImpl implements LlmConfigService {
     
     private ResolvedConfig createDefaultResolvedConfig() {
         ResolvedConfig resolved = new ResolvedConfig();
-        resolved.setProviderType("qianwen");
-        resolved.setModel("qwen-plus");
+        resolved.setProviderType("deepseek");
+        resolved.setModel("deepseek-chat");
         resolved.setPriority(999);
         resolved.setSource(new ResolvedConfig.ConfigSource(LlmConfig.ConfigLevel.ENTERPRISE, "default"));
         
         Map<String, Object> options = new HashMap<>();
         options.put("temperature", 0.7);
-        options.put("max_tokens", 2048);
+        options.put("max_tokens", 4096);
         resolved.setOptions(options);
         
         return resolved;

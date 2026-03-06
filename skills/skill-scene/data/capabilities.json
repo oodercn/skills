@@ -271,10 +271,10 @@
 			
 		],
 		"config":{
-			"provider":"ooder",
-			"createTime":1772584582076,
 			"updateTime":1772584582076,
 			"category":"办公协作",
+			"provider":"ooder",
+			"createTime":1772584582076,
 			"version":"2.3.0"
 		},
 		"createTime":1772584582076,
@@ -312,7 +312,7 @@
 		],
 		"config":{
 			"skillId":"skill-llm-conversation",
-			"updateTime":1772584582107,
+			"updateTime":1772673574895,
 			"createTime":1772584582107,
 			"version":"1.0.0"
 		},
@@ -321,11 +321,11 @@
 		"description":"大语言模型对话能力",
 		"driverCapability":false,
 		"icon":"ri-brain-line",
-		"installed":true,
+		"installed":false,
 		"mainFirst":false,
 		"metadata":{
 			"skillId":"skill-llm-conversation",
-			"updateTime":1772673574895,
+			"updateTime":1772687787977,
 			"createTime":1772584582107,
 			"version":"1.0.0"
 		},
@@ -336,10 +336,10 @@
 		],
 		"sceneCapability":false,
 		"skillId":"skill-llm-conversation",
-		"status":"ENABLED",
+		"status":"DISABLED",
 		"supportedSceneTypes":["llm"],
 		"type":"AI",
-		"updateTime":1772673574895,
+		"updateTime":1772687787977,
 		"version":"1.0.0"
 	},
 	{
@@ -350,10 +350,10 @@
 			
 		],
 		"config":{
-			"provider":"ooder",
-			"createTime":1772584582083,
 			"updateTime":1772584582083,
 			"category":"知识管理",
+			"provider":"ooder",
+			"createTime":1772584582083,
 			"version":"2.3.0"
 		},
 		"createTime":1772584582083,
@@ -501,10 +501,10 @@
 			
 		],
 		"config":{
-			"provider":"ooder",
-			"createTime":1772584582084,
 			"updateTime":1772584582084,
 			"category":"AI助手",
+			"provider":"ooder",
+			"createTime":1772584582084,
 			"version":"2.3.0"
 		},
 		"createTime":1772584582084,

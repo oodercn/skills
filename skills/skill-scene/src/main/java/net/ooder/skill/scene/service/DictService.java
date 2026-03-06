@@ -46,6 +46,9 @@ public class DictService {
         registerDictEnum(net.ooder.skill.scene.dto.scene.TemplateStatus.class);
         registerDictEnum(net.ooder.skill.scene.dto.scene.TemplateCategory.class);
         
+        registerDictEnum(net.ooder.skill.scene.dto.audit.AuditEventType.class);
+        registerDictEnum(net.ooder.skill.scene.dto.audit.AuditResultType.class);
+        
         initialized = true;
         logger.info("DictService initialized with {} dictionaries", dictCache.size());
     }

@@ -1,0 +1,155 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-scene-example
+  name: 场景技能示例
+  version: 2.3.0
+  description: 场景技能模板 - 自驱业务场景(ABS)示例
+  author: Ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - scene
+    - example
+    - template
+
+  category: abs
+  sceneCategory: abs
+
+spec:
+  type: scene-skill
+  category: abs
+  
+  classification:
+    category: abs
+    categoryName: 自驱业务场景
+    mainFirst: true
+    businessSemanticsScore: 9
+    detectedAt: "2026-03-06T00:00:00Z"
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies:
+    - id: skill-dependency-example
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "依赖技能描述"
+      capabilities:
+        - capability-1
+        - capability-2
+
+  sceneCapabilities:
+    - id: scene-example
+      name: 示例场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [capability-1, capability-2]
+          - checkDriverCapabilities: [intent-receiver]
+          - checkDependencies: [skill-dependency-example]
+          - onCheckFailed:
+              action: degrade
+              degradedCapabilities: []
+              retry:
+                maxAttempts: 3
+                delay: 5s
+          
+        selfStart:
+          - installDependencies: auto
+          - initDriverCapabilities: [intent-receiver]
+          - initCapabilities: [capability-1, capability-2]
+          - bindAddresses: auto
+          
+        startCollaboration:
+          - startScene: scene-collaborative
+            optional: true
+            timeout: 10s
+            bindInterface: collaborative-service
+          
+        selfDrive:
+          eventRules:
+            - event: user.action
+              action: example-flow
+              
+          capabilityChains:
+            example-flow:
+              - capability: capability-1
+                input:
+                  action: process
+              - capability: capability-2
+                input:
+                  context: "${previous.result}"
+
+      capabilities:
+        - capability-1
+        - capability-2
+        
+      collaborativeCapabilities:
+        - capabilityId: scene-collaborative
+          role: PROVIDER
+          interface: collaborative-service
+          autoStart: false
+          optional: true
+
+  capabilities:
+    - id: capability-1
+      name: 能力1
+      description: 能力1描述
+      category: service
+      type: ATOMIC
+      
+    - id: capability-2
+      name: 能力2
+      description: 能力2描述
+      category: service
+      type: ATOMIC
+      
+    - id: intent-receiver
+      name: 意图接收
+      description: 接收用户意图
+      category: driver
+      type: DRIVER
+      driverType: INTENT_RECEIVER
+
+  capabilityBindings:
+    - sceneCapabilityType: example
+      autoBind: true
+      capabilities:
+        - capability-1
+        - capability-2
+
+  endpoints:
+    - path: /api/example/action
+      method: POST
+      description: 执行动作
+      capability: capability-1
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.example.SceneExampleSkillApplication
+
+  config:
+    required: []
+    optional:
+      - name: EXAMPLE_CONFIG
+        type: string
+        default: "default"
+        description: 示例配置
+
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

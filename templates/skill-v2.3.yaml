@@ -1,0 +1,72 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-example
+  name: 示例技能
+  version: 1.0.0
+  description: 技能描述
+  author: Ooder Team
+  type: service-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - example
+    - template
+
+  category: svc
+  sceneCategory: null
+  subCategory: util
+
+spec:
+  type: service-skill
+  category: svc
+  
+  classification:
+    category: svc
+    categoryName: 服务技能
+    mainFirst: false
+    businessSemanticsScore: 0
+    detectedAt: null
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies: []
+
+  capabilities:
+    - id: example-capability
+      name: 示例能力
+      description: 示例能力描述
+      category: service
+      type: ATOMIC
+
+  endpoints:
+    - path: /api/example
+      method: GET
+      description: 示例接口
+      capability: example-capability
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.example.ExampleSkillApplication
+
+  config:
+    required: []
+    optional:
+      - name: EXAMPLE_CONFIG
+        type: string
+        default: "default"
+        description: 示例配置
+
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

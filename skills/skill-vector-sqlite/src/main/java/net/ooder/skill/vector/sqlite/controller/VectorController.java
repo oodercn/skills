@@ -1,7 +1,9 @@
 package net.ooder.skill.vector.sqlite.controller;
 
-import net.ooder.skill.vector.sqlite.EmbeddingService;
-import net.ooder.skill.vector.sqlite.VectorStore;
+import net.ooder.scene.skill.vector.EmbeddingService;
+import net.ooder.scene.skill.vector.VectorStore;
+import net.ooder.scene.skill.vector.VectorData;
+import net.ooder.scene.skill.vector.SearchResult;
 import net.ooder.skill.vector.sqlite.model.AddVectorRequest;
 import net.ooder.skill.vector.sqlite.model.VectorSearchRequest;
 import net.ooder.skill.vector.sqlite.model.EmbedRequest;
@@ -30,12 +32,12 @@ public class VectorController {
         
         Map<String, Object> metadata = request.getMetadata();
         
-        double[] embedding;
+        float[] embedding;
         if (request.getEmbedding() != null) {
             List<Double> embeddingList = request.getEmbedding();
-            embedding = new double[embeddingList.size()];
+            embedding = new float[embeddingList.size()];
             for (int i = 0; i < embeddingList.size(); i++) {
-                embedding[i] = embeddingList.get(i).doubleValue();
+                embedding[i] = embeddingList.get(i).floatValue();
             }
         } else if (text != null) {
             embedding = embeddingService.embed(text);
@@ -45,7 +47,7 @@ public class VectorController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
         
-        vectorStore.addVector(id, embedding, metadata != null ? metadata : new HashMap<String, Object>());
+        vectorStore.insert(id, embedding, metadata != null ? metadata : new HashMap<String, Object>());
         
         Map<String, Object> response = new HashMap<>();
         response.put("id", id);
@@ -55,7 +57,7 @@ public class VectorController {
     
     @PostMapping("/batch")
     public ResponseEntity<Map<String, Object>> addVectors(@RequestBody List<AddVectorRequest> requests) {
-        List<VectorStore.VectorEntry> entries = new ArrayList<>();
+        List<VectorData> entries = new ArrayList<>();
         
         for (AddVectorRequest request : requests) {
             String id = request.getId() != null ? request.getId() : UUID.randomUUID().toString();
@@ -63,12 +65,12 @@ public class VectorController {
             
             Map<String, Object> metadata = request.getMetadata();
             
-            double[] embedding;
+            float[] embedding;
             if (request.getEmbedding() != null) {
                 List<Double> embeddingList = request.getEmbedding();
-                embedding = new double[embeddingList.size()];
+                embedding = new float[embeddingList.size()];
                 for (int i = 0; i < embeddingList.size(); i++) {
-                    embedding[i] = embeddingList.get(i).doubleValue();
+                    embedding[i] = embeddingList.get(i).floatValue();
                 }
             } else if (text != null) {
                 embedding = embeddingService.embed(text);
@@ -76,10 +78,10 @@ public class VectorController {
                 continue;
             }
             
-            entries.add(new VectorStore.VectorEntry(id, embedding, metadata != null ? metadata : new HashMap<String, Object>()));
+            entries.add(new VectorData(id, embedding, metadata != null ? metadata : new HashMap<String, Object>()));
         }
         
-        vectorStore.addVectors(entries);
+        vectorStore.batchInsert(entries);
         
         Map<String, Object> response = new HashMap<>();
         response.put("count", entries.size());
@@ -87,26 +89,9 @@ public class VectorController {
         return ResponseEntity.ok(response);
     }
     
-    @GetMapping("/{id}")
-    public ResponseEntity<Map<String, Object>> getVector(@PathVariable String id) {
-        VectorStore.VectorEntry entry = vectorStore.getVector(id);
-        
-        if (entry == null) {
-            return ResponseEntity.notFound().build();
-        }
-        
-        Map<String, Object> result = new HashMap<>();
-        result.put("id", entry.getId());
-        result.put("embedding", entry.getEmbedding());
-        result.put("metadata", entry.getMetadata());
-        result.put("createdAt", entry.getCreatedAt());
-        
-        return ResponseEntity.ok(result);
-    }
-    
     @DeleteMapping("/{id}")
     public ResponseEntity<Map<String, Object>> deleteVector(@PathVariable String id) {
-        vectorStore.deleteVector(id);
+        vectorStore.delete(id);
         
         Map<String, Object> response = new HashMap<>();
         response.put("id", id);
@@ -118,39 +103,31 @@ public class VectorController {
     public ResponseEntity<List<Map<String, Object>>> search(@RequestBody VectorSearchRequest request) {
         int topK = request.getTopK() != null ? request.getTopK() : 10;
         
-        List<VectorStore.SearchResult> results;
+        List<SearchResult> results;
         
         if (request.getEmbedding() != null) {
             List<Double> embeddingList = request.getEmbedding();
-            double[] queryEmbedding = new double[embeddingList.size()];
+            float[] queryEmbedding = new float[embeddingList.size()];
             for (int i = 0; i < embeddingList.size(); i++) {
-                queryEmbedding[i] = embeddingList.get(i).doubleValue();
+                queryEmbedding[i] = embeddingList.get(i).floatValue();
             }
             
             Map<String, Object> filter = request.getFilter();
             
-            if (filter != null && !filter.isEmpty()) {
-                results = vectorStore.searchSimilarWithFilter(queryEmbedding, topK, filter);
-            } else {
-                results = vectorStore.searchSimilar(queryEmbedding, topK);
-            }
+            results = vectorStore.search(queryEmbedding, topK, filter);
         } else if (request.getText() != null) {
             String text = request.getText();
-            double[] queryEmbedding = embeddingService.embed(text);
+            float[] queryEmbedding = embeddingService.embed(text);
             
             Map<String, Object> filter = request.getFilter();
             
-            if (filter != null && !filter.isEmpty()) {
-                results = vectorStore.searchSimilarWithFilter(queryEmbedding, topK, filter);
-            } else {
-                results = vectorStore.searchSimilar(queryEmbedding, topK);
-            }
+            results = vectorStore.search(queryEmbedding, topK, filter);
         } else {
             return ResponseEntity.badRequest().build();
         }
         
         List<Map<String, Object>> response = new ArrayList<>();
-        for (VectorStore.SearchResult result : results) {
+        for (SearchResult result : results) {
             Map<String, Object> item = new HashMap<>();
             item.put("id", result.getId());
             item.put("score", result.getScore());
@@ -164,7 +141,14 @@ public class VectorController {
     @GetMapping("/count")
     public ResponseEntity<Map<String, Object>> getCount() {
         Map<String, Object> response = new HashMap<>();
-        response.put("count", vectorStore.getCount());
+        response.put("count", vectorStore.count());
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/dimension")
+    public ResponseEntity<Map<String, Object>> getDimension() {
+        Map<String, Object> response = new HashMap<>();
+        response.put("dimension", vectorStore.getDimension());
         return ResponseEntity.ok(response);
     }
     
@@ -187,17 +171,55 @@ public class VectorController {
             return ResponseEntity.badRequest().body(errorResponse);
         }
         
-        double[] embedding = embeddingService.embed(text);
+        float[] embedding = embeddingService.embed(text);
         
-        List<Double> embeddingList = new ArrayList<>();
-        for (double v : embedding) {
+        List<Float> embeddingList = new ArrayList<>();
+        for (float v : embedding) {
             embeddingList.add(v);
         }
         
         Map<String, Object> response = new HashMap<>();
         response.put("embedding", embeddingList);
         response.put("dimension", embedding.length);
-        response.put("model", embeddingService.getModelName());
+        response.put("model", embeddingService.getModel());
+        return ResponseEntity.ok(response);
+    }
+    
+    @PostMapping("/embed/batch")
+    public ResponseEntity<Map<String, Object>> embedBatch(@RequestBody List<String> texts) {
+        List<float[]> embeddings = embeddingService.embedBatch(texts);
+        
+        List<List<Float>> embeddingLists = new ArrayList<>();
+        for (float[] embedding : embeddings) {
+            List<Float> list = new ArrayList<>();
+            for (float v : embedding) {
+                list.add(v);
+            }
+            embeddingLists.add(list);
+        }
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("embeddings", embeddingLists);
+        response.put("count", embeddings.size());
+        response.put("dimension", embeddingService.getDimension());
+        response.put("model", embeddingService.getModel());
+        return ResponseEntity.ok(response);
+    }
+    
+    @GetMapping("/similarity")
+    public ResponseEntity<Map<String, Object>> similarity(
+            @RequestParam String text1,
+            @RequestParam String text2) {
+        
+        float[] embedding1 = embeddingService.embed(text1);
+        float[] embedding2 = embeddingService.embed(text2);
+        
+        float similarity = embeddingService.cosineSimilarity(embedding1, embedding2);
+        float distance = embeddingService.euclideanDistance(embedding1, embedding2);
+        
+        Map<String, Object> response = new HashMap<>();
+        response.put("cosineSimilarity", similarity);
+        response.put("euclideanDistance", distance);
         return ResponseEntity.ok(response);
     }
 }

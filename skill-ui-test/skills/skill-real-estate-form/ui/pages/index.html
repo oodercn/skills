@@ -1,0 +1,353 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>房源表单 - 房产中介管理系统</title>
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="../css/real-estate-form.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-home-4-line"></i> 房源管理
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <i class="ri-home-4-line"></i>
+                    <span>房源表单管理</span>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--primary" onclick="RealEstateForm.openCreateModal()">
+                        <i class="ri-add-line"></i> 新建房源
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-card nx-mb-4">
+                        <div class="nx-card__body">
+                            <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">区域</label>
+                            <select class="nx-select" id="filter-district">
+                                <option value="">全部区域</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">房型</label>
+                            <select class="nx-select" id="filter-type">
+                                <option value="">全部房型</option>
+                                <option value="1室">一室</option>
+                                <option value="2室">二室</option>
+                                <option value="3室">三室</option>
+                                <option value="4室">四室</option>
+                                <option value="5室+">五室及以上</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">价格区间</label>
+                            <select class="nx-select" id="filter-price">
+                                <option value="">全部价格</option>
+                                <option value="0-100">100万以下</option>
+                                <option value="100-200">100-200万</option>
+                                <option value="200-300">200-300万</option>
+                                <option value="300-500">300-500万</option>
+                                <option value="500+">500万以上</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">状态</label>
+                            <select class="nx-select" id="filter-status">
+                                <option value="">全部状态</option>
+                                <option value="available">在售</option>
+                                <option value="reserved">已预订</option>
+                                <option value="sold">已售</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group" style="display: flex; align-items: flex-end;">
+                            <button class="nx-btn nx-btn--primary" onclick="RealEstateForm.search()">
+                                <i class="ri-search-line"></i> 搜索
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="nx-card">
+                <div class="nx-card__header">
+                    <h3 class="nx-card__title">房源列表</h3>
+                    <span class="nx-badge" id="property-count">0 套</span>
+                </div>
+                <div class="nx-card__body">
+                    <table class="nx-table">
+                        <thead>
+                            <tr>
+                                <th>房源标题</th>
+                                <th>小区</th>
+                                <th>房型</th>
+                                <th>面积</th>
+                                <th>价格</th>
+                                <th>状态</th>
+                                <th>录入时间</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="property-table-body">
+                            <tr>
+                                <td colspan="8" class="nx-text-center nx-text-secondary">
+                                    <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="property-modal">
+        <div class="modal-content" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-home-4-line"></i>
+                    <span id="modal-title">新建房源</span>
+                </h3>
+                <button class="modal-close" onclick="RealEstateForm.closeModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="property-form">
+                    <input type="hidden" id="property-id">
+                    
+                    <div class="nx-form-divider"><span>基本信息</span></div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">房源标题 <span class="nx-text-danger">*</span></label>
+                        <input type="text" class="nx-input" id="property-title" placeholder="例：精装修三室两厅 南北通透 近地铁">
+                    </div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">所属区域 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="property-district">
+                                <option value="">请选择区域</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">小区名称 <span class="nx-text-danger">*</span></label>
+                            <input type="text" class="nx-input" id="property-community" placeholder="输入小区名称">
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">房型 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="property-room-type">
+                                <option value="">请选择房型</option>
+                                <option value="1室1厅">一室一厅</option>
+                                <option value="2室1厅">二室一厅</option>
+                                <option value="2室2厅">二室二厅</option>
+                                <option value="3室1厅">三室一厅</option>
+                                <option value="3室2厅">三室二厅</option>
+                                <option value="4室2厅">四室二厅</option>
+                                <option value="5室2厅">五室二厅</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">建筑面积 <span class="nx-text-danger">*</span></label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="property-area" placeholder="建筑面积">
+                                <span class="nx-input-suffix">㎡</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">套内面积</label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="property-inner-area" placeholder="套内面积">
+                                <span class="nx-input-suffix">㎡</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">楼层</label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="property-floor" placeholder="所在楼层">
+                                <span class="nx-input-suffix">层</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">总楼层</label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="property-total-floor" placeholder="总楼层">
+                                <span class="nx-input-suffix">层</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">朝向</label>
+                            <select class="nx-select" id="property-orientation">
+                                <option value="">请选择朝向</option>
+                                <option value="南">南</option>
+                                <option value="北">北</option>
+                                <option value="东">东</option>
+                                <option value="西">西</option>
+                                <option value="南北">南北</option>
+                                <option value="东西">东西</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">装修情况</label>
+                            <select class="nx-select" id="property-decoration">
+                                <option value="">请选择装修情况</option>
+                                <option value="毛坯">毛坯</option>
+                                <option value="简装">简装</option>
+                                <option value="精装">精装</option>
+                                <option value="豪装">豪装</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">建筑年代</label>
+                            <input type="number" class="nx-input" id="property-build-year" placeholder="例：2020">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">产权性质</label>
+                            <select class="nx-select" id="property-property-type">
+                                <option value="">请选择产权性质</option>
+                                <option value="商品房">商品房</option>
+                                <option value="经济适用房">经济适用房</option>
+                                <option value="公房">公房</option>
+                                <option value="其他">其他</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-divider"><span>价格信息</span></div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">售价 <span class="nx-text-danger">*</span></label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="property-price" placeholder="售价">
+                                <span class="nx-input-suffix">万元</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">单价</label>
+                            <div class="nx-input-group">
+                                <input type="text" class="nx-input" id="property-unit-price" readonly>
+                                <span class="nx-input-suffix">元/㎡</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">参考估价</label>
+                            <div class="nx-input-group">
+                                <input type="text" class="nx-input" id="property-valuation" readonly placeholder="点击估价">
+                                <button type="button" class="nx-btn nx-btn--secondary" onclick="RealEstateForm.getValuation()">
+                                    <i class="ri-robot-line"></i> AI估价
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-divider"><span>位置信息</span></div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">详细地址</label>
+                        <input type="text" class="nx-input" id="property-address" placeholder="详细地址">
+                    </div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">地图定位</label>
+                        <div id="map-container" style="height: 200px; background: var(--nx-bg-elevated); border-radius: var(--nx-radius); display: flex; align-items: center; justify-content: center; color: var(--nx-text-secondary);">
+                            <i class="ri-map-pin-line" style="font-size: 32px; margin-right: 8px;"></i>
+                            <span>点击选择地图位置</span>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-divider"><span>房源图片</span></div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">房源照片</label>
+                        <div class="image-upload-area" id="image-upload-area">
+                            <div class="image-upload-btn" onclick="document.getElementById('image-input').click()">
+                                <i class="ri-add-line"></i>
+                                <span>上传图片</span>
+                            </div>
+                        </div>
+                        <input type="file" id="image-input" accept="image/*" multiple style="display: none;" onchange="RealEstateForm.handleImageUpload(this.files)">
+                        <div class="nx-form-hint">支持 jpg、png 格式，单张不超过10MB，最多上传20张</div>
+                    </div>
+                    
+                    <div class="nx-form-divider"><span>其他信息</span></div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">房源描述</label>
+                        <textarea class="nx-textarea" id="property-description" rows="4" placeholder="详细描述房源特点、周边配套等信息" style="width: 100%;"></textarea>
+                    </div>
+                    
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">业主姓名</label>
+                            <input type="text" class="nx-input" id="property-owner-name" placeholder="业主姓名">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">联系电话</label>
+                            <input type="tel" class="nx-input" id="property-owner-phone" placeholder="联系电话">
+                        </div>
+                    </div>
+                    
+                    <div class="nx-form-group">
+                        <label class="nx-label">房源状态</label>
+                        <div class="nx-radio-group">
+                            <label class="nx-radio">
+                                <input type="radio" name="property-status" value="available" checked>
+                                <span>在售</span>
+                            </label>
+                            <label class="nx-radio">
+                                <input type="radio" name="property-status" value="reserved">
+                                <span>已预订</span>
+                            </label>
+                            <label class="nx-radio">
+                                <input type="radio" name="property-status" value="sold">
+                                <span>已售</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="RealEstateForm.closeModal()">
+                    <i class="ri-close-line"></i> 取消
+                </button>
+                <button class="nx-btn nx-btn--primary" onclick="RealEstateForm.saveProperty()">
+                    <i class="ri-save-line"></i> 保存
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="../js/real-estate-form.js"></script>
+</body>
+</html>

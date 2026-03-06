@@ -18,7 +18,7 @@ var DictCache = (function() {
         KEY_TYPE: 'key_type',
         KEY_STATUS: 'key_status',
         AUDIT_EVENT_TYPE: 'audit_event_type',
-        AUDIT_RESULT: 'audit_result'
+        AUDIT_RESULT_TYPE: 'audit_result_type'
     };
 
     function getDict(code) {

@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>已安装场景能力 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <h1><i class="ri-download-cloud-2-line"></i> 已安装场景能力</h1>
+                    <p>查看已安装的场景能力列表</p>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3>已安装能力列表</h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div id="capability-list">
+                                <p class="nx-text-secondary">加载中...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        async function loadCapabilities() {
+            try {
+                const response = await fetch('/api/v1/discovery/local');
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data && result.data.capabilities) {
+                    renderCapabilities(result.data.capabilities);
+                } else {
+                    document.getElementById('capability-list').innerHTML = '<p class="nx-text-secondary">暂无已安装的能力</p>';
+                }
+            } catch (e) {
+                console.error('Failed to load capabilities:', e);
+                document.getElementById('capability-list').innerHTML = '<p class="nx-text-secondary">加载失败</p>';
+            }
+        }
+        
+        function renderCapabilities(capabilities) {
+            const list = document.getElementById('capability-list');
+            
+            if (capabilities.length === 0) {
+                list.innerHTML = '<p class="nx-text-secondary">暂无已安装的能力</p>';
+                return;
+            }
+            
+            list.innerHTML = capabilities.map(cap => `
+                <div class="nx-flex nx-items-center nx-justify-between nx-p-4 nx-border-b nx-border-[var(--nx-border)]">
+                    <div>
+                        <h4 class="nx-font-medium">${cap.name || cap.capabilityName}</h4>
+                        <p class="nx-text-sm nx-text-secondary">${cap.description || cap.desc || ''}</p>
+                    </div>
+                    <span class="nx-badge nx-badge--success">${cap.type || 'SERVICE'}</span>
+                </div>
+            `).join('');
+        }
+        
+        document.addEventListener('DOMContentLoaded', loadCapabilities);
+    </script>
+</body>
+</html>

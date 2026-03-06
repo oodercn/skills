@@ -362,7 +362,9 @@ public class KnowledgeBaseController {
         String usedModel = model;
         if (llmReady) {
             answer = llmService.generateAnswer(question, sources, model);
-            usedModel = llmService.getLastUsedModel();
+            if (usedModel == null || usedModel.isEmpty()) {
+                usedModel = (String) llmStatus.get("model");
+            }
         } else {
             answer = "根据知识库检索结果，关于\"" + question + "\"的相关信息如下：\n\n";
             if (!sources.isEmpty()) {

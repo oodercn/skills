@@ -77,7 +77,7 @@ async function refreshCreated() {
 
 async function refreshStarted() {
     try {
-        var result = await ApiClient.get('/api/v1/workflows/my/started?pageNum=1&pageSize=20');
+        var result = await ApiClient.get('/api/v1/scene-groups?pageNum=1&pageSize=20&status=ACTIVE');
         
         if (result.code === 200 && result.data) {
             startedScenes = result.data.list || [];
@@ -325,4 +325,16 @@ async function cancelWorkflow(workflowId) {
 async function rerunWorkflow(sceneGroupId) {
     if (!confirm('确定要重新执行此场景吗？')) return;
     alert('场景已开始执行');
+}
+
+function goToAuditLogs() {
+    window.location.href = '/console/pages/audit-logs.html';
+}
+
+function goToCapabilityAudit() {
+    window.location.href = '/console/pages/capability-stats.html';
+}
+
+function goToSceneAudit() {
+    window.location.href = '/console/pages/my-history.html';
 }

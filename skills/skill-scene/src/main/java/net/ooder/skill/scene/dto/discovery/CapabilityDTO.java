@@ -1,6 +1,7 @@
 package net.ooder.skill.scene.dto.discovery;
 
 import java.util.List;
+import java.util.Map;
 
 public class CapabilityDTO {
     
@@ -25,6 +26,18 @@ public class CapabilityDTO {
     private List<String> supportedSceneTypes;
     
     private boolean isSceneCapability;
+    
+    private String category;
+    
+    private boolean mainFirst;
+    
+    private String visibility;
+    
+    private List<Map<String, Object>> driverConditions;
+    
+    private List<Map<String, Object>> participants;
+    
+    private Map<String, Object> metadata;
 
     public CapabilityDTO() {}
 
@@ -114,5 +127,53 @@ public class CapabilityDTO {
 
     public void setSceneCapability(boolean sceneCapability) {
         isSceneCapability = sceneCapability;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public boolean isMainFirst() {
+        return mainFirst;
+    }
+
+    public void setMainFirst(boolean mainFirst) {
+        this.mainFirst = mainFirst;
+    }
+
+    public String getVisibility() {
+        return visibility;
+    }
+
+    public void setVisibility(String visibility) {
+        this.visibility = visibility;
+    }
+
+    public List<Map<String, Object>> getDriverConditions() {
+        return driverConditions;
+    }
+
+    public void setDriverConditions(List<Map<String, Object>> driverConditions) {
+        this.driverConditions = driverConditions;
+    }
+
+    public List<Map<String, Object>> getParticipants() {
+        return participants;
+    }
+
+    public void setParticipants(List<Map<String, Object>> participants) {
+        this.participants = participants;
+    }
+
+    public Map<String, Object> getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(Map<String, Object> metadata) {
+        this.metadata = metadata;
     }
 }

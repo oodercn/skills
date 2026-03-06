@@ -237,7 +237,7 @@ public class SceneTemplateService {
 
                         log.info("[deployTemplate] Installing skill with dependencies: {}", skillId);
                         InstallResultWithDependencies installResult = skillPackageManager
-                            .installWithDependencies(skillId, InstallMode.TOPOLOGICAL).get();
+                            .installWithDependencies(skillId, InstallMode.FULL_INSTALL).get();
                         
                         if (installResult.isSuccess()) {
                             installedSkills.add(skillId);

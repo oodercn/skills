@@ -1,163 +1,212 @@
 /**
- * 菜单管理模块
+ * NexusMenu - 统一菜单系统
+ * 所有页面必须引用此文件
+ * 
+ * 使用方法:
+ * <script src="/console/js/nexus.js"></script>
+ * <script src="/console/js/menu.js"></script>
+ * <script src="/console/js/page-init.js" data-auto-init></script>
+ * <script src="/console/js/api.js"></script>
  */
 
-/**
- * 加载菜单配置
- */
-async function loadMenuConfig() {
-    try {
-        const response = await fetch('menu-config.json');
-        if (!response.ok) {
-            throw new Error('菜单配置加载失败');
-        }
-        COMMON.menuConfig = await response.json();
-        renderMenu();
-    } catch (error) {
-        console.error('加载菜单配置错误:', error);
-        // 加载失败时显示默认菜单
-        renderDefaultMenu();
-    }
-}
+(function() {
+    'use strict';
 
-/**
- * 渲染菜单
- */
-function renderMenu() {
-    const navMenu = document.getElementById('nav-menu');
-    if (!navMenu) return;
-    
-    navMenu.innerHTML = '';
-    
-    COMMON.menuConfig.menu.forEach(item => {
-        const menuItem = createMenuItem(item);
-        navMenu.appendChild(menuItem);
-        // 添加菜单分隔线
-        if (item.id !== 'dashboard') {
-            const divider = document.createElement('div');
-            divider.className = 'menu-divider';
-            navMenu.appendChild(divider);
-        }
-    });
-    
-    setupNavigation();
-}
+    const NexusMenu = {
+        initialized: false,
+        menuConfig: null,
+        currentUser: null,
+        expandedMenus: [],
 
-/**
- * 创建菜单项
- * @param {Object} menuItem 菜单项配置
- * @returns {HTMLElement} 菜单项元素
- */
-function createMenuItem(menuItem) {
-    const li = document.createElement('li');
-    
-    if (menuItem.children && menuItem.children.length > 0) {
-        // 有子菜单的菜单项
-        const a = document.createElement('a');
-        a.href = `#${menuItem.id}`;
-        a.innerHTML = `
-            <i class="${menuItem.icon}"></i>
-            ${menuItem.name}
-            <span class="toggle-icon">›</span>
-        `;
-        
-        // 处理点击事件
-        a.addEventListener('click', function(e) {
-            e.preventDefault();
-            const toggleIcon = this.querySelector('.toggle-icon');
-            const submenu = this.nextElementSibling;
-            
-            if (submenu) {
-                submenu.classList.toggle('hidden');
-                toggleIcon.classList.toggle('collapsed');
+        async init() {
+            if (this.initialized) {
+                console.log('[NexusMenu] 已经初始化，跳过');
+                return;
             }
-        });
-        
-        li.appendChild(a);
-        
-        // 创建子菜单
-        const submenu = document.createElement('ul');
-        submenu.className = 'submenu';
-        
-        menuItem.children.forEach(childItem => {
-            const childLi = createMenuItem(childItem);
-            submenu.appendChild(childLi);
-        });
-        
-        // 只有当子菜单不为空时才添加
-        if (submenu.children.length > 0) {
-            li.appendChild(submenu);
-        }
-    } else {
-        // 无子菜单的菜单项
-        const a = document.createElement('a');
-        if (menuItem.url) {
-            a.href = menuItem.url;
-        } else {
-            a.href = `#${menuItem.id}`;
-            a.setAttribute('data-page', menuItem.page || menuItem.id);
-        }
-        a.innerHTML = `
-            <i class="${menuItem.icon}"></i>
-            ${menuItem.name}
-        `;
-        
-        // 检查是否已实现
-        if (menuItem.status !== 'implemented' && menuItem.id !== 'dashboard') {
-            a.classList.add('disabled');
-            a.title = '功能开发中，敬请期待';
-        }
-        
-        li.appendChild(a);
-    }
-    
-    return li;
-}
 
-/**
- * 渲染默认菜单（加载失败时使用）
- */
-function renderDefaultMenu() {
-    const navMenu = document.getElementById('nav-menu');
-    if (!navMenu) return;
-    
-    navMenu.innerHTML = `
-        <li><a href="#dashboard" class="active" data-page="dashboard"><i class="ri-dashboard-line"></i> 仪表盘</a></li>
-        <li><a href="#system" data-page="system"><i class="ri-computer-line"></i> 系统信息</a></li>
-        <li><a href="#network" data-page="network"><i class="ri-wifi-line"></i> 网络状态</a></li>
-        <li><a href="#logs" data-page="logs"><i class="ri-file-text-line"></i> 日志查看</a></li>
-        <li><a href="#tests" data-page="tests"><i class="ri-test-tube-line"></i> 测试用例</a></li>
-        <li><a href="#config" data-page="config"><i class="ri-settings-3-line"></i> 配置管理</a></li>
-    `;
-    setupNavigation();
-}
+            console.log('[NexusMenu] 开始初始化...');
 
-/**
- * 设置导航
- */
-function setupNavigation() {
-    const navLinks = document.querySelectorAll('.nav-menu a');
-    navLinks.forEach(link => {
-        // 只处理带有data-page属性的链接（即叶子节点且没有url属性）
-        if (link.hasAttribute('data-page') && !link.hasAttribute('href') && link.getAttribute('href') !== '#') {
-            link.addEventListener('click', function(e) {
-                e.preventDefault();
-                
-                // 更新活跃状态
-                navLinks.forEach(l => l.classList.remove('active'));
-                this.classList.add('active');
+            this.expandedMenus = this.loadExpandedMenus();
+
+            try {
+                await this.loadSession();
+                await this.loadMenuConfig();
+                this.renderMenu();
+                this.initialized = true;
+                console.log('[NexusMenu] 初始化完成');
+            } catch (error) {
+                console.error('[NexusMenu] 初始化失败:', error);
+                this.renderDefaultMenu();
+            }
+        },
+
+        loadExpandedMenus() {
+            try {
+                const saved = localStorage.getItem('expandedMenus');
+                return saved ? JSON.parse(saved) : [];
+            } catch (e) {
+                return [];
+            }
+        },
+
+        saveExpandedMenus() {
+            try {
+                localStorage.setItem('expandedMenus', JSON.stringify(this.expandedMenus));
+            } catch (e) {
+                console.warn('[NexusMenu] 保存菜单状态失败:', e);
+            }
+        },
+
+        async loadSession() {
+            try {
+                const response = await fetch('/api/v1/auth/session');
+                const result = await response.json();
+                if (result.status === 'success' && result.data) {
+                    this.currentUser = result.data;
+                    console.log('[NexusMenu] 用户会话加载成功:', this.currentUser.name);
+                }
+            } catch (e) {
+                console.warn('[NexusMenu] 无法加载会话信息:', e);
+            }
+        },
+
+        async loadMenuConfig() {
+            const response = await fetch('/api/v1/auth/menu-config');
+            const result = await response.json();
+            
+            if (result.status === 'success' && result.data) {
+                this.menuConfig = result.data;
+                console.log('[NexusMenu] 菜单配置加载成功:', this.menuConfig.length, '项');
+            } else {
+                throw new Error('菜单配置加载失败');
+            }
+        },
+
+        renderMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            if (!navMenu) {
+                console.warn('[NexusMenu] 菜单容器未找到');
+                return;
+            }
+
+            if (!this.menuConfig || this.menuConfig.length === 0) {
+                this.renderDefaultMenu();
+                return;
+            }
+
+            const currentPath = window.location.pathname;
+            
+            navMenu.innerHTML = '';
+            
+            this.menuConfig.forEach(item => {
+                const li = this.createMenuItem(item, currentPath);
+                navMenu.appendChild(li);
             });
-        }
-    });
-}
+        },
 
-// 导出模块
-if (typeof module !== 'undefined' && module.exports) {
-    module.exports = {
-        loadMenuConfig,
-        renderMenu,
-        createMenuItem,
-        renderDefaultMenu,
-        setupNavigation
+        createMenuItem(item, currentPath) {
+            const li = document.createElement('li');
+            li.className = 'nav-menu__item';
+            
+            const isActive = this.isMenuItemActive(item, currentPath);
+            if (isActive) {
+                li.classList.add('nav-menu__item--active');
+            }
+
+            if (item.children && item.children.length > 0) {
+                const isExpanded = this.expandedMenus.includes(item.id) || isActive;
+                
+                const a = document.createElement('a');
+                a.href = `#${item.id}`;
+                a.innerHTML = `<i class="${item.icon}"></i> ${item.name}`;
+                a.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    this.toggleSubmenu(item.id, li);
+                });
+                li.appendChild(a);
+
+                const submenu = document.createElement('ul');
+                submenu.className = 'nav-menu__submenu';
+                if (isExpanded) {
+                    submenu.classList.add('nav-menu__submenu--open');
+                }
+                
+                item.children.forEach(child => {
+                    const childLi = this.createMenuItem(child, currentPath);
+                    submenu.appendChild(childLi);
+                });
+                
+                li.appendChild(submenu);
+            } else {
+                const a = document.createElement('a');
+                a.href = item.url || '#';
+                a.innerHTML = `<i class="${item.icon}"></i> ${item.name}`;
+                li.appendChild(a);
+            }
+
+            return li;
+        },
+
+        isMenuItemActive(item, currentPath) {
+            if (item.active) return true;
+            if (item.url && currentPath.includes(item.url)) return true;
+            if (item.children) {
+                return item.children.some(child => this.isMenuItemActive(child, currentPath));
+            }
+            return false;
+        },
+
+        toggleSubmenu(itemId, li) {
+            const submenu = li.querySelector('.nav-menu__submenu');
+            if (!submenu) return;
+
+            if (submenu.classList.contains('nav-menu__submenu--open')) {
+                submenu.classList.remove('nav-menu__submenu--open');
+                this.expandedMenus = this.expandedMenus.filter(id => id !== itemId);
+            } else {
+                submenu.classList.add('nav-menu__submenu--open');
+                if (!this.expandedMenus.includes(itemId)) {
+                    this.expandedMenus.push(itemId);
+                }
+            }
+            this.saveExpandedMenus();
+        },
+
+        renderDefaultMenu() {
+            const navMenu = document.getElementById('nav-menu');
+            if (!navMenu) return;
+
+            const defaultMenus = [
+                { name: '工作台', url: '/console/pages/role-installer.html', icon: 'ri-home-line' },
+                { name: '技能市场', url: '/console/pages/capability-discovery.html', icon: 'ri-store-2-line' },
+                { name: '已安装技能', url: '/console/pages/my-capabilities.html', icon: 'ri-download-cloud-line' }
+            ];
+
+            navMenu.innerHTML = defaultMenus.map(item => {
+                const isActive = window.location.pathname.includes(item.url);
+                return `
+                    <li class="nav-menu__item ${isActive ? 'nav-menu__item--active' : ''}">
+                        <a href="${item.url}"><i class="${item.icon}"></i> ${item.name}</a>
+                    </li>
+                `;
+            }).join('');
+        },
+
+        async refresh() {
+            this.initialized = false;
+            this.menuConfig = null;
+            await this.init();
+        },
+
+        getCurrentUser() {
+            return this.currentUser;
+        },
+
+        getCurrentRole() {
+            return this.currentUser?.roleType || null;
+        }
     };
-}
+
+    window.NexusMenu = NexusMenu;
+
+})();

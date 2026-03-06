@@ -1,5 +1,7 @@
 package net.ooder.skill.vector.sqlite;
 
+import net.ooder.scene.skill.vector.EmbeddingService;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,18 +25,18 @@ public class MockEmbeddingService implements EmbeddingService {
     @PostConstruct
     public void init() {
         this.random = new Random(42);
-        log.info("MockEmbeddingService initialized with dimension: {}", dimension);
+        log.info("MockEmbeddingService initialized with dimension: {}, using SDK EmbeddingService interface", dimension);
     }
     
     @Override
-    public double[] embed(String text) {
-        double[] embedding = new double[dimension];
+    public float[] embed(String text) {
+        float[] embedding = new float[dimension];
         
         int hash = text.hashCode();
         random.setSeed(hash);
         
         for (int i = 0; i < dimension; i++) {
-            embedding[i] = random.nextGaussian();
+            embedding[i] = (float) random.nextGaussian();
         }
         
         normalize(embedding);
@@ -43,8 +45,8 @@ public class MockEmbeddingService implements EmbeddingService {
     }
     
     @Override
-    public List<double[]> embedBatch(List<String> texts) {
-        List<double[]> embeddings = new ArrayList<>();
+    public List<float[]> embedBatch(List<String> texts) {
+        List<float[]> embeddings = new ArrayList<>();
         for (String text : texts) {
             embeddings.add(embed(text));
         }
@@ -57,16 +59,16 @@ public class MockEmbeddingService implements EmbeddingService {
     }
     
     @Override
-    public String getModelName() {
+    public String getModel() {
         return "mock-embedding";
     }
     
-    private void normalize(double[] vector) {
-        double norm = 0.0;
-        for (double v : vector) {
+    private void normalize(float[] vector) {
+        float norm = 0.0f;
+        for (float v : vector) {
             norm += v * v;
         }
-        norm = Math.sqrt(norm);
+        norm = (float) Math.sqrt(norm);
         
         if (norm > 0) {
             for (int i = 0; i < vector.length; i++) {

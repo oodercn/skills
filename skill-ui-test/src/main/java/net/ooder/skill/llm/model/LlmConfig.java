@@ -1,10 +1,11 @@
-package net.ooder.skill.llm.config.model;
+package net.ooder.skill.llm.model;
 
 import java.util.Map;
 
 public class LlmConfig {
     
     private String id;
+    private String name;
     private ConfigLevel level;
     private String scopeId;
     private String providerType;
@@ -36,6 +37,8 @@ public class LlmConfig {
 
     public String getId() { return id; }
     public void setId(String id) { this.id = id; }
+    public String getName() { return name; }
+    public void setName(String name) { this.name = name; }
     public ConfigLevel getLevel() { return level; }
     public void setLevel(ConfigLevel level) { this.level = level; }
     public String getScopeId() { return scopeId; }

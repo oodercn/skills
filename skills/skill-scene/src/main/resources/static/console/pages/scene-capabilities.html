@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>场景能力 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <h1><i class="ri-puzzle-line"></i> 场景能力</h1>
+                    <p>管理场景中的能力绑定</p>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--secondary" onclick="refreshList()">
+                        <i class="ri-refresh-line"></i> 刷新
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-row nx-mb-4">
+                        <div class="nx-col-4">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon"><i class="ri-puzzle-line"></i></div>
+                                <div class="nx-stat-card__content">
+                                    <h4>总能力数</h4>
+                                    <p class="nx-stat-card__value" id="total-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-col-4">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon" style="background: var(--nx-success-light); color: var(--nx-success);"><i class="ri-checkbox-circle-line"></i></div>
+                                <div class="nx-stat-card__content">
+                                    <h4>正常状态</h4>
+                                    <p class="nx-stat-card__value" id="normal-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-col-4">
+                            <div class="nx-stat-card">
+                                <div class="nx-stat-card__icon" style="background: var(--nx-warning-light); color: var(--nx-warning);"><i class="ri-error-warning-line"></i></div>
+                                <div class="nx-stat-card__content">
+                                    <h4>异常状态</h4>
+                                    <p class="nx-stat-card__value" id="error-count">0</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <div class="nx-flex nx-items-center nx-gap-4">
+                                <h3>能力列表</h3>
+                                <div class="nx-flex nx-items-center nx-gap-2">
+                                    <input type="text" class="nx-input" id="search-input" placeholder="搜索能力名称..." onkeyup="handleSearch(event)">
+                                    <select class="nx-select" id="type-filter" onchange="handleFilter()">
+                                        <option value="">全部类型</option>
+                                        <option value="SERVICE">SERVICE</option>
+                                        <option value="COMMUNICATION">COMMUNICATION</option>
+                                        <option value="AI">AI</option>
+                                        <option value="STORAGE">STORAGE</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="nx-card__body">
+                            <div id="capability-list">
+                                <div class="nx-flex nx-items-center nx-justify-center nx-p-8">
+                                    <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
+                                    <span class="nx-ml-2">加载中...</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        let allCapabilities = [];
+        let filteredCapabilities = [];
+        
+        async function loadCapabilities() {
+            showLoading();
+            
+            try {
+                const response = await fetch('/api/v1/capabilities');
+                const result = await response.json();
+                
+                if (result.status === 'success' && result.data) {
+                    allCapabilities = Array.isArray(result.data) ? result.data : (result.data.capabilities || []);
+                    filteredCapabilities = [...allCapabilities];
+                    updateStats();
+                    renderCapabilities();
+                } else {
+                    showError('暂无能力数据');
+                }
+            } catch (e) {
+                console.error('Failed to load capabilities:', e);
+                showError('加载失败，请稍后重试');
+            }
+        }
+        
+        function showLoading() {
+            document.getElementById('capability-list').innerHTML = `
+                <div class="nx-flex nx-items-center nx-justify-center nx-p-8">
+                    <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
+                    <span class="nx-ml-2">加载中...</span>
+                </div>
+            `;
+        }
+        
+        function showError(message) {
+            document.getElementById('capability-list').innerHTML = `
+                <div class="nx-flex nx-items-center nx-justify-center nx-p-8">
+                    <i class="ri-error-warning-line" style="font-size: 24px; color: var(--nx-danger);"></i>
+                    <span class="nx-ml-2">${message}</span>
+                    <button class="nx-btn nx-btn--sm nx-btn--secondary nx-ml-4" onclick="loadCapabilities()">重试</button>
+                </div>
+            `;
+        }
+        
+        function updateStats() {
+            const total = allCapabilities.length;
+            const normal = allCapabilities.filter(c => c.status === 'normal' || !c.status).length;
+            const error = allCapabilities.filter(c => c.status === 'error').length;
+            
+            document.getElementById('total-count').textContent = total;
+            document.getElementById('normal-count').textContent = normal;
+            document.getElementById('error-count').textContent = error;
+        }
+        
+        function renderCapabilities() {
+            const list = document.getElementById('capability-list');
+            
+            if (filteredCapabilities.length === 0) {
+                list.innerHTML = `
+                    <div class="nx-flex nx-items-center nx-justify-center nx-p-8">
+                        <i class="ri-inbox-line" style="font-size: 24px; color: var(--nx-text-secondary);"></i>
+                        <span class="nx-ml-2 nx-text-secondary">暂无能力</span>
+                    </div>
+                `;
+                return;
+            }
+            
+            list.innerHTML = filteredCapabilities.map(cap => `
+                <div class="nx-flex nx-items-center nx-justify-between nx-p-4 nx-border-b nx-border-[var(--nx-border)] hover:nx-bg-[var(--nx-bg-hover)] nx-cursor-pointer" onclick="viewDetail('${cap.id || cap.capabilityId}')">
+                    <div class="nx-flex nx-items-center nx-gap-4">
+                        <div class="nx-w-10 nx-h-10 nx-rounded-lg nx-flex nx-items-center nx-justify-center" style="background: var(--nx-primary-light); color: var(--nx-primary);">
+                            <i class="ri-puzzle-line"></i>
+                        </div>
+                        <div>
+                            <h4 class="nx-font-medium">${cap.name || cap.capabilityName}</h4>
+                            <p class="nx-text-sm nx-text-secondary">${cap.description || cap.desc || '暂无描述'}</p>
+                        </div>
+                    </div>
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <span class="nx-badge ${getTypeBadgeClass(cap.type)}">${cap.type || 'SERVICE'}</span>
+                        <span class="nx-badge ${getStatusBadgeClass(cap.status)}">${cap.status || 'normal'}</span>
+                        <i class="ri-arrow-right-s-line nx-text-secondary"></i>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function getTypeBadgeClass(type) {
+            const classes = {
+                'SERVICE': 'nx-badge--primary',
+                'COMMUNICATION': 'nx-badge--success',
+                'AI': 'nx-badge--warning',
+                'STORAGE': 'nx-badge--info'
+            };
+            return classes[type] || '';
+        }
+        
+        function getStatusBadgeClass(status) {
+            const classes = {
+                'normal': 'nx-badge--success',
+                'error': 'nx-badge--danger',
+                'disabled': 'nx-badge--secondary'
+            };
+            return classes[status] || 'nx-badge--success';
+        }
+        
+        function handleSearch(event) {
+            if (event.key === 'Enter') {
+                applyFilters();
+            }
+        }
+        
+        function handleFilter() {
+            applyFilters();
+        }
+        
+        function applyFilters() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            const type = document.getElementById('type-filter').value;
+            
+            filteredCapabilities = allCapabilities.filter(cap => {
+                const name = (cap.name || cap.capabilityName || '').toLowerCase();
+                const capType = cap.type || 'SERVICE';
+                
+                const matchKeyword = !keyword || name.includes(keyword);
+                const matchType = !type || capType === type;
+                
+                return matchKeyword && matchType;
+            });
+            
+            renderCapabilities();
+        }
+        
+        function refreshList() {
+            loadCapabilities();
+        }
+        
+        function viewDetail(id) {
+            if (id) {
+                window.location.href = `/console/pages/scene-capability-detail.html?id=${id}`;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadCapabilities();
+        });
+    </script>
+</body>
+</html>

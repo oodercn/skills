@@ -1,9 +1,13 @@
 package net.ooder.skill.scene.discovery;
 
+import net.ooder.skill.scene.capability.model.SceneSkillCategory;
+import net.ooder.skill.scene.capability.service.SceneSkillCategoryDetector;
 import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.discovery.RepositoryDTO;
+import net.ooder.skills.api.SkillPackageManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.yaml.snakeyaml.Yaml;
@@ -22,11 +26,22 @@ public class SkillIndexLoader {
 
     @Value("${ooder.skill.index-path:skill-index.yaml}")
     private String skillIndexPath;
+    
+    @Value("${ooder.mock.enabled:false}")
+    private boolean mockEnabled;
+
+    @Autowired(required = false)
+    private SkillPackageManager skillPackageManager;
+    
+    @Autowired
+    private SceneSkillCategoryDetector categoryDetector;
 
     private Map<String, Object> skillIndex;
     private List<Map<String, Object>> skills = new ArrayList<>();
     private List<Map<String, Object>> scenes = new ArrayList<>();
     private List<Map<String, Object>> categories = new ArrayList<>();
+    
+    private Set<String> mockInstalledSkills = new HashSet<>();
 
     @PostConstruct
     public void init() {
@@ -114,31 +129,107 @@ public class SkillIndexLoader {
         
         for (Map<String, Object> skill : skills) {
             CapabilityDTO cap = new CapabilityDTO();
-            cap.setId((String) skill.get("skillId"));
+            String skillId = (String) skill.get("skillId");
+            cap.setId(skillId);
             cap.setName((String) skill.get("name"));
             cap.setDescription((String) skill.get("description"));
             cap.setVersion((String) skill.get("version"));
             cap.setSource(source);
-            cap.setStatus("available");
+            
+            boolean isInstalled = checkIfInstalled(skillId);
+            cap.setStatus(isInstalled ? "installed" : "available");
             
             Object caps = skill.get("capabilities");
             if (caps instanceof List) {
                 cap.setCapabilities((List<String>) caps);
             }
             
-            String skillId = (String) skill.get("skillId");
             Object typeObj = skill.get("type");
             String type = typeObj != null ? String.valueOf(typeObj) : null;
             
-            boolean isScene = "SCENE".equals(type) || "scene".equals(type);
+            boolean isScene = "SCENE".equals(type) || "scene".equals(type) || "scene-skill".equals(type);
             
             cap.setType(isScene ? "SCENE" : "SKILL");
             cap.setSceneCapability(isScene);
+            
+            if (isScene) {
+                SceneSkillCategory category = categoryDetector.detectCategory(skill);
+                cap.setCategory(category.getCode());
+                cap.setMainFirst(category.hasMainFirst());
+                
+                Object visibilityObj = skill.get("visibility");
+                if (visibilityObj == null) {
+                    Object labelsObj = skill.get("labels");
+                    if (labelsObj instanceof Map) {
+                        @SuppressWarnings("unchecked")
+                        Map<String, Object> labels = (Map<String, Object>) labelsObj;
+                        visibilityObj = labels.get("scene.visibility");
+                    }
+                }
+                cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
+                    (category == SceneSkillCategory.ASS ? "internal" : "public"));
+                
+                Object driverConditionsObj = skill.get("driverConditions");
+                if (driverConditionsObj instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> driverConditions = (List<Map<String, Object>>) driverConditionsObj;
+                    cap.setDriverConditions(convertToMapList(driverConditions));
+                }
+                
+                Object participantsObj = skill.get("participants");
+                if (participantsObj instanceof List) {
+                    @SuppressWarnings("unchecked")
+                    List<Map<String, Object>> participants = (List<Map<String, Object>>) participantsObj;
+                    cap.setParticipants(convertToMapList(participants));
+                }
+            }
             
             capabilities.add(cap);
         }
         
         return capabilities;
+    }
+    
+    private List<Map<String, Object>> convertToMapList(List<Map<String, Object>> list) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        for (Map<String, Object> item : list) {
+            result.add(new HashMap<>(item));
+        }
+        return result;
+    }
+    
+    private boolean checkIfInstalled(String skillId) {
+        if (skillId == null) {
+            return false;
+        }
+        
+        if (mockEnabled && mockInstalledSkills.contains(skillId)) {
+            return true;
+        }
+        
+        if (skillPackageManager == null) {
+            return false;
+        }
+        try {
+            return skillPackageManager.isInstalled(skillId).get();
+        } catch (Exception e) {
+            log.debug("[checkIfInstalled] Failed to check installation status for {}: {}", skillId, e.getMessage());
+            return false;
+        }
+    }
+    
+    public void markAsInstalled(String skillId) {
+        if (skillId != null) {
+            mockInstalledSkills.add(skillId);
+            log.info("[markAsInstalled] Marked {} as installed (mock mode)", skillId);
+        }
+    }
+    
+    public void markAsUninstalled(String skillId) {
+        if (skillId != null) {
+            mockInstalledSkills.remove(skillId);
+            log.info("[markAsUninstalled] Marked {} as uninstalled (mock mode)", skillId);
+        }
     }
 
     public List<RepositoryDTO> getRepositories(String source) {
@@ -192,6 +283,28 @@ public class SkillIndexLoader {
                 cap.setCapabilities((List<String>) caps);
             }
             
+            SceneSkillCategory category = categoryDetector.detectCategory(scene);
+            cap.setCategory(category.getCode());
+            cap.setMainFirst(category.hasMainFirst());
+            
+            Object visibilityObj = scene.get("visibility");
+            cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
+                (category == SceneSkillCategory.ASS ? "internal" : "public"));
+            
+            Object driverConditionsObj = scene.get("driverConditions");
+            if (driverConditionsObj instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> driverConditions = (List<Map<String, Object>>) driverConditionsObj;
+                cap.setDriverConditions(convertToMapList(driverConditions));
+            }
+            
+            Object participantsObj = scene.get("participants");
+            if (participantsObj instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> participants = (List<Map<String, Object>>) participantsObj;
+                cap.setParticipants(convertToMapList(participants));
+            }
+            
             capabilities.add(cap);
         }
         
@@ -203,5 +316,30 @@ public class SkillIndexLoader {
         all.addAll(getSkillsFromIndex(source));
         all.addAll(getScenesFromIndex(source));
         return all;
+    }
+    
+    public Map<String, Object> getSkillInfo(String skillId) {
+        if (skillId == null || skills == null) {
+            return null;
+        }
+        
+        for (Map<String, Object> skill : skills) {
+            String id = (String) skill.get("skillId");
+            if (skillId.equals(id)) {
+                return skill;
+            }
+        }
+        
+        return null;
+    }
+    
+    public String getDownloadUrl(String skillId) {
+        Map<String, Object> skill = getSkillInfo(skillId);
+        if (skill != null) {
+            String giteeUrl = (String) skill.get("giteeDownloadUrl");
+            String githubUrl = (String) skill.get("downloadUrl");
+            return giteeUrl != null ? giteeUrl : githubUrl;
+        }
+        return null;
     }
 }

@@ -1,10 +1,10 @@
-package net.ooder.skill.llm.config.controller;
+package net.ooder.skill.llm.controller;
 
-import net.ooder.skill.llm.config.model.LlmConfig;
-import net.ooder.skill.llm.config.model.ResolveConfigRequest;
-import net.ooder.skill.llm.config.model.ResolvedConfig;
-import net.ooder.skill.llm.config.model.ResultModel;
-import net.ooder.skill.llm.config.service.LlmConfigService;
+import net.ooder.skill.llm.model.LlmConfig;
+import net.ooder.skill.llm.model.ResolveConfigRequest;
+import net.ooder.skill.llm.model.ResolvedConfig;
+import net.ooder.skill.llm.model.ResultModel;
+import net.ooder.skill.llm.service.LlmConfigService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

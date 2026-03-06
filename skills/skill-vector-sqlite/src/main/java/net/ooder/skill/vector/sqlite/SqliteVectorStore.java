@@ -224,10 +224,12 @@ public class SqliteVectorStore implements VectorStore {
             
             float similarity = cosineSimilarity(queryVector, data.getVector());
             
-            SearchResult result = new SearchResult();
-            result.setId(data.getId());
-            result.setScore(similarity);
-            result.setMetadata(data.getMetadata());
+            SearchResult result = new SearchResult(
+                data.getId(), 
+                data.getVector(), 
+                similarity, 
+                data.getMetadata()
+            );
             results.add(result);
         }
         

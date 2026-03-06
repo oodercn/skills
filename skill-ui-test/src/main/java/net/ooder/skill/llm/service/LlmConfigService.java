@@ -1,7 +1,7 @@
-package net.ooder.skill.llm.config.service;
+package net.ooder.skill.llm.service;
 
-import net.ooder.skill.llm.config.model.LlmConfig;
-import net.ooder.skill.llm.config.model.ResolvedConfig;
+import net.ooder.skill.llm.model.LlmConfig;
+import net.ooder.skill.llm.model.ResolvedConfig;
 
 import java.util.List;
 import java.util.Map;

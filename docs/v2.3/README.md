@@ -1,119 +1,142 @@
-# Ooder v2.3 文档索引
+# Ooder v2.3 文档分册总览
 
-## 文档版本信息
-
-| 项目 | 说明 |
-|------|------|
-| 版本 | v2.3 |
-| 发布日期 | 2026-03-02 |
-| 状态 | 正式发布 |
+> **文档版本**: v2.3.4  
+> **发布日期**: 2026-03-06  
+> **文档状态**: 正式发布  
+> **更新说明**: Engine Team 实现完成，所有任务已交付
 
 ---
 
-## 一、核心规格文档
+## 一、分册结构
 
-| 文档 | 描述 | 路径 |
+```
+docs/v2.3/
+├── README.md                           # 本文档（分册总览）
+├── GLOSSARY_V2.3.md                    # 术语表（含简写）
+│
+├── volume-01-specification/            # 第一分册：规范规格
+│   ├── SCENE_CAPABILITY_REQUIREMENT_SPEC.md
+│   ├── OODER_2.3_SPECIFICATION.md
+│   ├── SKILL_YAML_STANDARD.md
+│   └── CAPABILITY_MANAGEMENT_SPEC_V2.3.md
+│
+├── volume-02-classification/           # 第二分册：分类体系
+│   ├── SCENE_SKILL_CLASSIFICATION_AND_LIFECYCLE.md
+│   └── SCENE_CAPABILITY_CLASSIFICATION_SYSTEM.md
+│
+├── volume-03-lifecycle/                # 第三分册：生命周期
+│   └── README.md
+│
+├── volume-04-architecture/             # 第四分册：架构设计
+│   ├── CAPABILITY_DRIVEN_ARCHITECTURE.md
+│   ├── ENGINE_COLLABORATION_STATUS_V2.3.md
+│   ├── ENGINE_TEAM_DELIVERY.md
+│   └── SCENE-Engine-SPEC.md
+│
+├── volume-05-development/              # 第五分册：开发指南
+│   ├── SDK_2.3_UPGRADE_GUIDE.md
+│   ├── SDK_V2.3_MODULE_ADDRESS_TABLE.md
+│   └── ... (其他SDK文档)
+│
+├── volume-06-user-stories/             # 第六分册：用户故事
+│   ├── USER_CLOSED_LOOP_STORIES_V2.3.md
+│   └── STORY_001_*.md
+│
+└── archive/                            # 归档文档
+    ├── deprecated/                     # 已废弃文档 (15个)
+    ├── historical/                     # 历史版本 (10个)
+    ├── drafts/                         # 草稿文档 (16个)
+    ├── a2ui/                           # A2UI相关 (5个)
+    ├── blog/                           # 博客文章 (5个)
+    ├── nexus/                          # Nexus相关 (3个)
+    ├── product/                        # 产品文档 (2个)
+    └── skills-dev/                     # Skills开发 (9个)
+```
+
+---
+
+## 二、核心术语简写
+
+| 简写 | 全称 | 中文 |
 |------|------|------|
-| **术语表 v2** | 统一术语定义，整合能力驱动和南向协议术语 | [GLOSSARY_V2.md](./GLOSSARY_V2.md) |
-| **场景能力需求规格** | 场景能力模型、mainFirst自驱机制、能力调用链 | [SCENE_CAPABILITY_REQUIREMENT_SPEC.md](./SCENE_CAPABILITY_REQUIREMENT_SPEC.md) |
-| **能力管理规格 v2.3** | 能力类型体系、驱动能力、涌现能力 | [CAPABILITY_MANAGEMENT_SPEC_V2.3.md](./CAPABILITY_MANAGEMENT_SPEC_V2.3.md) |
+| **ABS** | Auto Business Scene | 自驱业务场景 |
+| **ASS** | Auto System Scene | 自驱系统场景 |
+| **TBS** | Trigger Business Scene | 触发业务场景 |
+| **SSK** | SceneSkill | 场景技能 |
+| **SC** | SceneCapability | 场景特性 |
+| **COMP** | CompositeCapability | 组合能力 |
+| **CLC** | CollaborativeCapability | 协作能力 |
 
 ---
 
-## 二、架构设计文档
+## 三、场景技能三大分类
 
-| 文档 | 描述 | 路径 |
-|------|------|------|
-| **能力驱动架构** | 能力驱动理论、场景即能力、驱动能力体系 | [CAPABILITY_DRIVEN_ARCHITECTURE.md](./CAPABILITY_DRIVEN_ARCHITECTURE.md) |
-| **场景模板协议分析** | SDK层与南向协议映射、闭环实现 | [SCENE_TEMPLATE_PROTOCOL_ANALYSIS.md](./SCENE_TEMPLATE_PROTOCOL_ANALYSIS.md) |
-| **术语新旧对应表** | 旧术语到新术语的映射关系 | [TERMINOLOGY_MAPPING.md](./TERMINOLOGY_MAPPING.md) |
-
----
-
-## 三、实施文档
-
-| 文档 | 描述 | 路径 |
-|------|------|------|
-| **API覆盖度与工作量评估** | 现有API覆盖度分析、工作量估算 | [CAPABILITY_DRIVEN_API_COVERAGE.md](./CAPABILITY_DRIVEN_API_COVERAGE.md) |
-| **SDK团队任务分解** | SDK协作团队开发任务 | [SDK_TEAM_TASKS.md](./SDK_TEAM_TASKS.md) |
-| **技能重构技术方案** | 零配置安装重构方案 | [SKILLS_REFACTOR_TECHNICAL_PROPOSAL.md](./SKILLS_REFACTOR_TECHNICAL_PROPOSAL.md) |
+| 分类 | 简写 | 自驱能力 | 业务语义 | 触发方式 |
+|------|------|---------|---------|---------|
+| **自驱业务场景** | ABS | ✓ 有 | ✓ 强 | 自动 |
+| **自驱系统场景** | ASS | ✓ 有 | ✗ 弱 | 自动 |
+| **触发业务场景** | TBS | ✗ 无 | ✓ 强 | 人工/API |
 
 ---
 
-## 四、核心概念变更
+## 四、分册说明
 
-### 4.1 术语变更
+### 第一分册：规范规格
+核心规范文档，定义系统的基本概念和规则
 
-| 旧术语 | 新术语 | 说明 |
-|--------|--------|------|
-| SceneDefinition | SceneCapability | 场景定义变为场景能力 |
-| primaryScene | mainFirst | 主场景变为自驱入口 |
-| collaborativeScenes | collaborativeCapabilities | 协作场景变为协作能力 |
-| WorkflowDefinition | capabilityChains | 工作流变为能力调用链 |
-| Trigger | DriverCapability | 触发器变为驱动能力 |
+### 第二分册：分类体系
+场景技能分类定义和判定规则
 
-### 4.2 新增能力类型
+### 第三分册：生命周期
+生命周期状态和流程管理
 
-| 类型 | 英文标识 | 说明 |
-|------|----------|------|
-| 原子能力 | ATOMIC_CAPABILITY | 单一功能，不可分解 |
-| 组合能力 | COMPOSITE_CAPABILITY | 组合多个原子能力 |
-| **场景能力** | SCENE_CAPABILITY | 自驱型SuperAgent能力 |
-| **驱动能力** | DRIVER_CAPABILITY | 意图/时间/事件驱动 |
-| 协作能力 | COLLABORATIVE_CAPABILITY | 跨场景协作能力 |
+### 第四分册：架构设计
+系统架构和 Engine 协作关系
 
-### 4.3 新增驱动能力
+### 第五分册：开发指南
+开发者指南和实施手册
 
-| 能力 | 英文标识 | 说明 |
-|------|----------|------|
-| 意图接收 | intent-receiver | 接收用户意图 |
-| 时间驱动 | scheduler | 时间事件驱动 |
-| 事件监听 | event-listener | 业务事件监听 |
-| 能力调用 | capability-invoker | 能力调用链管理 |
-| 协作协调 | collaboration-coordinator | 协作场景协调 |
+### 第六分册：用户故事
+用户故事和用例
 
 ---
 
-## 五、文档阅读顺序
+## 五、讨论决策汇总
 
-### 5.1 新用户入门
-
-```
-1. GLOSSARY_V2.md           → 了解核心术语
-2. CAPABILITY_DRIVEN_ARCHITECTURE.md → 理解能力驱动理论
-3. SCENE_CAPABILITY_REQUIREMENT_SPEC.md → 学习场景能力模型
-4. CAPABILITY_MANAGEMENT_SPEC_V2.3.md → 掌握能力管理
-```
-
-### 5.2 开发者实施
-
-```
-1. TERMINOLOGY_MAPPING.md   → 了解术语变更
-2. CAPABILITY_DRIVEN_API_COVERAGE.md → 评估API覆盖度
-3. SDK_TEAM_TASKS.md        → 获取开发任务
-4. SKILLS_REFACTOR_TECHNICAL_PROPOSAL.md → 实施重构
-```
-
-### 5.3 架构师设计
-
-```
-1. CAPABILITY_DRIVEN_ARCHITECTURE.md → 理解架构设计
-2. SCENE_TEMPLATE_PROTOCOL_ANALYSIS.md → 协议映射分析
-3. CAPABILITY_DRIVEN_API_COVERAGE.md → 工作量评估
-```
+| 编号 | 问题 | 决策结果 |
+|------|------|---------|
+| Q1 | 简写CC冲突 | COMP = 组合能力，CLC = 协作能力 |
+| Q2 | 业务语义量化 | 采用评分制（10分制） |
+| Q3 | 分类检测实现 | 已提交 Engine Team 处理依赖 |
+| Q4 | PENDING vs WAITING | PENDING=等待触发，WAITING=条件不满足 |
+| Q5 | capability-invoker类型 | 区分 DRIVER 和 EXECUTOR |
+| Q6 | API命名统一 | SceneCapability中文改为"场景特性" |
+| Q7 | mainFirst设计 | 保持布尔值 + 配置对象分离 |
+| Q8 | 自动归档 | 不自动归档，手动触发 |
+| Q9 | 文档合并 | 按分册结构合并 |
 
 ---
 
-## 六、版本历史
+## 六、任务执行状态
 
-| 版本 | 日期 | 说明 |
-|------|------|------|
-| v2.0 | 2026-03-01 | 初始版本，场景和能力需求规格 |
-| v2.1 | 2026-03-01 | 术语统一，引用统一术语表 |
-| v2.2 | 2026-03-02 | 新增核心问题讨论，零配置安装用户故事 |
-| v2.3 | 2026-03-02 | **重大升级**：能力驱动架构，场景即能力，mainFirst自驱机制，整合南向协议 |
+### 术语表更新 ✅ 已完成
+
+### 文档整理 ✅ 已完成
+
+### Engine Team 实现 ✅ 已完成
+
+| 任务 | 优先级 | 状态 |
+|------|--------|------|
+| 定义SceneSkillCategory枚举 | P0 | ✅ 已完成 |
+| 实现detectCategory()方法 | P0 | ✅ 已完成 |
+| 增加DRIVER/EXECUTOR类型区分 | P1 | ✅ 已完成 |
+| 实现WAITING子状态 | P1 | ✅ 已完成 |
+
+### Engine Team 交付文档
+
+详见：[ENGINE_TEAM_DELIVERY.md](./volume-04-architecture/ENGINE_TEAM_DELIVERY.md)
 
 ---
 
-**文档维护者**: ooder开发团队  
-**最后更新**: 2026-03-02
+**文档维护**: Ooder 开发团队  
+**最后更新**: 2026-03-06

@@ -1,0 +1,116 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-local
+  name: Local Organization Skill
+  version: 1.0.0
+  description: 本地组织管理服务 - 提供基于JSON存储的用户认证和组织管理能力，作为其他OrgSkill实现的降级方案
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-base
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - org
+    - local
+    - auth
+    - user
+    - department
+    - fallback
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.base.LocalOrgSkill
+  
+  capabilities:
+    - id: user.auth
+      name: User Authentication
+      description: 用户认证能力
+      category: auth
+    - id: user.manage
+      name: User Management
+      description: 用户管理能力
+      category: management
+    - id: org.manage
+      name: Organization Management
+      description: 组织管理能力
+      category: management
+    - id: role.manage
+      name: Role Management
+      description: 角色管理能力
+      category: management
+    - id: sync
+      name: Data Sync
+      description: 数据同步能力
+      category: sync
+  
+  scenes:
+    - name: org-local
+      description: 本地组织管理场景
+      capabilities:
+        - user.auth
+        - user.manage
+        - org.manage
+        - role.manage
+  
+  dependencies: []
+  
+  config:
+    optional:
+      - name: org.local.enabled
+        type: boolean
+        default: true
+        description: 是否启用本地组织服务
+      - name: org.local.data-path
+        type: string
+        default: ./data/org
+        description: JSON数据存储路径
+      - name: org.local.token-expire
+        type: integer
+        default: 86400
+        description: Token过期时间(秒)
+  
+  endpoints:
+    - path: /api/org/login
+      method: POST
+      description: 用户登录
+      capability: user.auth
+    - path: /api/org/logout
+      method: POST
+      description: 用户登出
+      capability: user.auth
+    - path: /api/org/users
+      method: GET
+      description: 获取用户列表
+      capability: user.manage
+    - path: /api/org/users/{userId}
+      method: GET
+      description: 获取用户信息
+      capability: user.manage
+    - path: /api/org/tree
+      method: GET
+      description: 获取组织树
+      capability: org.manage
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false
+  
+  fallback:
+    enabled: true
+    priority: 100
+    description: 作为其他OrgSkill实现的降级方案，当外部组织系统不可用时自动启用

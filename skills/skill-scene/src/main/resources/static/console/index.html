@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="SkillCenter Console - 技能中心管理控制台">
+    <meta name="description" content="Ooder 场景技能平台 - 控制台">
     <meta name="theme-color" content="#3b82f6">
-    <title>SkillCenter Console - Ooder</title>
+    <title>Ooder 场景技能平台</title>
     <link rel="stylesheet" href="/console/css/theme.css">
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
@@ -16,8 +16,9 @@
         <aside class="nx-page__sidebar">
             <div class="nx-p-4 nx-mb-4">
                 <h1 class="nx-text-lg nx-font-bold">
-                    <i class="ri-bolt-line"></i> Nexus Console
+                    <i class="ri-bolt-line"></i> Ooder
                 </h1>
+                <p class="nx-text-xs nx-text-secondary">场景技能平台 v2.3</p>
             </div>
             <ul class="nav-menu" id="nav-menu"></ul>
         </aside>
@@ -25,12 +26,18 @@
         <main class="nx-page__content">
             <header class="nx-page__header">
                 <div class="nx-page__title">
-                    <h1><i class="ri-dashboard-3-line"></i> SkillCenter 控制台</h1>
-                    <p class="nx-page__subtitle">请选择您要使用的功能模块</p>
+                    <h1><i class="ri-dashboard-3-line"></i> Ooder 控制台</h1>
+                    <p class="nx-page__subtitle">选择您要使用的功能模块</p>
                 </div>
                 <div class="nx-page__actions">
+                    <span class="nx-badge nx-badge--info" id="user-info" style="display: none;">
+                        <i class="ri-user-line"></i> <span id="user-name"></span>
+                    </span>
                     <button class="theme-toggle-btn btn btn-secondary" id="theme-toggle">
                         <i class="ri-sun-line"></i> 浅色模式
+                    </button>
+                    <button class="nx-btn nx-btn--secondary" id="logout-btn" onclick="handleLogout()" style="display: none;">
+                        <i class="ri-logout-box-line"></i> 退出登录
                     </button>
                 </div>
             </header>
@@ -38,32 +45,32 @@
             <div class="nx-page__main">
                 <div class="nx-container">
                     <div class="page-type-selection">
-                        <div class="page-type-card" onclick="selectPageType('dashboard')">
-                            <div class="icon"><i class="ri-dashboard-line"></i></div>
-                            <h3>仪表盘</h3>
-                            <p>查看系统概览、统计数据和最近活动</p>
-                            <button class="btn btn-primary">进入仪表盘</button>
+                        <div class="page-type-card" onclick="selectPageType('role-installer')">
+                            <div class="icon"><i class="ri-install-line"></i></div>
+                            <h3>系统安装者</h3>
+                            <p>闭环一：安装基础技能包，初始化系统环境</p>
+                            <button class="btn btn-primary">进入工作台</button>
                         </div>
                         
-                        <div class="page-type-card" onclick="selectPageType('personal')">
-                            <div class="icon"><i class="ri-user-line"></i></div>
-                            <h3>个人中心</h3>
-                            <p>管理个人技能、执行历史和群组设置</p>
-                            <button class="btn btn-primary">进入个人中心</button>
-                        </div>
-                        
-                        <div class="page-type-card" onclick="selectPageType('market')">
-                            <div class="icon"><i class="ri-store-2-line"></i></div>
-                            <h3>技能市场</h3>
-                            <p>浏览、搜索和安装各类技能组件</p>
-                            <button class="btn btn-primary">进入技能市场</button>
-                        </div>
-                        
-                        <div class="page-type-card" onclick="selectPageType('admin')">
+                        <div class="page-type-card" onclick="selectPageType('role-admin')">
                             <div class="icon"><i class="ri-admin-line"></i></div>
-                            <h3>管理中心</h3>
-                            <p>系统管理、技能认证和用户群组管理</p>
-                            <button class="btn btn-primary">进入管理中心</button>
+                            <h3>系统管理员</h3>
+                            <p>闭环二：发现场景技能 → 配置分发 → 推送给参与者</p>
+                            <button class="btn btn-primary">进入工作台</button>
+                        </div>
+                        
+                        <div class="page-type-card" onclick="selectPageType('role-leader')">
+                            <div class="icon"><i class="ri-user-star-line"></i></div>
+                            <h3>主导者</h3>
+                            <p>闭环三：激活场景 → 获取KEY → 场景自驱运行</p>
+                            <button class="btn btn-primary">进入工作台</button>
+                        </div>
+                        
+                        <div class="page-type-card" onclick="selectPageType('role-collaborator')">
+                            <div class="icon"><i class="ri-team-line"></i></div>
+                            <h3>协作者</h3>
+                            <p>闭环三：参与业务流转，执行分配的任务</p>
+                            <button class="btn btn-primary">进入工作台</button>
                         </div>
                     </div>
                     
@@ -81,6 +88,51 @@
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/api.js"></script>
     <script src="/console/js/theme-manager.js"></script>
-    <script src="/console/js/index.js"></script>
+    <script>
+        function checkLoginStatus() {
+            const loggedIn = localStorage.getItem('ooder_logged_in') === 'true';
+            const userName = localStorage.getItem('ooder_user_name');
+            const userRole = localStorage.getItem('ooder_user_role');
+            
+            if (loggedIn && userName) {
+                document.getElementById('user-info').style.display = 'inline-flex';
+                document.getElementById('user-name').textContent = userName;
+                document.getElementById('logout-btn').style.display = 'inline-flex';
+            } else {
+                document.getElementById('user-info').style.display = 'none';
+                document.getElementById('logout-btn').style.display = 'none';
+            }
+        }
+        
+        function handleLogout() {
+            localStorage.removeItem('ooder_logged_in');
+            localStorage.removeItem('ooder_user_role');
+            localStorage.removeItem('ooder_user_name');
+            window.location.href = '/console/pages/login.html';
+        }
+        
+        function selectPageType(type) {
+            const rolePages = {
+                'role-installer': '/console/pages/role-installer.html',
+                'role-admin': '/console/pages/role-admin.html',
+                'role-leader': '/console/pages/role-leader.html',
+                'role-collaborator': '/console/pages/role-collaborator.html',
+                'dashboard': '/console/pages/scene-management.html',
+                'personal': '/console/pages/my-todos.html',
+                'market': '/console/pages/capability-discovery.html',
+                'admin': '/console/pages/capability-management.html'
+            };
+            
+            if (type.startsWith('role-')) {
+                window.location.href = '/console/pages/login.html?role=' + type.replace('role-', '');
+            } else {
+                window.location.href = rolePages[type] || '/console/pages/scene-management.html';
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            checkLoginStatus();
+        });
+    </script>
 </body>
 </html>

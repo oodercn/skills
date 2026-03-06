@@ -2,8 +2,10 @@ package net.ooder.skill.scene.capability.service.impl;
 
 import net.ooder.skill.scene.capability.driver.DriverCondition;
 import net.ooder.skill.scene.capability.model.CapabilityType;
+import net.ooder.skill.scene.capability.model.SceneSkillCategory;
 import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService;
 import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.capability.service.SceneSkillCategoryDetector;
 import net.ooder.skill.scene.capability.model.Capability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +22,9 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
 
     @Autowired
     private CapabilityService capabilityService;
+
+    @Autowired
+    private SceneSkillCategoryDetector categoryDetector;
 
     @Override
     public DiscoveryResult discoverCapabilities(DiscoveryRequest request) {
@@ -47,6 +52,28 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
             allCapabilities = allCapabilities.stream()
                 .filter(c -> c.getName().toLowerCase().contains(query) ||
                             (c.getDescription() != null && c.getDescription().toLowerCase().contains(query)))
+                .collect(Collectors.toList());
+        }
+        
+        if (request.getCategory() != null) {
+            allCapabilities = allCapabilities.stream()
+                .filter(c -> {
+                    SceneSkillCategory category = categoryDetector.detectCategory(c);
+                    return category == request.getCategory();
+                })
+                .collect(Collectors.toList());
+        }
+        
+        if (request.getMainFirst() != null) {
+            allCapabilities = allCapabilities.stream()
+                .filter(c -> c.isMainFirst() == request.getMainFirst())
+                .collect(Collectors.toList());
+        }
+        
+        if (request.getVisibility() != null && !request.getVisibility().isEmpty()) {
+            allCapabilities = allCapabilities.stream()
+                .filter(c -> request.getVisibility().equals(c.getVisibility()) ||
+                            (c.getVisibility() == null && "public".equals(request.getVisibility())))
                 .collect(Collectors.toList());
         }
         
@@ -93,6 +120,10 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         detail.setDependencies(capability.getDependencies());
         detail.setOptionalCapabilities(capability.getOptionalCapabilities());
         detail.setConfig(capability.getConfig());
+        detail.setCategory(categoryDetector.detectCategory(capability));
+        detail.setMainFirst(capability.isMainFirst());
+        detail.setVisibility(capability.getVisibility());
+        detail.setParticipants(convertParticipants(capability));
         
         return detail;
     }
@@ -146,6 +177,10 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         item.setInstalled(cap.isInstalled());
         item.setSupportedSceneTypes(cap.getSupportedSceneTypes());
         item.setMetadata(cap.getMetadata());
+        item.setCategory(categoryDetector.detectCategory(cap));
+        item.setMainFirst(cap.isMainFirst());
+        item.setVisibility(cap.getVisibility());
+        item.setParticipants(convertParticipants(cap));
         
         if (cap.getType() == CapabilityType.SCENE) {
             List<DriverConditionInfo> conditions = getDriverConditions(cap.getCapabilityId())
@@ -163,5 +198,23 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         }
         
         return item;
+    }
+    
+    private List<ParticipantInfo> convertParticipants(Capability cap) {
+        List<Capability.Participant> participants = cap.getParticipants();
+        if (participants == null || participants.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        return participants.stream()
+            .map(p -> {
+                ParticipantInfo info = new ParticipantInfo();
+                info.setRole(p.getRole());
+                info.setName(p.getName());
+                info.setUserId(p.getUserId());
+                info.setPermissions(p.getPermissions());
+                return info;
+            })
+            .collect(Collectors.toList());
     }
 }
