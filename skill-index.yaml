@@ -162,7 +162,8 @@ spec:
     - skillId: skill-capability
       name: 能力管理服务
       version: "1.0.0"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: capability
       tags:
         - capability
@@ -176,7 +177,7 @@ spec:
     - skillId: skill-a2ui
       name: A2UI Skill
       version: "0.7.3"
-      category: ui
+      category: UI
       subCategory: code-gen
       tags:
         - a2ui
@@ -192,7 +193,7 @@ spec:
     - skillId: skill-llm-chat
       name: LLM智能对话场景能力
       version: "2.3.0"
-      category: llm
+      category: LLM
       subCategory: chat
       tags:
         - llm
@@ -224,7 +225,7 @@ spec:
     - skillId: skill-llm-conversation
       name: LLM对话服务
       version: "1.0.0"
-      category: llm
+      category: LLM
       subCategory: conversation
       tags:
         - llm
@@ -242,7 +243,7 @@ spec:
     - skillId: skill-llm-context-builder
       name: 上下文构建服务
       version: "1.0.0"
-      category: llm
+      category: LLM
       subCategory: context
       tags:
         - llm
@@ -255,7 +256,7 @@ spec:
     - skillId: skill-llm-config-manager
       name: LLM配置管理
       version: "1.0.0"
-      category: llm
+      category: LLM
       subCategory: config
       tags:
         - llm
@@ -268,7 +269,7 @@ spec:
     - skillId: skill-knowledge-base
       name: 知识库核心服务
       version: "1.0.0"
-      category: knowledge
+      category: KNOWLEDGE
       subCategory: base
       tags:
         - knowledge
@@ -281,7 +282,7 @@ spec:
     - skillId: skill-rag
       name: RAG检索增强
       version: "1.0.0"
-      category: knowledge
+      category: KNOWLEDGE
       subCategory: rag
       tags:
         - rag
@@ -298,7 +299,7 @@ spec:
     - skillId: skill-local-knowledge
       name: 本地知识服务
       version: "1.0.0"
-      category: knowledge
+      category: KNOWLEDGE
       subCategory: local
       tags:
         - knowledge
@@ -311,7 +312,7 @@ spec:
     - skillId: skill-vector-sqlite
       name: SQLite向量存储
       version: "1.0.0"
-      category: knowledge
+      category: KNOWLEDGE
       subCategory: vector
       tags:
         - vector
@@ -324,7 +325,7 @@ spec:
     - skillId: skill-knowledge-qa
       name: 知识问答场景能力
       version: "2.3.0"
-      category: knowledge
+      category: KNOWLEDGE
       subCategory: qa
       tags:
         - knowledge
@@ -347,8 +348,9 @@ spec:
     - skillId: skill-knowledge-ui
       name: 知识库管理界面
       version: "2.3.0"
-      category: nexus-ui
-      subCategory: knowledge
+      category: UI
+      domain: nexus
+      subcategory: KNOWLEDGE
       tags:
         - knowledge
         - ui
@@ -367,8 +369,9 @@ spec:
     - skillId: skill-llm-assistant-ui
       name: LLM智能助手界面
       version: "2.3.0"
-      category: nexus-ui
-      subCategory: llm
+      category: UI
+      domain: nexus
+      subcategory: LLM
       tags:
         - llm
         - assistant
@@ -390,8 +393,9 @@ spec:
     - skillId: skill-llm-management-ui
       name: LLM管理界面
       version: "1.0.0"
-      category: nexus-ui
-      subCategory: llm
+      category: UI
+      domain: nexus
+      subcategory: LLM
       tags:
         - llm
         - management
@@ -407,7 +411,8 @@ spec:
     - skillId: skill-org-base
       name: 组织基础服务
       version: "1.0.0"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: base
       tags:
         - org
@@ -420,7 +425,8 @@ spec:
     - skillId: skill-vfs-base
       name: VFS基础服务
       version: "1.0.0"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: base
       tags:
         - vfs
@@ -433,7 +439,7 @@ spec:
     - skillId: skill-document-processor
       name: 文档处理服务
       version: "1.0.0"
-      category: util
+      category: TOOL
       subCategory: document
       tags:
         - document
@@ -446,7 +452,8 @@ spec:
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
       version: "0.7.3"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: dingtalk
       tags:
         - dingtalk
@@ -463,7 +470,8 @@ spec:
     - skillId: skill-org-feishu
       name: Feishu Organization Service
       version: "0.7.3"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: feishu
       tags:
         - feishu
@@ -480,7 +488,8 @@ spec:
     - skillId: skill-org-wecom
       name: WeCom Organization Service
       version: "0.7.3"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: wecom
       tags:
         - wecom
@@ -497,7 +506,8 @@ spec:
     - skillId: skill-org-ldap
       name: LDAP Organization Service
       version: "0.7.3"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: ldap
       tags:
         - ldap
@@ -513,7 +523,8 @@ spec:
     - skillId: skill-user-auth
       name: User Authentication Service
       version: "0.7.3"
-      category: org
+      category: SERVICE
+      domain: org
       subCategory: auth
       tags:
         - auth
@@ -529,7 +540,7 @@ spec:
     - skillId: skill-trae-solo
       name: Trae Solo Service
       version: "0.7.3"
-      category: util
+      category: TOOL
       subCategory: general
       tags:
         - utility
@@ -544,7 +555,8 @@ spec:
     - skillId: skill-mqtt
       name: MQTT Service Skill
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: mqtt
       tags:
         - mqtt
@@ -560,7 +572,8 @@ spec:
     - skillId: skill-vfs-database
       name: Database VFS Service
       version: "0.7.3"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: database
       tags:
         - vfs
@@ -576,7 +589,8 @@ spec:
     - skillId: skill-vfs-local
       name: Local VFS Service
       version: "0.7.3"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: local
       tags:
         - vfs
@@ -592,7 +606,8 @@ spec:
     - skillId: skill-vfs-minio
       name: MinIO VFS Service
       version: "0.7.3"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -609,7 +624,8 @@ spec:
     - skillId: skill-vfs-oss
       name: Aliyun OSS VFS Service
       version: "0.7.3"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -626,7 +642,8 @@ spec:
     - skillId: skill-vfs-s3
       name: AWS S3 VFS Service
       version: "0.7.3"
-      category: vfs
+      category: DATA
+      domain: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -643,7 +660,8 @@ spec:
     - skillId: skill-network
       name: Network Management Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: network
       tags:
         - network
@@ -660,7 +678,8 @@ spec:
     - skillId: skill-agent
       name: Agent Management Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: agent
       tags:
         - agent
@@ -676,7 +695,8 @@ spec:
     - skillId: skill-security
       name: Security Management Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: security
       tags:
         - security
@@ -692,7 +712,8 @@ spec:
     - skillId: skill-health
       name: Health Check Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: health
       tags:
         - health
@@ -708,7 +729,8 @@ spec:
     - skillId: skill-protocol
       name: Protocol Management Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: protocol
       tags:
         - protocol
@@ -724,7 +746,8 @@ spec:
     - skillId: skill-openwrt
       name: OpenWrt Management Skill
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: router
       tags:
         - openwrt
@@ -740,7 +763,7 @@ spec:
     - skillId: skill-share
       name: Skill Share Skill
       version: "0.7.3"
-      category: util
+      category: TOOL
       subCategory: share
       tags:
         - share
@@ -755,7 +778,8 @@ spec:
     - skillId: skill-hosting
       name: Hosting Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: hosting
       tags:
         - hosting
@@ -773,7 +797,8 @@ spec:
     - skillId: skill-monitor
       name: Monitoring Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: monitor
       tags:
         - monitor
@@ -791,7 +816,8 @@ spec:
     - skillId: skill-im
       name: Instant Messaging Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: im
       tags:
         - im
@@ -809,7 +835,8 @@ spec:
     - skillId: skill-group
       name: Group Management Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: group
       tags:
         - group
@@ -827,7 +854,8 @@ spec:
     - skillId: skill-health
       name: Health Check Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: health
       tags:
         - health
@@ -845,7 +873,8 @@ spec:
     - skillId: skill-agent
       name: Agent Management Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: agent
       tags:
         - agent
@@ -863,7 +892,8 @@ spec:
     - skillId: skill-openwrt
       name: OpenWrt Router Driver
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: openwrt
       tags:
         - openwrt
@@ -881,7 +911,8 @@ spec:
     - skillId: skill-audit
       name: Audit Log Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: audit
       tags:
         - audit
@@ -899,7 +930,8 @@ spec:
     - skillId: skill-access-control
       name: Access Control Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: access
       tags:
         - access
@@ -918,7 +950,8 @@ spec:
     - skillId: skill-remote-terminal
       name: Remote Terminal Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: remote
       tags:
         - remote
@@ -937,7 +970,8 @@ spec:
     - skillId: skill-msg-service
       name: Message Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: message
       tags:
         - message
@@ -955,7 +989,8 @@ spec:
     - skillId: skill-cmd-service
       name: Command Monitoring Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: cmd
       tags:
         - command
@@ -973,7 +1008,8 @@ spec:
     - skillId: skill-res-service
       name: Resource Management Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: res
       tags:
         - resource
@@ -991,8 +1027,8 @@ spec:
     - skillId: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
       version: "0.7.3"
-      category: util
-      subCategory: llm
+      category: TOOL
+      subcategory: LLM
       tags:
         - llm
         - volcengine
@@ -1008,8 +1044,8 @@ spec:
     - skillId: skill-llm-qianwen
       name: Qianwen (Tongyi) LLM Provider
       version: "0.7.3"
-      category: util
-      subCategory: llm
+      category: TOOL
+      subcategory: LLM
       tags:
         - llm
         - qianwen
@@ -1025,8 +1061,8 @@ spec:
     - skillId: skill-llm-deepseek
       name: DeepSeek LLM Provider
       version: "0.7.3"
-      category: util
-      subCategory: llm
+      category: TOOL
+      subcategory: LLM
       tags:
         - llm
         - deepseek
@@ -1042,7 +1078,8 @@ spec:
     - skillId: skill-payment-alipay
       name: Alipay Payment Provider
       version: "0.7.3"
-      category: payment
+      category: SERVICE
+      domain: payment
       subCategory: alipay
       tags:
         - payment
@@ -1059,7 +1096,8 @@ spec:
     - skillId: skill-payment-wechat
       name: WeChat Pay Provider
       version: "0.7.3"
-      category: payment
+      category: SERVICE
+      domain: payment
       subCategory: wechat
       tags:
         - payment
@@ -1076,7 +1114,8 @@ spec:
     - skillId: skill-payment-unionpay
       name: UnionPay Payment Provider
       version: "0.7.3"
-      category: payment
+      category: SERVICE
+      domain: payment
       subCategory: unionpay
       tags:
         - payment
@@ -1093,7 +1132,8 @@ spec:
     - skillId: skill-media-wechat
       name: WeChat MP Publish Provider
       version: "0.7.3"
-      category: media
+      category: WORKFLOW
+      domain: media
       subCategory: wechat
       tags:
         - media
@@ -1110,7 +1150,8 @@ spec:
     - skillId: skill-media-weibo
       name: Weibo Publish Provider
       version: "0.7.3"
-      category: media
+      category: WORKFLOW
+      domain: media
       subCategory: weibo
       tags:
         - media
@@ -1127,7 +1168,8 @@ spec:
     - skillId: skill-media-zhihu
       name: Zhihu Publish Provider
       version: "0.7.3"
-      category: media
+      category: WORKFLOW
+      domain: media
       subCategory: zhihu
       tags:
         - media
@@ -1144,7 +1186,8 @@ spec:
     - skillId: skill-media-toutiao
       name: Toutiao Publish Provider
       version: "0.7.3"
-      category: media
+      category: WORKFLOW
+      domain: media
       subCategory: toutiao
       tags:
         - media
@@ -1161,7 +1204,8 @@ spec:
     - skillId: skill-media-xiaohongshu
       name: Xiaohongshu Publish Provider
       version: "0.7.3"
-      category: media
+      category: WORKFLOW
+      domain: media
       subCategory: xiaohongshu
       tags:
         - media
@@ -1178,7 +1222,8 @@ spec:
     - skillId: skill-notify
       name: Notification Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: notify
       tags:
         - notify
@@ -1195,7 +1240,8 @@ spec:
     - skillId: skill-email
       name: Email Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: email
       tags:
         - email
@@ -1212,7 +1258,8 @@ spec:
     - skillId: skill-search
       name: Search Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: search
       tags:
         - search
@@ -1229,7 +1276,8 @@ spec:
     - skillId: skill-audit
       name: Audit Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: audit
       tags:
         - audit
@@ -1246,7 +1294,8 @@ spec:
     - skillId: skill-report
       name: Report Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: report
       tags:
         - report
@@ -1263,7 +1312,8 @@ spec:
     - skillId: skill-task
       name: Task Management Service
       version: "0.7.3"
-      category: sys
+      category: SERVICE
+      domain: sys
       subCategory: task
       tags:
         - task
@@ -1280,7 +1330,7 @@ spec:
     - skillId: skill-market
       name: Skill Market Service
       version: "0.7.3"
-      category: util
+      category: TOOL
       subCategory: market
       tags:
         - market
@@ -1297,7 +1347,7 @@ spec:
     - skillId: skill-collaboration
       name: Collaboration Scene Service
       version: "0.7.3"
-      category: util
+      category: TOOL
       subCategory: collaboration
       tags:
         - collaboration
@@ -1314,7 +1364,8 @@ spec:
     - skillId: skill-msg
       name: Message Service
       version: "0.7.3"
-      category: msg
+      category: SERVICE
+      domain: msg
       subCategory: message
       tags:
         - message
@@ -1331,7 +1382,8 @@ spec:
     - skillId: skill-business
       name: Business Scene Service
       version: "0.7.3"
-      category: business
+      category: SERVICE
+      domain: business
       subCategory: scenario
       tags:
         - business
@@ -1348,7 +1400,7 @@ spec:
     - skillId: skill-common
       name: Skill Common Library
       version: "0.7.3"
-      category: util
+      category: TOOL
       subCategory: common
       tags:
         - common
@@ -1364,7 +1416,8 @@ spec:
     - skillId: skill-k8s
       name: Kubernetes Cluster Management
       version: "0.7.3"
-      category: infrastructure
+      category: SERVICE
+      domain: infrastructure
       subCategory: kubernetes
       tags:
         - kubernetes
@@ -1381,7 +1434,8 @@ spec:
     - skillId: skill-scheduler-quartz
       name: Quartz Scheduler Service
       version: "0.7.3"
-      category: scheduler
+      category: SERVICE
+      domain: scheduler
       subCategory: quartz
       tags:
         - scheduler
@@ -1398,7 +1452,8 @@ spec:
     - skillId: skill-nexus-dashboard-nexus-ui
       name: Nexus Dashboard UI
       version: "0.7.3"
-      category: nexus-ui
+      category: UI
+      domain: nexus
       subCategory: dashboard
       tags:
         - nexus
@@ -1415,7 +1470,8 @@ spec:
     - skillId: skill-nexus-system-status-nexus-ui
       name: Nexus System Status UI
       version: "0.7.3"
-      category: nexus-ui
+      category: UI
+      domain: nexus
       subCategory: status
       tags:
         - nexus
@@ -1432,7 +1488,8 @@ spec:
     - skillId: skill-personal-dashboard-nexus-ui
       name: Personal Dashboard UI
       version: "0.7.3"
-      category: nexus-ui
+      category: UI
+      domain: nexus
       subCategory: personal
       tags:
         - nexus
@@ -1449,7 +1506,8 @@ spec:
     - skillId: skill-nexus-health-check-nexus-ui
       name: Nexus Health Check UI
       version: "0.7.3"
-      category: nexus-ui
+      category: UI
+      domain: nexus
       subCategory: health
       tags:
         - nexus
@@ -1466,7 +1524,8 @@ spec:
     - skillId: skill-storage-management-nexus-ui
       name: Storage Management UI
       version: "0.7.3"
-      category: nexus-ui
+      category: UI
+      domain: nexus
       subCategory: storage
       tags:
         - nexus
@@ -1495,7 +1554,8 @@ spec:
       name: Authentication
       description: 认证场景，支持用户认证和组织数据访问
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - user-auth
         - org-data-read
@@ -1505,7 +1565,8 @@ spec:
       name: Utility
       description: 实用工具场景，提供各种实用功能
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - execute-task
       
@@ -1513,7 +1574,8 @@ spec:
       name: Kubernetes Management
       description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
       version: "1.0.0"
-      category: INFRASTRUCTURE
+      category: SERVICE
+      domain: infrastructure
       requiredCapabilities:
         - cluster-management
         - node-management
@@ -1525,7 +1587,8 @@ spec:
       name: Task Scheduling
       description: 任务调度场景，提供任务调度、执行历史管理能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - schedule-task
         - manage-execution
@@ -1557,7 +1620,8 @@ spec:
       name: Database VFS
       description: 数据库存储场景，支持将文件存储在数据库中
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1567,7 +1631,8 @@ spec:
       name: Local VFS
       description: 本地文件系统存储场景，提供基本的文件操作
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - vfs-storage
         - file-read
@@ -1578,7 +1643,8 @@ spec:
       name: MinIO VFS
       description: MinIO存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1588,7 +1654,8 @@ spec:
       name: Aliyun OSS VFS
       description: 阿里云OSS存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1598,7 +1665,8 @@ spec:
       name: AWS S3 VFS
       description: AWS S3存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1641,7 +1709,8 @@ spec:
       name: Human Resources
       description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - employee-create
         - employee-update
@@ -1653,7 +1722,8 @@ spec:
       name: Customer Relationship Management
       description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - customer-create
         - customer-update
@@ -1665,7 +1735,8 @@ spec:
       name: Financial Management
       description: 财务管理场景，提供账务、报销、预算、结算等财务能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - account-manage
         - expense-manage
@@ -1676,7 +1747,8 @@ spec:
       name: Approval Workflow
       description: 审批流程场景，提供流程定义、审批、流转等工作流能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - flow-start
         - flow-query
@@ -1688,7 +1760,8 @@ spec:
       name: Project Management
       description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - project-create
         - task-create
@@ -1700,7 +1773,8 @@ spec:
       name: Knowledge Management
       description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - knowledge-create
         - document-search
@@ -1796,7 +1870,8 @@ spec:
       name: System Management
       description: 系统管理场景，提供用户、权限、配置等系统管理能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - user-manage
         - permission-manage
@@ -1807,7 +1882,8 @@ spec:
       name: Monitoring & Operations
       description: 监控运维场景，提供监控、告警、日志等运维能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - monitor-metrics
         - monitor-alert
@@ -1818,7 +1894,8 @@ spec:
       name: Security & Audit
       description: 安全审计场景，提供安全、审计、合规等安全能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - security-auth
         - audit-log
@@ -1829,7 +1906,8 @@ spec:
       name: Network Management
       description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - network-config
         - ip-management
@@ -1840,7 +1918,8 @@ spec:
       name: Agent Management
       description: 代理管理场景，提供终端代理注册、管理、命令执行能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - agent-management
         - command-execution
@@ -1851,7 +1930,8 @@ spec:
       name: Health Check
       description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - health-check
         - service-check
@@ -1862,7 +1942,8 @@ spec:
       name: Protocol Management
       description: 协议管理场景，提供协议处理器注册、命令分发能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - handler-registration
         - command-dispatch
@@ -1873,7 +1954,8 @@ spec:
       name: OpenWrt Management
       description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - router-connection
         - uci-config
@@ -1884,7 +1966,8 @@ spec:
       name: Audit Log
       description: 审计日志场景，提供审计日志记录、查询、导出和统计分析能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - audit-log
         - audit-export
@@ -1895,7 +1978,8 @@ spec:
       name: Security Management
       description: 安全管理场景，提供权限管理、角色管理和访问控制能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - permission-management
         - role-management
@@ -1906,7 +1990,8 @@ spec:
       name: Remote Management
       description: 远程管理场景，提供SSH远程连接、命令执行和文件传输能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - ssh-connection
         - command-execution
@@ -1929,7 +2014,8 @@ spec:
       name: Command Monitoring
       description: 命令监控场景，提供命令分发、任务调度和执行追踪能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - command-dispatch
         - task-scheduling
@@ -1940,7 +2026,8 @@ spec:
       name: Resource Management
       description: 资源管理场景，提供组织、部门和资源管理能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - organization-management
         - department-management
@@ -1962,7 +2049,8 @@ spec:
       name: Hosting Service
       description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - instance-management
         - instance-scaling
@@ -2008,7 +2096,8 @@ spec:
       name: Business
       description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
       version: "1.0.0"
-      category: BUSINESS
+      category: SERVICE
+      domain: business
       requiredCapabilities:
         - scenario-management
         - workflow-execution
@@ -2019,7 +2108,8 @@ spec:
       name: Nexus UI
       description: Nexus界面场景，提供管理界面、仪表盘、监控页面能力
       version: "1.0.0"
-      category: SYSTEM
+      category: SERVICE
+      domain: sysTEM
       requiredCapabilities:
         - ui-rendering
         - menu-integration
