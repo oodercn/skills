@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-group
+  name: 群组服务
+  version: "0.7.3"
+  description: "群组服务，支持群组管理、成员管理、权限控制"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: OFFICE_COLLABORATION
+  subCategory: group
+  category: SERVICE
+  capabilityCategory: comm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x55
+        name: COMM_GROUP
+        description: "群组服务"
+    optional: []
+  
+  tags:
+    - group
+    - team
+    - member
+  
+  dependencies:
+    - skill-org-base

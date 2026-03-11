@@ -11,9 +11,9 @@ import net.ooder.skill.scene.capability.service.BusinessSemanticsScorer.Business
 import net.ooder.skill.scene.dto.capability.SceneSkillClassificationResultDTO;
 import net.ooder.skill.scene.integration.SceneEngineIntegration;
 import net.ooder.skill.scene.model.ResultModel;
-import net.ooder.scene.skill.model.SceneType;
-import net.ooder.scene.skill.model.SkillForm;
-import net.ooder.scene.skill.model.SkillCategory;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.CapabilityCategory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

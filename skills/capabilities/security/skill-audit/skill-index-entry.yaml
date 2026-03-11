@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-audit
+  name: 审计服务
+  version: "0.7.3"
+  description: "审计服务，提供操作审计、日志记录、合规检查"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SECURITY_AUDIT
+  subCategory: audit
+  category: SERVICE
+  capabilityCategory: sec
+  
+  capabilityAddresses:
+    required:
+      - address: 0x7A
+        name: SEC_AUDIT
+        description: "审计服务"
+    optional: []
+  
+  tags:
+    - audit
+    - log
+    - compliance
+  
+  dependencies:
+    - skill-security

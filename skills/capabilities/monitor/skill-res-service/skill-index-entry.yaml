@@ -1,0 +1,35 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-res-service
+  name: 资源管理服务
+  version: "0.7.3"
+  description: "资源管理服务，提供CPU、内存、磁盘监控"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SYSTEM_MONITOR
+  subCategory: resource
+  category: SERVICE
+  capabilityCategory: mon
+  
+  capabilityAddresses:
+    required:
+      - address: 0x58
+        name: MON_BASE
+        description: "监控基础服务"
+      - address: 0x5B
+        name: MON_METRICS
+        description: "指标采集"
+    optional: []
+  
+  tags:
+    - resource
+    - cpu
+    - memory
+    - disk
+  
+  dependencies:
+    - skill-monitor

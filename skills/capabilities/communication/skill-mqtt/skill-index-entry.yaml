@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-mqtt
+  name: MQTT服务
+  version: "0.7.3"
+  description: "MQTT消息服务，支持消息发布、订阅、推送"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: OFFICE_COLLABORATION
+  subCategory: mqtt
+  category: SERVICE
+  capabilityCategory: comm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x51
+        name: COMM_MQTT
+        description: "MQTT服务"
+    optional: []
+  
+  tags:
+    - mqtt
+    - message
+    - pubsub
+  
+  dependencies: []

@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-health
+  name: 健康检查服务
+  version: "0.7.3"
+  description: "健康检查服务，提供服务健康状态检查、告警"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SYSTEM_MONITOR
+  subCategory: health
+  category: SERVICE
+  capabilityCategory: mon
+  
+  capabilityAddresses:
+    required:
+      - address: 0x59
+        name: MON_HEALTH
+        description: "健康检查"
+    optional: []
+  
+  tags:
+    - health
+    - check
+    - monitor
+  
+  dependencies: []

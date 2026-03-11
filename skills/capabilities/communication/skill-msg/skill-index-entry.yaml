@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-msg
+  name: 消息服务
+  version: "0.7.3"
+  description: "消息服务，支持消息队列、订阅发布能力"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: OFFICE_COLLABORATION
+  subCategory: msg
+  category: SERVICE
+  capabilityCategory: comm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x50
+        name: COMM_BASE
+        description: "通讯基础服务"
+    optional: []
+  
+  tags:
+    - message
+    - queue
+    - pubsub
+  
+  dependencies: []

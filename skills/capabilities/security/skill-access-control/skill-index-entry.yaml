@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-access-control
+  name: 访问控制服务
+  version: "0.7.3"
+  description: "访问控制服务，提供权限管理、角色管理、访问策略"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SECURITY_AUDIT
+  subCategory: access
+  category: SERVICE
+  capabilityCategory: sec
+  
+  capabilityAddresses:
+    required:
+      - address: 0x79
+        name: SEC_ACCESS
+        description: "访问控制"
+    optional: []
+  
+  tags:
+    - access
+    - control
+    - permission
+  
+  dependencies:
+    - skill-security

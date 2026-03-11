@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-security
+  name: 安全管理服务
+  version: "0.7.3"
+  description: "安全管理服务，提供安全策略、威胁检测、漏洞扫描"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SECURITY_AUDIT
+  subCategory: security
+  category: SERVICE
+  capabilityCategory: sec
+  
+  capabilityAddresses:
+    required:
+      - address: 0x78
+        name: SEC_BASE
+        description: "安全基础服务"
+    optional: []
+  
+  tags:
+    - security
+    - threat
+    - vulnerability
+  
+  dependencies: []

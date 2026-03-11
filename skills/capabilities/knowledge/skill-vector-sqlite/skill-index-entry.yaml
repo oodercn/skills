@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-vector-sqlite
+  name: SQLite向量存储
+  version: "1.0.0"
+  description: "SQLite向量存储服务，提供向量存储和相似度检索功能"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: AI_ASSISTANT
+  subCategory: vector
+  category: KNOWLEDGE
+  capabilityCategory: know
+  
+  capabilityAddresses:
+    required:
+      - address: 0x39
+        name: KNOW_VECTOR
+        description: "向量知识库"
+    optional: []
+  
+  tags:
+    - vector
+    - sqlite
+    - embedding
+  
+  dependencies:
+    - skill-knowledge-base

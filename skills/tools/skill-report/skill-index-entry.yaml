@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-report
+  name: 报表服务
+  version: "0.7.3"
+  description: "报表服务，提供报表生成、导出、定时推送"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: DATA_PROCESSING
+  subCategory: report
+  category: TOOL
+  capabilityCategory: util
+  
+  capabilityAddresses:
+    required:
+      - address: 0xF1
+        name: UTIL_REPORT
+        description: "报表服务"
+    optional: []
+  
+  tags:
+    - report
+    - export
+    - schedule
+  
+  dependencies: []

@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-media-toutiao
+  name: 头条发布服务
+  version: "0.7.3"
+  description: "头条内容发布服务，支持文章发布、更新、删除、统计"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: MARKETING_OPERATIONS
+  subCategory: toutiao
+  category: SERVICE
+  capabilityCategory: media
+  
+  capabilityAddresses:
+    required:
+      - address: 0x4C
+        name: MEDIA_TOUTIAO
+        description: "头条"
+    optional: []
+  
+  tags:
+    - media
+    - toutiao
+    - publish
+  
+  dependencies: []

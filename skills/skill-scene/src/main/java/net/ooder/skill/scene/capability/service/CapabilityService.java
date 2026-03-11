@@ -3,9 +3,9 @@ package net.ooder.skill.scene.capability.service;
 import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.model.CapabilityOwnership;
 import net.ooder.skill.scene.capability.model.CapabilityType;
-import net.ooder.scene.skill.model.SceneType;
-import net.ooder.scene.skill.model.SkillForm;
-import net.ooder.scene.skill.model.SkillCategory;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.CapabilityCategory;
 
 import java.util.List;
 

@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-media-weibo
+  name: 微博发布服务
+  version: "0.7.3"
+  description: "微博内容发布服务，支持微博发布、互动管理"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: MARKETING_OPERATIONS
+  subCategory: weibo
+  category: SERVICE
+  capabilityCategory: media
+  
+  capabilityAddresses:
+    required:
+      - address: 0x4A
+        name: MEDIA_WEIBO
+        description: "微博"
+    optional: []
+  
+  tags:
+    - media
+    - weibo
+    - publish
+  
+  dependencies: []

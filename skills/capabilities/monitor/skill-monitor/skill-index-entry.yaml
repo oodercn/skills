@@ -1,0 +1,37 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-monitor
+  name: 监控服务
+  version: "0.7.3"
+  description: "监控服务，提供指标采集、告警、日志管理"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: SYSTEM_MONITOR
+  subCategory: monitor
+  category: SERVICE
+  capabilityCategory: mon
+  
+  capabilityAddresses:
+    required:
+      - address: 0x58
+        name: MON_BASE
+        description: "监控基础服务"
+      - address: 0x5B
+        name: MON_METRICS
+        description: "指标采集"
+      - address: 0x5C
+        name: MON_LOG
+        description: "日志服务"
+    optional: []
+  
+  tags:
+    - monitor
+    - metrics
+    - alert
+    - log
+  
+  dependencies: []

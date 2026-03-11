@@ -9,8 +9,8 @@ import net.ooder.skill.scene.capability.registry.CapabilityRegistry;
 import net.ooder.skill.scene.capability.service.CapabilityService;
 import net.ooder.skill.scene.storage.JsonStorageService;
 import net.ooder.scene.skill.model.SceneType;
-import net.ooder.scene.skill.model.SkillForm;
-import net.ooder.scene.skill.model.SkillCategory;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.CapabilityCategory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,23 +240,22 @@ public class CapabilityServiceImpl implements CapabilityService {
     }
 
     @Override
-    public List<Capability> findBySkillCategory(SkillCategory category) {
+    public List<Capability> findBySkillCategory(CapabilityCategory category) {
         return registry.findAll().stream()
             .filter(cap -> {
-                if (cap.getMetadata() == null) return false;
-                Object cat = cap.getMetadata().get("skillCategory");
-                return cat != null && cat.equals(category);
+                if (cap.getCapabilityCategory() == null) return false;
+                return cap.getCapabilityCategory() == category;
             })
             .collect(Collectors.toList());
     }
 
     @Override
-    public List<Capability> findByFilters(SkillForm form, SceneType sceneType, SkillCategory category,
+    public List<Capability> findByFilters(SkillForm form, SceneType sceneType, CapabilityCategory category,
                                            CapabilityOwnership ownership, String keyword) {
         return registry.findAll().stream()
-            .filter(cap -> form == null || (cap.getSkillForm() != null && cap.getSkillForm().equals(form.name())))
-            .filter(cap -> sceneType == null || (cap.getSceneType() != null && cap.getSceneType().equals(sceneType.name())))
-            .filter(cap -> category == null || (cap.getMetadata() != null && category.equals(cap.getMetadata().get("skillCategory"))))
+            .filter(cap -> form == null || cap.getSkillForm() == form)
+            .filter(cap -> sceneType == null || (cap.getSceneTypeEnum() != null && cap.getSceneTypeEnum() == sceneType))
+            .filter(cap -> category == null || cap.getCapabilityCategory() == category)
             .filter(cap -> ownership == null || cap.getOwnership() == ownership)
             .filter(cap -> keyword == null || keyword.isEmpty() || 
                 (cap.getName() != null && cap.getName().toLowerCase().contains(keyword.toLowerCase())) ||

@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-payment-alipay
+  name: 支付宝支付服务
+  version: "0.7.3"
+  description: "支付宝支付服务，支持支付、退款、回调处理"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: SYSTEM_TOOLS
+  subCategory: alipay
+  category: SERVICE
+  capabilityCategory: payment
+  
+  capabilityAddresses:
+    required:
+      - address: 0x41
+        name: PAY_ALIPAY
+        description: "支付宝"
+    optional: []
+  
+  tags:
+    - payment
+    - alipay
+    - pay
+  
+  dependencies: []
