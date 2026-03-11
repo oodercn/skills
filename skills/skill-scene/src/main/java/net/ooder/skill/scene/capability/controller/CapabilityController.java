@@ -56,9 +56,9 @@ public class CapabilityController {
         log.info("List capabilities - type: {}, sceneType: {}, keyword: {}, ownership: {}, skillForm: {}, skillCategory: {}", 
             type, sceneType, keyword, ownership, skillForm, skillCategory);
         
-        SkillForm form = skillForm != null && !skillForm.isEmpty() ? SkillForm.valueOf(skillForm) : null;
-        SceneType sceneTypeEnum = sceneType != null && !sceneType.isEmpty() ? SceneType.valueOf(sceneType) : null;
-        SkillCategory category = skillCategory != null && !skillCategory.isEmpty() ? SkillCategory.valueOf(skillCategory) : null;
+        SkillForm form = skillForm != null && !skillForm.isEmpty() ? SkillForm.fromCode(skillForm) : null;
+        SceneType sceneTypeEnum = sceneType != null && !sceneType.isEmpty() ? SceneType.fromCode(sceneType) : null;
+        CapabilityCategory category = skillCategory != null && !skillCategory.isEmpty() ? CapabilityCategory.fromCode(skillCategory) : null;
         CapabilityOwnership ownershipEnum = ownership != null && !ownership.isEmpty() ? CapabilityOwnership.fromCode(ownership) : null;
         
         List<Capability> capabilities = capabilityService.findByFilters(form, sceneTypeEnum, category, ownershipEnum, keyword);
@@ -77,9 +77,9 @@ public class CapabilityController {
         log.info("Search capabilities - keyword: {}, skillForm: {}, sceneType: {}, skillCategory: {}, ownership: {}",
             keyword, skillForm, sceneType, skillCategory, ownership);
         
-        SkillForm form = skillForm != null && !skillForm.isEmpty() ? SkillForm.valueOf(skillForm) : null;
-        SceneType sceneTypeEnum = sceneType != null && !sceneType.isEmpty() ? SceneType.valueOf(sceneType) : null;
-        SkillCategory category = skillCategory != null && !skillCategory.isEmpty() ? SkillCategory.valueOf(skillCategory) : null;
+        SkillForm form = skillForm != null && !skillForm.isEmpty() ? SkillForm.fromCode(skillForm) : null;
+        SceneType sceneTypeEnum = sceneType != null && !sceneType.isEmpty() ? SceneType.fromCode(sceneType) : null;
+        CapabilityCategory category = skillCategory != null && !skillCategory.isEmpty() ? CapabilityCategory.fromCode(skillCategory) : null;
         CapabilityOwnership ownershipEnum = ownership != null && !ownership.isEmpty() ? CapabilityOwnership.fromCode(ownership) : null;
         
         List<Capability> capabilities = capabilityService.findByFilters(form, sceneTypeEnum, category, ownershipEnum, keyword);

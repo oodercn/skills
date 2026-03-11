@@ -1,0 +1,50 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-document-assistant
+  name: 文档助手场景能力
+  version: "2.3.0"
+  description: "文档助手场景能力，支持文档生成、摘要、翻译、校对"
+
+spec:
+  skillForm: SCENE
+  sceneType: AUTO
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: document
+  category: TOOL
+  capabilityCategory: util
+  
+  capabilityAddresses:
+    required:
+      - address: 0x30
+        name: LLM_BASE
+        description: "LLM基础服务"
+        fallback: 0x31
+      - address: 0xF0
+        name: UTIL_BASE
+        description: "工具基础服务"
+    optional: []
+  
+  tags:
+    - document
+    - assistant
+    - ai
+    - scene-capability
+  
+  dependencies:
+    - skill-llm-conversation
+    - skill-document-processor
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]

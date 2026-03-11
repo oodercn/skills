@@ -5,12 +5,12 @@ import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.model.CapabilityOwnership;
 import net.ooder.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.skill.scene.capability.model.CapabilityType;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.skill.scene.capability.registry.CapabilityRegistry;
 import net.ooder.skill.scene.capability.service.CapabilityService;
 import net.ooder.skill.scene.storage.JsonStorageService;
-import net.ooder.scene.skill.model.SceneType;
-import net.ooder.skill.scene.capability.model.SkillForm;
-import net.ooder.skill.scene.capability.model.CapabilityCategory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -240,7 +240,7 @@ public class CapabilityServiceImpl implements CapabilityService {
     }
 
     @Override
-    public List<Capability> findBySkillCategory(CapabilityCategory category) {
+    public List<Capability> findByCapabilityCategory(CapabilityCategory category) {
         return registry.findAll().stream()
             .filter(cap -> {
                 if (cap.getCapabilityCategory() == null) return false;

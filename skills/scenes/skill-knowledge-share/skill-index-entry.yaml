@@ -1,0 +1,49 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-knowledge-share
+  name: 知识分享场景能力
+  version: "2.3.0"
+  description: "知识分享场景能力，支持知识发布、订阅、推送、统计"
+
+spec:
+  skillForm: SCENE
+  sceneType: TRIGGER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: share
+  category: KNOWLEDGE
+  capabilityCategory: know
+  
+  capabilityAddresses:
+    required:
+      - address: 0x38
+        name: KNOW_BASE
+        description: "知识库基础服务"
+      - address: 0x50
+        name: COMM_BASE
+        description: "通讯基础服务"
+    optional: []
+  
+  tags:
+    - knowledge
+    - share
+    - publish
+    - scene-capability
+  
+  dependencies:
+    - skill-knowledge-base
+    - skill-notify
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]

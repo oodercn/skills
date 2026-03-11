@@ -1,0 +1,54 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-onboarding-assistant
+  name: 入职助手场景能力
+  version: "2.3.0"
+  description: "入职助手场景能力，支持入职流程引导、知识学习、问答支持"
+
+spec:
+  skillForm: SCENE
+  sceneType: AUTO
+  visibility: public
+  businessCategory: HUMAN_RESOURCE
+  subCategory: onboarding
+  category: WORKFLOW
+  capabilityCategory: util
+  
+  capabilityAddresses:
+    required:
+      - address: 0x30
+        name: LLM_BASE
+        description: "LLM基础服务"
+        fallback: 0x31
+      - address: 0x38
+        name: KNOW_BASE
+        description: "知识库基础服务"
+      - address: 0x08
+        name: ORG_LOCAL
+        description: "本地组织服务"
+    optional: []
+  
+  tags:
+    - onboarding
+    - hr
+    - assistant
+    - scene-capability
+  
+  dependencies:
+    - skill-llm-conversation
+    - skill-knowledge-base
+    - skill-org-base
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]
