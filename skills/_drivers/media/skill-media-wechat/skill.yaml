@@ -1,0 +1,115 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-wechat
+  name: 微信公众号发布服务
+  version: 0.7.3
+  description: 微信公众号内容发布服务，支持图文消息发布、管理
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - wechat
+    - publish
+    - mp
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x49
+    category: MEDIA
+    code: MEDIA_WECHAT
+    operations: [publish, update, delete, stats]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: article-publish
+      name: 图文发布
+      description: 发布图文消息到公众号
+      category: service
+    - id: article-update
+      name: 图文更新
+      description: 更新已发布图文
+      category: service
+    - id: article-delete
+      name: 图文删除
+      description: 删除已发布图文
+      category: service
+    - id: article-stats
+      name: 图文统计
+      description: 获取图文统计数据
+      category: service
+  
+  endpoints:
+    - path: /api/media/wechat/articles
+      method: POST
+      description: 发布图文
+      capability: article-publish
+    - path: /api/media/wechat/articles/{id}
+      method: PUT
+      description: 更新图文
+      capability: article-update
+    - path: /api/media/wechat/articles/{id}
+      method: DELETE
+      description: 删除图文
+      capability: article-delete
+    - path: /api/media/wechat/articles/{id}/stats
+      method: GET
+      description: 获取统计
+      capability: article-stats
+  
+  config:
+    required:
+      - name: WECHAT_APP_ID
+        type: string
+        description: 公众号AppID
+      - name: WECHAT_APP_SECRET
+        type: string
+        description: 公众号AppSecret
+    optional:
+      - name: WECHAT_API_URL
+        type: string
+        default: "https://api.weixin.qq.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

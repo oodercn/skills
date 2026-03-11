@@ -71,6 +71,16 @@ public class GitDiscoveryController {
     
     @Autowired
     private net.ooder.skill.scene.capability.service.CapabilityClassificationService classificationService;
+    
+    @Autowired
+    private net.ooder.skill.scene.capability.service.SkillStatisticsService statisticsService;
+
+    @GetMapping("/statistics")
+    public ResultModel<SkillStatisticsDTO> getStatistics() {
+        log.info("[getStatistics] Getting skill statistics");
+        SkillStatisticsDTO stats = statisticsService.getStatistics();
+        return ResultModel.success(stats);
+    }
 
     @PostMapping("/github")
     public ResultModel<DiscoveryResultDTO> discoverFromGitHub(@RequestBody @Valid GitDiscoveryConfigDTO config) {

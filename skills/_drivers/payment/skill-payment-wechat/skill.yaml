@@ -1,0 +1,118 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-payment-wechat
+  name: 微信支付服务
+  version: 0.7.3
+  description: 微信支付服务，支持支付、退款、回调处理
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - payment
+    - wechat
+    - pay
+    - wxpay
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x42
+    category: PAYMENT
+    code: PAY_WECHAT
+    operations: [pay, refund, callback]
+  
+  driverType: payment
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - e-commerce
+    - payment-processing
+    - order-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: payment-service
+      version: "1.0"
+      description: "支付服务接口"
+  
+  capabilities:
+    - id: pay
+      name: 支付
+      description: 发起支付请求
+      category: service
+    - id: refund
+      name: 退款
+      description: 发起退款请求
+      category: service
+    - id: callback
+      name: 回调处理
+      description: 处理支付回调
+      category: service
+    - id: query
+      name: 查询
+      description: 查询支付状态
+      category: service
+  
+  endpoints:
+    - path: /api/payment/wechat/pay
+      method: POST
+      description: 发起支付
+      capability: pay
+    - path: /api/payment/wechat/refund
+      method: POST
+      description: 发起退款
+      capability: refund
+    - path: /api/payment/wechat/callback
+      method: POST
+      description: 支付回调
+      capability: callback
+    - path: /api/payment/wechat/query
+      method: GET
+      description: 查询支付
+      capability: query
+  
+  config:
+    required:
+      - name: WECHAT_APP_ID
+        type: string
+        description: 微信应用ID
+      - name: WECHAT_MCH_ID
+        type: string
+        description: 微信商户ID
+      - name: WECHAT_API_KEY
+        type: string
+        description: 微信API密钥
+    optional:
+      - name: WECHAT_GATEWAY
+        type: string
+        default: "https://api.mch.weixin.qq.com"
+        description: 微信支付网关
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

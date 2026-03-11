@@ -75,8 +75,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1773244334720,
-			"updateTime":1773244334720,
+			"createTime":1773273277258,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -99,7 +99,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1772849587186,
-			"updateTime":1773244334735,
+			"updateTime":1773273277272,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -128,8 +128,71 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334735,
+		"updateTime":1773273277272,
 		"version":"0.7.3",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"protocol-parse",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277306,
+		"dependencies":[],
+		"description":"解析各种协议格式(JSON/XML/YAML/Protobuf)",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-protocol",
+			"createTime":1773273277306,
+			"updateTime":1773273277306,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"协议解析",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-protocol",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277306,
+		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -142,8 +205,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1773244334623,
-			"updateTime":1773244334623,
+			"createTime":1773273277148,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -166,7 +229,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1772849586887,
-			"updateTime":1773244334636,
+			"updateTime":1773273277156,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -195,75 +258,8 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334636,
+		"updateTime":1773273277156,
 		"version":"0.7.3",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[],
-		"capabilityId":"rag-retrieval",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
-			"version":"2.3.0",
-			"skillForm":"SCENE"
-		},
-		"createTime":1772849586380,
-		"dependencies":[],
-		"description":"检索增强生成",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-links-line",
-		"independent":false,
-		"installed":true,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-knowledge-qa",
-			"createTime":1772849586380,
-			"updateTime":1773244334305,
-			"version":"2.3.0",
-			"skillForm":"PROVIDER"
-		},
-		"name":"RAG检索",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"skill-knowledge-qa",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[],
-		"tags":[],
-		"type":"COMPOSITE",
-		"updateTime":1773244334305,
-		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -276,8 +272,8 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1773244334430,
-			"updateTime":1773244334430,
+			"createTime":1773273276990,
+			"updateTime":1773273276990,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -300,7 +296,7 @@
 		"metadata":{
 			"skillId":"skill-meeting-minutes",
 			"createTime":1772849586734,
-			"updateTime":1773244334437,
+			"updateTime":1773273276994,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -329,8 +325,75 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334437,
+		"updateTime":1773273276994,
 		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"rag-retrieval",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"skill-knowledge-qa",
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
+			"version":"2.3.0",
+			"skillForm":"SCENE"
+		},
+		"createTime":1772849586380,
+		"dependencies":[],
+		"description":"检索增强生成",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-links-line",
+		"independent":false,
+		"installed":true,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-knowledge-qa",
+			"createTime":1772849586380,
+			"updateTime":1773273276943,
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"RAG检索",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-knowledge-qa",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"COMPOSITE",
+		"updateTime":1773273276943,
+		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -346,7 +409,7 @@
 			"updateTime":1773187438776,
 			"createTime":1772849587147,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587147,
 		"dependencies":[],
@@ -368,7 +431,8 @@
 			"skillId":"skill-storage-management-nexus-ui",
 			"createTime":1772849587147,
 			"updateTime":1773187438776,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看存储",
 		"optionalAddresses":[
@@ -389,6 +453,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-storage-management-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -408,8 +473,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1773244334000,
-			"updateTime":1773244334000,
+			"createTime":1773273276833,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -432,7 +497,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1772849586844,
-			"updateTime":1773244334015,
+			"updateTime":1773273276844,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -461,7 +526,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334015,
+		"updateTime":1773273276844,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -475,8 +540,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333908,
-			"updateTime":1773244333908,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -499,7 +564,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333948,
+			"updateTime":1773273276791,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -528,7 +593,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333948,
+		"updateTime":1773273276791,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -542,8 +607,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -566,7 +631,7 @@
 		"metadata":{
 			"skillId":"skill-llm-chat",
 			"createTime":1772849586536,
-			"updateTime":1773244334389,
+			"updateTime":1773273276972,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -595,7 +660,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334389,
+		"updateTime":1773273276972,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -611,7 +676,7 @@
 			"updateTime":1773116118589,
 			"createTime":1772584582088,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582088,
 		"dependencies":[],
@@ -632,7 +697,8 @@
 		"metadata":{
 			"createTime":1772584582088,
 			"updateTime":1773116118589,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"日志汇总",
 		"optionalAddresses":[
@@ -653,11 +719,75 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report"],
 		"tags":[],
 		"type":"SERVICE",
 		"updateTime":1773116118589,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"context",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277281,
+		"dependencies":[],
+		"description":"提供上下文存储和检索",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-common",
+			"createTime":1773273277281,
+			"updateTime":1773273277285,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"上下文管理",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-common",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277285,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -674,7 +804,7 @@
 			"updateTime":1773187438422,
 			"createTime":1772849586805,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586805,
 		"dependencies":[],
@@ -696,7 +826,8 @@
 			"skillId":"skill-nexus-dashboard-nexus-ui",
 			"createTime":1772849586805,
 			"updateTime":1773187438422,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看仪表盘",
 		"optionalAddresses":[
@@ -717,6 +848,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-nexus-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -736,8 +868,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1773244334623,
-			"updateTime":1773244334623,
+			"createTime":1773273277148,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -760,7 +892,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1772849586874,
-			"updateTime":1773244334632,
+			"updateTime":1773273277153,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -789,7 +921,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334632,
+		"updateTime":1773273277153,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -803,8 +935,8 @@
 		],
 		"config":{
 			"skillId":"skill-scene",
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -828,7 +960,7 @@
 			"skillId":"skill-scene",
 			"createTime":1772880495490,
 			"sceneType":"AUTO",
-			"updateTime":1773244334522,
+			"updateTime":1773273277055,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -877,7 +1009,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334522,
+		"updateTime":1773273277055,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -891,8 +1023,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333908,
-			"updateTime":1773244333908,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -915,7 +1047,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333955,
+			"updateTime":1773273276799,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -944,7 +1076,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333955,
+		"updateTime":1773273276799,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -961,7 +1093,7 @@
 			"updateTime":1773187438778,
 			"createTime":1772849587147,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587147,
 		"dependencies":[],
@@ -983,7 +1115,8 @@
 			"skillId":"skill-storage-management-nexus-ui",
 			"createTime":1772849587147,
 			"updateTime":1773187438778,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"上传文件",
 		"optionalAddresses":[
@@ -1004,6 +1137,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-storage-management-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -1023,8 +1157,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -1047,7 +1181,7 @@
 		"metadata":{
 			"skillId":"skill-llm-chat",
 			"createTime":1772849586380,
-			"updateTime":1773244334421,
+			"updateTime":1773273276984,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1076,7 +1210,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"DRIVER",
-		"updateTime":1773244334421,
+		"updateTime":1773273276984,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1092,7 +1226,7 @@
 			"updateTime":1773116118594,
 			"createTime":1772584582085,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582085,
 		"dependencies":[],
@@ -1113,7 +1247,8 @@
 		"metadata":{
 			"createTime":1772584582085,
 			"updateTime":1773116118594,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"日志提醒",
 		"optionalAddresses":[
@@ -1134,12 +1269,76 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report"],
 		"tags":[],
 		"type":"COMMUNICATION",
 		"updateTime":1773116118594,
 		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"article-publish",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277092,
+		"dependencies":[],
+		"description":"发布文章到头条",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-media-toutiao",
+			"createTime":1773273277092,
+			"updateTime":1773273277092,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文章发布",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-media-toutiao",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277092,
+		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -1155,7 +1354,7 @@
 			"updateTime":1773116118599,
 			"createTime":1772584582101,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582101,
 		"dependencies":[],
@@ -1177,7 +1376,8 @@
 			"skillId":"skill-security",
 			"createTime":1772584582101,
 			"updateTime":1773116118599,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"用户管理",
 		"optionalAddresses":[
@@ -1198,6 +1398,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-security",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["security"],
@@ -1217,8 +1418,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1773244334342,
-			"updateTime":1773244334342,
+			"createTime":1773273276957,
+			"updateTime":1773273276957,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -1241,7 +1442,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1772849586424,
-			"updateTime":1773244334342,
+			"updateTime":1773273276957,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1270,8 +1471,71 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334342,
+		"updateTime":1773273276957,
 		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"article-stats",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277092,
+		"dependencies":[],
+		"description":"获取文章统计数据",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-media-toutiao",
+			"createTime":1773273277092,
+			"updateTime":1773273277100,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文章统计",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-media-toutiao",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277100,
+		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -1287,7 +1551,7 @@
 			"updateTime":1773187438795,
 			"createTime":1772849587157,
 			"version":"0.7.3",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587157,
 		"dependencies":[],
@@ -1309,7 +1573,8 @@
 			"skillId":"skill-trae-solo",
 			"createTime":1772849587157,
 			"updateTime":1773187438795,
-			"version":"0.7.3"
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
 		},
 		"name":"A2UI Integration",
 		"optionalAddresses":[
@@ -1330,6 +1595,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-trae-solo",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -1349,8 +1615,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333909,
-			"updateTime":1773244333909,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1373,7 +1639,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333960,
+			"updateTime":1773273276803,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1402,7 +1668,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333960,
+		"updateTime":1773273276803,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1419,7 +1685,7 @@
 			"updateTime":1773187438695,
 			"createTime":1772849586912,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586912,
 		"dependencies":[],
@@ -1441,7 +1707,8 @@
 			"skillId":"skill-personal-dashboard-nexus-ui",
 			"createTime":1772849586912,
 			"updateTime":1773187438695,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看个人仪表盘",
 		"optionalAddresses":[
@@ -1462,6 +1729,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-personal-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -1481,8 +1749,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -1505,7 +1773,7 @@
 		"metadata":{
 			"skillId":"skill-llm-chat",
 			"createTime":1772849586536,
-			"updateTime":1773244334417,
+			"updateTime":1773273276981,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1534,7 +1802,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334417,
+		"updateTime":1773273276981,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1552,7 +1820,7 @@
 			"updateTime":1773116118603,
 			"category":"知识管理",
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582083,
 		"dependencies":["kb-management","kb-search"],
@@ -1575,7 +1843,8 @@
 			"createTime":1772584582083,
 			"updateTime":1773116118603,
 			"category":"知识管理",
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"知识问答场景",
 		"optionalAddresses":[
@@ -1596,6 +1865,7 @@
 		],
 		"sceneCapability":true,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["knowledge-qa"],
 		"tags":[],
@@ -1614,8 +1884,8 @@
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1773244334123,
-			"updateTime":1773244334123,
+			"createTime":1773273276892,
+			"updateTime":1773273276892,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1638,7 +1908,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1772849586797,
-			"updateTime":1773244334123,
+			"updateTime":1773273276892,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1667,7 +1937,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334123,
+		"updateTime":1773273276892,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1694,8 +1964,8 @@
 					}
 				}
 			],
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -1732,7 +2002,7 @@
 			],
 			"createTime":1772849586993,
 			"sceneType":"AUTO",
-			"updateTime":1773244334492,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1788,7 +2058,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334492,
+		"updateTime":1773273277031,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1869,8 +2139,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1773244334256,
-			"updateTime":1773244334256,
+			"createTime":1773273276923,
+			"updateTime":1773273276923,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -1893,7 +2163,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1772849586189,
-			"updateTime":1773244334270,
+			"updateTime":1773273276926,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1922,7 +2192,133 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334270,
+		"updateTime":1773273276926,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"file-move",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277167,
+		"dependencies":[],
+		"description":"移动文件",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-vfs-base",
+			"createTime":1773273277167,
+			"updateTime":1773273277183,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文件移动",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-vfs-base",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277183,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"utility",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277281,
+		"dependencies":[],
+		"description":"提供通用工具方法",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-common",
+			"createTime":1773273277281,
+			"updateTime":1773273277291,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"工具服务",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-common",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277291,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2003,8 +2399,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -2027,7 +2423,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1772849586380,
-			"updateTime":1773244334318,
+			"updateTime":1773273276947,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2056,7 +2452,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"DRIVER",
-		"updateTime":1773244334318,
+		"updateTime":1773273276947,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2064,106 +2460,41 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[],
-		"capabilityId":"llm-config",
+		"capabilityId":"network-link-view",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
-			"skillId":"skill-llm-management-ui",
-			"updateTime":1773187438347,
-			"createTime":1772849586668,
-			"version":"1.0.0",
-			"skillForm":"STANDALONE"
-		},
-		"createTime":1772849586668,
-		"dependencies":[],
-		"description":"配置LLM模型参数",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-server-line",
-		"independent":false,
-		"installed":true,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-llm-management-ui",
-			"createTime":1772849586668,
-			"updateTime":1773187438347,
-			"version":"1.0.0"
-		},
-		"name":"模型配置",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillId":"skill-llm-management-ui",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[],
-		"tags":[],
-		"type":"SERVICE",
-		"updateTime":1773187438347,
-		"version":"1.0.0",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[],
-		"capabilityId":"context-extraction",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
-			"version":"2.3.0",
-			"skillForm":"SCENE"
-		},
-		"createTime":1772849586536,
-		"dependencies":[],
-		"description":"自动提取页面上下文",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-server-line",
-		"independent":false,
-		"installed":true,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-llm-chat",
-			"createTime":1772849586536,
-			"updateTime":1773244334409,
+			"skillId":"skill-nexus-dashboard-nexus-ui",
+			"updateTime":1773187438427,
+			"createTime":1772941942847,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
-		"name":"上下文提取",
+		"createTime":1772941942847,
+		"dependencies":[],
+		"description":"查看网络链路状态",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-flashlight-line",
+		"independent":false,
+		"installed":true,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-nexus-dashboard-nexus-ui",
+			"createTime":1772941942847,
+			"updateTime":1773187438427,
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"查看网络链路",
 		"optionalAddresses":[
 			
 		],
@@ -2183,12 +2514,12 @@
 		"sceneCapability":false,
 		"sceneInternal":false,
 		"skillForm":"PROVIDER",
-		"skillId":"skill-llm-chat",
+		"skillId":"skill-nexus-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334409,
+		"updateTime":1773187438427,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2202,8 +2533,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1773244334255,
-			"updateTime":1773244334255,
+			"createTime":1773273276923,
+			"updateTime":1773273276923,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -2226,7 +2557,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1772849586189,
-			"updateTime":1773244334256,
+			"updateTime":1773273276923,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2255,7 +2586,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334256,
+		"updateTime":1773273276923,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2263,20 +2594,20 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[],
-		"capabilityId":"network-link-view",
+		"capabilityId":"context-extraction",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
-			"skillId":"skill-nexus-dashboard-nexus-ui",
-			"updateTime":1773187438427,
-			"createTime":1772941942847,
+			"skillId":"skill-llm-chat",
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"SCENE"
 		},
-		"createTime":1772941942847,
+		"createTime":1772849586536,
 		"dependencies":[],
-		"description":"查看网络链路状态",
+		"description":"自动提取页面上下文",
 		"developerVisible":false,
 		"driverCapability":false,
 		"driverConditions":[
@@ -2285,18 +2616,19 @@
 		"dynamicSceneTypes":false,
 		"enabled":true,
 		"hasSelfDrive":false,
-		"icon":"ri-flashlight-line",
+		"icon":"ri-server-line",
 		"independent":false,
 		"installed":true,
 		"internalVisible":false,
 		"mainFirst":false,
 		"metadata":{
-			"skillId":"skill-nexus-dashboard-nexus-ui",
-			"createTime":1772941942847,
-			"updateTime":1773187438427,
-			"version":"2.3.0"
+			"skillId":"skill-llm-chat",
+			"createTime":1772849586536,
+			"updateTime":1773273276978,
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
-		"name":"查看网络链路",
+		"name":"上下文提取",
 		"optionalAddresses":[
 			
 		],
@@ -2315,13 +2647,81 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
-		"skillId":"skill-nexus-dashboard-nexus-ui",
+		"skillForm":"PROVIDER",
+		"skillId":"skill-llm-chat",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773187438427,
+		"updateTime":1773273276978,
 		"version":"2.3.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"llm-config",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"skill-llm-management-ui",
+			"updateTime":1773187438347,
+			"createTime":1772849586668,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1772849586668,
+		"dependencies":[],
+		"description":"配置LLM模型参数",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":true,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-llm-management-ui",
+			"createTime":1772849586668,
+			"updateTime":1773187438347,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"模型配置",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-llm-management-ui",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773187438347,
+		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -2334,8 +2734,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1773244334342,
-			"updateTime":1773244334342,
+			"createTime":1773273276957,
+			"updateTime":1773273276957,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -2358,7 +2758,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1772849586424,
-			"updateTime":1773244334350,
+			"updateTime":1773273276961,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2387,7 +2787,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334350,
+		"updateTime":1773273276961,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2404,7 +2804,7 @@
 			"updateTime":1773187438352,
 			"createTime":1772849586668,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586668,
 		"dependencies":[],
@@ -2426,7 +2826,8 @@
 			"skillId":"skill-llm-management-ui",
 			"createTime":1772849586668,
 			"updateTime":1773187438352,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"对话监控",
 		"optionalAddresses":[
@@ -2447,6 +2848,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-llm-management-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -2494,8 +2896,8 @@
 					}
 				}
 			],
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -2547,7 +2949,7 @@
 			],
 			"createTime":1772849586993,
 			"sceneType":"AUTO",
-			"updateTime":1773244334504,
+			"updateTime":1773273277040,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2602,7 +3004,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334504,
+		"updateTime":1773273277040,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2619,7 +3021,7 @@
 			"updateTime":1773187438700,
 			"createTime":1772941942999,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941942999,
 		"dependencies":[],
@@ -2641,7 +3043,8 @@
 			"skillId":"skill-personal-dashboard-nexus-ui",
 			"createTime":1772941942999,
 			"updateTime":1773187438700,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"活动历史",
 		"optionalAddresses":[
@@ -2662,6 +3065,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-personal-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -2684,7 +3088,7 @@
 			"updateTime":1773116118614,
 			"createTime":1772849586859,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586859,
 		"dependencies":[],
@@ -2706,7 +3110,8 @@
 			"skillId":"skill-org-base",
 			"createTime":1772849586859,
 			"updateTime":1773116118614,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"User Management",
 		"optionalAddresses":[
@@ -2727,6 +3132,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-org-base",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -2746,8 +3152,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1773244334623,
-			"updateTime":1773244334623,
+			"createTime":1773273277148,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2770,7 +3176,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1772849586887,
-			"updateTime":1773244334628,
+			"updateTime":1773273277150,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2799,7 +3205,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334628,
+		"updateTime":1773273277150,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2817,7 +3223,7 @@
 			"updateTime":1773116118617,
 			"category":"AI助手",
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582084,
 		"dependencies":["llm-chat","conversation-manage"],
@@ -2840,7 +3246,8 @@
 			"createTime":1772584582084,
 			"updateTime":1773116118617,
 			"category":"AI助手",
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"LLM工作空间",
 		"optionalAddresses":[
@@ -2861,6 +3268,7 @@
 		],
 		"sceneCapability":true,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["llm-workspace"],
 		"tags":[],
@@ -2879,8 +3287,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1773244334623,
-			"updateTime":1773244334623,
+			"createTime":1773273277148,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2903,7 +3311,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1772849586873,
-			"updateTime":1773244334623,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2932,7 +3340,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334623,
+		"updateTime":1773273277148,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2946,8 +3354,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1773244334469,
-			"updateTime":1773244334469,
+			"createTime":1773273277013,
+			"updateTime":1773273277013,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -2970,7 +3378,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1772849586918,
-			"updateTime":1773244334478,
+			"updateTime":1773273277020,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2999,7 +3407,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334478,
+		"updateTime":1773273277020,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3026,8 +3434,8 @@
 					}
 				}
 			],
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -3064,7 +3472,7 @@
 			],
 			"createTime":1772849586993,
 			"sceneType":"AUTO",
-			"updateTime":1773244334497,
+			"updateTime":1773273277035,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3120,7 +3528,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334497,
+		"updateTime":1773273277035,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3204,7 +3612,7 @@
 			"updateTime":1773116118626,
 			"createTime":1772849586859,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586859,
 		"dependencies":[],
@@ -3226,7 +3634,8 @@
 			"skillId":"skill-org-base",
 			"createTime":1772849586859,
 			"updateTime":1773116118626,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"User Authentication",
 		"optionalAddresses":[
@@ -3247,6 +3656,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-org-base",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -3336,7 +3746,7 @@
 			"updateTime":1773116118629,
 			"createTime":1772584582103,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582103,
 		"dependencies":[],
@@ -3358,7 +3768,8 @@
 			"skillId":"skill-security",
 			"createTime":1772584582103,
 			"updateTime":1773116118629,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"权限控制",
 		"optionalAddresses":[
@@ -3379,6 +3790,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-security",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["security"],
@@ -3398,8 +3810,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -3422,7 +3834,7 @@
 		"metadata":{
 			"skillId":"skill-llm-chat",
 			"createTime":1772849586536,
-			"updateTime":1773244334398,
+			"updateTime":1773273276975,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3451,7 +3863,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334398,
+		"updateTime":1773273276975,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3465,8 +3877,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -3489,7 +3901,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1772849586380,
-			"updateTime":1773244334326,
+			"updateTime":1773273276950,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3518,7 +3930,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"DRIVER",
-		"updateTime":1773244334326,
+		"updateTime":1773273276950,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3532,8 +3944,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333909,
-			"updateTime":1773244333909,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3556,7 +3968,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333969,
+			"updateTime":1773273276809,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3585,7 +3997,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333969,
+		"updateTime":1773273276809,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3599,8 +4011,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1773244334450,
-			"updateTime":1773244334450,
+			"createTime":1773273277001,
+			"updateTime":1773273277001,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3623,7 +4035,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1772849586833,
-			"updateTime":1773244334459,
+			"updateTime":1773273277008,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3652,7 +4064,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334459,
+		"updateTime":1773273277008,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3666,8 +4078,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1773244334342,
-			"updateTime":1773244334342,
+			"createTime":1773273276957,
+			"updateTime":1773273276957,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3690,7 +4102,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1772849586424,
-			"updateTime":1773244334360,
+			"updateTime":1773273276963,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3719,7 +4131,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334360,
+		"updateTime":1773273276963,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3736,7 +4148,7 @@
 			"updateTime":1773187438425,
 			"createTime":1772941942847,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941942847,
 		"dependencies":[],
@@ -3758,7 +4170,8 @@
 			"skillId":"skill-nexus-dashboard-nexus-ui",
 			"createTime":1772941942847,
 			"updateTime":1773187438425,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看代理统计",
 		"optionalAddresses":[
@@ -3779,6 +4192,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-nexus-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -3868,7 +4282,7 @@
 			"updateTime":1773116118635,
 			"createTime":1772849586859,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586859,
 		"dependencies":[],
@@ -3890,7 +4304,8 @@
 			"skillId":"skill-org-base",
 			"createTime":1772849586859,
 			"updateTime":1773116118635,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Organization Management",
 		"optionalAddresses":[
@@ -3911,6 +4326,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-org-base",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -3930,8 +4346,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1773244334256,
-			"updateTime":1773244334256,
+			"createTime":1773273276923,
+			"updateTime":1773273276923,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3954,7 +4370,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1772849586189,
-			"updateTime":1773244334276,
+			"updateTime":1773273276929,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3983,7 +4399,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334276,
+		"updateTime":1773273276929,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3997,8 +4413,8 @@
 		],
 		"config":{
 			"skillId":"skill-scene",
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -4022,7 +4438,7 @@
 			"skillId":"skill-scene",
 			"createTime":1772880495490,
 			"sceneType":"AUTO",
-			"updateTime":1773244334511,
+			"updateTime":1773273277047,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4071,7 +4487,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334511,
+		"updateTime":1773273277047,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4085,8 +4501,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1773244334000,
-			"updateTime":1773244334000,
+			"createTime":1773273276833,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4109,7 +4525,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1772849586844,
-			"updateTime":1773244334018,
+			"updateTime":1773273276848,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4138,7 +4554,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334018,
+		"updateTime":1773273276848,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4173,8 +4589,8 @@
 					}
 				}
 			],
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -4219,7 +4635,7 @@
 			],
 			"createTime":1772849586993,
 			"sceneType":"AUTO",
-			"updateTime":1773244334501,
+			"updateTime":1773273277038,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4269,8 +4685,71 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334501,
+		"updateTime":1773273277038,
 		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"file-list",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277167,
+		"dependencies":[],
+		"description":"列出目录内容",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-vfs-base",
+			"createTime":1773273277167,
+			"updateTime":1773273277176,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文件列表",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-vfs-base",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277176,
+		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -4286,7 +4765,7 @@
 			"updateTime":1773187438698,
 			"createTime":1772941942999,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941942999,
 		"dependencies":[],
@@ -4308,7 +4787,8 @@
 			"skillId":"skill-personal-dashboard-nexus-ui",
 			"createTime":1772941942999,
 			"updateTime":1773187438698,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看我的技能",
 		"optionalAddresses":[
@@ -4329,6 +4809,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-personal-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -4348,8 +4829,8 @@
 		],
 		"config":{
 			"skillId":"skill-scene",
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -4373,7 +4854,7 @@
 			"skillId":"skill-scene",
 			"createTime":1772880495490,
 			"sceneType":"AUTO",
-			"updateTime":1773244334518,
+			"updateTime":1773273277053,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4423,7 +4904,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334518,
+		"updateTime":1773273277053,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4440,7 +4921,7 @@
 			"updateTime":1773116118655,
 			"createTime":1772584582105,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582105,
 		"dependencies":[],
@@ -4462,7 +4943,8 @@
 			"skillId":"skill-security",
 			"createTime":1772584582105,
 			"updateTime":1773116118655,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"安全审计",
 		"optionalAddresses":[
@@ -4483,6 +4965,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-security",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["security"],
@@ -4502,8 +4985,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1773244334469,
-			"updateTime":1773244334469,
+			"createTime":1773273277013,
+			"updateTime":1773273277013,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -4526,7 +5009,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1772849586918,
-			"updateTime":1773244334475,
+			"updateTime":1773273277018,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4555,7 +5038,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334475,
+		"updateTime":1773273277018,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4572,7 +5055,7 @@
 			"updateTime":1773187438703,
 			"createTime":1772941942999,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941942999,
 		"dependencies":[],
@@ -4594,7 +5077,8 @@
 			"skillId":"skill-personal-dashboard-nexus-ui",
 			"createTime":1772941942999,
 			"updateTime":1773187438703,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"群组统计",
 		"optionalAddresses":[
@@ -4615,6 +5099,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-personal-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -4634,8 +5119,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1773244334720,
-			"updateTime":1773244334720,
+			"createTime":1773273277258,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4658,7 +5143,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1772849587186,
-			"updateTime":1773244334723,
+			"updateTime":1773273277262,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4687,7 +5172,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334723,
+		"updateTime":1773273277262,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4701,8 +5186,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1773244334000,
-			"updateTime":1773244334000,
+			"createTime":1773273276833,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4725,7 +5210,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1772849586844,
-			"updateTime":1773244334000,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4754,7 +5239,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334000,
+		"updateTime":1773273276833,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4768,8 +5253,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1773244334469,
-			"updateTime":1773244334469,
+			"createTime":1773273277013,
+			"updateTime":1773273277013,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -4792,7 +5277,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1772849586918,
-			"updateTime":1773244334469,
+			"updateTime":1773273277013,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4821,7 +5306,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334469,
+		"updateTime":1773273277013,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4838,7 +5323,7 @@
 			"updateTime":1773116118658,
 			"createTime":1772849586859,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586859,
 		"dependencies":[],
@@ -4860,7 +5345,8 @@
 			"skillId":"skill-org-base",
 			"createTime":1772849586859,
 			"updateTime":1773116118658,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Role Management",
 		"optionalAddresses":[
@@ -4881,6 +5367,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-org-base",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -4900,8 +5387,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1773244334450,
-			"updateTime":1773244334450,
+			"createTime":1773273277001,
+			"updateTime":1773273277001,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -4924,7 +5411,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1772849586833,
-			"updateTime":1773244334450,
+			"updateTime":1773273277001,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4953,7 +5440,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334450,
+		"updateTime":1773273277001,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4967,8 +5454,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -4991,7 +5478,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1772584582098,
-			"updateTime":1773244334301,
+			"updateTime":1773273276940,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5020,7 +5507,7 @@
 		"supportedSceneTypes":["knowledge"],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334301,
+		"updateTime":1773273276940,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5101,8 +5588,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333908,
-			"updateTime":1773244333908,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5125,7 +5612,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333909,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5154,7 +5641,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333909,
+		"updateTime":1773273276760,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5168,8 +5655,8 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1773244334430,
-			"updateTime":1773244334430,
+			"createTime":1773273276990,
+			"updateTime":1773273276990,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -5192,7 +5679,7 @@
 		"metadata":{
 			"skillId":"skill-meeting-minutes",
 			"createTime":1772849586734,
-			"updateTime":1773244334430,
+			"updateTime":1773273276990,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5221,7 +5708,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334430,
+		"updateTime":1773273276990,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5235,8 +5722,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1773244334623,
-			"updateTime":1773244334623,
+			"createTime":1773273277148,
+			"updateTime":1773273277148,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5259,7 +5746,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1772849586887,
-			"updateTime":1773244334640,
+			"updateTime":1773273277158,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5288,7 +5775,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334640,
+		"updateTime":1773273277158,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5302,8 +5789,8 @@
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1773244334123,
-			"updateTime":1773244334123,
+			"createTime":1773273276892,
+			"updateTime":1773273276892,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5326,7 +5813,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1772849586797,
-			"updateTime":1773244334156,
+			"updateTime":1773273276898,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5355,7 +5842,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334156,
+		"updateTime":1773273276898,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5371,7 +5858,7 @@
 			"updateTime":1773116118661,
 			"createTime":1772584582094,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582094,
 		"dependencies":[],
@@ -5392,7 +5879,8 @@
 		"metadata":{
 			"createTime":1772584582094,
 			"updateTime":1773116118661,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"日志分析",
 		"optionalAddresses":[
@@ -5413,6 +5901,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report"],
 		"tags":[],
@@ -5434,7 +5923,7 @@
 			"updateTime":1773116118671,
 			"createTime":1772849586859,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586859,
 		"dependencies":[],
@@ -5456,7 +5945,8 @@
 			"skillId":"skill-org-base",
 			"createTime":1772849586859,
 			"updateTime":1773116118671,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Data Sync",
 		"optionalAddresses":[
@@ -5477,6 +5967,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-org-base",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -5496,8 +5987,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1773244334000,
-			"updateTime":1773244334000,
+			"createTime":1773273276833,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5520,7 +6011,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1772849586844,
-			"updateTime":1773244334005,
+			"updateTime":1773273276838,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5549,7 +6040,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334005,
+		"updateTime":1773273276838,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5577,8 +6068,8 @@
 					}
 				}
 			],
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -5616,7 +6107,7 @@
 			],
 			"createTime":1772876892817,
 			"sceneType":"AUTO",
-			"updateTime":1773244334507,
+			"updateTime":1773273277042,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -5662,7 +6153,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334507,
+		"updateTime":1773273277042,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5743,8 +6234,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1773244334469,
-			"updateTime":1773244334469,
+			"createTime":1773273277013,
+			"updateTime":1773273277013,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -5767,7 +6258,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1772849586918,
-			"updateTime":1773244334472,
+			"updateTime":1773273277015,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5796,7 +6287,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334472,
+		"updateTime":1773273277015,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5810,8 +6301,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1773244333909,
-			"updateTime":1773244333909,
+			"createTime":1773273276760,
+			"updateTime":1773273276760,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5834,7 +6325,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1772849586781,
-			"updateTime":1773244333976,
+			"updateTime":1773273276815,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5863,7 +6354,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244333976,
+		"updateTime":1773273276815,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5877,8 +6368,8 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1773244334430,
-			"updateTime":1773244334430,
+			"createTime":1773273276990,
+			"updateTime":1773273276990,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -5901,7 +6392,7 @@
 		"metadata":{
 			"skillId":"skill-meeting-minutes",
 			"createTime":1772849586734,
-			"updateTime":1773244334434,
+			"updateTime":1773273276992,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5930,7 +6421,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334434,
+		"updateTime":1773273276992,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5946,7 +6437,7 @@
 			"updateTime":1773116118684,
 			"createTime":1772584582095,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582095,
 		"dependencies":[],
@@ -5967,7 +6458,8 @@
 		"metadata":{
 			"createTime":1772584582095,
 			"updateTime":1773116118684,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"邮件发送",
 		"optionalAddresses":[
@@ -5988,6 +6480,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report","notification"],
 		"tags":[],
@@ -6006,8 +6499,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1773244334720,
-			"updateTime":1773244334720,
+			"createTime":1773273277258,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6030,7 +6523,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1772849587186,
-			"updateTime":1773244334720,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6059,7 +6552,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334720,
+		"updateTime":1773273277258,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6076,7 +6569,7 @@
 			"updateTime":1773116118687,
 			"createTime":1772849587170,
 			"version":"0.7.3",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587170,
 		"dependencies":[],
@@ -6098,7 +6591,8 @@
 			"skillId":"skill-user-auth",
 			"createTime":1772849587170,
 			"updateTime":1773116118687,
-			"version":"0.7.3"
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Token Validation",
 		"optionalAddresses":[
@@ -6119,6 +6613,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-user-auth",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -6132,14 +6627,140 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[],
+		"capabilityId":"article-update",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277092,
+		"dependencies":[],
+		"description":"更新已发布文章",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-media-toutiao",
+			"createTime":1773273277092,
+			"updateTime":1773273277094,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文章更新",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-media-toutiao",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277094,
+		"version":"0.7.3",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"protocol-adapt",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277306,
+		"dependencies":[],
+		"description":"适配不同协议版本和格式",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-protocol",
+			"createTime":1773273277306,
+			"updateTime":1773273277308,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"协议适配",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-protocol",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277308,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
 		"capabilityId":"llm-call-monitor",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
 			"skillId":"skill-scene",
-			"createTime":1773244334492,
-			"updateTime":1773244334492,
+			"createTime":1773273277031,
+			"updateTime":1773273277031,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -6163,7 +6784,7 @@
 			"skillId":"skill-scene",
 			"createTime":1772880495490,
 			"sceneType":"AUTO",
-			"updateTime":1773244334515,
+			"updateTime":1773273277050,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6214,7 +6835,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334515,
+		"updateTime":1773273277050,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6231,7 +6852,7 @@
 			"updateTime":1773187438792,
 			"createTime":1772849587157,
 			"version":"0.7.3",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587157,
 		"dependencies":[],
@@ -6253,7 +6874,8 @@
 			"skillId":"skill-trae-solo",
 			"createTime":1772849587157,
 			"updateTime":1773187438792,
-			"version":"0.7.3"
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Get Info",
 		"optionalAddresses":[
@@ -6274,6 +6896,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-trae-solo",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -6281,6 +6904,132 @@
 		"type":"SERVICE",
 		"updateTime":1773187438792,
 		"version":"0.7.3",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"article-delete",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277092,
+		"dependencies":[],
+		"description":"删除已发布文章",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-media-toutiao",
+			"createTime":1773273277092,
+			"updateTime":1773273277097,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文章删除",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-media-toutiao",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277097,
+		"version":"0.7.3",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
+		"capabilityId":"storage",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277281,
+		"dependencies":[],
+		"description":"提供键值存储、缓存管理",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-common",
+			"createTime":1773273277281,
+			"updateTime":1773273277281,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"存储服务",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-common",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277281,
+		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -6296,7 +7045,7 @@
 			"updateTime":1773187438433,
 			"createTime":1772941942847,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941942847,
 		"dependencies":[],
@@ -6318,7 +7067,8 @@
 			"skillId":"skill-nexus-dashboard-nexus-ui",
 			"createTime":1772941942847,
 			"updateTime":1773187438433,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"查看命令统计",
 		"optionalAddresses":[
@@ -6339,6 +7089,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-nexus-dashboard-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -6358,8 +7109,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1773244334720,
-			"updateTime":1773244334720,
+			"createTime":1773273277258,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6382,7 +7133,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1772849587186,
-			"updateTime":1773244334730,
+			"updateTime":1773273277268,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6411,7 +7162,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334730,
+		"updateTime":1773273277268,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6492,8 +7243,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -6516,7 +7267,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1772584582097,
-			"updateTime":1773244334291,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6545,7 +7296,7 @@
 		"supportedSceneTypes":["knowledge"],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334291,
+		"updateTime":1773273276935,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6629,7 +7380,7 @@
 			"updateTime":1773187438789,
 			"createTime":1772849587157,
 			"version":"0.7.3",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587157,
 		"dependencies":[],
@@ -6651,7 +7402,8 @@
 			"skillId":"skill-trae-solo",
 			"createTime":1772849587157,
 			"updateTime":1773187438789,
-			"version":"0.7.3"
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Execute Task",
 		"optionalAddresses":[
@@ -6672,6 +7424,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-trae-solo",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -6694,7 +7447,7 @@
 			"updateTime":1773116118696,
 			"createTime":1772584582109,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582109,
 		"dependencies":[],
@@ -6716,7 +7469,8 @@
 			"skillId":"skill-llm-conversation",
 			"createTime":1772584582109,
 			"updateTime":1773116118696,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"会话管理",
 		"optionalAddresses":[
@@ -6737,6 +7491,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-llm-conversation",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["llm"],
@@ -6817,6 +7572,69 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[],
+		"capabilityId":"file-copy",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277167,
+		"dependencies":[],
+		"description":"复制文件",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-vfs-base",
+			"createTime":1773273277167,
+			"updateTime":1773273277180,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"文件复制",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-vfs-base",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277180,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
 		"capabilityId":"storage-share",
 		"collaborativeCapabilities":[
 			
@@ -6826,7 +7644,7 @@
 			"updateTime":1773187438781,
 			"createTime":1772849587147,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849587147,
 		"dependencies":[],
@@ -6848,7 +7666,8 @@
 			"skillId":"skill-storage-management-nexus-ui",
 			"createTime":1772849587147,
 			"updateTime":1773187438781,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"分享文件",
 		"optionalAddresses":[
@@ -6869,6 +7688,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-storage-management-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -6888,8 +7708,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1773244334000,
-			"updateTime":1773244334000,
+			"createTime":1773273276833,
+			"updateTime":1773273276833,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6912,7 +7732,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1772849586844,
-			"updateTime":1773244334010,
+			"updateTime":1773273276841,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6941,7 +7761,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334010,
+		"updateTime":1773273276841,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6959,7 +7779,7 @@
 			"updateTime":1773116118700,
 			"category":"办公协作",
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582076,
 		"dependencies":["report-remind","report-submit","report-aggregate"],
@@ -6982,7 +7802,8 @@
 			"createTime":1772584582076,
 			"updateTime":1773116118700,
 			"category":"办公协作",
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"日志汇报场景",
 		"optionalAddresses":[
@@ -7003,6 +7824,7 @@
 		],
 		"sceneCapability":true,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report"],
 		"tags":[],
@@ -7021,8 +7843,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-chat",
-			"createTime":1773244334380,
-			"updateTime":1773244334380,
+			"createTime":1773273276970,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -7045,7 +7867,7 @@
 		"metadata":{
 			"skillId":"skill-llm-chat",
 			"createTime":1772584582107,
-			"updateTime":1773244334380,
+			"updateTime":1773273276970,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7074,7 +7896,7 @@
 		"supportedSceneTypes":["llm"],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334380,
+		"updateTime":1773273276970,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7091,7 +7913,7 @@
 			"updateTime":1773187438784,
 			"createTime":1772941943290,
 			"version":"2.3.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772941943290,
 		"dependencies":[],
@@ -7113,7 +7935,8 @@
 			"skillId":"skill-storage-management-nexus-ui",
 			"createTime":1772941943290,
 			"updateTime":1773187438784,
-			"version":"2.3.0"
+			"version":"2.3.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"文件浏览",
 		"optionalAddresses":[
@@ -7134,6 +7957,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-storage-management-nexus-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -7147,14 +7971,77 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[],
+		"capabilityId":"protocol-convert",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			
+		},
+		"createTime":1773273277306,
+		"dependencies":[],
+		"description":"协议格式转换",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-protocol",
+			"createTime":1773273277306,
+			"updateTime":1773273277311,
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
+		},
+		"name":"协议转换",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-protocol",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[],
+		"tags":[],
+		"type":"SERVICE",
+		"updateTime":1773273277311,
+		"version":"1.0.0",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[],
 		"capabilityId":"ip-management",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1773244334123,
-			"updateTime":1773244334123,
+			"createTime":1773273276892,
+			"updateTime":1773273276892,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7177,7 +8064,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1772849586797,
-			"updateTime":1773244334140,
+			"updateTime":1773273276894,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7206,7 +8093,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334140,
+		"updateTime":1773273276894,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7220,8 +8107,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1773244334450,
-			"updateTime":1773244334450,
+			"createTime":1773273277001,
+			"updateTime":1773273277001,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -7244,7 +8131,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1772849586833,
-			"updateTime":1773244334457,
+			"updateTime":1773273277005,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7273,7 +8160,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334457,
+		"updateTime":1773273277005,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7287,8 +8174,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1773244334291,
-			"updateTime":1773244334291,
+			"createTime":1773273276935,
+			"updateTime":1773273276935,
 			"version":"2.3.0",
 			"skillForm":"SCENE"
 		},
@@ -7311,7 +8198,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1772849586309,
-			"updateTime":1773244334296,
+			"updateTime":1773273276938,
 			"version":"2.3.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7340,7 +8227,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334296,
+		"updateTime":1773273276938,
 		"version":"2.3.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7356,7 +8243,7 @@
 			"updateTime":1773116118709,
 			"createTime":1772584582087,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772584582087,
 		"dependencies":[],
@@ -7377,7 +8264,8 @@
 		"metadata":{
 			"createTime":1772584582087,
 			"updateTime":1773116118709,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"日志提交",
 		"optionalAddresses":[
@@ -7398,6 +8286,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"status":"REGISTERED",
 		"supportedSceneTypes":["daily-report"],
 		"tags":[],
@@ -7419,7 +8308,7 @@
 			"updateTime":1773187438349,
 			"createTime":1772849586668,
 			"version":"1.0.0",
-			"skillForm":"STANDALONE"
+			"skillForm":"PROVIDER"
 		},
 		"createTime":1772849586668,
 		"dependencies":[],
@@ -7441,7 +8330,8 @@
 			"skillId":"skill-llm-management-ui",
 			"createTime":1772849586668,
 			"updateTime":1773187438349,
-			"version":"1.0.0"
+			"version":"1.0.0",
+			"skillForm":"PROVIDER"
 		},
 		"name":"Provider管理",
 		"optionalAddresses":[
@@ -7462,6 +8352,7 @@
 		],
 		"sceneCapability":false,
 		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-llm-management-ui",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[],
@@ -7481,8 +8372,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1773244334720,
-			"updateTime":1773244334720,
+			"createTime":1773273277258,
+			"updateTime":1773273277258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7505,7 +8396,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1772849587186,
-			"updateTime":1773244334726,
+			"updateTime":1773273277265,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7534,7 +8425,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"SERVICE",
-		"updateTime":1773244334726,
+		"updateTime":1773273277265,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7548,8 +8439,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1773244334450,
-			"updateTime":1773244334450,
+			"createTime":1773273277001,
+			"updateTime":1773273277001,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -7572,7 +8463,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1772849586833,
-			"updateTime":1773244334454,
+			"updateTime":1773273277003,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7601,7 +8492,7 @@
 		"supportedSceneTypes":[],
 		"tags":[],
 		"type":"ATOMIC",
-		"updateTime":1773244334454,
+		"updateTime":1773273277003,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"

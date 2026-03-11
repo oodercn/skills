@@ -1,0 +1,116 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-zhihu
+  name: 知乎发布服务
+  version: 0.7.3
+  description: 知乎内容发布服务，支持文章、回答发布管理
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - zhihu
+    - publish
+    - article
+    - answer
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x4B
+    category: MEDIA
+    code: MEDIA_ZHIHU
+    operations: [publish-article, publish-answer, update, delete]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: article-publish
+      name: 文章发布
+      description: 发布文章到知乎
+      category: service
+    - id: answer-publish
+      name: 回答发布
+      description: 发布回答
+      category: service
+    - id: content-update
+      name: 内容更新
+      description: 更新已发布内容
+      category: service
+    - id: content-delete
+      name: 内容删除
+      description: 删除已发布内容
+      category: service
+  
+  endpoints:
+    - path: /api/media/zhihu/articles
+      method: POST
+      description: 发布文章
+      capability: article-publish
+    - path: /api/media/zhihu/answers
+      method: POST
+      description: 发布回答
+      capability: answer-publish
+    - path: /api/media/zhihu/articles/{id}
+      method: PUT
+      description: 更新文章
+      capability: content-update
+    - path: /api/media/zhihu/articles/{id}
+      method: DELETE
+      description: 删除文章
+      capability: content-delete
+  
+  config:
+    required:
+      - name: ZHIHU_APP_ID
+        type: string
+        description: 知乎应用ID
+      - name: ZHIHU_APP_SECRET
+        type: string
+        description: 知乎应用密钥
+    optional:
+      - name: ZHIHU_API_URL
+        type: string
+        default: "https://api.zhihu.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

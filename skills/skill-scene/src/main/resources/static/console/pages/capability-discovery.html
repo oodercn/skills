@@ -113,6 +113,16 @@
                                             <div class="stat-label">已安装</div>
                                         </div>
                                     </div>
+                                    <div class="chart-section" id="chartSection" style="display: none;">
+                                        <div class="chart-title">
+                                            <i class="ri-pie-chart-line"></i> 业务领域分布
+                                        </div>
+                                        <div class="chart-container" id="businessChart"></div>
+                                        <div class="chart-title" style="margin-top: 16px;">
+                                            <i class="ri-bar-chart-line"></i> 技能形态分布
+                                        </div>
+                                        <div class="chart-container" id="skillFormChart"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -139,14 +149,14 @@
                                 </div>
                                 <div class="results-filter">
                                     <span class="filter-chip active" data-filter="all">全部 <span class="filter-count" id="filterCountAll">0</span></span>
-                                    <span class="filter-chip" data-filter="scene" title="场景技能 - 具有完整场景流程">
-                                        <i class="ri-layout-grid-line"></i> 场景技能 <span class="filter-count" id="filterCountScene">0</span>
+                                    <span class="filter-chip" data-filter="scene" title="场景应用 - 具有完整场景流程">
+                                        <i class="ri-layout-grid-line"></i> 场景应用 <span class="filter-count" id="filterCountScene">0</span>
                                     </span>
-                                    <span class="filter-chip" data-filter="provider" title="能力提供者 - 提供基础能力">
-                                        <i class="ri-cpu-line"></i> 能力提供 <span class="filter-count" id="filterCountProvider">0</span>
+                                    <span class="filter-chip" data-filter="provider" title="能力服务 - 提供基础能力">
+                                        <i class="ri-cpu-line"></i> 能力服务 <span class="filter-count" id="filterCountProvider">0</span>
                                     </span>
-                                    <span class="filter-chip" data-filter="driver" title="驱动技能 - 驱动场景运行">
-                                        <i class="ri-steering-line"></i> 驱动技能 <span class="filter-count" id="filterCountDriver">0</span>
+                                    <span class="filter-chip" data-filter="driver" title="驱动适配 - 驱动场景运行">
+                                        <i class="ri-steering-line"></i> 驱动适配 <span class="filter-count" id="filterCountDriver">0</span>
                                     </span>
                                     <span class="filter-chip" data-filter="auto" title="自驱场景 - 自动驱动执行">
                                         <i class="ri-rocket-line"></i> 自驱 <span class="filter-count" id="filterCountAuto">0</span>
@@ -156,6 +166,39 @@
                                     </span>
                                     <span class="filter-chip" data-filter="new">新能力 <span class="filter-count" id="filterCountNew">0</span></span>
                                     <span class="filter-chip" data-filter="installed">已安装 <span class="filter-count" id="filterCountInstalled">0</span></span>
+                                </div>
+                                <div class="results-filter results-filter--business" style="margin-top: 8px;">
+                                    <span class="filter-label">业务领域:</span>
+                                    <span class="filter-chip" data-filter="ai_assistant" title="AI助手 - AI对话、知识问答、智能客服">
+                                        <i class="ri-robot-line"></i> AI助手 <span class="filter-count" id="filterCountAiAssistant">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="infrastructure" title="基础设施 - 调度服务、网络服务、认证服务">
+                                        <i class="ri-server-line"></i> 基础设施 <span class="filter-count" id="filterCountInfrastructure">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="system_tools" title="系统工具 - 存储、通知、定时任务、备份">
+                                        <i class="ri-tools-line"></i> 系统工具 <span class="filter-count" id="filterCountSystemTools">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="system_monitor" title="系统监控 - 监控告警、日志收集、健康检查">
+                                        <i class="ri-pulse-line"></i> 系统监控 <span class="filter-count" id="filterCountSystemMonitor">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="office_collaboration" title="办公协作 - 团队协作、日志、会议、审批">
+                                        <i class="ri-team-line"></i> 办公协作 <span class="filter-count" id="filterCountOfficeCollaboration">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="marketing_operations" title="营销运营 - 内容发布、社媒管理、活动">
+                                        <i class="ri-megaphone-line"></i> 营销运营 <span class="filter-count" id="filterCountMarketingOperations">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="security_audit" title="安全审计 - 访问控制、审计日志、安全检测">
+                                        <i class="ri-shield-check-line"></i> 安全审计 <span class="filter-count" id="filterCountSecurityAudit">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="data_processing" title="数据处理 - 报表、分析、同步、可视化">
+                                        <i class="ri-bar-chart-line"></i> 数据处理 <span class="filter-count" id="filterCountDataProcessing">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="human_resource" title="人力资源 - 招聘、绩效、培训、员工管理">
+                                        <i class="ri-user-add-line"></i> 人力资源 <span class="filter-count" id="filterCountHumanResource">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="finance_accounting" title="财务会计 - 财务报表、账务处理、成本管理">
+                                        <i class="ri-money-cny-box-line"></i> 财务会计 <span class="filter-count" id="filterCountFinanceAccounting">0</span>
+                                    </span>
                                 </div>
                             </div>
                             <div class="results-body" id="resultsBody">

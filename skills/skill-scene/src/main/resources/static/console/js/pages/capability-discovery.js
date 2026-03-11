@@ -371,6 +371,7 @@
                     skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
                     sceneType: cap.sceneType || cap.sceneTypeCode || null,
                     skillCategory: cap.skillCategory || null,
+                    businessCategory: cap.businessCategory || null,
                     hasSelfDrive: cap.hasSelfDrive || false,
                     businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
                     skillId: cap.skillId || null
@@ -619,6 +620,7 @@
             var html = '';
             var sceneCount = 0, providerCount = 0, driverCount = 0, internalCount = 0;
             var autoCount = 0, triggerCount = 0;
+            var businessCounts = {};
             discoveredCapabilities.forEach(function(cap) {
                 var isInstalled = !!(cap.installed || installedCapabilities.find(function(i) { 
                     return i.capabilityId === cap.id || i.id === cap.id; 
@@ -641,6 +643,10 @@
                 if (skillForm === 'INTERNAL') internalCount++;
                 if (sceneType === 'AUTO') autoCount++;
                 if (sceneType === 'TRIGGER') triggerCount++;
+                
+                var bc = cap.businessCategory || 'OTHER';
+                if (!businessCounts[bc]) businessCounts[bc] = 0;
+                businessCounts[bc]++;
                 
                 var categoryBadge = '<span class="capability-category-badge ' + categoryInfo.code.toLowerCase() + '">' +
                     '<i class="' + categoryInfo.icon + '"></i> ' + categoryInfo.name + '</span>';
@@ -678,7 +684,8 @@
             scanStats.new = newVisibleCount;
             scanStats.installed = installedVisibleCount;
             CapabilityDiscovery.updateStats();
-            CapabilityDiscovery.updateFilterCounts(visibleCount, sceneCount, providerCount, driverCount, internalCount, autoCount, triggerCount, newVisibleCount, installedVisibleCount);
+            CapabilityDiscovery.updateFilterCounts(visibleCount, sceneCount, providerCount, driverCount, internalCount, autoCount, triggerCount, newVisibleCount, installedVisibleCount, businessCounts);
+            CapabilityDiscovery.renderCharts(businessCounts, { scene: sceneCount, provider: providerCount, driver: driverCount, internal: internalCount }, visibleCount);
             
             document.getElementById('resultsCount').textContent = visibleCount;
             
@@ -692,7 +699,7 @@
             }
         },
         
-        updateFilterCounts: function(all, scene, provider, driver, internal, auto, trigger, newCaps, installed) {
+        updateFilterCounts: function(all, scene, provider, driver, internal, auto, trigger, newCaps, installed, businessCounts) {
             var elAll = document.getElementById('filterCountAll');
             var elScene = document.getElementById('filterCountScene');
             var elProvider = document.getElementById('filterCountProvider');
@@ -710,6 +717,25 @@
             if (elTrigger) elTrigger.textContent = trigger;
             if (elNew) elNew.textContent = newCaps;
             if (elInstalled) elInstalled.textContent = installed;
+            
+            if (businessCounts) {
+                var bcMap = {
+                    'AI_ASSISTANT': 'filterCountAiAssistant',
+                    'INFRASTRUCTURE': 'filterCountInfrastructure',
+                    'SYSTEM_TOOLS': 'filterCountSystemTools',
+                    'SYSTEM_MONITOR': 'filterCountSystemMonitor',
+                    'OFFICE_COLLABORATION': 'filterCountOfficeCollaboration',
+                    'MARKETING_OPERATIONS': 'filterCountMarketingOperations',
+                    'SECURITY_AUDIT': 'filterCountSecurityAudit',
+                    'DATA_PROCESSING': 'filterCountDataProcessing',
+                    'HUMAN_RESOURCE': 'filterCountHumanResource',
+                    'FINANCE_ACCOUNTING': 'filterCountFinanceAccounting'
+                };
+                for (var bc in bcMap) {
+                    var el = document.getElementById(bcMap[bc]);
+                    if (el) el.textContent = businessCounts[bc] || 0;
+                }
+            }
         },
         
         getCategoryInfoNew: function(skillForm, sceneType) {
@@ -721,15 +747,15 @@
                 } else if (sceneType === 'HYBRID') {
                     return { code: 'SCENE_HYBRID', name: '混合场景', icon: 'ri-shuffle-line', description: '结合自驱和触发的场景技能' };
                 }
-                return { code: 'SCENE', name: '场景技能', icon: 'ri-layout-grid-line', description: '具有完整场景流程的技能' };
+                return { code: 'SCENE', name: '场景应用', icon: 'ri-layout-grid-line', description: '具有完整场景流程的技能' };
             } else if (skillForm === 'PROVIDER') {
-                return { code: 'PROVIDER', name: '能力提供者', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
+                return { code: 'PROVIDER', name: '能力服务', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
             } else if (skillForm === 'DRIVER') {
-                return { code: 'DRIVER', name: '驱动技能', icon: 'ri-steering-line', description: '驱动场景运行的技能' };
+                return { code: 'DRIVER', name: '驱动适配', icon: 'ri-steering-line', description: '驱动场景运行的技能' };
             } else if (skillForm === 'INTERNAL') {
-                return { code: 'INTERNAL', name: '内部能力', icon: 'ri-settings-3-line', description: '系统内部使用的技能' };
+                return { code: 'INTERNAL', name: '内部服务', icon: 'ri-settings-3-line', description: '系统内部使用的技能' };
             }
-            return { code: 'PROVIDER', name: '能力提供者', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
+            return { code: 'PROVIDER', name: '能力服务', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
         },
         
         getCategoryInfo: function(category) {
@@ -752,10 +778,97 @@
         
         getSkillFormInfo: function(skillForm) {
             var forms = {
-                'SCENE': { code: 'SCENE', name: '场景技能', icon: 'ri-layout-grid-line', description: '场景类型技能' },
+                'SCENE': { code: 'SCENE', name: '场景应用', icon: 'ri-layout-grid-line', description: '场景类型技能' },
                 'STANDALONE': { code: 'STANDALONE', name: '独立技能', icon: 'ri-tools-line', description: '独立运行的功能单元' }
             };
             return forms[skillForm] || forms['STANDALONE'];
+        },
+        
+        renderCharts: function(businessCounts, skillFormCounts, total) {
+            var chartSection = document.getElementById('chartSection');
+            var businessChart = document.getElementById('businessChart');
+            var skillFormChart = document.getElementById('skillFormChart');
+            
+            if (!chartSection || !businessChart || !skillFormChart) return;
+            
+            if (total === 0) {
+                chartSection.style.display = 'none';
+                return;
+            }
+            
+            chartSection.style.display = 'block';
+            
+            var bcColors = {
+                'AI_ASSISTANT': '#722ed1',
+                'INFRASTRUCTURE': '#1890ff',
+                'SYSTEM_TOOLS': '#52c41a',
+                'SYSTEM_MONITOR': '#faad14',
+                'OFFICE_COLLABORATION': '#13c2c2',
+                'MARKETING_OPERATIONS': '#eb2f96',
+                'SECURITY_AUDIT': '#f5222d',
+                'DATA_PROCESSING': '#2f54eb',
+                'HUMAN_RESOURCE': '#fa8c16',
+                'FINANCE_ACCOUNTING': '#a0d911'
+            };
+            
+            var bcNames = {
+                'AI_ASSISTANT': 'AI助手',
+                'INFRASTRUCTURE': '基础设施',
+                'SYSTEM_TOOLS': '系统工具',
+                'SYSTEM_MONITOR': '系统监控',
+                'OFFICE_COLLABORATION': '办公协作',
+                'MARKETING_OPERATIONS': '营销运营',
+                'SECURITY_AUDIT': '安全审计',
+                'DATA_PROCESSING': '数据处理',
+                'HUMAN_RESOURCE': '人力资源',
+                'FINANCE_ACCOUNTING': '财务会计'
+            };
+            
+            var bcHtml = '';
+            for (var bc in businessCounts) {
+                var count = businessCounts[bc];
+                var percent = Math.round((count * 100.0) / total);
+                var color = bcColors[bc] || '#8c8c8c';
+                var name = bcNames[bc] || bc;
+                bcHtml += '<div class="chart-pie-item">' +
+                    '<div class="chart-pie-dot" style="background: ' + color + '"></div>' +
+                    '<span class="chart-pie-label">' + name + '</span>' +
+                    '<span class="chart-pie-value">' + count + '</span>' +
+                    '<span class="chart-pie-percent">(' + percent + '%)</span>' +
+                    '</div>';
+            }
+            businessChart.innerHTML = bcHtml;
+            
+            var sfColors = {
+                'SCENE': '#722ed1',
+                'PROVIDER': '#1890ff',
+                'DRIVER': '#52c41a',
+                'INTERNAL': '#8c8c8c'
+            };
+            
+            var sfNames = {
+                'SCENE': '场景应用',
+                'PROVIDER': '能力服务',
+                'DRIVER': '驱动适配',
+                'INTERNAL': '内部服务'
+            };
+            
+            var sfHtml = '';
+            for (var sf in skillFormCounts) {
+                var count = skillFormCounts[sf];
+                if (count > 0) {
+                    var percent = Math.round((count * 100.0) / total);
+                    var color = sfColors[sf] || '#8c8c8c';
+                    var name = sfNames[sf] || sf;
+                    var barWidth = Math.max(10, percent);
+                    sfHtml += '<div class="chart-bar">' +
+                        '<span class="chart-bar-label">' + name + '</span>' +
+                        '<div class="chart-bar-bar" style="width: ' + barWidth + 'px; background: ' + color + '"></div>' +
+                        '<span class="chart-bar-value">' + count + '</span>' +
+                        '</div>';
+                }
+            }
+            skillFormChart.innerHTML = sfHtml;
         },
 
         getTypeIcon: function(type) {
@@ -1584,6 +1697,26 @@
                 CapabilityDiscovery.filterBySceneType('AUTO');
             } else if (filter === 'trigger') {
                 CapabilityDiscovery.filterBySceneType('TRIGGER');
+            } else if (filter === 'ai_assistant') {
+                CapabilityDiscovery.filterByBusinessCategory('AI_ASSISTANT');
+            } else if (filter === 'infrastructure') {
+                CapabilityDiscovery.filterByBusinessCategory('INFRASTRUCTURE');
+            } else if (filter === 'system_tools') {
+                CapabilityDiscovery.filterByBusinessCategory('SYSTEM_TOOLS');
+            } else if (filter === 'system_monitor') {
+                CapabilityDiscovery.filterByBusinessCategory('SYSTEM_MONITOR');
+            } else if (filter === 'office_collaboration') {
+                CapabilityDiscovery.filterByBusinessCategory('OFFICE_COLLABORATION');
+            } else if (filter === 'marketing_operations') {
+                CapabilityDiscovery.filterByBusinessCategory('MARKETING_OPERATIONS');
+            } else if (filter === 'security_audit') {
+                CapabilityDiscovery.filterByBusinessCategory('SECURITY_AUDIT');
+            } else if (filter === 'data_processing') {
+                CapabilityDiscovery.filterByBusinessCategory('DATA_PROCESSING');
+            } else if (filter === 'human_resource') {
+                CapabilityDiscovery.filterByBusinessCategory('HUMAN_RESOURCE');
+            } else if (filter === 'finance_accounting') {
+                CapabilityDiscovery.filterByBusinessCategory('FINANCE_ACCOUNTING');
             }
         },
         
@@ -1622,6 +1755,7 @@
                                 category: cap.category || 'NOT_SCENE_SKILL',
                                 skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
                                 sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                businessCategory: cap.businessCategory || null,
                                 hasSelfDrive: cap.hasSelfDrive || false,
                                 businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
                                 skillId: cap.skillId || null
@@ -1684,6 +1818,7 @@
                                 category: cap.category || 'NOT_SCENE_SKILL',
                                 skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
                                 sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                businessCategory: cap.businessCategory || null,
                                 hasSelfDrive: cap.hasSelfDrive || false,
                                 businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
                                 skillId: cap.skillId || null
@@ -1709,6 +1844,48 @@
                     console.error('[filterBySceneType] Error:', error);
                     CapabilityDiscovery.addLog('error', '过滤失败: ' + error.message);
                 });
+        },
+        
+        filterByBusinessCategory: function(businessCategory) {
+            CapabilityDiscovery.addLog('info', '按业务领域过滤: ' + businessCategory);
+            
+            var filteredCaps = [];
+            var newCount = 0;
+            var installedCount = 0;
+            
+            allCapabilities.forEach(function(cap) {
+                if (cap.businessCategory === businessCategory) {
+                    var isInstalled = cap.installed || false;
+                    filteredCaps.push(cap);
+                    if (isInstalled) {
+                        installedCount++;
+                    } else {
+                        newCount++;
+                    }
+                }
+            });
+            
+            discoveredCapabilities = filteredCaps;
+            scanStats.found = discoveredCapabilities.length;
+            scanStats.new = newCount;
+            scanStats.installed = installedCount;
+            scanStats.scanned = 100;
+            
+            CapabilityDiscovery.renderResults();
+            
+            var bcNames = {
+                'AI_ASSISTANT': 'AI助手',
+                'INFRASTRUCTURE': '基础设施',
+                'SYSTEM_TOOLS': '系统工具',
+                'SYSTEM_MONITOR': '系统监控',
+                'OFFICE_COLLABORATION': '办公协作',
+                'MARKETING_OPERATIONS': '营销运营',
+                'SECURITY_AUDIT': '安全审计',
+                'DATA_PROCESSING': '数据处理',
+                'HUMAN_RESOURCE': '人力资源',
+                'FINANCE_ACCOUNTING': '财务会计'
+            };
+            CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个' + (bcNames[businessCategory] || businessCategory) + '能力');
         },
         
         filterByCategory: function(category) {
@@ -1746,6 +1923,7 @@
                                 category: cap.category || 'NOT_SCENE_SKILL',
                                 skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
                                 sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                businessCategory: cap.businessCategory || null,
                                 hasSelfDrive: cap.hasSelfDrive || false,
                                 businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
                                 skillId: cap.skillId || null

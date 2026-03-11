@@ -1,0 +1,107 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-xiaohongshu
+  name: 小红书发布服务
+  version: 0.7.3
+  description: 小红书内容发布服务，支持笔记发布、管理
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - xiaohongshu
+    - publish
+    - note
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x4D
+    category: MEDIA
+    code: MEDIA_XIAOHONGSHU
+    operations: [publish, update, delete, stats]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: note-publish
+      name: 笔记发布
+      description: 发布笔记到小红书
+      category: service
+    - id: note-update
+      name: 笔记更新
+      description: 更新已发布笔记
+      category: service
+    - id: note-delete
+      name: 笔记删除
+      description: 删除已发布笔记
+      category: service
+  
+  endpoints:
+    - path: /api/media/xiaohongshu/notes
+      method: POST
+      description: 发布笔记
+      capability: note-publish
+    - path: /api/media/xiaohongshu/notes/{id}
+      method: PUT
+      description: 更新笔记
+      capability: note-update
+    - path: /api/media/xiaohongshu/notes/{id}
+      method: DELETE
+      description: 删除笔记
+      capability: note-delete
+  
+  config:
+    required:
+      - name: XHS_APP_ID
+        type: string
+        description: 小红书应用ID
+      - name: XHS_APP_SECRET
+        type: string
+        description: 小红书应用密钥
+    optional:
+      - name: XHS_API_URL
+        type: string
+        default: "https://api.xiaohongshu.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

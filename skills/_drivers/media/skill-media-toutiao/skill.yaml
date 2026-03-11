@@ -1,0 +1,115 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-toutiao
+  name: 头条发布服务
+  version: 0.7.3
+  description: 头条内容发布服务，支持文章发布、更新、删除、统计
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - toutiao
+    - publish
+    - article
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x4C
+    category: MEDIA
+    code: MEDIA_TOUTIAO
+    operations: [publish, update, delete, stats]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: article-publish
+      name: 文章发布
+      description: 发布文章到头条
+      category: service
+    - id: article-update
+      name: 文章更新
+      description: 更新已发布文章
+      category: service
+    - id: article-delete
+      name: 文章删除
+      description: 删除已发布文章
+      category: service
+    - id: article-stats
+      name: 文章统计
+      description: 获取文章统计数据
+      category: service
+  
+  endpoints:
+    - path: /api/media/toutiao/articles
+      method: POST
+      description: 发布文章
+      capability: article-publish
+    - path: /api/media/toutiao/articles/{id}
+      method: PUT
+      description: 更新文章
+      capability: article-update
+    - path: /api/media/toutiao/articles/{id}
+      method: DELETE
+      description: 删除文章
+      capability: article-delete
+    - path: /api/media/toutiao/articles/{id}/stats
+      method: GET
+      description: 获取统计
+      capability: article-stats
+  
+  config:
+    required:
+      - name: TOUTIAO_APP_ID
+        type: string
+        description: 头条应用ID
+      - name: TOUTIAO_APP_SECRET
+        type: string
+        description: 头条应用密钥
+    optional:
+      - name: TOUTIAO_API_URL
+        type: string
+        default: "https://api.toutiao.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

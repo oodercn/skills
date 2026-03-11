@@ -1,0 +1,107 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-weibo
+  name: 微博发布服务
+  version: 0.7.3
+  description: 微博内容发布服务，支持微博发布、互动管理
+  author: ooder Team
+  type: driver-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - weibo
+    - publish
+    - social
+
+spec:
+  type: driver-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x4A
+    category: MEDIA
+    code: MEDIA_WEIBO
+    operations: [publish, update, delete, interact]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: weibo-publish
+      name: 微博发布
+      description: 发布微博
+      category: service
+    - id: weibo-delete
+      name: 微博删除
+      description: 删除微博
+      category: service
+    - id: weibo-interact
+      name: 互动管理
+      description: 评论、点赞管理
+      category: service
+  
+  endpoints:
+    - path: /api/media/weibo/posts
+      method: POST
+      description: 发布微博
+      capability: weibo-publish
+    - path: /api/media/weibo/posts/{id}
+      method: DELETE
+      description: 删除微博
+      capability: weibo-delete
+    - path: /api/media/weibo/posts/{id}/comments
+      method: GET
+      description: 获取评论
+      capability: weibo-interact
+  
+  config:
+    required:
+      - name: WEIBO_APP_KEY
+        type: string
+        description: 微博AppKey
+      - name: WEIBO_APP_SECRET
+        type: string
+        description: 微博AppSecret
+    optional:
+      - name: WEIBO_API_URL
+        type: string
+        default: "https://api.weibo.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false
