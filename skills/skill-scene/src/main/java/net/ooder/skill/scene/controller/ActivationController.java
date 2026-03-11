@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -47,6 +48,25 @@ public class ActivationController {
         return ResultModel.success(process);
     }
 
+    @PostMapping("/{installId}/start-with-template")
+    public ResultModel<ActivationProcess> startProcessWithTemplate(
+            @PathVariable String installId,
+            @RequestBody TemplateActivationRequest request) {
+        log.info("[startProcessWithTemplate] Starting activation for template: {}, role: {}", 
+            request.getTemplateId(), request.getRoleName());
+        ActivationProcess process = activationService.startProcessWithTemplate(
+            installId, 
+            request.getTemplateId(),
+            request.getSceneGroupId(),
+            request.getActivator(),
+            request.getRoleName()
+        );
+        if (process == null) {
+            return ResultModel.error(404, "Template not found: " + request.getTemplateId());
+        }
+        return ResultModel.success(process);
+    }
+
     @PostMapping("/{installId}/steps/{stepId}/execute")
     public ResultModel<ActivationProcess> executeStep(
             @PathVariable String installId,
@@ -54,7 +74,7 @@ public class ActivationController {
             @RequestBody(required = false) StepExecutionRequest request) {
         log.info("[executeStep] Executing step {} for: {}", stepId, installId);
         try {
-            java.util.Map<String, Object> data = request != null ? request.getData() : null;
+            Map<String, Object> data = request != null ? request.getData() : null;
             ActivationProcess process = activationService.executeStep(installId, stepId, data);
             return ResultModel.success(process);
         } catch (Exception e) {
@@ -117,6 +137,30 @@ public class ActivationController {
         }
     }
 
+    @GetMapping("/{installId}/private-capabilities")
+    public ResultModel<List<ActivationProcess.PrivateCapabilityConfig>> getPrivateCapabilities(@PathVariable String installId) {
+        log.info("[getPrivateCapabilities] Getting private capabilities for: {}", installId);
+        List<ActivationProcess.PrivateCapabilityConfig> caps = activationService.getPrivateCapabilities(installId);
+        return ResultModel.success(caps);
+    }
+
+    @PostMapping("/{installId}/private-capabilities/configure")
+    public ResultModel<ActivationProcess> configurePrivateCapabilities(
+            @PathVariable String installId,
+            @RequestBody PrivateCapabilitiesRequest request) {
+        log.info("[configurePrivateCapabilities] Configuring private capabilities for: {}", installId);
+        try {
+            ActivationProcess process = activationService.configurePrivateCapabilities(
+                installId, 
+                request.getEnabledCapabilityIds()
+            );
+            return ResultModel.success(process);
+        } catch (Exception e) {
+            log.error("[configurePrivateCapabilities] Failed: {}", e.getMessage());
+            return ResultModel.error(500, "Failed to configure private capabilities: " + e.getMessage());
+        }
+    }
+
     @GetMapping(value = "/{installId}/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter streamActivation(@PathVariable String installId) {
         log.info("[streamActivation] Starting SSE stream for: {}", installId);
@@ -152,5 +196,28 @@ public class ActivationController {
         });
         
         return emitter;
+    }
+
+    public static class TemplateActivationRequest {
+        private String templateId;
+        private String sceneGroupId;
+        private String activator;
+        private String roleName;
+
+        public String getTemplateId() { return templateId; }
+        public void setTemplateId(String templateId) { this.templateId = templateId; }
+        public String getSceneGroupId() { return sceneGroupId; }
+        public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
+        public String getActivator() { return activator; }
+        public void setActivator(String activator) { this.activator = activator; }
+        public String getRoleName() { return roleName; }
+        public void setRoleName(String roleName) { this.roleName = roleName; }
+    }
+
+    public static class PrivateCapabilitiesRequest {
+        private List<String> enabledCapabilityIds;
+
+        public List<String> getEnabledCapabilityIds() { return enabledCapabilityIds; }
+        public void setEnabledCapabilityIds(List<String> enabledCapabilityIds) { this.enabledCapabilityIds = enabledCapabilityIds; }
     }
 }

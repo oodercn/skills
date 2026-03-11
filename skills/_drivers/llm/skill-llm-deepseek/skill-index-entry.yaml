@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-deepseek
+  name: DeepSeek LLM服务
+  version: "2.0.0"
+  description: "DeepSeek API服务"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: deepseek
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x34
+        name: LLM_DEEPSEEK
+        description: "DeepSeek"
+    optional: []
+  
+  tags:
+    - llm
+    - deepseek
+    - ai
+  
+  dependencies: []

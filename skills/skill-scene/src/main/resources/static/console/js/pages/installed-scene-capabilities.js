@@ -29,7 +29,7 @@
             ApiClient.post('/api/v1/discovery/gitee', { repoUrl: 'https://gitee.com/ooderCN/skills' })
                 .then(function(result) {
                     console.log('[InstalledSceneCapabilities] API response:', result);
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         allCapabilities = result.data.capabilities || [];
                         console.log('[InstalledSceneCapabilities] Total capabilities:', allCapabilities.length);
                         var installed = allCapabilities.filter(function(c) { return c.status === 'installed'; });

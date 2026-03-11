@@ -3,23 +3,26 @@ package net.ooder.skill.scene.controller;
 import javax.validation.Valid;
 import net.ooder.config.ResultModel;
 import net.ooder.scene.skill.LlmProvider;
+import net.ooder.scene.skill.tool.ToolOrchestrator;
+import net.ooder.scene.skill.tool.ToolRegistry;
+import net.ooder.scene.llm.context.*;
 import net.ooder.skill.scene.dto.llm.*;
 import net.ooder.skill.scene.llm.BaiduLlmProvider;
 import net.ooder.skill.scene.llm.DeepSeekLlmProvider;
+import net.ooder.skill.scene.llm.SkillActivationService;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ServiceLoader;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,6 +34,8 @@ public class LlmController extends BaseController {
 
     private static final Logger log = LoggerFactory.getLogger(LlmController.class);
     private static final long SSE_TIMEOUT = 120000L;
+    
+    private static final String DEFAULT_ROLE_ID = "discovery-assistant";
     
     @Value("${ooder.mock.enabled:false}")
     private boolean mockEnabled;
@@ -51,6 +56,29 @@ public class LlmController extends BaseController {
     private String deepseekApiKey;
     
     private final ExecutorService executor = Executors.newCachedThreadPool();
+    
+    private final ObjectMapper objectMapper = new ObjectMapper();
+    
+    private SkillActivationService skillActivationService;
+    
+    @Autowired
+    public void setSkillActivationService(SkillActivationService skillActivationService) {
+        this.skillActivationService = skillActivationService;
+    }
+    
+    private ToolRegistry toolRegistry;
+     
+    @Autowired
+    public void setToolRegistry(ToolRegistry toolRegistry) {
+        this.toolRegistry = toolRegistry;
+    }
+    
+    private ToolOrchestrator toolOrchestrator;
+     
+    @Autowired(required = false)
+    public void setToolOrchestrator(ToolOrchestrator toolOrchestrator) {
+         this.toolOrchestrator = toolOrchestrator;
+     }
     
     private final Map<String, LlmProvider> providers = new ConcurrentHashMap<String, LlmProvider>();
     private String currentProviderType = "mock";
@@ -94,6 +122,10 @@ public class LlmController extends BaseController {
         if (deepseekApiKey != null && !deepseekApiKey.isEmpty()) {
             DeepSeekLlmProvider deepseekProvider = new DeepSeekLlmProvider();
             deepseekProvider.setApiKey(deepseekApiKey);
+            deepseekProvider.setToolRegistry(toolRegistry);
+            if (toolOrchestrator != null) {
+                deepseekProvider.setToolOrchestrator(toolOrchestrator);
+            }
             providers.put("deepseek", deepseekProvider);
             log.info("DeepSeek LLM Provider registered with models: {}", deepseekProvider.getSupportedModels());
         }
@@ -144,7 +176,36 @@ public class LlmController extends BaseController {
             
             String response;
             if (provider != null) {
+                SkillActivationContext activationContext = null;
+                String activationId = null;
+                
+                if (skillActivationService != null) {
+                    ActivationRequest activationRequest = ActivationRequest.builder()
+                        .skillId("skill-scene")
+                        .userId("current-user")
+                        .roleId(DEFAULT_ROLE_ID)
+                        .build();
+                    
+                    activationContext = skillActivationService.activateSkill(activationRequest);
+                    activationId = activationContext.getActivationId();
+                    log.info("[LlmController] Skill activated: {}", activationId);
+                }
+                
                 List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
+                
+                Map<String, Object> systemMessage = new HashMap<String, Object>();
+                systemMessage.put("role", "system");
+                
+                String systemPrompt;
+                if (activationContext != null) {
+                    systemPrompt = getSystemPrompt() + "\n\n" + activationContext.buildSystemPrompt();
+                } else {
+                    systemPrompt = getSystemPrompt();
+                }
+                log.info("[LlmController] System prompt length: {}, first 100 chars: {}", 
+                    systemPrompt.length(), systemPrompt.substring(0, Math.min(100, systemPrompt.length())));
+                systemMessage.put("content", systemPrompt);
+                messages.add(systemMessage);
                 
                 Map<String, Object> userMessage = new HashMap<String, Object>();
                 userMessage.put("role", "user");
@@ -159,10 +220,48 @@ public class LlmController extends BaseController {
                     options.put("max_tokens", request.getMaxTokens());
                 }
                 
+                if (provider.supportsFunctionCalling()) {
+                    List<Map<String, Object>> tools;
+                    if (activationContext != null && activationContext.getFunctionContext() != null) {
+                        tools = activationContext.getFunctionContext().toTools();
+                        log.debug("Added {} tools from SkillActivationContext for function calling", tools.size());
+                    } else if (toolRegistry != null) {
+                        tools = toolRegistry.getToolDefinitions();
+                        log.debug("Added {} tools from ToolRegistry for function calling", tools.size());
+                    } else {
+                        tools = Collections.emptyList();
+                    }
+                    
+                    if (!tools.isEmpty()) {
+                        options.put("tools", tools);
+                        options.put("tool_choice", "auto");
+                    }
+                }
+                
+                if (activationId != null) {
+                    options.put("activationId", activationId);
+                }
+                
                 Map<String, Object> chatResult = provider.chat(model, messages, options);
                 response = (String) chatResult.get("content");
                 
+                Map<String, Object> actionResult = (Map<String, Object>) chatResult.get("actionResult");
+                
                 log.info("LLM response received from provider: {}", providerType);
+                
+                if (activationId != null && skillActivationService != null) {
+                    skillActivationService.deactivateContext(activationId);
+                }
+                
+                if (actionResult != null) {
+                    ChatResponseDTO responseDTO = ChatResponseDTO.success(response, model, providerType);
+                    responseDTO.setAction(actionResult);
+                    
+                    result.setData(responseDTO);
+                    result.setRequestStatus(200);
+                    result.setMessage("Success");
+                    return result;
+                }
             } else if (mockEnabled) {
                 response = getMockResponse(prompt);
                 log.info("Using mock response (mockEnabled=true), provider not available: {}", providerType);
@@ -205,7 +304,33 @@ public class LlmController extends BaseController {
                     String fullResponse;
                     
                     if (provider != null) {
+                        SkillActivationContext activationContext = null;
+                        String activationId = null;
+                        
+                        if (skillActivationService != null) {
+                            ActivationRequest activationRequest = ActivationRequest.builder()
+                                .skillId("skill-scene")
+                                .userId("current-user")
+                                .roleId(DEFAULT_ROLE_ID)
+                                .build();
+                            
+                            activationContext = skillActivationService.activateSkill(activationRequest);
+                            activationId = activationContext.getActivationId();
+                            log.info("[LlmController] Skill activated for stream: {}", activationId);
+                        }
+                        
                         List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
+                        
+                        Map<String, Object> systemMessage = new HashMap<String, Object>();
+                        systemMessage.put("role", "system");
+                        String systemPrompt;
+                        if (activationContext != null) {
+                            systemPrompt = getSystemPrompt() + "\n\n" + activationContext.buildSystemPrompt();
+                        } else {
+                            systemPrompt = getSystemPrompt();
+                        }
+                        systemMessage.put("content", systemPrompt);
+                        messages.add(systemMessage);
                         
                         Map<String, Object> userMessage = new HashMap<String, Object>();
                         userMessage.put("role", "user");
@@ -220,8 +345,44 @@ public class LlmController extends BaseController {
                             options.put("max_tokens", request.getMaxTokens());
                         }
                         
+                        if (provider.supportsFunctionCalling()) {
+                            List<Map<String, Object>> tools;
+                            if (activationContext != null && activationContext.getFunctionContext() != null) {
+                                tools = activationContext.getFunctionContext().toTools();
+                                log.debug("Added {} tools from SkillActivationContext for stream", tools.size());
+                            } else if (toolRegistry != null) {
+                                tools = toolRegistry.getToolDefinitions();
+                                log.debug("Added {} tools from ToolRegistry for stream", tools.size());
+                            } else {
+                                tools = Collections.emptyList();
+                            }
+                            
+                            if (!tools.isEmpty()) {
+                                options.put("tools", tools);
+                                options.put("tool_choice", "auto");
+                            }
+                        }
+                        
                         Map<String, Object> chatResult = provider.chat(model, messages, options);
                         fullResponse = (String) chatResult.get("content");
+                        
+                        Map<String, Object> actionResult = (Map<String, Object>) chatResult.get("actionResult");
+                        
+                        if (actionResult != null) {
+                            ChatResponseDTO responseDTO = ChatResponseDTO.success(fullResponse, model, providerType);
+                            responseDTO.setAction(actionResult);
+                            
+                            String jsonResponse = LlmController.this.objectMapper.writeValueAsString(responseDTO);
+                            emitter.send(SseEmitter.event()
+                                .name("action")
+                                .data(jsonResponse));
+                            
+                            log.info("[LlmController] Action returned in stream response: {}", actionResult);
+                        }
+                        
+                        if (activationId != null && skillActivationService != null) {
+                            skillActivationService.deactivateContext(activationId);
+                        }
                     } else if (mockEnabled) {
                         fullResponse = getMockResponse(prompt);
                     } else {
@@ -422,6 +583,60 @@ public class LlmController extends BaseController {
         return result;
     }
 
+    @PostMapping("/execute")
+    @ResponseBody
+    public ResultModel<Map<String, Object>> executeAction(@RequestBody Map<String, Object> request) {
+        String action = (String) request.get("action");
+        String module = (String) request.getOrDefault("module", "discovery");
+        Map<String, Object> params = (Map<String, Object>) request.getOrDefault("params", new HashMap<String, Object>());
+        
+        log.info("[LlmController] Execute action: {}, module: {}, params: {}", action, module, params);
+        
+        ResultModel<Map<String, Object>> result = new ResultModel<Map<String, Object>>();
+        
+        try {
+            Map<String, Object> actionResult = new HashMap<String, Object>();
+            actionResult.put("action", action);
+            actionResult.put("module", module);
+            actionResult.put("params", params);
+            
+            if ("startScan".equals(action)) {
+                String method = params.containsKey("method") ? (String) params.get("method") : "AUTO";
+                actionResult.put("success", true);
+                actionResult.put("message", "扫描已启动: " + method);
+                actionResult.put("method", method);
+                log.info("[LlmController] Start scan with method: {}", method);
+            } else if ("filterCapabilities".equals(action)) {
+                actionResult.put("success", true);
+                actionResult.put("message", "筛选条件已应用");
+                log.info("[LlmController] Filter capabilities applied");
+            } else if ("selectCapability".equals(action)) {
+                String capabilityId = (String) params.get("capabilityId");
+                actionResult.put("success", true);
+                actionResult.put("message", "已选择能力: " + capabilityId);
+                log.info("[LlmController] Capability selected: {}", capabilityId);
+            } else if ("startInstall".equals(action)) {
+                String capabilityId = (String) params.get("capabilityId");
+                actionResult.put("success", true);
+                actionResult.put("message", "安装已开始: " + capabilityId);
+                log.info("[LlmController] Install started for: {}", capabilityId);
+            } else {
+                actionResult.put("success", true);
+                actionResult.put("message", "Action executed: " + action);
+            }
+            
+            result.setData(actionResult);
+            result.setRequestStatus(200);
+            result.setMessage("Action executed successfully");
+        } catch (Exception e) {
+            log.error("Execute action error", e);
+            result.setRequestStatus(500);
+            result.setMessage("Execute action failed: " + e.getMessage());
+        }
+
+        return result;
+    }
+
     @PostMapping("/complete")
     @ResponseBody
     public ResultModel<String> complete(@RequestBody @Valid CompleteRequestDTO request) {
@@ -526,6 +741,45 @@ public class LlmController extends BaseController {
         }
 
         return result;
+    }
+
+    private String getSystemPrompt() {
+        StringBuilder prompt = new StringBuilder();
+        prompt.append("你是Ooder场景技能平台的智能助手。\n\n");
+        prompt.append("## 平台简介\n");
+        prompt.append("Ooder是一个场景驱动的技能管理平台，用户可以通过发现、安装、配置能力来构建自动化场景。\n\n");
+        prompt.append("## 核心概念\n");
+        prompt.append("- **能力(Capability)**: 可执行的功能单元，如发送邮件、生成报告等\n");
+        prompt.append("- **场景(Scene)**: 由多个能力组成的自动化流程\n\n");
+        prompt.append("## 技能分类体系 v3.0\n");
+        prompt.append("### 技能形态(SkillForm)\n");
+        prompt.append("- **SCENE**: 场景技能 - 具有完整场景流程的技能\n");
+        prompt.append("- **STANDALONE**: 独立技能 - 独立运行的功能单元\n\n");
+        prompt.append("### 场景类型(SceneType)\n");
+        prompt.append("- **AUTO**: 自驱场景 - 自动驱动执行\n");
+        prompt.append("- **TRIGGER**: 触发场景 - 需要外部触发\n");
+        prompt.append("- **HYBRID**: 混合场景 - 结合自驱和触发\n\n");
+        prompt.append("### 技能分类(SkillCategory)\n");
+        prompt.append("- **AI**: AI智能技能\n");
+        prompt.append("- **SERVICE**: 服务类技能\n");
+        prompt.append("- **COMMUNICATION**: 通信类技能\n");
+        prompt.append("- **STORAGE**: 存储类技能\n");
+        prompt.append("- **CUSTOM**: 自定义技能\n\n");
+        prompt.append("## 发现能力功能\n");
+        prompt.append("用户可以通过以下方式发现能力：\n");
+        prompt.append("1. **本地文件系统**: 扫描本地已安装的技能目录\n");
+        prompt.append("2. **Gitee发现**: 从 https://gitee.com/ooderCN/skills 仓库发现技能\n");
+        prompt.append("3. **GitHub发现**: 从GitHub仓库发现技能\n");
+        prompt.append("4. **Git仓库**: 从任意Git仓库发现技能\n\n");
+        prompt.append("## Gitee发现说明\n");
+        prompt.append("当用户点击\"Gitee发现\"时，系统会从 ooderCN/skills 仓库扫描技能包(skill.yaml)，\n");
+        prompt.append("识别其中的能力并展示给用户。用户可以查看能力详情、安装能力到本地。\n\n");
+        prompt.append("## 回复要求\n");
+        prompt.append("- 用简洁专业的中文回复\n");
+        prompt.append("- 不要提及你是DeepSeek或其他AI模型\n");
+        prompt.append("- 如果用户询问下载应用，请解释这是Web平台，无需下载\n");
+        prompt.append("- 如果用户询问Gitee发现，请解释这是从ooderCN技能仓库发现能力，不是代码安全扫描");
+        return prompt.toString();
     }
 
     private String getMockResponse(String prompt) {

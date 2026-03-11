@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-vfs-base
+  name: VFS基础服务
+  version: "1.0.0"
+  description: "VFS基础服务，提供文件操作基础接口"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: SYSTEM_TOOLS
+  subCategory: base
+  category: DATA
+  capabilityCategory: vfs
+  
+  capabilityAddresses:
+    required:
+      - address: 0x20
+        name: VFS_BASE
+        description: "VFS基础服务"
+    optional: []
+  
+  tags:
+    - vfs
+    - base
+    - storage
+  
+  dependencies: []

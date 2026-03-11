@@ -1,0 +1,123 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-ldap
+  name: LDAP Organization
+  version: 0.7.3
+  description: LDAP组织服务 - 提供基于LDAP的组织架构管理和用户认证能力
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-ldap
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - ldap
+    - org
+    - authentication
+    - organization
+    - directory
+
+spec:
+  type: enterprise-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x0C
+    category: ORG
+    code: ORG_LDAP
+    operations: [auth, org-sync, user-query]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.ldap.LdapOrgApplication
+  
+  capabilities:
+    - id: org-data-read
+      name: Org Data Read
+      description: 组织数据读取
+      category: organization
+    - id: org-data-sync
+      name: Org Data Sync
+      description: 组织数据同步
+      category: organization
+    - id: user-auth
+      name: User Authentication
+      description: 用户认证
+      category: authentication
+    - id: department-query
+      name: Department Query
+      description: 部门查询
+      category: organization
+    - id: user-query
+      name: User Query
+      description: 用户查询
+      category: organization
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - org-data-read
+        - org-data-sync
+        - user-auth
+        - department-query
+        - user-query
+  
+  dependencies: []
+  
+  config:
+    required:
+      - name: LDAP_URL
+        type: string
+        description: LDAP服务器URL
+      - name: LDAP_BASE_DN
+        type: string
+        description: LDAP基础DN
+      - name: LDAP_USERNAME
+        type: string
+        description: LDAP管理员用户名
+      - name: LDAP_PASSWORD
+        type: string
+        secret: true
+        description: LDAP管理员密码
+    optional:
+      - name: LDAP_USER_SEARCH_BASE
+        type: string
+        description: 用户搜索基础DN
+      - name: LDAP_GROUP_SEARCH_BASE
+        type: string
+        description: 组搜索基础DN
+  
+  endpoints:
+    - path: /api/org/departments
+      method: GET
+      description: 获取部门列表
+      capability: department-query
+    - path: /api/org/users
+      method: GET
+      description: 获取用户列表
+      capability: user-query
+    - path: /api/org/sync
+      method: POST
+      description: 同步组织数据
+      capability: org-data-sync
+    - path: /api/auth/login
+      method: POST
+      description: 用户登录
+      capability: user-auth
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

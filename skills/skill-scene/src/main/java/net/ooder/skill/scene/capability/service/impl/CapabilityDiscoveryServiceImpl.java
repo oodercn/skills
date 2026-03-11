@@ -2,10 +2,8 @@ package net.ooder.skill.scene.capability.service.impl;
 
 import net.ooder.skill.scene.capability.driver.DriverCondition;
 import net.ooder.skill.scene.capability.model.CapabilityType;
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
 import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService;
 import net.ooder.skill.scene.capability.service.CapabilityService;
-import net.ooder.skill.scene.capability.service.SceneSkillCategoryDetector;
 import net.ooder.skill.scene.capability.model.Capability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,9 +20,6 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
 
     @Autowired
     private CapabilityService capabilityService;
-
-    @Autowired
-    private SceneSkillCategoryDetector categoryDetector;
 
     @Override
     public DiscoveryResult discoverCapabilities(DiscoveryRequest request) {
@@ -55,12 +50,10 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
                 .collect(Collectors.toList());
         }
         
-        if (request.getCategory() != null) {
+        if (request.getSkillForm() != null && !request.getSkillForm().isEmpty()) {
+            final String skillForm = request.getSkillForm();
             allCapabilities = allCapabilities.stream()
-                .filter(c -> {
-                    SceneSkillCategory category = categoryDetector.detectCategory(c);
-                    return category == request.getCategory();
-                })
+                .filter(c -> skillForm.equals(c.getSkillForm()))
                 .collect(Collectors.toList());
         }
         
@@ -81,6 +74,11 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         List<CapabilityItem> collaborationCapabilities = new ArrayList<>();
         
         for (Capability cap : allCapabilities) {
+            if (isInternalCapability(cap)) {
+                log.debug("[discoverCapabilities] Filtering internal capability: {}", cap.getCapabilityId());
+                continue;
+            }
+            
             CapabilityItem item = convertToItem(cap);
             
             if (cap.getType() == CapabilityType.SCENE) {
@@ -120,7 +118,8 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         detail.setDependencies(capability.getDependencies());
         detail.setOptionalCapabilities(capability.getOptionalCapabilities());
         detail.setConfig(capability.getConfig());
-        detail.setCategory(categoryDetector.detectCategory(capability));
+        detail.setSkillForm(capability.getSkillForm() != null ? capability.getSkillForm().getCode() : null);
+        detail.setSceneType(capability.getSceneType());
         detail.setMainFirst(capability.isMainFirst());
         detail.setVisibility(capability.getVisibility());
         detail.setParticipants(convertParticipants(capability));
@@ -166,6 +165,26 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         return conditions;
     }
 
+    @Override
+    public Object invokeCapability(String capabilityId, Map<String, Object> params) {
+        log.info("[invokeCapability] Invoking capability: {} with params: {}", capabilityId, params);
+        
+        Capability capability = capabilityService.findById(capabilityId);
+        if (capability == null) {
+            throw new RuntimeException("Capability not found: " + capabilityId);
+        }
+        
+        Map<String, Object> result = new HashMap<>();
+        result.put("capabilityId", capabilityId);
+        result.put("name", capability.getName());
+        result.put("invokedAt", System.currentTimeMillis());
+        result.put("params", params);
+        result.put("status", "invoked");
+        result.put("message", "Capability invoked successfully");
+        
+        return result;
+    }
+
     private CapabilityItem convertToItem(Capability cap) {
         CapabilityItem item = new CapabilityItem();
         item.setCapabilityId(cap.getCapabilityId());
@@ -177,7 +196,8 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         item.setInstalled(cap.isInstalled());
         item.setSupportedSceneTypes(cap.getSupportedSceneTypes());
         item.setMetadata(cap.getMetadata());
-        item.setCategory(categoryDetector.detectCategory(cap));
+        item.setSkillForm(cap.getSkillForm() != null ? cap.getSkillForm().getCode() : null);
+        item.setSceneType(cap.getSceneType());
         item.setMainFirst(cap.isMainFirst());
         item.setVisibility(cap.getVisibility());
         item.setParticipants(convertParticipants(cap));
@@ -216,5 +236,13 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
                 return info;
             })
             .collect(Collectors.toList());
+    }
+    
+    private boolean isInternalCapability(Capability cap) {
+        if ("internal".equals(cap.getVisibility())) {
+            return true;
+        }
+        
+        return false;
     }
 }

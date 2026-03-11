@@ -1,7 +1,5 @@
 package net.ooder.skill.scene.capability.install;
 
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
-
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -32,7 +30,8 @@ public class InstallConfig {
     private boolean pushed;
     private long pushTime;
     
-    private SceneSkillCategory category;
+    private String skillForm;
+    private String sceneType;
     private String visibility;
     private List<String> nextSteps;
     
@@ -173,8 +172,10 @@ public class InstallConfig {
     public void setPushTime(long pushTime) { this.pushTime = pushTime; }
     public String getDriverConditionConfig() { return driverConditionConfig; }
     public void setDriverConditionConfig(String driverConditionConfig) { this.driverConditionConfig = driverConditionConfig; }
-    public SceneSkillCategory getCategory() { return category; }
-    public void setCategory(SceneSkillCategory category) { this.category = category; }
+    public String getSkillForm() { return skillForm; }
+    public void setSkillForm(String skillForm) { this.skillForm = skillForm; }
+    public String getSceneType() { return sceneType; }
+    public void setSceneType(String sceneType) { this.sceneType = sceneType; }
     public String getVisibility() { return visibility; }
     public void setVisibility(String visibility) { this.visibility = visibility; }
     public List<String> getNextSteps() { return nextSteps != null ? nextSteps : new ArrayList<String>(); }

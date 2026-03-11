@@ -1,0 +1,43 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-business
+  name: 业务场景服务
+  version: "0.7.3"
+  description: "业务场景服务，提供通用业务流程管理能力"
+
+spec:
+  skillForm: SCENE
+  sceneType: TRIGGER
+  visibility: public
+  businessCategory: SYSTEM_TOOLS
+  subCategory: business
+  category: WORKFLOW
+  capabilityCategory: util
+  
+  capabilityAddresses:
+    required:
+      - address: 0xF0
+        name: UTIL_BASE
+        description: "工具基础服务"
+    optional: []
+  
+  tags:
+    - business
+    - workflow
+    - scene
+  
+  dependencies: []
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]

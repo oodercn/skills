@@ -220,23 +220,27 @@ function throttle(func, limit) {
 if (!window.toggleTheme) {
     window.toggleTheme = function() {
         console.warn('theme-manager.js not loaded, using basic toggle');
-        document.documentElement.classList.toggle('light-theme');
-        document.body.classList.toggle('light-theme');
+        const html = document.documentElement;
+        if (html.getAttribute('data-theme') === 'light') {
+            html.removeAttribute('data-theme');
+            localStorage.setItem('nx-theme', 'dark');
+        } else {
+            html.setAttribute('data-theme', 'light');
+            localStorage.setItem('nx-theme', 'light');
+        }
     };
 }
 
 // ========== 监听主题变化并更新按钮 ==========
 window.addEventListener('themeChanged', function(e) {
     const theme = e.detail ? e.detail.theme : 'dark';
-    const buttons = document.querySelectorAll('.theme-toggle-btn');
+    const buttons = document.querySelectorAll('.theme-toggle-btn, #theme-toggle');
     buttons.forEach(btn => {
-        if (theme === 'dark') {
-            btn.innerHTML = '<i class="ri-sun-line"></i> 浅色模式';
-            btn.title = '切换到浅色模式';
-        } else {
-            btn.innerHTML = '<i class="ri-moon-line"></i> 深色模式';
-            btn.title = '切换到深色模式';
+        const icon = btn.querySelector('i');
+        if (icon) {
+            icon.className = theme === 'dark' ? 'ri-moon-line' : 'ri-sun-line';
         }
+        btn.title = theme === 'dark' ? '切换到浅色模式' : '切换到深色模式';
     });
 });
 

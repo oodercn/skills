@@ -1,6 +1,11 @@
 package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.model.ResultModel;
+import net.ooder.skill.scene.service.DependencyAutoInstallService;
+import net.ooder.skill.scene.service.DependencyAutoInstallService.AutoInstallResult;
+import net.ooder.skill.scene.service.DependencyHealthCheckService;
+import net.ooder.skill.scene.service.DependencyHealthCheckService.HealthCheckResult;
+import net.ooder.skill.scene.service.DependencyHealthCheckService.DependencyStatus;
 import net.ooder.skill.scene.template.SceneTemplate;
 import net.ooder.skill.scene.template.SceneTemplateService;
 import net.ooder.skill.scene.template.SceneTemplateService.DeployResult;
@@ -23,6 +28,12 @@ public class SceneTemplateController {
 
     @Autowired
     private SceneTemplateService templateService;
+
+    @Autowired
+    private DependencyHealthCheckService dependencyHealthCheckService;
+
+    @Autowired
+    private DependencyAutoInstallService dependencyAutoInstallService;
 
     @GetMapping
     public ResultModel<List<SceneTemplate>> listTemplates() {
@@ -88,6 +99,61 @@ public class SceneTemplateController {
         } catch (Exception e) {
             log.error("[installTemplate] Error installing template dependencies: {}", templateId, e);
             return ResultModel.error(500, "Failed to install dependencies: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{templateId}/dependencies/health")
+    public ResultModel<HealthCheckResult> checkDependenciesHealth(@PathVariable String templateId) {
+        log.info("[checkDependenciesHealth] Checking dependencies health for template: {}", templateId);
+        
+        try {
+            HealthCheckResult result = dependencyHealthCheckService.checkTemplateDependencies(templateId);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            log.error("[checkDependenciesHealth] Error checking dependencies for template: {}", templateId, e);
+            return ResultModel.error(500, "Failed to check dependencies: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{templateId}/dependencies/missing")
+    public ResultModel<List<DependencyStatus>> getMissingDependencies(@PathVariable String templateId) {
+        log.info("[getMissingDependencies] Getting missing dependencies for template: {}", templateId);
+        
+        try {
+            List<DependencyStatus> missing = dependencyHealthCheckService.getMissingDependencies(templateId);
+            return ResultModel.success(missing);
+        } catch (Exception e) {
+            log.error("[getMissingDependencies] Error getting missing dependencies for template: {}", templateId, e);
+            return ResultModel.error(500, "Failed to get missing dependencies: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{templateId}/dependencies/auto-install")
+    public ResultModel<AutoInstallResult> autoInstallDependencies(
+            @PathVariable String templateId,
+            @RequestParam(required = false, defaultValue = "false") boolean includeOptional) {
+        log.info("[autoInstallDependencies] Auto installing dependencies for template: {}, includeOptional: {}", 
+            templateId, includeOptional);
+        
+        try {
+            AutoInstallResult result = dependencyAutoInstallService.autoInstallDependencies(templateId, includeOptional);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            log.error("[autoInstallDependencies] Error auto installing dependencies for template: {}", templateId, e);
+            return ResultModel.error(500, "Failed to auto install dependencies: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/{templateId}/dependencies/install-missing")
+    public ResultModel<AutoInstallResult> installMissingRequired(@PathVariable String templateId) {
+        log.info("[installMissingRequired] Installing missing required dependencies for template: {}", templateId);
+        
+        try {
+            AutoInstallResult result = dependencyAutoInstallService.installMissingRequired(templateId);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            log.error("[installMissingRequired] Error installing missing required dependencies for template: {}", templateId, e);
+            return ResultModel.error(500, "Failed to install missing required dependencies: " + e.getMessage());
         }
     }
 

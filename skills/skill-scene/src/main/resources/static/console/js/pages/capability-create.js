@@ -136,7 +136,7 @@
 
             ApiClient.post('/api/v1/capabilities', data)
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         alert('能力创建成功！');
                         window.location.href = '/console/pages/my-capabilities.html';
                     } else {

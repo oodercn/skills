@@ -29,7 +29,7 @@ async function loadKeys() {
     try {
         var result = await ApiClient.get(url);
         
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             keys = result.data || [];
         } else {
             keys = result || [];

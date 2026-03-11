@@ -230,4 +230,34 @@ public class CapabilityBindingServiceImpl implements CapabilityBindingService {
             saveToStorage();
         }
     }
+    
+    @Override
+    public List<CapabilityBinding> listByAgent(String agentId) {
+        List<CapabilityBinding> result = new ArrayList<CapabilityBinding>();
+        if (agentId == null || agentId.isEmpty()) {
+            return result;
+        }
+        for (CapabilityBinding binding : bindings.values()) {
+            if (agentId.equals(binding.getAgentId()) && 
+                binding.getStatus() != CapabilityBindingStatus.RELEASED) {
+                result.add(binding);
+            }
+        }
+        return result;
+    }
+    
+    @Override
+    public List<CapabilityBinding> listByLink(String linkId) {
+        List<CapabilityBinding> result = new ArrayList<CapabilityBinding>();
+        if (linkId == null || linkId.isEmpty()) {
+            return result;
+        }
+        for (CapabilityBinding binding : bindings.values()) {
+            if (linkId.equals(binding.getLinkId()) && 
+                binding.getStatus() != CapabilityBindingStatus.RELEASED) {
+                result.add(binding);
+            }
+        }
+        return result;
+    }
 }

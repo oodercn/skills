@@ -3,7 +3,7 @@ package net.ooder.skill.scene.service;
 import net.ooder.skill.scene.dto.PageResult;
 import net.ooder.skill.scene.dto.SceneDefinitionDTO;
 import net.ooder.skill.scene.dto.SceneStateDTO;
-import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.scene.SceneSnapshotDTO;
 import net.ooder.skill.scene.controller.SceneController.LogDTO;
 

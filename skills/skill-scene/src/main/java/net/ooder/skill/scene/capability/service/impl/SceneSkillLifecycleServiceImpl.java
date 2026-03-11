@@ -3,9 +3,10 @@ package net.ooder.skill.scene.capability.service.impl;
 import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.skill.scene.capability.model.CapabilityType;
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.Visibility;
 import net.ooder.skill.scene.capability.service.CapabilityService;
-import net.ooder.skill.scene.capability.service.SceneSkillCategoryDetector;
 import net.ooder.skill.scene.capability.service.SceneSkillLifecycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,9 +27,6 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
     @Autowired
     private CapabilityService capabilityService;
 
-    @Autowired
-    private SceneSkillCategoryDetector categoryDetector;
-
     private Map<String, CapabilityStatus> statusMap = new ConcurrentHashMap<String, CapabilityStatus>();
 
     @Override
@@ -44,15 +42,18 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Only scene capabilities can be activated");
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
-        if (category == SceneSkillCategory.NOT_SCENE_SKILL || category == SceneSkillCategory.INVALID) {
-            return LifecycleResult.failure(capabilityId, "Invalid scene skill category: " + category);
+        SkillForm skillForm = capability.getSkillForm() != null ? capability.getSkillForm() : SkillForm.PROVIDER;
+        if (skillForm != SkillForm.SCENE) {
+            return LifecycleResult.failure(capabilityId, "Invalid skill form: " + skillForm);
         }
         
-        CapabilityStatus currentStatus = getStatus(capabilityId);
-        CapabilityStatus targetStatus = determineActivateStatus(category);
+        SceneType sceneType = capability.getSceneTypeEnum();
+        boolean isInternal = capability.getVisibilityEnum() == Visibility.INTERNAL;
         
-        if (!canTransition(currentStatus, targetStatus, category)) {
+        CapabilityStatus currentStatus = getStatus(capabilityId);
+        CapabilityStatus targetStatus = determineActivateStatus(sceneType, isInternal);
+        
+        if (!canTransition(currentStatus, targetStatus, sceneType)) {
             return LifecycleResult.failure(capabilityId, 
                 "Cannot activate from status: " + currentStatus + " to: " + targetStatus);
         }
@@ -60,9 +61,10 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         statusMap.put(capabilityId, targetStatus);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
-        result.setCategory(category);
+        result.setSceneType(sceneType);
+        result.setSkillForm(skillForm);
         result.setMessage("Activated successfully");
-        result.setNextSteps(getNextSteps(targetStatus, category));
+        result.setNextSteps(getNextSteps(targetStatus, sceneType));
         
         return result;
     }
@@ -76,9 +78,9 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
-        if (!category.supportsPause()) {
-            return LifecycleResult.failure(capabilityId, "Category " + category + " does not support pause");
+        SceneType sceneType = capability.getSceneTypeEnum();
+        if (sceneType == SceneType.AUTO && capability.getVisibilityEnum() == Visibility.INTERNAL) {
+            return LifecycleResult.failure(capabilityId, "Internal AUTO scenes do not support pause");
         }
         
         CapabilityStatus currentStatus = getStatus(capabilityId);
@@ -89,7 +91,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         statusMap.put(capabilityId, CapabilityStatus.PAUSED);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.PAUSED);
-        result.setCategory(category);
+        result.setSceneType(sceneType);
         result.setMessage("Paused successfully");
         
         return result;
@@ -104,20 +106,21 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
+        SceneType sceneType = capability.getSceneTypeEnum();
+        boolean isInternal = capability.getVisibilityEnum() == Visibility.INTERNAL;
         
         CapabilityStatus currentStatus = getStatus(capabilityId);
         if (currentStatus != CapabilityStatus.PAUSED) {
             return LifecycleResult.failure(capabilityId, "Can only resume from PAUSED status");
         }
         
-        CapabilityStatus targetStatus = category == SceneSkillCategory.ASS 
+        CapabilityStatus targetStatus = (sceneType == SceneType.AUTO && isInternal) 
             ? CapabilityStatus.SCHEDULED : CapabilityStatus.RUNNING;
         
         statusMap.put(capabilityId, targetStatus);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
-        result.setCategory(category);
+        result.setSceneType(sceneType);
         result.setMessage("Resumed successfully");
         
         return result;
@@ -132,9 +135,9 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
-        if (category != SceneSkillCategory.TBS) {
-            return LifecycleResult.failure(capabilityId, "Only SEMI_AUTO capabilities can be manually triggered");
+        SceneType sceneType = capability.getSceneTypeEnum();
+        if (sceneType != SceneType.TRIGGER) {
+            return LifecycleResult.failure(capabilityId, "Only TRIGGER scenes can be manually triggered");
         }
         
         CapabilityStatus currentStatus = getStatus(capabilityId);
@@ -146,7 +149,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         statusMap.put(capabilityId, CapabilityStatus.RUNNING);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.RUNNING);
-        result.setCategory(category);
+        result.setSceneType(sceneType);
         result.setMessage("Triggered successfully with action: " + request.getAction());
         
         return result;
@@ -161,10 +164,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
-        if (!category.supportsArchive()) {
-            return LifecycleResult.failure(capabilityId, "Category " + category + " does not support archive");
-        }
+        SceneType sceneType = capability.getSceneTypeEnum();
         
         CapabilityStatus currentStatus = getStatus(capabilityId);
         if (currentStatus != CapabilityStatus.COMPLETED && currentStatus != CapabilityStatus.PAUSED) {
@@ -175,7 +175,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         statusMap.put(capabilityId, CapabilityStatus.ARCHIVED);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.ARCHIVED);
-        result.setCategory(category);
+        result.setSceneType(sceneType);
         result.setMessage("Archived successfully");
         
         return result;
@@ -188,17 +188,17 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return null;
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
+        SceneType sceneType = capability.getSceneType() != null ? SceneType.valueOf(capability.getSceneType()) : null;
         CapabilityStatus status = getStatus(capabilityId);
         
         LifecycleState state = new LifecycleState();
         state.setCapabilityId(capabilityId);
         state.setStatus(status);
-        state.setCategory(category);
-        state.setCanPause(canPause(status, category));
-        state.setCanResume(canResume(status, category));
-        state.setCanTrigger(canTrigger(status, category));
-        state.setCanArchive(canArchive(status, category));
+        state.setSceneType(sceneType);
+        state.setCanPause(canPause(status, sceneType));
+        state.setCanResume(canResume(status, sceneType));
+        state.setCanTrigger(canTrigger(status, sceneType));
+        state.setCanArchive(canArchive(status, sceneType));
         state.setAvailableTransitions(getAvailableTransitions(capabilityId));
         state.setContext(new HashMap<String, Object>());
         
@@ -214,26 +214,26 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return transitions;
         }
         
-        SceneSkillCategory category = categoryDetector.detectCategory(capability);
+        SceneType sceneType = capability.getSceneType() != null ? SceneType.valueOf(capability.getSceneType()) : null;
         CapabilityStatus currentStatus = getStatus(capabilityId);
         
-        if (canTransition(currentStatus, CapabilityStatus.SCHEDULED, category)) {
+        if (canTransition(currentStatus, CapabilityStatus.SCHEDULED, sceneType)) {
             transitions.add(createTransition("activate", "激活", "激活场景", CapabilityStatus.SCHEDULED));
         }
         
-        if (canPause(currentStatus, category)) {
+        if (canPause(currentStatus, sceneType)) {
             transitions.add(createTransition("pause", "暂停", "暂停场景运行", CapabilityStatus.PAUSED));
         }
         
-        if (canResume(currentStatus, category)) {
+        if (canResume(currentStatus, sceneType)) {
             transitions.add(createTransition("resume", "恢复", "恢复场景运行", CapabilityStatus.RUNNING));
         }
         
-        if (canTrigger(currentStatus, category)) {
+        if (canTrigger(currentStatus, sceneType)) {
             transitions.add(createTransition("trigger", "触发", "手动触发场景", CapabilityStatus.RUNNING));
         }
         
-        if (canArchive(currentStatus, category)) {
+        if (canArchive(currentStatus, sceneType)) {
             transitions.add(createTransition("archive", "归档", "归档场景记录", CapabilityStatus.ARCHIVED));
         }
         
@@ -242,26 +242,19 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
 
     private CapabilityStatus getStatus(String capabilityId) {
         CapabilityStatus status = statusMap.get(capabilityId);
-        if (status == null) {
-            return CapabilityStatus.DRAFT;
-        }
-        return status;
+        return status != null ? status : CapabilityStatus.DRAFT;
     }
 
-    private CapabilityStatus determineActivateStatus(SceneSkillCategory category) {
-        switch (category) {
-            case ABS:
-                return CapabilityStatus.SCHEDULED;
-            case ASS:
-                return CapabilityStatus.INITIALIZING;
-            case TBS:
-                return CapabilityStatus.PENDING;
-            default:
-                return CapabilityStatus.DRAFT;
+    private CapabilityStatus determineActivateStatus(SceneType sceneType, boolean isInternal) {
+        if (sceneType == SceneType.AUTO) {
+            return isInternal ? CapabilityStatus.INITIALIZING : CapabilityStatus.SCHEDULED;
+        } else if (sceneType == SceneType.TRIGGER) {
+            return CapabilityStatus.PENDING;
         }
+        return CapabilityStatus.DRAFT;
     }
 
-    private boolean canTransition(CapabilityStatus from, CapabilityStatus to, SceneSkillCategory category) {
+    private boolean canTransition(CapabilityStatus from, CapabilityStatus to, SceneType sceneType) {
         if (from == to) {
             return false;
         }
@@ -303,29 +296,23 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         }
     }
 
-    private boolean canPause(CapabilityStatus status, SceneSkillCategory category) {
-        if (!category.supportsPause()) {
-            return false;
-        }
+    private boolean canPause(CapabilityStatus status, SceneType sceneType) {
         return status == CapabilityStatus.RUNNING || status == CapabilityStatus.SCHEDULED;
     }
 
-    private boolean canResume(CapabilityStatus status, SceneSkillCategory category) {
+    private boolean canResume(CapabilityStatus status, SceneType sceneType) {
         return status == CapabilityStatus.PAUSED;
     }
 
-    private boolean canTrigger(CapabilityStatus status, SceneSkillCategory category) {
-        return category == SceneSkillCategory.TBS 
+    private boolean canTrigger(CapabilityStatus status, SceneType sceneType) {
+        return sceneType == SceneType.TRIGGER 
             && (status == CapabilityStatus.PENDING || status == CapabilityStatus.WAITING);
     }
 
-    private boolean canArchive(CapabilityStatus status, SceneSkillCategory category) {
-        if (!category.supportsArchive()) {
-            return false;
-        }
+    private boolean canArchive(CapabilityStatus status, SceneType sceneType) {
         return status == CapabilityStatus.COMPLETED || status == CapabilityStatus.PAUSED;
     }
-
+    
     private LifecycleTransition createTransition(String action, String name, String description, 
             CapabilityStatus targetStatus) {
         LifecycleTransition transition = new LifecycleTransition();
@@ -348,7 +335,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         return transition;
     }
 
-    private List<String> getNextSteps(CapabilityStatus status, SceneSkillCategory category) {
+    private List<String> getNextSteps(CapabilityStatus status, SceneType sceneType) {
         List<String> steps = new ArrayList<String>();
         
         switch (status) {

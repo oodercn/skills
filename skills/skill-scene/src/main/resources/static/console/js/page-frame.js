@@ -142,15 +142,15 @@
             const icon = themeToggle ? themeToggle.querySelector('i') : null;
             const text = themeToggle ? themeToggle.querySelector('span') : null;
             
-            if (html.classList.contains('light-theme')) {
-                html.classList.remove('light-theme');
-                localStorage.setItem('theme', 'dark');
-                if (icon) icon.className = 'ri-sun-line';
+            if (html.getAttribute('data-theme') === 'light') {
+                html.removeAttribute('data-theme');
+                localStorage.setItem('nx-theme', 'dark');
+                if (icon) icon.className = 'ri-moon-line';
                 if (text) text.textContent = '浅色模式';
             } else {
-                html.classList.add('light-theme');
-                localStorage.setItem('theme', 'light');
-                if (icon) icon.className = 'ri-moon-line';
+                html.setAttribute('data-theme', 'light');
+                localStorage.setItem('nx-theme', 'light');
+                if (icon) icon.className = 'ri-sun-line';
                 if (text) text.textContent = '深色模式';
             }
         },
@@ -225,19 +225,19 @@
         },
 
         initTheme() {
-            const savedTheme = localStorage.getItem('theme');
+            const savedTheme = localStorage.getItem('nx-theme') || 'dark';
             const html = document.documentElement;
             const themeToggle = document.getElementById('theme-toggle');
             const icon = themeToggle ? themeToggle.querySelector('i') : null;
             const text = themeToggle ? themeToggle.querySelector('span') : null;
             
             if (savedTheme === 'light') {
-                html.classList.add('light-theme');
-                if (icon) icon.className = 'ri-moon-line';
+                html.setAttribute('data-theme', 'light');
+                if (icon) icon.className = 'ri-sun-line';
                 if (text) text.textContent = '深色模式';
             } else {
-                html.classList.remove('light-theme');
-                if (icon) icon.className = 'ri-sun-line';
+                html.removeAttribute('data-theme');
+                if (icon) icon.className = 'ri-moon-line';
                 if (text) text.textContent = '浅色模式';
             }
         }

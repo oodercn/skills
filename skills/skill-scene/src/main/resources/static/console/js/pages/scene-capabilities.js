@@ -1,282 +1,319 @@
-(function(global) {
-    'use strict';
+let allCapabilities = [];
+let filteredCapabilities = [];
+let capabilityTypes = [];
+let currentPage = 1;
+let pageSize = 20;
+let totalPages = 1;
+let totalCount = 0;
 
-    var allCapabilities = [];
-    var filteredCapabilities = [];
-    var currentFilter = 'all';
-    var searchKeyword = '';
+function getUrlParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
 
-    var CATEGORY_CONFIG = {
-        'FULL': { 
-            icon: 'ri-layout-grid-line', 
-            name: '完整场景技能',
-            description: '具备完整自驱能力的业务场景',
-            color: '#2563eb'
-        },
-        'TECHNICAL': { 
-            icon: 'ri-settings-4-line', 
-            name: '技术场景技能',
-            description: '系统内部技术流程场景',
-            color: '#d97706'
-        },
-        'SEMI_AUTO': { 
-            icon: 'ri-hand-coin-line', 
-            name: '半自动场景技能',
-            description: '需要外部触发的业务场景',
-            color: '#db2777'
-        },
-        'default': { 
-            icon: 'ri-flashlight-line', 
-            name: '其他',
-            description: '',
-            color: '#64748b'
-        }
-    };
+function getSkillForm(cap) {
+    return cap.skillForm || cap.skillFormCode || 'STANDALONE';
+}
 
-    var SceneCapabilities = {
-        init: function() {
-            window.onPageInit = function() {
-                console.log('[SceneCapabilities] 页面初始化完成');
-                SceneCapabilities.loadCapabilities();
-            };
-        },
+function getSceneType(cap) {
+    return cap.sceneType || cap.sceneTypeCode || null;
+}
 
-        loadCapabilities: function() {
-            ApiClient.post('/api/v1/discovery/gitee', { repoUrl: 'https://gitee.com/ooderCN/skills' })
-                .then(function(result) {
-                    console.log('[SceneCapabilities] API response:', result);
-                    if (result.code === 200 && result.data) {
-                        allCapabilities = (result.data.capabilities || []).filter(function(cap) {
-                            return cap.sceneCapability === true || cap.sceneCapability === 'true' || cap.type === 'SCENE';
-                        });
-                        console.log('[SceneCapabilities] Filtered capabilities:', allCapabilities.length);
-                        SceneCapabilities.updateStats();
-                        SceneCapabilities.renderCapabilities();
-                    } else if (result.status === 'success' && result.data) {
-                        allCapabilities = (result.data.capabilities || []).filter(function(cap) {
-                            return cap.sceneCapability === true || cap.sceneCapability === 'true' || cap.type === 'SCENE';
-                        });
-                        console.log('[SceneCapabilities] Filtered capabilities (status):', allCapabilities.length);
-                        SceneCapabilities.updateStats();
-                        SceneCapabilities.renderCapabilities();
-                    }
-                })
-                .catch(function(error) {
-                    console.error('[SceneCapabilities] 加载失败:', error);
-                    allCapabilities = [];
-                    SceneCapabilities.updateStats();
-                    SceneCapabilities.renderCapabilities();
-                });
-        },
+function isInternalCapability(cap) {
+    if (cap.visibility === 'internal') {
+        return true;
+    }
+    
+    var category = (cap.category || '').toUpperCase();
+    if (category === 'ASS') {
+        return true;
+    }
+    
+    var skillForm = getSkillForm(cap);
+    var sceneType = getSceneType(cap);
+    var businessScore = cap.businessSemanticsScore || cap.score || 5;
+    
+    if (skillForm === 'SCENE' && sceneType === 'AUTO' && businessScore < 6) {
+        return true;
+    }
+    
+    return false;
+}
 
-        updateStats: function() {
-            var installed = allCapabilities.filter(function(c) { return c.status === 'installed'; }).length;
-            var available = allCapabilities.filter(function(c) { return c.status !== 'installed'; }).length;
-            var fullCount = allCapabilities.filter(function(c) { return c.category === 'FULL'; }).length;
-            var technicalCount = allCapabilities.filter(function(c) { return c.category === 'TECHNICAL'; }).length;
-            var semiAutoCount = allCapabilities.filter(function(c) { return c.category === 'SEMI_AUTO'; }).length;
+async function initPage() {
+    const redirectType = getUrlParam('type');
+    if (redirectType) {
+        window.location.href = '/console/pages/my-capabilities.html?type=' + redirectType;
+        return;
+    }
+    
+    await loadCapabilityTypes();
+    await loadCapabilities();
+}
 
-            document.getElementById('totalCount').textContent = allCapabilities.length;
-            document.getElementById('installedCount').textContent = installed;
-            document.getElementById('availableCount').textContent = available;
-            document.getElementById('categoryCount').textContent = fullCount + technicalCount + semiAutoCount;
-        },
-
-        filterCapabilities: function() {
-            filteredCapabilities = allCapabilities.filter(function(cap) {
-                var matchCategory = currentFilter === 'all' || cap.category === currentFilter;
-                var matchSearch = !searchKeyword || 
-                    (cap.name && cap.name.toLowerCase().includes(searchKeyword.toLowerCase())) ||
-                    (cap.id && cap.id.toLowerCase().includes(searchKeyword.toLowerCase())) ||
-                    (cap.description && cap.description.toLowerCase().includes(searchKeyword.toLowerCase()));
-                return matchCategory && matchSearch;
-            });
-        },
-
-        getCategoryName: function(category) {
-            var config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['default'];
-            return config.name;
-        },
-
-        getCategoryIcon: function(category) {
-            var config = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['default'];
-            return config.icon;
-        },
-
-        getInstallHint: function(cap) {
-            if (cap.status === 'installed') {
-                return null;
-            }
-            
-            var category = cap.category;
-            var hints = [];
-            
-            if (category === 'FULL') {
-                hints.push('安装后将自动激活并按计划运行');
-            } else if (category === 'TECHNICAL') {
-                hints.push('安装后将自动执行系统维护任务');
-            } else if (category === 'SEMI_AUTO') {
-                hints.push('安装后需要手动触发执行');
-            }
-            
-            if (cap.driverConditions && cap.driverConditions.length > 0) {
-                hints.push('包含 ' + cap.driverConditions.length + ' 个驱动条件');
-            }
-            
-            if (cap.participants && cap.participants.length > 0) {
-                hints.push('需要配置 ' + cap.participants.length + ' 个参与者');
-            }
-            
-            return hints.length > 0 ? hints.join('；') : null;
-        },
-
-        renderCapabilities: function() {
-            SceneCapabilities.filterCapabilities();
-            var container = document.getElementById('capabilitiesGrid');
-
-            if (filteredCapabilities.length === 0) {
-                container.innerHTML = '<div class="empty-state">' +
-                    '<i class="ri-layout-grid-line"></i>' +
-                    '<div class="empty-state-title">暂无场景能力</div>' +
-                    '<div class="empty-state-desc">请检查网络连接或稍后重试</div>' +
-                    '</div>';
-                return;
-            }
-
-            var html = '';
-            filteredCapabilities.forEach(function(cap) {
-                var category = cap.category || 'default';
-                var categoryConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['default'];
-                var icon = categoryConfig.icon;
-                var statusClass = cap.status === 'installed' ? 'installed' : 'available';
-                var statusText = cap.status === 'installed' ? '已安装' : '可安装';
-                
-                var categoryBadgeHtml = category !== 'default' 
-                    ? '<span class="category-badge ' + category + '"><i class="' + icon + '"></i> ' + categoryConfig.name + '</span>'
-                    : '';
-                
-                var mainFirstBadgeHtml = cap.mainFirst !== undefined
-                    ? '<span class="mainfirst-badge' + (cap.mainFirst ? '' : ' manual') + '">' +
-                      '<i class="' + (cap.mainFirst ? 'ri-flashlight-line' : 'ri-hand-coin-line') + '"></i> ' +
-                      (cap.mainFirst ? '自驱' : '手动') + '</span>'
-                    : '';
-                
-                var visibilityBadgeHtml = cap.visibility 
-                    ? '<span class="visibility-badge ' + cap.visibility + '">' +
-                      (cap.visibility === 'internal' ? '内部' : '公开') + '</span>'
-                    : '';
-                
-                var installHint = SceneCapabilities.getInstallHint(cap);
-                var installHintHtml = installHint && cap.status !== 'installed'
-                    ? '<div class="install-hint"><i class="ri-information-line"></i>' + installHint + '</div>'
-                    : '';
-
-                html += '<div class="capability-card" data-id="' + cap.id + '" data-category="' + category + '">' +
-                    '<div class="card-header">' +
-                    '<div class="card-icon ' + category + '"><i class="' + icon + '"></i></div>' +
-                    '<div class="card-info">' +
-                    '<div class="card-title">' + (cap.name || cap.id) + 
-                        categoryBadgeHtml + mainFirstBadgeHtml + visibilityBadgeHtml + '</div>' +
-                    '<div class="card-id">' + cap.id + '</div>' +
-                    '</div>' +
-                    '<span class="card-status ' + statusClass + '">' + statusText + '</span>' +
-                    '</div>' +
-                    '<div class="card-body">' +
-                    '<div class="card-desc">' + (cap.description || '暂无描述') + '</div>' +
-                    '<div class="card-meta">' +
-                    '<span><i class="ri-information-line"></i> v' + (cap.version || '1.0.0') + '</span>' +
-                    '<span><i class="ri-folder-line"></i> ' + categoryConfig.name + '</span>' +
-                    '</div>' +
-                    installHintHtml +
-                    '</div>' +
-                    '<div class="card-footer">' +
-                    (cap.status === 'installed' 
-                        ? '<button class="nx-btn nx-btn--primary" onclick="useCapability(\'' + cap.id + '\')"><i class="ri-play-line"></i> 使用</button>' +
-                          '<button class="nx-btn nx-btn--secondary" onclick="viewDetail(\'' + cap.id + '\')"><i class="ri-eye-line"></i> 详情</button>'
-                        : '<button class="nx-btn nx-btn--primary" onclick="installCapability(\'' + cap.id + '\')"><i class="ri-download-line"></i> 安装</button>' +
-                          '<button class="nx-btn nx-btn--secondary" onclick="viewDetail(\'' + cap.id + '\')"><i class="ri-eye-line"></i> 详情</button>') +
-                    '</div>' +
-                    '</div>';
-            });
-            container.innerHTML = html;
-        }
-    };
-
-    SceneCapabilities.init();
-
-    global.filterByCategory = function(category) {
-        currentFilter = category;
-        document.querySelectorAll('.filter-chip').forEach(function(chip) {
-            chip.classList.remove('active');
-            if (chip.dataset.filter === category) {
-                chip.classList.add('active');
-            }
-        });
-        SceneCapabilities.renderCapabilities();
-    };
-
-    global.searchCapabilities = function() {
-        searchKeyword = document.getElementById('searchInput').value;
-        SceneCapabilities.renderCapabilities();
-    };
-
-    global.useCapability = function(capabilityId) {
-        window.location.href = '/console/pages/scene-capability-detail.html?id=' + capabilityId + '&action=use';
-    };
-
-    global.viewDetail = function(capabilityId) {
-        window.location.href = '/console/pages/scene-capability-detail.html?id=' + capabilityId;
-    };
-
-    global.installCapability = function(capabilityId) {
-        var card = document.querySelector('.capability-card[data-id="' + capabilityId + '"]');
-        var btn = card.querySelector('.nx-btn--primary');
-        var originalHtml = btn.innerHTML;
-        btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 安装中...';
-        btn.disabled = true;
-
-        var cap = allCapabilities.find(function(c) { return c.id === capabilityId; });
-        var category = cap ? (cap.category || 'FULL') : 'FULL';
+async function loadCapabilityTypes() {
+    try {
+        const response = await fetch('/api/v1/discovery/capabilities/types');
+        const result = await response.json();
         
-        ApiClient.post('/api/v1/discovery/install', { skillId: capabilityId, source: 'GITEE' })
-            .then(function(result) {
-                if ((result.status === 'success' || result.code === 200) && result.data) {
-                    btn.innerHTML = '<i class="ri-check-line"></i> 已安装';
-                    btn.classList.remove('nx-btn--primary');
-                    btn.classList.add('nx-btn--secondary');
-                    btn.onclick = function() { useCapability(capabilityId); };
-                    
-                    var statusBadge = card.querySelector('.card-status');
-                    statusBadge.classList.remove('available');
-                    statusBadge.classList.add('installed');
-                    statusBadge.textContent = '已安装';
+        if (result.status === 'success' && result.data) {
+            capabilityTypes = result.data;
+        } else if (Array.isArray(result)) {
+            capabilityTypes = result;
+        } else {
+            capabilityTypes = [
+                { id: 'SCENE', code: 'SCENE', name: '场景能力' },
+                { id: 'SKILL', code: 'SKILL', name: '技能能力' },
+                { id: 'CUSTOM', code: 'CUSTOM', name: '自定义能力' }
+            ];
+        }
+        renderTypeOptions();
+    } catch (e) {
+        console.error('Failed to load capability types:', e);
+        capabilityTypes = [
+            { id: 'SCENE', code: 'SCENE', name: '场景能力' },
+            { id: 'SKILL', code: 'SKILL', name: '技能能力' },
+            { id: 'CUSTOM', code: 'CUSTOM', name: '自定义能力' }
+        ];
+        renderTypeOptions();
+    }
+}
 
-                    var hintEl = card.querySelector('.install-hint');
-                    if (hintEl) {
-                        var nextStep = '';
-                        if (category === 'FULL') {
-                            nextStep = '场景已自动激活，将按计划运行';
-                        } else if (category === 'TECHNICAL') {
-                            nextStep = '技术场景已激活，将自动执行';
-                        } else if (category === 'SEMI_AUTO') {
-                            nextStep = '请手动触发场景执行';
-                        }
-                        hintEl.innerHTML = '<i class="ri-checkbox-circle-line" style="color: #059669;"></i>' + nextStep;
+function renderTypeOptions() {
+    const select = document.getElementById('type-filter');
+    select.innerHTML = '<option value="">全部类型</option>';
+    
+    capabilityTypes.forEach(type => {
+        const option = document.createElement('option');
+        option.value = type.id || type.code;
+        option.textContent = type.name;
+        select.appendChild(option);
+    });
+}
+
+async function loadCapabilities() {
+    const container = document.getElementById('capability-list');
+    container.innerHTML = '<div class="nx-flex nx-items-center nx-justify-center nx-p-8"><i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i><span class="nx-ml-2">加载中...</span></div>';
+    
+    try {
+        const response = await fetch('/api/v1/discovery/capabilities?pageNum=' + currentPage + '&pageSize=' + pageSize);
+        const result = await response.json();
+        
+        var rawList = [];
+        if (result.status === 'success' && result.data) {
+            rawList = result.data.list || result.data || [];
+        } else if (Array.isArray(result)) {
+            rawList = result;
+        }
+        
+        console.log('[scene-capabilities] 原始数据:', rawList.length, '条');
+        
+        if (rawList.length > 0) {
+            console.log('[scene-capabilities] 第一条数据结构:', JSON.stringify(rawList[0], null, 2));
+            
+            var allFields = {};
+            rawList.forEach(function(cap) {
+                Object.keys(cap).forEach(function(key) {
+                    if (!allFields[key]) {
+                        allFields[key] = cap[key];
                     }
-
-                    if (cap) cap.status = 'installed';
-                    SceneCapabilities.updateStats();
-                } else {
-                    btn.innerHTML = originalHtml;
-                    btn.disabled = false;
-                    alert('安装失败: ' + (result.message || '未知错误'));
-                }
-            })
-            .catch(function(error) {
-                btn.innerHTML = originalHtml;
-                btn.disabled = false;
-                alert('安装失败: ' + error.message);
+                });
             });
-    };
+            console.log('[scene-capabilities] 所有字段:', Object.keys(allFields));
+            console.log('[scene-capabilities] 字段值示例:', allFields);
+        }
+        
+        var internalCount = 0;
+        allCapabilities = rawList.filter(function(cap) {
+            var isInternal = isInternalCapability(cap);
+            if (isInternal) {
+                internalCount++;
+                console.log('[scene-capabilities] 过滤内部能力:', cap.name || cap.id, {
+                    category: cap.category,
+                    skillForm: getSkillForm(cap),
+                    sceneType: getSceneType(cap),
+                    visibility: cap.visibility,
+                    businessScore: cap.businessSemanticsScore || cap.score
+                });
+            }
+            return !isInternal;
+        });
+        
+        console.log('[scene-capabilities] 过滤后数据:', allCapabilities.length, '条，剔除内部能力:', internalCount, '条');
+        
+        filteredCapabilities = allCapabilities;
+        updateStats();
+        renderCapabilities();
+    } catch (e) {
+        console.error('Failed to load capabilities:', e);
+        container.innerHTML = '<p class="nx-text-secondary nx-text-center nx-p-4">加载失败: ' + e.message + '</p>';
+    }
+}
 
-})(typeof window !== 'undefined' ? window : this);
+function refreshCapabilities() {
+    loadCapabilities();
+}
+
+function updateStats() {
+    var total = filteredCapabilities.length;
+    var active = filteredCapabilities.filter(function(c) {
+        return c.status === 'ACTIVE' || c.status === 'REGISTERED' || c.status === 'ENABLED' || c.active === true;
+    }).length;
+    var scene = filteredCapabilities.filter(function(c) {
+        return c.type === 'SCENE' || c.type === 'SCENE_GROUP' || c.sceneCapability === true || getSkillForm(c) === 'SCENE' || c.skillForm === 'SCENE';
+    }).length;
+    var custom = filteredCapabilities.filter(function(c) {
+        return c.type === 'CUSTOM';
+    }).length;
+    
+    document.getElementById('total-count').textContent = total;
+    document.getElementById('active-count').textContent = active;
+    document.getElementById('scene-count').textContent = scene;
+    document.getElementById('custom-count').textContent = custom;
+}
+
+function renderCapabilities() {
+    const container = document.getElementById('capability-list');
+    
+    totalCount = filteredCapabilities.length;
+    totalPages = Math.ceil(totalCount / pageSize) || 1;
+    
+    if (currentPage > totalPages) {
+        currentPage = totalPages;
+    }
+    
+    const startIdx = (currentPage - 1) * pageSize;
+    const endIdx = Math.min(startIdx + pageSize, totalCount);
+    const pagedData = filteredCapabilities.slice(startIdx, endIdx);
+    
+    if (pagedData.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary nx-text-center nx-p-4">暂无能力数据</p>';
+        renderPagination();
+        return;
+    }
+    
+    let html = '<div class="nx-table-container"><table class="nx-table">';
+    html += '<thead><tr><th>能力名称</th><th>类型</th><th>提供者</th><th>状态</th><th>描述</th><th>操作</th></tr></thead><tbody>';
+    
+    pagedData.forEach(cap => {
+        const capId = cap.id || cap.capabilityId;
+        const isActive = cap.status === 'ACTIVE' || cap.status === 'REGISTERED' || cap.status === 'ENABLED' || cap.active === true || cap.installed === true;
+        const statusClass = isActive ? 'nx-badge--success' : 'nx-badge--secondary';
+        const statusText = isActive ? '活跃' : '停用';
+        const typeName = getTypeName(cap.type);
+        
+        html += '<tr>';
+        html += '<td><div class="nx-flex nx-items-center nx-gap-2"><i class="ri-puzzle-line"></i><span class="nx-font-medium">' + (cap.name || capId) + '</span></div></td>';
+        html += '<td><span class="nx-badge nx-badge--primary">' + typeName + '</span></td>';
+        html += '<td>' + (cap.skillId || cap.provider || '-') + '</td>';
+        html += '<td><span class="nx-badge ' + statusClass + '">' + statusText + '</span></td>';
+        html += '<td>' + (cap.description || '-') + '</td>';
+        html += '<td>';
+        html += '<button class="nx-btn nx-btn--primary nx-btn--sm" data-id="' + encodeURIComponent(capId) + '" onclick="useCapability(decodeURIComponent(this.dataset.id))">使用</button> ';
+        html += '<button class="nx-btn nx-btn--secondary nx-btn--sm" data-id="' + encodeURIComponent(capId) + '" onclick="showDetail(decodeURIComponent(this.dataset.id))">详情</button> ';
+        html += '</td>';
+        html += '</tr>';
+    });
+    
+    html += '</tbody></table></div>';
+    container.innerHTML = html;
+    renderPagination();
+}
+
+function getTypeName(type) {
+    const typeObj = capabilityTypes.find(t => t.id === type || t.code === type);
+    return typeObj ? typeObj.name : (type || '未知');
+}
+
+function handleFilter() {
+    const keyword = document.getElementById('search-input').value.toLowerCase();
+    const typeFilter = document.getElementById('type-filter').value;
+    const statusFilter = document.getElementById('status-filter').value;
+    
+    filteredCapabilities = allCapabilities.filter(function(cap) {
+        const capId = cap.id || cap.capabilityId;
+        const matchKeyword = !keyword || (cap.name || '').toLowerCase().includes(keyword) || (capId || '').toLowerCase().includes(keyword);
+        const matchType = !typeFilter || cap.type === typeFilter;
+        const isActive = cap.status === 'ACTIVE' || cap.status === 'REGISTERED' || cap.status === 'ENABLED' || cap.active === true || cap.installed === true;
+        const matchStatus = !statusFilter || 
+            (statusFilter === 'ACTIVE' && isActive) || 
+            (statusFilter === 'INACTIVE' && !isActive);
+        return matchKeyword && matchType && matchStatus;
+    });
+    
+    updateStats();
+    renderCapabilities();
+}
+
+function showDetail(capabilityId) {
+    window.location.href = '/console/pages/capability-detail.html?id=' + encodeURIComponent(capabilityId);
+}
+
+function useCapability(capabilityId) {
+    if (capabilityId === 'daily-report' || capabilityId === 'report-submit' || capabilityId.includes('report')) {
+        window.location.href = '/console/pages/daily-report-form.html?capabilityId=' + encodeURIComponent(capabilityId);
+    } else {
+        alert('该能力暂不支持直接使用');
+    }
+}
+
+function closeDetailModal() {
+    document.getElementById('detail-modal').classList.remove('nx-modal--open');
+}
+
+function renderPagination() {
+    const container = document.getElementById('pagination-container');
+    if (!container) {
+        console.log('[renderPagination] Container not found');
+        return;
+    }
+    
+    totalCount = filteredCapabilities.length;
+    totalPages = Math.ceil(totalCount / pageSize) || 1;
+    
+    console.log('[renderPagination] total:', totalCount, 'totalPages:', totalPages, 'currentPage:', currentPage);
+    
+    if (totalPages <= 1) {
+        container.innerHTML = '<div class="nx-flex nx-items-center nx-gap-4"><span class="nx-text-sm nx-text-secondary">共 ' + totalCount + ' 条记录</span></div>';
+        return;
+    }
+    
+    let html = '<div class="nx-pagination">';
+    
+    html += '<button class="nx-pagination__btn" onclick="goToPage(1)" ' + (currentPage === 1 ? 'disabled' : '') + ' title="首页"><i class="ri-skip-back-line"></i></button>';
+    html += '<button class="nx-pagination__btn" onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + ' title="上一页"><i class="ri-arrow-left-s-line"></i></button>';
+    
+    const startPage = Math.max(1, currentPage - 2);
+    const endPage = Math.min(totalPages, startPage + 4);
+    
+    for (let i = startPage; i <= endPage; i++) {
+        html += '<button class="nx-pagination__btn ' + (i === currentPage ? 'nx-pagination__btn--active' : '') + '" onclick="goToPage(' + i + ')">' + i + '</button>';
+    }
+    
+    html += '<button class="nx-pagination__btn" onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + ' title="下一页"><i class="ri-arrow-right-s-line"></i></button>';
+    html += '<button class="nx-pagination__btn" onclick="goToPage(' + totalPages + ')" ' + (currentPage === totalPages ? 'disabled' : '') + ' title="末页"><i class="ri-skip-forward-line"></i></button>';
+    
+    html += '</div>';
+    html += '<div class="nx-flex nx-items-center nx-gap-2 nx-ml-4">';
+    html += '<span class="nx-text-sm nx-text-secondary">第 ' + currentPage + ' / ' + totalPages + ' 页</span>';
+    html += '<span class="nx-text-sm nx-text-secondary">共 ' + totalCount + ' 条</span>';
+    html += '</div>';
+    
+    container.innerHTML = html;
+}
+
+function goToPage(page) {
+    if (page < 1 || page > totalPages || page === currentPage) return;
+    currentPage = page;
+    renderCapabilities();
+    renderPagination();
+}
+
+function changePageSize(newSize) {
+    pageSize = newSize;
+    currentPage = 1;
+    renderCapabilities();
+    renderPagination();
+}
+
+document.addEventListener('DOMContentLoaded', initPage);

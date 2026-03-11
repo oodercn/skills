@@ -51,6 +51,18 @@ public class MainFirstConfig implements Serializable {
     public void setStartCollaboration(List<CollaborationStep> startCollaboration) {
         this.startCollaboration = startCollaboration;
     }
+    
+    public boolean isEmpty() {
+        boolean hasSelfCheck = selfCheck != null && !selfCheck.isEmpty();
+        boolean hasSelfStart = selfStart != null && !selfStart.isEmpty();
+        boolean hasSelfDrive = selfDrive != null 
+            && ((selfDrive.getScheduleRules() != null && !selfDrive.getScheduleRules().isEmpty())
+                || (selfDrive.getEventRules() != null && !selfDrive.getEventRules().isEmpty())
+                || (selfDrive.getCapabilityChains() != null && !selfDrive.getCapabilityChains().isEmpty()));
+        boolean hasCollaboration = startCollaboration != null && !startCollaboration.isEmpty();
+        
+        return !hasSelfCheck && !hasSelfStart && !hasSelfDrive && !hasCollaboration;
+    }
 
     public static class CheckStep implements Serializable {
         private static final long serialVersionUID = 1L;

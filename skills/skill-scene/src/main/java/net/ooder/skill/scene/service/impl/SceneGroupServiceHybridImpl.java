@@ -10,6 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @Primary
 public class SceneGroupServiceHybridImpl implements SceneGroupService {
@@ -180,5 +182,30 @@ public class SceneGroupServiceHybridImpl implements SceneGroupService {
     @Override
     public boolean handleFailover(String sceneGroupId, String failedParticipantId) {
         return memoryService.handleFailover(sceneGroupId, failedParticipantId);
+    }
+
+    @Override
+    public SceneGroupDTO update(String sceneGroupId, SceneGroupConfigDTO config) {
+        return memoryService.update(sceneGroupId, config);
+    }
+
+    @Override
+    public boolean updateCapabilityBinding(String sceneGroupId, String bindingId, CapabilityBindingDTO binding) {
+        return memoryService.updateCapabilityBinding(sceneGroupId, bindingId, binding);
+    }
+
+    @Override
+    public List<SceneSnapshotDTO> listSnapshots(String sceneGroupId) {
+        return memoryService.listSnapshots(sceneGroupId);
+    }
+
+    @Override
+    public boolean bindKnowledgeBase(String sceneGroupId, KnowledgeBindingDTO binding) {
+        return memoryService.bindKnowledgeBase(sceneGroupId, binding);
+    }
+
+    @Override
+    public boolean unbindKnowledgeBase(String sceneGroupId, String kbId) {
+        return memoryService.unbindKnowledgeBase(sceneGroupId, kbId);
     }
 }

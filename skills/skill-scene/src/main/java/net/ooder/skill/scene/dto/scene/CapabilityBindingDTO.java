@@ -6,6 +6,7 @@ public class CapabilityBindingDTO {
     private String bindingId;
     private String sceneGroupId;
     private String capId;
+    private String capName;
     private CapabilityProviderType providerType;
     private String providerId;
     private ConnectorType connectorType;
@@ -20,6 +21,8 @@ public class CapabilityBindingDTO {
     public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
     public String getCapId() { return capId; }
     public void setCapId(String capId) { this.capId = capId; }
+    public String getCapName() { return capName; }
+    public void setCapName(String capName) { this.capName = capName; }
     public CapabilityProviderType getProviderType() { return providerType; }
     public void setProviderType(CapabilityProviderType providerType) { this.providerType = providerType; }
     public String getProviderId() { return providerId; }

@@ -1,5 +1,7 @@
 package net.ooder.skill.scene.dto.llm;
 
+import java.util.Map;
+
 public class ChatResponseDTO {
     
     private String response;
@@ -7,6 +9,9 @@ public class ChatResponseDTO {
     private String provider;
     private boolean error;
     private String errorMessage;
+    private Map<String, Object> action;
+    private boolean syncContext;
+    private Map<String, Object> syncData;
     
     public ChatResponseDTO() {}
     
@@ -71,5 +76,29 @@ public class ChatResponseDTO {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Map<String, Object> getAction() {
+        return action;
+    }
+
+    public void setAction(Map<String, Object> action) {
+        this.action = action;
+    }
+
+    public boolean isSyncContext() {
+        return syncContext;
+    }
+
+    public void setSyncContext(boolean syncContext) {
+        this.syncContext = syncContext;
+    }
+
+    public Map<String, Object> getSyncData() {
+        return syncData;
+    }
+
+    public void setSyncData(Map<String, Object> syncData) {
+        this.syncData = syncData;
     }
 }

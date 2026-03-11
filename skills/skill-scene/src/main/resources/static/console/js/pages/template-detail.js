@@ -66,7 +66,7 @@ async function loadAvailableCapabilities() {
     try {
         const result = await ApiClient.get('/api/v1/capabilities');
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             availableCapabilities = result.data;
         }
     } catch (error) {
@@ -79,7 +79,7 @@ async function loadOrgTree() {
     try {
         const result = await ApiClient.get('/api/v1/org/tree');
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             orgTree = result.data;
         }
     } catch (error) {
@@ -92,7 +92,7 @@ async function loadRoles() {
     try {
         const result = await ApiClient.get('/api/v1/org/roles');
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             roles = result.data;
         }
     } catch (error) {
@@ -127,7 +127,7 @@ async function loadTemplate(id) {
     try {
         const result = await ApiClient.get('/api/v1/scene-templates/' + id);
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             currentTemplate = result.data;
             renderTemplate();
         } else {
@@ -466,7 +466,7 @@ async function saveCapability() {
     try {
         const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/capabilities', capability);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             if (!currentTemplate.capabilities) currentTemplate.capabilities = [];
             const existingIndex = currentTemplate.capabilities.findIndex(c => c.capId === capability.capId);
             if (existingIndex >= 0) {
@@ -507,7 +507,7 @@ async function deleteCapability(capId) {
     try {
         const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/capabilities/' + capId);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             currentTemplate.capabilities = currentTemplate.capabilities?.filter(c => c.capId !== capId);
             renderCapabilities();
             renderCapabilityOverview();
@@ -595,7 +595,7 @@ async function saveRole() {
     try {
         const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/roles', role);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             if (!currentTemplate.roles) currentTemplate.roles = [];
             const existingIndex = currentTemplate.roles.findIndex(r => r.name === role.name);
             if (existingIndex >= 0) {
@@ -644,7 +644,7 @@ async function deleteRole(roleName) {
     try {
         const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/roles/' + encodeURIComponent(roleName));
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             currentTemplate.roles = currentTemplate.roles?.filter(r => r.name !== roleName);
             renderRoles();
             document.getElementById('roleCount').textContent = currentTemplate.roles?.length || 0;
@@ -678,7 +678,7 @@ async function saveTemplate() {
     try {
         const result = await ApiClient.put('/api/v1/scene-templates/' + currentTemplate.templateId, currentTemplate);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             alert('保存成功');
             loadTemplate(currentTemplate.templateId);
         } else {
@@ -718,7 +718,7 @@ async function saveSceneGroup() {
     try {
         const result = await ApiClient.post('/api/v1/scene-groups', request);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             closeSceneGroupModal();
             window.location.href = 'scene-group-detail.html?id=' + result.data.sceneGroupId;
         } else {

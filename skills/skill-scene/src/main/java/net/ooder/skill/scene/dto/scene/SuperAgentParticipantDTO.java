@@ -1,6 +1,6 @@
 package net.ooder.skill.scene.dto.scene;
 
-import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import java.util.List;
 
 public class SuperAgentParticipantDTO {

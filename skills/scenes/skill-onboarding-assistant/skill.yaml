@@ -1,0 +1,268 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-onboarding-assistant
+  name: 新人培训助手
+  version: 1.0.0
+  description: 新员工入职培训助手场景能力，帮助新人快速了解公司和岗位知识
+  author: Ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - onboarding
+    - training
+    - learning
+    - assistant
+    - hr
+  category: abs
+  sceneCategory: abs
+
+spec:
+  type: scene-skill
+  category: abs
+  
+  classification:
+    category: abs
+    categoryName: 自驱业务场景
+    mainFirst: true
+    businessSemanticsScore: 9
+    detectedAt: "2026-03-06T00:00:00Z"
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies:
+    - id: skill-knowledge-base
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "知识库核心服务"
+      capabilities:
+        - knowledge-base
+        
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "LLM对话服务"
+      capabilities:
+        - llm-chat
+        
+    - id: skill-rag
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "RAG检索增强"
+      capabilities:
+        - rag-retrieval
+
+  sceneCapabilities:
+    - id: scene-onboarding-assistant
+      name: 新人培训助手场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [init-learning-path, ask-question, generate-report]
+          - checkDriverCapabilities: [intent-receiver]
+          - checkDependencies: [skill-knowledge-base, skill-llm-conversation, skill-rag]
+          
+        selfStart:
+          - initDriverCapabilities: [intent-receiver]
+          - initCapabilities: [init-learning-path, ask-question, generate-report]
+          
+        selfDrive:
+          eventRules:
+            - event: employee.onboarding
+              action: init-learning-path-flow
+            - event: employee.question
+              action: qa-flow
+            - event: employee.completeStage
+              action: update-progress-flow
+              
+          capabilityChains:
+            init-learning-path-flow:
+              - capability: init-learning-path
+                input:
+                  employeeId: "${event.employeeId}"
+                  position: "${event.position}"
+                  department: "${event.department}"
+                  
+            qa-flow:
+              - capability: ask-question
+                input:
+                  employeeId: "${event.employeeId}"
+                  question: "${event.question}"
+                  
+            update-progress-flow:
+              - capability: update-progress
+                input:
+                  employeeId: "${event.employeeId}"
+                  stageId: "${event.stageId}"
+
+      capabilities:
+        - init-learning-path
+        - ask-question
+        - generate-report
+        - update-progress
+        
+      collaborativeCapabilities:
+        - capabilityId: notification-service
+          role: PROVIDER
+          interface: training-notification
+          autoStart: false
+          optional: true
+
+  capabilities:
+    - id: init-learning-path
+      name: 初始化学习路径
+      description: 根据岗位为新员工创建个性化学习路径
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          employeeId:
+            type: string
+            description: 员工ID
+          position:
+            type: string
+            description: 岗位
+          department:
+            type: string
+            description: 部门
+      outputSchema:
+        type: object
+        properties:
+          pathId:
+            type: string
+          stages:
+            type: array
+          totalDuration:
+            type: integer
+            
+    - id: ask-question
+      name: 培训问答
+      description: 7x24小时智能问答支持
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          employeeId:
+            type: string
+          question:
+            type: string
+          context:
+            type: string
+      outputSchema:
+        type: object
+        properties:
+          answer:
+            type: string
+          sources:
+            type: array
+          needHumanSupport:
+            type: boolean
+            
+    - id: generate-report
+      name: 生成学习报告
+      description: 生成员工学习进度报告
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          employeeId:
+            type: string
+      outputSchema:
+        type: object
+        properties:
+          progress:
+            type: number
+          completedTasks:
+            type: integer
+          assessmentScore:
+            type: number
+            
+    - id: update-progress
+      name: 更新进度
+      description: 更新学习进度
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          employeeId:
+            type: string
+          stageId:
+            type: string
+          completed:
+            type: boolean
+      outputSchema:
+        type: object
+        properties:
+          status:
+            type: string
+          progress:
+            type: number
+
+  capabilityBindings:
+    - sceneCapabilityType: onboarding-assistant
+      autoBind: true
+      capabilities:
+        - init-learning-path
+        - ask-question
+        - generate-report
+        - update-progress
+
+  endpoints:
+    - path: /api/v1/onboarding/learning-path
+      method: POST
+      description: 初始化学习路径
+      capability: init-learning-path
+      
+    - path: /api/v1/onboarding/question
+      method: POST
+      description: 培训问答
+      capability: ask-question
+      
+    - path: /api/v1/onboarding/report/{employeeId}
+      method: GET
+      description: 获取学习报告
+      capability: generate-report
+      
+    - path: /api/v1/onboarding/progress
+      method: PUT
+      description: 更新学习进度
+      capability: update-progress
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.onboarding.assistant.OnboardingAssistantApplication
+
+  config:
+    optional:
+      - name: CONFIDENCE_THRESHOLD
+        type: number
+        default: 0.6
+        description: 转人工置信度阈值
+      - name: DEFAULT_KB_IDS
+        type: string
+        default: "company-policy-kb,hr-kb"
+        description: 默认知识库ID列表
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

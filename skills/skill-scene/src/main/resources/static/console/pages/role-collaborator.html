@@ -20,48 +20,62 @@
         
         <main class="nx-page__content">
             <header class="nx-page__header">
-                <div class="nx-page__title">
-                    <h1><i class="ri-user-follow-line"></i> 协作者工作台</h1>
-                    <p>闭环四：接收任务 → 执行任务 → 提交结果</p>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="nx-page__title">
+                        <h1><i class="ri-user-follow-line" aria-hidden="true"></i> 协作者工作台</h1>
+                        <p>闭环四：接收任务 → 执行任务 → 提交结果</p>
+                    </div>
                 </div>
                 <div class="nx-page__actions">
-                    <span class="nx-badge nx-badge--primary" id="user-badge">
-                        <i class="ri-user-line"></i> <span id="user-name">加载中...</span>
-                    </span>
-                    <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="handleLogout()" title="退出">
-                        <i class="ri-logout-box-line"></i>
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
                     </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                <i class="ri-puzzle-line"></i> 我的能力
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </header>
             
             <div class="nx-page__main">
                 <div class="nx-container">
-                    <div class="nx-row nx-mb-4">
-                        <div class="nx-col-4">
-                            <div class="nx-stat-card">
-                                <div class="nx-stat-card__icon"><i class="ri-task-line"></i></div>
-                                <div class="nx-stat-card__content">
-                                    <h4>待办任务</h4>
-                                    <p class="nx-stat-card__value" id="todo-count">0</p>
-                                </div>
+                    <div class="nx-grid nx-grid-cols-3 nx-mb-4">
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon"><i class="ri-task-line"></i></div>
+                            <div class="nx-stat-card__content">
+                                <h4>待办任务</h4>
+                                <p class="nx-stat-card__value" id="todo-count">0</p>
                             </div>
                         </div>
-                        <div class="nx-col-4">
-                            <div class="nx-stat-card">
-                                <div class="nx-stat-card__icon" style="background: var(--nx-success-light); color: var(--nx-success);"><i class="ri-checkbox-circle-line"></i></div>
-                                <div class="nx-stat-card__content">
-                                    <h4>已完成</h4>
-                                    <p class="nx-stat-card__value" id="done-count">0</p>
-                                </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon" style="background: var(--nx-success-light); color: var(--nx-success);"><i class="ri-checkbox-circle-line"></i></div>
+                            <div class="nx-stat-card__content">
+                                <h4>已完成</h4>
+                                <p class="nx-stat-card__value" id="done-count">0</p>
                             </div>
                         </div>
-                        <div class="nx-col-4">
-                            <div class="nx-stat-card">
-                                <div class="nx-stat-card__icon" style="background: var(--nx-warning-light); color: var(--nx-warning);"><i class="ri-time-line"></i></div>
-                                <div class="nx-stat-card__content">
-                                    <h4>参与场景</h4>
-                                    <p class="nx-stat-card__value" id="scene-count">0</p>
-                                </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon" style="background: var(--nx-warning-light); color: var(--nx-warning);"><i class="ri-time-line"></i></div>
+                            <div class="nx-stat-card__content">
+                                <h4>参与场景</h4>
+                                <p class="nx-stat-card__value" id="scene-count">0</p>
                             </div>
                         </div>
                     </div>
@@ -108,7 +122,7 @@
                     
                     <div class="nx-card nx-mt-4">
                         <div class="nx-card__header">
-                            <h3>我的待办</h3>
+                            <h3 id="todo-section-title">我的待办</h3>
                         </div>
                         <div class="nx-card__body">
                             <div id="todo-list">
@@ -122,7 +136,7 @@
                     
                     <div class="nx-card nx-mt-4">
                         <div class="nx-card__header">
-                            <h3>参与的场景</h3>
+                            <h3 id="scene-section-title">参与的场景</h3>
                         </div>
                         <div class="nx-card__body">
                             <div id="scene-list">

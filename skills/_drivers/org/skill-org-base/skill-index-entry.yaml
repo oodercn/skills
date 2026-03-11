@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-org-base
+  name: 组织基础服务
+  version: "1.0.0"
+  description: "组织基础服务，提供组织架构、部门管理基础功能"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: INFRASTRUCTURE
+  subCategory: base
+  category: SERVICE
+  capabilityCategory: org
+  
+  capabilityAddresses:
+    required:
+      - address: 0x08
+        name: ORG_LOCAL
+        description: "本地组织服务"
+    optional: []
+  
+  tags:
+    - org
+    - base
+    - organization
+  
+  dependencies: []

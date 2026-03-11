@@ -11,29 +11,36 @@
         { id: 'skill-llm-chat', name: 'skill-llm-chat LLM对话包', desc: '大语言模型对话功能' }
     ];
     
-    const installedSkills = new Set();
-    let currentUser = null;
+    const installedSkillIds = new Set();
     let currentSyscode = null;
+    let completionShown = false;
 
-    async function checkLogin() {
+    async function initPage() {
+        await loadSystemConfig();
+        await loadInstalledSkills();
+        await checkLoopStatus();
+    }
+    
+    async function checkLoopStatus() {
         try {
-            const response = await fetch('/api/v1/auth/session');
+            const response = await fetch('/api/v1/installer/status/loop1');
             const result = await response.json();
+            
             if (result.status === 'success' && result.data) {
-                currentUser = result.data;
-                if (currentUser.roleType !== 'installer') {
-                    window.location.href = '/console/pages/login.html';
-                    return;
+                const status = result.data.status;
+                const completedAt = result.data.completedAt;
+                
+                if (status === 'completed') {
+                    addLog('闭环一已完成，跳过安装', 'info');
+                    requiredSkills.forEach(skill => {
+                        installedSkillIds.add(skill.id);
+                    });
+                    updateProgress();
+                    showCompletionMessage();
                 }
-                document.getElementById('user-name').textContent = currentUser.name;
-                await loadSystemConfig();
-                await loadInstalledSkills();
-            } else {
-                window.location.href = '/console/pages/login.html';
             }
         } catch (e) {
-            console.error('Session check failed:', e);
-            window.location.href = '/console/pages/login.html';
+            console.error('Failed to check loop status:', e);
         }
     }
 
@@ -73,14 +80,12 @@
                 
                 capabilities.forEach(cap => {
                     const skillId = cap.skillId || cap.id;
-                    if (skillId) {
-                        installedSkills.add(skillId);
+                    if (skillId && requiredSkills.some(s => s.id === skillId)) {
+                        installedSkillIds.add(skillId);
                     }
                 });
                 
-                installedSkills.add(currentSyscode);
-                
-                addLog(`发现 ${capabilities.length} 个已安装技能`, 'success');
+                addLog(`发现 ${installedSkillIds.size} 个已安装技能`, 'success');
             }
         } catch (e) {
             console.error('Failed to load installed skills:', e);
@@ -107,21 +112,16 @@
     }
 
     function updateProgress() {
-        const count = installedSkills.size;
-        const total = requiredSkills.length;
-        const percent = Math.round((count / total) * 100);
-
-        document.getElementById('installed-count').textContent = count;
-        document.getElementById('progress-percent').textContent = percent + '%';
-        document.getElementById('pending-count').textContent = total - count;
-
+        let installedCount = 0;
+        
         requiredSkills.forEach((skill, index) => {
             const item = document.getElementById(`check-${index + 1}`);
             if (item) {
-                const isInstalled = installedSkills.has(skill.id);
                 const isCurrentSystem = skill.isCurrentSystem;
+                const isInstalled = installedSkillIds.has(skill.id);
                 
                 if (isInstalled || isCurrentSystem) {
+                    installedCount++;
                     item.classList.add('completed');
                     const icon = item.querySelector('.checklist-icon i');
                     if (icon) icon.className = 'ri-checkbox-circle-line';
@@ -138,9 +138,99 @@
                             btn.classList.add('nx-btn--secondary');
                         }
                     }
+                } else {
+                    item.classList.remove('completed');
+                    const icon = item.querySelector('.checklist-icon i');
+                    if (icon) icon.className = 'ri-checkbox-blank-line';
+                    const btn = item.querySelector('button');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.textContent = '安装';
+                        btn.classList.remove('nx-btn--success', 'nx-btn--secondary');
+                        btn.classList.add('nx-btn--primary');
+                    }
                 }
             }
         });
+        
+        const total = requiredSkills.length;
+        const percent = Math.min(100, Math.round((installedCount / total) * 100));
+        const pending = Math.max(0, total - installedCount);
+
+        document.getElementById('installed-count').textContent = installedCount;
+        document.getElementById('progress-percent').textContent = percent + '%';
+        document.getElementById('pending-count').textContent = pending;
+        
+        checkAllCompleted();
+    }
+    
+    function checkAllCompleted() {
+        const total = requiredSkills.length;
+        let installedCount = 0;
+        
+        requiredSkills.forEach(skill => {
+            if (installedSkillIds.has(skill.id) || skill.isCurrentSystem) {
+                installedCount++;
+            }
+        });
+        
+        if (installedCount === total) {
+            showCompletionMessage();
+        }
+    }
+    
+    function showCompletionMessage() {
+        if (completionShown) return;
+        completionShown = true;
+        
+        const logContainer = document.getElementById('install-log');
+        const completionDiv = document.createElement('div');
+        completionDiv.className = 'log-item success';
+        completionDiv.innerHTML = `
+            <i class="ri-checkbox-circle-line"></i>
+            <span class="log-time">${new Date().toLocaleTimeString()}</span>
+            <strong>闭环一完成！所有基础技能包已安装</strong>
+        `;
+        logContainer.appendChild(completionDiv);
+        logContainer.scrollTop = logContainer.scrollHeight;
+        
+        const mainContainer = document.querySelector('.installer-main');
+        const actionDiv = document.createElement('div');
+        actionDiv.className = 'completion-banner';
+        actionDiv.innerHTML = `
+            <h3><i class="ri-checkbox-circle-fill"></i> 闭环一已完成</h3>
+            <p>所有基础技能包已成功安装，系统环境初始化完成</p>
+            <button class="nx-btn nx-btn--primary" onclick="goToNextStep()">
+                <i class="ri-arrow-right-line"></i> 进入闭环二：场景配置
+            </button>
+        `;
+        mainContainer.appendChild(actionDiv);
+        
+        saveCompletionStatus();
+    }
+    
+    function goToNextStep() {
+        window.location.href = '/console/pages/scene-group-management.html';
+    }
+    
+    async function saveCompletionStatus() {
+        try {
+            const response = await fetch('/api/v1/installer/status', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    loop: 'loop1',
+                    status: 'completed',
+                    completedAt: new Date().toISOString()
+                })
+            });
+            const result = await response.json();
+            if (result.status !== 'success') {
+                console.error('Failed to save completion status:', result);
+            }
+        } catch (e) {
+            console.error('Failed to save completion status:', e);
+        }
     }
 
     async function installSkill(skillId) {
@@ -170,7 +260,7 @@
                 const installResult = result.data;
                 
                 if (installResult.status === 'installed' || installResult.status === 'success') {
-                    installedSkills.add(skillId);
+                    installedSkillIds.add(skillId);
                     addLog(`${skill.name} 安装成功`, 'success');
                     
                     if (installResult.installedDependencies && installResult.installedDependencies.length > 0) {
@@ -181,7 +271,7 @@
                 } else if (installResult.status === 'failed' || installResult.status === 'error') {
                     addLog(`${skill.name} 安装失败: ${installResult.message || '未知错误'}`, 'error');
                 } else {
-                    installedSkills.add(skillId);
+                    installedSkillIds.add(skillId);
                     addLog(`${skill.name} 安装完成 (${installResult.status})`, 'success');
                     updateProgress();
                 }
@@ -195,44 +285,9 @@
         }
     }
 
-    function handleLogout() {
-        fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
-        localStorage.clear();
-        window.location.href = '/console/pages/login.html';
-    }
-
-    function initThemeToggle() {
-        const toggleBtn = document.getElementById('theme-toggle');
-        if (toggleBtn) {
-            toggleBtn.addEventListener('click', function() {
-                const html = document.documentElement;
-                const icon = this.querySelector('i');
-                
-                if (html.classList.contains('light-theme')) {
-                    html.classList.remove('light-theme');
-                    localStorage.setItem('theme', 'dark');
-                    icon.className = 'ri-sun-line';
-                } else {
-                    html.classList.add('light-theme');
-                    localStorage.setItem('theme', 'light');
-                    icon.className = 'ri-moon-line';
-                }
-            });
-
-            const savedTheme = localStorage.getItem('theme');
-            if (savedTheme === 'light') {
-                document.documentElement.classList.add('light-theme');
-                toggleBtn.querySelector('i').className = 'ri-moon-line';
-            }
-        }
-    }
-
     window.installSkill = installSkill;
-    window.handleLogout = handleLogout;
+    window.goToNextStep = goToNextStep;
 
-    document.addEventListener('DOMContentLoaded', function() {
-        checkLogin();
-        initThemeToggle();
-    });
+    document.addEventListener('DOMContentLoaded', initPage);
 
 })();

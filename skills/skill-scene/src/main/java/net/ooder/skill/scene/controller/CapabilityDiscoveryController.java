@@ -4,6 +4,9 @@ import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService;
 import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService.*;
 import net.ooder.skill.scene.capability.model.CapabilityType;
 import net.ooder.skill.scene.model.ResultModel;
+import net.ooder.skill.scene.dto.PageResult;
+import net.ooder.skill.scene.dto.scene.CapabilityInfoDTO;
+import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService.CapabilityItem;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/capabilities")
+@RequestMapping("/api/v1/discovery/capabilities")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CapabilityDiscoveryController {
 
@@ -71,7 +74,7 @@ public class CapabilityDiscoveryController {
         return ResultModel.success(conditions);
     }
 
-    @GetMapping("/discovery/types")
+    @GetMapping("/types")
     public ResultModel<List<CapabilityTypeInfo>> getCapabilityTypes() {
         List<CapabilityTypeInfo> types = new java.util.ArrayList<>();
         
@@ -87,6 +90,63 @@ public class CapabilityDiscoveryController {
         }
         
         return ResultModel.success(types);
+    }
+
+    @GetMapping
+    public ResultModel<PageResult<CapabilityItem>> getCapabilities(
+            @RequestParam(required = false, defaultValue = "1") int pageNum,
+            @RequestParam(required = false, defaultValue = "20") int pageSize,
+            @RequestParam(required = false) String type,
+            @RequestParam(required = false) String status,
+            @RequestParam(required = false) String query) {
+        
+        log.info("[getCapabilities] pageNum={}, pageSize={}, type={}, status={}, query={}", 
+            pageNum, pageSize, type, status, query);
+        
+        DiscoveryRequest request = new DiscoveryRequest();
+        request.setMethod(DiscoveryMethod.AUTO);
+        request.setPage(pageNum - 1);
+        request.setSize(pageSize);
+        if (type != null && !type.isEmpty()) {
+            request.setType(CapabilityType.valueOf(type.toUpperCase()));
+        }
+        
+        DiscoveryResult discoveryResult = discoveryService.discoverCapabilities(request);
+        
+        List<CapabilityItem> allCapabilities = new java.util.ArrayList<>();
+        allCapabilities.addAll(discoveryResult.getSceneCapabilities());
+        allCapabilities.addAll(discoveryResult.getCollaborationCapabilities());
+        
+        PageResult<CapabilityItem> pageResult = new PageResult<>();
+        pageResult.setList(allCapabilities);
+        pageResult.setTotal(allCapabilities.size());
+        pageResult.setPageNum(pageNum);
+        pageResult.setPageSize(pageSize);
+        
+        return ResultModel.success(pageResult);
+    }
+
+    @PostMapping("/invoke")
+    public ResultModel<Object> invokeCapability(@RequestBody InvokeRequest request) {
+        log.info("[invokeCapability] capabilityId={}, params={}", request.getCapabilityId(), request.getParams());
+        
+        try {
+            Object result = discoveryService.invokeCapability(request.getCapabilityId(), request.getParams());
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            log.error("[invokeCapability] Failed to invoke capability: {}", e.getMessage());
+            return ResultModel.error(500, "Failed to invoke capability: " + e.getMessage());
+        }
+    }
+
+    public static class InvokeRequest {
+        private String capabilityId;
+        private java.util.Map<String, Object> params;
+
+        public String getCapabilityId() { return capabilityId; }
+        public void setCapabilityId(String capabilityId) { this.capabilityId = capabilityId; }
+        public java.util.Map<String, Object> getParams() { return params; }
+        public void setParams(java.util.Map<String, Object> params) { this.params = params; }
     }
 
     public static class CapabilityTypeInfo {

@@ -1,81 +1,203 @@
 (function(global) {
     'use strict';
 
-    var capabilities = [];
+    var allCapabilities = [];
+    var skillPackages = [];
+    var icSkillPackages = [];
+    var pcSkillPackages = [];
+    var toolSkillPackages = [];
     var bindings = [];
     var currentFilter = 'all';
+    var currentTypeFilter = 'all';
+    var currentOwnershipFilter = 'all';
     var searchKeyword = '';
+    var currentDrillDown = null;
+    var currentPage = 1;
+    var pageSize = 20;
+    var totalPages = 1;
+    var totalCount = 0;
 
-    var TYPE_ICONS = {
-        'DRIVER': 'ri-hard-drive-2-line',
-        'SERVICE': 'ri-server-line',
-        'MANAGEMENT': 'ri-settings-3-line',
-        'AI': 'ri-brain-line',
-        'STORAGE': 'ri-database-2-line',
-        'COMMUNICATION': 'ri-message-3-line',
-        'SECURITY': 'ri-shield-check-line',
-        'MONITORING': 'ri-pulse-line',
-        'SKILL': 'ri-flashlight-line',
-        'SCENE': 'ri-layout-grid-line',
-        'CUSTOM': 'ri-tools-line'
+    var OWNERSHIP_CONFIG = {
+        'SIC': {
+            name: '场景技能',
+            shortName: 'SIC',
+            icon: 'ri-puzzle-line',
+            desc: '场景内可见，生命周期绑定场景',
+            color: '#db2777',
+            bgColor: '#fce7f3',
+            features: ['场景内可见', '绑定场景', '生命周期绑定场景', '不可跨场景调用'],
+            canBind: ['IC', 'PC']
+        },
+        'IC': {
+            name: '独立能力',
+            shortName: 'IC',
+            icon: 'ri-share-line',
+            desc: '跨场景复用，任务间隔离',
+            color: '#059669',
+            bgColor: '#d1fae5',
+            features: ['跨场景复用', '独立部署', '支持多场景组', '任务间隔离'],
+            canBind: []
+        },
+        'PC': {
+            name: '平台能力',
+            shortName: 'PC',
+            icon: 'ri-global-line',
+            desc: '全局可见，无需绑定场景',
+            color: '#d97706',
+            bgColor: '#fef3c7',
+            features: ['全局可见', '平台管理', '直接调用', '无场景限制'],
+            canBind: []
+        },
+        'TOOL': {
+            name: '工具技能',
+            shortName: 'TOOL',
+            icon: 'ri-tools-line',
+            desc: '轻量级工具，独立运行',
+            color: '#4f46e5',
+            bgColor: '#e0e7ff',
+            features: ['轻量级', '无状态', '独立运行', '工具功能'],
+            canBind: []
+        }
     };
 
-    var TYPE_NAMES = {
-        'ATOMIC': '原子能力',
-        'COMPOSITE': '组合能力',
-        'SCENE': '场景能力',
-        'DRIVER': '驱动能力',
-        'COLLABORATIVE': '协作能力',
-        'SERVICE': '服务能力',
-        'AI': 'AI能力',
-        'TOOL': '工具能力',
-        'CONNECTOR': '连接器能力',
-        'DATA': '数据能力',
-        'MANAGEMENT': '管理能力',
-        'COMMUNICATION': '通信能力',
-        'SECURITY': '安全能力',
-        'MONITORING': '监控能力',
-        'SKILL': '技能能力',
-        'CUSTOM': '自定义能力'
+    var CAPABILITY_TYPE_CONFIG = {
+        'ATOMIC': { name: '原子能力', shortName: 'AC', icon: 'ri-flashlight-line', desc: '单一功能，不可分解' },
+        'COMPOSITE': { name: '组合能力', shortName: 'COMP', icon: 'ri-stack-line', desc: '组合多个原子能力' },
+        'SCENE': { name: '场景特性', shortName: 'SC', icon: 'ri-layout-grid-line', desc: '自驱型SuperAgent能力' },
+        'DRIVER': { name: '驱动能力', shortName: 'DC', icon: 'ri-timer-line', desc: '意图/时间/事件驱动' },
+        'SERVICE': { name: '服务能力', shortName: 'SVC', icon: 'ri-server-line', desc: '业务服务、API服务' },
+        'AI': { name: 'AI能力', shortName: 'AI', icon: 'ri-brain-line', desc: 'LLM、机器学习' },
+        'TOOL': { name: '工具能力', shortName: 'TOOL', icon: 'ri-tools-line', desc: '工具类功能' },
+        'CONNECTOR': { name: '连接器能力', shortName: 'CONN', icon: 'ri-plug-line', desc: '连接协议类' },
+        'DATA': { name: '数据能力', shortName: 'DATA', icon: 'ri-database-2-line', desc: '数据存储、处理' },
+        'MANAGEMENT': { name: '管理能力', shortName: 'MGT', icon: 'ri-settings-3-line', desc: '系统管理' },
+        'COMMUNICATION': { name: '通信能力', shortName: 'COMM', icon: 'ri-message-3-line', desc: '消息通信' },
+        'SECURITY': { name: '安全能力', shortName: 'SEC', icon: 'ri-shield-check-line', desc: '安全认证' },
+        'MONITORING': { name: '监控能力', shortName: 'MON', icon: 'ri-pulse-line', desc: '系统监控' },
+        'SKILL': { name: '技能能力', shortName: 'SKILL', icon: 'ri-puzzle-line', desc: '技能包' },
+        'CUSTOM': { name: '自定义能力', shortName: 'CUST', icon: 'ri-code-line', desc: '用户自定义' }
     };
 
     var MyCapabilities = {
         init: function() {
             window.onPageInit = function() {
-                console.log('我的能力页面初始化完成');
+                console.log('我的能力页面初始化');
+                MyCapabilities.parseUrlParams();
                 MyCapabilities.loadCapabilities();
                 MyCapabilities.loadBindings();
-                MyCapabilities.initLlmAssistant();
             };
         },
-
-        initLlmAssistant: function() {
-            if (typeof LlmAssistant !== 'undefined') {
-                LlmAssistant.init();
+        
+        parseUrlParams: function() {
+            var urlParams = new URLSearchParams(window.location.search);
+            var typeParam = urlParams.get('type');
+            
+            if (typeParam) {
+                if (typeParam === 'SCENE') {
+                    currentOwnershipFilter = 'SIC';
+                } else if (typeParam === 'SKILL') {
+                    currentOwnershipFilter = 'IC';
+                } else if (typeParam === 'TOOL') {
+                    currentOwnershipFilter = 'TOOL';
+                }
             }
         },
 
         loadCapabilities: function() {
-            ApiClient.get('/api/v1/capabilities')
-                .then(function(result) {
-                    if (result.code === 200 && result.data) {
-                        capabilities = result.data;
-                        MyCapabilities.renderTable();
-                        MyCapabilities.updateStats();
-                    }
+            var filters = {
+                ownership: currentOwnershipFilter !== 'all' ? currentOwnershipFilter : null,
+                keyword: searchKeyword || null
+            };
+            
+            CapabilityService.searchByFilters(filters)
+                .then(function(list) {
+                    allCapabilities = list || [];
+                    MyCapabilities.groupBySkillPackage();
+                    MyCapabilities.updateStats();
+                    MyCapabilities.updateFilterChips();
+                    MyCapabilities.renderTable();
                 })
                 .catch(function(error) {
-                    console.error('加载能力失败:', error);
-                    capabilities = [];
-                    MyCapabilities.renderTable();
-                    MyCapabilities.updateStats();
+                    console.error('加载能力列表失败:', error);
+                    MyCapabilities.showError('加载能力列表失败: ' + error.message);
                 });
+        },
+
+        groupBySkillPackage: function() {
+            skillPackages = [];
+            icSkillPackages = [];
+            pcSkillPackages = [];
+            toolSkillPackages = [];
+            
+            var sicMap = {};
+            var icMap = {};
+            var pcMap = {};
+            var toolMap = {};
+
+            allCapabilities.forEach(function(cap) {
+                var skillId = cap.skillId || (cap.metadata && cap.metadata.skillId) || 'unknown';
+                var ownership = CapabilityService._normalizeOwnership(cap.ownership);
+                cap._ownership = ownership;
+                cap._skillId = skillId;
+
+                var targetMap, targetList;
+                if (ownership === 'SIC') {
+                    targetMap = sicMap;
+                    targetList = skillPackages;
+                } else if (ownership === 'IC') {
+                    targetMap = icMap;
+                    targetList = icSkillPackages;
+                } else if (ownership === 'PC') {
+                    targetMap = pcMap;
+                    targetList = pcSkillPackages;
+                } else if (ownership === 'TOOL') {
+                    targetMap = toolMap;
+                    targetList = toolSkillPackages;
+                }
+
+                if (!targetMap[skillId]) {
+                    var pkg = {
+                        skillId: skillId,
+                        name: MyCapabilities.formatSkillName(skillId),
+                        capabilityCount: 0,
+                        capabilities: [],
+                        ownership: ownership,
+                        types: {},
+                        status: 'ENABLED',
+                        version: cap.version || '1.0.0'
+                    };
+                    targetMap[skillId] = pkg;
+                    targetList.push(pkg);
+                }
+                targetMap[skillId].capabilityCount++;
+                targetMap[skillId].capabilities.push(cap);
+                if (cap.type) {
+                    targetMap[skillId].types[cap.type] = true;
+                }
+                if (cap.status && !targetMap[skillId].status) {
+                    targetMap[skillId].status = cap.status;
+                }
+            });
+
+            console.log('=== 技能包分类统计 ===');
+            console.log('场景技能(SIC):', skillPackages.length, '个技能包');
+            console.log('独立能力(IC):', icSkillPackages.length, '个技能包');
+            console.log('平台能力(PC):', pcSkillPackages.length, '个技能包');
+            console.log('工具技能(TOOL):', toolSkillPackages.length, '个技能包');
+        },
+
+        formatSkillName: function(skillId) {
+            return skillId
+                .replace(/^skill-/, '')
+                .replace(/-nexus-ui$/, '')
+                .replace(/-/g, ' ')
+                .replace(/\b\w/g, function(l) { return l.toUpperCase(); });
         },
 
         loadBindings: function() {
             ApiClient.get('/api/v1/capabilities/bindings')
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.data) {
                         bindings = result.data;
                     }
                 })
@@ -85,290 +207,292 @@
                 });
         },
 
-        loadMockData: function() {
-            capabilities = [];
-            MyCapabilities.renderTable();
-            MyCapabilities.updateStats();
+        updateStats: function() {
+            document.getElementById('statTotal').textContent = skillPackages.length + icSkillPackages.length + pcSkillPackages.length + toolSkillPackages.length;
+            document.getElementById('statSIC').textContent = skillPackages.length;
+            document.getElementById('statIC').textContent = icSkillPackages.length;
+            document.getElementById('statPC').textContent = pcSkillPackages.length;
+            document.getElementById('statTOOL').textContent = toolSkillPackages.length;
         },
 
-        updateStats: function() {
-            var total = capabilities.length;
-            var active = capabilities.filter(function(c) { return c.status === 'ENABLED'; }).length;
-            var inactive = capabilities.filter(function(c) { return c.status === 'DISABLED'; }).length;
-            var error = capabilities.filter(function(c) { return c.status === 'ERROR'; }).length;
-            var calls = capabilities.reduce(function(sum, c) { return sum + (c.invokeCount || 0); }, 0);
+        updateFilterChips: function() {
+            var statusChips = document.getElementById('statusFilterChips');
+            var typeChips = document.getElementById('typeFilterChips');
+            
+            if (!statusChips || !typeChips) return;
 
-            document.getElementById('statTotal').textContent = total;
-            document.getElementById('statActive').textContent = active;
-            document.getElementById('statInactive').textContent = inactive;
-            document.getElementById('statError').textContent = error;
-            document.getElementById('statCalls').textContent = calls;
+            var statusHtml = '<span class="filter-chip' + (currentFilter === 'all' ? ' active' : '') + '" data-status="all" onclick="filterByStatus(\'all\')">全部</span>' +
+                '<span class="filter-chip' + (currentFilter === 'ENABLED' ? ' active' : '') + '" data-status="ENABLED" onclick="filterByStatus(\'ENABLED\')">已启用</span>' +
+                '<span class="filter-chip' + (currentFilter === 'DISABLED' ? ' active' : '') + '" data-status="DISABLED" onclick="filterByStatus(\'DISABLED\')">已停用</span>';
+            
+            var typeHtml = '<span class="filter-chip' + (currentTypeFilter === 'all' ? ' active' : '') + '" data-type="all" onclick="filterByType(\'all\')">全部</span>';
+
+            statusChips.innerHTML = statusHtml;
+            typeChips.innerHTML = typeHtml;
         },
 
         renderTable: function() {
+            if (currentOwnershipFilter === 'SIC') {
+                MyCapabilities.renderSkillPackages(skillPackages, 'SIC');
+            } else if (currentOwnershipFilter === 'IC') {
+                MyCapabilities.renderSkillPackages(icSkillPackages, 'IC');
+            } else if (currentOwnershipFilter === 'PC') {
+                MyCapabilities.renderSkillPackages(pcSkillPackages, 'PC');
+            } else if (currentOwnershipFilter === 'TOOL') {
+                MyCapabilities.renderSkillPackages(toolSkillPackages, 'TOOL');
+            } else {
+                MyCapabilities.renderAllPackages();
+            }
+        },
+
+        renderAllPackages: function() {
             var tbody = document.getElementById('capabilityTableBody');
+            var allPackages = skillPackages.concat(icSkillPackages).concat(pcSkillPackages).concat(toolSkillPackages);
             
-            var filtered = capabilities.filter(function(cap) {
-                var statusMatch = currentFilter === 'all' || cap.status === currentFilter;
+            var filtered = allPackages.filter(function(pkg) {
                 var searchMatch = !searchKeyword || 
-                    (cap.name && cap.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0) ||
-                    (cap.capabilityId && cap.capabilityId.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0);
-                return statusMatch && searchMatch;
+                    (pkg.name && pkg.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0) ||
+                    (pkg.skillId && pkg.skillId.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0);
+                var statusMatch = currentFilter === 'all' || pkg.status === currentFilter;
+                return searchMatch && statusMatch;
             });
 
+            totalCount = filtered.length;
+            totalPages = Math.ceil(totalCount / pageSize) || 1;
+            
+            if (currentPage > totalPages) {
+                currentPage = totalPages;
+            }
+            
+            var startIdx = (currentPage - 1) * pageSize;
+            var endIdx = Math.min(startIdx + pageSize, totalCount);
+            var pagedData = filtered.slice(startIdx, endIdx);
+
             if (filtered.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--nx-text-secondary);">' +
-                    '<i class="ri-inbox-line" style="font-size: 32px; display: block; margin-bottom: 8px;"></i>' +
-                    '暂无能力数据</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 60px; color: var(--nx-text-secondary);">' +
+                    '<i class="ri-inbox-line" style="font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.5;"></i>' +
+                    '<div style="font-size: 16px; font-weight: 500;">暂无技能包数据</div></td></tr>';
+                MyCapabilities.renderPagination(0);
                 return;
             }
 
             var html = '';
-            filtered.forEach(function(cap) {
-                var typeIcon = TYPE_ICONS[cap.type] || TYPE_ICONS['CUSTOM'];
-                var typeName = TYPE_NAMES[cap.type] || '自定义类型';
-                var statusClass = cap.status === 'ENABLED' ? 'enabled' : cap.status === 'DISABLED' ? 'disabled' : 'error';
-                var statusText = cap.status === 'ENABLED' ? '已启用' : cap.status === 'DISABLED' ? '已停用' : '异常';
-                var lastInvoke = cap.lastInvokeTime ? MyCapabilities.formatTime(cap.lastInvokeTime) : '-';
-                var bindingCount = bindings.filter(function(b) { return b.capabilityId === cap.capabilityId; }).length;
+            pagedData.forEach(function(pkg) {
+                var config = OWNERSHIP_CONFIG[pkg.ownership] || OWNERSHIP_CONFIG['PC'];
+                var typeLabels = Object.keys(pkg.types).map(function(t) {
+                    var tc = CAPABILITY_TYPE_CONFIG[t] || CAPABILITY_TYPE_CONFIG['CUSTOM'];
+                    return tc.shortName;
+                }).join(', ');
                 
-                var activationStatus = cap.activationStatus || 'INACTIVE';
-                var activationClass = activationStatus === 'ACTIVATED' ? 'activated' : activationStatus === 'PENDING' ? 'pending' : 'inactive';
-                var activationText = activationStatus === 'ACTIVATED' ? '已激活' : activationStatus === 'PENDING' ? '待激活' : '未激活';
-
                 html += '<tr>' +
                     '<td><div class="cap-info">' +
-                    '<div class="cap-icon type-' + (cap.type || 'CUSTOM') + '"><i class="' + typeIcon + '"></i></div>' +
-                    '<div><div class="cap-name">' + (cap.name || cap.capabilityId) + '</div>' +
-                    '<div class="cap-id">' + cap.capabilityId + '</div></div></div></td>' +
-                    '<td>' + typeName + '</td>' +
-                    '<td><span class="status-badge ' + statusClass + '"><span class="status-dot"></span>' + statusText + '</span></td>' +
-                    '<td><span class="activation-badge ' + activationClass + '">' + activationText + '</span></td>' +
-                    '<td>v' + (cap.version || '1.0.0') + '</td>' +
-                    '<td>' + bindingCount + ' 个场景</td>' +
-                    '<td>' + lastInvoke + '</td>' +
-                    '<td><div class="action-btns">';
-                
-                if (activationStatus === 'PENDING') {
-                    html += '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="goToActivation(\'' + cap.installId + '\')" title="激活">' +
-                        '<i class="ri-key-2-line"></i></button>';
-                }
-                
-                html += '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="showDetail(\'' + cap.capabilityId + '\')" title="详情">' +
-                    '<i class="ri-eye-line"></i></button>' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="toggleStatus(\'' + cap.capabilityId + '\')" title="' + (cap.status === 'ENABLED' ? '停用' : '启用') + '">' +
-                    '<i class="ri-' + (cap.status === 'ENABLED' ? 'pause' : 'play') + '-line"></i></button>' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="invokeCapability(\'' + cap.capabilityId + '\')" title="调用">' +
-                    '<i class="ri-play-line"></i></button>' +
-                    '<button class="nx-btn nx-btn--ghost nx-btn--sm nx-text-danger" onclick="uninstallCapability(\'' + cap.capabilityId + '\')" title="卸载">' +
-                    '<i class="ri-delete-bin-line"></i></button>' +
-                    '</div></td></tr>';
+                    '<div class="cap-icon ownership-' + pkg.ownership + '"><i class="' + config.icon + '"></i></div>' +
+                    '<div><div class="cap-name">' + pkg.name + '</div>' +
+                    '<div class="cap-id">' + pkg.skillId + '</div></div></div></td>' +
+                    '<td><span class="ownership-badge ' + pkg.ownership.toLowerCase() + '">' + config.shortName + '</span></td>' +
+                    '<td>' + pkg.capabilityCount + '</td>' +
+                    '<td>' + (typeLabels || '-') + '</td>' +
+                    '<td>' + pkg.version + '</td>' +
+                    '<td><span class="status-badge ' + (pkg.status === 'ENABLED' ? 'enabled' : 'disabled') + '">' + 
+                    (pkg.status === 'ENABLED' ? '已启用' : '已停用') + '</span></td>' +
+                    '<td>' + MyCapabilities.getActionButtons(pkg) + '</td>' +
+                    '</tr>';
             });
+            
             tbody.innerHTML = html;
+            MyCapabilities.renderPagination(filtered.length);
         },
 
-        formatTime: function(timestamp) {
-            var now = Date.now();
-            var diff = now - timestamp;
+        renderSkillPackages: function(packages, ownership) {
+            var tbody = document.getElementById('capabilityTableBody');
             
-            if (diff < 60000) return '刚刚';
-            if (diff < 3600000) return Math.floor(diff / 60000) + '分钟前';
-            if (diff < 86400000) return Math.floor(diff / 3600000) + '小时前';
-            return Math.floor(diff / 86400000) + '天前';
-        },
-
-        showDetailPanel: function(capabilityId) {
-            var cap = capabilities.find(function(c) { return c.capabilityId === capabilityId; });
-            if (!cap) return;
-
-            var typeIcon = TYPE_ICONS[cap.type] || TYPE_ICONS['CUSTOM'];
-            var typeName = TYPE_NAMES[cap.type] || '自定义类型';
-            var capBindings = bindings.filter(function(b) { return b.capabilityId === capabilityId; });
-
-            document.getElementById('detailTitle').textContent = cap.name || cap.capabilityId;
-
-            var html = '<div class="detail-section">' +
-                '<div class="detail-section-title"><i class="ri-information-line"></i> 基本信息</div>' +
-                '<div class="detail-row"><span class="detail-row-label">能力ID</span><span class="detail-row-value">' + cap.capabilityId + '</span></div>' +
-                '<div class="detail-row"><span class="detail-row-label">类型</span><span class="detail-row-value">' + typeName + '</span></div>' +
-                '<div class="detail-row"><span class="detail-row-label">版本</span><span class="detail-row-value">v' + (cap.version || '1.0.0') + '</span></div>' +
-                '<div class="detail-row"><span class="detail-row-label">状态</span><span class="detail-row-value">' + (cap.status === 'ENABLED' ? '已启用' : '已停用') + '</span></div>' +
-                '<div class="detail-row"><span class="detail-row-label">调用次数</span><span class="detail-row-value">' + (cap.invokeCount || 0) + '</span></div>' +
-                '</div>';
-
-            html += '<div class="detail-section">' +
-                '<div class="detail-section-title"><i class="ri-file-text-line"></i> 描述</div>' +
-                '<p style="font-size: 14px; line-height: 1.6;">' + (cap.description || '暂无描述') + '</p>' +
-                '</div>';
-
-            html += '<div class="detail-section">' +
-                '<div class="detail-section-title"><i class="ri-settings-3-line"></i> 配置</div>' +
-                '<div class="config-form">' +
-                '<div class="config-field">' +
-                '<label class="config-label">超时时间(毫秒)</label>' +
-                '<input type="number" class="config-input" value="30000">' +
-                '<div class="config-hint">能力调用的超时时间</div>' +
-                '</div>' +
-                '<div class="config-field">' +
-                '<label class="config-label">重试次数</label>' +
-                '<input type="number" class="config-input" value="3">' +
-                '<div class="config-hint">调用失败后的重试次数</div>' +
-                '</div>' +
-                '</div></div>';
-
-            html += '<div class="detail-section">' +
-                '<div class="detail-section-title"><i class="ri-link"></i> 绑定场景 (' + capBindings.length + ')</div>';
-
-            if (capBindings.length > 0) {
-                html += '<div class="binding-list">';
-                capBindings.forEach(function(b) {
-                    html += '<div class="binding-item">' +
-                        '<div class="binding-info">' +
-                        '<div class="binding-icon"><i class="ri-group-line"></i></div>' +
-                        '<div><div class="binding-name">' + (b.sceneGroupId || '未知场景组') + '</div>' +
-                        '<div class="binding-scene">优先级: ' + (b.priority || 1) + '</div></div></div>' +
-                        '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="unbindCapability(\'' + b.bindingId + '\')">' +
-                        '<i class="ri-link-unlink"></i></button></div>';
-                });
-                html += '</div>';
-            } else {
-                html += '<p style="color: var(--nx-text-secondary); font-size: 14px;">尚未绑定到任何场景组</p>';
-            }
-
-            html += '<div style="margin-top: 12px;">' +
-                '<button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="showBindingModal(\'' + capabilityId + '\')">' +
-                '<i class="ri-add-line"></i> 添加绑定</button></div></div>';
-
-            html += '<div class="detail-section">' +
-                '<div class="detail-section-title"><i class="ri-tools-line"></i> 操作</div>' +
-                '<div style="display: flex; gap: 8px; flex-wrap: wrap;">' +
-                '<button class="nx-btn nx-btn--primary" onclick="invokeCapability(\'' + capabilityId + '\')">' +
-                '<i class="ri-play-line"></i> 调用能力</button>' +
-                '<button class="nx-btn nx-btn--secondary" onclick="toggleStatus(\'' + capabilityId + '\')">' +
-                '<i class="ri-refresh-line"></i> ' + (cap.status === 'ENABLED' ? '停用' : '启用') + '</button>' +
-                '<button class="nx-btn nx-btn--danger" onclick="uninstallCapability(\'' + capabilityId + '\')">' +
-                '<i class="ri-delete-bin-line"></i> 卸载</button>' +
-                '</div></div>';
-
-            document.getElementById('detailBody').innerHTML = html;
-            document.getElementById('detailPanel').classList.add('open');
-            document.getElementById('overlay').classList.add('open');
-        },
-
-        closeDetail: function() {
-            document.getElementById('detailPanel').classList.remove('open');
-            document.getElementById('overlay').classList.remove('open');
-        },
-
-        toggleCapabilityStatus: function(capabilityId) {
-            var cap = capabilities.find(function(c) { return c.capabilityId === capabilityId; });
-            if (!cap) return;
-
-            var newStatus = cap.status === 'ENABLED' ? 'DISABLED' : 'ENABLED';
-
-            ApiClient.post('/api/v1/capabilities/' + capabilityId + '/status', { status: newStatus })
-                .then(function(result) {
-                    if (result.code === 200) {
-                        cap.status = newStatus;
-                        MyCapabilities.renderTable();
-                        MyCapabilities.updateStats();
-                    }
-                })
-                .catch(function(error) {
-                    cap.status = newStatus;
-                    MyCapabilities.renderTable();
-                    MyCapabilities.updateStats();
-                });
-        },
-
-        invokeCap: function(capabilityId) {
-            var cap = capabilities.find(function(c) { return c.capabilityId === capabilityId; });
-            if (!cap) return;
-            
-            var params = {};
-            var paramsStr = prompt('请输入调用参数(JSON格式):', '{}');
-            if (paramsStr) {
-                try {
-                    params = JSON.parse(paramsStr);
-                } catch (e) {
-                    alert('参数格式错误，请使用有效的JSON格式');
-                    return;
-                }
-            }
-            
-            ApiClient.post('/api/v1/capabilities/discovery/invoke', {
-                capabilityId: capabilityId,
-                params: params
-            })
-                .then(function(result) {
-                    if (result.code === 200) {
-                        alert('调用成功!\n\n结果: ' + JSON.stringify(result.data, null, 2));
-                        cap.invokeCount = (cap.invokeCount || 0) + 1;
-                        cap.lastInvokeTime = Date.now();
-                        MyCapabilities.renderTable();
-                        MyCapabilities.updateStats();
-                    } else {
-                        alert('调用失败: ' + result.message);
-                    }
-                })
-                .catch(function(error) {
-                    alert('调用失败: ' + error.message);
-                });
-        },
-
-        uninstallCap: function(capabilityId) {
-            if (!confirm('确定要卸载能力 "' + capabilityId + '" 吗？')) return;
-
-            ApiClient.delete('/api/v1/capabilities/' + capabilityId)
-                .then(function(result) {
-                    if (result.code === 200) {
-                        capabilities = capabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
-                        MyCapabilities.renderTable();
-                        MyCapabilities.updateStats();
-                        MyCapabilities.closeDetail();
-                    }
-                })
-                .catch(function(error) {
-                    capabilities = capabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
-                    MyCapabilities.renderTable();
-                    MyCapabilities.updateStats();
-                    MyCapabilities.closeDetail();
-                });
-        },
-
-        filter: function() {
-            MyCapabilities.renderTable();
-        },
-
-        filterByStatus: function(status) {
-            currentFilter = status;
-            document.querySelectorAll('.filter-chip').forEach(function(chip) {
-                chip.classList.toggle('active', chip.dataset.status === status);
+            var filtered = packages.filter(function(pkg) {
+                var searchMatch = !searchKeyword || 
+                    (pkg.name && pkg.name.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0) ||
+                    (pkg.skillId && pkg.skillId.toLowerCase().indexOf(searchKeyword.toLowerCase()) >= 0);
+                var statusMatch = currentFilter === 'all' || pkg.status === currentFilter;
+                return searchMatch && statusMatch;
             });
+            
+            totalCount = filtered.length;
+            totalPages = Math.ceil(totalCount / pageSize) || 1;
+            
+            var startIdx = (currentPage - 1) * pageSize;
+            var endIdx = Math.min(startIdx + pageSize, totalCount);
+            var pagedData = filtered.slice(startIdx, endIdx);
+
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 60px; color: var(--nx-text-secondary);">' +
+                    '<i class="ri-inbox-line" style="font-size: 48px; display: block; margin-bottom: 16px; opacity: 0.5;"></i>' +
+                    '<div style="font-size: 16px; font-weight: 500;">暂无' + (OWNERSHIP_CONFIG[ownership]?.name || '技能包') + '</div></td></tr>';
+                return;
+            }
+
+            var html = '';
+            pagedData.forEach(function(pkg) {
+                var config = OWNERSHIP_CONFIG[pkg.ownership] || OWNERSHIP_CONFIG['PC'];
+                var typeLabels = Object.keys(pkg.types).map(function(t) {
+                    var tc = CAPABILITY_TYPE_CONFIG[t] || CAPABILITY_TYPE_CONFIG['CUSTOM'];
+                    return tc.shortName;
+                }).join(', ');
+                
+                html += '<tr>' +
+                    '<td><div class="cap-info">' +
+                    '<div class="cap-icon ownership-' + pkg.ownership + '"><i class="' + config.icon + '"></i></div>' +
+                    '<div><div class="cap-name">' + pkg.name + '</div>' +
+                    '<div class="cap-id">' + pkg.skillId + '</div></div></div></td>' +
+                    '<td><span class="ownership-badge ' + pkg.ownership.toLowerCase() + '">' + config.shortName + '</span></td>' +
+                    '<td>' + pkg.capabilityCount + '</td>' +
+                    '<td>' + (typeLabels || '-') + '</td>' +
+                    '<td>' + pkg.version + '</td>' +
+                    '<td><span class="status-badge ' + (pkg.status === 'ENABLED' ? 'enabled' : 'disabled') + '">' + 
+                    (pkg.status === 'ENABLED' ? '已启用' : '已停用') + '</span></td>' +
+                    '<td>' + MyCapabilities.getActionButtons(pkg) + '</td>' +
+                    '</tr>';
+            });
+            
+            tbody.innerHTML = html;
+            MyCapabilities.renderPagination(filtered.length);
+        },
+        
+        renderPagination: function(total) {
+            var container = document.getElementById('pagination-container');
+            if (!container) {
+                console.log('[renderPagination] Container not found');
+                return;
+            }
+            
+            console.log('[renderPagination] total:', total, 'totalPages:', totalPages, 'currentPage:', currentPage);
+            
+            if (totalPages <= 1) {
+                container.innerHTML = '<div class="nx-flex nx-items-center nx-gap-4"><span class="nx-text-sm nx-text-secondary">共 ' + total + ' 条记录</span></div>';
+                return;
+            }
+            
+            var html = '<div class="nx-pagination">';
+            
+            html += '<button class="nx-pagination__btn" onclick="goToPage(1)" ' + (currentPage === 1 ? 'disabled' : '') + ' title="首页"><i class="ri-skip-back-line"></i></button>';
+            html += '<button class="nx-pagination__btn" onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + ' title="上一页"><i class="ri-arrow-left-s-line"></i></button>';
+            
+            var startPage = Math.max(1, currentPage - 2);
+            var endPage = Math.min(totalPages, startPage + 4);
+            
+            for (var i = startPage; i <= endPage; i++) {
+                html += '<button class="nx-pagination__btn ' + (i === currentPage ? 'nx-pagination__btn--active' : '') + '" onclick="goToPage(' + i + ')">' + i + '</button>';
+            }
+            
+            html += '<button class="nx-pagination__btn" onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + ' title="下一页"><i class="ri-arrow-right-s-line"></i></button>';
+            html += '<button class="nx-pagination__btn" onclick="goToPage(' + totalPages + ')" ' + (currentPage === totalPages ? 'disabled' : '') + ' title="末页"><i class="ri-skip-forward-line"></i></button>';
+            
+            html += '</div>';
+            html += '<div class="nx-flex nx-items-center nx-gap-2 nx-ml-4">';
+            html += '<span class="nx-text-sm nx-text-secondary">第 ' + currentPage + ' / ' + totalPages + ' 页</span>';
+            html += '<span class="nx-text-sm nx-text-secondary">共 ' + total + ' 条</span>';
+            html += '</div>';
+            
+            container.innerHTML = html;
+        },
+        
+        goToPage: function(page) {
+            if (page < 1 || page > totalPages || page === currentPage) return;
+            currentPage = page;
             MyCapabilities.renderTable();
+        },
+        
+        changePageSize: function(newSize) {
+            pageSize = newSize;
+            currentPage = 1;
+            MyCapabilities.renderTable();
+        },
+
+        getActionButtons: function(pkg) {
+            var buttons = '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="drillDownSkill(\'' + pkg.skillId + '\')">' +
+                '<i class="ri-eye-line"></i> 详情</button> ';
+            
+            if (pkg.ownership === 'SIC') {
+                buttons += '<button class="nx-btn nx-btn--sm nx-btn--primary" onclick="showBindDialog(\'' + pkg.skillId + '\')">' +
+                    '<i class="ri-link"></i> 绑定</button>';
+            }
+            
+            return buttons;
+        },
+
+        showError: function(message) {
+            var tbody = document.getElementById('capabilityTableBody');
+            if (tbody) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 60px; color: #ef4444;">' +
+                    '<i class="ri-error-warning-line" style="font-size: 48px; display: block; margin-bottom: 16px;"></i>' +
+                    '<div style="font-size: 16px; font-weight: 500;">' + message + '</div></td></tr>';
+            }
         }
     };
 
-    MyCapabilities.init();
+    global.filterByOwnership = function(ownership) {
+        currentOwnershipFilter = ownership;
+        currentFilter = 'all';
+        currentTypeFilter = 'all';
+        
+        document.querySelectorAll('.ownership-tab').forEach(function(tab) {
+            tab.classList.remove('active');
+        });
+        document.querySelector('.ownership-tab[data-ownership="' + ownership + '"]')?.classList.add('active');
+        
+        MyCapabilities.updateFilterChips();
+        MyCapabilities.renderTable();
+    };
 
-    global.showDetail = MyCapabilities.showDetailPanel;
-    global.closeDetailPanel = MyCapabilities.closeDetail;
-    global.toggleStatus = MyCapabilities.toggleCapabilityStatus;
-    global.invokeCapability = MyCapabilities.invokeCap;
-    global.uninstallCapability = MyCapabilities.uninstallCap;
-    global.filterCapabilities = MyCapabilities.filter;
-    global.filterByStatus = MyCapabilities.filterByStatus;
-    global.refreshCapabilities = MyCapabilities.loadCapabilities;
-    global.goToActivation = function(installId) {
-        window.location.href = '/console/pages/capability-activation.html?installId=' + installId;
+    global.filterByStatus = function(status) {
+        currentFilter = status;
+        document.querySelectorAll('#statusFilterChips .filter-chip').forEach(function(chip) {
+            chip.classList.remove('active');
+        });
+        document.querySelector('#statusFilterChips .filter-chip[data-status="' + status + '"]')?.classList.add('active');
+        MyCapabilities.renderTable();
     };
-    global.showBindingModal = function(capabilityId) {
-        window.location.href = '/console/pages/capability-binding.html?capabilityId=' + capabilityId;
+
+    global.filterByType = function(type) {
+        currentTypeFilter = type;
+        document.querySelectorAll('#typeFilterChips .filter-chip').forEach(function(chip) {
+            chip.classList.remove('active');
+        });
+        document.querySelector('#typeFilterChips .filter-chip[data-type="' + type + '"]')?.classList.add('active');
+        MyCapabilities.renderTable();
     };
-    global.unbindCapability = function(bindingId) {
-        if (!confirm('确定要解绑此能力吗？')) return;
-        bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
-        MyCapabilities.showDetailPanel(document.getElementById('detailTitle').textContent);
+
+    global.searchCapabilities = function(keyword) {
+        searchKeyword = keyword;
+        MyCapabilities.renderTable();
     };
+
+    global.drillDownSkill = function(skillId) {
+        currentDrillDown = skillId;
+        var pkg = skillPackages.find(function(p) { return p.skillId === skillId; }) ||
+                  icSkillPackages.find(function(p) { return p.skillId === skillId; }) ||
+                  pcSkillPackages.find(function(p) { return p.skillId === skillId; }) ||
+                  toolSkillPackages.find(function(p) { return p.skillId === skillId; });
+        
+        if (pkg) {
+            console.log('查看技能包详情:', pkg);
+        }
+    };
+
+    global.showBindDialog = function(skillId) {
+        console.log('显示绑定对话框:', skillId);
+    };
+
+    global.refreshCapabilities = function() {
+        CapabilityService.clearCache();
+        MyCapabilities.loadCapabilities();
+    };
+
+    global.goToPage = function(page) {
+        MyCapabilities.goToPage(page);
+    };
+
+    global.changePageSize = function(newSize) {
+        MyCapabilities.changePageSize(newSize);
+    };
+
+    MyCapabilities.init();
 
 })(typeof window !== 'undefined' ? window : this);

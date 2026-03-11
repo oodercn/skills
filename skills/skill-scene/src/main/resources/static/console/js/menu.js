@@ -64,9 +64,17 @@
                 if (result.status === 'success' && result.data) {
                     this.currentUser = result.data;
                     console.log('[NexusMenu] 用户会话加载成功:', this.currentUser.name);
+                } else {
+                    console.warn('[NexusMenu] 会话无效，跳转到登录页');
+                    window.location.href = '/console/pages/login.html';
+                    throw new Error('会话无效');
                 }
             } catch (e) {
                 console.warn('[NexusMenu] 无法加载会话信息:', e);
+                if (!window.location.pathname.includes('login.html')) {
+                    window.location.href = '/console/pages/login.html';
+                }
+                throw e;
             }
         },
 

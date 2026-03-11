@@ -10,6 +10,8 @@ public interface ActivationService {
     
     ActivationProcess startProcess(String installId, String activator);
     
+    ActivationProcess startProcessWithTemplate(String installId, String templateId, String sceneGroupId, String activator, String roleName);
+    
     ActivationProcess executeStep(String installId, String stepId, Map<String, Object> data);
     
     KeyResult getKey(String installId);
@@ -24,8 +26,13 @@ public interface ActivationService {
     
     ActivationProcess skipStep(String installId, String stepId);
     
+    ActivationProcess configurePrivateCapabilities(String installId, List<String> enabledCapabilityIds);
+    
+    List<ActivationProcess.PrivateCapabilityConfig> getPrivateCapabilities(String installId);
+    
     public static class KeyResult {
         private String keyId;
+        private String keyValue;
         private String keyStatus;
         private long expireTime;
         private Map<String, Object> permissions;
@@ -33,6 +40,8 @@ public interface ActivationService {
         
         public String getKeyId() { return keyId; }
         public void setKeyId(String keyId) { this.keyId = keyId; }
+        public String getKeyValue() { return keyValue; }
+        public void setKeyValue(String keyValue) { this.keyValue = keyValue; }
         public String getKeyStatus() { return keyStatus; }
         public void setKeyStatus(String keyStatus) { this.keyStatus = keyStatus; }
         public long getExpireTime() { return expireTime; }

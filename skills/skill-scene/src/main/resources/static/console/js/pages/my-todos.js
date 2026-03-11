@@ -49,8 +49,13 @@ async function refreshAll() {
     try {
         var result = await ApiClient.get('/api/v1/my/todos?pageNum=1&pageSize=50');
         
-        if (result.code === 200 && result.data) {
-            todos = result.data.list || result.data;
+        if (result.status === 'success' && result.data) {
+            todos = result.data.list || result.data || [];
+            renderTodos();
+            updateStats();
+        } else {
+            console.error('API returned error:', result.message);
+            todos = [];
             renderTodos();
             updateStats();
         }
@@ -292,7 +297,7 @@ async function acceptTodo(todoId) {
     try {
         var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/accept');
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
@@ -301,17 +306,11 @@ async function acceptTodo(todoId) {
             renderTodos();
             updateStats();
         } else {
-            alert('操作失败: ' + result.message);
+            alert('操作失败: ' + (result.message || '未知错误'));
         }
     } catch (error) {
         console.error('Failed to accept todo:', error);
-        var todo = todos.find(t => t.id === todoId);
-        if (todo) {
-            todo.status = 'completed';
-            todo.completedTime = Date.now();
-        }
-        renderTodos();
-        updateStats();
+        alert('操作失败: ' + error.message);
     }
 }
 
@@ -321,7 +320,7 @@ async function rejectTodo(todoId) {
     try {
         var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/reject');
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
@@ -330,17 +329,11 @@ async function rejectTodo(todoId) {
             renderTodos();
             updateStats();
         } else {
-            alert('操作失败: ' + result.message);
+            alert('操作失败: ' + (result.message || '未知错误'));
         }
     } catch (error) {
         console.error('Failed to reject todo:', error);
-        var todo = todos.find(t => t.id === todoId);
-        if (todo) {
-            todo.status = 'completed';
-            todo.completedTime = Date.now();
-        }
-        renderTodos();
-        updateStats();
+        alert('操作失败: ' + error.message);
     }
 }
 
@@ -348,7 +341,7 @@ async function completeTodo(todoId) {
     try {
         var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/complete');
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';
@@ -357,17 +350,11 @@ async function completeTodo(todoId) {
             renderTodos();
             updateStats();
         } else {
-            alert('操作失败: ' + result.message);
+            alert('操作失败: ' + (result.message || '未知错误'));
         }
     } catch (error) {
         console.error('Failed to complete todo:', error);
-        var todo = todos.find(t => t.id === todoId);
-        if (todo) {
-            todo.status = 'completed';
-            todo.completedTime = Date.now();
-        }
-        renderTodos();
-        updateStats();
+        alert('操作失败: ' + error.message);
     }
 }
 
@@ -375,7 +362,7 @@ async function approveTodo(todoId) {
     try {
         var result = await ApiClient.post('/api/v1/my/todos/' + todoId + '/approve');
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             var todo = todos.find(t => t.id === todoId);
             if (todo) {
                 todo.status = 'completed';

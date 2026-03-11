@@ -836,6 +836,15 @@
                 
                 if (data.requestStatus === 200 && data.data) {
                     this.addMessage('assistant', data.data.response);
+                    
+                    var action = data.data.action || data.action;
+                    if (action && typeof ContextTrustLayer !== 'undefined') {
+                        this.executeAction(action);
+                    }
+                    
+                    if (data.data.syncContext && data.data.syncData && typeof ContextTrustLayer !== 'undefined') {
+                        ContextTrustLayer.syncToFrontend(data.data.syncData);
+                    }
                 } else {
                     this.addMessage('assistant', '抱歉，发生了错误: ' + data.message, true);
                 }
@@ -845,6 +854,38 @@
                 console.error('Chat error:', error);
                 this.addMessage('assistant', '抱歉，网络错误，请重试', true);
                 this.updateStatus('error');
+            }
+        },
+
+        executeAction: function(action) {
+            var self = this;
+            
+            if (!action || !action.action) {
+                return;
+            }
+            
+            console.log('[LlmAssistant] Executing action:', action);
+            
+            this.addMessage('assistant', '正在执行操作: ' + action.action + '...');
+            
+            if (typeof ContextTrustLayer !== 'undefined') {
+                ContextTrustLayer.executeAction({
+                    name: action.action,
+                    module: action.module || 'discovery',
+                    params: action
+                }).then(function(result) {
+                    console.log('[LlmAssistant] Action result:', result);
+                    if (result && result.success) {
+                        self.addMessage('assistant', '操作执行成功！');
+                    } else if (result && result.error) {
+                        self.addMessage('assistant', '操作失败: ' + result.error, true);
+                    }
+                }).catch(function(err) {
+                console.error('[LlmAssistant] Action execution error:', err);
+                self.addMessage('assistant', '操作执行失败: ' + err.message, true);
+            });
+            } else {
+                console.warn('[LlmAssistant] ContextTrustLayer not available');
             }
         },
 
@@ -884,6 +925,7 @@
                 var decoder = new TextDecoder();
 
                 var buffer = '';
+                var currentEvent = 'message';
                 while (true) {
                     var result = await reader.read();
                     if (result.done) break;
@@ -894,15 +936,31 @@
 
                     for (var i = 0; i < lines.length; i++) {
                         var line = lines[i].trim();
-                        if (line.startsWith('data:')) {
+                        if (line.startsWith('event:')) {
+                            currentEvent = line.substring(6).trim();
+                        } else if (line.startsWith('data:')) {
                             var data = line.substring(5).trim();
                             if (data === '[DONE]') {
                                 break;
                             }
                             if (data) {
-                                fullResponse += data;
-                                contentDiv.innerHTML = self.formatResponse(fullResponse);
-                                self.scrollToBottom();
+                                if (currentEvent === 'action') {
+                                    try {
+                                        var actionData = JSON.parse(data);
+                                        console.log('[LlmAssistant] Received action event:', actionData);
+                                        if (actionData.data && actionData.data.action) {
+                                            self.executeAction(actionData.data.action);
+                                        } else if (actionData.action) {
+                                            self.executeAction(actionData);
+                                        }
+                                    } catch (e) {
+                                        console.error('[LlmAssistant] Failed to parse action data:', e);
+                                    }
+                                } else {
+                                    fullResponse += data;
+                                    contentDiv.innerHTML = self.formatResponse(fullResponse);
+                                    self.scrollToBottom();
+                                }
                             }
                         }
                     }

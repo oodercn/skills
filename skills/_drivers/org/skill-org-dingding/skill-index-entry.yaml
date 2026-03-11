@@ -1,0 +1,32 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-org-dingding
+  name: 钉钉组织服务
+  version: "0.7.3"
+  description: "钉钉组织数据集成服务，包括组织架构同步和用户认证"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: INFRASTRUCTURE
+  subCategory: dingtalk
+  category: SERVICE
+  capabilityCategory: org
+  
+  capabilityAddresses:
+    required:
+      - address: 0x09
+        name: ORG_DINGDING
+        description: "钉钉组织服务"
+    optional: []
+  
+  tags:
+    - dingtalk
+    - dingding
+    - organization
+    - auth
+  
+  dependencies:
+    - skill-org-base

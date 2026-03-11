@@ -3,9 +3,13 @@ package net.ooder.skill.scene.service;
 import net.ooder.skill.scene.dto.PageResult;
 import net.ooder.skill.scene.dto.scene.*;
 
+import java.util.List;
+
 public interface SceneGroupService {
     
     SceneGroupDTO create(String templateId, SceneGroupConfigDTO config);
+    
+    SceneGroupDTO update(String sceneGroupId, SceneGroupConfigDTO config);
     
     boolean destroy(String sceneGroupId);
     
@@ -35,11 +39,15 @@ public interface SceneGroupService {
     
     boolean bindCapability(String sceneGroupId, CapabilityBindingDTO binding);
     
+    boolean updateCapabilityBinding(String sceneGroupId, String bindingId, CapabilityBindingDTO binding);
+    
     boolean unbindCapability(String sceneGroupId, String bindingId);
     
     PageResult<CapabilityBindingDTO> listCapabilityBindings(String sceneGroupId, int pageNum, int pageSize);
     
     SceneSnapshotDTO createSnapshot(String sceneGroupId);
+    
+    List<SceneSnapshotDTO> listSnapshots(String sceneGroupId);
     
     boolean restoreSnapshot(String sceneGroupId, SceneSnapshotDTO snapshot);
     
@@ -48,4 +56,8 @@ public interface SceneGroupService {
     FailoverStatusDTO getFailoverStatus(String sceneGroupId);
     
     boolean handleFailover(String sceneGroupId, String failedParticipantId);
+    
+    boolean bindKnowledgeBase(String sceneGroupId, KnowledgeBindingDTO binding);
+    
+    boolean unbindKnowledgeBase(String sceneGroupId, String kbId);
 }

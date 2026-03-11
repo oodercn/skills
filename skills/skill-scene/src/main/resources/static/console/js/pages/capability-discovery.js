@@ -122,7 +122,21 @@
                 CapabilityDiscovery.loadInstalled();
                 CapabilityDiscovery.initFilters();
                 CapabilityDiscovery.initLlmAssistant();
+                CapabilityDiscovery.initContextTrustLayer();
             };
+        },
+
+        initContextTrustLayer: function() {
+            if (typeof ContextTrustLayer !== 'undefined') {
+                ContextTrustLayer.setCurrentModule('discovery');
+                ContextTrustLayer.updatePageState({
+                    currentMethod: currentMethod,
+                    isScanning: isScanning,
+                    discoveredCapabilities: discoveredCapabilities,
+                    installedCapabilities: installedCapabilities
+                });
+                console.log('[CapabilityDiscovery] ContextTrustLayer initialized for discovery module');
+            }
         },
 
         initLlmAssistant: function() {
@@ -149,13 +163,9 @@
         },
 
         loadInstalled: function() {
-            ApiClient.get('/api/v1/capabilities')
-                .then(function(result) {
-                    if (result.code === 200 && result.data) {
-                        installedCapabilities = result.data;
-                        scanStats.installed = installedCapabilities.length;
-                        CapabilityDiscovery.updateStats();
-                    }
+            CapabilityService.getAll()
+                .then(function(list) {
+                    installedCapabilities = list || [];
                 })
                 .catch(function(error) {
                     console.error('加载已安装能力失败:', error);
@@ -248,7 +258,7 @@
             } else if (currentMethod === 'LOCAL_FS') {
                 CapabilityDiscovery.discoverFromLocalFs(false);
             } else {
-                var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
+                var url = '/api/v1/discovery/capabilities?method=' + currentMethod;
                 CapabilityDiscovery.discoverFromLocal(url);
             }
         },
@@ -276,7 +286,7 @@
             } else if (currentMethod === 'LOCAL_FS') {
                 CapabilityDiscovery.discoverFromLocalFs(true);
             } else {
-                var url = '/api/v1/capabilities/discovery?method=' + currentMethod;
+                var url = '/api/v1/discovery/capabilities?method=' + currentMethod;
                 CapabilityDiscovery.discoverFromLocal(url);
             }
         },
@@ -316,7 +326,7 @@
             ApiClient.post(apiUrl, config, { timeout: 120000 })
                 .then(function(result) {
                     console.log('[Discovery] Response received:', result);
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         CapabilityDiscovery.setCache(cacheKey, result.data);
                         CapabilityDiscovery.processDiscoveryResult(result.data);
                     } else {
@@ -336,35 +346,46 @@
 
         processDiscoveryResult: function(data) {
             var caps = data.capabilities || [];
+            var newCount = 0;
+            var installedCount = 0;
+            
+            discoveredCapabilities = [];
             
             caps.forEach(function(cap) {
-                var existsInInstalled = installedCapabilities.find(function(i) { 
-                    return i.capabilityId === cap.id; 
-                });
-                var existsInDiscovered = discoveredCapabilities.find(function(d) { 
-                    return d.id === cap.id; 
+                var isInstalled = cap.installed === true;
+                
+                discoveredCapabilities.push({
+                    capabilityId: cap.id,
+                    id: cap.id,
+                    name: cap.name,
+                    type: cap.type,
+                    description: cap.description,
+                    version: cap.version,
+                    source: currentMethod,
+                    isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
+                    sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
+                    dependencies: cap.dependencies || [],
+                    provider: cap.provider || null,
+                    installed: isInstalled,
+                    category: cap.category || 'NOT_SCENE_SKILL',
+                    skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
+                    sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                    skillCategory: cap.skillCategory || null,
+                    hasSelfDrive: cap.hasSelfDrive || false,
+                    businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
+                    skillId: cap.skillId || null
                 });
                 
-                if (!existsInInstalled && !existsInDiscovered) {
-                    var isScene = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
-                    discoveredCapabilities.push({
-                        capabilityId: cap.id,
-                        id: cap.id,
-                        name: cap.name,
-                        type: cap.type,
-                        description: cap.description,
-                        version: cap.version,
-                        source: currentMethod,
-                        isSceneCapability: isScene,
-                        sceneCapability: isScene,
-                        dependencies: [],
-                        provider: null
-                    });
-                    scanStats.new++;
+                if (isInstalled) {
+                    installedCount++;
+                } else {
+                    newCount++;
                 }
             });
 
-            scanStats.found = caps.length;
+            scanStats.found = discoveredCapabilities.length;
+            scanStats.new = newCount;
+            scanStats.installed = installedCount;
             scanStats.scanned = 100;
 
             CapabilityDiscovery.addLog('success', '从 ' + currentMethod + ' 发现 ' + caps.length + ' 个能力');
@@ -442,22 +463,13 @@
 
             ApiClient.get(url)
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
-                        discoveredCapabilities = result.data;
-                        scanStats.found = discoveredCapabilities.length;
-                        scanStats.scanned = 100;
-
-                        discoveredCapabilities.forEach(function(cap) {
-                            var exists = installedCapabilities.find(function(i) { 
-                                return i.capabilityId === cap.id; 
-                            });
-                            if (!exists) {
-                                scanStats.new++;
-                            }
-                        });
-
-                        CapabilityDiscovery.addLog('success', '扫描完成，发现 ' + scanStats.found + ' 个能力');
-                        CapabilityDiscovery.renderResults();
+                    if (result.status === 'success' && result.data) {
+                        var caps = result.data;
+                        if (caps.capabilities) {
+                            caps = caps.capabilities;
+                        }
+                        CapabilityDiscovery.processDiscoveryResult({ capabilities: caps });
+                        CapabilityDiscovery.addLog('success', '扫描完成，发现 ' + caps.length + ' 个能力');
                         CapabilityDiscovery.addRadarDots();
                     } else {
                         CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
@@ -503,7 +515,7 @@
                 .then(function(result) {
                     console.log('[Discovery LOCAL_FS] Response:', result);
                     
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         var data = result.data;
                         if (data.capabilities && data.capabilities.length > 0) {
                             CapabilityDiscovery.setCache(cacheKey, data);
@@ -537,6 +549,18 @@
             document.getElementById('badge-' + currentMethod).textContent = '完成';
             document.getElementById('badge-' + currentMethod).className = 'method-badge done';
             CapabilityDiscovery.updateStats();
+            CapabilityDiscovery.updateContextState();
+        },
+
+        updateContextState: function() {
+            if (typeof ContextTrustLayer !== 'undefined') {
+                ContextTrustLayer.updatePageState({
+                    currentMethod: currentMethod,
+                    isScanning: isScanning,
+                    discoveredCapabilities: discoveredCapabilities,
+                    scanStats: scanStats
+                });
+            }
         },
 
         showEmptyResult: function() {
@@ -574,32 +598,64 @@
 
         renderResults: function() {
             var container = document.getElementById('resultsBody');
-            document.getElementById('resultsCount').textContent = discoveredCapabilities.length;
+            var visibleCount = 0;
+            var newVisibleCount = 0;
+            var installedVisibleCount = 0;
+            var sceneCount = 0;
+            var standaloneCount = 0;
+            var autoCount = 0;
+            var triggerCount = 0;
 
             if (discoveredCapabilities.length === 0) {
                 container.innerHTML = '<div class="empty-state">' +
                     '<i class="ri-inbox-line"></i>' +
                     '<div class="empty-state-title">未发现能力</div>' +
                     '<div class="empty-state-desc">尝试其他发现途径</div></div>';
+                document.getElementById('resultsCount').textContent = '0';
+                CapabilityDiscovery.updateFilterCounts(0, 0, 0, 0, 0, 0, 0, 0, 0);
                 return;
             }
 
             var html = '';
+            var sceneCount = 0, providerCount = 0, driverCount = 0, internalCount = 0;
+            var autoCount = 0, triggerCount = 0;
             discoveredCapabilities.forEach(function(cap) {
-                var isInstalled = installedCapabilities.find(function(i) { 
-                    return i.capabilityId === cap.id; 
-                });
+                var isInstalled = !!(cap.installed || installedCapabilities.find(function(i) { 
+                    return i.capabilityId === cap.id || i.id === cap.id; 
+                }));
                 var typeIcon = CapabilityDiscovery.getTypeIcon(cap.type);
-                var isSceneCapability = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
-                var capabilityTypeLabel = isSceneCapability ? 
-                    '<span class="capability-type-badge scene"><i class="ri-layout-grid-line"></i> 场景能力</span>' : 
-                    '<span class="capability-type-badge collaboration"><i class="ri-team-line"></i> 协作能力</span>';
+                var skillForm = cap.skillForm || cap.skillFormCode || 'PROVIDER';
+                var sceneType = cap.sceneType || cap.sceneTypeCode || null;
+                var categoryInfo = CapabilityDiscovery.getCategoryInfoNew(skillForm, sceneType);
+                
+                visibleCount++;
+                if (isInstalled) {
+                    installedVisibleCount++;
+                } else {
+                    newVisibleCount++;
+                }
+                
+                if (skillForm === 'SCENE') sceneCount++;
+                if (skillForm === 'PROVIDER') providerCount++;
+                if (skillForm === 'DRIVER') driverCount++;
+                if (skillForm === 'INTERNAL') internalCount++;
+                if (sceneType === 'AUTO') autoCount++;
+                if (sceneType === 'TRIGGER') triggerCount++;
+                
+                var categoryBadge = '<span class="capability-category-badge ' + categoryInfo.code.toLowerCase() + '">' +
+                    '<i class="' + categoryInfo.icon + '"></i> ' + categoryInfo.name + '</span>';
+                
+                var installedBadge = isInstalled ? 
+                    '<span class="capability-status-badge installed"><i class="ri-checkbox-circle-line"></i> 已安装</span>' : '';
 
-                html += '<div class="result-item" data-scene="' + isSceneCapability + '">' +
+                html += '<div class="result-item' + (isInstalled ? ' installed' : '') + '" ' +
+                    'data-skill-form="' + skillForm.toLowerCase() + '" ' +
+                    'data-scene-type="' + (sceneType ? sceneType.toLowerCase() : '') + '" ' +
+                    'data-installed="' + isInstalled + '">' +
                     '<div class="result-icon type-' + (cap.type || 'CUSTOM') + '">' +
                     '<i class="' + typeIcon + '"></i></div>' +
                     '<div class="result-info">' +
-                    '<div class="result-name">' + (cap.name || cap.id) + capabilityTypeLabel + '</div>' +
+                    '<div class="result-name">' + (cap.name || cap.id) + categoryBadge + installedBadge + '</div>' +
                     '<div class="result-id">' + cap.id + '</div>' +
                     '<div class="result-desc">' + (cap.description || '暂无描述') + '</div>' +
                     '<div class="result-meta">' +
@@ -609,7 +665,7 @@
                     '<div class="result-actions">';
 
                 if (isInstalled) {
-                    html += '<button class="nx-btn nx-btn--secondary nx-btn--sm" disabled>已安装</button>';
+                    html += '<button class="nx-btn nx-btn--secondary nx-btn--sm" disabled><i class="ri-checkbox-circle-line"></i> 已安装</button>';
                 } else {
                     html += '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installCapability(\'' + cap.id + '\')">' +
                         '<i class="ri-download-line"></i> 安装</button>';
@@ -617,7 +673,89 @@
 
                 html += '</div></div>';
             });
-            container.innerHTML = html;
+            
+            scanStats.found = visibleCount;
+            scanStats.new = newVisibleCount;
+            scanStats.installed = installedVisibleCount;
+            CapabilityDiscovery.updateStats();
+            CapabilityDiscovery.updateFilterCounts(visibleCount, sceneCount, providerCount, driverCount, internalCount, autoCount, triggerCount, newVisibleCount, installedVisibleCount);
+            
+            document.getElementById('resultsCount').textContent = visibleCount;
+            
+            if (visibleCount === 0) {
+                container.innerHTML = '<div class="empty-state">' +
+                    '<i class="ri-inbox-line"></i>' +
+                    '<div class="empty-state-title">未发现公开能力</div>' +
+                    '<div class="empty-state-desc">所有发现的能力都是内部能力</div></div>';
+            } else {
+                container.innerHTML = html;
+            }
+        },
+        
+        updateFilterCounts: function(all, scene, provider, driver, internal, auto, trigger, newCaps, installed) {
+            var elAll = document.getElementById('filterCountAll');
+            var elScene = document.getElementById('filterCountScene');
+            var elProvider = document.getElementById('filterCountProvider');
+            var elDriver = document.getElementById('filterCountDriver');
+            var elAuto = document.getElementById('filterCountAuto');
+            var elTrigger = document.getElementById('filterCountTrigger');
+            var elNew = document.getElementById('filterCountNew');
+            var elInstalled = document.getElementById('filterCountInstalled');
+            
+            if (elAll) elAll.textContent = all;
+            if (elScene) elScene.textContent = scene;
+            if (elProvider) elProvider.textContent = provider;
+            if (elDriver) elDriver.textContent = driver;
+            if (elAuto) elAuto.textContent = auto;
+            if (elTrigger) elTrigger.textContent = trigger;
+            if (elNew) elNew.textContent = newCaps;
+            if (elInstalled) elInstalled.textContent = installed;
+        },
+        
+        getCategoryInfoNew: function(skillForm, sceneType) {
+            if (skillForm === 'SCENE') {
+                if (sceneType === 'AUTO') {
+                    return { code: 'SCENE_AUTO', name: '自驱场景', icon: 'ri-rocket-line', description: '自动驱动执行的场景技能' };
+                } else if (sceneType === 'TRIGGER') {
+                    return { code: 'SCENE_TRIGGER', name: '触发场景', icon: 'ri-hand-coin-line', description: '需要外部触发的场景技能' };
+                } else if (sceneType === 'HYBRID') {
+                    return { code: 'SCENE_HYBRID', name: '混合场景', icon: 'ri-shuffle-line', description: '结合自驱和触发的场景技能' };
+                }
+                return { code: 'SCENE', name: '场景技能', icon: 'ri-layout-grid-line', description: '具有完整场景流程的技能' };
+            } else if (skillForm === 'PROVIDER') {
+                return { code: 'PROVIDER', name: '能力提供者', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
+            } else if (skillForm === 'DRIVER') {
+                return { code: 'DRIVER', name: '驱动技能', icon: 'ri-steering-line', description: '驱动场景运行的技能' };
+            } else if (skillForm === 'INTERNAL') {
+                return { code: 'INTERNAL', name: '内部能力', icon: 'ri-settings-3-line', description: '系统内部使用的技能' };
+            }
+            return { code: 'PROVIDER', name: '能力提供者', icon: 'ri-cpu-line', description: '提供基础能力的技能' };
+        },
+        
+        getCategoryInfo: function(category) {
+            var categories = {
+                'SCENE': { code: 'SCENE', name: '场景技能', icon: 'ri-layout-grid-line', description: '场景类型技能' },
+                'STANDALONE': { code: 'STANDALONE', name: '独立技能', icon: 'ri-tools-line', description: '独立运行的功能单元' },
+                'AUTO': { code: 'AUTO', name: '自驱场景', icon: 'ri-robot-line', description: '自动驱动的场景' },
+                'TRIGGER': { code: 'TRIGGER', name: '触发场景', icon: 'ri-hand-coin-line', description: '需要外部触发的场景' }
+            };
+            return categories[category] || categories['STANDALONE'];
+        },
+        
+        getSceneTypeInfo: function(sceneType) {
+            var types = {
+                'AUTO': { code: 'AUTO', name: '自驱场景', icon: 'ri-robot-line', description: '自动驱动的场景' },
+                'TRIGGER': { code: 'TRIGGER', name: '触发场景', icon: 'ri-hand-coin-line', description: '需要外部触发的场景' }
+            };
+            return types[sceneType] || null;
+        },
+        
+        getSkillFormInfo: function(skillForm) {
+            var forms = {
+                'SCENE': { code: 'SCENE', name: '场景技能', icon: 'ri-layout-grid-line', description: '场景类型技能' },
+                'STANDALONE': { code: 'STANDALONE', name: '独立技能', icon: 'ri-tools-line', description: '独立运行的功能单元' }
+            };
+            return forms[skillForm] || forms['STANDALONE'];
         },
 
         getTypeIcon: function(type) {
@@ -639,9 +777,13 @@
 
         currentInstallCap: null,
         currentWizardStep: 1,
+        totalWizardSteps: 7,
         selectedDriverCondition: null,
+        selectedRole: null,
+        availableRoles: [],
         collaborators: [],
         installId: null,
+        installResult: null,
 
         installCap: async function(capId) {
             var cap = discoveredCapabilities.find(function(c) { return c.id === capId; });
@@ -650,28 +792,155 @@
             CapabilityDiscovery.currentInstallCap = cap;
             CapabilityDiscovery.currentWizardStep = 1;
             CapabilityDiscovery.selectedDriverCondition = null;
+            CapabilityDiscovery.selectedRole = null;
+            CapabilityDiscovery.availableRoles = [];
             CapabilityDiscovery.collaborators = [];
             CapabilityDiscovery.installId = null;
+            CapabilityDiscovery.installResult = null;
 
             document.getElementById('installModalTitle').textContent = '安装能力: ' + (cap.name || cap.id);
             
-            CapabilityDiscovery.loadDriverConditions(cap.id);
+            CapabilityDiscovery.loadCapabilityDetail(cap);
             
             document.getElementById('leaderInput').value = '';
             document.getElementById('collaboratorList').innerHTML = '';
             document.getElementById('collaboratorInput').value = '';
             document.getElementById('pushType').value = 'SHARE';
             
+            CapabilityDiscovery.updateStepper(1);
             CapabilityDiscovery.showWizardStep(1);
             document.getElementById('installModal').classList.add('show');
+        },
+
+        loadCapabilityDetail: function(cap) {
+            var typeIcon = CapabilityDiscovery.getTypeIcon(cap.type);
+            var isScene = cap.isSceneCapability === true || cap.sceneCapability === true || cap.type === 'SCENE';
+            
+            document.getElementById('detailIcon').innerHTML = '<i class="' + typeIcon + '"></i>';
+            document.getElementById('detailName').textContent = cap.name || cap.id;
+            document.getElementById('detailId').textContent = cap.id;
+            document.getElementById('detailTypeBadge').textContent = isScene ? '场景能力' : '协作能力';
+            document.getElementById('detailVersion').textContent = 'v' + (cap.version || '1.0.0');
+            document.getElementById('detailDescription').textContent = cap.description || '暂无详细描述';
+            
+            var featureHtml = '';
+            var features = cap.features || ['核心功能'];
+            features.forEach(function(f) {
+                featureHtml += '<div class="feature-item"><i class="ri-check-line"></i> ' + f + '</div>';
+            });
+            document.getElementById('featureList').innerHTML = featureHtml;
+            
+            CapabilityDiscovery.loadRolesForCapability(cap.id);
+            
+            CapabilityDiscovery.loadDependencyPreview(cap);
+        },
+
+        loadRolesForCapability: function(capabilityId) {
+            ApiClient.get('/api/v1/discovery/capabilities/detail/' + capabilityId + '/roles')
+                .then(function(result) {
+                    if (result.status === 'success' && result.data && result.data.length > 0) {
+                        CapabilityDiscovery.availableRoles = result.data;
+                        CapabilityDiscovery.renderRolePreview(result.data);
+                        CapabilityDiscovery.renderRoleSelection(result.data);
+                    } else {
+                        CapabilityDiscovery.availableRoles = [
+                            { name: 'MANAGER', displayName: '管理者', description: '拥有完整管理权限', icon: 'ri-user-star-line', permissions: ['READ', 'WRITE', 'CONFIG'] },
+                            { name: 'USER', displayName: '普通用户', description: '基础使用权限', icon: 'ri-user-line', permissions: ['READ', 'WRITE'] }
+                        ];
+                        CapabilityDiscovery.renderRolePreview(CapabilityDiscovery.availableRoles);
+                        CapabilityDiscovery.renderRoleSelection(CapabilityDiscovery.availableRoles);
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[loadRolesForCapability] Error:', error);
+                    CapabilityDiscovery.availableRoles = [
+                        { name: 'MANAGER', displayName: '管理者', description: '拥有完整管理权限', icon: 'ri-user-star-line', permissions: ['READ', 'WRITE', 'CONFIG'] },
+                        { name: 'USER', displayName: '普通用户', description: '基础使用权限', icon: 'ri-user-line', permissions: ['READ', 'WRITE'] }
+                    ];
+                    CapabilityDiscovery.renderRolePreview(CapabilityDiscovery.availableRoles);
+                    CapabilityDiscovery.renderRoleSelection(CapabilityDiscovery.availableRoles);
+                });
+        },
+
+        renderRolePreview: function(roles) {
+            var html = '';
+            roles.forEach(function(role) {
+                html += '<div class="role-preview-item">' +
+                    '<i class="' + (role.icon || 'ri-user-line') + '"></i>' +
+                    '<span>' + (role.displayName || role.name) + '</span>' +
+                    '</div>';
+            });
+            document.getElementById('rolePreviewList').innerHTML = html;
+        },
+
+        renderRoleSelection: function(roles) {
+            var html = '';
+            roles.forEach(function(role, i) {
+                var permissionsHtml = '';
+                (role.permissions || []).forEach(function(p) {
+                    permissionsHtml += '<span class="permission-tag">' + p + '</span>';
+                });
+                html += '<div class="role-selection-item' + (i === 0 ? ' selected' : '') + '" data-role="' + role.name + '" onclick="selectRole(\'' + role.name + '\')">' +
+                    '<div class="role-selection-radio"></div>' +
+                    '<div class="role-selection-icon"><i class="' + (role.icon || 'ri-user-line') + '"></i></div>' +
+                    '<div class="role-selection-info">' +
+                    '<div class="role-selection-name">' + (role.displayName || role.name) + '</div>' +
+                    '<div class="role-selection-desc">' + (role.description || '') + '</div>' +
+                    '<div class="role-selection-permissions">' + permissionsHtml + '</div>' +
+                    '</div></div>';
+            });
+            document.getElementById('roleSelectionList').innerHTML = html;
+            if (roles.length > 0) {
+                CapabilityDiscovery.selectedRole = roles[0].name;
+            }
+        },
+
+        selectRole: function(roleName) {
+            CapabilityDiscovery.selectedRole = roleName;
+            document.querySelectorAll('.role-selection-item').forEach(function(item) {
+                item.classList.toggle('selected', item.dataset.role === roleName);
+            });
+        },
+
+        loadDependencyPreview: function(cap) {
+            var html = '';
+            var deps = cap.dependencies || [];
+            if (deps.length === 0) {
+                html = '<div class="dependency-preview-item installed"><i class="ri-checkbox-circle-line"></i><span>无依赖项</span></div>';
+            } else {
+                deps.forEach(function(dep) {
+                    var isInstalled = installedCapabilities.find(function(i) { return i.capabilityId === dep.id; });
+                    html += '<div class="dependency-preview-item ' + (isInstalled ? 'installed' : 'pending') + '">' +
+                        '<i class="ri-' + (isInstalled ? 'checkbox-circle' : 'checkbox-blank') + '-line"></i>' +
+                        '<span>' + (dep.name || dep.id) + '</span>' +
+                        '</div>';
+                });
+            }
+            document.getElementById('dependencyPreviewList').innerHTML = html;
+        },
+
+        updateStepper: function(currentStep) {
+            document.querySelectorAll('.stepper-item').forEach(function(item, i) {
+                var step = i + 1;
+                item.classList.remove('active', 'completed');
+                if (step < currentStep) {
+                    item.classList.add('completed');
+                } else if (step === currentStep) {
+                    item.classList.add('active');
+                }
+            });
+            
+            document.querySelectorAll('.stepper-line').forEach(function(line, i) {
+                line.classList.toggle('completed', i < currentStep - 1);
+            });
         },
 
         loadDriverConditions: function(capabilityId) {
             var container = document.getElementById('driverConditionList');
             
-            ApiClient.get('/api/v1/capabilities/detail/' + capabilityId + '/driver-conditions')
+            ApiClient.get('/api/v1/discovery/capabilities/detail/' + capabilityId + '/driver-conditions')
                 .then(function(result) {
-                    if (result.code === 200 && result.data && result.data.length > 0) {
+                    if (result.status === 'success' && result.data && result.data.length > 0) {
                         var html = '';
                         result.data.forEach(function(dc, i) {
                             html += '<div class="driver-condition-item' + (i === 0 ? ' selected' : '') + '" data-id="' + dc.conditionId + '" onclick="selectDriverCondition(\'' + dc.conditionId + '\')">' +
@@ -723,7 +992,7 @@
             
             ApiClient.get('/api/v1/org/users')
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         CapabilityDiscovery.cachedUsers = result.data;
                         callback(result.data);
                     } else {
@@ -899,14 +1168,94 @@
                 s.classList.toggle('active', i + 1 === step);
             });
             
+            CapabilityDiscovery.updateStepper(step);
+            
             document.getElementById('installPrev').style.display = step > 1 ? 'inline-flex' : 'none';
-            document.getElementById('installNext').style.display = step < 3 ? 'inline-flex' : 'none';
-            document.getElementById('installCancel').style.display = 'inline-flex';
+            document.getElementById('installNext').style.display = step < 7 ? 'inline-flex' : 'none';
+            document.getElementById('installCancel').style.display = step < 8 ? 'inline-flex' : 'none';
             document.getElementById('installDone').style.display = 'none';
             
-            if (step === 2) {
+            if (step === 4) {
+                CapabilityDiscovery.loadDriverConditions(CapabilityDiscovery.currentInstallCap.id);
+            } else if (step === 5) {
                 CapabilityDiscovery.loadDependencies();
+            } else if (step === 6) {
+                CapabilityDiscovery.initLLMConfig();
             }
+        },
+
+        initLLMConfig: function() {
+            var cap = CapabilityDiscovery.currentInstallCap;
+            if (!cap) return;
+            
+            if (!CapabilityDiscovery.selectedLLMProvider) {
+                CapabilityDiscovery.selectedLLMProvider = 'deepseek';
+                document.querySelector('.llm-provider-item[data-provider="deepseek"]').classList.add('selected');
+            }
+            
+            var defaultPrompt = '你是一个专业的' + (cap.name || '场景') + '助手。\n\n' +
+                '你的职责是：\n' +
+                '1. 理解用户的需求和意图\n' +
+                '2. 提供专业的建议和解决方案\n' +
+                '3. 协调场景中的各项任务\n\n' +
+                '场景描述：' + (cap.description || '暂无描述');
+            
+            document.getElementById('systemPrompt').value = defaultPrompt;
+        },
+
+        selectLLMProvider: function(provider) {
+            CapabilityDiscovery.selectedLLMProvider = provider;
+            document.querySelectorAll('.llm-provider-item').forEach(function(item) {
+                item.classList.toggle('selected', item.dataset.provider === provider);
+            });
+        },
+
+        generatePrompt: async function() {
+            var cap = CapabilityDiscovery.currentInstallCap;
+            var promptArea = document.getElementById('systemPrompt');
+            
+            promptArea.value = '正在生成提示语...';
+            promptArea.disabled = true;
+            
+            try {
+                var result = await ApiClient.post('/api/llm/generate-prompt', {
+                    capabilityId: cap.id,
+                    capabilityName: cap.name,
+                    description: cap.description,
+                    type: cap.type,
+                    sceneType: cap.sceneType
+                });
+                
+                if (result.code === 200 && result.data && result.data.prompt) {
+                    promptArea.value = result.data.prompt;
+                } else {
+                    var generatedPrompt = '# 角色定义\n\n' +
+                        '你是' + (cap.name || '场景') + '的专业助手。\n\n' +
+                        '## 核心职责\n\n' +
+                        '1. 理解并分析用户需求\n' +
+                        '2. 提供专业的解决方案\n' +
+                        '3. 协调场景任务执行\n\n' +
+                        '## 场景信息\n\n' +
+                        '- **场景名称**: ' + (cap.name || '未知') + '\n' +
+                        '- **场景类型**: ' + (cap.sceneType || '通用') + '\n' +
+                        '- **描述**: ' + (cap.description || '暂无描述') + '\n\n' +
+                        '## 工作流程\n\n' +
+                        '1. 接收用户请求\n' +
+                        '2. 分析请求内容\n' +
+                        '3. 调用相关工具\n' +
+                        '4. 返回处理结果';
+                    promptArea.value = generatedPrompt;
+                }
+            } catch (e) {
+                console.error('Generate prompt error:', e);
+                promptArea.value = '生成失败，请手动编辑提示语';
+            }
+            
+            promptArea.disabled = false;
+        },
+
+        resetPrompt: function() {
+            CapabilityDiscovery.initLLMConfig();
         },
 
         loadDependencies: function() {
@@ -939,13 +1288,27 @@
             var step = CapabilityDiscovery.currentWizardStep;
             
             if (step === 1) {
+                CapabilityDiscovery.showWizardStep(2);
+            } else if (step === 2) {
+                if (!CapabilityDiscovery.selectedRole) {
+                    alert('请选择角色');
+                    return;
+                }
+                CapabilityDiscovery.showWizardStep(3);
+            } else if (step === 3) {
                 var leader = document.getElementById('leaderInput').value.trim();
                 if (!leader) {
                     alert('请指定主导者');
                     return;
                 }
-                CapabilityDiscovery.showWizardStep(2);
-            } else if (step === 2) {
+                CapabilityDiscovery.showWizardStep(4);
+            } else if (step === 4) {
+                CapabilityDiscovery.showWizardStep(5);
+            } else if (step === 5) {
+                CapabilityDiscovery.showWizardStep(6);
+            } else if (step === 6) {
+                CapabilityDiscovery.showWizardStep(7);
+            } else if (step === 7) {
                 CapabilityDiscovery.executeInstall();
             }
         },
@@ -958,7 +1321,7 @@
         },
 
         executeInstall: async function() {
-            CapabilityDiscovery.showWizardStep(3);
+            CapabilityDiscovery.showWizardStep(7);
             
             var cap = CapabilityDiscovery.currentInstallCap;
             var leader = document.getElementById('leaderInput').value.trim();
@@ -971,6 +1334,7 @@
                 { name: '创建安装配置', status: 'pending' },
                 { name: '下载能力包', status: 'pending' },
                 { name: '解析依赖', status: 'pending' },
+                { name: '配置LLM', status: 'pending' },
                 { name: '安装能力', status: 'pending' },
                 { name: '推送通知', status: 'pending' }
             ];
@@ -1024,7 +1388,8 @@
                     name: cap.name,
                     type: cap.type,
                     description: cap.description,
-                    source: currentMethod
+                    source: currentMethod,
+                    role: CapabilityDiscovery.selectedRole
                 });
 
                 if (createResult.code !== 200) {
@@ -1042,7 +1407,23 @@
                 await new Promise(function(r) { setTimeout(r, 500); });
                 updateStep(2, 'done', '完成');
                 
-                updateStep(3, 'running', '安装中...');
+                updateStep(3, 'running', '配置LLM...');
+                
+                var llmProvider = CapabilityDiscovery.selectedLLMProvider || 'deepseek';
+                var systemPrompt = document.getElementById('systemPrompt').value;
+                var enableFunctionCall = document.getElementById('enableFunctionCall').checked;
+                
+                var llmConfigResult = await ApiClient.post('/api/llm/config', {
+                    capabilityId: cap.id,
+                    installId: CapabilityDiscovery.installId,
+                    provider: llmProvider,
+                    systemPrompt: systemPrompt,
+                    enableFunctionCall: enableFunctionCall
+                });
+                
+                updateStep(3, 'done', '完成');
+                
+                updateStep(4, 'running', '安装中...');
                 
                 var execResult = await ApiClient.post('/api/v1/installs/' + CapabilityDiscovery.installId + '/execute');
                 
@@ -1050,9 +1431,10 @@
                     throw new Error(execResult.message || '安装失败');
                 }
                 
-                updateStep(3, 'done', '完成');
+                CapabilityDiscovery.installResult = execResult.data;
+                updateStep(4, 'done', '完成');
                 
-                updateStep(4, 'running', '推送中...');
+                updateStep(5, 'running', '推送中...');
                 
                 if (CapabilityDiscovery.collaborators.length > 0 || pushType === 'DELEGATE') {
                     var pushResult = await ApiClient.post('/api/v1/installs/' + CapabilityDiscovery.installId + '/push', {
@@ -1061,7 +1443,7 @@
                     });
                 }
                 
-                updateStep(4, 'done', '完成');
+                updateStep(5, 'done', '完成');
                 progress.style.width = '100%';
 
                 installedCapabilities.push({
@@ -1077,12 +1459,70 @@
                 
                 CapabilityDiscovery.addLog('success', '安装成功: ' + (cap.name || cap.id));
                 
+                setTimeout(function() {
+                    CapabilityDiscovery.showWizardStep(8);
+                }, 500);
+                
             } catch (error) {
                 console.error('Install failed:', error);
                 updateStep(currentStep, 'error', '失败');
                 CapabilityDiscovery.addLog('error', '安装失败: ' + error.message);
+                
+                document.getElementById('installCancel').style.display = 'inline-flex';
+                document.getElementById('installPrev').style.display = 'inline-flex';
+                document.getElementById('installNext').style.display = 'inline-flex';
+                document.getElementById('installDone').style.display = 'none';
             }
+        },
 
+        showCompletePage: function() {
+            var cap = CapabilityDiscovery.currentInstallCap;
+            var selectedRoleInfo = CapabilityDiscovery.availableRoles.find(function(r) {
+                return r.name === CapabilityDiscovery.selectedRole;
+            });
+            
+            document.getElementById('completeName').textContent = cap.name || cap.id;
+            document.getElementById('completeRole').textContent = selectedRoleInfo ? 
+                (selectedRoleInfo.displayName || selectedRoleInfo.name) : CapabilityDiscovery.selectedRole;
+            
+            var participants = [];
+            var leader = document.getElementById('leaderInput').value.trim();
+            if (leader) participants.push(leader);
+            participants = participants.concat(CapabilityDiscovery.collaborators);
+            document.getElementById('completeParticipants').textContent = participants.length > 0 ? 
+                participants.length + '人 (' + participants.join('、') + ')' : '仅自己';
+            
+            var menuPreview = document.getElementById('completeMenuPreview');
+            var menus = CapabilityDiscovery.installResult && CapabilityDiscovery.installResult.menus ? 
+                CapabilityDiscovery.installResult.menus : [
+                    { name: '功能入口', icon: 'ri-apps-line' }
+                ];
+            var menuHtml = '';
+            menus.forEach(function(menu) {
+                menuHtml += '<div class="menu-preview-item">' +
+                    '<i class="' + (menu.icon || 'ri-apps-line') + '"></i>' +
+                    '<span>' + menu.name + '</span></div>';
+            });
+            menuPreview.innerHTML = menuHtml;
+            
+            var notifyStatus = document.getElementById('completeNotifyStatus');
+            var notifyHtml = '';
+            if (CapabilityDiscovery.collaborators.length > 0) {
+                notifyHtml = '<div class="notify-item success">' +
+                    '<i class="ri-checkbox-circle-line"></i>' +
+                    '<span>已向 ' + CapabilityDiscovery.collaborators.length + ' 位参与者发送邀请通知</span></div>' +
+                    '<div class="notify-item success">' +
+                    '<i class="ri-checkbox-circle-line"></i>' +
+                    '<span>参与者可在"我的待办"中查看并激活</span></div>';
+            } else {
+                notifyHtml = '<div class="notify-item success">' +
+                    '<i class="ri-checkbox-circle-line"></i>' +
+                    '<span>安装完成，可立即使用</span></div>';
+            }
+            notifyStatus.innerHTML = notifyHtml;
+            
+            CapabilityDiscovery.showWizardStep(7);
+            
             document.getElementById('installCancel').style.display = 'none';
             document.getElementById('installPrev').style.display = 'none';
             document.getElementById('installNext').style.display = 'none';
@@ -1128,22 +1568,273 @@
         },
 
         filterResults: function(filter) {
-            var items = document.querySelectorAll('.result-item');
-            items.forEach(function(item) {
-                if (filter === 'all') {
-                    item.style.display = 'flex';
-                } else if (filter === 'new') {
-                    var btn = item.querySelector('.nx-btn--primary');
-                    item.style.display = btn ? 'flex' : 'none';
-                } else if (filter === 'installed') {
-                    var btn = item.querySelector('.nx-btn--primary');
-                    item.style.display = btn ? 'none' : 'flex';
-                } else if (filter === 'scene') {
-                    item.style.display = item.dataset.scene === 'true' ? 'flex' : 'none';
-                } else if (filter === 'collaboration') {
-                    item.style.display = item.dataset.scene === 'false' ? 'flex' : 'none';
+            if (filter === 'all') {
+                CapabilityDiscovery.discoverFromLocalFs(true);
+            } else if (filter === 'new') {
+                CapabilityDiscovery.filterByInstalled(false);
+            } else if (filter === 'installed') {
+                CapabilityDiscovery.filterByInstalled(true);
+            } else if (filter === 'scene') {
+                CapabilityDiscovery.filterBySkillForm('SCENE');
+            } else if (filter === 'provider') {
+                CapabilityDiscovery.filterBySkillForm('PROVIDER');
+            } else if (filter === 'driver') {
+                CapabilityDiscovery.filterBySkillForm('DRIVER');
+            } else if (filter === 'auto') {
+                CapabilityDiscovery.filterBySceneType('AUTO');
+            } else if (filter === 'trigger') {
+                CapabilityDiscovery.filterBySceneType('TRIGGER');
+            }
+        },
+        
+        filterBySkillForm: function(skillForm) {
+            CapabilityDiscovery.addLog('info', '按技能形态过滤: ' + skillForm);
+            
+            var config = { skillForm: skillForm };
+            
+            ApiClient.post('/api/v1/discovery/local', config, { timeout: 60000 })
+                .then(function(result) {
+                    console.log('[filterBySkillForm] Response:', result);
+                    
+                    if (result.status === 'success' && result.data) {
+                        var data = result.data;
+                        discoveredCapabilities = [];
+                        var newCount = 0;
+                        var installedCount = 0;
+                        
+                        var caps = data.capabilities || [];
+                        caps.forEach(function(cap) {
+                            var isInstalled = cap.installed || false;
+                            
+                            discoveredCapabilities.push({
+                                capabilityId: cap.id,
+                                id: cap.id,
+                                name: cap.name,
+                                type: cap.type,
+                                description: cap.description,
+                                version: cap.version,
+                                source: 'LOCAL_FS',
+                                isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
+                                sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
+                                dependencies: cap.dependencies || [],
+                                provider: cap.provider || null,
+                                installed: isInstalled,
+                                category: cap.category || 'NOT_SCENE_SKILL',
+                                skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
+                                sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                hasSelfDrive: cap.hasSelfDrive || false,
+                                businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
+                                skillId: cap.skillId || null
+                            });
+                            
+                            if (isInstalled) {
+                                installedCount++;
+                            } else {
+                                newCount++;
+                            }
+                        });
+                        
+                        scanStats.found = discoveredCapabilities.length;
+                        scanStats.new = newCount;
+                        scanStats.installed = installedCount;
+                        scanStats.scanned = 100;
+                        
+                        CapabilityDiscovery.renderResults();
+                        CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个' + (skillForm === 'SCENE' ? '场景技能' : '独立技能'));
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[filterBySkillForm] Error:', error);
+                    CapabilityDiscovery.addLog('error', '过滤失败: ' + error.message);
+                });
+        },
+        
+        filterBySceneType: function(sceneType) {
+            CapabilityDiscovery.addLog('info', '按场景类型过滤: ' + sceneType);
+            
+            var config = { sceneType: sceneType };
+            
+            ApiClient.post('/api/v1/discovery/local', config, { timeout: 60000 })
+                .then(function(result) {
+                    console.log('[filterBySceneType] Response:', result);
+                    
+                    if (result.status === 'success' && result.data) {
+                        var data = result.data;
+                        discoveredCapabilities = [];
+                        var newCount = 0;
+                        var installedCount = 0;
+                        
+                        var caps = data.capabilities || [];
+                        caps.forEach(function(cap) {
+                            var isInstalled = cap.installed || false;
+                            
+                            discoveredCapabilities.push({
+                                capabilityId: cap.id,
+                                id: cap.id,
+                                name: cap.name,
+                                type: cap.type,
+                                description: cap.description,
+                                version: cap.version,
+                                source: 'LOCAL_FS',
+                                isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
+                                sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
+                                dependencies: cap.dependencies || [],
+                                provider: cap.provider || null,
+                                installed: isInstalled,
+                                category: cap.category || 'NOT_SCENE_SKILL',
+                                skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
+                                sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                hasSelfDrive: cap.hasSelfDrive || false,
+                                businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
+                                skillId: cap.skillId || null
+                            });
+                            
+                            if (isInstalled) {
+                                installedCount++;
+                            } else {
+                                newCount++;
+                            }
+                        });
+                        
+                        scanStats.found = discoveredCapabilities.length;
+                        scanStats.new = newCount;
+                        scanStats.installed = installedCount;
+                        scanStats.scanned = 100;
+                        
+                        CapabilityDiscovery.renderResults();
+                        CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个' + (sceneType === 'AUTO' ? '自驱场景' : '触发场景'));
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[filterBySceneType] Error:', error);
+                    CapabilityDiscovery.addLog('error', '过滤失败: ' + error.message);
+                });
+        },
+        
+        filterByCategory: function(category) {
+            CapabilityDiscovery.addLog('info', '按分类过滤: ' + category);
+            
+            var config = { category: category };
+            
+            ApiClient.post('/api/v1/discovery/local', config, { timeout: 60000 })
+                .then(function(result) {
+                    console.log('[filterByCategory] Response:', result);
+                    
+                    if (result.status === 'success' && result.data) {
+                        var data = result.data;
+                        discoveredCapabilities = [];
+                        var newCount = 0;
+                        var installedCount = 0;
+                        
+                        var caps = data.capabilities || [];
+                        caps.forEach(function(cap) {
+                            var isInstalled = cap.installed || cap.status === 'installed';
+                            
+                            discoveredCapabilities.push({
+                                capabilityId: cap.id,
+                                id: cap.id,
+                                name: cap.name,
+                                type: cap.type,
+                                description: cap.description,
+                                version: cap.version,
+                                source: 'LOCAL_FS',
+                                isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
+                                sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
+                                dependencies: cap.dependencies || [],
+                                provider: cap.provider || null,
+                                installed: isInstalled,
+                                category: cap.category || 'NOT_SCENE_SKILL',
+                                skillForm: cap.skillForm || cap.skillFormCode || 'STANDALONE',
+                                sceneType: cap.sceneType || cap.sceneTypeCode || null,
+                                hasSelfDrive: cap.hasSelfDrive || false,
+                                businessSemanticsScore: cap.businessSemanticsScore || cap.score || 5,
+                                skillId: cap.skillId || null
+                            });
+                            
+                            if (isInstalled) {
+                                installedCount++;
+                            } else {
+                                newCount++;
+                            }
+                        });
+                        
+                        scanStats.found = discoveredCapabilities.length;
+                        scanStats.new = newCount;
+                        scanStats.installed = installedCount;
+                        scanStats.scanned = 100;
+                        
+                        CapabilityDiscovery.updateStats();
+                        CapabilityDiscovery.renderResults();
+                        CapabilityDiscovery.addLog('success', '分类过滤完成，找到 ' + discoveredCapabilities.length + ' 个能力');
+                    } else {
+                        CapabilityDiscovery.addLog('error', '分类过滤失败: ' + (result.message || '未知错误'));
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[filterByCategory] Error:', error);
+                    CapabilityDiscovery.addLog('error', '分类过滤失败: ' + error.message);
+                });
+        },
+        
+        filterByInstalled: function(installed) {
+            CapabilityDiscovery.addLog('info', installed ? '过滤已安装能力' : '过滤新能力');
+            
+            var filteredCaps = [];
+            discoveredCapabilities.forEach(function(cap) {
+                if (installed && cap.installed) {
+                    filteredCaps.push(cap);
+                } else if (!installed && !cap.installed) {
+                    filteredCaps.push(cap);
                 }
             });
+            
+            var container = document.getElementById('resultsBody');
+            if (filteredCaps.length === 0) {
+                container.innerHTML = '<div class="empty-state">' +
+                    '<i class="ri-inbox-line"></i>' +
+                    '<div class="empty-state-title">' + (installed ? '没有已安装的能力' : '没有新能力') + '</div>' +
+                    '<div class="empty-state-desc">尝试其他过滤条件</div></div>';
+                document.getElementById('resultsCount').textContent = '0';
+            } else {
+                var html = '';
+                filteredCaps.forEach(function(cap) {
+                    var typeIcon = CapabilityDiscovery.getTypeIcon(cap.type);
+                    var category = cap.category || 'NOT_SCENE_SKILL';
+                    var categoryInfo = CapabilityDiscovery.getCategoryInfo(category);
+                    
+                    var categoryBadge = '<span class="capability-category-badge ' + categoryInfo.code.toLowerCase() + '">' +
+                        '<i class="' + categoryInfo.icon + '"></i> ' + categoryInfo.name + '</span>';
+                    
+                    var installedBadge = cap.installed ? 
+                        '<span class="capability-status-badge installed"><i class="ri-checkbox-circle-line"></i> 已安装</span>' : '';
+                    
+                    html += '<div class="result-item' + (cap.installed ? ' installed' : '') + '" ' +
+                        'data-category="' + categoryInfo.code.toLowerCase() + '" ' +
+                        'data-installed="' + cap.installed + '">' +
+                        '<div class="result-icon type-' + (cap.type || 'CUSTOM') + '">' +
+                        '<i class="' + typeIcon + '"></i></div>' +
+                        '<div class="result-info">' +
+                        '<div class="result-name">' + (cap.name || cap.id) + categoryBadge + installedBadge + '</div>' +
+                        '<div class="result-id">' + cap.id + '</div>' +
+                        '<div class="result-desc">' + (cap.description || '暂无描述') + '</div>' +
+                        '<div class="result-meta">' +
+                        '<span class="meta-item"><i class="ri-git-branch-line"></i> v' + (cap.version || '1.0.0') + '</span>' +
+                        '<span class="meta-item"><i class="ri-cloud-line"></i> ' + (cap.source || 'LOCAL_FS') + '</span>' +
+                        '</div></div>' +
+                        '<div class="result-actions">';
+                    
+                    if (cap.installed) {
+                        html += '<button class="nx-btn nx-btn--secondary nx-btn--sm" disabled><i class="ri-checkbox-circle-line"></i> 已安装</button>';
+                    } else {
+                        html += '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installCapability(\'' + cap.id + '\')">' +
+                            '<i class="ri-download-line"></i> 安装</button>';
+                    }
+                    
+                    html += '</div></div>';
+                });
+                container.innerHTML = html;
+                document.getElementById('resultsCount').textContent = filteredCaps.length;
+            }
         }
     };
 
@@ -1165,10 +1856,65 @@
         document.getElementById('logsBody').classList.toggle('show');
     };
     global.selectDriverCondition = CapabilityDiscovery.selectDriverCondition;
+    global.selectRole = CapabilityDiscovery.selectRole;
     global.selectLeader = CapabilityDiscovery.selectLeader;
     global.addCollaborator = CapabilityDiscovery.addCollaborator;
     global.removeCollaborator = CapabilityDiscovery.removeCollaborator;
     global.nextStep = CapabilityDiscovery.nextStep;
     global.prevStep = CapabilityDiscovery.prevStep;
+    global.goToCapability = function() {
+        window.location.href = 'my-capabilities.html';
+    };
 
 })(typeof window !== 'undefined' ? window : this);
+
+function selectRole(role) {
+    CapabilityDiscovery.selectRole(role);
+}
+
+function addCollaborator() {
+    CapabilityDiscovery.addCollaborator();
+}
+
+function removeCollaborator(userId) {
+    CapabilityDiscovery.removeCollaborator(userId);
+}
+
+function selectLeader() {
+    var leader = prompt('请输入主导者用户ID:', 'current-user');
+    if (leader) {
+        document.getElementById('leaderInput').value = leader;
+    }
+}
+
+function selectLLMProvider(provider) {
+    CapabilityDiscovery.selectLLMProvider(provider);
+}
+
+function generatePrompt() {
+    CapabilityDiscovery.generatePrompt();
+}
+
+function resetPrompt() {
+    CapabilityDiscovery.resetPrompt();
+}
+
+function nextStep() {
+    CapabilityDiscovery.nextStep();
+}
+
+function prevStep() {
+    CapabilityDiscovery.prevStep();
+}
+
+function cancelInstall() {
+    CapabilityDiscovery.closeInstallModal();
+}
+
+function closeInstall() {
+    CapabilityDiscovery.closeInstallModal();
+}
+
+function goToCapability() {
+    window.location.href = '/console/pages/my-capabilities.html';
+}

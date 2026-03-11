@@ -1,0 +1,96 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-dingding
+  name: DingTalk Organization
+  version: 0.7.3
+  description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-dingding
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - dingding
+    - dingtalk
+    - organization
+    - enterprise
+    - authentication
+
+spec:
+  type: enterprise-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x09
+    category: ORG
+    code: ORG_DINGDING
+    operations: [auth, org-sync, user-query]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.dingding.DingTalkOrgSkillApplication
+  
+  capabilities:
+    - id: org-data-read
+      name: Org Data Read
+      description: 组织数据读取
+      category: organization
+    - id: user-auth
+      name: User Authentication
+      description: 用户认证
+      category: authentication
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - org-data-read
+        - user-auth
+  
+  dependencies: []
+  
+  config:
+    required:
+      - name: DINGTALK_APP_KEY
+        type: string
+        description: 钉钉应用Key
+      - name: DINGTALK_APP_SECRET
+        type: string
+        secret: true
+        description: 钉钉应用Secret
+    optional:
+      - name: DINGTALK_API_BASE_URL
+        type: string
+        default: https://oapi.dingtalk.com
+        description: 钉钉API基础URL
+  
+  endpoints:
+    - path: /api/org/departments
+      method: GET
+      description: 获取部门列表
+      capability: org-data-read
+    - path: /api/org/users
+      method: GET
+      description: 获取用户列表
+      capability: org-data-read
+    - path: /api/auth/login
+      method: POST
+      description: 用户登录
+      capability: user-auth
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

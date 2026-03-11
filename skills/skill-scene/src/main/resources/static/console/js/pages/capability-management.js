@@ -174,7 +174,7 @@
         loadInstalledCapabilities: function() {
             ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         installedCapabilities = result.data;
                         capabilities = result.data;
                         CapabilityManagement.updateStats();
@@ -339,11 +339,11 @@
             document.getElementById('discoveryStatus').textContent = '发现中...';
             document.getElementById('startDiscoveryBtn').disabled = true;
 
-            var url = '/api/v1/capabilities/discovery?method=' + methodId;
+            var url = '/api/v1/discovery/capabilities?method=' + methodId;
             
             ApiClient.get(url)
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         var discovered = result.data;
                         discovered.forEach(function(cap) {
                             var exists = capabilities.find(function(c) { return c.capabilityId === cap.id; });
@@ -487,7 +487,7 @@
                 description: cap.description
             })
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         cap.status = 'installed';
                         installedCapabilities.push(cap);
                         CapabilityManagement.addLog('success', '安装成功: ' + capabilityId);
@@ -517,7 +517,7 @@
 
             ApiClient.delete('/api/v1/capabilities/' + capabilityId)
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         cap.status = 'available';
                         installedCapabilities = installedCapabilities.filter(function(c) { return c.capabilityId !== capabilityId; });
                         CapabilityManagement.addLog('success', '卸载成功: ' + capabilityId);
@@ -544,12 +544,12 @@
 
             CapabilityManagement.addLog('info', '正在调用: ' + capabilityId);
 
-            ApiClient.post('/api/v1/capabilities/discovery/invoke', {
+            ApiClient.post('/api/v1/discovery/capabilities/invoke', {
                 capabilityId: capabilityId,
                 params: {}
             })
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         CapabilityManagement.addLog('success', '调用成功: ' + JSON.stringify(result.data));
                         alert('调用成功: ' + JSON.stringify(result.data, null, 2));
                     } else {
@@ -660,7 +660,7 @@
                 description: desc
             })
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         capabilities.push({
                             capabilityId: capabilityId,
                             name: name,

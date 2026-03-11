@@ -13,18 +13,24 @@ function initThemeToggle() {
     const themeToggle = document.getElementById('theme-toggle');
     if (themeToggle) {
         themeToggle.addEventListener('click', function() {
-            document.documentElement.classList.toggle('light-theme');
-            const isLight = document.documentElement.classList.contains('light-theme');
-            this.innerHTML = isLight 
-                ? '<i class="ri-moon-line"></i> 深色模式'
-                : '<i class="ri-sun-line"></i> 浅色模式';
-            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            const html = document.documentElement;
+            const isLight = html.getAttribute('data-theme') === 'light';
+            
+            if (isLight) {
+                html.removeAttribute('data-theme');
+                this.innerHTML = '<i class="ri-moon-line"></i> 浅色模式';
+                localStorage.setItem('nx-theme', 'dark');
+            } else {
+                html.setAttribute('data-theme', 'light');
+                this.innerHTML = '<i class="ri-sun-line"></i> 深色模式';
+                localStorage.setItem('nx-theme', 'light');
+            }
         });
         
-        const savedTheme = localStorage.getItem('theme');
+        const savedTheme = localStorage.getItem('nx-theme') || 'dark';
         if (savedTheme === 'light') {
-            document.documentElement.classList.add('light-theme');
-            themeToggle.innerHTML = '<i class="ri-moon-line"></i> 深色模式';
+            document.documentElement.setAttribute('data-theme', 'light');
+            themeToggle.innerHTML = '<i class="ri-sun-line"></i> 深色模式';
         }
     }
 }

@@ -4,7 +4,7 @@ import net.ooder.skills.api.SkillPackageManager;
 import net.ooder.skills.api.InstallResultWithDependencies;
 import net.ooder.skills.api.InstallRequest.InstallMode;
 import net.ooder.skill.scene.dto.SceneDefinitionDTO;
-import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.service.SceneService;
 import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.service.CapabilityService;
@@ -248,9 +248,9 @@ public class SceneTemplateService {
                             }
                         } else {
                             failedSkills.add(skillId);
-                            log.error("[deployTemplate] Failed to install: {} - {}", skillId, installResult.getMessage());
+                            log.error("[deployTemplate] Failed to install: {} - {}", skillId, installResult.getError());
                             if (callback != null) {
-                                callback.onSkillComplete(skillId, false, installResult.getMessage());
+                                callback.onSkillComplete(skillId, false, installResult.getError());
                             }
                             
                             if (isRequiredSkill(template, skillId)) {

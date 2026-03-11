@@ -38,10 +38,27 @@ public class Capability implements Serializable {
     private List<String> dependencies;
     private List<String> optionalCapabilities;
     
-    private SceneSkillCategory category;
-    private String visibility;
+    private SkillForm skillForm;
+    private SceneType sceneType;
+    private Visibility visibility;
+    private CapabilityCategory capabilityCategory;
+    
+    private String businessCategory;
+    private String subCategory;
+    private List<String> tags;
+    
+    private List<CapabilityAddress> requiredAddresses;
+    private List<CapabilityAddress> optionalAddresses;
+    
     private List<DriverCondition> driverConditions;
     private List<Participant> participants;
+    
+    private boolean dynamicSceneTypes;
+    private String parentSkill;
+    private String parentScene;
+    
+    private boolean installed;
+    private Integer businessSemanticsScore;
 
     public Capability() {
         this.version = "1.0.0";
@@ -53,6 +70,13 @@ public class Capability implements Serializable {
         this.updateTime = this.createTime;
         this.capabilities = new ArrayList<String>();
         this.collaborativeCapabilities = new ArrayList<CollaborativeCapabilityRef>();
+        this.skillForm = SkillForm.PROVIDER;
+        this.visibility = Visibility.PUBLIC;
+        this.tags = new ArrayList<String>();
+        this.requiredAddresses = new ArrayList<CapabilityAddress>();
+        this.optionalAddresses = new ArrayList<CapabilityAddress>();
+        this.driverConditions = new ArrayList<DriverCondition>();
+        this.participants = new ArrayList<Participant>();
     }
 
     public String getCapabilityId() {
@@ -228,14 +252,54 @@ public class Capability implements Serializable {
     }
 
     public boolean isSceneCapability() {
-        return type == CapabilityType.SCENE;
+        return "SCENE".equals(skillForm) || type == CapabilityType.SCENE;
+    }
+    
+    public void setSceneCapability(boolean sceneCapability) {
+        this.skillForm = sceneCapability ? SkillForm.SCENE : SkillForm.PROVIDER;
+    }
+
+    public boolean isInstalled() {
+        return installed;
+    }
+
+    public void setInstalled(boolean installed) {
+        this.installed = installed;
+    }
+
+    public String getCategory() {
+        return capabilityCategory != null ? capabilityCategory.getCode() : null;
+    }
+
+    public void setCategory(String category) {
+        this.capabilityCategory = CapabilityCategory.fromCode(category);
+    }
+
+    public Integer getBusinessSemanticsScore() {
+        return businessSemanticsScore;
+    }
+
+    public void setBusinessSemanticsScore(Integer businessSemanticsScore) {
+        this.businessSemanticsScore = businessSemanticsScore;
+    }
+
+    public boolean isHasSelfDrive() {
+        return mainFirst && hasSelfDriveConfig();
+    }
+    
+    private boolean hasSelfDriveConfig() {
+        return mainFirstConfig != null && mainFirstConfig.getSelfDrive() != null;
+    }
+    
+    private boolean hasTriggerConfig() {
+        return driverType != null && driverType.isTrigger();
     }
 
     public boolean isDriverCapability() {
         return type == CapabilityType.DRIVER;
     }
 
-    public boolean isInstalled() {
+    public boolean isEnabled() {
         return status == CapabilityStatus.ENABLED || status == CapabilityStatus.REGISTERED;
     }
 
@@ -245,10 +309,6 @@ public class Capability implements Serializable {
             config.putAll(metadata);
         }
         return config;
-    }
-
-    public boolean hasMainFirst() {
-        return mainFirst && mainFirstConfig != null;
     }
 
     public Map<String, Object> getMetadata() {
@@ -261,6 +321,8 @@ public class Capability implements Serializable {
         result.put("updateTime", updateTime);
         result.put("ownerId", ownerId);
         result.put("skillId", skillId);
+        result.put("skillForm", skillForm);
+        result.put("sceneType", sceneType);
         return result;
     }
 
@@ -307,20 +369,100 @@ public class Capability implements Serializable {
         this.optionalCapabilities = optionalCapabilities;
     }
 
-    public SceneSkillCategory getCategory() {
-        return category;
+    public SkillForm getSkillForm() {
+        return skillForm;
     }
 
-    public void setCategory(SceneSkillCategory category) {
-        this.category = category;
+    public void setSkillForm(SkillForm skillForm) {
+        this.skillForm = skillForm;
+    }
+    
+    public void setSkillForm(String skillForm) {
+        this.skillForm = SkillForm.fromCode(skillForm);
     }
 
-    public String getVisibility() {
+    public SceneType getSceneTypeEnum() {
+        return sceneType;
+    }
+    
+    public String getSceneType() {
+        return sceneType != null ? sceneType.getCode() : null;
+    }
+
+    public void setSceneType(SceneType sceneType) {
+        this.sceneType = sceneType;
+    }
+    
+    public void setSceneType(String sceneType) {
+        this.sceneType = sceneType != null ? SceneType.fromCode(sceneType) : null;
+    }
+
+    public Visibility getVisibilityEnum() {
         return visibility;
     }
+    
+    public String getVisibility() {
+        return visibility != null ? visibility.getCode() : null;
+    }
 
-    public void setVisibility(String visibility) {
+    public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
+    }
+    
+    public void setVisibility(String visibility) {
+        this.visibility = visibility != null ? Visibility.fromCode(visibility) : Visibility.PUBLIC;
+    }
+    
+    public CapabilityCategory getCapabilityCategory() {
+        return capabilityCategory;
+    }
+    
+    public void setCapabilityCategory(CapabilityCategory capabilityCategory) {
+        this.capabilityCategory = capabilityCategory;
+    }
+    
+    public void setCapabilityCategory(String capabilityCategory) {
+        this.capabilityCategory = CapabilityCategory.fromCode(capabilityCategory);
+    }
+    
+    public String getBusinessCategory() {
+        return businessCategory;
+    }
+    
+    public void setBusinessCategory(String businessCategory) {
+        this.businessCategory = businessCategory;
+    }
+    
+    public String getSubCategory() {
+        return subCategory;
+    }
+    
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
+    }
+    
+    public List<String> getTags() {
+        return tags;
+    }
+    
+    public void setTags(List<String> tags) {
+        this.tags = tags;
+    }
+    
+    public List<CapabilityAddress> getRequiredAddresses() {
+        return requiredAddresses;
+    }
+    
+    public void setRequiredAddresses(List<CapabilityAddress> requiredAddresses) {
+        this.requiredAddresses = requiredAddresses;
+    }
+    
+    public List<CapabilityAddress> getOptionalAddresses() {
+        return optionalAddresses;
+    }
+    
+    public void setOptionalAddresses(List<CapabilityAddress> optionalAddresses) {
+        this.optionalAddresses = optionalAddresses;
     }
 
     public List<DriverCondition> getDriverConditions() {
@@ -339,17 +481,79 @@ public class Capability implements Serializable {
         this.participants = participants;
     }
 
-    public boolean hasBusinessSemantics() {
-        return (driverConditions != null && !driverConditions.isEmpty()) 
-            && (participants != null && !participants.isEmpty());
-    }
-
     public boolean isPublicVisible() {
-        return "public".equals(visibility) || (category != null && category.isPublicVisible());
+        return visibility == Visibility.PUBLIC || visibility == Visibility.DEVELOPER;
     }
 
     public boolean isInternalVisible() {
-        return "internal".equals(visibility) || (category != null && category.isInternalVisible());
+        return visibility == Visibility.INTERNAL;
+    }
+    
+    public boolean isDeveloperVisible() {
+        return visibility == Visibility.DEVELOPER;
+    }
+    
+    public boolean isDynamicSceneTypes() {
+        return dynamicSceneTypes;
+    }
+    
+    public void setDynamicSceneTypes(boolean dynamicSceneTypes) {
+        this.dynamicSceneTypes = dynamicSceneTypes;
+    }
+    
+    public String getParentSkill() {
+        return parentSkill;
+    }
+    
+    public void setParentSkill(String parentSkill) {
+        this.parentSkill = parentSkill;
+    }
+    
+    public String getParentScene() {
+        return parentScene;
+    }
+    
+    public void setParentScene(String parentScene) {
+        this.parentScene = parentScene;
+    }
+    
+    public CapabilityOwnership getOwnership() {
+        if (parentSkill != null && parentScene != null) {
+            return CapabilityOwnership.SCENE_INTERNAL;
+        } else if (supportedSceneTypes != null && !supportedSceneTypes.isEmpty()) {
+            return CapabilityOwnership.INDEPENDENT;
+        } else {
+            return CapabilityOwnership.PLATFORM;
+        }
+    }
+    
+    public boolean isSceneInternal() {
+        return getOwnership() == CapabilityOwnership.SCENE_INTERNAL;
+    }
+    
+    public boolean isIndependent() {
+        return getOwnership() == CapabilityOwnership.INDEPENDENT;
+    }
+    
+    public boolean isPlatform() {
+        return getOwnership() == CapabilityOwnership.PLATFORM;
+    }
+    
+    public void addSceneType(String sceneType) {
+        if (supportedSceneTypes == null) {
+            supportedSceneTypes = new ArrayList<String>();
+        }
+        if (!supportedSceneTypes.contains(sceneType)) {
+            supportedSceneTypes.add(sceneType);
+            this.updateTime = System.currentTimeMillis();
+        }
+    }
+    
+    public void removeSceneType(String sceneType) {
+        if (supportedSceneTypes != null) {
+            supportedSceneTypes.remove(sceneType);
+            this.updateTime = System.currentTimeMillis();
+        }
     }
 
     public static class Participant implements Serializable {

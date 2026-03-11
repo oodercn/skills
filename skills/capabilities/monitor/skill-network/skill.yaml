@@ -1,0 +1,124 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-network
+  name: Network Management Skill
+  version: 0.7.3
+  description: 网络管理技能，提供网络配置、IP管理、设备扫描等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-network
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - network
+    - ip
+    - dhcp
+    - dns
+    - wifi
+    - device
+
+spec:
+  type: service-skill
+  
+  ownership: platform
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.network.NetworkSkillApplication
+  
+  capabilities:
+    - id: network-config
+      name: Network Configuration
+      description: 管理网络设置，包括DNS、DHCP、WiFi
+      category: network
+    - id: ip-management
+      name: IP Address Management
+      description: 管理IP地址和黑名单
+      category: network
+    - id: device-scanning
+      name: Network Device Scanning
+      description: 扫描和发现网络设备
+      category: network
+  
+  scenes:
+    - name: network
+      description: 网络管理场景
+      capabilities:
+        - network-config
+        - ip-management
+        - device-scanning
+  
+  dependencies: []
+  
+  config:
+    optional:
+      - name: NETWORK_SCAN_INTERVAL
+        type: number
+        default: 300000
+        description: 网络扫描间隔（毫秒）
+      - name: DHCP_LEASE_FILE
+        type: string
+        default: /var/lib/dhcp/dhcpd.leases
+        description: DHCP租约文件路径
+      - name: ARP_CACHE_FILE
+        type: string
+        default: /proc/net/arp
+        description: ARP缓存文件路径
+  
+  endpoints:
+    - path: /api/network/settings
+      method: GET
+      description: 获取所有网络设置
+      capability: network-config
+    - path: /api/network/settings/{type}
+      method: GET
+      description: 按类型获取网络设置
+      capability: network-config
+    - path: /api/network/settings/{type}
+      method: PUT
+      description: 更新网络设置
+      capability: network-config
+    - path: /api/network/ips
+      method: GET
+      description: 获取IP地址列表
+      capability: ip-management
+    - path: /api/network/ips
+      method: POST
+      description: 添加静态IP地址
+      capability: ip-management
+    - path: /api/network/ips/{id}
+      method: DELETE
+      description: 删除IP地址
+      capability: ip-management
+    - path: /api/network/blacklist
+      method: GET
+      description: 获取IP黑名单
+      capability: ip-management
+    - path: /api/network/blacklist
+      method: POST
+      description: 添加IP到黑名单
+      capability: ip-management
+    - path: /api/network/blacklist/{id}
+      method: DELETE
+      description: 从黑名单移除IP
+      capability: ip-management
+    - path: /api/network/devices
+      method: GET
+      description: 获取网络设备
+      capability: device-scanning
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

@@ -3,7 +3,7 @@ package net.ooder.skill.scene.service;
 import net.ooder.skill.org.base.OrgSkill;
 import net.ooder.skill.org.base.UserInfo;
 import net.ooder.skill.org.base.OrgInfo;
-import net.ooder.skill.scene.dto.MenuItemDTO;
+import net.ooder.skill.scene.dto.menu.MenuItemDTO;
 import net.ooder.skill.scene.dto.RoleDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,63 +33,67 @@ public class RoleManagementService {
     }
 
     private void initDefaultRoles() {
-        createRole("installer", "系统安装者", "安装基础技能包，初始化系统环境", "ri-install-line",
-            "installer", Arrays.asList("skill:install", "skill:view", "system:init"));
+        createRole("admin", "管理员", "系统运维、能力管理、用户管理", "ri-admin-line",
+            "admin", Arrays.asList(
+                "system:init", "system:config",
+                "capability:discover", "capability:install", "capability:distribute", "capability:manage",
+                "scene:create", "scene:manage",
+                "user:manage", "org:manage",
+                "llm:config", "knowledge:manage",
+                "audit:view"
+            ));
 
-        createRole("admin", "系统管理员", "发现场景技能，配置分发，推送给参与者", "ri-admin-line",
-            "admin", Arrays.asList("capability:discover", "capability:install", "capability:distribute",
-                "scene:create", "scene:manage", "user:assign", "capability:view", "scene:view"));
+        createRole("user", "普通用户", "场景参与、任务执行、业务流转", "ri-user-line",
+            "user", Arrays.asList(
+                "scene:view", "scene:activate", "scene:participate",
+                "task:view", "task:execute", "task:submit",
+                "todo:view", "todo:process",
+                "history:view", "key:manage"
+            ));
 
-        createRole("leader", "主导者", "激活场景，获取KEY，执行入网动作", "ri-user-star-line",
-            "manager", Arrays.asList("scene:activate", "scene:manage", "scene:view",
-                "key:generate", "participant:manage", "task:assign"));
-
-        createRole("collaborator", "协作者", "参与业务流转，执行分配的任务", "ri-team-line",
-            "employee", Arrays.asList("task:view", "task:execute", "task:submit", "scene:view", "todo:view"));
+        createRole("developer", "开发者", "能力开发、测试、发布", "ri-code-line",
+            "developer", Arrays.asList(
+                "capability:create", "capability:edit", "capability:test", "capability:publish", "capability:view",
+                "llm:execute", "arch:check"
+            ));
     }
 
     private void initDefaultMenus() {
-        List<MenuItemDTO> installerMenus = Arrays.asList(
-            createMenuItem("menu-installer-1", "工作台", "/console/pages/role-installer.html", "ri-home-line", 1, true),
-            createMenuItem("menu-installer-2", "技能市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 2, false),
-            createMenuItem("menu-installer-3", "已安装技能", "/console/pages/my-capabilities.html", "ri-download-cloud-line", 3, false),
-            createMenuItem("menu-installer-4", "安装日志", "/console/pages/audit-logs.html", "ri-file-list-3-line", 4, false)
-        );
-        roleMenus.put("installer", installerMenus);
-
         List<MenuItemDTO> adminMenus = Arrays.asList(
             createMenuItem("menu-admin-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true),
-            createMenuItem("menu-admin-2", "场景能力", "/console/pages/scene-capabilities.html", "ri-layout-grid-line", 2, false),
-            createMenuItem("menu-admin-3", "发现场景", "/console/pages/capability-discovery.html", "ri-compass-discover-line", 3, false),
-            createMenuItem("menu-admin-4", "场景组管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false),
-            createMenuItem("menu-admin-5", "能力统计", "/console/pages/capability-stats.html", "ri-bar-chart-box-line", 5, false),
-            createMenuItem("menu-admin-6", "组织管理", "/console/pages/org-management.html", "ri-organization-chart", 6, false),
-            createMenuItem("menu-admin-7", "架构检查", "/console/pages/arch-check.html", "ri-shield-check-line", 7, false)
+            createMenuItem("menu-admin-2", "能力市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 2, false),
+            createMenuItem("menu-admin-3", "已安装能力", "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false),
+            createMenuItem("menu-admin-4", "场景管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false),
+            createMenuItem("menu-admin-5", "组织管理", "/console/pages/org-management.html", "ri-organization-chart", 5, false),
+            createMenuItem("menu-admin-6", "系统配置", "/console/pages/llm-config.html", "ri-settings-3-line", 6, false),
+            createMenuItem("menu-admin-7", "系统监控", "/console/pages/llm-monitor.html", "ri-line-chart-line", 7, false),
+            createMenuItem("menu-admin-8", "审计日志", "/console/pages/audit-logs.html", "ri-file-list-3-line", 8, false)
         );
         roleMenus.put("admin", adminMenus);
 
-        List<MenuItemDTO> leaderMenus = Arrays.asList(
-            createMenuItem("menu-leader-1", "工作台", "/console/pages/role-leader.html", "ri-home-line", 1, true),
-            createMenuItem("menu-leader-2", "待激活场景", "/console/pages/my-todos.html", "ri-task-line", 2, false),
-            createMenuItem("menu-leader-3", "我的场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false),
-            createMenuItem("menu-leader-4", "密钥管理", "/console/pages/key-management.html", "ri-key-2-line", 4, false)
+        List<MenuItemDTO> userMenus = Arrays.asList(
+            createMenuItem("menu-user-1", "工作台", "/console/pages/role-user.html", "ri-home-line", 1, true),
+            createMenuItem("menu-user-2", "我的待办", "/console/pages/my-todos.html", "ri-task-line", 2, false),
+            createMenuItem("menu-user-3", "我的场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false),
+            createMenuItem("menu-user-4", "历史记录", "/console/pages/my-history.html", "ri-history-line", 4, false),
+            createMenuItem("menu-user-5", "密钥管理", "/console/pages/key-management.html", "ri-key-2-line", 5, false)
         );
-        roleMenus.put("leader", leaderMenus);
+        roleMenus.put("user", userMenus);
 
-        List<MenuItemDTO> collaboratorMenus = Arrays.asList(
-            createMenuItem("menu-collaborator-1", "工作台", "/console/pages/role-collaborator.html", "ri-home-line", 1, true),
-            createMenuItem("menu-collaborator-2", "我的待办", "/console/pages/my-todos.html", "ri-task-line", 2, false),
-            createMenuItem("menu-collaborator-3", "参与场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false),
-            createMenuItem("menu-collaborator-4", "历史记录", "/console/pages/my-history.html", "ri-history-line", 4, false)
+        List<MenuItemDTO> developerMenus = Arrays.asList(
+            createMenuItem("menu-developer-1", "工作台", "/console/pages/role-developer.html", "ri-home-line", 1, true),
+            createMenuItem("menu-developer-2", "我的能力", "/console/pages/my-capabilities.html", "ri-puzzle-line", 2, false),
+            createMenuItem("menu-developer-3", "创建能力", "/console/pages/capability-create.html", "ri-add-circle-line", 3, false),
+            createMenuItem("menu-developer-4", "架构检查", "/console/pages/arch-check.html", "ri-shield-check-line", 4, false),
+            createMenuItem("menu-developer-5", "能力统计", "/console/pages/capability-stats.html", "ri-bar-chart-box-line", 5, false)
         );
-        roleMenus.put("collaborator", collaboratorMenus);
+        roleMenus.put("developer", developerMenus);
     }
 
     private void initDefaultUsers() {
-        initUserIfNotExists("installer", "系统安装者", "installer@ooder.local", "root", Arrays.asList("installer"));
-        initUserIfNotExists("admin", "系统管理员", "admin@ooder.local", "root", Arrays.asList("admin"));
-        initUserIfNotExists("leader", "张主导", "leader@ooder.local", "root", Arrays.asList("leader"));
-        initUserIfNotExists("user", "李协作者", "user@ooder.local", "root", Arrays.asList("collaborator"));
+        initUserIfNotExists("admin", "管理员", "admin@ooder.local", "root", Arrays.asList("admin"));
+        initUserIfNotExists("user", "普通用户", "user@ooder.local", "root", Arrays.asList("user"));
+        initUserIfNotExists("developer", "开发者", "developer@ooder.local", "root", Arrays.asList("developer"));
     }
 
     private void initUserIfNotExists(String username, String nickname, String email, String orgId, List<String> roles) {

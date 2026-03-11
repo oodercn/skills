@@ -17,7 +17,7 @@ async function refreshTemplates() {
     try {
         const result = await ApiClient.get('/api/v1/scene-templates?pageNum=' + currentPage + '&pageSize=' + pageSize);
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             templates = result.data.list || [];
             renderTemplateTable();
             updateStats();
@@ -119,7 +119,7 @@ async function saveTemplate() {
     try {
         const result = await ApiClient.post('/api/v1/scene-templates', template);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             closeModal();
             refreshTemplates();
         } else {
@@ -145,7 +145,7 @@ async function deleteTemplate(templateId) {
     try {
         const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId);
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             refreshTemplates();
         } else {
             alert('删除失败: ' + result.message);
@@ -160,7 +160,7 @@ async function filterByCategory() {
     const category = document.getElementById('categoryFilter').value;
     if (category) {
         const result = await ApiClient.get('/api/v1/scene-templates?pageNum=1&pageSize=10&category=' + category);
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             templates = result.data.list || [];
             renderTemplateTable();
         }

@@ -60,7 +60,7 @@ async function loadStats() {
         var result = await ApiClient.get('/api/v1/audit/stats');
         
         var stats;
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             stats = result.data || {};
         } else {
             stats = {};

@@ -36,7 +36,7 @@ public class SdkConfiguration {
     @Value("${ooder.sdk.node-id:skill-scene}")
     private String nodeId;
 
-    @Value("${ooder.skill.root-path:./skills}")
+    @Value("${ooder.skills.path:./skills}")
     private String skillRootPath;
 
     @Value("${ooder.gitee.token:}")
@@ -122,8 +122,10 @@ public class SdkConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SkillDiscoverer skillDiscoverer() {
-        log.info("[skillDiscoverer] Creating LocalDiscoverer");
-        return new LocalDiscoverer();
+        log.info("[skillDiscoverer] Creating LocalDiscoverer with path: {}", skillRootPath);
+        LocalDiscoverer discoverer = new LocalDiscoverer();
+        discoverer.setSkillsDirectory(skillRootPath);
+        return discoverer;
     }
 
     @Bean

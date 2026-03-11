@@ -1,16 +1,24 @@
 package net.ooder.skill.scene.capability.service.impl;
 
+import net.ooder.skill.scene.capability.event.SceneTypeUpdateEvent;
 import net.ooder.skill.scene.capability.model.Capability;
+import net.ooder.skill.scene.capability.model.CapabilityOwnership;
 import net.ooder.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.skill.scene.capability.model.CapabilityType;
 import net.ooder.skill.scene.capability.registry.CapabilityRegistry;
 import net.ooder.skill.scene.capability.service.CapabilityService;
 import net.ooder.skill.scene.storage.JsonStorageService;
+import net.ooder.scene.skill.model.SceneType;
+import net.ooder.scene.skill.model.SkillForm;
+import net.ooder.scene.skill.model.SkillCategory;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.ApplicationEventPublisher;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class CapabilityServiceImpl implements CapabilityService {
 
@@ -19,12 +27,17 @@ public class CapabilityServiceImpl implements CapabilityService {
 
     private final CapabilityRegistry registry;
     private final JsonStorageService storageService;
+    private ApplicationEventPublisher eventPublisher;
 
     public CapabilityServiceImpl(JsonStorageService storageService) {
         this.storageService = storageService;
         this.registry = new CapabilityRegistry();
         loadFromStorage();
         initDefaultCapabilities();
+    }
+    
+    public void setEventPublisher(ApplicationEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
     }
 
     private void loadFromStorage() {
@@ -51,163 +64,8 @@ public class CapabilityServiceImpl implements CapabilityService {
 
     private void initDefaultCapabilities() {
         if (registry.size() == 0) {
-            registerDefaultCapabilities();
+            log.info("No capabilities found in storage, will be synced from skill.yaml files");
         }
-    }
-
-    private void registerDefaultCapabilities() {
-        Capability dailyLogScene = new Capability();
-        dailyLogScene.setCapabilityId("daily-log-scene");
-        dailyLogScene.setName("日志汇报场景");
-        dailyLogScene.setDescription("完整的日志汇报场景能力，包含提醒、提交、汇总、分析等闭环流程");
-        dailyLogScene.setType(CapabilityType.SCENE);
-        dailyLogScene.getSupportedSceneTypes().add("daily-report");
-        dailyLogScene.setVersion("2.3.0");
-        dailyLogScene.setIcon("ri-file-list-3-line");
-        java.util.Map<String, Object> dailyLogMeta = new java.util.HashMap<>();
-        dailyLogMeta.put("category", "办公协作");
-        dailyLogMeta.put("provider", "ooder");
-        dailyLogScene.setMetadata(dailyLogMeta);
-        dailyLogScene.setDependencies(java.util.Arrays.asList("report-remind", "report-submit", "report-aggregate"));
-        dailyLogScene.setOptionalCapabilities(java.util.Arrays.asList("report-analyze", "email-send"));
-        register(dailyLogScene);
-
-        Capability knowledgeQAScene = new Capability();
-        knowledgeQAScene.setCapabilityId("knowledge-qa-scene");
-        knowledgeQAScene.setName("知识问答场景");
-        knowledgeQAScene.setDescription("基于知识库的智能问答场景，支持文档导入、索引构建、语义搜索");
-        knowledgeQAScene.setType(CapabilityType.SCENE);
-        knowledgeQAScene.getSupportedSceneTypes().add("knowledge-qa");
-        knowledgeQAScene.setVersion("2.3.0");
-        knowledgeQAScene.setIcon("ri-book-open-line");
-        java.util.Map<String, Object> knowledgeMeta = new java.util.HashMap<>();
-        knowledgeMeta.put("category", "知识管理");
-        knowledgeMeta.put("provider", "ooder");
-        knowledgeQAScene.setMetadata(knowledgeMeta);
-        knowledgeQAScene.setDependencies(java.util.Arrays.asList("kb-management", "kb-search"));
-        knowledgeQAScene.setOptionalCapabilities(java.util.Arrays.asList("llm-chat"));
-        register(knowledgeQAScene);
-
-        Capability llmWorkspaceScene = new Capability();
-        llmWorkspaceScene.setCapabilityId("llm-workspace-scene");
-        llmWorkspaceScene.setName("LLM工作空间");
-        llmWorkspaceScene.setDescription("大语言模型工作空间，支持多轮对话、上下文管理、模型切换");
-        llmWorkspaceScene.setType(CapabilityType.SCENE);
-        llmWorkspaceScene.getSupportedSceneTypes().add("llm-workspace");
-        llmWorkspaceScene.setVersion("2.3.0");
-        llmWorkspaceScene.setIcon("ri-robot-line");
-        java.util.Map<String, Object> llmMeta = new java.util.HashMap<>();
-        llmMeta.put("category", "AI助手");
-        llmMeta.put("provider", "ooder");
-        llmWorkspaceScene.setMetadata(llmMeta);
-        llmWorkspaceScene.setDependencies(java.util.Arrays.asList("llm-chat", "conversation-manage"));
-        register(llmWorkspaceScene);
-
-        Capability reportRemind = new Capability();
-        reportRemind.setCapabilityId("report-remind");
-        reportRemind.setName("日志提醒");
-        reportRemind.setDescription("定时提醒员工提交日志");
-        reportRemind.setType(CapabilityType.COMMUNICATION);
-        reportRemind.getSupportedSceneTypes().add("daily-report");
-        register(reportRemind);
-
-        Capability reportSubmit = new Capability();
-        reportSubmit.setCapabilityId("report-submit");
-        reportSubmit.setName("日志提交");
-        reportSubmit.setDescription("员工提交工作日志");
-        reportSubmit.setType(CapabilityType.SERVICE);
-        reportSubmit.getSupportedSceneTypes().add("daily-report");
-        register(reportSubmit);
-
-        Capability reportAggregate = new Capability();
-        reportAggregate.setCapabilityId("report-aggregate");
-        reportAggregate.setName("日志汇总");
-        reportAggregate.setDescription("汇总所有员工日志");
-        reportAggregate.setType(CapabilityType.SERVICE);
-        reportAggregate.getSupportedSceneTypes().add("daily-report");
-        register(reportAggregate);
-
-        Capability reportAnalyze = new Capability();
-        reportAnalyze.setCapabilityId("report-analyze");
-        reportAnalyze.setName("日志分析");
-        reportAnalyze.setDescription("AI分析日志内容");
-        reportAnalyze.setType(CapabilityType.AI);
-        reportAnalyze.getSupportedSceneTypes().add("daily-report");
-        register(reportAnalyze);
-
-        Capability emailSend = new Capability();
-        emailSend.setCapabilityId("email-send");
-        emailSend.setName("邮件发送");
-        emailSend.setDescription("发送邮件通知");
-        emailSend.setType(CapabilityType.COMMUNICATION);
-        emailSend.getSupportedSceneTypes().add("daily-report");
-        emailSend.getSupportedSceneTypes().add("notification");
-        register(emailSend);
-
-        Capability kbManagement = new Capability();
-        kbManagement.setCapabilityId("kb-management");
-        kbManagement.setName("知识库管理");
-        kbManagement.setDescription("创建、更新、删除知识库，支持BM25搜索");
-        kbManagement.setType(CapabilityType.DATA);
-        kbManagement.getSupportedSceneTypes().add("knowledge");
-        kbManagement.setSkillId("skill-knowledge-base");
-        register(kbManagement);
-
-        Capability kbSearch = new Capability();
-        kbSearch.setCapabilityId("kb-search");
-        kbSearch.setName("知识搜索");
-        kbSearch.setDescription("BM25文档搜索能力");
-        kbSearch.setType(CapabilityType.AI);
-        kbSearch.getSupportedSceneTypes().add("knowledge");
-        kbSearch.setSkillId("skill-knowledge-base");
-        register(kbSearch);
-
-        Capability userManagement = new Capability();
-        userManagement.setCapabilityId("user-management");
-        userManagement.setName("用户管理");
-        userManagement.setDescription("管理用户和权限配置");
-        userManagement.setType(CapabilityType.SECURITY);
-        userManagement.getSupportedSceneTypes().add("security");
-        userManagement.setSkillId("skill-security");
-        register(userManagement);
-
-        Capability permissionControl = new Capability();
-        permissionControl.setCapabilityId("permission-control");
-        permissionControl.setName("权限控制");
-        permissionControl.setDescription("控制用户权限和角色");
-        permissionControl.setType(CapabilityType.SECURITY);
-        permissionControl.getSupportedSceneTypes().add("security");
-        permissionControl.setSkillId("skill-security");
-        register(permissionControl);
-
-        Capability securityAudit = new Capability();
-        securityAudit.setCapabilityId("security-audit");
-        securityAudit.setName("安全审计");
-        securityAudit.setDescription("审计安全事件");
-        securityAudit.setType(CapabilityType.SECURITY);
-        securityAudit.getSupportedSceneTypes().add("security");
-        securityAudit.setSkillId("skill-security");
-        register(securityAudit);
-
-        Capability llmChat = new Capability();
-        llmChat.setCapabilityId("llm-chat");
-        llmChat.setName("LLM对话");
-        llmChat.setDescription("大语言模型对话能力");
-        llmChat.setType(CapabilityType.AI);
-        llmChat.getSupportedSceneTypes().add("llm");
-        llmChat.setSkillId("skill-llm-conversation");
-        register(llmChat);
-
-        Capability conversationManage = new Capability();
-        conversationManage.setCapabilityId("conversation-manage");
-        conversationManage.setName("会话管理");
-        conversationManage.setDescription("多轮对话上下文管理");
-        conversationManage.setType(CapabilityType.SERVICE);
-        conversationManage.getSupportedSceneTypes().add("llm");
-        conversationManage.setSkillId("skill-llm-conversation");
-        register(conversationManage);
-
-        log.info("Registered {} default capabilities", registry.size());
     }
 
     @Override
@@ -286,6 +144,136 @@ public class CapabilityServiceImpl implements CapabilityService {
             capability.setUpdateTime(System.currentTimeMillis());
             saveToStorage();
             log.info("Updated capability status: {} -> {}", capabilityId, status);
+        }
+    }
+
+    @Override
+    public Capability addSceneType(String capabilityId, String sceneType, String approvedBy) {
+        Capability capability = registry.findById(capabilityId);
+        if (capability == null) {
+            throw new IllegalArgumentException("Capability not found: " + capabilityId);
+        }
+        
+        if (!capability.isDynamicSceneTypes()) {
+            throw new IllegalStateException("Capability does not support dynamic scene types: " + capabilityId);
+        }
+        
+        capability.addSceneType(sceneType);
+        saveToStorage();
+        log.info("Added scene type {} to capability {} by {}", sceneType, capabilityId, approvedBy);
+        
+        publishSceneTypeUpdateEvent(capability, SceneTypeUpdateEvent.UpdateAction.ADD, sceneType, approvedBy);
+        
+        return capability;
+    }
+
+    @Override
+    public Capability removeSceneType(String capabilityId, String sceneType, String approvedBy) {
+        Capability capability = registry.findById(capabilityId);
+        if (capability == null) {
+            throw new IllegalArgumentException("Capability not found: " + capabilityId);
+        }
+        
+        if (!capability.isDynamicSceneTypes()) {
+            throw new IllegalStateException("Capability does not support dynamic scene types: " + capabilityId);
+        }
+        
+        capability.removeSceneType(sceneType);
+        saveToStorage();
+        log.info("Removed scene type {} from capability {} by {}", sceneType, capabilityId, approvedBy);
+        
+        publishSceneTypeUpdateEvent(capability, SceneTypeUpdateEvent.UpdateAction.REMOVE, sceneType, approvedBy);
+        
+        return capability;
+    }
+    
+    private void publishSceneTypeUpdateEvent(Capability capability, SceneTypeUpdateEvent.UpdateAction action, 
+                                             String sceneType, String approvedBy) {
+        if (eventPublisher != null) {
+            List<String> updatedSceneTypes = new ArrayList<>(capability.getSupportedSceneTypes());
+            SceneTypeUpdateEvent event = new SceneTypeUpdateEvent(
+                capability.getCapabilityId(),
+                capability.getName(),
+                action,
+                sceneType,
+                updatedSceneTypes,
+                approvedBy
+            );
+            eventPublisher.publishEvent(event);
+            log.debug("Published scene type update event: {}", event);
+        }
+    }
+
+    @Override
+    public List<Capability> findByOwnership(CapabilityOwnership ownership) {
+        return registry.findAll().stream()
+            .filter(cap -> cap.getOwnership() == ownership)
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Capability> findByOwnershipAndSceneType(CapabilityOwnership ownership, String sceneType) {
+        return registry.findAll().stream()
+            .filter(cap -> cap.getOwnership() == ownership)
+            .filter(cap -> cap.supportsSceneType(sceneType))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Capability> findBySkillForm(SkillForm form) {
+        return registry.findAll().stream()
+            .filter(cap -> {
+                SkillForm capForm = cap.getSkillForm();
+                return capForm != null && capForm == form;
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Capability> findBySceneTypeNew(SceneType sceneType) {
+        return registry.findAll().stream()
+            .filter(cap -> {
+                String capSceneType = cap.getSceneType();
+                return capSceneType != null && capSceneType.equals(sceneType.getCode());
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Capability> findBySkillCategory(SkillCategory category) {
+        return registry.findAll().stream()
+            .filter(cap -> {
+                if (cap.getMetadata() == null) return false;
+                Object cat = cap.getMetadata().get("skillCategory");
+                return cat != null && cat.equals(category);
+            })
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<Capability> findByFilters(SkillForm form, SceneType sceneType, SkillCategory category,
+                                           CapabilityOwnership ownership, String keyword) {
+        return registry.findAll().stream()
+            .filter(cap -> form == null || (cap.getSkillForm() != null && cap.getSkillForm().equals(form.name())))
+            .filter(cap -> sceneType == null || (cap.getSceneType() != null && cap.getSceneType().equals(sceneType.name())))
+            .filter(cap -> category == null || (cap.getMetadata() != null && category.equals(cap.getMetadata().get("skillCategory"))))
+            .filter(cap -> ownership == null || cap.getOwnership() == ownership)
+            .filter(cap -> keyword == null || keyword.isEmpty() || 
+                (cap.getName() != null && cap.getName().toLowerCase().contains(keyword.toLowerCase())) ||
+                (cap.getCapabilityId() != null && cap.getCapabilityId().toLowerCase().contains(keyword.toLowerCase())) ||
+                (cap.getDescription() != null && cap.getDescription().toLowerCase().contains(keyword.toLowerCase())))
+            .collect(Collectors.toList());
+    }
+
+    @Override
+    public void updateInstallStatus(String capabilityId, boolean installed) {
+        Capability cap = registry.findById(capabilityId);
+        if (cap != null) {
+            cap.setInstalled(installed);
+            registry.register(cap);
+            log.info("[updateInstallStatus] Updated install status for {}: {}", capabilityId, installed);
+        } else {
+            log.warn("[updateInstallStatus] Capability not found: {}", capabilityId);
         }
     }
 }

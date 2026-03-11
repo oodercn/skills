@@ -1,0 +1,34 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-rag
+  name: RAG检索增强
+  version: "1.0.0"
+  description: "RAG检索增强生成服务，支持关键词检索、语义检索、混合检索策略"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: AI_ASSISTANT
+  subCategory: rag
+  category: KNOWLEDGE
+  capabilityCategory: know
+  
+  capabilityAddresses:
+    required:
+      - address: 0x38
+        name: KNOW_BASE
+        description: "知识库基础服务"
+      - address: 0x3A
+        name: KNOW_RAG
+        description: "RAG检索服务"
+    optional: []
+  
+  tags:
+    - rag
+    - retrieval
+    - semantic
+  
+  dependencies:
+    - skill-knowledge-base

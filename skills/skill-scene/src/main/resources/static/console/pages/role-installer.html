@@ -224,6 +224,35 @@
             background: var(--nx-bg-hover);
             color: var(--nx-text-primary);
         }
+        
+        .completion-banner {
+            background: linear-gradient(135deg, var(--nx-success-light), var(--nx-primary-light));
+            border: 1px solid var(--nx-success);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .completion-banner h3 {
+            color: var(--nx-success);
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .completion-banner p {
+            color: var(--nx-text-secondary);
+            margin: 0 0 16px 0;
+        }
+        
+        .completion-banner .nx-btn {
+            padding: 12px 24px;
+            font-size: 15px;
+        }
     </style>
 </head>
 <body>
@@ -238,33 +267,48 @@
         </aside>
         
         <main class="nx-page__content">
-            <div class="installer-page">
-                <div class="installer-header">
-                    <div>
-                        <div class="installer-title">
-                            <i class="ri-install-line"></i> 系统安装者工作台
-                        </div>
-                        <div class="installer-subtitle">闭环一：安装基础技能包，初始化系统环境</div>
-                    </div>
-                    <div class="header-actions">
-                        <div class="user-badge">
-                            <i class="ri-user-line"></i>
-                            <span id="user-name">加载中...</span>
-                        </div>
-                        <button class="icon-btn" id="theme-toggle" title="切换主题">
-                            <i class="ri-sun-line"></i>
-                        </button>
-                        <button class="icon-btn" onclick="handleLogout()" title="退出">
-                            <i class="ri-logout-box-line"></i>
-                        </button>
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="nx-page__title">
+                        <h1><i class="ri-install-line" aria-hidden="true"></i> 系统安装者工作台</h1>
+                        <p>闭环一：安装基础技能包，初始化系统环境</p>
                     </div>
                 </div>
-                
-                <div class="installer-main">
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                <i class="ri-puzzle-line"></i> 我的能力
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="installer-main">
                     <div class="checklist-panel">
                         <div class="panel-header">
                             <div class="panel-title">
-                                <i class="ri-checkbox-circle-line"></i> 闭环一检查清单
+                                <i class="ri-checkbox-circle-line"></i> <span id="checklist-title">闭环一检查清单</span>
                             </div>
                             <span class="nx-badge nx-badge--warning">系统初始化</span>
                         </div>
@@ -337,6 +381,7 @@
                         <div class="log-body" id="install-log">
                             <div class="log-item info"><i class="ri-information-line"></i> 等待开始安装...</div>
                         </div>
+                    </div>
                     </div>
                 </div>
             </div>

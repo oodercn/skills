@@ -1,0 +1,48 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-chat
+  name: LLM智能对话场景能力
+  version: "2.3.0"
+  description: "LLM智能对话场景能力，支持多轮对话、上下文感知、流式输出"
+
+spec:
+  skillForm: SCENE
+  sceneType: AUTO
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: chat
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x30
+        name: LLM_BASE
+        description: "LLM基础服务"
+        fallback: 0x31
+    optional: []
+  
+  tags:
+    - llm
+    - chat
+    - ai
+    - conversation
+    - scene-capability
+  
+  dependencies:
+    - skill-llm-conversation
+    - skill-llm-context-builder
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]

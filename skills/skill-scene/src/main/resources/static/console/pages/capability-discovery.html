@@ -6,559 +6,7 @@
     <title>发现能力 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <style>
-        .discovery-page { padding: 20px; }
-        
-        .discovery-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-        
-        .discovery-title {
-            font-size: 24px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .discovery-title i { color: var(--nx-primary); }
-        
-        .discovery-subtitle {
-            color: var(--nx-text-secondary);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        
-        .discovery-main {
-            display: grid;
-            grid-template-columns: 280px 1fr;
-            gap: 24px;
-        }
-        
-        .discovery-sidebar {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            overflow: hidden;
-        }
-        
-        .sidebar-header {
-            padding: 16px;
-            border-bottom: 1px solid var(--nx-border);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .sidebar-header i { color: var(--nx-primary); }
-        
-        .method-list { padding: 8px; }
-        
-        .method-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s;
-            margin-bottom: 4px;
-        }
-        
-        .method-item:hover { background: var(--nx-bg-hover); }
-        .method-item.active { background: var(--nx-primary-light); border: 1px solid var(--nx-primary); }
-        
-        .method-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-        }
-        
-        .method-info { flex: 1; }
-        .method-name { font-weight: 500; font-size: 14px; }
-        .method-desc { font-size: 12px; color: var(--nx-text-secondary); margin-top: 2px; }
-        
-        .method-badge {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .method-badge.ready { background: var(--nx-bg); color: var(--nx-text-secondary); }
-        .method-badge.running { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .method-badge.done { background: var(--nx-success-light); color: var(--nx-success); }
-        
-        .discovery-content {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-        }
-        
-        .radar-panel {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            overflow: hidden;
-        }
-        
-        .radar-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--nx-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .radar-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .radar-status {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 13px;
-        }
-        
-        .radar-body {
-            padding: 20px;
-        }
-        
-        .radar-visual {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 40px;
-            margin-bottom: 20px;
-        }
-        
-        .radar-circle {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            border: 2px solid var(--nx-border);
-            position: relative;
-            background: 
-                radial-gradient(circle, transparent 30%, var(--nx-bg) 30%, var(--nx-bg) 32%, transparent 32%),
-                radial-gradient(circle, transparent 60%, var(--nx-bg) 60%, var(--nx-bg) 62%, transparent 62%);
-        }
-        
-        .radar-sweep {
-            position: absolute;
-            top: 0;
-            left: 50%;
-            width: 50%;
-            height: 50%;
-            transform-origin: bottom left;
-            background: linear-gradient(90deg, transparent, var(--nx-primary-light));
-            animation: radar-sweep 3s linear infinite;
-            border-radius: 0 100% 0 0;
-            opacity: 0.6;
-        }
-        
-        .radar-sweep.idle { animation: none; opacity: 0; }
-        
-        @keyframes radar-sweep {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-        
-        .radar-center {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            background: var(--nx-primary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 24px;
-            box-shadow: 0 0 20px var(--nx-primary);
-        }
-        
-        .radar-dots {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-        }
-        
-        .radar-dot {
-            position: absolute;
-            width: 12px;
-            height: 12px;
-            border-radius: 50%;
-            background: var(--nx-success);
-            box-shadow: 0 0 10px var(--nx-success);
-            animation: dot-pulse 1.5s ease-in-out infinite;
-        }
-        
-        @keyframes dot-pulse {
-            0%, 100% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.3); opacity: 0.7; }
-        }
-        
-        .radar-stats {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-        }
-        
-        .stat-card {
-            background: var(--nx-bg);
-            border-radius: 8px;
-            padding: 16px;
-            text-align: center;
-        }
-        
-        .stat-value {
-            font-size: 28px;
-            font-weight: 600;
-            color: var(--nx-primary);
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-            margin-top: 4px;
-        }
-        
-        .config-panel {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 20px;
-            display: none;
-        }
-        
-        .config-panel.show { display: block; }
-        
-        .config-title {
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .config-form {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-        }
-        
-        .form-group { margin-bottom: 0; }
-        .form-group.full { grid-column: span 2; }
-        
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-        
-        .form-input {
-            width: 100%;
-            padding: 8px 12px;
-            border: 1px solid var(--nx-border);
-            border-radius: 6px;
-            background: var(--nx-bg);
-            font-size: 14px;
-        }
-        
-        .form-input:focus {
-            outline: none;
-            border-color: var(--nx-primary);
-        }
-        
-        .form-hint {
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-            margin-top: 4px;
-        }
-        
-        .results-panel {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            overflow: hidden;
-        }
-        
-        .results-header {
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--nx-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .results-title {
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .results-count {
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 12px;
-        }
-        
-        .results-filter {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .filter-chip {
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            cursor: pointer;
-            background: var(--nx-bg);
-            border: 1px solid var(--nx-border);
-            transition: all 0.2s;
-        }
-        
-        .filter-chip:hover { border-color: var(--nx-primary); }
-        .filter-chip.active { background: var(--nx-primary); color: white; border-color: var(--nx-primary); }
-        
-        .capability-type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-            margin-left: 8px;
-        }
-        
-        .capability-type-badge.scene {
-            background: #dbeafe;
-            color: #2563eb;
-        }
-        
-        .capability-type-badge.collaboration {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        
-        .results-body {
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        
-        .result-item {
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            padding: 16px 20px;
-            border-bottom: 1px solid var(--nx-border);
-            transition: background 0.2s;
-        }
-        
-        .result-item:hover { background: var(--nx-bg-hover); }
-        .result-item:last-child { border-bottom: none; }
-        
-        .result-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            flex-shrink: 0;
-        }
-        
-        .result-icon.type-SERVICE { background: #dbeafe; color: #2563eb; }
-        .result-icon.type-AI { background: #fce7f3; color: #db2777; }
-        .result-icon.type-COMMUNICATION { background: #d1fae5; color: #059669; }
-        .result-icon.type-STORAGE { background: #fef3c7; color: #d97706; }
-        .result-icon.type-SKILL { background: #cffafe; color: #0891b2; }
-        .result-icon.type-CUSTOM { background: #f1f5f9; color: #64748b; }
-        
-        .result-info { flex: 1; min-width: 0; }
-        .result-name { font-weight: 600; font-size: 15px; }
-        .result-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
-        .result-desc { font-size: 13px; color: var(--nx-text-secondary); margin-top: 4px; }
-        
-        .result-meta {
-            display: flex;
-            gap: 16px;
-            margin-top: 8px;
-        }
-        
-        .meta-item {
-            display: flex;
-            align-items: center;
-            gap: 4px;
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .result-actions {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .logs-panel {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            overflow: hidden;
-        }
-        
-        .logs-header {
-            padding: 12px 20px;
-            border-bottom: 1px solid var(--nx-border);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            cursor: pointer;
-        }
-        
-        .logs-body {
-            max-height: 200px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 12px;
-            display: none;
-        }
-        
-        .logs-body.show { display: block; }
-        
-        .log-entry {
-            padding: 8px 20px;
-            border-bottom: 1px solid var(--nx-border);
-            display: flex;
-            gap: 12px;
-        }
-        
-        .log-time { color: var(--nx-text-secondary); min-width: 80px; }
-        .log-level { min-width: 50px; font-weight: 500; }
-        .log-level.info { color: var(--nx-primary); }
-        .log-level.warn { color: var(--nx-warning); }
-        .log-level.error { color: var(--nx-danger); }
-        .log-level.success { color: var(--nx-success); }
-        .log-msg { flex: 1; }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
-        .empty-state-desc { font-size: 14px; }
-        
-        .install-modal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.5);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-        
-        .install-modal.show { display: flex; }
-        
-        .install-dialog {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            width: 480px;
-            max-width: 90%;
-        }
-        
-        .install-header {
-            padding: 20px;
-            border-bottom: 1px solid var(--nx-border);
-            font-weight: 600;
-        }
-        
-        .install-body { padding: 20px; }
-        
-        .install-progress {
-            height: 8px;
-            background: var(--nx-bg);
-            border-radius: 4px;
-            overflow: hidden;
-            margin-bottom: 16px;
-        }
-        
-        .install-progress-bar {
-            height: 100%;
-            background: var(--nx-primary);
-            transition: width 0.3s;
-        }
-        
-        .install-steps {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        
-        .install-step {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--nx-bg);
-            border-radius: 8px;
-        }
-        
-        .step-icon {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-        
-        .step-icon.pending { background: var(--nx-border); color: var(--nx-text-secondary); }
-        .step-icon.running { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .step-icon.done { background: var(--nx-success-light); color: var(--nx-success); }
-        
-        .step-info { flex: 1; }
-        .step-name { font-weight: 500; font-size: 14px; }
-        .step-status { font-size: 12px; color: var(--nx-text-secondary); }
-        
-        .install-footer {
-            padding: 16px 20px;
-            border-top: 1px solid var(--nx-border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 8px;
-        }
-    </style>
+    <link rel="stylesheet" href="/console/css/pages/capability-discovery.css">
 </head>
 <body>
     <div class="nx-page">
@@ -575,7 +23,7 @@
             <div class="discovery-page">
                 <header class="nx-page__header" style="border-bottom: none;">
                     <div class="nx-flex nx-items-center nx-gap-3">
-                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
                             <i class="ri-menu-line"></i>
                         </button>
                         <div>
@@ -587,9 +35,27 @@
                         </div>
                     </div>
                     <div class="nx-flex nx-items-center nx-gap-3">
-                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
                             <i class="ri-sun-line"></i>
                         </button>
+                        <div class="nx-relative">
+                            <div class="nx-page__user-menu" id="user-menu">
+                                <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                                <span class="nx-page__user-name" id="user-name">加载中...</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </div>
+                            <div class="nx-page__dropdown-menu" id="user-dropdown">
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                    <i class="ri-user-line"></i> 个人中心
+                                </div>
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                    <i class="ri-puzzle-line"></i> 我的能力
+                                </div>
+                                <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                    <i class="ri-logout-box-line"></i> 退出登录
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </header>
                 
@@ -672,11 +138,24 @@
                                     <span class="results-count" id="resultsCount">0</span>
                                 </div>
                                 <div class="results-filter">
-                                    <span class="filter-chip active" data-filter="all">全部</span>
-                                    <span class="filter-chip" data-filter="scene">场景能力</span>
-                                    <span class="filter-chip" data-filter="collaboration">协作能力</span>
-                                    <span class="filter-chip" data-filter="new">新能力</span>
-                                    <span class="filter-chip" data-filter="installed">已安装</span>
+                                    <span class="filter-chip active" data-filter="all">全部 <span class="filter-count" id="filterCountAll">0</span></span>
+                                    <span class="filter-chip" data-filter="scene" title="场景技能 - 具有完整场景流程">
+                                        <i class="ri-layout-grid-line"></i> 场景技能 <span class="filter-count" id="filterCountScene">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="provider" title="能力提供者 - 提供基础能力">
+                                        <i class="ri-cpu-line"></i> 能力提供 <span class="filter-count" id="filterCountProvider">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="driver" title="驱动技能 - 驱动场景运行">
+                                        <i class="ri-steering-line"></i> 驱动技能 <span class="filter-count" id="filterCountDriver">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="auto" title="自驱场景 - 自动驱动执行">
+                                        <i class="ri-rocket-line"></i> 自驱 <span class="filter-count" id="filterCountAuto">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="trigger" title="触发场景 - 需要外部触发">
+                                        <i class="ri-hand-coin-line"></i> 触发 <span class="filter-count" id="filterCountTrigger">0</span>
+                                    </span>
+                                    <span class="filter-chip" data-filter="new">新能力 <span class="filter-count" id="filterCountNew">0</span></span>
+                                    <span class="filter-chip" data-filter="installed">已安装 <span class="filter-count" id="filterCountInstalled">0</span></span>
                                 </div>
                             </div>
                             <div class="results-body" id="resultsBody">
@@ -704,54 +183,167 @@
     </div>
     
     <div class="install-modal" id="installModal">
-        <div class="install-dialog" style="width: 640px;">
+        <div class="install-dialog">
             <div class="install-header">
                 <i class="ri-download-line"></i>
                 <span id="installModalTitle">安装能力</span>
             </div>
             <div class="install-body">
+                <div class="wizard-stepper" id="wizardStepper">
+                    <div class="stepper-item active" data-step="1">
+                        <div class="stepper-circle"><i class="ri-eye-line"></i></div>
+                        <div class="stepper-label">预览详情</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="2">
+                        <div class="stepper-circle"><i class="ri-user-settings-line"></i></div>
+                        <div class="stepper-label">选择角色</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="3">
+                        <div class="stepper-circle"><i class="ri-team-line"></i></div>
+                        <div class="stepper-label">配置参与者</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="4">
+                        <div class="stepper-circle"><i class="ri-route-line"></i></div>
+                        <div class="stepper-label">驱动条件</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="5">
+                        <div class="stepper-circle"><i class="ri-link"></i></div>
+                        <div class="stepper-label">确认依赖</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="6">
+                        <div class="stepper-circle"><i class="ri-robot-line"></i></div>
+                        <div class="stepper-label">LLM配置</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="7">
+                        <div class="stepper-circle"><i class="ri-download-2-line"></i></div>
+                        <div class="stepper-label">安装进度</div>
+                    </div>
+                    <div class="stepper-line"></div>
+                    <div class="stepper-item" data-step="8">
+                        <div class="stepper-circle"><i class="ri-check-line"></i></div>
+                        <div class="stepper-label">安装完成</div>
+                    </div>
+                </div>
+                
                 <div class="install-wizard" id="installWizard">
                     <div class="wizard-step active" id="wizardStep1">
                         <div class="wizard-step-title">
-                            <i class="ri-settings-3-line"></i>
-                            配置安装参数
+                            <i class="ri-information-line"></i>
+                            能力详情
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="capability-detail-card" id="capabilityDetailCard">
+                                <div class="detail-header">
+                                    <div class="detail-icon" id="detailIcon">
+                                        <i class="ri-puzzle-line"></i>
+                                    </div>
+                                    <div class="detail-info">
+                                        <div class="detail-name" id="detailName">能力名称</div>
+                                        <div class="detail-id" id="detailId">capability-id</div>
+                                        <div class="detail-badges">
+                                            <span class="detail-badge type" id="detailTypeBadge">场景能力</span>
+                                            <span class="detail-badge version" id="detailVersion">v1.0.0</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="detail-description" id="detailDescription">
+                                    能力描述信息
+                                </div>
+                                <div class="detail-sections">
+                                    <div class="detail-section">
+                                        <div class="detail-section-title">
+                                            <i class="ri-flashlight-line"></i>
+                                            功能特性
+                                        </div>
+                                        <div class="feature-list" id="featureList">
+                                            <div class="feature-item"><i class="ri-check-line"></i> 功能1</div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-title">
+                                            <i class="ri-team-line"></i>
+                                            支持角色
+                                        </div>
+                                        <div class="role-preview-list" id="rolePreviewList">
+                                            <div class="role-preview-item">
+                                                <i class="ri-user-line"></i>
+                                                <span>角色名称</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="detail-section">
+                                        <div class="detail-section-title">
+                                            <i class="ri-link"></i>
+                                            依赖项
+                                        </div>
+                                        <div class="dependency-preview-list" id="dependencyPreviewList">
+                                            <div class="dependency-preview-item installed">
+                                                <i class="ri-checkbox-circle-line"></i>
+                                                <span>依赖项</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wizard-step" id="wizardStep2">
+                        <div class="wizard-step-title">
+                            <i class="ri-user-settings-line"></i>
+                            选择角色
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="role-selection-hint">
+                                请选择您在场景中的角色，不同角色拥有不同的权限和功能
+                            </div>
+                            <div class="role-selection-list" id="roleSelectionList">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wizard-step" id="wizardStep3">
+                        <div class="wizard-step-title">
+                            <i class="ri-team-line"></i>
+                            配置参与者
                         </div>
                         <div class="wizard-step-content">
                             <div class="config-section">
                                 <div class="config-section-title">
-                                    <i class="ri-route-line"></i>
-                                    驱动条件
+                                    <i class="ri-user-star-line"></i>
+                                    主导者（启动者）
                                 </div>
-                                <div class="driver-condition-list" id="driverConditionList">
+                                <div class="participant-config">
+                                    <div class="participant-input">
+                                        <input type="text" id="leaderInput" placeholder="输入用户ID或选择用户" class="form-input">
+                                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="selectLeader()">
+                                            <i class="ri-user-search-line"></i> 选择
+                                        </button>
+                                    </div>
+                                    <div class="participant-hint">主导者拥有激活权限，默认为当前用户</div>
                                 </div>
                             </div>
                             <div class="config-section">
                                 <div class="config-section-title">
-                                    <i class="ri-user-settings-line"></i>
-                                    参与者配置
+                                    <i class="ri-user-add-line"></i>
+                                    协作者
                                 </div>
                                 <div class="participant-config">
-                                    <div class="participant-role">
-                                        <label>主导者（启动者）</label>
-                                        <div class="participant-input">
-                                            <input type="text" id="leaderInput" placeholder="输入用户ID或选择用户" class="form-input">
-                                            <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="selectLeader()">
-                                                <i class="ri-user-search-line"></i>
-                                            </button>
-                                        </div>
-                                        <div class="participant-hint">主导者拥有激活权限</div>
+                                    <div class="participant-list" id="collaboratorList">
                                     </div>
-                                    <div class="participant-role">
-                                        <label>协作者</label>
-                                        <div class="participant-list" id="collaboratorList">
-                                        </div>
-                                        <div class="participant-input">
-                                            <input type="text" id="collaboratorInput" placeholder="点击添加按钮选择用户" class="form-input" readonly>
-                                            <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addCollaborator()">
-                                                <i class="ri-user-add-line"></i> 选择
-                                            </button>
-                                        </div>
+                                    <div class="participant-input">
+                                        <input type="text" id="collaboratorInput" placeholder="点击添加按钮选择用户" class="form-input" readonly>
+                                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addCollaborator()">
+                                            <i class="ri-user-add-line"></i> 选择
+                                        </button>
                                     </div>
+                                    <div class="participant-hint">添加协作者，共同参与场景</div>
                                 </div>
                             </div>
                             <div class="config-section">
@@ -770,7 +362,28 @@
                             </div>
                         </div>
                     </div>
-                    <div class="wizard-step" id="wizardStep2">
+                    
+                    <div class="wizard-step" id="wizardStep4">
+                        <div class="wizard-step-title">
+                            <i class="ri-route-line"></i>
+                            配置驱动条件
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="driver-condition-hint">
+                                选择场景的触发条件，系统将根据条件自动执行相应操作
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-timer-line"></i>
+                                    触发条件
+                                </div>
+                                <div class="driver-condition-list" id="driverConditionList">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wizard-step" id="wizardStep5">
                         <div class="wizard-step-title">
                             <i class="ri-list-check"></i>
                             确认依赖
@@ -780,7 +393,86 @@
                             </div>
                         </div>
                     </div>
-                    <div class="wizard-step" id="wizardStep3">
+                    
+                    <div class="wizard-step" id="wizardStep6">
+                        <div class="wizard-step-title">
+                            <i class="ri-robot-line"></i>
+                            LLM配置
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="llm-config-hint">
+                                配置场景所需的LLM助手，系统将自动生成场景专属提示语
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-openai-line"></i>
+                                    选择LLM Provider
+                                </div>
+                                <div class="llm-provider-list" id="llmProviderList">
+                                    <div class="llm-provider-item" data-provider="deepseek" onclick="selectLLMProvider('deepseek')">
+                                        <div class="provider-icon"><i class="ri-robot-2-line"></i></div>
+                                        <div class="provider-info">
+                                            <div class="provider-name">DeepSeek</div>
+                                            <div class="provider-desc">高性价比，适合通用场景</div>
+                                        </div>
+                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                    </div>
+                                    <div class="llm-provider-item" data-provider="baidu" onclick="selectLLMProvider('baidu')">
+                                        <div class="provider-icon"><i class="ri-baidu-line"></i></div>
+                                        <div class="provider-info">
+                                            <div class="provider-name">百度文心</div>
+                                            <div class="provider-desc">中文优化，企业级服务</div>
+                                        </div>
+                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                    </div>
+                                    <div class="llm-provider-item" data-provider="mock" onclick="selectLLMProvider('mock')">
+                                        <div class="provider-icon"><i class="ri-test-tube-line"></i></div>
+                                        <div class="provider-info">
+                                            <div class="provider-name">Mock测试</div>
+                                            <div class="provider-desc">测试环境，无需API Key</div>
+                                        </div>
+                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-magic-line"></i>
+                                    系统提示语
+                                </div>
+                                <div class="llm-prompt-config">
+                                    <div class="prompt-actions">
+                                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="generatePrompt()">
+                                            <i class="ri-ai-generate"></i> AI生成
+                                        </button>
+                                        <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="resetPrompt()">
+                                            <i class="ri-refresh-line"></i> 重置
+                                        </button>
+                                    </div>
+                                    <textarea id="systemPrompt" class="form-textarea" rows="6" placeholder="系统将根据场景信息自动生成提示语..."></textarea>
+                                    <div class="prompt-hint">提示语将帮助LLM更好地理解场景上下文</div>
+                                </div>
+                            </div>
+                            <div class="config-section">
+                                <div class="config-section-title">
+                                    <i class="ri-tools-line"></i>
+                                    Function Calling
+                                </div>
+                                <div class="function-call-config">
+                                    <div class="function-call-toggle">
+                                        <label class="toggle-switch">
+                                            <input type="checkbox" id="enableFunctionCall" checked>
+                                            <span class="toggle-slider"></span>
+                                        </label>
+                                        <span class="toggle-label">启用工具调用</span>
+                                    </div>
+                                    <div class="function-call-hint">启用后，LLM可以调用场景中的工具函数</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wizard-step" id="wizardStep7">
                         <div class="wizard-step-title">
                             <i class="ri-download-2-line"></i>
                             安装进度
@@ -790,6 +482,74 @@
                                 <div class="install-progress-bar" id="installProgress" style="width: 0%"></div>
                             </div>
                             <div class="install-steps" id="installSteps">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="wizard-step" id="wizardStep8">
+                        <div class="wizard-step-title">
+                            <i class="ri-checkbox-circle-line"></i>
+                            安装完成
+                        </div>
+                        <div class="wizard-step-content">
+                            <div class="install-complete-card" id="installCompleteCard">
+                                <div class="complete-icon">
+                                    <i class="ri-checkbox-circle-line"></i>
+                                </div>
+                                <div class="complete-title">安装成功！</div>
+                                <div class="complete-subtitle" id="completeSubtitle">以下是为您准备的内容</div>
+                                
+                                <div class="complete-section">
+                                    <div class="complete-section-title">
+                                        <i class="ri-information-line"></i>
+                                        场景信息
+                                    </div>
+                                    <div class="complete-info-grid">
+                                        <div class="complete-info-item">
+                                            <span class="info-label">名称</span>
+                                            <span class="info-value" id="completeName">-</span>
+                                        </div>
+                                        <div class="complete-info-item">
+                                            <span class="info-label">角色</span>
+                                            <span class="info-value" id="completeRole">-</span>
+                                        </div>
+                                        <div class="complete-info-item">
+                                            <span class="info-label">参与者</span>
+                                            <span class="info-value" id="completeParticipants">-</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="complete-section" id="completeMenuSection">
+                                    <div class="complete-section-title">
+                                        <i class="ri-menu-line"></i>
+                                        您的菜单
+                                    </div>
+                                    <div class="complete-menu-preview" id="completeMenuPreview">
+                                    </div>
+                                </div>
+                                
+                                <div class="complete-section" id="completeNotifySection">
+                                    <div class="complete-section-title">
+                                        <i class="ri-notification-3-line"></i>
+                                        通知状态
+                                    </div>
+                                    <div class="complete-notify-status" id="completeNotifyStatus">
+                                        <div class="notify-item success">
+                                            <i class="ri-checkbox-circle-line"></i>
+                                            <span>已发送邀请通知</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="complete-actions">
+                                    <button class="nx-btn nx-btn--primary" onclick="goToCapability()">
+                                        <i class="ri-arrow-right-line"></i> 查看已安装能力
+                                    </button>
+                                    <button class="nx-btn nx-btn--secondary" onclick="closeInstall()">
+                                        关闭
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -804,130 +564,12 @@
         </div>
     </div>
     
-    <style>
-        .install-wizard { min-height: 300px; }
-        .wizard-step { display: none; }
-        .wizard-step.active { display: block; }
-        .wizard-step-title {
-            font-size: 16px;
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        .wizard-step-title i { color: var(--nx-primary); }
-        .config-section {
-            margin-bottom: 20px;
-            padding: 16px;
-            background: var(--nx-bg);
-            border-radius: 8px;
-        }
-        .config-section-title {
-            font-size: 13px;
-            font-weight: 600;
-            color: var(--nx-text-secondary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            gap: 6px;
-        }
-        .driver-condition-list { display: flex; flex-direction: column; gap: 8px; }
-        .driver-condition-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--nx-bg-elevated);
-            border: 1px solid var(--nx-border);
-            border-radius: 6px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        .driver-condition-item:hover { border-color: var(--nx-primary); }
-        .driver-condition-item.selected { border-color: var(--nx-primary); background: var(--nx-primary-light); }
-        .driver-condition-radio {
-            width: 18px;
-            height: 18px;
-            border-radius: 50%;
-            border: 2px solid var(--nx-border);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .driver-condition-item.selected .driver-condition-radio {
-            border-color: var(--nx-primary);
-        }
-        .driver-condition-item.selected .driver-condition-radio::after {
-            content: '';
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            background: var(--nx-primary);
-        }
-        .driver-condition-info { flex: 1; }
-        .driver-condition-name { font-weight: 500; font-size: 14px; }
-        .driver-condition-desc { font-size: 12px; color: var(--nx-text-secondary); margin-top: 2px; }
-        .participant-config { display: flex; flex-direction: column; gap: 16px; }
-        .participant-role label { display: block; font-size: 13px; font-weight: 500; margin-bottom: 8px; }
-        .participant-input { display: flex; gap: 8px; }
-        .participant-input .form-input { flex: 1; }
-        .participant-hint { font-size: 12px; color: var(--nx-text-secondary); margin-top: 4px; }
-        .participant-list { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
-        .participant-tag {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-            border-radius: 16px;
-            font-size: 12px;
-        }
-        .participant-tag .remove-btn {
-            cursor: pointer;
-            opacity: 0.7;
-        }
-        .participant-tag .remove-btn:hover { opacity: 1; }
-        .push-config select { width: 100%; }
-        .push-hint { font-size: 12px; color: var(--nx-text-secondary); margin-top: 8px; }
-        .dependency-list { display: flex; flex-direction: column; gap: 8px; }
-        .dependency-item {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            padding: 12px;
-            background: var(--nx-bg);
-            border: 1px solid var(--nx-border);
-            border-radius: 6px;
-        }
-        .dependency-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-        }
-        .dependency-info { flex: 1; }
-        .dependency-name { font-weight: 500; font-size: 14px; }
-        .dependency-version { font-size: 12px; color: var(--nx-text-secondary); }
-        .dependency-status {
-            padding: 2px 8px;
-            border-radius: 10px;
-            font-size: 11px;
-        }
-        .dependency-status.installed { background: #d1fae5; color: #059669; }
-        .dependency-status.pending { background: #fef3c7; color: #d97706; }
-    </style>
-    
     <script src="/console/js/nexus.js"></script>
     <script src="/console/js/api-client.js"></script>
-    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/llm-assistant.js"></script>
-    <script src="/console/js/pages/capability-discovery.js?v=20260305f"></script>
+    <script src="/console/js/capability-service.js"></script>
+    <script src="/console/js/pages/capability-discovery.js?v=20260311"></script>
 </body>
 </html>

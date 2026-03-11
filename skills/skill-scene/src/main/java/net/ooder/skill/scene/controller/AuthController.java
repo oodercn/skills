@@ -1,10 +1,11 @@
 package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.dto.LoginRequest;
-import net.ooder.skill.scene.dto.MenuItemDTO;
+import net.ooder.skill.scene.dto.menu.MenuItemDTO;
 import net.ooder.skill.scene.dto.UserSessionDTO;
 import net.ooder.skill.scene.model.ResultModel;
 import net.ooder.skill.scene.service.AuthService;
+import net.ooder.skill.scene.service.MenuRoleConfigService;
 import net.ooder.skill.scene.service.RoleManagementService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,6 +29,9 @@ public class AuthController {
 
     @Autowired
     private RoleManagementService roleManagementService;
+
+    @Autowired
+    private MenuRoleConfigService menuRoleConfigService;
 
     @PostMapping("/login")
     public ResultModel<UserSessionDTO> login(@RequestBody LoginRequest request, HttpServletRequest httpRequest) {
@@ -102,7 +106,7 @@ public class AuthController {
         }
 
         String roleType = user.getRoleType();
-        List<MenuItemDTO> menus = roleManagementService.getMenusByRole(roleType);
+        List<MenuItemDTO> menus = menuRoleConfigService.getMenusByRole(roleType);
         
         List<Map<String, Object>> menuItems = new ArrayList<>();
         for (MenuItemDTO menu : menus) {

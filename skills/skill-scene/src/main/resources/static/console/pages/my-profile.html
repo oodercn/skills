@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>个人中心 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .profile-page { padding: 20px; }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .page-title i { color: var(--nx-primary); }
+        
+        .page-subtitle {
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .profile-grid {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 24px;
+        }
+        
+        .profile-card {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .profile-card-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .profile-card-header i { color: var(--nx-primary); }
+        
+        .profile-card-body { padding: 20px; }
+        
+        .avatar-section {
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .avatar-wrapper {
+            position: relative;
+            display: inline-block;
+        }
+        
+        .avatar-large {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: var(--nx-primary);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            font-weight: 600;
+            margin: 0 auto 16px;
+        }
+        
+        .avatar-edit-btn {
+            position: absolute;
+            bottom: 10px;
+            right: 0;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: var(--nx-bg-elevated);
+            border: 2px solid var(--nx-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .avatar-edit-btn:hover {
+            background: var(--nx-primary);
+            color: white;
+            border-color: var(--nx-primary);
+        }
+        
+        .user-name-large {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        
+        .user-role-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            border-radius: 16px;
+            font-size: 13px;
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+        }
+        
+        .quick-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-top: 20px;
+        }
+        
+        .quick-stat {
+            text-align: center;
+            padding: 12px;
+            background: var(--nx-bg);
+            border-radius: 8px;
+        }
+        
+        .quick-stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--nx-primary);
+        }
+        
+        .quick-stat-label {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 4px;
+        }
+        
+        .form-section { margin-bottom: 24px; }
+        
+        .form-section:last-child { margin-bottom: 0; }
+        
+        .form-section-title {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--nx-text-secondary);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+        
+        .form-group {
+            margin-bottom: 16px;
+        }
+        
+        .form-group:last-child { margin-bottom: 0; }
+        
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            margin-bottom: 6px;
+            color: var(--nx-text);
+        }
+        
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            background: var(--nx-bg);
+            font-size: 14px;
+            transition: all 0.2s;
+        }
+        
+        .form-input:focus {
+            outline: none;
+            border-color: var(--nx-primary);
+            box-shadow: 0 0 0 3px var(--nx-primary-light);
+        }
+        
+        .form-input:disabled {
+            background: var(--nx-bg-hover);
+            color: var(--nx-text-secondary);
+            cursor: not-allowed;
+        }
+        
+        .form-hint {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 4px;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+            margin-top: 24px;
+            padding-top: 20px;
+            border-top: 1px solid var(--nx-border);
+        }
+        
+        .info-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .info-row:last-child { border-bottom: none; }
+        
+        .info-label { color: var(--nx-text-secondary); }
+        
+        .info-value { font-weight: 500; }
+        
+        .security-section {
+            margin-top: 20px;
+        }
+        
+        .security-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--nx-bg);
+            border-radius: 8px;
+            margin-bottom: 12px;
+        }
+        
+        .security-item:last-child { margin-bottom: 0; }
+        
+        .security-info { display: flex; align-items: center; gap: 12px; }
+        
+        .security-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+        }
+        
+        .security-icon.password { background: #dbeafe; color: #2563eb; }
+        .security-icon.session { background: #d1fae5; color: #059669; }
+        .security-icon.apikey { background: #fef3c7; color: #d97706; }
+        
+        .security-title { font-weight: 500; }
+        .security-desc { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .toast {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-size: 14px;
+            z-index: 10000;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s;
+        }
+        
+        .toast.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .toast.success { background: #059669; color: white; }
+        .toast.error { background: #dc2626; color: white; }
+        
+        @media (max-width: 900px) {
+            .profile-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <div class="profile-page">
+                <header class="nx-page__header" style="border-bottom: none;">
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                            <i class="ri-menu-line"></i>
+                        </button>
+                        <div>
+                            <h2 class="page-title">
+                                <i class="ri-user-line"></i>
+                                个人中心
+                            </h2>
+                            <p class="page-subtitle">查看和管理您的个人信息</p>
+                        </div>
+                    </div>
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                            <i class="ri-sun-line"></i>
+                        </button>
+                        <div class="nx-relative">
+                            <div class="nx-page__user-menu" id="user-menu">
+                                <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                                <span class="nx-page__user-name" id="user-name">加载中...</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </div>
+                            <div class="nx-page__dropdown-menu" id="user-dropdown">
+                                <div class="nx-page__dropdown-item nx-page__dropdown-item--active">
+                                    <i class="ri-user-line"></i> 个人中心
+                                </div>
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                    <i class="ri-puzzle-line"></i> 我的能力
+                                </div>
+                                <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                    <i class="ri-logout-box-line"></i> 退出登录
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                
+                <div class="profile-grid">
+                    <div class="profile-sidebar">
+                        <div class="profile-card">
+                            <div class="avatar-section">
+                                <div class="avatar-wrapper">
+                                    <div class="avatar-large" id="profileAvatar">U</div>
+                                    <button class="avatar-edit-btn" title="更换头像">
+                                        <i class="ri-camera-line"></i>
+                                    </button>
+                                </div>
+                                <div class="user-name-large" id="profileName">加载中...</div>
+                                <div class="user-role-badge" id="profileRole">
+                                    <i class="ri-shield-user-line"></i>
+                                    <span>用户</span>
+                                </div>
+                            </div>
+                            <div class="quick-stats">
+                                <div class="quick-stat">
+                                    <div class="quick-stat-value" id="statScenes">0</div>
+                                    <div class="quick-stat-label">参与场景</div>
+                                </div>
+                                <div class="quick-stat">
+                                    <div class="quick-stat-value" id="statCapabilities">0</div>
+                                    <div class="quick-stat-label">已用能力</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card" style="margin-top: 16px;">
+                            <div class="profile-card-header">
+                                <i class="ri-information-line"></i>
+                                账户信息
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="info-row">
+                                    <span class="info-label">用户ID</span>
+                                    <span class="info-value" id="infoUserId" style="font-family: monospace; font-size: 12px;">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">注册时间</span>
+                                    <span class="info-value" id="infoCreateTime">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">最后更新</span>
+                                    <span class="info-value" id="infoUpdateTime">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">账户状态</span>
+                                    <span class="info-value" id="infoStatus">
+                                        <span class="status-badge" style="background: #d1fae5; color: #059669; padding: 2px 8px; border-radius: 12px; font-size: 12px;">
+                                            <i class="ri-checkbox-circle-line"></i> 正常
+                                        </span>
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-main">
+                        <div class="profile-card">
+                            <div class="profile-card-header">
+                                <i class="ri-user-settings-line"></i>
+                                基本信息
+                            </div>
+                            <div class="profile-card-body">
+                                <form id="profileForm">
+                                    <div class="form-section">
+                                        <div class="form-section-title">
+                                            <i class="ri-user-3-line"></i>
+                                            个人资料
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">姓名</label>
+                                                <input type="text" class="form-input" id="formName" placeholder="请输入姓名">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">职位</label>
+                                                <input type="text" class="form-input" id="formTitle" placeholder="请输入职位">
+                                            </div>
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">邮箱</label>
+                                                <input type="email" class="form-input" id="formEmail" placeholder="请输入邮箱">
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">电话</label>
+                                                <input type="tel" class="form-input" id="formPhone" placeholder="请输入电话">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section">
+                                        <div class="form-section-title">
+                                            <i class="ri-building-line"></i>
+                                            组织信息
+                                        </div>
+                                        <div class="form-row">
+                                            <div class="form-group">
+                                                <label class="form-label">部门</label>
+                                                <input type="text" class="form-input" id="formDepartment" disabled>
+                                                <div class="form-hint">部门信息由管理员分配</div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="form-label">角色</label>
+                                                <input type="text" class="form-input" id="formRole" disabled>
+                                                <div class="form-hint">角色由系统分配</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <button type="button" class="nx-btn nx-btn--secondary" onclick="resetForm()">
+                                            <i class="ri-refresh-line"></i> 重置
+                                        </button>
+                                        <button type="submit" class="nx-btn nx-btn--primary">
+                                            <i class="ri-save-line"></i> 保存修改
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        
+                        <div class="profile-card" style="margin-top: 16px;">
+                            <div class="profile-card-header">
+                                <i class="ri-shield-keyhole-line"></i>
+                                安全设置
+                            </div>
+                            <div class="profile-card-body">
+                                <div class="security-section">
+                                    <div class="security-item">
+                                        <div class="security-info">
+                                            <div class="security-icon password">
+                                                <i class="ri-lock-password-line"></i>
+                                            </div>
+                                            <div>
+                                                <div class="security-title">登录密码</div>
+                                                <div class="security-desc">定期修改密码可以提高账户安全性</div>
+                                            </div>
+                                        </div>
+                                        <button class="nx-btn nx-btn--secondary" onclick="showPasswordModal()">
+                                            <i class="ri-edit-line"></i> 修改
+                                        </button>
+                                    </div>
+                                    <div class="security-item">
+                                        <div class="security-info">
+                                            <div class="security-icon session">
+                                                <i class="ri-device-line"></i>
+                                            </div>
+                                            <div>
+                                                <div class="security-title">登录设备</div>
+                                                <div class="security-desc">管理已登录的设备</div>
+                                            </div>
+                                        </div>
+                                        <button class="nx-btn nx-btn--secondary" onclick="showDevicesModal()">
+                                            <i class="ri-list-check"></i> 查看
+                                        </button>
+                                    </div>
+                                    <div class="security-item">
+                                        <div class="security-info">
+                                            <div class="security-icon apikey">
+                                                <i class="ri-key-2-line"></i>
+                                            </div>
+                                            <div>
+                                                <div class="security-title">API密钥</div>
+                                                <div class="security-desc">管理API访问密钥</div>
+                                            </div>
+                                        </div>
+                                        <a href="key-management.html" class="nx-btn nx-btn--secondary">
+                                            <i class="ri-settings-4-line"></i> 管理
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        let currentUser = null;
+        let originalData = {};
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadUserProfile();
+            loadUserStats();
+        });
+        
+        function loadUserProfile() {
+            fetch('/api/v1/org/users/current')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success' && result.data) {
+                        currentUser = result.data;
+                        originalData = {
+                            name: currentUser.name || '',
+                            title: currentUser.title || '',
+                            email: currentUser.email || '',
+                            phone: currentUser.phone || ''
+                        };
+                        renderProfile(currentUser);
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load user profile:', error);
+                    showToast('加载用户信息失败', 'error');
+                });
+        }
+        
+        function loadUserStats() {
+            fetch('/api/v1/org/users/current/stats')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success' && result.data) {
+                        document.getElementById('statScenes').textContent = result.data.scenesCount || 0;
+                        document.getElementById('statCapabilities').textContent = result.data.capabilitiesCount || 0;
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load user stats:', error);
+                });
+        }
+        
+        function renderProfile(user) {
+            document.getElementById('profileAvatar').textContent = (user.name || 'U').charAt(0).toUpperCase();
+            document.getElementById('profileName').textContent = user.name || '未知用户';
+            
+            const roleMap = {
+                'admin': { name: '管理员', icon: 'ri-admin-line' },
+                'manager': { name: '管理者', icon: 'ri-user-settings-line' },
+                'leader': { name: '主导者', icon: 'ri-user-star-line' },
+                'collaborator': { name: '协作者', icon: 'ri-team-line' },
+                'installer': { name: '安装者', icon: 'ri-install-line' },
+                'employee': { name: '员工', icon: 'ri-user-line' }
+            };
+            const roleInfo = roleMap[user.role] || { name: user.role || '用户', icon: 'ri-shield-user-line' };
+            document.getElementById('profileRole').innerHTML = '<i class="' + roleInfo.icon + '"></i><span>' + roleInfo.name + '</span>';
+            
+            document.getElementById('infoUserId').textContent = user.userId || '-';
+            document.getElementById('infoCreateTime').textContent = formatTime(user.createTime);
+            document.getElementById('infoUpdateTime').textContent = formatTime(user.updateTime);
+            
+            document.getElementById('formName').value = user.name || '';
+            document.getElementById('formTitle').value = user.title || '';
+            document.getElementById('formEmail').value = user.email || '';
+            document.getElementById('formPhone').value = user.phone || '';
+            document.getElementById('formDepartment').value = user.departmentId || '-';
+            document.getElementById('formRole').value = roleInfo.name;
+        }
+        
+        function formatTime(timestamp) {
+            if (!timestamp) return '-';
+            const date = new Date(timestamp);
+            return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+        }
+        
+        document.getElementById('profileForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            saveProfile();
+        });
+        
+        function saveProfile() {
+            if (!currentUser) return;
+            
+            const updatedData = {
+                name: document.getElementById('formName').value,
+                title: document.getElementById('formTitle').value,
+                email: document.getElementById('formEmail').value,
+                phone: document.getElementById('formPhone').value
+            };
+            
+            fetch('/api/v1/org/users/' + currentUser.userId, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(updatedData)
+            })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success') {
+                        currentUser = result.data;
+                        originalData = {
+                            name: currentUser.name || '',
+                            title: currentUser.title || '',
+                            email: currentUser.email || '',
+                            phone: currentUser.phone || ''
+                        };
+                        renderProfile(currentUser);
+                        showToast('保存成功', 'success');
+                    } else {
+                        showToast(result.message || '保存失败', 'error');
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to save profile:', error);
+                    showToast('保存失败', 'error');
+                });
+        }
+        
+        function resetForm() {
+            if (!currentUser) return;
+            document.getElementById('formName').value = originalData.name;
+            document.getElementById('formTitle').value = originalData.title;
+            document.getElementById('formEmail').value = originalData.email;
+            document.getElementById('formPhone').value = originalData.phone;
+        }
+        
+        function showPasswordModal() {
+            showToast('密码修改功能开发中', 'error');
+        }
+        
+        function showDevicesModal() {
+            showToast('设备管理功能开发中', 'error');
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

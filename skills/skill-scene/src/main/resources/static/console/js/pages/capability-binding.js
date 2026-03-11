@@ -64,7 +64,7 @@
         loadSceneGroups: function() {
             ApiClient.get('/api/selector/scene-groups')
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         sceneGroups = result.data.map(function(item) {
                             return {
                                 sceneGroupId: item.id,
@@ -91,7 +91,7 @@
         loadCapabilities: function() {
             ApiClient.get('/api/v1/capabilities')
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         capabilities = result.data.map(function(item) {
                             return {
                                 capabilityId: item.capabilityId || item.id,
@@ -159,7 +159,7 @@
         loadBindings: function(sceneGroupId) {
             ApiClient.get('/api/v1/capabilities/bindings?sceneGroupId=' + sceneGroupId)
                 .then(function(result) {
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         bindings = result.data.map(function(item) {
                             return {
                                 bindingId: item.bindingId || item.id,
@@ -314,7 +314,7 @@
 
             ApiClient.post('/api/v1/capabilities/bindings', request)
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         bindings.push({
                             bindingId: result.data ? result.data.bindingId : 'bind-' + Date.now(),
                             sceneGroupId: currentSceneGroup,
@@ -356,7 +356,7 @@
 
             ApiClient.delete('/api/v1/capabilities/bindings/' + bindingId)
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         bindings = bindings.filter(function(b) { return b.bindingId !== bindingId; });
                         if (selectedBinding && selectedBinding.bindingId === bindingId) {
                             selectedBinding = null;
@@ -395,7 +395,7 @@
             
             ApiClient.put('/api/v1/capabilities/bindings/' + bindingId + '/priority', { priority: priority })
                 .then(function(result) {
-                    if (result.code === 200) {
+                    if (result.status === 'success') {
                         binding.priority = priority;
                         CapabilityBinding.renderBindings();
                         if (selectedBinding && selectedBinding.bindingId === bindingId) {
@@ -449,7 +449,7 @@
                     btn.innerHTML = originalHtml;
                     btn.disabled = false;
                     
-                    if (result.code === 200 && result.data) {
+                    if (result.status === 'success' && result.data) {
                         var data = result.data;
                         var message = '测试调用结果\n\n';
                         message += '能力ID: ' + data.capabilityId + '\n';

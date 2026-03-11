@@ -17,6 +17,10 @@ public interface CapabilityBindingService {
     List<CapabilityBinding> listBySceneGroup(String sceneGroupId);
 
     List<CapabilityBinding> listByCapability(String capabilityId);
+    
+    List<CapabilityBinding> listByAgent(String agentId);
+    
+    List<CapabilityBinding> listByLink(String linkId);
 
     void updateStatus(String bindingId, String status);
 

@@ -1,6 +1,9 @@
 package net.ooder.skill.scene.llm;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.TypeReference;
 import net.ooder.scene.skill.LlmProvider;
+import net.ooder.scene.skill.tool.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,6 +26,8 @@ public class DeepSeekLlmProvider implements LlmProvider {
     private static final String API_URL = "https://api.deepseek.com/v1/chat/completions";
     
     private String apiKey;
+    private ToolRegistry toolRegistry;
+    private ToolOrchestrator toolOrchestrator;
     
     private final List<String> supportedModels = new ArrayList<String>();
     
@@ -38,6 +43,14 @@ public class DeepSeekLlmProvider implements LlmProvider {
     
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
+    }
+
+    public void setToolRegistry(ToolRegistry toolRegistry) {
+        this.toolRegistry = toolRegistry;
+    }
+    
+    public void setToolOrchestrator(ToolOrchestrator toolOrchestrator) {
+        this.toolOrchestrator = toolOrchestrator;
     }
 
     @Override
@@ -78,13 +91,29 @@ public class DeepSeekLlmProvider implements LlmProvider {
                 if (options.containsKey("max_tokens")) {
                     requestBody.put("max_tokens", options.get("max_tokens"));
                 }
+                
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> tools = (List<Map<String, Object>>) options.get("tools");
+                if (tools != null && !tools.isEmpty()) {
+                    requestBody.put("tools", tools);
+                    Object toolChoice = options.get("tool_choice");
+                    if (toolChoice != null) {
+                        requestBody.put("tool_choice", toolChoice);
+                    } else {
+                        requestBody.put("tool_choice", "auto");
+                    }
+                }
             }
             
             String response = sendRequest(API_URL, requestBody);
             
-            result.put("content", response);
+            result = parseResponse(response);
             result.put("model", model);
             result.put("provider", PROVIDER_TYPE);
+            
+            if (result.containsKey("tool_calls")) {
+                result = handleToolCalls(result, messages, model, options);
+            }
             
         } catch (Exception e) {
             log.error("DeepSeek LLM chat error", e);
@@ -93,6 +122,245 @@ public class DeepSeekLlmProvider implements LlmProvider {
         }
         
         return result;
+    }
+
+    private Map<String, Object> parseResponse(String response) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        
+        String content = extractNestedJsonValue(response, "choices", "message", "content");
+        if (content != null) {
+            result.put("content", content);
+        }
+        
+        String toolCallsJson = extractToolCallsJson(response);
+        if (toolCallsJson != null) {
+            List<Map<String, Object>> toolCalls = parseToolCalls(toolCallsJson);
+            if (!toolCalls.isEmpty()) {
+                result.put("tool_calls", toolCalls);
+            }
+        }
+        
+        return result;
+    }
+
+    private String extractToolCallsJson(String response) {
+        String searchKey = "\"tool_calls\":";
+        int startIndex = response.indexOf(searchKey);
+        if (startIndex == -1) {
+            return null;
+        }
+        
+        startIndex += searchKey.length();
+        while (startIndex < response.length() && (response.charAt(startIndex) == ' ' || response.charAt(startIndex) == '\t')) {
+            startIndex++;
+        }
+        
+        if (startIndex >= response.length() || response.charAt(startIndex) != '[') {
+            return null;
+        }
+        
+        int bracketCount = 0;
+        int endIndex = startIndex;
+        while (endIndex < response.length()) {
+            char c = response.charAt(endIndex);
+            if (c == '[') bracketCount++;
+            else if (c == ']') bracketCount--;
+            endIndex++;
+            if (bracketCount == 0) break;
+        }
+        
+        return response.substring(startIndex, endIndex);
+    }
+
+    private List<Map<String, Object>> parseToolCalls(String toolCallsJson) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        int i = 0;
+        while (i < toolCallsJson.length()) {
+            int objStart = toolCallsJson.indexOf('{', i);
+            if (objStart == -1) break;
+            
+            int braceCount = 0;
+            int objEnd = objStart;
+            while (objEnd < toolCallsJson.length()) {
+                char c = toolCallsJson.charAt(objEnd);
+                if (c == '{') braceCount++;
+                else if (c == '}') braceCount--;
+                objEnd++;
+                if (braceCount == 0) break;
+            }
+            
+            String objJson = toolCallsJson.substring(objStart, objEnd);
+            
+            String id = extractJsonValue(objJson, "id");
+            String type = extractJsonValue(objJson, "type");
+            
+            String funcJson = extractFunctionJson(objJson);
+            if (funcJson != null) {
+                String funcName = extractJsonValue(funcJson, "name");
+                String funcArgs = extractJsonValue(funcJson, "arguments");
+                
+                Map<String, Object> toolCall = new HashMap<String, Object>();
+                toolCall.put("id", id);
+                toolCall.put("type", type);
+                
+                Map<String, Object> funcMap = new HashMap<String, Object>();
+                funcMap.put("name", funcName != null ? funcName : "");
+                funcMap.put("arguments", funcArgs != null ? funcArgs : "{}");
+                toolCall.put("function", funcMap);
+                
+                result.add(toolCall);
+            }
+            
+            i = objEnd;
+        }
+        
+        return result;
+    }
+
+    private String extractFunctionJson(String objJson) {
+        String searchKey = "\"function\":";
+        int startIndex = objJson.indexOf(searchKey);
+        if (startIndex == -1) {
+            return null;
+        }
+        
+        startIndex += searchKey.length();
+        while (startIndex < objJson.length() && (objJson.charAt(startIndex) == ' ' || objJson.charAt(startIndex) == '\t')) {
+            startIndex++;
+        }
+        
+        if (startIndex >= objJson.length() || objJson.charAt(startIndex) != '{') {
+            return null;
+        }
+        
+        int braceCount = 0;
+        int endIndex = startIndex;
+        while (endIndex < objJson.length()) {
+            char c = objJson.charAt(endIndex);
+            if (c == '{') braceCount++;
+            else if (c == '}') braceCount--;
+            endIndex++;
+            if (braceCount == 0) break;
+        }
+        
+        return objJson.substring(startIndex, endIndex);
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> handleToolCalls(Map<String, Object> result, 
+                                                 List<Map<String, Object>> originalMessages,
+                                                 String model,
+                                                 Map<String, Object> options) {
+        List<Map<String, Object>> toolCalls = (List<Map<String, Object>>) result.get("tool_calls");
+        if (toolCalls == null || toolCalls.isEmpty() || toolOrchestrator == null) {
+            return result;
+        }
+        
+        List<Map<String, Object>> newMessages = new ArrayList<Map<String, Object>>(originalMessages);
+        
+        Map<String, Object> assistantMessage = new HashMap<String, Object>();
+        assistantMessage.put("role", "assistant");
+        assistantMessage.put("tool_calls", toolCalls);
+        newMessages.add(assistantMessage);
+        
+        Map<String, Object> lastAction = null;
+        ToolExecutionContext context = new ToolExecutionContext("default-session", "current-user");
+        
+        for (Map<String, Object> toolCall : toolCalls) {
+            Map<String, Object> func = (Map<String, Object>) toolCall.get("function");
+            String funcName = (String) func.get("name");
+            String argsJson = (String) func.get("arguments");
+            
+            Map<String, Object> args = parseArguments(argsJson);
+            
+            ToolCall tc = new ToolCall(
+                (String) toolCall.get("id"),
+                funcName,
+                args
+            );
+            
+            ToolCallResult toolCallResult = toolOrchestrator.executeToolCall(tc, context);
+            
+            Object funcResult;
+            if (toolCallResult.isSuccess()) {
+                funcResult = toolCallResult.getToolResult().getData();
+                if (funcResult instanceof Map) {
+                    Map<String, Object> funcResultMap = (Map<String, Object>) funcResult;
+                    if (funcResultMap.containsKey("action")) {
+                        lastAction = funcResultMap;
+                    }
+                }
+            } else {
+                Map<String, Object> errorResult = new HashMap<String, Object>();
+                errorResult.put("error", true);
+                errorResult.put("message", toolCallResult.getToolResult() != null ? 
+                    toolCallResult.getToolResult().getMessage() : "Tool execution failed");
+                funcResult = errorResult;
+            }
+            
+            Map<String, Object> toolResultMessage = new HashMap<String, Object>();
+            toolResultMessage.put("role", "tool");
+            toolResultMessage.put("tool_call_id", toolCall.get("id"));
+            toolResultMessage.put("content", toJsonString(funcResult));
+            newMessages.add(toolResultMessage);
+            
+            log.info("[DeepSeek] Tool {} executed, result: {}", funcName, funcResult);
+        }
+        
+        Map<String, Object> followUpResult = chat(model, newMessages, options);
+        
+        if (lastAction != null) {
+            followUpResult.put("actionResult", lastAction);
+            followUpResult.put("syncContext", true);
+        }
+        
+        return followUpResult;
+    }
+
+    private static final TypeReference<Map<String, Object>> MAP_TYPE = new TypeReference<Map<String, Object>>() {};
+
+    private Map<String, Object> parseArguments(String argsJson) {
+        Map<String, Object> result = new HashMap<String, Object>();
+        
+        if (argsJson == null || argsJson.isEmpty()) {
+            return result;
+        }
+        
+        try {
+            String json = argsJson;
+            if (json.startsWith("\"") && json.endsWith("\"")) {
+                json = json.substring(1, json.length() - 1);
+            }
+            json = json.replace("\\\"", "\"")
+                       .replace("\\n", "\n")
+                       .replace("\\r", "\r")
+                       .replace("\\t", "\t");
+            
+            return JSON.parseObject(json, MAP_TYPE);
+        } catch (Exception e) {
+            log.warn("[DeepSeek] Failed to parse arguments: {}", argsJson);
+            return result;
+        }
+    }
+
+    private String toJsonString(Object obj) {
+        if (obj == null) {
+            return "null";
+        }
+        if (obj instanceof String) {
+            return "\"" + escapeJson((String) obj) + "\"";
+        }
+        if (obj instanceof Number || obj instanceof Boolean) {
+            return obj.toString();
+        }
+        if (obj instanceof Map) {
+            return mapToJson((Map<String, Object>) obj);
+        }
+        if (obj instanceof List) {
+            return listToJson((List<?>) obj);
+        }
+        return "\"" + escapeJson(obj.toString()) + "\"";
     }
 
     @Override
@@ -185,15 +453,10 @@ public class DeepSeekLlmProvider implements LlmProvider {
         
         if (responseCode != 200) {
             log.error("DeepSeek API error: {} - {}", responseCode, responseBody);
-            return "Error (HTTP " + responseCode + "): " + responseBody;
+            return "{\"error\": \"HTTP " + responseCode + "\", \"message\": \"" + escapeJson(responseBody) + "\"}";
         }
         
-        String content = extractNestedJsonValue(responseBody, "choices", "message", "content");
-        if (content == null) {
-            content = extractJsonValue(responseBody, "result");
-        }
-        
-        return content != null ? content : responseBody;
+        return responseBody;
     }
     
     private String extractNestedJsonValue(String json, String... keys) {
@@ -293,6 +556,8 @@ public class DeepSeekLlmProvider implements LlmProvider {
                 json.append(mapToJson((Map<String, Object>) value));
             } else if (value instanceof Number || value instanceof Boolean) {
                 json.append(value);
+            } else if (value == null) {
+                json.append("null");
             } else {
                 json.append("\"").append(escapeJson(value.toString())).append("\"");
             }
@@ -316,6 +581,12 @@ public class DeepSeekLlmProvider implements LlmProvider {
                 json.append("\"").append(escapeJson((String) item)).append("\"");
             } else if (item instanceof Map) {
                 json.append(mapToJson((Map<String, Object>) item));
+            } else if (item instanceof List) {
+                json.append(listToJson((List<?>) item));
+            } else if (item instanceof Number || item instanceof Boolean) {
+                json.append(item);
+            } else if (item == null) {
+                json.append("null");
             } else {
                 json.append("\"").append(escapeJson(item.toString())).append("\"");
             }

@@ -121,6 +121,50 @@ public class OrgWebAdapter {
             hr.setActive(true);
             users.put(hr.getUserId(), hr);
 
+            OrgUserDTO admin = new OrgUserDTO();
+            admin.setUserId("user-admin-001");
+            admin.setName("系统管理员");
+            admin.setEmail("admin@example.com");
+            admin.setDepartmentId("dept-it");
+            admin.setRole("admin");
+            admin.setTitle("系统管理员");
+            admin.setCreateTime(System.currentTimeMillis());
+            admin.setActive(true);
+            users.put(admin.getUserId(), admin);
+
+            OrgUserDTO installer = new OrgUserDTO();
+            installer.setUserId("user-installer-001");
+            installer.setName("安装者");
+            installer.setEmail("installer@example.com");
+            installer.setDepartmentId("dept-it");
+            installer.setRole("installer");
+            installer.setTitle("系统安装者");
+            installer.setCreateTime(System.currentTimeMillis());
+            installer.setActive(true);
+            users.put(installer.getUserId(), installer);
+
+            OrgUserDTO leader = new OrgUserDTO();
+            leader.setUserId("user-leader-001");
+            leader.setName("主导者");
+            leader.setEmail("leader@example.com");
+            leader.setDepartmentId("dept-rd");
+            leader.setRole("leader");
+            leader.setTitle("项目主导");
+            leader.setCreateTime(System.currentTimeMillis());
+            leader.setActive(true);
+            users.put(leader.getUserId(), leader);
+
+            OrgUserDTO collaborator = new OrgUserDTO();
+            collaborator.setUserId("user-collaborator-001");
+            collaborator.setName("协作者");
+            collaborator.setEmail("collaborator@example.com");
+            collaborator.setDepartmentId("dept-rd");
+            collaborator.setRole("collaborator");
+            collaborator.setTitle("项目协作");
+            collaborator.setCreateTime(System.currentTimeMillis());
+            collaborator.setActive(true);
+            users.put(collaborator.getUserId(), collaborator);
+
             users.forEach((id, user) -> storage.put("users", id, user));
             log.info("Initialized {} default users", users.size());
         }
@@ -132,7 +176,7 @@ public class OrgWebAdapter {
             rd.setDescription("负责产品研发和技术创新");
             rd.setParentId(null);
             rd.setManagerId("user-manager-001");
-            rd.setMemberIds(Arrays.asList("user-manager-001", "user-employee-001", "user-employee-002", "user-employee-003"));
+            rd.setMemberIds(Arrays.asList("user-manager-001", "user-employee-001", "user-employee-002", "user-employee-003", "user-leader-001", "user-collaborator-001"));
             rd.setCreateTime(System.currentTimeMillis());
             departments.put(rd.getDepartmentId(), rd);
 
@@ -146,6 +190,16 @@ public class OrgWebAdapter {
             hr.setCreateTime(System.currentTimeMillis());
             departments.put(hr.getDepartmentId(), hr);
 
+            OrgDepartmentDTO it = new OrgDepartmentDTO();
+            it.setDepartmentId("dept-it");
+            it.setName("信息技术部");
+            it.setDescription("负责系统运维和技术支持");
+            it.setParentId(null);
+            it.setManagerId("user-admin-001");
+            it.setMemberIds(Arrays.asList("user-admin-001", "user-installer-001"));
+            it.setCreateTime(System.currentTimeMillis());
+            departments.put(it.getDepartmentId(), it);
+
             departments.forEach((id, dept) -> storage.put("departments", id, dept));
             log.info("Initialized {} default departments", departments.size());
         }
@@ -157,6 +211,22 @@ public class OrgWebAdapter {
 
     public OrgUserDTO getUser(String userId) {
         return users.get(userId);
+    }
+
+    public OrgUserDTO getCurrentUser() {
+        if (!users.isEmpty()) {
+            OrgUserDTO admin = users.get("user-admin-001");
+            if (admin != null) {
+                return admin;
+            }
+            return users.values().iterator().next();
+        }
+        OrgUserDTO defaultUser = new OrgUserDTO();
+        defaultUser.setUserId("default");
+        defaultUser.setName("默认用户");
+        defaultUser.setRole("user");
+        defaultUser.setActive(true);
+        return defaultUser;
     }
 
     public List<OrgUserDTO> getAllUsers() {
@@ -220,10 +290,90 @@ public class OrgWebAdapter {
         log.info("Added user: {}", user.getUserId());
     }
 
+    public void updateUser(OrgUserDTO user) {
+        users.put(user.getUserId(), user);
+        storage.put("users", user.getUserId(), user);
+        log.info("Updated user: {}", user.getUserId());
+    }
+
+    public boolean deleteUser(String userId) {
+        OrgUserDTO removed = users.remove(userId);
+        if (removed != null) {
+            storage.remove("users", userId);
+            log.info("Deleted user: {}", userId);
+            return true;
+        }
+        return false;
+    }
+
     public void addDepartment(OrgDepartmentDTO department) {
         departments.put(department.getDepartmentId(), department);
         storage.put("departments", department.getDepartmentId(), department);
         log.info("Added department: {}", department.getDepartmentId());
+    }
+
+    public void updateDepartment(OrgDepartmentDTO department) {
+        departments.put(department.getDepartmentId(), department);
+        storage.put("departments", department.getDepartmentId(), department);
+        log.info("Updated department: {}", department.getDepartmentId());
+    }
+
+    public boolean deleteDepartment(String departmentId) {
+        OrgDepartmentDTO removed = departments.remove(departmentId);
+        if (removed != null) {
+            storage.remove("departments", departmentId);
+            log.info("Deleted department: {}", departmentId);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean addMemberToDepartment(String departmentId, String userId) {
+        OrgDepartmentDTO dept = departments.get(departmentId);
+        OrgUserDTO user = users.get(userId);
+        
+        if (dept == null || user == null) {
+            return false;
+        }
+        
+        List<String> memberIds = dept.getMemberIds();
+        if (memberIds == null) {
+            memberIds = new ArrayList<>();
+        }
+        
+        if (!memberIds.contains(userId)) {
+            memberIds.add(userId);
+            dept.setMemberIds(memberIds);
+            user.setDepartmentId(departmentId);
+            
+            storage.put("departments", departmentId, dept);
+            storage.put("users", userId, user);
+            log.info("Added member {} to department {}", userId, departmentId);
+        }
+        
+        return true;
+    }
+
+    public boolean removeMemberFromDepartment(String departmentId, String userId) {
+        OrgDepartmentDTO dept = departments.get(departmentId);
+        OrgUserDTO user = users.get(userId);
+        
+        if (dept == null || user == null) {
+            return false;
+        }
+        
+        List<String> memberIds = dept.getMemberIds();
+        if (memberIds != null && memberIds.contains(userId)) {
+            memberIds.remove(userId);
+            dept.setMemberIds(memberIds);
+            user.setDepartmentId(null);
+            
+            storage.put("departments", departmentId, dept);
+            storage.put("users", userId, user);
+            log.info("Removed member {} from department {}", userId, departmentId);
+        }
+        
+        return true;
     }
 
     public boolean isUserInRole(String userId, String role) {
@@ -233,5 +383,13 @@ public class OrgWebAdapter {
 
     public boolean isUserManager(String userId) {
         return isUserInRole(userId, "manager");
+    }
+    
+    public int getUserSceneCount(String userId) {
+        return 0;
+    }
+    
+    public int getUserCapabilityCount(String userId) {
+        return 0;
     }
 }

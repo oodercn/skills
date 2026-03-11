@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-openai
+  name: OpenAI LLM服务
+  version: "2.0.0"
+  description: "OpenAI API服务，支持GPT系列模型"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: openai
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x32
+        name: LLM_OPENAI
+        description: "OpenAI API"
+    optional: []
+  
+  tags:
+    - llm
+    - openai
+    - ai
+    - gpt
+  
+  dependencies: []

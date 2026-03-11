@@ -370,11 +370,9 @@
      * @private
      */
     _bindThemeToggle() {
-      const themeToggle = document.querySelector('[data-nx-theme-toggle]');
-      if (themeToggle && typeof NX !== 'undefined' && NX.theme) {
-        themeToggle.addEventListener('click', () => {
-          NX.theme.toggle();
-        });
+      // NX.theme.init() 已经绑定了所有按钮，这里只需要确保初始化被调用
+      if (typeof NX !== 'undefined' && NX.theme && typeof NX.theme.init === 'function') {
+        NX.theme.init();
       }
     },
     
@@ -383,11 +381,9 @@
      * @private
      */
     _bindSidebarToggle() {
-      const sidebarToggle = document.querySelector('[data-nx-sidebar-toggle]');
-      if (sidebarToggle && typeof NX !== 'undefined' && NX.sidebar) {
-        sidebarToggle.addEventListener('click', () => {
-          NX.sidebar.toggle();
-        });
+      // NX.sidebar.init() 已经绑定了所有按钮，这里只需要确保初始化被调用
+      if (typeof NX !== 'undefined' && NX.sidebar && typeof NX.sidebar.init === 'function') {
+        NX.sidebar.init();
       }
     },
     

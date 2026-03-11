@@ -1,0 +1,32 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-market
+  name: 技能市场服务
+  version: "0.7.3"
+  description: "技能市场服务，提供技能发布、搜索、安装、更新能力"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: SYSTEM_TOOLS
+  subCategory: market
+  category: SERVICE
+  capabilityCategory: util
+  
+  capabilityAddresses:
+    required:
+      - address: 0xF3
+        name: UTIL_MARKET
+        description: "技能市场"
+    optional: []
+  
+  tags:
+    - market
+    - skill
+    - install
+    - update
+  
+  dependencies:
+    - skill-capability

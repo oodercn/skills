@@ -5,7 +5,7 @@ import net.ooder.skill.scene.dto.PageResult;
 import net.ooder.skill.scene.dto.SceneDefinitionDTO;
 import net.ooder.skill.scene.dto.SceneStateDTO;
 import net.ooder.skill.scene.dto.scene.SceneSnapshotDTO;
-import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.service.SceneService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

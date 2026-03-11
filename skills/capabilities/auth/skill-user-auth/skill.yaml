@@ -1,0 +1,152 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-user-auth
+  name: 用户认证服务
+  version: 2.3
+  description: 用户认证服务 - 支持多种认证方式(密码/Token/OAuth)、会话管理、Token刷新
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-user-auth
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - authentication
+    - user
+    - login
+    - token
+    - session
+    - oauth
+
+spec:
+  type: service-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x10
+    category: AUTH
+    code: AUTH_LOCAL
+    operations: [login, logout, validate, refresh, session-manage]
+  
+  supportedSceneTypes:
+    - user-auth
+    - scene-activation
+    - org-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.user.auth.UserAuthSkillApplication
+  
+  providedInterfaces:
+    - id: user-authentication
+      version: "1.0"
+      description: "用户认证接口"
+    - id: token-management
+      version: "1.0"
+      description: "Token管理接口"
+  
+  capabilities:
+    - id: user-auth
+      name: 用户认证
+      description: 用户认证登录
+      category: authentication
+    - id: token-validate
+      name: Token验证
+      description: Token验证
+      category: authentication
+    - id: token-refresh
+      name: Token刷新
+      description: Token刷新
+      category: authentication
+    - id: session-manage
+      name: 会话管理
+      description: 会话管理
+      category: session
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - user-auth
+        - token-validate
+        - token-refresh
+        - session-manage
+  
+  dependencies: []
+  
+  config:
+    optional:
+      - name: AUTH_TOKEN_EXPIRE
+        type: integer
+        default: 3600
+        description: Token过期时间(秒)
+      - name: AUTH_REFRESH_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用Token刷新
+      - name: AUTH_REFRESH_EXPIRE
+        type: integer
+        default: 604800
+        description: Refresh Token过期时间(秒)
+      - name: AUTH_MAX_SESSIONS
+        type: integer
+        default: 5
+        description: 最大会话数
+  
+  endpoints:
+    - path: /api/auth/login
+      method: POST
+      description: 用户登录
+      capability: user-auth
+    - path: /api/auth/logout
+      method: POST
+      description: 用户登出
+      capability: user-auth
+    - path: /api/auth/validate
+      method: POST
+      description: 验证Token
+      capability: token-validate
+    - path: /api/auth/refresh
+      method: POST
+      description: 刷新Token
+      capability: token-refresh
+    - path: /api/session/info
+      method: GET
+      description: 获取会话信息
+      capability: session-manage
+    - path: /api/session/list
+      method: GET
+      description: 获取会话列表
+      capability: session-manage
+    - path: /api/session/{sessionId}
+      method: DELETE
+      description: 终止会话
+      capability: session-manage
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

@@ -1,0 +1,143 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-rag
+  name: RAG检索增强
+  version: 2.3
+  description: RAG检索增强生成服务 - 支持关键词检索、语义检索、混合检索策略，知识库注册与Prompt构建
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - rag
+    - retrieval
+    - semantic
+    - search
+    - hybrid
+    - prompt
+
+spec:
+  type: service-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x33
+    category: KNOW
+    code: KNOW_RAG
+    operations: [retrieve, augment, generate, hybrid-search]
+  
+  supportedSceneTypes:
+    - knowledge-qa
+    - document-assistant
+    - meeting-minutes
+    - project-knowledge
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 3s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 15
+  
+  dependencies:
+    - id: skill-knowledge-base
+      version: ">=2.3"
+      required: false
+      description: "知识库服务（可选，用于知识库注册）"
+    - id: skill-vector-sqlite
+      version: ">=2.3"
+      required: false
+      description: "向量存储服务（可选，用于语义检索）"
+  
+  providedInterfaces:
+    - id: rag-retrieval
+      version: "1.0"
+      description: "RAG检索接口"
+    - id: prompt-building
+      version: "1.0"
+      description: "Prompt构建接口"
+    - id: kb-registration
+      version: "1.0"
+      description: "知识库注册接口"
+  
+  capabilities:
+    - id: retrieval
+      name: 文档检索
+      description: 关键词、语义、混合检索
+      category: ai
+    - id: prompt-building
+      name: Prompt构建
+      description: 构建带检索上下文的Prompt
+      category: ai
+    - id: kb-registration
+      name: 知识库注册
+      description: 注册外部知识库
+      category: service
+  
+  endpoints:
+    - path: /api/v1/rag/retrieve
+      method: POST
+      description: 执行检索
+      capability: retrieval
+    - path: /api/v1/rag/prompt
+      method: POST
+      description: 构建Prompt
+      capability: prompt-building
+    - path: /api/v1/rag/prompt/custom
+      method: POST
+      description: 自定义Prompt构建
+      capability: prompt-building
+    - path: /api/v1/rag/kb/{kbId}/register
+      method: POST
+      description: 注册知识库
+      capability: kb-registration
+    - path: /api/v1/rag/kb/{kbId}
+      method: DELETE
+      description: 注销知识库
+      capability: kb-registration
+  
+  strategies:
+    - KEYWORD
+    - SEMANTIC
+    - HYBRID
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  config:
+    optional:
+      - name: DEFAULT_STRATEGY
+        type: string
+        default: "HYBRID"
+        description: 默认检索策略
+      - name: MAX_RESULTS
+        type: integer
+        default: 10
+        description: 最大返回结果数
+      - name: EMBEDDING_MODEL
+        type: string
+        default: "text-embedding-3-small"
+        description: 语义检索嵌入模型
+      - name: SCORE_THRESHOLD
+        type: number
+        default: 0.7
+        description: 相似度阈值
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

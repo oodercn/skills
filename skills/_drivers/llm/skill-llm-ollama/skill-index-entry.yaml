@@ -1,0 +1,32 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-ollama
+  name: Ollama LLM服务
+  version: "2.0.0"
+  description: "基于Ollama的本地LLM服务，支持多种开源模型"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: ollama
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x31
+        name: LLM_OLLAMA
+        description: "Ollama本地模型"
+        fallback: 0x32
+    optional: []
+  
+  tags:
+    - llm
+    - ollama
+    - ai
+    - local-model
+  
+  dependencies: []

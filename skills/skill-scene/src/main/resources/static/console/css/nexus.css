@@ -687,6 +687,40 @@ ul, ol {
   box-shadow: 0 0 0 3px var(--nx-danger-light);
 }
 
+/* 选择框 */
+.nx-select {
+  width: 100%;
+  padding: var(--nx-space-2) var(--nx-space-3);
+  font-size: var(--nx-text-sm);
+  color: var(--nx-text-primary);
+  background: var(--nx-bg-input);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  transition: all var(--nx-transition-fast);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 12px center;
+  padding-right: 36px;
+}
+
+.nx-select:focus {
+  outline: none;
+  border-color: var(--nx-primary);
+  box-shadow: 0 0 0 3px var(--nx-primary-light);
+}
+
+.nx-select:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.nx-select option {
+  background: var(--nx-bg-card);
+  color: var(--nx-text-primary);
+}
+
 /* 开关 */
 .nx-switch {
   position: relative;
@@ -3025,4 +3059,234 @@ ul, ol {
 textarea.form-control {
   resize: vertical;
   min-height: 80px;
+}
+
+/* ============================================
+   15. 页面头部工具栏组件
+   ============================================ */
+
+.nx-page__header {
+  height: 64px;
+  padding: 0 var(--nx-space-6);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: var(--nx-bg-card);
+  border-bottom: 1px solid var(--nx-border);
+  position: sticky;
+  top: 0;
+  z-index: var(--nx-z-sticky);
+}
+
+.nx-page__title {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nx-space-1);
+}
+
+.nx-page__title h1 {
+  margin: 0;
+  font-size: var(--nx-text-lg);
+  font-weight: var(--nx-font-semibold);
+  color: var(--nx-text-primary);
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-2);
+}
+
+.nx-page__title h1 i {
+  color: var(--nx-primary);
+}
+
+.nx-page__title p {
+  margin: 0;
+  font-size: var(--nx-text-xs);
+  color: var(--nx-text-secondary);
+}
+
+.nx-page__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-3);
+}
+
+/* 用户菜单 */
+.nx-page__user-menu {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-2);
+  padding: var(--nx-space-2) var(--nx-space-3);
+  background: var(--nx-bg-elevated);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius-full);
+  cursor: pointer;
+  transition: all var(--nx-transition-fast);
+}
+
+.nx-page__user-menu:hover {
+  background: var(--nx-bg-hover);
+  border-color: var(--nx-border-hover);
+}
+
+.nx-page__user-avatar {
+  width: 32px;
+  height: 32px;
+  background: var(--nx-primary);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: var(--nx-text-sm);
+  font-weight: var(--nx-font-semibold);
+}
+
+.nx-page__user-name {
+  font-size: var(--nx-text-sm);
+  font-weight: var(--nx-font-medium);
+  color: var(--nx-text-primary);
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+/* 下拉菜单 */
+.nx-page__dropdown-menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 180px;
+  background: var(--nx-bg-card);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  box-shadow: var(--nx-shadow-lg);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: all var(--nx-transition-fast);
+  z-index: var(--nx-z-dropdown);
+}
+
+.nx-page__dropdown-menu--open {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nx-page__dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-3);
+  padding: var(--nx-space-3) var(--nx-space-4);
+  font-size: var(--nx-text-sm);
+  color: var(--nx-text-primary);
+  cursor: pointer;
+  transition: background var(--nx-transition-fast);
+}
+
+.nx-page__dropdown-item:first-child {
+  border-radius: var(--nx-radius) var(--nx-radius) 0 0;
+}
+
+.nx-page__dropdown-item:last-child {
+  border-radius: 0 0 var(--nx-radius) var(--nx-radius);
+}
+
+.nx-page__dropdown-item:hover {
+  background: var(--nx-bg-hover);
+}
+
+.nx-page__dropdown-item i {
+  font-size: 16px;
+  color: var(--nx-text-secondary);
+}
+
+.nx-page__dropdown-item--danger {
+  color: var(--nx-danger);
+  border-top: 1px solid var(--nx-border);
+}
+
+.nx-page__dropdown-item--danger i {
+  color: var(--nx-danger);
+}
+
+/* 主题切换按钮 */
+.nx-theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: var(--nx-bg-elevated);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  cursor: pointer;
+  transition: all var(--nx-transition-fast);
+  color: var(--nx-text-secondary);
+}
+
+.nx-theme-toggle:hover {
+  background: var(--nx-bg-hover);
+  color: var(--nx-text-primary);
+}
+
+.nx-theme-toggle i {
+  font-size: 18px;
+}
+
+/* 侧边栏折叠按钮 */
+.nx-sidebar-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  background: transparent;
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  cursor: pointer;
+  transition: all var(--nx-transition-fast);
+  color: var(--nx-text-secondary);
+}
+
+.nx-sidebar-toggle:hover {
+  background: var(--nx-bg-hover);
+  color: var(--nx-text-primary);
+}
+
+.nx-sidebar-toggle i {
+  font-size: 18px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .nx-page__header {
+    height: 56px;
+    padding: 0 var(--nx-space-4);
+  }
+  
+  .nx-page__title h1 {
+    font-size: var(--nx-text-base);
+  }
+  
+  .nx-page__title p {
+    display: none;
+  }
+  
+  .nx-page__user-name {
+    display: none;
+  }
+  
+  .nx-page__actions {
+    gap: var(--nx-space-2);
+  }
+  
+  .nx-page__actions .nx-btn span {
+    display: none;
+  }
+  
+  .nx-page__actions .nx-btn i {
+    margin: 0;
+  }
 }

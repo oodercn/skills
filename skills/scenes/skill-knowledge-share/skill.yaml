@@ -1,0 +1,225 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-knowledge-share
+  name: 知识共享管理
+  version: 1.0.0
+  description: 知识库权限管理和分享场景能力，支持部门内和跨部门的知识共享
+  author: Ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - knowledge
+    - share
+    - permission
+    - collaboration
+  category: ass
+  sceneCategory: ass
+
+spec:
+  type: scene-skill
+  category: ass
+  
+  classification:
+    category: ass
+    categoryName: 自驱系统场景
+    mainFirst: true
+    businessSemanticsScore: 6
+    detectedAt: "2026-03-06T00:00:00Z"
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies:
+    - id: skill-knowledge-base
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "知识库核心服务"
+      capabilities:
+        - knowledge-base
+        
+    - id: skill-user-auth
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "用户认证服务"
+      capabilities:
+        - user-auth
+        - permission-check
+
+  sceneCapabilities:
+    - id: scene-knowledge-share
+      name: 知识共享管理场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [manage-permission, create-share, collaboration]
+          - checkDependencies: [skill-knowledge-base, skill-user-auth]
+          
+        selfStart:
+          - initCapabilities: [manage-permission, create-share, collaboration]
+          
+        selfDrive:
+          scheduleRules:
+            - trigger: "0 0 * * *"
+              action: cleanup-expired-shares
+              
+          capabilityChains:
+            cleanup-expired-shares:
+              - capability: manage-permission
+                input:
+                  action: cleanup-expired
+
+      capabilities:
+        - manage-permission
+        - create-share
+        - collaboration
+        
+      collaborativeCapabilities:
+        - capabilityId: notify
+          role: PROVIDER
+          interface: notification-service
+          autoStart: false
+          optional: true
+
+  capabilities:
+    - id: manage-permission
+      name: 权限管理
+      description: 知识库权限设置和管理
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+          action:
+            type: string
+            enum: [grant, revoke, check, list]
+          userId:
+            type: string
+          permission:
+            type: string
+            enum: [READ, WRITE, ADMIN, OWNER]
+      outputSchema:
+        type: object
+        properties:
+          success:
+            type: boolean
+          permission:
+            type: string
+            
+    - id: create-share
+      name: 创建分享
+      description: 生成知识库分享链接
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+          ownerId:
+            type: string
+          expireDays:
+            type: integer
+          password:
+            type: string
+          maxAccessCount:
+            type: integer
+      outputSchema:
+        type: object
+        properties:
+          shareCode:
+            type: string
+          shareLink:
+            type: string
+          expiresAt:
+            type: string
+            
+    - id: collaboration
+      name: 协作功能
+      description: 多人协同编辑和版本控制
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+          action:
+            type: string
+            enum: [start, stop, status]
+      outputSchema:
+        type: object
+        properties:
+          status:
+            type: string
+          participants:
+            type: array
+
+  capabilityBindings:
+    - sceneCapabilityType: knowledge-share
+      autoBind: true
+      capabilities:
+        - manage-permission
+        - create-share
+        - collaboration
+
+  endpoints:
+    - path: /api/v1/knowledge-share/permission
+      method: POST
+      description: 权限管理接口
+      capability: manage-permission
+      
+    - path: /api/v1/knowledge-share/permission/check
+      method: GET
+      description: 检查权限
+      capability: manage-permission
+      
+    - path: /api/v1/knowledge-share/share
+      method: POST
+      description: 创建分享
+      capability: create-share
+      
+    - path: /api/v1/knowledge-share/share/{shareCode}
+      method: GET
+      description: 验证分享
+      capability: create-share
+      
+    - path: /api/v1/knowledge-share/collaboration
+      method: POST
+      description: 协作管理
+      capability: collaboration
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.knowledge.share.KnowledgeShareApplication
+
+  config:
+    optional:
+      - name: SHARE_DEFAULT_EXPIRE_DAYS
+        type: integer
+        default: 7
+        description: 默认分享有效期（天）
+      - name: SHARE_MAX_ACCESS_COUNT
+        type: integer
+        default: 100
+        description: 默认最大访问次数
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

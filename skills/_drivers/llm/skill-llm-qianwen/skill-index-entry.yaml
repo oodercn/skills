@@ -1,0 +1,31 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-qianwen
+  name: 通义千问LLM服务
+  version: "2.0.0"
+  description: "阿里云通义千问API服务"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: qianwen
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x33
+        name: LLM_QIANWEN
+        description: "通义千问"
+    optional: []
+  
+  tags:
+    - llm
+    - qianwen
+    - ai
+    - aliyun
+  
+  dependencies: []

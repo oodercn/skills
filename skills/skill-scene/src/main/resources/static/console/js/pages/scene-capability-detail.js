@@ -63,7 +63,7 @@
                     var capabilities = [];
                     if (result.status === 'success' && result.data) {
                         capabilities = result.data.capabilities || [];
-                    } else if (result.code === 200 && result.data) {
+                    } else if (result.status === 'success' && result.data) {
                         capabilities = result.data.capabilities || [];
                     }
                     
@@ -357,7 +357,7 @@
 
         ApiClient.post('/api/v1/discovery/install', { skillId: capability.id, source: capability.source || 'GITEE' })
             .then(function(result) {
-                if ((result.status === 'success' || result.code === 200) && result.data) {
+                if ((result.status === 'success') && result.data) {
                     capability.status = 'installed';
                     SceneCapabilityDetail.renderCapability();
                     SceneCapabilityDetail.loadLifecycleState();
@@ -393,7 +393,7 @@
         
         ApiClient.post('/api/v1/scene-capabilities/' + capability.id + '/pause')
             .then(function(result) {
-                if (result.status === 'success' || result.code === 200) {
+                if (result.status === 'success') {
                     alert('场景已暂停');
                     SceneCapabilityDetail.loadLifecycleState();
                 } else {
@@ -410,7 +410,7 @@
         
         ApiClient.post('/api/v1/scene-capabilities/' + capability.id + '/resume')
             .then(function(result) {
-                if (result.status === 'success' || result.code === 200) {
+                if (result.status === 'success') {
                     alert('场景已恢复');
                     SceneCapabilityDetail.loadLifecycleState();
                 } else {
@@ -430,7 +430,7 @@
         
         ApiClient.post('/api/v1/scene-capabilities/' + capability.id + '/trigger', { action: action })
             .then(function(result) {
-                if (result.status === 'success' || result.code === 200) {
+                if (result.status === 'success') {
                     alert('场景已触发执行');
                     SceneCapabilityDetail.loadLifecycleState();
                 } else {
@@ -448,7 +448,7 @@
         
         ApiClient.post('/api/v1/scene-capabilities/' + capability.id + '/archive')
             .then(function(result) {
-                if (result.status === 'success' || result.code === 200) {
+                if (result.status === 'success') {
                     alert('场景已归档');
                     window.history.back();
                 } else {

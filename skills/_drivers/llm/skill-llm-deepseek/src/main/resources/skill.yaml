@@ -1,0 +1,149 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-deepseek
+  name: DeepSeek LLM Provider
+  version: 2.3
+  description: DeepSeek LLM Provider - 支持deepseek-chat、deepseek-coder、deepseek-reasoner等模型，提供对话、代码生成、推理能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - deepseek
+    - coder
+    - reasoning
+    - embedding
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x2B
+    category: LLM
+    code: LLM_DEEPSEEK
+    operations: [chat, completion, code-generation, reasoning, streaming]
+  
+  providerType: llm
+  
+  supportedSceneTypes:
+    - llm-chat
+    - knowledge-qa
+    - document-assistant
+    - code-assistant
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies:
+    - id: llm-sdk
+      version: ">=2.3"
+      required: true
+      description: "LLM SDK"
+  
+  providedInterfaces:
+    - id: llm-provider
+      version: "1.0"
+      description: "LLM Provider接口"
+  
+  supportedModels:
+    - id: deepseek-chat
+      name: DeepSeek Chat
+      type: chat
+      maxTokens: 64000
+      supportsFunctionCalling: true
+      supportsStreaming: true
+    - id: deepseek-coder
+      name: DeepSeek Coder
+      type: chat
+      maxTokens: 16384
+      supportsFunctionCalling: true
+      supportsStreaming: true
+      specialty: code
+    - id: deepseek-reasoner
+      name: DeepSeek Reasoner
+      type: chat
+      maxTokens: 64000
+      supportsFunctionCalling: true
+      supportsStreaming: true
+      specialty: reasoning
+  
+  capabilities:
+    - id: chat-completion
+      name: 对话补全
+      description: 支持多轮对话补全
+      category: ai
+    - id: code-generation
+      name: 代码生成
+      description: 代码生成与补全
+      category: ai
+    - id: reasoning
+      name: 推理能力
+      description: 复杂推理任务
+      category: ai
+    - id: function-calling
+      name: 函数调用
+      description: 支持Function Calling
+      category: ai
+    - id: streaming
+      name: 流式输出
+      description: 支持SSE流式输出
+      category: ai
+  
+  endpoints:
+    - path: /api/llm/chat
+      method: POST
+      description: 对话补全
+      capability: chat-completion
+    - path: /api/llm/chat/stream
+      method: POST
+      description: 流式对话
+      capability: streaming
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    
+  config:
+    required:
+      - name: DEEPSEEK_API_KEY
+        type: string
+        description: DeepSeek API Key
+        secret: true
+    optional:
+      - name: DEEPSEEK_BASE_URL
+        type: string
+        default: "https://api.deepseek.com/v1"
+        description: API基础URL
+      - name: DEFAULT_MODEL
+        type: string
+        default: "deepseek-chat"
+        description: 默认模型
+      - name: TIMEOUT
+        type: integer
+        default: 60000
+        description: 请求超时(毫秒)
+      - name: MAX_RETRIES
+        type: integer
+        default: 3
+        description: 最大重试次数
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

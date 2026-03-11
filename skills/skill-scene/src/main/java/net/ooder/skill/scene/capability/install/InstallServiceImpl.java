@@ -1,7 +1,11 @@
 package net.ooder.skill.scene.capability.install;
 
+import net.ooder.skill.scene.capability.model.Capability;
+import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.notification.SceneNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -15,6 +19,12 @@ public class InstallServiceImpl implements InstallService {
 
     private Map<String, InstallConfig> installs = new ConcurrentHashMap<String, InstallConfig>();
     private Map<String, InstallProgress> progressMap = new ConcurrentHashMap<String, InstallProgress>();
+
+    @Autowired(required = false)
+    private CapabilityService capabilityService;
+
+    @Autowired(required = false)
+    private SceneNotificationService notificationService;
 
     @Override
     public InstallConfig createInstall(CreateInstallRequest request) {
@@ -42,6 +52,11 @@ public class InstallServiceImpl implements InstallService {
             config.setParticipants(participants);
         }
         
+        determineSceneTypeAndVisibility(config, request.getCapabilityId());
+        
+        List<String> nextSteps = determineNextSteps(config);
+        config.setNextSteps(nextSteps);
+        
         installs.put(installId, config);
         
         InstallProgress progress = new InstallProgress();
@@ -50,7 +65,76 @@ public class InstallServiceImpl implements InstallService {
         progress.setStatus(InstallConfig.InstallStatus.PENDING);
         progressMap.put(installId, progress);
         
+        log.info("[createInstall] Created install: {} with sceneType={}, visibility={}, nextSteps={}", 
+            installId, config.getSceneType(), config.getVisibility(), nextSteps);
+        
         return config;
+    }
+    
+    private void determineSceneTypeAndVisibility(InstallConfig config, String capabilityId) {
+        if (capabilityService == null) {
+            config.setSkillForm("STANDALONE");
+            config.setVisibility("public");
+            return;
+        }
+        
+        try {
+            net.ooder.skill.scene.capability.model.Capability cap = capabilityService.findById(capabilityId);
+            if (cap == null) {
+                config.setSkillForm("STANDALONE");
+                config.setVisibility("public");
+                log.warn("[determineSceneTypeAndVisibility] Capability not found: {}", capabilityId);
+                return;
+            }
+            
+            config.setSkillForm(cap.getSkillForm() != null ? cap.getSkillForm().getCode() : "PROVIDER");
+            config.setSceneType(cap.getSceneType());
+            config.setVisibility(cap.getVisibility() != null ? cap.getVisibility() : "public");
+            
+            log.info("[determineSceneTypeAndVisibility] Determined: skillForm={}, sceneType={}, visibility={}", 
+                config.getSkillForm(), config.getSceneType(), config.getVisibility());
+                
+        } catch (Exception e) {
+            log.error("[determineSceneTypeAndVisibility] Failed to determine scene type: {}", e.getMessage());
+            config.setSkillForm("PROVIDER");
+            config.setVisibility("public");
+        }
+    }
+    
+    private List<String> determineNextSteps(InstallConfig config) {
+        List<String> steps = new ArrayList<>();
+        
+        String skillForm = config.getSkillForm();
+        String sceneType = config.getSceneType();
+        String visibility = config.getVisibility();
+        
+        if (!"SCENE".equals(skillForm)) {
+            steps.add("安装独立能力");
+            steps.add("完成");
+            return steps;
+        }
+        
+        if ("AUTO".equals(sceneType)) {
+            if ("internal".equals(visibility)) {
+                steps.add("自动安装依赖");
+                steps.add("自动激活");
+                steps.add("后台运行");
+            } else {
+                steps.add("安装依赖能力");
+                steps.add("等待用户确认激活");
+                steps.add("定时调度执行");
+            }
+        } else if ("TRIGGER".equals(sceneType)) {
+            steps.add("安装依赖能力");
+            steps.add("配置触发条件");
+            steps.add("等待触发事件");
+            steps.add("触发后执行");
+        } else {
+            steps.add("安装能力");
+            steps.add("完成配置");
+        }
+        
+        return steps;
     }
 
     @Override
@@ -121,44 +205,113 @@ public class InstallServiceImpl implements InstallService {
             InstallProgress progress = progressMap.get(installId);
             
             if (config == null) {
+                log.error("[executeInstall] Install config not found: {}", installId);
                 return null;
             }
             
             config.setStatus(InstallConfig.InstallStatus.INSTALLING);
             if (progress != null) {
                 progress.setStatus(InstallConfig.InstallStatus.INSTALLING);
-                progress.setCurrentAction("正在安装依赖...");
-                progress.setProgress(20);
+                progress.setCurrentAction("正在解析依赖...");
+                progress.setProgress(5);
             }
             
+            net.ooder.skill.scene.capability.model.Capability capability = null;
             try {
-                Thread.sleep(1000);
+                if (capabilityService != null) {
+                    capability = capabilityService.findById(config.getCapabilityId());
+                }
                 
-                List<InstallConfig.DependencyInfo> deps = new ArrayList<InstallConfig.DependencyInfo>();
-                InstallConfig.DependencyInfo dep1 = new InstallConfig.DependencyInfo();
-                dep1.setCapabilityId("kb-management");
-                dep1.setName("知识库管理");
-                dep1.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
-                deps.add(dep1);
+                if (capability == null) {
+                    log.warn("[executeInstall] Capability not found, using mock data");
+                    capability = createMockCapability(config.getCapabilityId());
+                }
                 
-                InstallConfig.DependencyInfo dep2 = new InstallConfig.DependencyInfo();
-                dep2.setCapabilityId("kb-search");
-                dep2.setName("知识检索");
-                dep2.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
-                deps.add(dep2);
+                List<String> dependencyIds = capability.getDependencies();
+                if (dependencyIds == null || dependencyIds.isEmpty()) {
+                    dependencyIds = capability.getCapabilities();
+                }
                 
-                config.setDependencies(deps);
-                config.setStatus(InstallConfig.InstallStatus.INSTALLED);
+                List<InstallConfig.DependencyInfo> installedDeps = new ArrayList<>();
+                List<String> installedCapabilityIds = new ArrayList<>();
+                
+                if (dependencyIds != null && !dependencyIds.isEmpty()) {
+                    int totalDeps = dependencyIds.size();
+                    int currentDep = 0;
+                    
+                    for (String depId : dependencyIds) {
+                        currentDep++;
+                        int progressPercent = 10 + (currentDep * 80 / totalDeps);
+                        
+                        if (progress != null) {
+                            progress.setCurrentAction("正在安装依赖: " + depId);
+                            progress.setProgress(progressPercent);
+                        }
+                        
+                        InstallConfig.DependencyInfo depInfo = installDependency(depId);
+                        installedDeps.add(depInfo);
+                        
+                        if (depInfo.getStatus() == InstallConfig.DependencyInfo.DependencyStatus.INSTALLED) {
+                            installedCapabilityIds.add(depId);
+                        }
+                    }
+                }
+                
+                if (config.getOptionalCapabilities() != null) {
+                    for (String optCapId : config.getOptionalCapabilities()) {
+                        InstallConfig.DependencyInfo optDepInfo = installDependency(optCapId);
+                        installedDeps.add(optDepInfo);
+                        
+                        if (optDepInfo.getStatus() == InstallConfig.DependencyInfo.DependencyStatus.INSTALLED) {
+                            installedCapabilityIds.add(optCapId);
+                        }
+                    }
+                }
+                
+                config.setDependencies(installedDeps);
+                config.setInstalledCapabilities(installedCapabilityIds);
+                
+                if (capabilityService != null) {
+                    capabilityService.updateInstallStatus(config.getCapabilityId(), true);
+                }
+                
+                InstallConfig.InstallStatus targetStatus = determinePostInstallStatus(config);
+                config.setStatus(targetStatus);
+                
+                log.info("[executeInstall] Install completed with status: {} (sceneType={}, visibility={})", 
+                    targetStatus, config.getSceneType(), config.getVisibility());
                 
                 if (progress != null) {
                     progress.setStatus(InstallConfig.InstallStatus.INSTALLED);
                     progress.setProgress(100);
                     progress.setCurrentAction("安装完成");
-                    progress.setDependencies(deps);
-                    progress.setInstalledCapabilities(Arrays.asList("kb-management", "kb-search"));
-                    progress.setMessage("安装成功");
+                    progress.setDependencies(installedDeps);
+                    progress.setInstalledCapabilities(installedCapabilityIds);
+                    progress.setMessage("安装成功，共安装 " + installedCapabilityIds.size() + " 个依赖");
                 }
-            } catch (InterruptedException e) {
+                
+                if (notificationService != null && config.getParticipants() != null) {
+                    try {
+                        String leaderId = config.getParticipants().getLeader() != null 
+                            ? config.getParticipants().getLeader().getUserId() : null;
+                        if (leaderId != null) {
+                            notificationService.notifyInstallComplete(
+                                leaderId, 
+                                capability.getName(), 
+                                true, 
+                                "共安装 " + installedCapabilityIds.size() + " 个依赖"
+                            );
+                        }
+                    } catch (Exception e) {
+                        log.error("[executeInstall] Failed to send notification: {}", e.getMessage());
+                    }
+                }
+                
+                log.info("[executeInstall] Install completed successfully: {}", installId);
+                
+            } catch (Exception e) {
+                log.error("[executeInstall] Install failed: {}", e.getMessage());
+                
                 config.setStatus(InstallConfig.InstallStatus.FAILED);
                 if (progress != null) {
                     progress.setStatus(InstallConfig.InstallStatus.FAILED);
@@ -168,6 +321,84 @@ public class InstallServiceImpl implements InstallService {
             
             return config;
         });
+    }
+    
+    private InstallConfig.DependencyInfo installDependency(String capabilityId) {
+        InstallConfig.DependencyInfo depInfo = new InstallConfig.DependencyInfo();
+        depInfo.setCapabilityId(capabilityId);
+        
+        try {
+            if (capabilityService != null) {
+                net.ooder.skill.scene.capability.model.Capability dep = capabilityService.findById(capabilityId);
+                
+                if (dep != null) {
+                    depInfo.setName(dep.getName());
+                    
+                    if (dep.isInstalled()) {
+                        depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
+                        depInfo.setMessage("已安装");
+                        log.info("[installDependency] Dependency already installed: {}", capabilityId);
+                        return depInfo;
+                    }
+                    
+                    dep.setInstalled(true);
+                    capabilityService.update(dep);
+                    
+                    depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
+                    depInfo.setMessage("安装成功");
+                    log.info("[installDependency] Dependency installed: {}", capabilityId);
+                } else {
+                    depInfo.setName(capabilityId);
+                    depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.SKIPPED);
+                    depInfo.setMessage("能力不存在，已跳过");
+                    log.warn("[installDependency] Dependency not found: {}", capabilityId);
+                }
+            } else {
+                depInfo.setName(capabilityId);
+                depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
+                depInfo.setMessage("模拟安装成功");
+                log.info("[installDependency] Mock install for: {}", capabilityId);
+            }
+        } catch (Exception e) {
+            depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.FAILED);
+            depInfo.setMessage("安装失败: " + e.getMessage());
+            log.error("[installDependency] Failed to install dependency {}: {}", capabilityId, e.getMessage());
+        }
+        
+        return depInfo;
+    }
+    
+    private net.ooder.skill.scene.capability.model.Capability createMockCapability(String capabilityId) {
+        net.ooder.skill.scene.capability.model.Capability cap = new net.ooder.skill.scene.capability.model.Capability();
+        cap.setCapabilityId(capabilityId);
+        cap.setName(capabilityId);
+        cap.setDependencies(Arrays.asList("kb-management", "kb-search"));
+        return cap;
+    }
+    
+    private InstallConfig.InstallStatus determinePostInstallStatus(InstallConfig config) {
+        String skillForm = config.getSkillForm();
+        String sceneType = config.getSceneType();
+        String visibility = config.getVisibility();
+        
+        if (!"SCENE".equals(skillForm)) {
+            return InstallConfig.InstallStatus.INSTALLED;
+        }
+        
+        if ("AUTO".equals(sceneType)) {
+            if ("internal".equals(visibility)) {
+                log.info("[determinePostInstallStatus] AUTO+internal: auto-activating");
+                return InstallConfig.InstallStatus.RUNNING;
+            } else {
+                log.info("[determinePostInstallStatus] AUTO+public: waiting for user activation");
+                return InstallConfig.InstallStatus.SCHEDULED;
+            }
+        } else if ("TRIGGER".equals(sceneType)) {
+            log.info("[determinePostInstallStatus] TRIGGER: waiting for trigger");
+            return InstallConfig.InstallStatus.PENDING;
+        }
+        
+        return InstallConfig.InstallStatus.INSTALLED;
     }
 
     @Override
@@ -220,6 +451,122 @@ public class InstallServiceImpl implements InstallService {
                 result.add(config);
             }
         }
+        return result;
+    }
+
+    @Override
+    public CompletableFuture<RollbackResult> rollbackInstall(String installId) {
+        log.info("[rollbackInstall] Rolling back install: {}", installId);
+        
+        return CompletableFuture.supplyAsync(() -> {
+            RollbackResult result = new RollbackResult();
+            result.setInstallId(installId);
+            result.setRollbackTime(System.currentTimeMillis());
+            
+            InstallConfig config = installs.get(installId);
+            if (config == null) {
+                result.setSuccess(false);
+                result.setMessage("安装配置不存在");
+                return result;
+            }
+            
+            List<String> rolledBack = new ArrayList<>();
+            List<String> failed = new ArrayList<>();
+            
+            List<String> installedCapabilities = config.getInstalledCapabilities();
+            if (installedCapabilities == null || installedCapabilities.isEmpty()) {
+                result.setSuccess(true);
+                result.setMessage("无需回滚，没有已安装的依赖");
+                result.setRolledBackCapabilities(rolledBack);
+                result.setFailedRollbacks(failed);
+                return result;
+            }
+            
+            List<String> toRollback = new ArrayList<>(installedCapabilities);
+            Collections.reverse(toRollback);
+            
+            for (String capabilityId : toRollback) {
+                try {
+                    boolean rolledBackSuccessfully = rollbackDependency(capabilityId);
+                    if (rolledBackSuccessfully) {
+                        rolledBack.add(capabilityId);
+                        log.info("[rollbackInstall] Rolled back: {}", capabilityId);
+                    } else {
+                        failed.add(capabilityId);
+                        log.warn("[rollbackInstall] Failed to rollback: {}", capabilityId);
+                    }
+                } catch (Exception e) {
+                    failed.add(capabilityId);
+                    log.error("[rollbackInstall] Error rolling back {}: {}", capabilityId, e.getMessage());
+                }
+            }
+            
+            config.setStatus(InstallConfig.InstallStatus.FAILED);
+            config.setInstalledCapabilities(new ArrayList<>());
+            
+            if (capabilityService != null) {
+                try {
+                    capabilityService.updateInstallStatus(config.getCapabilityId(), false);
+                } catch (Exception e) {
+                    log.error("[rollbackInstall] Failed to update main capability status: {}", e.getMessage());
+                }
+            }
+            
+            result.setRolledBackCapabilities(rolledBack);
+            result.setFailedRollbacks(failed);
+            result.setSuccess(failed.isEmpty());
+            
+            if (failed.isEmpty()) {
+                result.setMessage("回滚成功，共回滚 " + rolledBack.size() + " 个依赖");
+            } else {
+                result.setMessage("部分回滚成功，成功 " + rolledBack.size() + " 个，失败 " + failed.size() + " 个");
+            }
+            
+            log.info("[rollbackInstall] Rollback completed: {} rolled back, {} failed", 
+                rolledBack.size(), failed.size());
+            
+            return result;
+        });
+    }
+    
+    private boolean rollbackDependency(String capabilityId) {
+        if (capabilityService == null) {
+            log.info("[rollbackDependency] Mock rollback for: {}", capabilityId);
+            return true;
+        }
+        
+        try {
+            net.ooder.skill.scene.capability.model.Capability cap = capabilityService.findById(capabilityId);
+            if (cap == null) {
+                log.warn("[rollbackDependency] Capability not found: {}", capabilityId);
+                return true;
+            }
+            
+            cap.setInstalled(false);
+            capabilityService.update(cap);
+            
+            log.info("[rollbackDependency] Dependency uninstalled: {}", capabilityId);
+            return true;
+            
+        } catch (Exception e) {
+            log.error("[rollbackDependency] Failed to rollback {}: {}", capabilityId, e.getMessage());
+            return false;
+        }
+    }
+
+    @Override
+    public RollbackResult getRollbackStatus(String installId) {
+        InstallConfig config = installs.get(installId);
+        if (config == null) {
+            return null;
+        }
+        
+        RollbackResult result = new RollbackResult();
+        result.setInstallId(installId);
+        result.setSuccess(config.getStatus() == InstallConfig.InstallStatus.FAILED);
+        result.setMessage(config.getStatus() == InstallConfig.InstallStatus.FAILED 
+            ? "安装已回滚" : "安装未回滚");
+        
         return result;
     }
 }

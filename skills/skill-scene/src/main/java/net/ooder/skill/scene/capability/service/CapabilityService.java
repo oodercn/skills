@@ -1,7 +1,11 @@
 package net.ooder.skill.scene.capability.service;
 
 import net.ooder.skill.scene.capability.model.Capability;
+import net.ooder.skill.scene.capability.model.CapabilityOwnership;
 import net.ooder.skill.scene.capability.model.CapabilityType;
+import net.ooder.scene.skill.model.SceneType;
+import net.ooder.scene.skill.model.SkillForm;
+import net.ooder.scene.skill.model.SkillCategory;
 
 import java.util.List;
 
@@ -24,4 +28,23 @@ public interface CapabilityService {
     Capability update(Capability capability);
 
     void updateStatus(String capabilityId, String status);
+    
+    Capability addSceneType(String capabilityId, String sceneType, String approvedBy);
+    
+    Capability removeSceneType(String capabilityId, String sceneType, String approvedBy);
+    
+    List<Capability> findByOwnership(CapabilityOwnership ownership);
+    
+    List<Capability> findByOwnershipAndSceneType(CapabilityOwnership ownership, String sceneType);
+    
+    List<Capability> findBySkillForm(SkillForm form);
+    
+    List<Capability> findBySceneTypeNew(SceneType sceneType);
+    
+    List<Capability> findBySkillCategory(SkillCategory category);
+    
+    List<Capability> findByFilters(SkillForm form, SceneType sceneType, SkillCategory category, 
+                                    CapabilityOwnership ownership, String keyword);
+    
+    void updateInstallStatus(String capabilityId, boolean installed);
 }

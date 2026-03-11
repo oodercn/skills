@@ -232,4 +232,37 @@ public class SceneEngineIntegration {
             }
         }
     }
+    
+    public Object getSdkService(String serviceName) {
+        try {
+            if ("sceneMonitor".equals(serviceName)) {
+                // 尝试从 Spring 上下文获取 SceneMonitor
+                return getBeanFromContext("sceneMonitor");
+            } else if ("llmProxyMonitor".equals(serviceName)) {
+                return getBeanFromContext("llmProxyMonitor");
+            } else if ("performanceMonitor".equals(serviceName)) {
+                return getBeanFromContext("performanceMonitor");
+            }
+        } catch (Exception e) {
+            log.debug("Failed to get SDK service {}: {}", serviceName, e.getMessage());
+        }
+        return null;
+    }
+    
+    private Object getBeanFromContext(String beanName) {
+        try {
+            // 尝试从 skillManager 获取 Spring 上下文
+            if (skillManager != null) {
+                Method getApplicationContext = skillManager.getClass().getMethod("getApplicationContext");
+                Object context = getApplicationContext.invoke(skillManager);
+                if (context != null) {
+                    Method getBean = context.getClass().getMethod("getBean", String.class);
+                    return getBean.invoke(context, beanName);
+                }
+            }
+        } catch (Exception e) {
+            log.debug("Failed to get bean {} from context: {}", beanName, e.getMessage());
+        }
+        return null;
+    }
 }

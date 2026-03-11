@@ -17,12 +17,23 @@
       init() {
         this.apply(this.current);
         this.setupToggle();
+        // 确保初始化后更新按钮图标
+        this.updateButtons();
       },
       
       apply(theme) {
         this.current = theme;
-        document.documentElement.setAttribute('data-theme', theme);
+        
+        if (theme === 'light') {
+          document.documentElement.setAttribute('data-theme', 'light');
+        } else {
+          document.documentElement.removeAttribute('data-theme');
+        }
+        
         localStorage.setItem('nx-theme', theme);
+        
+        // 更新所有主题切换按钮的图标
+        this.updateButtons();
         
         // 触发主题变更事件
         window.dispatchEvent(new CustomEvent('nx:themechange', { 
@@ -37,8 +48,28 @@
       
       setupToggle() {
         document.querySelectorAll('[data-nx-theme-toggle]').forEach(btn => {
+          // 移除旧的事件监听器，避免重复绑定
+          btn.removeEventListener('click', this._toggleHandler);
           btn.addEventListener('click', () => this.toggle());
         });
+      },
+      
+      updateButtons() {
+        const buttons = document.querySelectorAll('[data-nx-theme-toggle]');
+        if (buttons.length === 0) {
+          console.warn('[NX.theme] 未找到主题切换按钮');
+          return;
+        }
+        
+        buttons.forEach(btn => {
+          const icon = btn.querySelector('i');
+          if (icon) {
+            // 深色主题显示太阳图标（暗示可切换到浅色），浅色主题显示月亮图标（暗示可切换到深色）
+            icon.className = this.current === 'dark' ? 'ri-sun-line' : 'ri-moon-line';
+          }
+        });
+        
+        console.log('[NX.theme] 按钮图标已更新，当前主题:', this.current);
       }
     },
     
@@ -140,14 +171,185 @@
       }
     },
     
+    // 用户菜单管理
+    userMenu: {
+      init() {
+        this.bindEvents();
+        this.loadUserInfo();
+      },
+      
+      bindEvents() {
+        const userMenu = document.getElementById('user-menu');
+        const dropdown = document.getElementById('user-dropdown');
+        
+        if (userMenu && dropdown) {
+          userMenu.addEventListener('click', (e) => {
+            e.stopPropagation();
+            dropdown.classList.toggle('nx-page__dropdown-menu--open');
+          });
+          
+          document.addEventListener('click', () => {
+            dropdown.classList.remove('nx-page__dropdown-menu--open');
+          });
+          
+          dropdown.querySelectorAll('.nx-page__dropdown-item').forEach(item => {
+            item.addEventListener('click', () => {
+              dropdown.classList.remove('nx-page__dropdown-menu--open');
+            });
+          });
+        }
+      },
+      
+      loadUserInfo() {
+        const avatarEl = document.getElementById('user-avatar');
+        const nameEl = document.getElementById('user-name');
+        
+        if (!avatarEl || !nameEl) return;
+        
+        const session = NX.storage.get('nx-session');
+        if (session && session.user) {
+          const user = session.user;
+          avatarEl.textContent = (user.name || user.username || 'U').charAt(0).toUpperCase();
+          nameEl.textContent = user.name || user.username || '用户';
+        } else {
+          fetch('/api/v1/org/users/current')
+            .then(res => res.json())
+            .then(result => {
+              if (result.status === 'success' && result.data) {
+                const user = result.data;
+                avatarEl.textContent = (user.name || user.userId || 'U').charAt(0).toUpperCase();
+                nameEl.textContent = user.name || user.userId || '用户';
+                NX.storage.set('nx-session', { user: user });
+              } else {
+                avatarEl.textContent = 'U';
+                nameEl.textContent = '用户';
+              }
+            })
+            .catch(() => {
+              avatarEl.textContent = 'U';
+              nameEl.textContent = '用户';
+            });
+        }
+      },
+      
+      logout() {
+        fetch('/api/v1/auth/logout', { method: 'POST' }).catch(() => {});
+        NX.storage.clear();
+        window.location.href = '/console/pages/login.html';
+      }
+    },
+    
     // 初始化
     init() {
       this.theme.init();
       this.sidebar.init();
       this.nav.init();
       this.modal.init();
+      this.userMenu.init();
       
       console.log(`ooderNexus UI v${this.version} initialized`);
+    },
+    
+    // ========== 公共组件 ==========
+    
+    /**
+     * 公共组件渲染器
+     */
+    components: {
+      /**
+       * 渲染用户菜单组件
+       * @returns {string} HTML字符串
+       */
+      renderUserMenu() {
+        return `
+          <div class="nx-relative">
+            <div class="nx-page__user-menu" id="user-menu">
+              <div class="nx-page__user-avatar" id="user-avatar">U</div>
+              <span class="nx-page__user-name" id="user-name">加载中...</span>
+              <i class="ri-arrow-down-s-line"></i>
+            </div>
+            <div class="nx-page__dropdown-menu" id="user-dropdown">
+              <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                <i class="ri-user-line"></i> 个人中心
+              </div>
+              <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                <i class="ri-puzzle-line"></i> 我的能力
+              </div>
+              <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                <i class="ri-logout-box-line"></i> 退出登录
+              </div>
+            </div>
+          </div>
+        `;
+      },
+      
+      /**
+       * 渲染主题切换按钮
+       * @returns {string} HTML字符串
+       */
+      renderThemeToggle() {
+        return `
+          <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+            <i class="ri-sun-line"></i>
+          </button>
+        `;
+      },
+      
+      /**
+       * 渲染侧边栏折叠按钮
+       * @returns {string} HTML字符串
+       */
+      renderSidebarToggle() {
+        return `
+          <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+            <i class="ri-menu-line"></i>
+          </button>
+        `;
+      },
+      
+      /**
+       * 渲染完整的页面头部工具栏
+       * @param {Object} options - 配置选项
+       * @param {string} options.title - 页面标题
+       * @param {string} options.subtitle - 页面副标题
+       * @param {string} options.icon - 标题图标
+       * @param {string} options.actions - 额外的操作按钮HTML
+       * @returns {string} HTML字符串
+       */
+      renderPageHeader(options = {}) {
+        const { title = '页面标题', subtitle = '', icon = 'ri-file-line', actions = '' } = options;
+        
+        return `
+          <header class="nx-page__header">
+            <div class="nx-flex nx-items-center nx-gap-3">
+              ${this.renderSidebarToggle()}
+              <div class="nx-page__title">
+                <h1><i class="${icon}" aria-hidden="true"></i> ${title}</h1>
+                ${subtitle ? `<p>${subtitle}</p>` : ''}
+              </div>
+            </div>
+            <div class="nx-page__actions">
+              ${this.renderThemeToggle()}
+              ${this.renderUserMenu()}
+              ${actions}
+            </div>
+          </header>
+        `;
+      },
+      
+      /**
+       * 初始化页面头部组件
+       * 自动查找并初始化页面中的用户菜单、主题切换等组件
+       */
+      initPageHeader() {
+        // 初始化用户菜单
+        NX.userMenu.init();
+        // 初始化主题切换
+        NX.theme.setupToggle();
+        NX.theme.updateButtons();
+        // 初始化侧边栏切换
+        NX.sidebar.setupToggle();
+      }
     },
     
     // ========== 工具函数 ==========

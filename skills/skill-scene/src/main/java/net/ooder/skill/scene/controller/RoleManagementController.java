@@ -2,7 +2,7 @@ package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.org.base.UserInfo;
 import net.ooder.skill.scene.dto.CreateUserRequest;
-import net.ooder.skill.scene.dto.MenuItemDTO;
+import net.ooder.skill.scene.dto.menu.MenuItemDTO;
 import net.ooder.skill.scene.dto.RoleDTO;
 import net.ooder.skill.scene.dto.SetPasswordRequest;
 import net.ooder.skill.scene.dto.UserSessionDTO;

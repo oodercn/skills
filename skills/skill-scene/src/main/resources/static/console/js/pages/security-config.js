@@ -12,7 +12,7 @@ async function loadConfig() {
         var result = await ApiClient.get('/api/security/config');
         
         var configData;
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             configData = result.data || {};
         } else {
             configData = result || {};
@@ -42,7 +42,7 @@ async function loadPolicies() {
     try {
         var result = await ApiClient.get('/api/security/policies');
         
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             policies = result.data || [];
         } else {
             policies = result || [];
@@ -63,7 +63,7 @@ async function loadStats() {
         var result = await ApiClient.get('/api/v1/keys');
         
         var keys;
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             keys = result.data || [];
         } else {
             keys = result || [];
@@ -77,7 +77,7 @@ async function loadStats() {
         var result = await ApiClient.get('/api/security/stats');
         
         var stats;
-        if (result && result.code === 200) {
+        if (result && result.status === 'success') {
             stats = result.data || {};
         } else {
             stats = result || {};
@@ -141,7 +141,7 @@ async function saveConfig() {
     try {
         var result = await ApiClient.post('/api/security/config', configData);
         
-        if (result && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.status === 'success' || result.code === undefined)) {
             alert('配置保存成功');
         } else {
             var errorMsg = result.message || result.error || '配置保存失败';
@@ -176,7 +176,7 @@ async function createPolicy(e) {
     try {
         var result = await ApiClient.post('/api/security/policies', policy);
         
-        if (result && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.status === 'success' || result.code === undefined)) {
             hideCreatePolicyModal();
             loadPolicies();
             alert('策略创建成功');
@@ -204,7 +204,7 @@ async function togglePolicy(policyId) {
         
         var result = await ApiClient.post(url);
         
-        if (result && (result === true || result.code === 200)) {
+        if (result && (result === true || result.status === 'success')) {
             loadPolicies();
             alert('策略已' + action);
         } else {
@@ -223,7 +223,7 @@ async function deletePolicy(policyId) {
     try {
         var result = await ApiClient.delete('/api/security/policies/' + policyId);
         
-        if (result && (result.code === 200 || result.code === undefined)) {
+        if (result && (result.status === 'success' || result.code === undefined)) {
             loadPolicies();
             alert('策略删除成功');
         } else {

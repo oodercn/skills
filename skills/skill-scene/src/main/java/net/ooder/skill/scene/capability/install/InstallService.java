@@ -28,6 +28,10 @@ public interface InstallService {
     
     List<InstallConfig> listPendingActivations(String userId);
     
+    CompletableFuture<RollbackResult> rollbackInstall(String installId);
+    
+    RollbackResult getRollbackStatus(String installId);
+    
     public static class CreateInstallRequest {
         private String capabilityId;
         private String driverCondition;
@@ -100,5 +104,27 @@ public interface InstallService {
         public void setLeader(InstallConfig.Participant leader) { this.leader = leader; }
         public List<InstallConfig.Participant> getCollaborators() { return collaborators; }
         public void setCollaborators(List<InstallConfig.Participant> collaborators) { this.collaborators = collaborators; }
+    }
+    
+    public static class RollbackResult {
+        private String installId;
+        private boolean success;
+        private List<String> rolledBackCapabilities;
+        private List<String> failedRollbacks;
+        private String message;
+        private long rollbackTime;
+        
+        public String getInstallId() { return installId; }
+        public void setInstallId(String installId) { this.installId = installId; }
+        public boolean isSuccess() { return success; }
+        public void setSuccess(boolean success) { this.success = success; }
+        public List<String> getRolledBackCapabilities() { return rolledBackCapabilities; }
+        public void setRolledBackCapabilities(List<String> rolledBackCapabilities) { this.rolledBackCapabilities = rolledBackCapabilities; }
+        public List<String> getFailedRollbacks() { return failedRollbacks; }
+        public void setFailedRollbacks(List<String> failedRollbacks) { this.failedRollbacks = failedRollbacks; }
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+        public long getRollbackTime() { return rollbackTime; }
+        public void setRollbackTime(long rollbackTime) { this.rollbackTime = rollbackTime; }
     }
 }

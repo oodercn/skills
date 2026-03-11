@@ -1,0 +1,34 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-capability
+  name: 能力管理服务
+  version: "1.0.0"
+  description: "能力管理服务 - 提供能力注册、发现、验证、统计能力"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: INFRASTRUCTURE
+  subCategory: capability
+  category: SERVICE
+  capabilityCategory: sys
+  
+  capabilityAddresses:
+    required:
+      - address: 0x00
+        name: SYS_REGISTRY
+        description: "系统注册中心"
+      - address: 0x02
+        name: SYS_CAPABILITY
+        description: "能力管理服务"
+    optional: []
+  
+  tags:
+    - capability
+    - register
+    - discover
+    - validate
+  
+  dependencies: []

@@ -18,6 +18,7 @@ public class SceneGroupDTO {
     private long lastUpdateTime;
     private List<SceneParticipantDTO> participants;
     private List<CapabilityBindingDTO> capabilityBindings;
+    private List<KnowledgeBindingDTO> knowledgeBases;
     private Map<String, Object> context;
 
     public String getSceneGroupId() { return sceneGroupId; }
@@ -48,6 +49,8 @@ public class SceneGroupDTO {
     public void setParticipants(List<SceneParticipantDTO> participants) { this.participants = participants; }
     public List<CapabilityBindingDTO> getCapabilityBindings() { return capabilityBindings; }
     public void setCapabilityBindings(List<CapabilityBindingDTO> capabilityBindings) { this.capabilityBindings = capabilityBindings; }
+    public List<KnowledgeBindingDTO> getKnowledgeBases() { return knowledgeBases; }
+    public void setKnowledgeBases(List<KnowledgeBindingDTO> knowledgeBases) { this.knowledgeBases = knowledgeBases; }
     public Map<String, Object> getContext() { return context; }
     public void setContext(Map<String, Object> context) { this.context = context; }
 }

@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-knowledge-base
+  name: 知识库核心服务
+  version: "1.0.0"
+  description: "知识库核心服务，提供知识库管理、文档管理、检索功能"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: AI_ASSISTANT
+  subCategory: base
+  category: KNOWLEDGE
+  capabilityCategory: know
+  
+  capabilityAddresses:
+    required:
+      - address: 0x38
+        name: KNOW_BASE
+        description: "知识库基础服务"
+    optional: []
+  
+  tags:
+    - knowledge
+    - kb
+    - document
+  
+  dependencies: []

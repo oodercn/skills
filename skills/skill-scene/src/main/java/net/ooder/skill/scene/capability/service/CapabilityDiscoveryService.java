@@ -2,7 +2,6 @@ package net.ooder.skill.scene.capability.service;
 
 import net.ooder.skill.scene.capability.model.Capability;
 import net.ooder.skill.scene.capability.model.CapabilityType;
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
 import net.ooder.skill.scene.capability.driver.DriverCondition;
 
 import java.util.List;
@@ -16,6 +15,8 @@ public interface CapabilityDiscoveryService {
     
     List<DriverCondition> getDriverConditions(String capabilityId);
     
+    Object invokeCapability(String capabilityId, Map<String, Object> params);
+    
     public static class DiscoveryRequest {
         private DiscoveryMethod method;
         private String query;
@@ -23,7 +24,7 @@ public interface CapabilityDiscoveryService {
         private String sceneType;
         private int page;
         private int size;
-        private SceneSkillCategory category;
+        private String skillForm;
         private Boolean mainFirst;
         private String visibility;
         
@@ -39,8 +40,8 @@ public interface CapabilityDiscoveryService {
         public void setPage(int page) { this.page = page; }
         public int getSize() { return size; }
         public void setSize(int size) { this.size = size; }
-        public SceneSkillCategory getCategory() { return category; }
-        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public String getSkillForm() { return skillForm; }
+        public void setSkillForm(String skillForm) { this.skillForm = skillForm; }
         public Boolean getMainFirst() { return mainFirst; }
         public void setMainFirst(Boolean mainFirst) { this.mainFirst = mainFirst; }
         public String getVisibility() { return visibility; }
@@ -82,7 +83,8 @@ public interface CapabilityDiscoveryService {
         private List<DriverConditionInfo> driverConditions;
         private List<String> supportedSceneTypes;
         private Map<String, Object> metadata;
-        private SceneSkillCategory category;
+        private String skillForm;
+        private String sceneType;
         private boolean mainFirst;
         private String visibility;
         private List<ParticipantInfo> participants;
@@ -107,8 +109,10 @@ public interface CapabilityDiscoveryService {
         public void setSupportedSceneTypes(List<String> supportedSceneTypes) { this.supportedSceneTypes = supportedSceneTypes; }
         public Map<String, Object> getMetadata() { return metadata; }
         public void setMetadata(Map<String, Object> metadata) { this.metadata = metadata; }
-        public SceneSkillCategory getCategory() { return category; }
-        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public String getSkillForm() { return skillForm; }
+        public void setSkillForm(String skillForm) { this.skillForm = skillForm; }
+        public String getSceneType() { return sceneType; }
+        public void setSceneType(String sceneType) { this.sceneType = sceneType; }
         public boolean isMainFirst() { return mainFirst; }
         public void setMainFirst(boolean mainFirst) { this.mainFirst = mainFirst; }
         public String getVisibility() { return visibility; }
@@ -154,6 +158,7 @@ public interface CapabilityDiscoveryService {
         private String name;
         private String description;
         private CapabilityType type;
+        private String typeName;
         private String icon;
         private String version;
         private boolean installed;
@@ -161,7 +166,8 @@ public interface CapabilityDiscoveryService {
         private List<String> dependencies;
         private List<String> optionalCapabilities;
         private Map<String, Object> config;
-        private SceneSkillCategory category;
+        private String skillForm;
+        private String sceneType;
         private boolean mainFirst;
         private String visibility;
         private List<ParticipantInfo> participants;
@@ -173,7 +179,11 @@ public interface CapabilityDiscoveryService {
         public String getDescription() { return description; }
         public void setDescription(String description) { this.description = description; }
         public CapabilityType getType() { return type; }
-        public void setType(CapabilityType type) { this.type = type; }
+        public void setType(CapabilityType type) { 
+            this.type = type; 
+            this.typeName = type != null ? type.getName() : null;
+        }
+        public String getTypeName() { return typeName; }
         public String getIcon() { return icon; }
         public void setIcon(String icon) { this.icon = icon; }
         public String getVersion() { return version; }
@@ -188,8 +198,10 @@ public interface CapabilityDiscoveryService {
         public void setOptionalCapabilities(List<String> optionalCapabilities) { this.optionalCapabilities = optionalCapabilities; }
         public Map<String, Object> getConfig() { return config; }
         public void setConfig(Map<String, Object> config) { this.config = config; }
-        public SceneSkillCategory getCategory() { return category; }
-        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public String getSkillForm() { return skillForm; }
+        public void setSkillForm(String skillForm) { this.skillForm = skillForm; }
+        public String getSceneType() { return sceneType; }
+        public void setSceneType(String sceneType) { this.sceneType = sceneType; }
         public boolean isMainFirst() { return mainFirst; }
         public void setMainFirst(boolean mainFirst) { this.mainFirst = mainFirst; }
         public String getVisibility() { return visibility; }

@@ -4,6 +4,10 @@ import javax.validation.Valid;
 import net.ooder.skill.scene.discovery.SkillIndexLoader;
 import net.ooder.skill.scene.dto.discovery.*;
 import net.ooder.skill.scene.model.ResultModel;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
+import net.ooder.skill.scene.capability.model.CapabilityCategory;
+import net.ooder.skill.scene.capability.model.Visibility;
 import net.ooder.scene.core.SceneEngine;
 import net.ooder.scene.core.service.UnifiedSceneService;
 import net.ooder.sdk.discovery.git.GitHubDiscoverer;
@@ -64,6 +68,9 @@ public class GitDiscoveryController {
     
     @Autowired
     private SkillIndexLoader skillIndexLoader;
+    
+    @Autowired
+    private net.ooder.skill.scene.capability.service.CapabilityClassificationService classificationService;
 
     @PostMapping("/github")
     public ResultModel<DiscoveryResultDTO> discoverFromGitHub(@RequestBody @Valid GitDiscoveryConfigDTO config) {
@@ -694,12 +701,31 @@ public class GitDiscoveryController {
 
     @PostMapping("/local")
     public ResultModel<DiscoveryResultDTO> discoverFromLocal(@RequestBody(required = false) LocalDiscoveryConfigDTO config) {
-        log.info("[discoverFromLocal] Scanning local installed skills");
+        log.info("[discoverFromLocal] Scanning local installed skills, config: {}", config);
         
         DiscoveryResultDTO result = new DiscoveryResultDTO();
         result.setMethod("LOCAL_FS");
         
         List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        SkillForm formFilter = null;
+        SceneType sceneTypeFilter = null;
+        CapabilityCategory categoryFilter = null;
+        
+        if (config != null) {
+            if (config.getSkillForm() != null && !config.getSkillForm().isEmpty()) {
+                try { formFilter = SkillForm.fromCode(config.getSkillForm()); } catch (Exception e) {}
+            }
+            if (config.getSceneType() != null && !config.getSceneType().isEmpty()) {
+                try { sceneTypeFilter = SceneType.fromCode(config.getSceneType()); } catch (Exception e) {}
+            }
+            if (config.getSkillCategory() != null && !config.getSkillCategory().isEmpty()) {
+                try { categoryFilter = CapabilityCategory.fromCode(config.getSkillCategory()); } catch (Exception e) {}
+            }
+        }
+        
+        log.info("[discoverFromLocal] Filters - form: {}, sceneType: {}, category: {}", 
+            formFilter, sceneTypeFilter, categoryFilter);
         
         if (capabilityService != null) {
             try {
@@ -707,6 +733,17 @@ public class GitDiscoveryController {
                 log.info("[discoverFromLocal] Found {} registered capabilities", registeredCaps.size());
                 
                 for (net.ooder.skill.scene.capability.model.Capability cap : registeredCaps) {
+                    net.ooder.skill.scene.capability.service.CapabilityClassificationService.ClassificationResult classification =
+                        classificationService.classify(cap);
+                    
+                    if (classification.isInternal()) {
+                        continue;
+                    }
+                    
+                    if (!classificationService.matchesFilter(cap, formFilter, sceneTypeFilter, categoryFilter)) {
+                        continue;
+                    }
+                    
                     CapabilityDTO dto = new CapabilityDTO();
                     dto.setId(cap.getCapabilityId());
                     dto.setName(cap.getName());
@@ -715,54 +752,70 @@ public class GitDiscoveryController {
                     dto.setType(cap.getType() != null ? cap.getType().name() : "SERVICE");
                     dto.setSource("LOCAL_FS");
                     dto.setStatus("installed");
-                    dto.setSceneCapability(cap.isSceneCapability());
+                    
+                    dto.setSkillForm(classification.getSkillForm().getCode());
+                    dto.setSceneType(classification.getSceneType() != null ? classification.getSceneType().getCode() : null);
+                    dto.setVisibility(classification.getVisibility().getCode());
+                    dto.setCapabilityCategory(classification.getCapabilityCategory().getCode());
+                    dto.setSceneCapability(classification.getSkillForm() == SkillForm.SCENE);
                     dto.setSkillId(cap.getSkillId());
+                    dto.setCategory(cap.getCategory());
+                    dto.setBusinessCategory(cap.getBusinessCategory());
+                    dto.setSubCategory(cap.getSubCategory());
+                    dto.setTags(cap.getTags());
+                    dto.setHasSelfDrive(cap.isHasSelfDrive());
+                    dto.setBusinessSemanticsScore(cap.getBusinessSemanticsScore());
+                    dto.setInstalled(true);
                     capabilities.add(dto);
                 }
+                
+                log.info("[discoverFromLocal] Returning {} capabilities after classification filters", capabilities.size());
             } catch (Exception e) {
                 log.error("[discoverFromLocal] Error loading registered capabilities: {}", e.getMessage());
             }
-        }
-        
-        try {
-            java.nio.file.Path skillsPath = null;
-            
-            if (config != null && config.getSkillsPath() != null && !config.getSkillsPath().isEmpty()) {
-                skillsPath = java.nio.file.Paths.get(config.getSkillsPath());
-            } else {
-                skillsPath = java.nio.file.Paths.get(".").toAbsolutePath();
-            }
-            
-            log.info("[discoverFromLocal] Scanning path: {}", skillsPath.toAbsolutePath());
-            
-            java.nio.file.Path skillYaml = skillsPath.resolve("src/main/resources/skill.yaml");
-            if (java.nio.file.Files.exists(skillYaml)) {
-                log.info("[discoverFromLocal] Found skill.yaml in current service");
-                
-                boolean exists = capabilities.stream().anyMatch(c -> "skill-scene".equals(c.getId()));
-                if (!exists) {
-                    CapabilityDTO selfCap = new CapabilityDTO();
-                    selfCap.setId("skill-scene");
-                    selfCap.setName("场景管理");
-                    selfCap.setDescription("场景管理技能 - 场景定义、会话管理、能力验证");
-                    selfCap.setVersion("1.0.0");
-                    selfCap.setSource("LOCAL_FS");
-                    selfCap.setStatus("installed");
-                    selfCap.setType("SKILL");
-                    selfCap.setSceneCapability(true);
-                    capabilities.add(selfCap);
-                }
-            }
-            
-            log.info("[discoverFromLocal] Found {} total capabilities", capabilities.size());
-        } catch (Exception e) {
-            log.error("[discoverFromLocal] Error scanning local skills: {}", e.getMessage());
-            result.setErrorMessage(e.getMessage());
         }
         
         result.setCapabilities(capabilities);
         result.setScanTime(System.currentTimeMillis());
         
         return ResultModel.success(result);
+    }
+
+    @GetMapping("/capabilities/detail/{capabilityId}/roles")
+    public ResultModel<List<Map<String, Object>>> getCapabilityRoles(@PathVariable String capabilityId) {
+        log.info("[getCapabilityRoles] capabilityId: {}", capabilityId);
+        
+        List<Map<String, Object>> roles = new ArrayList<>();
+        
+        if ("daily-log-scene".equals(capabilityId) || capabilityId.contains("log") || capabilityId.contains("report")) {
+            roles.add(createRole("LEADER", "领导", "管理者角色，配置场景参数、查看团队日志", "ri-user-star-line", 
+                Arrays.asList("CONFIG", "VIEW_ALL", "MANAGE")));
+            roles.add(createRole("EMPLOYEE", "员工", "参与者角色，填写日志、查看个人记录", "ri-user-line", 
+                Arrays.asList("WRITE", "VIEW_SELF")));
+            roles.add(createRole("HR", "HR", "观察者角色，查看团队日志、统计分析", "ri-team-line", 
+                Arrays.asList("VIEW_ALL", "ANALYZE", "EXPORT")));
+        } else if (capabilityId.contains("meeting")) {
+            roles.add(createRole("ORGANIZER", "组织者", "创建和管理会议", "ri-user-star-line", 
+                Arrays.asList("CREATE", "MANAGE", "CANCEL")));
+            roles.add(createRole("PARTICIPANT", "参与者", "参加会议", "ri-user-line", 
+                Arrays.asList("JOIN", "VIEW")));
+        } else {
+            roles.add(createRole("MANAGER", "管理者", "拥有完整管理权限", "ri-user-star-line", 
+                Arrays.asList("READ", "WRITE", "CONFIG", "DELETE")));
+            roles.add(createRole("USER", "普通用户", "基础使用权限", "ri-user-line", 
+                Arrays.asList("READ", "WRITE")));
+        }
+        
+        return ResultModel.success(roles);
+    }
+    
+    private Map<String, Object> createRole(String name, String displayName, String description, String icon, List<String> permissions) {
+        Map<String, Object> role = new HashMap<>();
+        role.put("name", name);
+        role.put("displayName", displayName);
+        role.put("description", description);
+        role.put("icon", icon);
+        role.put("permissions", permissions);
+        return role;
     }
 }

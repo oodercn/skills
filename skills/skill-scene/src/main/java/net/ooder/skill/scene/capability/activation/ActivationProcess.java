@@ -10,6 +10,8 @@ public class ActivationProcess {
     private String installId;
     private String sceneId;
     private String sceneGroupId;
+    private String templateId;
+    private String roleName;
     private List<ActivationStep> steps;
     private int currentStep;
     private int totalSteps;
@@ -22,6 +24,10 @@ public class ActivationProcess {
     private String keyStatus;
     private List<NetworkAction> networkActions;
     private Map<String, Object> config;
+    private List<PrivateCapabilityConfig> privateCapabilities;
+    private List<String> enabledPrivateCapabilities;
+    private boolean menuRegistered;
+    private boolean notificationSent;
     
     public enum ActivationStatus {
         PENDING,
@@ -106,6 +112,31 @@ public class ActivationProcess {
         public void setResult(Map<String, Object> result) { this.result = result; }
     }
     
+    public static class PrivateCapabilityConfig {
+        private String capId;
+        private String name;
+        private String description;
+        private boolean optional;
+        private boolean enabled;
+        private String skillId;
+        private Map<String, Object> config;
+        
+        public String getCapId() { return capId; }
+        public void setCapId(String capId) { this.capId = capId; }
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
+        public boolean isOptional() { return optional; }
+        public void setOptional(boolean optional) { this.optional = optional; }
+        public boolean isEnabled() { return enabled; }
+        public void setEnabled(boolean enabled) { this.enabled = enabled; }
+        public String getSkillId() { return skillId; }
+        public void setSkillId(String skillId) { this.skillId = skillId; }
+        public Map<String, Object> getConfig() { return config; }
+        public void setConfig(Map<String, Object> config) { this.config = config; }
+    }
+    
     public String getProcessId() { return processId; }
     public void setProcessId(String processId) { this.processId = processId; }
     public String getInstallId() { return installId; }
@@ -114,6 +145,10 @@ public class ActivationProcess {
     public void setSceneId(String sceneId) { this.sceneId = sceneId; }
     public String getSceneGroupId() { return sceneGroupId; }
     public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
+    public String getTemplateId() { return templateId; }
+    public void setTemplateId(String templateId) { this.templateId = templateId; }
+    public String getRoleName() { return roleName; }
+    public void setRoleName(String roleName) { this.roleName = roleName; }
     public List<ActivationStep> getSteps() { return steps != null ? steps : new ArrayList<>(); }
     public void setSteps(List<ActivationStep> steps) { this.steps = steps; }
     public int getCurrentStep() { return currentStep; }
@@ -136,6 +171,14 @@ public class ActivationProcess {
     public void setNetworkActions(List<NetworkAction> networkActions) { this.networkActions = networkActions; }
     public Map<String, Object> getConfig() { return config; }
     public void setConfig(Map<String, Object> config) { this.config = config; }
+    public List<PrivateCapabilityConfig> getPrivateCapabilities() { return privateCapabilities != null ? privateCapabilities : new ArrayList<>(); }
+    public void setPrivateCapabilities(List<PrivateCapabilityConfig> privateCapabilities) { this.privateCapabilities = privateCapabilities; }
+    public List<String> getEnabledPrivateCapabilities() { return enabledPrivateCapabilities; }
+    public void setEnabledPrivateCapabilities(List<String> enabledPrivateCapabilities) { this.enabledPrivateCapabilities = enabledPrivateCapabilities; }
+    public boolean isMenuRegistered() { return menuRegistered; }
+    public void setMenuRegistered(boolean menuRegistered) { this.menuRegistered = menuRegistered; }
+    public boolean isNotificationSent() { return notificationSent; }
+    public void setNotificationSent(boolean notificationSent) { this.notificationSent = notificationSent; }
     
     public int getProgress() {
         if (totalSteps == 0) return 0;
@@ -165,7 +208,7 @@ public class ActivationProcess {
         process.setCreateTime(System.currentTimeMillis());
         process.setUpdateTime(System.currentTimeMillis());
         process.setCurrentStep(0);
-        process.setTotalSteps(5);
+        process.setTotalSteps(6);
         
         List<ActivationStep> steps = new ArrayList<>();
         
@@ -179,40 +222,49 @@ public class ActivationProcess {
         steps.add(step1);
         
         ActivationStep step2 = new ActivationStep();
-        step2.setStepId("config-conditions");
-        step2.setName("配置驱动条件");
-        step2.setDescription("配置场景的驱动条件和触发规则");
+        step2.setStepId("select-push-targets");
+        step2.setName("选择推送目标");
+        step2.setDescription("选择要推送的下属员工");
         step2.setStatus(ActivationStep.StepStatus.PENDING);
         step2.setRequired(true);
         step2.setSkippable(false);
         steps.add(step2);
         
         ActivationStep step3 = new ActivationStep();
-        step3.setStepId("get-key");
-        step3.setName("获取KEY");
-        step3.setDescription("获取访问安全数据的密钥");
+        step3.setStepId("config-conditions");
+        step3.setName("配置驱动条件");
+        step3.setDescription("配置场景的驱动条件和触发规则");
         step3.setStatus(ActivationStep.StepStatus.PENDING);
         step3.setRequired(true);
         step3.setSkippable(false);
         steps.add(step3);
         
         ActivationStep step4 = new ActivationStep();
-        step4.setStepId("confirm-activation");
-        step4.setName("确认激活");
-        step4.setDescription("确认激活场景");
+        step4.setStepId("get-key");
+        step4.setName("获取KEY");
+        step4.setDescription("获取访问安全数据的密钥");
         step4.setStatus(ActivationStep.StepStatus.PENDING);
         step4.setRequired(true);
         step4.setSkippable(false);
         steps.add(step4);
         
         ActivationStep step5 = new ActivationStep();
-        step5.setStepId("network-actions");
-        step5.setName("入网动作");
-        step5.setDescription("执行入网相关动作");
+        step5.setStepId("confirm-activation");
+        step5.setName("确认激活");
+        step5.setDescription("确认激活场景");
         step5.setStatus(ActivationStep.StepStatus.PENDING);
         step5.setRequired(true);
         step5.setSkippable(false);
         steps.add(step5);
+        
+        ActivationStep step6 = new ActivationStep();
+        step6.setStepId("network-actions");
+        step6.setName("入网动作");
+        step6.setDescription("执行入网相关动作，推送通知给员工");
+        step6.setStatus(ActivationStep.StepStatus.PENDING);
+        step6.setRequired(true);
+        step6.setSkippable(false);
+        steps.add(step6);
         
         process.setSteps(steps);
         

@@ -1,0 +1,32 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-vfs-minio
+  name: MinIO对象存储
+  version: "0.7.3"
+  description: "MinIO对象存储服务"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: SYSTEM_TOOLS
+  subCategory: minio
+  category: DATA
+  capabilityCategory: vfs
+  
+  capabilityAddresses:
+    required:
+      - address: 0x22
+        name: VFS_MINIO
+        description: "MinIO对象存储"
+    optional: []
+  
+  tags:
+    - vfs
+    - minio
+    - storage
+    - s3
+  
+  dependencies:
+    - skill-vfs-base

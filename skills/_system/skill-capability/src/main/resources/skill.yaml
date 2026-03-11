@@ -1,0 +1,89 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-capability
+  name: 能力管理
+  version: 1.0.0
+  description: 能力管理技能 - 能力注册、发现、验证、统计
+  author: ooder Team
+  license: Apache-2.0
+  type: service-skill
+
+spec:
+  type: service-skill
+  
+  ownership: platform
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.capability.CapabilitySkillApplication
+  
+  capabilities:
+    - id: capability-register
+      name: 能力注册
+      description: 注册新能力定义
+      category: orchestration
+      
+    - id: capability-discover
+      name: 能力发现
+      description: 发现和搜索能力
+      category: orchestration
+      
+    - id: capability-validate
+      name: 能力验证
+      description: 验证能力参数
+      category: orchestration
+      
+    - id: capability-stats
+      name: 能力统计
+      description: 能力使用统计
+      category: monitoring
+  
+  scenes:
+    - name: capability-management
+      description: 能力管理主场景
+      capabilities:
+        - capability-register
+        - capability-discover
+        - capability-validate
+        - capability-stats
+  
+  config:
+    optional:
+      - name: CAPABILITY_DEFAULT_TIMEOUT
+        type: integer
+        default: 30000
+        description: 默认超时时间(毫秒)
+  
+  endpoints:
+    - path: /api/v1/capabilities
+      method: GET
+      description: 获取能力列表
+      capability: capability-discover
+      
+    - path: /api/v1/capabilities
+      method: POST
+      description: 注册能力
+      capability: capability-register
+      
+    - path: /api/v1/capabilities/{capabilityId}
+      method: GET
+      description: 获取能力详情
+      capability: capability-discover
+      
+    - path: /api/v1/capabilities/{capabilityId}/validate
+      method: POST
+      description: 验证能力参数
+      capability: capability-validate
+      
+    - path: /api/v1/capabilities/stats
+      method: GET
+      description: 获取能力统计
+      capability: capability-stats
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"

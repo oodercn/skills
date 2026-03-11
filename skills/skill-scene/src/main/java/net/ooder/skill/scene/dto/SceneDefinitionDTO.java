@@ -1,5 +1,6 @@
 package net.ooder.skill.scene.dto;
 
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import java.util.List;
 import java.util.Map;
 

@@ -1,7 +1,8 @@
 package net.ooder.skill.scene.capability.service;
 
 import net.ooder.skill.scene.capability.model.CapabilityStatus;
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
+import net.ooder.skill.scene.capability.model.SceneType;
+import net.ooder.skill.scene.capability.model.SkillForm;
 
 import java.util.List;
 import java.util.Map;
@@ -40,7 +41,8 @@ public interface SceneSkillLifecycleService {
         private String capabilityId;
         private CapabilityStatus previousStatus;
         private CapabilityStatus currentStatus;
-        private SceneSkillCategory category;
+        private SceneType sceneType;
+        private SkillForm skillForm;
         private String message;
         private List<String> nextSteps;
         private long timestamp;
@@ -53,8 +55,10 @@ public interface SceneSkillLifecycleService {
         public void setPreviousStatus(CapabilityStatus previousStatus) { this.previousStatus = previousStatus; }
         public CapabilityStatus getCurrentStatus() { return currentStatus; }
         public void setCurrentStatus(CapabilityStatus currentStatus) { this.currentStatus = currentStatus; }
-        public SceneSkillCategory getCategory() { return category; }
-        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public SceneType getSceneType() { return sceneType; }
+        public void setSceneType(SceneType sceneType) { this.sceneType = sceneType; }
+        public SkillForm getSkillForm() { return skillForm; }
+        public void setSkillForm(SkillForm skillForm) { this.skillForm = skillForm; }
         public String getMessage() { return message; }
         public void setMessage(String message) { this.message = message; }
         public List<String> getNextSteps() { return nextSteps; }
@@ -85,7 +89,8 @@ public interface SceneSkillLifecycleService {
     public static class LifecycleState {
         private String capabilityId;
         private CapabilityStatus status;
-        private SceneSkillCategory category;
+        private SceneType sceneType;
+        private SkillForm skillForm;
         private boolean canPause;
         private boolean canResume;
         private boolean canTrigger;
@@ -97,8 +102,10 @@ public interface SceneSkillLifecycleService {
         public void setCapabilityId(String capabilityId) { this.capabilityId = capabilityId; }
         public CapabilityStatus getStatus() { return status; }
         public void setStatus(CapabilityStatus status) { this.status = status; }
-        public SceneSkillCategory getCategory() { return category; }
-        public void setCategory(SceneSkillCategory category) { this.category = category; }
+        public SceneType getSceneType() { return sceneType; }
+        public void setSceneType(SceneType sceneType) { this.sceneType = sceneType; }
+        public SkillForm getSkillForm() { return skillForm; }
+        public void setSkillForm(SkillForm skillForm) { this.skillForm = skillForm; }
         public boolean isCanPause() { return canPause; }
         public void setCanPause(boolean canPause) { this.canPause = canPause; }
         public boolean isCanResume() { return canResume; }

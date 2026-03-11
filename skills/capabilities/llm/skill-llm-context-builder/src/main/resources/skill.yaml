@@ -1,0 +1,144 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-context-builder
+  name: LLM上下文构建器
+  version: 2.3
+  description: LLM上下文构建服务 - 支持多源上下文提取(PAGE/SKILL/SCENE/USER/KNOWLEDGE)、智能合并、Token管理与Prompt格式化
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - context
+    - token
+    - prompt
+    - rag
+
+spec:
+  type: service-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x2E
+    category: LLM
+    code: LLM_CONTEXT_BUILDER
+    operations: [extract, merge, token-manage, format]
+  
+  supportedSceneTypes:
+    - llm-chat
+    - knowledge-qa
+    - document-assistant
+    - onboarding-assistant
+    - meeting-minutes
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: context-building
+      version: "1.0"
+      description: "上下文构建接口"
+    - id: prompt-formatting
+      version: "1.0"
+      description: "Prompt格式化接口"
+  
+  contextSources:
+    - type: PAGE
+      priority: 10
+      description: 页面上下文
+    - type: SKILL
+      priority: 20
+      description: 技能上下文
+    - type: SCENE
+      priority: 30
+      description: 场景上下文
+    - type: USER
+      priority: 40
+      description: 用户上下文
+    - type: KNOWLEDGE
+      priority: 50
+      description: 知识库上下文
+  
+  capabilities:
+    - id: context-extraction
+      name: 上下文提取
+      description: 从PAGE/SKILL/SCENE/USER/KNOWLEDGE多种来源提取上下文信息
+      category: context
+    - id: context-merging
+      name: 上下文合并
+      description: 按优先级合并多个上下文，支持去重和压缩
+      category: context
+    - id: token-management
+      name: Token管理
+      description: Token计数、限制裁剪、智能摘要
+      category: context
+    - id: prompt-formatting
+      name: Prompt格式化
+      description: 生成格式化Prompt，支持模板注入
+      category: ai
+  
+  endpoints:
+    - path: /api/llm/context/build
+      method: POST
+      description: 构建上下文
+      capability: context-extraction
+    - path: /api/llm/context/{contextId}
+      method: GET
+      description: 获取上下文
+      capability: context-extraction
+    - path: /api/llm/context/format
+      method: POST
+      description: 格式化Prompt
+      capability: prompt-formatting
+    - path: /api/llm/context/sources
+      method: GET
+      description: 获取支持的上下文源
+      capability: context-extraction
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    
+  config:
+    optional:
+      - name: MAX_TOKENS
+        type: integer
+        default: 4096
+        description: 最大Token数
+      - name: CONTEXT_TTL
+        type: integer
+        default: 3600000
+        description: 上下文缓存时间(毫秒)
+      - name: ENABLE_CACHE
+        type: boolean
+        default: true
+        description: 是否启用上下文缓存
+      - name: TRUNCATION_STRATEGY
+        type: string
+        default: "smart"
+        description: Token裁剪策略(smart/truncate/summarize)
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

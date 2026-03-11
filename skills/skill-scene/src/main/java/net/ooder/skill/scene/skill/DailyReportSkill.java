@@ -1,6 +1,6 @@
 package net.ooder.skill.scene.skill;
 
-import net.ooder.skill.scene.dto.CapabilityDTO;
+import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.dailyreport.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

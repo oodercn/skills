@@ -1,0 +1,33 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-conversation
+  name: LLM对话服务
+  version: "1.0.0"
+  description: "LLM对话服务，提供智能对话、会话管理、历史记录功能"
+
+spec:
+  skillForm: PROVIDER
+  visibility: developer
+  businessCategory: AI_ASSISTANT
+  subCategory: conversation
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x30
+        name: LLM_BASE
+        description: "LLM基础服务"
+        fallback: 0x31
+    optional: []
+  
+  tags:
+    - llm
+    - conversation
+    - chat
+    - ai
+  
+  dependencies:
+    - skill-llm-context-builder

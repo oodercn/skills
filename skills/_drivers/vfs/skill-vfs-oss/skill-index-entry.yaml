@@ -1,0 +1,32 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-vfs-oss
+  name: 阿里云OSS存储
+  version: "0.7.3"
+  description: "阿里云OSS对象存储服务"
+
+spec:
+  skillForm: DRIVER
+  visibility: developer
+  businessCategory: SYSTEM_TOOLS
+  subCategory: oss
+  category: DATA
+  capabilityCategory: vfs
+  
+  capabilityAddresses:
+    required:
+      - address: 0x23
+        name: VFS_OSS
+        description: "阿里云OSS存储"
+    optional: []
+  
+  tags:
+    - vfs
+    - oss
+    - storage
+    - aliyun
+  
+  dependencies:
+    - skill-vfs-base

@@ -63,7 +63,7 @@ async function refreshHistory() {
         
         var result = await ApiClient.get(url);
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             historyData = result.data.list || [];
             hasMore = historyData.length === pageSize;
         } else {
@@ -82,7 +82,7 @@ async function loadStatistics() {
     try {
         var result = await ApiClient.get('/api/v1/my/history/statistics');
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             statistics = result.data;
         } else {
             statistics = { totalCount: 0, successCount: 0, partialCount: 0, failedCount: 0 };
@@ -208,7 +208,7 @@ async function loadMore() {
         var timeRange = document.getElementById('timeRange').value;
         var result = await ApiClient.get('/api/v1/my/history/scenes?pageNum=' + pageNum + '&pageSize=' + pageSize + '&days=' + timeRange);
         
-        if (result.code === 200 && result.data) {
+        if (result.status === 'success' && result.data) {
             var newData = result.data.list || [];
             historyData = historyData.concat(newData);
             hasMore = newData.length === pageSize;
@@ -230,7 +230,7 @@ async function rerunScene(sceneGroupId) {
     try {
         var result = await ApiClient.post('/api/v1/my/history/' + sceneGroupId + '/rerun');
         
-        if (result.code === 200) {
+        if (result.status === 'success') {
             alert('场景已开始执行');
             window.location.href = '/console/pages/my-scenes.html';
         } else {

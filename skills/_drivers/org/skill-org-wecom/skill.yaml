@@ -1,0 +1,130 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-wecom
+  name: WeCom Organization
+  version: 0.7.3
+  description: 企业微信组织服务 - 提供企业微信组织架构同步和用户认证能力
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-wecom
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - wecom
+    - enterprise-wechat
+    - org
+    - authentication
+    - organization
+
+spec:
+  type: enterprise-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x0B
+    category: ORG
+    code: ORG_WECOM
+    operations: [auth, org-sync, user-query]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.wecom.WeComOrgApplication
+  
+  capabilities:
+    - id: org-data-read
+      name: Org Data Read
+      description: 组织数据读取
+      category: organization
+    - id: org-data-sync
+      name: Org Data Sync
+      description: 组织数据同步
+      category: organization
+    - id: user-auth
+      name: User Authentication
+      description: 用户认证
+      category: authentication
+    - id: department-query
+      name: Department Query
+      description: 部门查询
+      category: organization
+    - id: user-query
+      name: User Query
+      description: 用户查询
+      category: organization
+  
+  scenes:
+    - name: auth
+      description: 认证场景
+      capabilities:
+        - org-data-read
+        - org-data-sync
+        - user-auth
+        - department-query
+        - user-query
+  
+  dependencies: []
+  
+  config:
+    required:
+      - name: WECOM_CORP_ID
+        type: string
+        description: 企业微信CorpId
+      - name: WECOM_AGENT_ID
+        type: string
+        description: 企业微信AgentId
+      - name: WECOM_SECRET
+        type: string
+        secret: true
+        description: 企业微信Secret
+    optional:
+      - name: WECOM_API_BASE_URL
+        type: string
+        default: https://qyapi.weixin.qq.com
+        description: 企业微信API基础URL
+      - name: WECOM_TIMEOUT
+        type: number
+        default: 30000
+        description: 请求超时时间(毫秒)
+      - name: WECOM_CACHE_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用缓存
+      - name: WECOM_CACHE_TTL
+        type: number
+        default: 300000
+        description: 缓存过期时间(毫秒)
+  
+  endpoints:
+    - path: /api/org/departments
+      method: GET
+      description: 获取部门列表
+      capability: department-query
+    - path: /api/org/users
+      method: GET
+      description: 获取用户列表
+      capability: user-query
+    - path: /api/org/sync
+      method: POST
+      description: 同步组织数据
+      capability: org-data-sync
+    - path: /api/auth/login
+      method: POST
+      description: 用户登录
+      capability: user-auth
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

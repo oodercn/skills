@@ -1,7 +1,8 @@
 package net.ooder.skill.scene.discovery;
 
-import net.ooder.skill.scene.capability.model.SceneSkillCategory;
-import net.ooder.skill.scene.capability.service.SceneSkillCategoryDetector;
+import net.ooder.scene.skill.model.SceneType;
+import net.ooder.scene.skill.model.SkillForm;
+import net.ooder.skill.scene.capability.service.MetadataCompat;
 import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.discovery.RepositoryDTO;
 import net.ooder.skills.api.SkillPackageManager;
@@ -32,9 +33,6 @@ public class SkillIndexLoader {
 
     @Autowired(required = false)
     private SkillPackageManager skillPackageManager;
-    
-    @Autowired
-    private SceneSkillCategoryDetector categoryDetector;
 
     private Map<String, Object> skillIndex;
     private List<Map<String, Object>> skills = new ArrayList<>();
@@ -153,9 +151,17 @@ public class SkillIndexLoader {
             cap.setSceneCapability(isScene);
             
             if (isScene) {
-                SceneSkillCategory category = categoryDetector.detectCategory(skill);
-                cap.setCategory(category.getCode());
-                cap.setMainFirst(category.hasMainFirst());
+                Object sceneTypeObj = skill.get("sceneType");
+                String sceneTypeCode = sceneTypeObj != null ? String.valueOf(sceneTypeObj) : "MANUAL";
+                
+                Object skillFormObj = skill.get("skillForm");
+                String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : "STANDALONE";
+                
+                boolean hasSelfDrive = "AUTO".equals(sceneTypeCode);
+                
+                cap.setSceneType(sceneTypeCode);
+                cap.setSkillForm(skillFormCode);
+                cap.setMainFirst(hasSelfDrive);
                 
                 Object visibilityObj = skill.get("visibility");
                 if (visibilityObj == null) {
@@ -167,7 +173,7 @@ public class SkillIndexLoader {
                     }
                 }
                 cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
-                    (category == SceneSkillCategory.ASS ? "internal" : "public"));
+                    MetadataCompat.getVisibility(skill));
                 
                 Object driverConditionsObj = skill.get("driverConditions");
                 if (driverConditionsObj instanceof List) {
@@ -283,13 +289,18 @@ public class SkillIndexLoader {
                 cap.setCapabilities((List<String>) caps);
             }
             
-            SceneSkillCategory category = categoryDetector.detectCategory(scene);
-            cap.setCategory(category.getCode());
-            cap.setMainFirst(category.hasMainFirst());
+            Object sceneTypeObj = scene.get("sceneType");
+            String sceneTypeCode = sceneTypeObj != null ? String.valueOf(sceneTypeObj) : "MANUAL";
+            
+            Object skillFormObj = scene.get("skillForm");
+            String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : "STANDALONE";
+            
+            cap.setSceneType(sceneTypeCode);
+            cap.setSkillForm(skillFormCode);
+            cap.setMainFirst("AUTO".equals(sceneTypeCode));
             
             Object visibilityObj = scene.get("visibility");
-            cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
-                (category == SceneSkillCategory.ASS ? "internal" : "public"));
+            cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : "public");
             
             Object driverConditionsObj = scene.get("driverConditions");
             if (driverConditionsObj instanceof List) {

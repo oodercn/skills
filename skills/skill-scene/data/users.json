@@ -1,7 +1,18 @@
 {
+	"user-leader-001":{
+		"active":true,
+		"createTime":1773243257820,
+		"departmentId":"dept-rd",
+		"email":"leader@example.com",
+		"name":"主导者",
+		"role":"leader",
+		"title":"项目主导",
+		"updateTime":0,
+		"userId":"user-leader-001"
+	},
 	"user-hr-001":{
 		"active":true,
-		"createTime":1772795454673,
+		"createTime":1773243257820,
 		"departmentId":"dept-hr",
 		"email":"liu.hr@example.com",
 		"name":"刘HR",
@@ -10,9 +21,20 @@
 		"updateTime":0,
 		"userId":"user-hr-001"
 	},
+	"user-installer-001":{
+		"active":true,
+		"createTime":1773243257820,
+		"departmentId":"dept-it",
+		"email":"installer@example.com",
+		"name":"安装者",
+		"role":"installer",
+		"title":"系统安装者",
+		"updateTime":0,
+		"userId":"user-installer-001"
+	},
 	"user-employee-003":{
 		"active":true,
-		"createTime":1772795454673,
+		"createTime":1773243257820,
 		"departmentId":"dept-rd",
 		"email":"zhao.employee@example.com",
 		"name":"赵员工",
@@ -23,7 +45,7 @@
 	},
 	"user-employee-002":{
 		"active":true,
-		"createTime":1772795454673,
+		"createTime":1773243257820,
 		"departmentId":"dept-rd",
 		"email":"wang.employee@example.com",
 		"name":"王员工",
@@ -34,7 +56,7 @@
 	},
 	"user-employee-001":{
 		"active":true,
-		"createTime":1772795454673,
+		"createTime":1773243257820,
 		"departmentId":"dept-rd",
 		"email":"li.employee@example.com",
 		"name":"李员工",
@@ -43,9 +65,20 @@
 		"updateTime":0,
 		"userId":"user-employee-001"
 	},
+	"user-admin-001":{
+		"active":true,
+		"createTime":1773243257820,
+		"departmentId":"dept-it",
+		"email":"admin@example.com",
+		"name":"系统管理员",
+		"role":"admin",
+		"title":"系统管理员",
+		"updateTime":0,
+		"userId":"user-admin-001"
+	},
 	"user-manager-001":{
 		"active":true,
-		"createTime":1772795454673,
+		"createTime":1773243257819,
 		"departmentId":"dept-rd",
 		"email":"zhang.manager@example.com",
 		"name":"张经理",
@@ -53,5 +86,16 @@
 		"title":"研发经理",
 		"updateTime":0,
 		"userId":"user-manager-001"
+	},
+	"user-collaborator-001":{
+		"active":true,
+		"createTime":1773243257820,
+		"departmentId":"dept-rd",
+		"email":"collaborator@example.com",
+		"name":"协作者",
+		"role":"collaborator",
+		"title":"项目协作",
+		"updateTime":0,
+		"userId":"user-collaborator-001"
 	}
 }

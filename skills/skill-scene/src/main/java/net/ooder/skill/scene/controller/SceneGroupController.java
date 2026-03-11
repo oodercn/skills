@@ -7,6 +7,8 @@ import net.ooder.skill.scene.service.SceneGroupService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/v1/scene-groups")
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
@@ -31,6 +33,27 @@ public class SceneGroupController extends BaseController {
         } catch (Exception e) {
             logRequestError("create", e);
             return ResultModel.error(500, "创建场景组失败: " + e.getMessage());
+        }
+    }
+
+    @PutMapping("/{sceneGroupId}")
+    public ResultModel<SceneGroupDTO> update(
+            @PathVariable String sceneGroupId,
+            @RequestBody UpdateSceneGroupRequest request) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("update", sceneGroupId);
+
+        try {
+            SceneGroupDTO result = sceneGroupService.update(sceneGroupId, request.getConfig());
+            if (result == null) {
+                logRequestEnd("update", "Not found", System.currentTimeMillis() - startTime);
+                return ResultModel.notFound("场景组不存在");
+            }
+            logRequestEnd("update", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("update", e);
+            return ResultModel.error(500, "更新场景组失败: " + e.getMessage());
         }
     }
 
@@ -256,6 +279,39 @@ public class SceneGroupController extends BaseController {
         }
     }
 
+    @PutMapping("/{sceneGroupId}/capabilities/{bindingId}")
+    public ResultModel<Boolean> updateCapabilityBinding(
+            @PathVariable String sceneGroupId,
+            @PathVariable String bindingId,
+            @RequestBody CapabilityBindingDTO binding) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("updateCapabilityBinding", bindingId);
+
+        try {
+            boolean result = sceneGroupService.updateCapabilityBinding(sceneGroupId, bindingId, binding);
+            logRequestEnd("updateCapabilityBinding", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("updateCapabilityBinding", e);
+            return ResultModel.error(500, "更新能力绑定失败: " + e.getMessage());
+        }
+    }
+
+    @GetMapping("/{sceneGroupId}/snapshots")
+    public ResultModel<List<SceneSnapshotDTO>> listSnapshots(@PathVariable String sceneGroupId) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("listSnapshots", sceneGroupId);
+
+        try {
+            List<SceneSnapshotDTO> result = sceneGroupService.listSnapshots(sceneGroupId);
+            logRequestEnd("listSnapshots", result != null ? result.size() : 0, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("listSnapshots", e);
+            return ResultModel.error(500, "获取快照列表失败: " + e.getMessage());
+        }
+    }
+
     @PostMapping("/{sceneGroupId}/snapshots")
     public ResultModel<SceneSnapshotDTO> createSnapshot(@PathVariable String sceneGroupId) {
         long startTime = System.currentTimeMillis();
@@ -352,10 +408,51 @@ public class SceneGroupController extends BaseController {
         public void setConfig(SceneGroupConfigDTO config) { this.config = config; }
     }
 
+    public static class UpdateSceneGroupRequest {
+        private SceneGroupConfigDTO config;
+
+        public SceneGroupConfigDTO getConfig() { return config; }
+        public void setConfig(SceneGroupConfigDTO config) { this.config = config; }
+    }
+
     public static class ChangeRoleRequest {
         private String newRole;
 
         public String getNewRole() { return newRole; }
         public void setNewRole(String newRole) { this.newRole = newRole; }
+    }
+
+    @PostMapping("/{sceneGroupId}/knowledge-bases")
+    public ResultModel<Boolean> bindKnowledgeBase(
+            @PathVariable String sceneGroupId,
+            @RequestBody KnowledgeBindingDTO binding) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("bindKnowledgeBase", sceneGroupId);
+
+        try {
+            boolean result = sceneGroupService.bindKnowledgeBase(sceneGroupId, binding);
+            logRequestEnd("bindKnowledgeBase", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("bindKnowledgeBase", e);
+            return ResultModel.error(500, "绑定知识库失败: " + e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/{sceneGroupId}/knowledge-bases/{kbId}")
+    public ResultModel<Boolean> unbindKnowledgeBase(
+            @PathVariable String sceneGroupId,
+            @PathVariable String kbId) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("unbindKnowledgeBase", kbId);
+
+        try {
+            boolean result = sceneGroupService.unbindKnowledgeBase(sceneGroupId, kbId);
+            logRequestEnd("unbindKnowledgeBase", result, System.currentTimeMillis() - startTime);
+            return ResultModel.success(result);
+        } catch (Exception e) {
+            logRequestError("unbindKnowledgeBase", e);
+            return ResultModel.error(500, "解绑知识库失败: " + e.getMessage());
+        }
     }
 }
