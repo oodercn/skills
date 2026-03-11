@@ -1,9 +1,9 @@
-apiVersion: ooder.io/v1
+﻿apiVersion: ooder.io/v1
 kind: SkillIndex
 
 metadata:
   name: ooder-skills
-  version: "2.3"
+  version: "2.3.1"
   description: Ooder Skills Repository - Shared skills for Ooder Agent Platform
   author: Ooder Team
   license: Apache-2.0
@@ -159,11 +159,10 @@ spec:
       sceneDriver: null
   
   skills:
-    - skillId: skill-capability
+    - id: skill-capability
       name: 能力管理服务
       version: "1.0.0"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: capability
       tags:
         - capability
@@ -174,10 +173,10 @@ spec:
       sceneId: capability
       path: skills/skill-capability
       
-    - skillId: skill-a2ui
+    - id: skill-a2ui
       name: A2UI Skill
       version: "0.7.3"
-      category: UI
+      capabilityCategory: ui
       subCategory: code-gen
       tags:
         - a2ui
@@ -190,10 +189,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-chat
+    - id: skill-llm-chat
       name: LLM智能对话场景能力
       version: "2.3.0"
-      category: LLM
+      capabilityCategory: llm
       subCategory: chat
       tags:
         - llm
@@ -215,17 +214,17 @@ spec:
       driverCapabilities:
         - intent-receiver
       dependencies:
-        - skillId: skill-llm-conversation
+        - id: skill-llm-conversation
           version: ">=1.0.0"
           required: true
-        - skillId: skill-llm-context-builder
+        - id: skill-llm-context-builder
           version: ">=1.0.0"
           required: true
       
-    - skillId: skill-llm-conversation
+    - id: skill-llm-conversation
       name: LLM对话服务
       version: "1.0.0"
-      category: LLM
+      capabilityCategory: llm
       subCategory: conversation
       tags:
         - llm
@@ -236,14 +235,14 @@ spec:
       sceneId: llm
       path: skills/skill-llm-conversation
       dependencies:
-        - skillId: skill-llm-context-builder
+        - id: skill-llm-context-builder
           version: ">=1.0.0"
           required: true
       
-    - skillId: skill-llm-context-builder
+    - id: skill-llm-context-builder
       name: 上下文构建服务
       version: "1.0.0"
-      category: LLM
+      capabilityCategory: llm
       subCategory: context
       tags:
         - llm
@@ -253,10 +252,10 @@ spec:
       sceneId: llm
       path: skills/skill-llm-context-builder
       
-    - skillId: skill-llm-config-manager
+    - id: skill-llm-config-manager
       name: LLM配置管理
       version: "1.0.0"
-      category: LLM
+      capabilityCategory: llm
       subCategory: config
       tags:
         - llm
@@ -266,10 +265,10 @@ spec:
       sceneId: llm
       path: skills/skill-llm-config-manager
       
-    - skillId: skill-knowledge-base
+    - id: skill-knowledge-base
       name: 知识库核心服务
       version: "1.0.0"
-      category: KNOWLEDGE
+      capabilityCategory: know
       subCategory: base
       tags:
         - knowledge
@@ -279,10 +278,10 @@ spec:
       sceneId: knowledge
       path: skills/skill-knowledge-base
       
-    - skillId: skill-rag
+    - id: skill-rag
       name: RAG检索增强
       version: "1.0.0"
-      category: KNOWLEDGE
+      capabilityCategory: know
       subCategory: rag
       tags:
         - rag
@@ -292,14 +291,14 @@ spec:
       sceneId: knowledge
       path: skills/skill-rag
       dependencies:
-        - skillId: skill-knowledge-base
+        - id: skill-knowledge-base
           version: ">=1.0.0"
           required: false
       
-    - skillId: skill-local-knowledge
+    - id: skill-local-knowledge
       name: 本地知识服务
       version: "1.0.0"
-      category: KNOWLEDGE
+      capabilityCategory: know
       subCategory: local
       tags:
         - knowledge
@@ -309,10 +308,10 @@ spec:
       sceneId: knowledge
       path: skills/skill-local-knowledge
       
-    - skillId: skill-vector-sqlite
+    - id: skill-vector-sqlite
       name: SQLite向量存储
       version: "1.0.0"
-      category: KNOWLEDGE
+      capabilityCategory: know
       subCategory: vector
       tags:
         - vector
@@ -322,10 +321,10 @@ spec:
       sceneId: knowledge
       path: skills/skill-vector-sqlite
       
-    - skillId: skill-knowledge-qa
+    - id: skill-knowledge-qa
       name: 知识问答场景能力
       version: "2.3.0"
-      category: KNOWLEDGE
+      capabilityCategory: know
       subCategory: qa
       tags:
         - knowledge
@@ -338,19 +337,18 @@ spec:
       path: skills/skill-knowledge-qa
       mainFirst: true
       dependencies:
-        - skillId: skill-knowledge-base
+        - id: skill-knowledge-base
           version: ">=1.0.0"
           required: true
-        - skillId: skill-rag
+        - id: skill-rag
           version: ">=1.0.0"
           required: false
       
-    - skillId: skill-knowledge-ui
+    - id: skill-knowledge-ui
       name: 知识库管理界面
       version: "2.3.0"
-      category: UI
-      domain: nexus
-      subcategory: KNOWLEDGE
+      capabilityCategory: nexus-ui
+      subCategory: knowledge
       tags:
         - knowledge
         - ui
@@ -362,16 +360,15 @@ spec:
       path: skills/skill-knowledge-ui
       mainFirst: true
       dependencies:
-        - skillId: skill-knowledge-base
+        - id: skill-knowledge-base
           version: ">=1.0.0"
           required: true
       
-    - skillId: skill-llm-assistant-ui
+    - id: skill-llm-assistant-ui
       name: LLM智能助手界面
       version: "2.3.0"
-      category: UI
-      domain: nexus
-      subcategory: LLM
+      capabilityCategory: nexus-ui
+      subCategory: llm
       tags:
         - llm
         - assistant
@@ -383,19 +380,18 @@ spec:
       path: skills/skill-llm-assistant-ui
       mainFirst: true
       dependencies:
-        - skillId: skill-llm-conversation
+        - id: skill-llm-conversation
           version: ">=1.0.0"
           required: true
-        - skillId: skill-llm-context-builder
+        - id: skill-llm-context-builder
           version: ">=1.0.0"
           required: true
       
-    - skillId: skill-llm-management-ui
+    - id: skill-llm-management-ui
       name: LLM管理界面
       version: "1.0.0"
-      category: UI
-      domain: nexus
-      subcategory: LLM
+      capabilityCategory: nexus-ui
+      subCategory: llm
       tags:
         - llm
         - management
@@ -404,15 +400,14 @@ spec:
       sceneId: llm-management
       path: skills/skill-llm-management-ui
       dependencies:
-        - skillId: skill-llm-conversation
+        - id: skill-llm-conversation
           version: ">=1.0.0"
           required: true
       
-    - skillId: skill-org-base
+    - id: skill-org-base
       name: 组织基础服务
       version: "1.0.0"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: base
       tags:
         - org
@@ -422,11 +417,10 @@ spec:
       sceneId: org
       path: skills/skill-org-base
       
-    - skillId: skill-vfs-base
+    - id: skill-vfs-base
       name: VFS基础服务
       version: "1.0.0"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: base
       tags:
         - vfs
@@ -436,10 +430,10 @@ spec:
       sceneId: vfs
       path: skills/skill-vfs-base
       
-    - skillId: skill-document-processor
+    - id: skill-document-processor
       name: 文档处理服务
       version: "1.0.0"
-      category: TOOL
+      capabilityCategory: util
       subCategory: document
       tags:
         - document
@@ -449,11 +443,10 @@ spec:
       sceneId: document
       path: skills/skill-document-processor
       
-    - skillId: skill-org-dingding
+    - id: skill-org-dingding
       name: DingTalk Organization Service
       version: "0.7.3"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: dingtalk
       tags:
         - dingtalk
@@ -467,11 +460,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-org-feishu
+    - id: skill-org-feishu
       name: Feishu Organization Service
       version: "0.7.3"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: feishu
       tags:
         - feishu
@@ -485,11 +477,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-org-wecom
+    - id: skill-org-wecom
       name: WeCom Organization Service
       version: "0.7.3"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: wecom
       tags:
         - wecom
@@ -503,11 +494,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-org-ldap
+    - id: skill-org-ldap
       name: LDAP Organization Service
       version: "0.7.3"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: ldap
       tags:
         - ldap
@@ -520,11 +510,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-user-auth
+    - id: skill-user-auth
       name: User Authentication Service
       version: "0.7.3"
-      category: SERVICE
-      domain: org
+      capabilityCategory: org
       subCategory: auth
       tags:
         - auth
@@ -537,10 +526,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-trae-solo
+    - id: skill-trae-solo
       name: Trae Solo Service
       version: "0.7.3"
-      category: TOOL
+      capabilityCategory: util
       subCategory: general
       tags:
         - utility
@@ -552,11 +541,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-mqtt
+    - id: skill-mqtt
       name: MQTT Service Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: mqtt
       tags:
         - mqtt
@@ -569,11 +557,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-vfs-database
+    - id: skill-vfs-database
       name: Database VFS Service
       version: "0.7.3"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: database
       tags:
         - vfs
@@ -586,11 +573,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-vfs-local
+    - id: skill-vfs-local
       name: Local VFS Service
       version: "0.7.3"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: local
       tags:
         - vfs
@@ -603,11 +589,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-vfs-minio
+    - id: skill-vfs-minio
       name: MinIO VFS Service
       version: "0.7.3"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -621,11 +606,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-vfs-oss
+    - id: skill-vfs-oss
       name: Aliyun OSS VFS Service
       version: "0.7.3"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -639,11 +623,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-vfs-s3
+    - id: skill-vfs-s3
       name: AWS S3 VFS Service
       version: "0.7.3"
-      category: DATA
-      domain: vfs
+      capabilityCategory: vfs
       subCategory: object-storage
       tags:
         - vfs
@@ -657,11 +640,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-network
+    - id: skill-network
       name: Network Management Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: network
       tags:
         - network
@@ -675,11 +657,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-network-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-agent
+    - id: skill-agent
       name: Agent Management Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: agent
       tags:
         - agent
@@ -692,11 +673,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-security
+    - id: skill-security
       name: Security Management Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: security
       tags:
         - security
@@ -709,11 +689,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-security-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-health
+    - id: skill-health
       name: Health Check Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: health
       tags:
         - health
@@ -726,11 +705,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-protocol
+    - id: skill-protocol
       name: Protocol Management Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: protocol
       tags:
         - protocol
@@ -743,11 +721,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-protocol-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-openwrt
+    - id: skill-openwrt
       name: OpenWrt Management Skill
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: router
       tags:
         - openwrt
@@ -760,10 +737,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-share
+    - id: skill-share
       name: Skill Share Skill
       version: "0.7.3"
-      category: TOOL
+      capabilityCategory: util
       subCategory: share
       tags:
         - share
@@ -775,11 +752,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-hosting
+    - id: skill-hosting
       name: Hosting Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: hosting
       tags:
         - hosting
@@ -794,11 +770,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-hosting-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-monitor
+    - id: skill-monitor
       name: Monitoring Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: monitor
       tags:
         - monitor
@@ -813,11 +788,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-monitor-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-im
+    - id: skill-im
       name: Instant Messaging Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: im
       tags:
         - im
@@ -832,11 +806,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-group
+    - id: skill-group
       name: Group Management Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: group
       tags:
         - group
@@ -851,11 +824,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-health
+    - id: skill-health
       name: Health Check Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: health
       tags:
         - health
@@ -870,11 +842,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-health-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-agent
+    - id: skill-agent
       name: Agent Management Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: agent
       tags:
         - agent
@@ -889,11 +860,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-agent-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-openwrt
+    - id: skill-openwrt
       name: OpenWrt Router Driver
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: openwrt
       tags:
         - openwrt
@@ -908,11 +878,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-openwrt-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-audit
+    - id: skill-audit
       name: Audit Log Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: audit
       tags:
         - audit
@@ -927,11 +896,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-access-control
+    - id: skill-access-control
       name: Access Control Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: access
       tags:
         - access
@@ -947,11 +915,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-access-control-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-remote-terminal
+    - id: skill-remote-terminal
       name: Remote Terminal Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: remote
       tags:
         - remote
@@ -967,11 +934,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-remote-terminal-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-msg-service
+    - id: skill-msg-service
       name: Message Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: message
       tags:
         - message
@@ -986,11 +952,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-service-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-cmd-service
+    - id: skill-cmd-service
       name: Command Monitoring Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: cmd
       tags:
         - command
@@ -1005,11 +970,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-cmd-service-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-res-service
+    - id: skill-res-service
       name: Resource Management Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: res
       tags:
         - resource
@@ -1024,11 +988,11 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-res-service-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-volcengine
+    - id: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
       version: "0.7.3"
-      category: TOOL
-      subcategory: LLM
+      capabilityCategory: util
+      subCategory: llm
       tags:
         - llm
         - volcengine
@@ -1041,11 +1005,11 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-qianwen
+    - id: skill-llm-qianwen
       name: Qianwen (Tongyi) LLM Provider
       version: "0.7.3"
-      category: TOOL
-      subcategory: LLM
+      capabilityCategory: util
+      subCategory: llm
       tags:
         - llm
         - qianwen
@@ -1058,11 +1022,11 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-llm-deepseek
+    - id: skill-llm-deepseek
       name: DeepSeek LLM Provider
       version: "0.7.3"
-      category: TOOL
-      subcategory: LLM
+      capabilityCategory: util
+      subCategory: llm
       tags:
         - llm
         - deepseek
@@ -1075,11 +1039,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-payment-alipay
+    - id: skill-payment-alipay
       name: Alipay Payment Provider
       version: "0.7.3"
-      category: SERVICE
-      domain: payment
+      capabilityCategory: payment
       subCategory: alipay
       tags:
         - payment
@@ -1093,11 +1056,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-payment-wechat
+    - id: skill-payment-wechat
       name: WeChat Pay Provider
       version: "0.7.3"
-      category: SERVICE
-      domain: payment
+      capabilityCategory: payment
       subCategory: wechat
       tags:
         - payment
@@ -1111,11 +1073,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-payment-unionpay
+    - id: skill-payment-unionpay
       name: UnionPay Payment Provider
       version: "0.7.3"
-      category: SERVICE
-      domain: payment
+      capabilityCategory: payment
       subCategory: unionpay
       tags:
         - payment
@@ -1129,11 +1090,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-media-wechat
+    - id: skill-media-wechat
       name: WeChat MP Publish Provider
       version: "0.7.3"
-      category: WORKFLOW
-      domain: media
+      capabilityCategory: media
       subCategory: wechat
       tags:
         - media
@@ -1147,11 +1107,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-wechat-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-media-weibo
+    - id: skill-media-weibo
       name: Weibo Publish Provider
       version: "0.7.3"
-      category: WORKFLOW
-      domain: media
+      capabilityCategory: media
       subCategory: weibo
       tags:
         - media
@@ -1165,11 +1124,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-weibo-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-media-zhihu
+    - id: skill-media-zhihu
       name: Zhihu Publish Provider
       version: "0.7.3"
-      category: WORKFLOW
-      domain: media
+      capabilityCategory: media
       subCategory: zhihu
       tags:
         - media
@@ -1183,11 +1141,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-zhihu-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-media-toutiao
+    - id: skill-media-toutiao
       name: Toutiao Publish Provider
       version: "0.7.3"
-      category: WORKFLOW
-      domain: media
+      capabilityCategory: media
       subCategory: toutiao
       tags:
         - media
@@ -1201,11 +1158,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-toutiao-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-media-xiaohongshu
+    - id: skill-media-xiaohongshu
       name: Xiaohongshu Publish Provider
       version: "0.7.3"
-      category: WORKFLOW
-      domain: media
+      capabilityCategory: media
       subCategory: xiaohongshu
       tags:
         - media
@@ -1219,11 +1175,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-notify
+    - id: skill-notify
       name: Notification Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: notify
       tags:
         - notify
@@ -1237,11 +1192,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-email
+    - id: skill-email
       name: Email Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: email
       tags:
         - email
@@ -1255,11 +1209,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-search
+    - id: skill-search
       name: Search Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: search
       tags:
         - search
@@ -1273,11 +1226,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-search-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-audit
+    - id: skill-audit
       name: Audit Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: audit
       tags:
         - audit
@@ -1291,11 +1243,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-audit-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-report
+    - id: skill-report
       name: Report Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: report
       tags:
         - report
@@ -1309,11 +1260,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-report-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-task
+    - id: skill-task
       name: Task Management Service
       version: "0.7.3"
-      category: SERVICE
-      domain: sys
+      capabilityCategory: sys
       subCategory: task
       tags:
         - task
@@ -1327,10 +1277,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-task-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-market
+    - id: skill-market
       name: Skill Market Service
       version: "0.7.3"
-      category: TOOL
+      capabilityCategory: util
       subCategory: market
       tags:
         - market
@@ -1344,10 +1294,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-collaboration
+    - id: skill-collaboration
       name: Collaboration Scene Service
       version: "0.7.3"
-      category: TOOL
+      capabilityCategory: util
       subCategory: collaboration
       tags:
         - collaboration
@@ -1361,11 +1311,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-msg
+    - id: skill-msg
       name: Message Service
       version: "0.7.3"
-      category: SERVICE
-      domain: msg
+      capabilityCategory: msg
       subCategory: message
       tags:
         - message
@@ -1379,11 +1328,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-business
+    - id: skill-business
       name: Business Scene Service
       version: "0.7.3"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       subCategory: scenario
       tags:
         - business
@@ -1397,10 +1345,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-business-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-common
+    - id: skill-common
       name: Skill Common Library
       version: "0.7.3"
-      category: TOOL
+      capabilityCategory: util
       subCategory: common
       tags:
         - common
@@ -1413,11 +1361,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-common-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-k8s
+    - id: skill-k8s
       name: Kubernetes Cluster Management
       version: "0.7.3"
-      category: SERVICE
-      domain: infrastructure
+      capabilityCategory: infrastructure
       subCategory: kubernetes
       tags:
         - kubernetes
@@ -1431,11 +1378,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-scheduler-quartz
+    - id: skill-scheduler-quartz
       name: Quartz Scheduler Service
       version: "0.7.3"
-      category: SERVICE
-      domain: scheduler
+      capabilityCategory: scheduler
       subCategory: quartz
       tags:
         - scheduler
@@ -1449,11 +1395,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
       checksum: ""
       
-    - skillId: skill-nexus-dashboard-nexus-ui
+    - id: skill-nexus-dashboard-nexus-ui
       name: Nexus Dashboard UI
       version: "0.7.3"
-      category: UI
-      domain: nexus
+      capabilityCategory: nexus-ui
       subCategory: dashboard
       tags:
         - nexus
@@ -1467,11 +1412,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-dashboard-nexus-ui-0.7.3.zip
       checksum: ""
       
-    - skillId: skill-nexus-system-status-nexus-ui
+    - id: skill-nexus-system-status-nexus-ui
       name: Nexus System Status UI
       version: "0.7.3"
-      category: UI
-      domain: nexus
+      capabilityCategory: nexus-ui
       subCategory: status
       tags:
         - nexus
@@ -1485,11 +1429,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-system-status-nexus-ui-0.7.3.zip
       checksum: ""
       
-    - skillId: skill-personal-dashboard-nexus-ui
+    - id: skill-personal-dashboard-nexus-ui
       name: Personal Dashboard UI
       version: "0.7.3"
-      category: UI
-      domain: nexus
+      capabilityCategory: nexus-ui
       subCategory: personal
       tags:
         - nexus
@@ -1503,11 +1446,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-personal-dashboard-nexus-ui-0.7.3.zip
       checksum: ""
       
-    - skillId: skill-nexus-health-check-nexus-ui
+    - id: skill-nexus-health-check-nexus-ui
       name: Nexus Health Check UI
       version: "0.7.3"
-      category: UI
-      domain: nexus
+      capabilityCategory: nexus-ui
       subCategory: health
       tags:
         - nexus
@@ -1521,11 +1463,10 @@ spec:
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-health-check-nexus-ui-0.7.3.zip
       checksum: ""
       
-    - skillId: skill-storage-management-nexus-ui
+    - id: skill-storage-management-nexus-ui
       name: Storage Management UI
       version: "0.7.3"
-      category: UI
-      domain: nexus
+      capabilityCategory: nexus-ui
       subCategory: storage
       tags:
         - nexus
@@ -1544,7 +1485,7 @@ spec:
       name: UI Generation
       description: UI生成场景，支持图转代码、组件生成等能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - generate-ui
         - preview-ui
@@ -1554,8 +1495,7 @@ spec:
       name: Authentication
       description: 认证场景，支持用户认证和组织数据访问
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - user-auth
         - org-data-read
@@ -1565,8 +1505,7 @@ spec:
       name: Utility
       description: 实用工具场景，提供各种实用功能
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - execute-task
       
@@ -1574,8 +1513,7 @@ spec:
       name: Kubernetes Management
       description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: infrastructure
+      capabilityCategory: infrastructure
       requiredCapabilities:
         - cluster-management
         - node-management
@@ -1587,8 +1525,7 @@ spec:
       name: Task Scheduling
       description: 任务调度场景，提供任务调度、执行历史管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - schedule-task
         - manage-execution
@@ -1599,7 +1536,7 @@ spec:
       name: MQTT Messaging
       description: MQTT消息场景，提供MQTT Broker和消息服务能力
       version: "1.0.0"
-      category: COMMUNICATION
+      capabilityCategory: commUNICATION
       requiredCapabilities:
         - mqtt-broker
         - mqtt-publish
@@ -1610,7 +1547,7 @@ spec:
       name: IoT Device
       description: IoT设备场景，提供设备连接、数据上报和命令控制能力
       version: "1.0.0"
-      category: IOT
+      capabilityCategory: iot
       requiredCapabilities:
         - mqtt-broker
         - mqtt-command
@@ -1620,8 +1557,7 @@ spec:
       name: Database VFS
       description: 数据库存储场景，支持将文件存储在数据库中
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1631,8 +1567,7 @@ spec:
       name: Local VFS
       description: 本地文件系统存储场景，提供基本的文件操作
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - vfs-storage
         - file-read
@@ -1643,8 +1578,7 @@ spec:
       name: MinIO VFS
       description: MinIO存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1654,8 +1588,7 @@ spec:
       name: Aliyun OSS VFS
       description: 阿里云OSS存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1665,8 +1598,7 @@ spec:
       name: AWS S3 VFS
       description: AWS S3存储场景，提供对象存储能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - vfs-storage
         - metadata
@@ -1676,7 +1608,7 @@ spec:
       name: P2P Communication
       description: 点对点通讯场景，提供消息、文件、能力共享等点对点通讯能力
       version: "1.0.0"
-      category: COMMUNICATION
+      capabilityCategory: commUNICATION
       requiredCapabilities:
         - message-send
         - message-receive
@@ -1688,7 +1620,7 @@ spec:
       name: Group Communication
       description: 群组通讯场景，提供群组消息、群组文件、群组协作能力
       version: "1.0.0"
-      category: COMMUNICATION
+      capabilityCategory: commUNICATION
       requiredCapabilities:
         - message-broadcast
         - group-members
@@ -1699,7 +1631,7 @@ spec:
       name: Broadcast Communication
       description: 广播通讯场景，提供一对多消息广播能力
       version: "1.0.0"
-      category: COMMUNICATION
+      capabilityCategory: commUNICATION
       requiredCapabilities:
         - message-broadcast
         - message-subscribe
@@ -1709,8 +1641,7 @@ spec:
       name: Human Resources
       description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - employee-create
         - employee-update
@@ -1722,8 +1653,7 @@ spec:
       name: Customer Relationship Management
       description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - customer-create
         - customer-update
@@ -1735,8 +1665,7 @@ spec:
       name: Financial Management
       description: 财务管理场景，提供账务、报销、预算、结算等财务能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - account-manage
         - expense-manage
@@ -1747,8 +1676,7 @@ spec:
       name: Approval Workflow
       description: 审批流程场景，提供流程定义、审批、流转等工作流能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - flow-start
         - flow-query
@@ -1760,8 +1688,7 @@ spec:
       name: Project Management
       description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - project-create
         - task-create
@@ -1773,8 +1700,7 @@ spec:
       name: Knowledge Management
       description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - knowledge-create
         - document-search
@@ -1785,7 +1711,7 @@ spec:
       name: LLM智能对话场景
       description: LLM智能对话场景能力，自驱型SuperAgent，支持多轮对话、上下文感知、流式输出
       version: "2.3.0"
-      category: SCENE
+      capabilityCategory: scene
       mainFirst: true
       requiredCapabilities:
         - llm-chat
@@ -1803,7 +1729,7 @@ spec:
       name: Device Management
       description: 设备管理场景，提供设备注册、监控、控制等IoT能力
       version: "1.0.0"
-      category: IOT
+      capabilityCategory: iot
       requiredCapabilities:
         - device-register
         - device-monitor
@@ -1814,7 +1740,7 @@ spec:
       name: Data Collection
       description: 数据采集场景，提供数据采集、存储、分析等IoT能力
       version: "1.0.0"
-      category: IOT
+      capabilityCategory: iot
       requiredCapabilities:
         - data-collect
         - data-store
@@ -1825,7 +1751,7 @@ spec:
       name: Edge Computing
       description: 边缘计算场景，提供边缘节点、边缘应用等边缘计算能力
       version: "1.0.0"
-      category: IOT
+      capabilityCategory: iot
       requiredCapabilities:
         - edge-node
         - edge-compute
@@ -1836,7 +1762,7 @@ spec:
       name: Meeting Collaboration
       description: 会议协作场景，提供会议、白板、共享等协作能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - meeting-create
         - whiteboard-share
@@ -1847,7 +1773,7 @@ spec:
       name: Document Collaboration
       description: 文档协作场景，提供文档编辑、评论、版本等协作能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - document-edit
         - document-comment
@@ -1858,7 +1784,7 @@ spec:
       name: Task Collaboration
       description: 任务协作场景，提供任务分配、跟踪、报告等协作能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - task-create
         - task-assign
@@ -1870,8 +1796,7 @@ spec:
       name: System Management
       description: 系统管理场景，提供用户、权限、配置等系统管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - user-manage
         - permission-manage
@@ -1882,8 +1807,7 @@ spec:
       name: Monitoring & Operations
       description: 监控运维场景，提供监控、告警、日志等运维能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - monitor-metrics
         - monitor-alert
@@ -1894,8 +1818,7 @@ spec:
       name: Security & Audit
       description: 安全审计场景，提供安全、审计、合规等安全能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - security-auth
         - audit-log
@@ -1906,8 +1829,7 @@ spec:
       name: Network Management
       description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - network-config
         - ip-management
@@ -1918,8 +1840,7 @@ spec:
       name: Agent Management
       description: 代理管理场景，提供终端代理注册、管理、命令执行能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - agent-management
         - command-execution
@@ -1930,8 +1851,7 @@ spec:
       name: Health Check
       description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - health-check
         - service-check
@@ -1942,8 +1862,7 @@ spec:
       name: Protocol Management
       description: 协议管理场景，提供协议处理器注册、命令分发能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - handler-registration
         - command-dispatch
@@ -1954,8 +1873,7 @@ spec:
       name: OpenWrt Management
       description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - router-connection
         - uci-config
@@ -1966,8 +1884,7 @@ spec:
       name: Audit Log
       description: 审计日志场景，提供审计日志记录、查询、导出和统计分析能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - audit-log
         - audit-export
@@ -1978,8 +1895,7 @@ spec:
       name: Security Management
       description: 安全管理场景，提供权限管理、角色管理和访问控制能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - permission-management
         - role-management
@@ -1990,8 +1906,7 @@ spec:
       name: Remote Management
       description: 远程管理场景，提供SSH远程连接、命令执行和文件传输能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - ssh-connection
         - command-execution
@@ -2003,7 +1918,7 @@ spec:
       name: Message Service
       description: 消息服务场景，提供消息推送、Topic管理和P2P通信能力
       version: "1.0.0"
-      category: MESSAGING
+      capabilityCategory: messaging
       requiredCapabilities:
         - message-push
         - topic-management
@@ -2014,8 +1929,7 @@ spec:
       name: Command Monitoring
       description: 命令监控场景，提供命令分发、任务调度和执行追踪能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - command-dispatch
         - task-scheduling
@@ -2026,8 +1940,7 @@ spec:
       name: Resource Management
       description: 资源管理场景，提供组织、部门和资源管理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - organization-management
         - department-management
@@ -2038,7 +1951,7 @@ spec:
       name: Skill Share
       description: 技能分享场景，提供技能分享、接收管理能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - skill-sharing
         - skill-receiving
@@ -2049,8 +1962,7 @@ spec:
       name: Hosting Service
       description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - instance-management
         - instance-scaling
@@ -2062,7 +1974,7 @@ spec:
       name: Skill Market
       description: 技能市场场景，提供技能发现、搜索、安装和管理能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - skill-discovery
         - skill-search
@@ -2074,7 +1986,7 @@ spec:
       name: Collaboration Scene
       description: 协作场景，提供场景创建、成员管理、密钥管理能力
       version: "1.0.0"
-      category: COLLABORATION
+      capabilityCategory: collaboration
       requiredCapabilities:
         - scene-management
         - member-management
@@ -2085,7 +1997,7 @@ spec:
       name: Messaging
       description: 消息场景，提供消息发送、广播、群组消息能力
       version: "1.0.0"
-      category: COMMUNICATION
+      capabilityCategory: commUNICATION
       requiredCapabilities:
         - message-sending
         - message-management
@@ -2096,8 +2008,7 @@ spec:
       name: Business
       description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
       version: "1.0.0"
-      category: SERVICE
-      domain: business
+      capabilityCategory: business
       requiredCapabilities:
         - scenario-management
         - workflow-execution
@@ -2108,8 +2019,7 @@ spec:
       name: Nexus UI
       description: Nexus界面场景，提供管理界面、仪表盘、监控页面能力
       version: "1.0.0"
-      category: SERVICE
-      domain: sysTEM
+      capabilityCategory: sysTEM
       requiredCapabilities:
         - ui-rendering
         - menu-integration
