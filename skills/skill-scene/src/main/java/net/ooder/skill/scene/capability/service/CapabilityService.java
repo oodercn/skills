@@ -41,9 +41,9 @@ public interface CapabilityService {
     
     List<Capability> findBySceneTypeNew(SceneType sceneType);
     
-    List<Capability> findBySkillCategory(SkillCategory category);
+    List<Capability> findByCapabilityCategory(CapabilityCategory category);
     
-    List<Capability> findByFilters(SkillForm form, SceneType sceneType, SkillCategory category, 
+    List<Capability> findByFilters(SkillForm form, SceneType sceneType, CapabilityCategory category, 
                                     CapabilityOwnership ownership, String keyword);
     
     void updateInstallStatus(String capabilityId, boolean installed);

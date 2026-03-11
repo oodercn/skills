@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-k8s
+  name: Kubernetes集群管理
+  version: "0.7.3"
+  description: "Kubernetes集群管理服务，提供集群管理、部署、监控"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: INFRASTRUCTURE
+  subCategory: k8s
+  category: SERVICE
+  capabilityCategory: iot
+  
+  capabilityAddresses:
+    required:
+      - address: 0x61
+        name: IOT_K8S
+        description: "Kubernetes"
+    optional: []
+  
+  tags:
+    - kubernetes
+    - k8s
+    - cluster
+  
+  dependencies: []

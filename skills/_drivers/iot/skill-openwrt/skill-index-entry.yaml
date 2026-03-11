@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-openwrt
+  name: OpenWrt管理服务
+  version: "0.7.3"
+  description: "OpenWrt路由器管理服务，提供路由器配置、监控、管理"
+
+spec:
+  skillForm: DRIVER
+  visibility: internal
+  businessCategory: INFRASTRUCTURE
+  subCategory: openwrt
+  category: SERVICE
+  capabilityCategory: iot
+  
+  capabilityAddresses:
+    required:
+      - address: 0x63
+        name: IOT_OPENWRT
+        description: "OpenWrt路由器"
+    optional: []
+  
+  tags:
+    - openwrt
+    - router
+    - iot
+  
+  dependencies: []

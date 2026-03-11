@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-hosting
+  name: 托管服务
+  version: "0.7.3"
+  description: "托管服务，提供应用托管、资源管理、自动扩缩容"
+
+spec:
+  skillForm: PROVIDER
+  visibility: internal
+  businessCategory: INFRASTRUCTURE
+  subCategory: hosting
+  category: SERVICE
+  capabilityCategory: iot
+  
+  capabilityAddresses:
+    required:
+      - address: 0x62
+        name: IOT_HOSTING
+        description: "托管服务"
+    optional: []
+  
+  tags:
+    - hosting
+    - deploy
+    - scale
+  
+  dependencies: []
