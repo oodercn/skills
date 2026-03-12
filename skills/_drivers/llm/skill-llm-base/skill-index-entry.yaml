@@ -1,0 +1,30 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillIndexEntry
+
+metadata:
+  id: skill-llm-base
+  name: LLM基础模块
+  version: "2.3.1"
+  description: "LLM基础模块 - 提供LLM提供者通用接口和工具"
+
+spec:
+  skillForm: PROVIDER
+  visibility: public
+  businessCategory: AI_ASSISTANT
+  subCategory: base
+  category: LLM
+  capabilityCategory: llm
+  
+  capabilityAddresses:
+    required:
+      - address: 0x30
+        name: LLM_BASE
+        description: "LLM基础地址"
+    optional: []
+  
+  tags:
+    - llm
+    - base
+    - interface
+  
+  dependencies: []

@@ -4,17 +4,18 @@ kind: Skill
 metadata:
   id: skill-common
   name: 通用工具库
-  version: 1.0.0
-  description: 通用工具库 - 提供基础工具类、存储服务、上下文管理
+  version: 2.3.1
+  description: 通用工具库 - 提供认证、组织、配置等核心 API
   author: ooder Team
   type: system-service
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
     - common
-    - utility
+    - auth
+    - org
+    - config
     - storage
-    - context
 
 spec:
   type: service-skill
@@ -25,7 +26,7 @@ spec:
     address: 0x01
     category: SYS
     code: SYS_COMMON
-    operations: [storage, context, utility]
+    operations: [auth, org, config, storage]
   
   runtime:
     language: java
@@ -49,66 +50,149 @@ spec:
   dependencies: []
   
   providedInterfaces:
+    - id: auth-service
+      version: "1.0"
+      description: "认证服务接口"
+    - id: org-service
+      version: "1.0"
+      description: "组织管理接口"
+    - id: config-service
+      version: "1.0"
+      description: "配置服务接口"
     - id: storage-service
       version: "1.0"
       description: "存储服务接口"
-    - id: context-manager
-      version: "1.0"
-      description: "上下文管理接口"
-    - id: utility-service
-      version: "1.0"
-      description: "工具服务接口"
   
   capabilities:
+    - id: auth
+      name: 认证服务
+      description: 提供用户登录、登出、会话管理
+      category: service
+    - id: org
+      name: 组织管理
+      description: 提供用户、部门、组织树管理
+      category: service
+    - id: config
+      name: 系统配置
+      description: 提供系统配置查询
+      category: service
     - id: storage
       name: 存储服务
       description: 提供键值存储、缓存管理
       category: service
-    - id: context
-      name: 上下文管理
-      description: 提供上下文存储和检索
-      category: service
-    - id: utility
-      name: 工具服务
-      description: 提供通用工具方法
-      category: service
   
   endpoints:
-    - path: /api/common/storage/{key}
+    - path: /api/v1/auth/login
+      method: POST
+      description: 用户登录
+      capability: auth
+    - path: /api/v1/auth/logout
+      method: POST
+      description: 用户登出
+      capability: auth
+    - path: /api/v1/auth/session
       method: GET
-      description: 获取存储值
-      capability: storage
-    - path: /api/common/storage/{key}
+      description: 获取会话信息
+      capability: auth
+    - path: /api/v1/auth/current-user
+      method: GET
+      description: 获取当前用户
+      capability: auth
+    - path: /api/v1/auth/roles
+      method: GET
+      description: 获取可用角色列表
+      capability: auth
+    - path: /api/v1/auth/check-permission
+      method: GET
+      description: 检查权限
+      capability: auth
+    - path: /api/v1/auth/check-role
+      method: GET
+      description: 检查角色
+      capability: auth
+    - path: /api/v1/org/users/current
+      method: GET
+      description: 获取当前用户
+      capability: org
+    - path: /api/v1/org/users
+      method: GET
+      description: 列出用户
+      capability: org
+    - path: /api/v1/org/users
+      method: POST
+      description: 创建用户
+      capability: org
+    - path: /api/v1/org/users/{userId}
+      method: GET
+      description: 获取用户
+      capability: org
+    - path: /api/v1/org/users/{userId}
       method: PUT
-      description: 设置存储值
-      capability: storage
-    - path: /api/common/storage/{key}
+      description: 更新用户
+      capability: org
+    - path: /api/v1/org/users/{userId}
       method: DELETE
-      description: 删除存储值
-      capability: storage
-    - path: /api/common/context
+      description: 删除用户
+      capability: org
+    - path: /api/v1/org/departments
       method: GET
-      description: 获取当前上下文
-      capability: context
-    - path: /api/common/context
+      description: 列出部门
+      capability: org
+    - path: /api/v1/org/departments
+      method: POST
+      description: 创建部门
+      capability: org
+    - path: /api/v1/org/departments/{departmentId}
+      method: GET
+      description: 获取部门
+      capability: org
+    - path: /api/v1/org/departments/{departmentId}
       method: PUT
-      description: 更新上下文
-      capability: context
+      description: 更新部门
+      capability: org
+    - path: /api/v1/org/departments/{departmentId}
+      method: DELETE
+      description: 删除部门
+      capability: org
+    - path: /api/v1/org/tree
+      method: GET
+      description: 获取组织树
+      capability: org
+    - path: /api/v1/org/roles
+      method: GET
+      description: 获取角色列表
+      capability: org
+    - path: /api/v1/system/config
+      method: GET
+      description: 获取系统配置
+      capability: config
+    - path: /api/v1/system/syscode
+      method: GET
+      description: 获取系统代码
+      capability: config
+    - path: /api/v1/system/check
+      method: GET
+      description: 检查系统
+      capability: config
+    - path: /api/v1/system/health
+      method: GET
+      description: 健康检查
+      capability: config
   
   config:
     optional:
       - name: STORAGE_TYPE
         type: string
-        default: "memory"
-        description: 存储类型 (memory/file/redis)
-      - name: CACHE_TTL
+        default: "json"
+        description: 存储类型 (json/memory)
+      - name: STORAGE_PATH
+        type: string
+        default: "./data"
+        description: 存储路径
+      - name: SESSION_TIMEOUT
         type: integer
         default: 3600
-        description: 缓存过期时间(秒)
-      - name: MAX_CACHE_SIZE
-        type: integer
-        default: 10000
-        description: 最大缓存条目数
+        description: 会话超时时间(秒)
   
   resources:
     cpu: "50m"
@@ -119,21 +203,3 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: false
-
-  knowledge:
-    documents:
-      - id: overview
-        name: 功能概述
-        path: README.md
-        type: guide
-        language: zh
-        priority: high
-    ragConfig:
-      enabled: true
-      indexName: "skill-common-knowledge"
-      embeddingModel: text-embedding-3-small
-      chunkSize: 1000
-      chunkOverlap: 200
-      searchStrategy: hybrid
-      topK: 5
-      threshold: 0.7
