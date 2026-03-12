@@ -1,0 +1,104 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-business
+  name: 业务场景服务
+  version: 0.7.3
+  description: 业务场景服务，提供通用业务流程管理能力
+  author: ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - business
+    - workflow
+    - scene
+    - process
+
+spec:
+  type: scene-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0xF0
+    category: UTIL
+    code: UTIL_BASE
+    operations: [create, execute, monitor]
+  
+  sceneType: TRIGGER
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  mainFirst: false
+  
+  dependencies: []
+  
+  sceneCapabilities:
+    mainFirst: false
+    capabilities: []
+  
+  roles:
+    - name: MANAGER
+      displayName: 场景管理员
+      minCount: 1
+      maxCount: 1
+      permissions: [READ, WRITE, CONFIG, DELETE]
+    - name: MEMBER
+      displayName: 场景成员
+      minCount: 0
+      maxCount: 100
+      permissions: [READ, WRITE]
+  
+  capabilities:
+    - id: process
+      name: 流程管理
+      description: 管理业务流程
+      category: service
+    - id: task
+      name: 任务管理
+      description: 管理业务任务
+      category: service
+    - id: monitor
+      name: 流程监控
+      description: 监控业务流程
+      category: service
+  
+  endpoints:
+    - path: /api/business/processes
+      method: POST
+      description: 创建流程
+      capability: process
+    - path: /api/business/processes/{id}/execute
+      method: POST
+      description: 执行流程
+      capability: process
+    - path: /api/business/tasks
+      method: GET
+      description: 获取任务
+      capability: task
+  
+  config:
+    optional:
+      - name: MAX_PROCESS_INSTANCES
+        type: integer
+        default: 1000
+        description: 最大流程实例数
+      - name: TASK_TIMEOUT
+        type: integer
+        default: 86400
+        description: 任务超时(秒)
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

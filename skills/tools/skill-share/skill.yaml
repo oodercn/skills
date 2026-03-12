@@ -1,0 +1,111 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-share
+  name: 分享服务
+  version: 0.7.3
+  description: 分享服务，提供内容分享、链接管理、权限控制
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - share
+    - link
+    - permission
+    - content
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0xF2
+    category: UTIL
+    code: UTIL_SHARE
+    operations: [share, manage, control]
+  
+  providerType: tool
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - content-management
+    - collaboration
+    - social
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: share-service
+      version: "1.0"
+      description: "分享服务接口"
+  
+  capabilities:
+    - id: share
+      name: 内容分享
+      description: 分享内容
+      category: service
+    - id: manage
+      name: 链接管理
+      description: 管理分享链接
+      category: service
+    - id: control
+      name: 权限控制
+      description: 控制访问权限
+      category: service
+  
+  endpoints:
+    - path: /api/share
+      method: POST
+      description: 创建分享
+      capability: share
+    - path: /api/share/{id}
+      method: GET
+      description: 获取分享
+      capability: manage
+    - path: /api/share/{id}/permissions
+      method: PUT
+      description: 设置权限
+      capability: control
+  
+  config:
+    optional:
+      - name: LINK_EXPIRY
+        type: integer
+        default: 604800
+        description: 链接有效期(秒)
+      - name: MAX_SHARE_SIZE
+        type: integer
+        default: 104857600
+        description: 最大分享大小
+      - name: PASSWORD_REQUIRED
+        type: boolean
+        default: false
+        description: 需要密码
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

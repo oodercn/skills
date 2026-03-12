@@ -1,0 +1,115 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-notify
+  name: 通知服务
+  version: 0.7.3
+  description: 通知服务，支持多渠道通知推送
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - notify
+    - notification
+    - push
+    - alert
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x53
+    category: COMM
+    code: COMM_NOTIFY
+    operations: [push, broadcast, schedule]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - notification
+    - alert
+    - workflow
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 30
+  
+  dependencies:
+    - id: skill-msg
+      version: ">=0.7.0"
+      required: true
+      description: "消息服务依赖"
+  
+  providedInterfaces:
+    - id: notify-service
+      version: "1.0"
+      description: "通知服务接口"
+  
+  capabilities:
+    - id: push
+      name: 推送通知
+      description: 推送通知到用户
+      category: service
+    - id: broadcast
+      name: 广播通知
+      description: 广播通知到所有用户
+      category: service
+    - id: schedule
+      name: 定时通知
+      description: 定时发送通知
+      category: service
+  
+  endpoints:
+    - path: /api/notify/push
+      method: POST
+      description: 推送通知
+      capability: push
+    - path: /api/notify/broadcast
+      method: POST
+      description: 广播通知
+      capability: broadcast
+    - path: /api/notify/schedule
+      method: POST
+      description: 定时通知
+      capability: schedule
+  
+  config:
+    optional:
+      - name: CHANNELS
+        type: string
+        default: "email,sms,push"
+        description: 支持的通知渠道
+      - name: RETRY_COUNT
+        type: integer
+        default: 3
+        description: 重试次数
+      - name: RETRY_DELAY
+        type: integer
+        default: 60
+        description: 重试延迟(秒)
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

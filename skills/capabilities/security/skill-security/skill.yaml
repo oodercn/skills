@@ -1,0 +1,107 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-security
+  name: 安全管理服务
+  version: 0.7.3
+  description: 安全管理服务，提供安全策略、威胁检测、漏洞扫描
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - security
+    - threat
+    - vulnerability
+    - policy
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x78
+    category: SEC
+    code: SEC_BASE
+    operations: [policy, detect, scan]
+  
+  providerType: security
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - security
+    - compliance
+    - audit
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 3s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: security-service
+      version: "1.0"
+      description: "安全服务接口"
+  
+  capabilities:
+    - id: policy
+      name: 安全策略
+      description: 管理安全策略
+      category: service
+    - id: detect
+      name: 威胁检测
+      description: 检测安全威胁
+      category: service
+    - id: scan
+      name: 漏洞扫描
+      description: 扫描安全漏洞
+      category: service
+  
+  endpoints:
+    - path: /api/security/policies
+      method: GET
+      description: 获取策略
+      capability: policy
+    - path: /api/security/threats
+      method: GET
+      description: 获取威胁
+      capability: detect
+    - path: /api/security/vulnerabilities
+      method: GET
+      description: 获取漏洞
+      capability: scan
+  
+  config:
+    optional:
+      - name: SCAN_INTERVAL
+        type: integer
+        default: 86400
+        description: 扫描间隔(秒)
+      - name: ALERT_THRESHOLD
+        type: string
+        default: "medium"
+        description: 告警阈值
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

@@ -1,0 +1,111 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-report
+  name: 报表服务
+  version: 0.7.3
+  description: 报表服务，提供报表生成、导出、定时推送
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - report
+    - export
+    - schedule
+    - pdf
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0xF1
+    category: UTIL
+    code: UTIL_REPORT
+    operations: [generate, export, schedule]
+  
+  providerType: tool
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - reporting
+    - analytics
+    - dashboard
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: report-service
+      version: "1.0"
+      description: "报表服务接口"
+  
+  capabilities:
+    - id: generate
+      name: 报表生成
+      description: 生成报表
+      category: service
+    - id: export
+      name: 报表导出
+      description: 导出报表
+      category: service
+    - id: schedule
+      name: 定时推送
+      description: 定时推送报表
+      category: service
+  
+  endpoints:
+    - path: /api/reports
+      method: POST
+      description: 生成报表
+      capability: generate
+    - path: /api/reports/{id}/export
+      method: GET
+      description: 导出报表
+      capability: export
+    - path: /api/reports/schedules
+      method: POST
+      description: 创建定时任务
+      capability: schedule
+  
+  config:
+    optional:
+      - name: EXPORT_FORMATS
+        type: string
+        default: "pdf,excel,csv"
+        description: 导出格式
+      - name: MAX_REPORT_SIZE
+        type: integer
+        default: 10485760
+        description: 最大报表大小
+      - name: SCHEDULE_ENABLED
+        type: boolean
+        default: true
+        description: 启用定时
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

@@ -1,0 +1,119 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-group
+  name: 群组服务
+  version: 0.7.3
+  description: 群组服务，支持群组管理、成员管理、权限控制
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - group
+    - team
+    - member
+    - permission
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x55
+    category: COMM
+    code: COMM_GROUP
+    operations: [create, delete, member, permission]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - collaboration
+    - project-management
+    - social
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 50
+  
+  dependencies:
+    - id: skill-org-base
+      version: ">=1.0.0"
+      required: true
+      description: "组织服务依赖"
+  
+  providedInterfaces:
+    - id: group-service
+      version: "1.0"
+      description: "群组服务接口"
+  
+  capabilities:
+    - id: create
+      name: 创建群组
+      description: 创建新群组
+      category: service
+    - id: delete
+      name: 删除群组
+      description: 删除群组
+      category: service
+    - id: member
+      name: 成员管理
+      description: 管理群组成员
+      category: service
+    - id: permission
+      name: 权限控制
+      description: 管理群组权限
+      category: service
+  
+  endpoints:
+    - path: /api/groups
+      method: POST
+      description: 创建群组
+      capability: create
+    - path: /api/groups/{id}
+      method: DELETE
+      description: 删除群组
+      capability: delete
+    - path: /api/groups/{id}/members
+      method: GET
+      description: 获取成员
+      capability: member
+    - path: /api/groups/{id}/permissions
+      method: PUT
+      description: 设置权限
+      capability: permission
+  
+  config:
+    optional:
+      - name: MAX_GROUP_SIZE
+        type: integer
+        default: 500
+        description: 最大群组人数
+      - name: DEFAULT_ROLE
+        type: string
+        default: "member"
+        description: 默认角色
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

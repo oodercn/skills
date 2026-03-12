@@ -1,0 +1,115 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-cmd-service
+  name: 命令监控服务
+  version: 0.7.3
+  description: 命令监控服务，提供命令执行、输出监控、状态管理
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - cmd
+    - command
+    - monitor
+    - process
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x58
+    category: MON
+    code: MON_BASE
+    operations: [execute, monitor, status]
+  
+  providerType: monitoring
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - monitoring
+    - infrastructure
+    - devops
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies:
+    - id: skill-monitor
+      version: ">=0.7.0"
+      required: true
+      description: "监控服务依赖"
+  
+  providedInterfaces:
+    - id: command-service
+      version: "1.0"
+      description: "命令服务接口"
+  
+  capabilities:
+    - id: execute
+      name: 命令执行
+      description: 执行系统命令
+      category: service
+    - id: monitor
+      name: 输出监控
+      description: 监控命令输出
+      category: service
+    - id: status
+      name: 状态管理
+      description: 管理命令状态
+      category: service
+  
+  endpoints:
+    - path: /api/commands
+      method: POST
+      description: 执行命令
+      capability: execute
+    - path: /api/commands/{id}/output
+      method: GET
+      description: 获取输出
+      capability: monitor
+    - path: /api/commands/{id}/status
+      method: GET
+      description: 获取状态
+      capability: status
+  
+  config:
+    optional:
+      - name: COMMAND_TIMEOUT
+        type: integer
+        default: 300
+        description: 命令超时(秒)
+      - name: MAX_OUTPUT_SIZE
+        type: integer
+        default: 1048576
+        description: 最大输出大小
+      - name: ALLOWED_COMMANDS
+        type: string
+        default: "*"
+        description: 允许的命令
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

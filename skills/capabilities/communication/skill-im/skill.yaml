@@ -1,0 +1,121 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im
+  name: 即时通讯服务
+  version: 0.7.3
+  description: 即时通讯服务，支持实时消息、群聊、在线状态
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - im
+    - chat
+    - realtime
+    - websocket
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x54
+    category: COMM
+    code: COMM_IM
+    operations: [send, receive, presence, group]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - collaboration
+    - customer-service
+    - social
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies:
+    - id: skill-msg
+      version: ">=0.7.0"
+      required: true
+      description: "消息服务依赖"
+  
+  providedInterfaces:
+    - id: im-service
+      version: "1.0"
+      description: "即时通讯接口"
+  
+  capabilities:
+    - id: send
+      name: 发送消息
+      description: 发送即时消息
+      category: service
+    - id: receive
+      name: 接收消息
+      description: 接收即时消息
+      category: service
+    - id: presence
+      name: 在线状态
+      description: 管理在线状态
+      category: service
+    - id: group
+      name: 群聊
+      description: 群组聊天
+      category: service
+  
+  endpoints:
+    - path: /api/im/send
+      method: POST
+      description: 发送消息
+      capability: send
+    - path: /api/im/presence
+      method: PUT
+      description: 更新状态
+      capability: presence
+    - path: /api/im/groups
+      method: GET
+      description: 获取群组
+      capability: group
+    - path: /ws/im
+      method: GET
+      description: WebSocket连接
+      capability: receive
+  
+  config:
+    optional:
+      - name: WS_PORT
+        type: integer
+        default: 8080
+        description: WebSocket端口
+      - name: MAX_CONNECTIONS
+        type: integer
+        default: 1000
+        description: 最大连接数
+      - name: HEARTBEAT_INTERVAL
+        type: integer
+        default: 30
+        description: 心跳间隔(秒)
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false

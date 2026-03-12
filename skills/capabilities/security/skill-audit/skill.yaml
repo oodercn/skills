@@ -1,0 +1,111 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-audit
+  name: 审计服务
+  version: 0.7.3
+  description: 审计服务，提供操作审计、日志记录、合规检查
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - audit
+    - log
+    - compliance
+    - record
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x7A
+    category: SEC
+    code: SEC_AUDIT
+    operations: [record, query, report]
+  
+  providerType: security
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - security
+    - compliance
+    - admin
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies:
+    - id: skill-security
+      version: ">=0.7.0"
+      required: true
+      description: "安全服务依赖"
+  
+  providedInterfaces:
+    - id: audit-service
+      version: "1.0"
+      description: "审计服务接口"
+  
+  capabilities:
+    - id: record
+      name: 操作记录
+      description: 记录操作日志
+      category: service
+    - id: query
+      name: 日志查询
+      description: 查询审计日志
+      category: service
+    - id: report
+      name: 合规报告
+      description: 生成合规报告
+      category: service
+  
+  endpoints:
+    - path: /api/audit/logs
+      method: POST
+      description: 记录日志
+      capability: record
+    - path: /api/audit/logs
+      method: GET
+      description: 查询日志
+      capability: query
+    - path: /api/audit/reports
+      method: GET
+      description: 获取报告
+      capability: report
+  
+  config:
+    optional:
+      - name: RETENTION_DAYS
+        type: integer
+        default: 90
+        description: 日志保留天数
+      - name: LOG_LEVEL
+        type: string
+        default: "INFO"
+        description: 日志级别
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "1Gi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

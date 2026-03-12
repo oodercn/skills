@@ -1,0 +1,120 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-email
+  name: 邮件服务
+  version: 0.7.3
+  description: 邮件服务，支持邮件发送、接收、模板管理
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - email
+    - mail
+    - notification
+    - smtp
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x52
+    category: COMM
+    code: COMM_EMAIL
+    operations: [send, receive, template]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - notification
+    - marketing
+    - workflow
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: email-service
+      version: "1.0"
+      description: "邮件服务接口"
+  
+  capabilities:
+    - id: send
+      name: 邮件发送
+      description: 发送邮件
+      category: service
+    - id: receive
+      name: 邮件接收
+      description: 接收邮件
+      category: service
+    - id: template
+      name: 模板管理
+      description: 邮件模板管理
+      category: service
+  
+  endpoints:
+    - path: /api/email/send
+      method: POST
+      description: 发送邮件
+      capability: send
+    - path: /api/email/templates
+      method: GET
+      description: 获取模板列表
+      capability: template
+    - path: /api/email/templates
+      method: POST
+      description: 创建模板
+      capability: template
+  
+  config:
+    required:
+      - name: SMTP_HOST
+        type: string
+        description: SMTP服务器地址
+      - name: SMTP_PORT
+        type: integer
+        description: SMTP端口
+      - name: SMTP_USERNAME
+        type: string
+        description: SMTP用户名
+      - name: SMTP_PASSWORD
+        type: string
+        description: SMTP密码
+    optional:
+      - name: SMTP_AUTH
+        type: boolean
+        default: true
+        description: 启用认证
+      - name: SMTP_TLS
+        type: boolean
+        default: true
+        description: 启用TLS
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false

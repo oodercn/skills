@@ -1,0 +1,111 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-msg
+  name: 消息服务
+  version: 0.7.3
+  description: 消息服务，支持消息队列、订阅发布能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - message
+    - queue
+    - pubsub
+    - mq
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x50
+    category: COMM
+    code: COMM_BASE
+    operations: [publish, subscribe, queue]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - notification
+    - event-driven
+    - workflow
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 1s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 50
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: message-service
+      version: "1.0"
+      description: "消息服务接口"
+  
+  capabilities:
+    - id: publish
+      name: 消息发布
+      description: 发布消息到队列
+      category: service
+    - id: subscribe
+      name: 消息订阅
+      description: 订阅消息队列
+      category: service
+    - id: queue
+      name: 队列管理
+      description: 管理消息队列
+      category: service
+  
+  endpoints:
+    - path: /api/msg/publish
+      method: POST
+      description: 发布消息
+      capability: publish
+    - path: /api/msg/subscribe
+      method: POST
+      description: 订阅消息
+      capability: subscribe
+    - path: /api/msg/queues
+      method: GET
+      description: 获取队列列表
+      capability: queue
+  
+  config:
+    optional:
+      - name: MSG_TYPE
+        type: string
+        default: "memory"
+        description: 消息类型 (memory/redis/kafka)
+      - name: MAX_QUEUE_SIZE
+        type: integer
+        default: 10000
+        description: 最大队列大小
+      - name: MSG_TTL
+        type: integer
+        default: 86400
+        description: 消息过期时间(秒)
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

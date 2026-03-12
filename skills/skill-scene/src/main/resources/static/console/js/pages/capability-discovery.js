@@ -811,7 +811,7 @@
                 'FINANCE_ACCOUNTING': '#a0d911'
             };
             
-            var bcNames = {
+ var bcNames = {
                 'AI_ASSISTANT': 'AI助手',
                 'INFRASTRUCTURE': '基础设施',
                 'SYSTEM_TOOLS': '系统工具',
