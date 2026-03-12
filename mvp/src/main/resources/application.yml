@@ -1,0 +1,35 @@
+server:
+  port: 8084
+
+spring:
+  application:
+    name: mvp-core
+  profiles:
+    active: micro
+
+app:
+  storage:
+    path: ./data
+
+ooder:
+  sdk:
+    enabled: true
+  mock:
+    enabled: false
+  jds:
+    config:
+      name: mvp
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    root: INFO
+    net.ooder: DEBUG

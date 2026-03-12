@@ -1,0 +1,49 @@
+{
+  "profile": "small",
+  "description": "小型部署 - 核心功能 + 本地LLM",
+  "coreApis": true,
+  "optionalSkills": [
+    "skill-llm-ollama"
+  ],
+  "estimatedMemory": "256MB",
+  "startupTime": "10s",
+  "modules": {
+    "skill-common": {
+      "enabled": true,
+      "required": true
+    },
+    "skill-capability": {
+      "enabled": true,
+      "required": true
+    },
+    "skill-llm-base": {
+      "enabled": true,
+      "required": false
+    },
+    "skill-llm-ollama": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "baseUrl": "http://localhost:11434",
+        "model": "llama2"
+      }
+    }
+  },
+  "features": {
+    "auth": true,
+    "org": true,
+    "config": true,
+    "capability": true,
+    "llm": true,
+    "knowledge": false,
+    "audit": false
+  },
+  "ports": {
+    "http": 8084,
+    "management": 8085
+  },
+  "jvm": {
+    "xms": "256m",
+    "xmx": "512m"
+  }
+}

@@ -48,6 +48,13 @@
     </properties>
 
     <modules>
+        <!-- MVP Core -->
+        <module>mvp</module>
+        <!-- System Skills -->
+        <module>skills/_system/skill-common</module>
+        <module>skills/_system/skill-capability</module>
+        <!-- LLM Drivers -->
+        <module>skills/_drivers/llm/skill-llm-base</module>
         <!-- Base Skills -->
         <module>skills/skill-common</module>
         <module>skills/skill-org-base</module>

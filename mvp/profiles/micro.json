@@ -1,0 +1,35 @@
+{
+  "profile": "micro",
+  "description": "微型部署 - 仅核心功能",
+  "coreApis": true,
+  "optionalSkills": [],
+  "estimatedMemory": "128MB",
+  "startupTime": "5s",
+  "modules": {
+    "skill-common": {
+      "enabled": true,
+      "required": true
+    },
+    "skill-capability": {
+      "enabled": true,
+      "required": true
+    }
+  },
+  "features": {
+    "auth": true,
+    "org": true,
+    "config": true,
+    "capability": true,
+    "llm": false,
+    "knowledge": false,
+    "audit": false
+  },
+  "ports": {
+    "http": 8084,
+    "management": 8085
+  },
+  "jvm": {
+    "xms": "128m",
+    "xmx": "256m"
+  }
+}

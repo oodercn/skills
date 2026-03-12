@@ -1,0 +1,85 @@
+{
+  "profile": "enterprise",
+  "description": "企业部署 - 全功能",
+  "coreApis": true,
+  "optionalSkills": [
+    "skill-llm-openai",
+    "skill-llm-qianwen",
+    "skill-llm-deepseek",
+    "skill-knowledge-base",
+    "skill-rag",
+    "skill-audit",
+    "skill-monitor"
+  ],
+  "estimatedMemory": "1GB",
+  "startupTime": "30s",
+  "modules": {
+    "skill-common": {
+      "enabled": true,
+      "required": true
+    },
+    "skill-capability": {
+      "enabled": true,
+      "required": true
+    },
+    "skill-llm-base": {
+      "enabled": true,
+      "required": false
+    },
+    "skill-llm-openai": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "model": "gpt-4"
+      }
+    },
+    "skill-llm-qianwen": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "model": "qwen-max"
+      }
+    },
+    "skill-llm-deepseek": {
+      "enabled": true,
+      "required": false,
+      "config": {
+        "model": "deepseek-chat"
+      }
+    },
+    "skill-knowledge-base": {
+      "enabled": true,
+      "required": false
+    },
+    "skill-rag": {
+      "enabled": true,
+      "required": false
+    },
+    "skill-audit": {
+      "enabled": true,
+      "required": false
+    },
+    "skill-monitor": {
+      "enabled": true,
+      "required": false
+    }
+  },
+  "features": {
+    "auth": true,
+    "org": true,
+    "config": true,
+    "capability": true,
+    "llm": true,
+    "knowledge": true,
+    "audit": true,
+    "monitor": true
+  },
+  "ports": {
+    "http": 8084,
+    "management": 8085
+  },
+  "jvm": {
+    "xms": "1g",
+    "xmx": "2g"
+  }
+}

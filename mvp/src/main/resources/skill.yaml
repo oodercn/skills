@@ -1,0 +1,100 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: mvp-core
+  name: MVP核心
+  version: 2.3.1
+  description: MVP核心模块 - 提供最小可用的核心功能集
+  author: ooder Team
+  type: system-core
+  license: Apache-2.0
+
+spec:
+  type: system-core
+  
+  ownership: platform
+  
+  capability:
+    address: 0x00
+    category: SYS
+    code: SYS_MVP
+    operations: [auth, org, config, capability]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.mvp.MvpCoreApplication
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: auth-service
+      version: "1.0"
+      description: "认证服务接口"
+    - id: org-service
+      version: "1.0"
+      description: "组织管理接口"
+    - id: config-service
+      version: "1.0"
+      description: "配置服务接口"
+    - id: capability-service
+      version: "1.0"
+      description: "能力管理接口"
+  
+  capabilities:
+    - id: auth
+      name: 认证服务
+      description: 提供用户登录、登出、会话管理
+      category: service
+    - id: org
+      name: 组织管理
+      description: 提供用户、部门、组织树管理
+      category: service
+    - id: config
+      name: 系统配置
+      description: 提供系统配置查询
+      category: service
+    - id: capability
+      name: 能力管理
+      description: 提供能力注册、发现、验证
+      category: service
+  
+  profiles:
+    - name: micro
+      description: 微型部署
+      skills: []
+    - name: small
+      description: 小型部署
+      skills:
+        - skill-llm-ollama
+    - name: large
+      description: 大型部署
+      skills:
+        - skill-llm-openai
+        - skill-knowledge-base
+        - skill-audit
+    - name: enterprise
+      description: 企业部署
+      skills:
+        - skill-llm-openai
+        - skill-llm-qianwen
+        - skill-knowledge-base
+        - skill-rag
+        - skill-audit
+        - skill-monitor
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"

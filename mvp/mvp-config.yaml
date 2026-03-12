@@ -1,0 +1,86 @@
+apiVersion: skill.ooder.net/v1
+kind: MVPConfig
+
+metadata:
+  version: "2.3.1"
+  description: "Ooder MVP 最小配置规范"
+
+spec:
+  coreApis:
+    - path: /api/v1/auth
+      module: skill-common
+      required: true
+      description: "认证核心 API"
+    - path: /api/v1/org
+      module: skill-common
+      required: true
+      description: "组织核心 API"
+    - path: /api/v1/system
+      module: skill-common
+      required: true
+      description: "系统配置 API"
+    - path: /api/v1/config
+      module: skill-common
+      required: true
+      description: "配置中心 API"
+    - path: /api/v1/capabilities
+      module: skill-capability
+      required: true
+      description: "能力管理 API"
+      
+  optionalSkills:
+    - id: skill-llm-openai
+      category: llm
+      address: 0x32
+      condition: "llm.enabled == true"
+      
+    - id: skill-llm-ollama
+      category: llm
+      address: 0x31
+      condition: "llm.enabled == true"
+      
+    - id: skill-llm-qianwen
+      category: llm
+      address: 0x33
+      condition: "llm.enabled == true"
+      
+    - id: skill-llm-deepseek
+      category: llm
+      address: 0x34
+      condition: "llm.enabled == true"
+      
+    - id: skill-knowledge-base
+      category: know
+      address: 0x38
+      condition: "knowledge.enabled == true"
+      
+    - id: skill-rag
+      category: know
+      address: 0x39
+      condition: "knowledge.enabled == true"
+      
+    - id: skill-audit
+      category: sec
+      address: 0x7A
+      condition: "audit.enabled == true"
+
+  profiles:
+    - name: micro
+      description: "微型部署 - 仅核心功能"
+      estimatedMemory: "128MB"
+      startupTime: "5s"
+      
+    - name: small
+      description: "小型部署 - 核心功能 + 本地LLM"
+      estimatedMemory: "256MB"
+      startupTime: "10s"
+      
+    - name: large
+      description: "大型部署 - 核心功能 + LLM + 知识库"
+      estimatedMemory: "512MB"
+      startupTime: "15s"
+      
+    - name: enterprise
+      description: "企业部署 - 全功能"
+      estimatedMemory: "1GB"
+      startupTime: "30s"
