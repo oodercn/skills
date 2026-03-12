@@ -6,7 +6,9 @@ import org.springframework.context.annotation.ComponentScan;
 
 @SpringBootApplication
 @ComponentScan(basePackages = {
-    "net.ooder.mvp"
+    "net.ooder.mvp",
+    "net.ooder.skill.common",
+    "net.ooder.skill.capability"
 })
 public class MvpCoreApplication {
     
