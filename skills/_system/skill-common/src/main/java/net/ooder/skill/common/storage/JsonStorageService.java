@@ -1,4 +1,4 @@
-package net.ooder.skill.common.service;
+package net.ooder.skill.common.storage;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONReader;

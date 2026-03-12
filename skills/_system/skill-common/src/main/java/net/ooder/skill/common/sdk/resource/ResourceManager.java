@@ -18,13 +18,6 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-/**
- * 璧勬簮绠＄悊鍣? *
- * 缁熶竴绠＄悊瀛樺偍銆佽绠椼€佺綉缁滆祫婧? * 涓?Skills 鎻愪緵璧勬簮鐢宠銆佺洃鎺с€侀檺鍒惰兘鍔? *
- * @author Skills Team
- * @version 2.3.0
- * @since 2026-02-24
- */
 @Slf4j
 @Component
 public class ResourceManager {
@@ -32,14 +25,7 @@ public class ResourceManager {
     private MemoryMXBean memoryMXBean;
     private OperatingSystemMXBean osMXBean;
 
-    /**
-     * 璧勬簮閰嶉鏄犲皠
-     */
     private final ConcurrentMap<String, ResourceQuota> quotas = new ConcurrentHashMap<>();
-
-    /**
-     * 璧勬簮浣跨敤缁熻
-     */
     private final ConcurrentMap<String, ResourceUsage> usageStats = new ConcurrentHashMap<>();
 
     @PostConstruct
@@ -49,13 +35,6 @@ public class ResourceManager {
         log.info("ResourceManager initialized");
     }
 
-    // ============================================================
-    // 瀛樺偍璧勬簮绠＄悊
-    // ============================================================
-
-    /**
-     * 鑾峰彇瀛樺偍璧勬簮淇℃伅
-     */
     public StorageResource getStorageResource(Path path) {
         try {
             FileStore store = Files.getFileStore(path);
@@ -71,8 +50,6 @@ public class ResourceManager {
         }
     }
 
-    /**
-     * 鑾峰彇鎵€鏈夊瓨鍌ㄨ祫婧?     */
     public List<StorageResource> getAllStorageResources() {
         List<StorageResource> resources = new ArrayList<>();
         for (Path root : FileSystems.getDefault().getRootDirectories()) {
@@ -84,9 +61,6 @@ public class ResourceManager {
         return resources;
     }
 
-    /**
-     * 鐢宠瀛樺偍閰嶉
-     */
     public boolean allocateStorageQuota(String skillId, long quotaBytes) {
         StorageResource systemResource = getStorageResource(FileSystems.getDefault().getPath("."));
         if (systemResource == null || systemResource.getUsableSpace() < quotaBytes) {
@@ -100,13 +74,6 @@ public class ResourceManager {
         return true;
     }
 
-    // ============================================================
-    // 璁＄畻璧勬簮绠＄悊
-    // ============================================================
-
-    /**
-     * 鑾峰彇璁＄畻璧勬簮淇℃伅
-     */
     public ComputeResource getComputeResource() {
         return ComputeResource.builder()
                 .availableProcessors(osMXBean.getAvailableProcessors())
@@ -117,13 +84,10 @@ public class ResourceManager {
                 .build();
     }
 
-    /**
-     * 鐢宠璁＄畻閰嶉
-     */
     public boolean allocateComputeQuota(String skillId, int maxCpuPercent, long maxMemoryBytes) {
         ComputeResource systemResource = getComputeResource();
 
-        // 妫€鏌ユ槸鍚︽湁瓒冲鐨勮绠楄祫婧?        if (maxCpuPercent > 100 || maxMemoryBytes > systemResource.getHeapMemoryMax()) {
+        if (maxCpuPercent > 100 || maxMemoryBytes > systemResource.getHeapMemoryMax()) {
             log.warn("Invalid compute quota for skill: {}", skillId);
             return false;
         }
@@ -136,15 +100,7 @@ public class ResourceManager {
         return true;
     }
 
-    // ============================================================
-    // 缃戠粶璧勬簮绠＄悊
-    // ============================================================
-
-    /**
-     * 鑾峰彇缃戠粶璧勬簮淇℃伅
-     */
     public NetworkResource getNetworkResource() {
-        // 绠€鍖栧疄鐜帮紝瀹為檯搴旈€氳繃缃戠粶鎺ュ彛鑾峰彇
         return NetworkResource.builder()
                 .hostname(getHostname())
                 .portRangeStart(10000)
@@ -152,9 +108,6 @@ public class ResourceManager {
                 .build();
     }
 
-    /**
-     * 鐢宠缃戠粶閰嶉
-     */
     public boolean allocateNetworkQuota(String skillId, int maxConnections, int maxBandwidthKbps) {
         ResourceQuota quota = quotas.computeIfAbsent(skillId, k -> new ResourceQuota());
         quota.setMaxConnections(maxConnections);
@@ -164,52 +117,27 @@ public class ResourceManager {
         return true;
     }
 
-    // ============================================================
-    // 璧勬簮閰嶉鏌ヨ
-    // ============================================================
-
-    /**
-     * 鑾峰彇 Skill 鐨勮祫婧愰厤棰?     */
     public ResourceQuota getQuota(String skillId) {
         return quotas.get(skillId);
     }
 
-    /**
-     * 鑾峰彇鎵€鏈夐厤棰?     */
     public ConcurrentMap<String, ResourceQuota> getAllQuotas() {
         return new ConcurrentHashMap<>(quotas);
     }
 
-    /**
-     * 閲婃斁璧勬簮閰嶉
-     */
     public void releaseQuota(String skillId) {
         quotas.remove(skillId);
         usageStats.remove(skillId);
         log.info("Released quota for skill: {}", skillId);
     }
 
-    // ============================================================
-    // 璧勬簮浣跨敤缁熻
-    // ============================================================
-
-    /**
-     * 璁板綍璧勬簮浣跨敤
-     */
     public void recordUsage(String skillId, ResourceUsage usage) {
         usageStats.put(skillId, usage);
     }
 
-    /**
-     * 鑾峰彇璧勬簮浣跨敤缁熻
-     */
     public ResourceUsage getUsage(String skillId) {
         return usageStats.get(skillId);
     }
-
-    // ============================================================
-    // 杈呭姪鏂规硶
-    // ============================================================
 
     private String getHostname() {
         try {
@@ -218,9 +146,6 @@ public class ResourceManager {
             return "unknown";
         }
     }
-
-    // ============================================================
-    // 鏁版嵁绫诲畾涔?    // ============================================================
 
     @Data
     @Builder
@@ -261,14 +186,9 @@ public class ResourceManager {
 
     @Data
     public static class ResourceQuota {
-        // 瀛樺偍閰嶉
         private long storageQuota;
-
-        // 璁＄畻閰嶉
         private int maxCpuPercent;
         private long maxMemoryBytes;
-
-        // 缃戠粶閰嶉
         private int maxConnections;
         private int maxBandwidthKbps;
     }
