@@ -1,0 +1,106 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-scheduler-quartz
+  name: Quartz调度服务
+  version: 0.7.3
+  description: Quartz调度服务，提供定时任务调度、执行管理
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - scheduler
+    - quartz
+    - job
+    - cron
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x71
+    category: SCHED
+    code: SCHED_QUARTZ
+    operations: [schedule, execute, manage]
+  
+  providerType: scheduler
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - workflow
+    - automation
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: scheduler-service
+      version: "1.0"
+      description: "调度服务接口"
+  
+  capabilities:
+    - id: schedule
+      name: 任务调度
+      description: 调度定时任务
+      category: service
+    - id: execute
+      name: 任务执行
+      description: 执行任务
+      category: service
+    - id: manage
+      name: 任务管理
+      description: 管理任务
+      category: service
+  
+  endpoints:
+    - path: /api/scheduler/jobs
+      method: POST
+      description: 创建任务
+      capability: schedule
+    - path: /api/scheduler/jobs/{name}/trigger
+      method: POST
+      description: 触发任务
+      capability: execute
+    - path: /api/scheduler/jobs
+      method: GET
+      description: 获取任务列表
+      capability: manage
+  
+  config:
+    optional:
+      - name: THREAD_POOL_SIZE
+        type: integer
+        default: 10
+        description: 线程池大小
+      - name: JOB_STORE
+        type: string
+        default: "memory"
+        description: 任务存储类型
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

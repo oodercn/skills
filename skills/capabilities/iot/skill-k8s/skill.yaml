@@ -1,0 +1,106 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-k8s
+  name: Kubernetes集群管理
+  version: 0.7.3
+  description: Kubernetes集群管理服务，提供集群管理、部署、监控
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - kubernetes
+    - k8s
+    - cluster
+    - container
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x61
+    category: IOT
+    code: IOT_K8S
+    operations: [deploy, scale, monitor]
+  
+  providerType: infrastructure
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - devops
+    - infrastructure
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 3s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: k8s-service
+      version: "1.0"
+      description: "K8s服务接口"
+  
+  capabilities:
+    - id: deploy
+      name: 部署管理
+      description: 管理部署
+      category: service
+    - id: scale
+      name: 扩缩容
+      description: 扩缩容管理
+      category: service
+    - id: monitor
+      name: 集群监控
+      description: 监控集群
+      category: service
+  
+  endpoints:
+    - path: /api/k8s/deployments
+      method: POST
+      description: 创建部署
+      capability: deploy
+    - path: /api/k8s/deployments/{name}/scale
+      method: PUT
+      description: 扩缩容
+      capability: scale
+    - path: /api/k8s/nodes
+      method: GET
+      description: 获取节点
+      capability: monitor
+  
+  config:
+    required:
+      - name: KUBECONFIG
+        type: string
+        description: Kubeconfig配置
+    optional:
+      - name: NAMESPACE
+        type: string
+        default: "default"
+        description: 默认命名空间
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

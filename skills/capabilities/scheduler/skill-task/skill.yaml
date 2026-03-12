@@ -1,0 +1,110 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-task
+  name: 任务管理服务
+  version: 0.7.3
+  description: 任务管理服务，提供任务创建、执行、状态管理
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - task
+    - job
+    - scheduler
+    - execution
+
+spec:
+  type: provider-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x70
+    category: SCHED
+    code: SCHED_BASE
+    operations: [create, execute, status]
+  
+  providerType: scheduler
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - workflow
+    - automation
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies:
+    - id: skill-scheduler-quartz
+      version: ">=0.7.0"
+      required: true
+      description: "Quartz调度服务依赖"
+  
+  providedInterfaces:
+    - id: task-service
+      version: "1.0"
+      description: "任务服务接口"
+  
+  capabilities:
+    - id: create
+      name: 任务创建
+      description: 创建任务
+      category: service
+    - id: execute
+      name: 任务执行
+      description: 执行任务
+      category: service
+    - id: status
+      name: 状态管理
+      description: 管理任务状态
+      category: service
+  
+  endpoints:
+    - path: /api/tasks
+      method: POST
+      description: 创建任务
+      capability: create
+    - path: /api/tasks/{id}/execute
+      method: POST
+      description: 执行任务
+      capability: execute
+    - path: /api/tasks/{id}/status
+      method: GET
+      description: 获取状态
+      capability: status
+  
+  config:
+    optional:
+      - name: MAX_TASKS
+        type: integer
+        default: 1000
+        description: 最大任务数
+      - name: TASK_TIMEOUT
+        type: integer
+        default: 3600
+        description: 任务超时(秒)
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
