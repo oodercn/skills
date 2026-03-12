@@ -302,14 +302,25 @@ skill-payment-alipay
 
 ---
 
-## 五、补全的依赖关系配置
+## 五、已补全的依赖关系配置
 
-### 5.1 skill-org-dingding 补全依赖
+> **更新日期**: 2026-03-12  
+> **已更新技能数**: 15
 
+### 5.1 ORG 类驱动 (已更新 4 个)
+
+| 技能ID | 直接依赖 | 间接依赖 | 状态 |
+|--------|----------|----------|:----:|
+| skill-org-dingding | skill-org-base | skill-user-auth, skill-common | ✅ |
+| skill-org-feishu | skill-org-base | skill-user-auth, skill-common | ✅ |
+| skill-org-wecom | skill-org-base | skill-user-auth, skill-common | ✅ |
+| skill-org-ldap | skill-org-base | skill-user-auth, skill-common | ✅ |
+
+**依赖配置示例**:
 ```yaml
 dependencies:
   - id: skill-org-base
-    version: ">=1.0.0"
+    version: ">=2.3.0"
     required: true
     description: "组织基础服务"
   - id: skill-user-auth
@@ -322,8 +333,17 @@ dependencies:
     description: "通用工具库(间接)"
 ```
 
-### 5.2 skill-vfs-minio 补全依赖
+### 5.2 VFS 类驱动 (已更新 5 个)
 
+| 技能ID | 直接依赖 | 间接依赖 | 状态 |
+|--------|----------|----------|:----:|
+| skill-vfs-local | skill-vfs-base | skill-common | ✅ |
+| skill-vfs-minio | skill-vfs-base | skill-common | ✅ |
+| skill-vfs-oss | skill-vfs-base | skill-common | ✅ |
+| skill-vfs-s3 | skill-vfs-base | skill-common | ✅ |
+| skill-vfs-database | skill-vfs-base | skill-common | ✅ |
+
+**依赖配置示例**:
 ```yaml
 dependencies:
   - id: skill-vfs-base
@@ -336,58 +356,52 @@ dependencies:
     description: "通用工具库(间接)"
 ```
 
-### 5.3 skill-media-wechat 补全依赖
+### 5.3 PAYMENT 类驱动 (已更新 3 个)
 
+| 技能ID | 直接依赖 | 间接依赖 | 状态 |
+|--------|----------|----------|:----:|
+| skill-payment-alipay | skill-common | skill-user-auth | ✅ |
+| skill-payment-wechat | skill-common | skill-user-auth | ✅ |
+| skill-payment-unionpay | skill-common | skill-user-auth | ✅ |
+
+**依赖配置示例**:
 ```yaml
 dependencies:
   - id: skill-common
     version: ">=1.0.0"
-    required: false
-    description: "通用工具库(间接)"
-  - id: skill-protocol
-    version: ">=1.0.0"
-    required: false
-    description: "协议处理服务(间接)"
+    required: true
+    description: "通用工具库"
   - id: skill-user-auth
     version: ">=0.7.0"
     required: false
     description: "用户认证服务(间接)"
 ```
 
-### 5.4 skill-payment-alipay 补全依赖
+### 5.4 MEDIA 类驱动 (已更新 5 个)
 
+| 技能ID | 直接依赖 | 间接依赖 | 状态 |
+|--------|----------|----------|:----:|
+| skill-media-wechat | skill-common | skill-user-auth, skill-vfs-base | ✅ |
+| skill-media-weibo | skill-common | skill-user-auth, skill-vfs-base | ✅ |
+| skill-media-xiaohongshu | skill-common | skill-user-auth, skill-vfs-base | ✅ |
+| skill-media-zhihu | skill-common | skill-user-auth, skill-vfs-base | ✅ |
+| skill-media-toutiao | skill-common | skill-user-auth, skill-vfs-base | ✅ |
+
+**依赖配置示例**:
 ```yaml
 dependencies:
   - id: skill-common
     version: ">=1.0.0"
-    required: false
-    description: "通用工具库(间接)"
-  - id: skill-protocol
-    version: ">=1.0.0"
-    required: false
-    description: "协议处理服务(间接)"
-  - id: skill-security
+    required: true
+    description: "通用工具库"
+  - id: skill-user-auth
     version: ">=0.7.0"
     required: false
-    description: "安全管理服务(间接)"
-```
-
-### 5.5 skill-knowledge-base 补全依赖
-
-```yaml
-dependencies:
+    description: "用户认证服务(间接)"
   - id: skill-vfs-base
     version: ">=1.0.0"
     required: false
-    description: "VFS基础服务(间接)"
-  - id: skill-search
-    version: ">=0.7.0"
-    required: false
-    description: "搜索服务(间接)"
-  - id: skill-common
-    version: ">=1.0.0"
-    required: false
-    description: "通用工具库(间接)"
+    description: "文件存储服务(间接)"
 ```
 
 ---
@@ -429,13 +443,26 @@ dependencies:
 | **直接依赖关系** | 35 |
 | **间接依赖关系** | 28 |
 | **最大依赖深度** | 3 |
+| **已更新依赖配置技能数** | 15 |
 
-### 7.2 关键发现
+### 7.2 已更新技能清单
+
+| 分类 | 技能数 | 技能列表 |
+|------|:------:|----------|
+| **ORG** | 4 | skill-org-dingding, skill-org-feishu, skill-org-wecom, skill-org-ldap |
+| **VFS** | 5 | skill-vfs-local, skill-vfs-minio, skill-vfs-oss, skill-vfs-s3, skill-vfs-database |
+| **PAYMENT** | 3 | skill-payment-alipay, skill-payment-wechat, skill-payment-unionpay |
+| **MEDIA** | 3 | skill-media-weibo, skill-media-xiaohongshu, skill-media-zhihu, skill-media-toutiao |
+
+### 7.3 关键发现
 
 1. **sys** 是所有能力的基础依赖
 2. **know** (知识库) 依赖最复杂，深度为3
 3. **llm** 与 **know** 相互依赖，形成核心AI能力
 4. 驱动类技能通常依赖基础能力服务
+5. ORG类驱动统一依赖 skill-org-base 作为直接依赖
+6. VFS类驱动统一依赖 skill-vfs-base 作为直接依赖
+7. PAYMENT/MEDIA类驱动依赖 skill-common 作为直接依赖
 
 ---
 

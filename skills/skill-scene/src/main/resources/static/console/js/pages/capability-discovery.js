@@ -503,23 +503,7 @@ var CapabilityDiscovery = {
             })
             .catch(function(error) {
                 console.error('[loadUsers] Error:', error);
-                var mockUsers = [
-                    { id: '1', name: '当前用户', username: 'current_user', email: 'current@example.com' },
-                    { id: '2', name: '张三', username: 'zhangsan', email: 'zhangsan@example.com' },
-                    { id: '3', name: '李四', username: 'lisi', email: 'lisi@example.com' },
-                    { id: '4', name: '王五', username: 'wangwu', email: 'wangwu@example.com' }
-                ];
-                
-                var html = '';
-                mockUsers.forEach(function(user) {
-                    html += '<div class="user-item" onclick="selectUser(this)" data-user=\'' + JSON.stringify(user) + '\'>' +
-                        '<div class="user-avatar"><i class="ri-user-line"></i></div>' +
-                        '<div class="user-info">' +
-                        '<div class="user-name">' + user.name + '</div>' +
-                        '<div class="user-email">' + user.email + '</div>' +
-                        '</div>' +
-                        '</div>';
-                });
+                var html = '<div class="user-empty">加载失败，请重试</div>';
                 list.innerHTML = html;
             });
     },
@@ -765,14 +749,17 @@ var CapabilityDiscovery = {
 
     renderParticipantsStep: function(cap) {
         var leaderInput = document.getElementById('leaderInput');
-        if (leaderInput) {
+        if (leaderInput && !leaderInput.value) {
             leaderInput.value = '当前用户';
         }
         var collaboratorList = document.getElementById('collaboratorList');
-        if (collaboratorList) {
+        if (collaboratorList && collaboratorList.children.length === 0) {
             collaboratorList.innerHTML = '<div class="participant-empty">暂无协作者，点击下方按钮添加</div>';
         }
         var pushType = document.getElementById('pushType');
+        if (pushType && !pushType.value) {
+            pushType.value = 'SHARE';
+        }
         if (pushType) {
             pushType.onchange = function() {
                 var hint = document.getElementById('pushHint');

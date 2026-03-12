@@ -48,7 +48,15 @@ spec:
     matchSceneTypes: true
     maxSceneGroups: 10
   
-  dependencies: []
+  dependencies:
+    - id: skill-common
+      version: ">=1.0.0"
+      required: true
+      description: "通用工具库"
+    - id: skill-user-auth
+      version: ">=0.7.0"
+      required: false
+      description: "用户认证服务(间接)"
   
   providedInterfaces:
     - id: payment-service

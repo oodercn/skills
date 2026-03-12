@@ -6,6 +6,7 @@
     <title>我的能力 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/stat-cards.css">
     <style>
         .my-cap-page { padding: 20px; }
         
@@ -32,67 +33,55 @@
             margin-top: 4px;
         }
         
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(5, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
             background: var(--nx-bg-elevated);
+            border-radius: 12px;
             border: 1px solid var(--nx-border);
-            border-radius: 12px;
-            padding: 20px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s;
         }
         
-        .stat-card:hover {
-            border-color: var(--nx-primary);
-            transform: translateY(-2px);
-        }
-        
-        .stat-card.active {
-            border-color: var(--nx-primary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-        }
-        
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
+        .category-tab {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            margin: 0 auto 12px;
-        }
-        
-        .stat-icon.total { background: #dbeafe; color: #2563eb; }
-        .stat-icon.sic { background: #fce7f3; color: #db2777; }
-        .stat-icon.ic { background: #d1fae5; color: #059669; }
-        .stat-icon.pc { background: #fef3c7; color: #d97706; }
-        .stat-icon.tool { background: #e0e7ff; color: #4f46e5; }
-        
-        .stat-value {
-            font-size: 32px;
-            font-weight: 600;
-            color: var(--nx-text);
-        }
-        
-        .stat-label {
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
             font-size: 13px;
+            cursor: pointer;
+            background: var(--nx-bg);
+            border: 1px solid transparent;
+            transition: all 0.2s;
             color: var(--nx-text-secondary);
-            margin-top: 4px;
         }
         
-        .stat-desc {
+        .category-tab:hover {
+            background: var(--nx-bg-hover);
+            border-color: var(--nx-border);
+        }
+        
+        .category-tab.active {
+            background: var(--nx-primary);
+            color: white;
+            border-color: var(--nx-primary);
+        }
+        
+        .category-tab i {
+            font-size: 16px;
+        }
+        
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
             font-size: 11px;
-            color: var(--nx-text-secondary);
-            margin-top: 2px;
-            opacity: 0.7;
+            font-weight: 500;
+            margin-left: 8px;
         }
         
         .toolbar {
@@ -214,62 +203,6 @@
         
         .cap-name { font-weight: 500; }
         .cap-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
-        
-        .ownership-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 4px 10px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 600;
-        }
-        
-        .ownership-badge.SIC { background: #fce7f3; color: #db2777; }
-        .ownership-badge.IC { background: #d1fae5; color: #059669; }
-        .ownership-badge.PC { background: #fef3c7; color: #d97706; }
-        .ownership-badge.TOOL { background: #e0e7ff; color: #4f46e5; }
-        
-        .type-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            background: var(--nx-bg);
-            color: var(--nx-text-secondary);
-        }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 12px;
-            border-radius: 16px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .status-badge.enabled { background: #d1fae5; color: #059669; }
-        .status-badge.disabled { background: #fef3c7; color: #d97706; }
-        .status-badge.error { background: #fee2e2; color: #dc2626; }
-        .status-badge.pending { background: #e0e7ff; color: #4f46e5; }
-        .status-badge.inactive { background: #f1f5f9; color: #64748b; }
-        
-        .status-dot {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background: currentColor;
-        }
-        
-        .status-badge.enabled .status-dot { animation: pulse 2s infinite; }
-        
-        @keyframes pulse {
-            0%, 100% { opacity: 1; }
-            50% { opacity: 0.5; }
-        }
         
         .action-btns {
             display: flex;
@@ -614,36 +547,48 @@
                 </header>
                 
                 <div class="stats-row">
-                    <div class="stat-card" data-ownership="all" onclick="filterByOwnership('all')">
+                    <div class="stat-card" data-category="all" onclick="filterByCategory('all')">
                         <div class="stat-icon total"><i class="ri-flashlight-line"></i></div>
                         <div class="stat-value" id="statTotal">0</div>
                         <div class="stat-label">总能力数</div>
                     </div>
-                    <div class="stat-card" data-ownership="SIC" onclick="filterByOwnership('SIC')">
-                        <div class="stat-icon sic"><i class="ri-puzzle-line"></i></div>
-                        <div class="stat-value" id="statSIC">0</div>
-                        <div class="stat-label">场景技能</div>
-                        <div class="stat-desc">SIC - 技能包内部能力</div>
+                    <div class="stat-card" onclick="filterByStatus('installed')">
+                        <div class="stat-icon installed"><i class="ri-download-cloud-line"></i></div>
+                        <div class="stat-value" id="statInstalled">0</div>
+                        <div class="stat-label">已安装</div>
                     </div>
-                    <div class="stat-card" data-ownership="IC" onclick="filterByOwnership('IC')">
-                        <div class="stat-icon ic"><i class="ri-share-line"></i></div>
-                        <div class="stat-value" id="statIC">0</div>
-                        <div class="stat-label">独立能力</div>
-                        <div class="stat-desc">IC - 跨场景复用</div>
+                    <div class="stat-card" onclick="filterByStatus('active')">
+                        <div class="stat-icon active"><i class="ri-play-circle-line"></i></div>
+                        <div class="stat-value" id="statActive">0</div>
+                        <div class="stat-label">运行中</div>
                     </div>
-                    <div class="stat-card" data-ownership="PC" onclick="filterByOwnership('PC')">
-                        <div class="stat-icon pc"><i class="ri-global-line"></i></div>
-                        <div class="stat-value" id="statPC">0</div>
-                        <div class="stat-label">平台能力</div>
-                        <div class="stat-desc">PC - 全局可见</div>
+                    <div class="stat-card" data-category="llm" onclick="filterByCategory('llm')">
+                        <div class="stat-icon llm"><i class="ri-robot-line"></i></div>
+                        <div class="stat-value" id="statLLM">0</div>
+                        <div class="stat-label">LLM</div>
+                        <div class="stat-desc">0x30 大语言模型</div>
                     </div>
-                    <div class="stat-card" data-ownership="TOOL" onclick="filterByOwnership('TOOL')">
-                        <div class="stat-icon tool"><i class="ri-tools-line"></i></div>
-                        <div class="stat-value" id="statTOOL">0</div>
-                        <div class="stat-label">工具技能</div>
-                        <div class="stat-desc">TOOL - 工具类</div>
+                    <div class="stat-card" data-category="db" onclick="filterByCategory('db')">
+                        <div class="stat-icon db"><i class="ri-database-2-line"></i></div>
+                        <div class="stat-value" id="statDB">0</div>
+                        <div class="stat-label">数据库</div>
+                        <div class="stat-desc">0x28 数据存储</div>
+                    </div>
+                    <div class="stat-card" data-category="vfs" onclick="filterByCategory('vfs')">
+                        <div class="stat-icon vfs"><i class="ri-folder-line"></i></div>
+                        <div class="stat-value" id="statVFS">0</div>
+                        <div class="stat-label">文件存储</div>
+                        <div class="stat-desc">0x20 虚拟文件系统</div>
+                    </div>
+                    <div class="stat-card" data-category="know" onclick="filterByCategory('know')">
+                        <div class="stat-icon know"><i class="ri-book-line"></i></div>
+                        <div class="stat-value" id="statKnow">0</div>
+                        <div class="stat-label">知识库</div>
+                        <div class="stat-desc">0x38 RAG检索增强</div>
                     </div>
                 </div>
+                
+                <div class="category-tabs" id="categoryTabs"></div>
                 
                 <div class="toolbar">
                     <div class="toolbar-left">
@@ -715,6 +660,7 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/capability-config.js"></script>
     <script src="/console/js/api-client.js"></script>
     <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>

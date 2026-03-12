@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>录音上传 - 录音质检系统</title>
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="../css/recording-qa.css">
+</head>
+<body>
+    <div class="nexus-layout">
+        <!-- 侧边栏 -->
+        <aside class="nexus-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ri-mic-line"></i>
+                    <span>录音质检</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="upload.html" class="nav-link active">
+                            <i class="ri-upload-cloud-line"></i>
+                            <span>录音上传</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="review.html" class="nav-link">
+                            <i class="ri-file-search-line"></i>
+                            <span>人工审核</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <i class="ri-bar-chart-line"></i>
+                            <span>质检统计</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="nexus-main">
+            <!-- 顶部导航 -->
+            <header class="nexus-header">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <h1 class="page-title">录音上传</h1>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <i class="ri-user-line"></i>
+                        <span>管理员</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="nexus-content">
+                <!-- 上传区域 -->
+                <div class="upload-section">
+                    <div class="upload-area" id="upload-area">
+                        <div class="upload-icon">
+                            <i class="ri-upload-cloud-2-line"></i>
+                        </div>
+                        <h3>拖拽录音文件到此处上传</h3>
+                        <p>或点击选择文件</p>
+                        <p class="upload-hint">支持格式：MP3, WAV, M4A, OGG (最大100MB)</p>
+                        <input type="file" id="file-input" accept=".mp3,.wav,.m4a,.ogg" multiple>
+                    </div>
+                </div>
+
+                <!-- 上传表单 -->
+                <div class="form-section">
+                    <h3 class="section-title">录音信息</h3>
+                    <form id="upload-form" class="qa-form">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">客服姓名 <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="agent-name" placeholder="请输入客服姓名" required>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">客服工号 <span class="required">*</span></label>
+                                <input type="text" class="form-input" id="agent-id" placeholder="请输入客服工号" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">所属部门 <span class="required">*</span></label>
+                                <select class="form-select" id="department" required>
+                                    <option value="">请选择部门</option>
+                                    <option value="客服一部">客服一部</option>
+                                    <option value="客服二部">客服二部</option>
+                                    <option value="客服三部">客服三部</option>
+                                    <option value="技术支持部">技术支持部</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">通话类型 <span class="required">*</span></label>
+                                <select class="form-select" id="call-type" required>
+                                    <option value="">请选择类型</option>
+                                    <option value="来电">来电</option>
+                                    <option value="去电">去电</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">客户电话</label>
+                                <input type="text" class="form-input" id="customer-phone" placeholder="请输入客户电话">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">录音时长</label>
+                                <input type="text" class="form-input" id="duration" placeholder="自动计算" readonly>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">
+                                <i class="ri-upload-line"></i>
+                                <span>开始上传</span>
+                            </button>
+                            <button type="reset" class="btn btn-secondary">
+                                <i class="ri-refresh-line"></i>
+                                <span>重置</span>
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- 上传列表 -->
+                <div class="list-section">
+                    <h3 class="section-title">最近上传</h3>
+                    <div class="table-container">
+                        <table class="data-table" id="upload-list">
+                            <thead>
+                                <tr>
+                                    <th>文件名</th>
+                                    <th>客服</th>
+                                    <th>部门</th>
+                                    <th>通话类型</th>
+                                    <th>时长</th>
+                                    <th>大小</th>
+                                    <th>状态</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api.js"></script>
+    <script src="../js/recording-qa.js"></script>
+    <script>
+        // 页面初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            RecordingQA.initUpload();
+        });
+    </script>
+</body>
+</html>

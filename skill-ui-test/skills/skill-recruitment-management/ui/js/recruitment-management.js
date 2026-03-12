@@ -8,6 +8,7 @@ const RecruitmentManagement = {
     currentOffer: null,
     
     init() {
+        this.initTheme();
         this.loadData();
         this.initEventListeners();
     },
@@ -1012,7 +1013,8 @@ const RecruitmentManagement = {
         // 根据tab找到对应的菜单项并激活
         const menuItems = document.querySelectorAll('.sidebar-menu__item');
         menuItems.forEach(item => {
-            if (item.getAttribute('onclick')?.includes(`switchTab('${tab}')`)) {
+            const onclickAttr = item.getAttribute('onclick');
+            if (onclickAttr && (onclickAttr.includes(`switchTab('${tab}')`) || onclickAttr.includes(`switchTab("${tab}")`))) {
                 item.classList.add('active');
             }
         });
@@ -1098,6 +1100,54 @@ const RecruitmentManagement = {
         if (!timestamp) return '-';
         const date = new Date(timestamp);
         return `${date.getMonth() + 1}/${date.getDate()} ${date.getHours()}:${String(date.getMinutes()).padStart(2, '0')}`;
+    },
+    
+    formatDate(timestamp) {
+        const date = new Date(timestamp);
+        return `${date.getMonth() + 1}/${date.getDate()}`;
+    },
+    
+    // ========== 主题切换功能 ==========
+    initTheme() {
+        // 从localStorage读取主题设置
+        const savedTheme = localStorage.getItem('recruitment-theme');
+        if (savedTheme === 'dark') {
+            document.documentElement.setAttribute('data-theme', 'dark');
+            this.updateThemeIcon(true);
+        } else {
+            // 默认亮色主题，移除dark属性
+            document.documentElement.removeAttribute('data-theme');
+            this.updateThemeIcon(false);
+        }
+    },
+    
+    toggleTheme() {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        if (isDark) {
+            // 切换到亮色
+            document.documentElement.removeAttribute('data-theme');
+            localStorage.setItem('recruitment-theme', 'light');
+            this.updateThemeIcon(false);
+        } else {
+            // 切换到深色
+            document.documentElement.setAttribute('data-theme', 'dark');
+            localStorage.setItem('recruitment-theme', 'dark');
+            this.updateThemeIcon(true);
+        }
+    },
+    
+    updateThemeIcon(isDark) {
+        const icon = document.getElementById('theme-icon');
+        const text = document.getElementById('theme-text');
+        if (icon && text) {
+            if (isDark) {
+                icon.className = 'ri-moon-line';
+                text.textContent = '深色模式';
+            } else {
+                icon.className = 'ri-sun-line';
+                text.textContent = '亮色模式';
+            }
+        }
     }
 };
 

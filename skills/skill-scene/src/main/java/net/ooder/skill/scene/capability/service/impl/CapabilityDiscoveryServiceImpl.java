@@ -4,6 +4,7 @@ import net.ooder.skill.scene.capability.driver.DriverCondition;
 import net.ooder.skill.scene.capability.model.CapabilityType;
 import net.ooder.skill.scene.capability.service.CapabilityDiscoveryService;
 import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.skill.scene.capability.model.Capability;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,6 +21,9 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
 
     @Autowired
     private CapabilityService capabilityService;
+    
+    @Autowired(required = false)
+    private CapabilityStateService capabilityStateService;
 
     @Override
     public DiscoveryResult discoverCapabilities(DiscoveryRequest request) {
@@ -113,7 +117,9 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         detail.setType(capability.getType());
         detail.setIcon(capability.getIcon());
         detail.setVersion(capability.getVersion());
-        detail.setInstalled(capability.isInstalled());
+        detail.setInstalled(capabilityStateService != null 
+            ? capabilityStateService.isInstalled(capability.getCapabilityId()) 
+            : capability.isInstalled());
         detail.setDriverConditions(getDriverConditions(capabilityId));
         detail.setDependencies(capability.getDependencies());
         detail.setOptionalCapabilities(capability.getOptionalCapabilities());
@@ -193,7 +199,9 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         item.setType(cap.getType());
         item.setIcon(cap.getIcon());
         item.setVersion(cap.getVersion());
-        item.setInstalled(cap.isInstalled());
+        item.setInstalled(capabilityStateService != null 
+            ? capabilityStateService.isInstalled(cap.getCapabilityId()) 
+            : cap.isInstalled());
         item.setSupportedSceneTypes(cap.getSupportedSceneTypes());
         item.setMetadata(cap.getMetadata());
         item.setSkillForm(cap.getSkillForm() != null ? cap.getSkillForm().getCode() : null);

@@ -467,7 +467,8 @@ const ApprovalForm = {
         // 根据tab找到对应的菜单项并激活
         const menuItems = document.querySelectorAll('.sidebar-menu__item');
         menuItems.forEach(item => {
-            if (item.getAttribute('onclick')?.includes(`switchTab('${tab}')`)) {
+            const onclickAttr = item.getAttribute('onclick');
+            if (onclickAttr && (onclickAttr.includes(`switchTab('${tab}')`) || onclickAttr.includes(`switchTab("${tab}")`))) {
                 item.classList.add('active');
             }
         });

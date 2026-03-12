@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>招聘管理系统</title>
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="../css/recruitment-management.css">
 </head>
 <body>
@@ -73,6 +73,14 @@
             </div>
             
             <ul class="nav-menu" id="nav-menu" style="display: none;"></ul>
+            
+            <!-- 主题切换按钮 -->
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="theme-toggle" onclick="RecruitmentManagement.toggleTheme()">
+                    <i class="ri-sun-line" id="theme-icon"></i>
+                    <span id="theme-text">切换主题</span>
+                </button>
+            </div>
         </aside>
         
         <main class="nx-page__content">
@@ -697,11 +705,102 @@
         </div>
     </div>
     
+    <!-- AI招聘助手浮动面板 -->
+    <div class="llm-floating-trigger" id="llm-trigger" onclick="RecruitmentAIAssistant.toggle()">
+        <i class="ri-robot-2-line"></i>
+        <span class="llm-trigger-badge" id="llm-badge" style="display: none;">0</span>
+    </div>
+    
+    <div class="llm-floating-panel" id="llm-panel">
+        <div class="llm-floating-header">
+            <div class="llm-floating-title">
+                <i class="ri-robot-2-line"></i>
+                <span>AI招聘助手</span>
+            </div>
+            <div class="llm-floating-actions">
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.toggleSettings()" title="设置">
+                    <i class="ri-settings-3-line"></i>
+                </button>
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.minimize()" title="最小化">
+                    <i class="ri-subtract-line"></i>
+                </button>
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.close()" title="关闭">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        </div>
+        <div class="llm-floating-body" id="llm-body">
+            <!-- 模型选择栏 -->
+            <div class="llm-model-bar">
+                <div class="llm-model-select">
+                    <i class="ri-brain-line"></i>
+                    <select id="llm-provider" onchange="RecruitmentAIAssistant.changeProvider()">
+                        <option value="deepseek" selected>DeepSeek</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="qianwen">通义千问</option>
+                        <option value="baidu">百度文心</option>
+                    </select>
+                </div>
+                <div class="llm-model-select">
+                    <select id="llm-model" onchange="RecruitmentAIAssistant.changeModel()">
+                        <option value="default">默认模型</option>
+                    </select>
+                </div>
+            </div>
+            <div class="llm-context-bar">
+                <div class="llm-context-info">
+                    <i class="ri-briefcase-line"></i>
+                    <span id="llm-context-text">已获取招聘上下文</span>
+                </div>
+                <button class="llm-context-refresh" onclick="RecruitmentAIAssistant.refreshContext()" title="刷新上下文">
+                    <i class="ri-refresh-line"></i>
+                </button>
+            </div>
+            <div class="llm-messages" id="llm-messages">
+                <div class="llm-message llm-message--system">
+                    <div class="llm-message-avatar">
+                        <i class="ri-robot-2-line"></i>
+                    </div>
+                    <div class="llm-message-content">
+                        <p>你好！我是AI招聘助手，可以帮助你：</p>
+                        <ul>
+                            <li>分析简历匹配度</li>
+                            <li>生成面试问题</li>
+                            <li>评估候选人</li>
+                            <li>提供招聘建议</li>
+                        </ul>
+                        <p>请告诉我你需要什么帮助？</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="llm-floating-footer">
+            <div class="llm-input-area">
+                <textarea class="llm-input" id="llm-input" placeholder="输入你的问题..." rows="1"></textarea>
+                <button class="llm-send-btn" onclick="RecruitmentAIAssistant.sendMessage()" id="llm-send-btn">
+                    <i class="ri-send-plane-fill"></i>
+                </button>
+            </div>
+            <div class="llm-quick-actions">
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('分析当前简历质量')">
+                    <i class="ri-file-list-line"></i> 分析简历
+                </button>
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('生成Java工程师面试题')">
+                    <i class="ri-questionnaire-line"></i> 面试题
+                </button>
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('招聘进度如何？')">
+                    <i class="ri-bar-chart-line"></i> 招聘进度
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="/console/js/nexus.js"></script>
     <script src="/console/js/menu-loader.js"></script>
     <script src="/console/js/nexus-menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/api.js"></script>
+    <script src="../js/recruitment-ai-assistant.js"></script>
     <script src="../js/recruitment-management.js"></script>
 </body>
 </html>

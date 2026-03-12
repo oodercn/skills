@@ -41,20 +41,20 @@
   --nx-info-light: rgba(6, 182, 212, 0.1);
   --ns-info: #06b6d4;
 
-  /* 深色主题（默认）- 直接定义 --ns- 变量 */
-  --ns-background: #000000;
-  --ns-card-bg: #121212;
-  --ns-sidebar-bg: #121212;
-  --ns-input-bg: #1a1a1a;
-  --ns-bg-secondary: #1a1a1a;
-  --ns-bg-hover: #2a2a2a;
-  --ns-bg-active: #2a2a2a;
-  --ns-light: #0f0f0f;
-  --ns-dark: #ffffff;
-  --ns-text: #ffffff;
-  --ns-secondary: #94a3b8;
-  --ns-border: #2a2a2a;
-  --ns-shadow: 0 1px 3px rgba(0,0,0,0.5);
+  /* 浅色主题（默认）- 直接定义 --ns- 变量 */
+  --ns-background: #ffffff;
+  --ns-card-bg: #f1f5f9;
+  --ns-sidebar-bg: #f8fafc;
+  --ns-input-bg: #f8fafc;
+  --ns-bg-secondary: #f1f5f9;
+  --ns-bg-hover: #e2e8f0;
+  --ns-bg-active: #e2e8f0;
+  --ns-light: #f8fafc;
+  --ns-dark: #1e293b;
+  --ns-text: #1e293b;
+  --ns-secondary: #64748b;
+  --ns-border: #e2e8f0;
+  --ns-shadow: 0 1px 3px rgba(0,0,0,0.1);
   --ns-radius: 8px;
   --ns-spacing: 16px;
 
@@ -68,16 +68,16 @@
   --nx-bg-active: var(--ns-bg-active);
   --nx-text-primary: var(--ns-dark);
   --nx-text-secondary: var(--ns-secondary);
-  --nx-text-tertiary: #71717a;
-  --nx-text-disabled: #52525b;
+  --nx-text-tertiary: #a1a1aa;
+  --nx-text-disabled: #d4d4d8;
   --nx-border: var(--ns-border);
-  --nx-border-hover: #3f3f46;
-  --nx-border-active: #52525b;
+  --nx-border-hover: #d4d4d8;
+  --nx-border-active: #a1a1aa;
 
   /* 阴影 */
-  --nx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-  --nx-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
-  --nx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -4px rgba(0, 0, 0, 0.5);
+  --nx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --nx-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+  --nx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
   --nx-shadow-glow: 0 0 20px rgba(59, 130, 246, 0.3);
 
   /* 圆角 */
@@ -136,54 +136,6 @@
   --nx-z-popover: 1060;
   --nx-z-tooltip: 1070;
   --nx-z-toast: 1080;
-}
-
-/* 浅色主题 - 直接定义 --ns- 变量 */
-[data-theme="light"],
-.light-theme,
-html.light-theme,
-:root.light-theme {
-  /* 功能色保持不变 */
-  --ns-primary: #3b82f6;
-  --ns-success: #22c55e;
-  --ns-warning: #f59e0b;
-  --ns-danger: #ef4444;
-  --ns-info: #06b6d4;
-
-  /* 浅色主题变量 */
-  --ns-background: #ffffff;
-  --ns-card-bg: #f1f5f9;
-  --ns-sidebar-bg: #f8fafc;
-  --ns-input-bg: #f8fafc;
-  --ns-bg-secondary: #f1f5f9;
-  --ns-bg-hover: #e2e8f0;
-  --ns-bg-active: #e2e8f0;
-  --ns-light: #f8fafc;
-  --ns-dark: #1e293b;
-  --ns-text: #1e293b;
-  --ns-secondary: #64748b;
-  --ns-border: #e2e8f0;
-  --ns-shadow: 0 1px 3px rgba(0,0,0,0.1);
-
-  /* 内部 --nx- 变量映射 */
-  --nx-bg-body: var(--ns-background);
-  --nx-bg-page: var(--ns-background);
-  --nx-bg-card: var(--ns-card-bg);
-  --nx-bg-elevated: var(--ns-bg-secondary);
-  --nx-bg-input: var(--ns-input-bg);
-  --nx-bg-hover: var(--ns-bg-hover);
-  --nx-bg-active: var(--ns-bg-active);
-  --nx-text-primary: var(--ns-dark);
-  --nx-text-secondary: var(--ns-secondary);
-  --nx-text-tertiary: #a1a1aa;
-  --nx-text-disabled: #d4d4d8;
-  --nx-border: var(--ns-border);
-  --nx-border-hover: #d4d4d8;
-  --nx-border-active: #a1a1aa;
-
-  --nx-shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --nx-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
-  --nx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
 }
 
 /* ============================================
@@ -939,7 +891,8 @@ ul, ol {
 
 /* 布局兼容 */
 .container,
-.nexus-container {
+.nexus-container,
+.nexus-layout {
   display: flex;
   min-height: 100vh;
 }
@@ -957,7 +910,8 @@ ul, ol {
 }
 
 .main-content,
-.nexus-main-content {
+.nexus-main-content,
+.nexus-main {
   flex: 1;
   display: flex;
   flex-direction: column;

@@ -66,6 +66,9 @@ public class GitDiscoveryController {
     @Autowired(required = false)
     private net.ooder.skill.scene.capability.service.CapabilityService capabilityService;
     
+    @Autowired(required = false)
+    private net.ooder.skill.scene.capability.service.CapabilityStateService capabilityStateService;
+    
     @Autowired
     private SkillIndexLoader skillIndexLoader;
     
@@ -471,62 +474,80 @@ public class GitDiscoveryController {
     }
     
     private void applyInstallConfig(InstallRequest installRequest, InstallSkillRequestDTO request) {
+        Map<String, String> options = new HashMap<>();
+        
         if (request.getSelectedRole() != null) {
-            installRequest.addOption("selectedRole", request.getSelectedRole());
+            options.put("selectedRole", request.getSelectedRole());
         }
         
         if (request.getParticipants() != null) {
             InstallSkillRequestDTO.ParticipantConfig pc = request.getParticipants();
             if (pc.getLeader() != null) {
-                installRequest.addOption("leader", pc.getLeader());
+                options.put("leader", pc.getLeader());
             }
             if (pc.getPushType() != null) {
-                installRequest.addOption("pushType", pc.getPushType());
+                options.put("pushType", pc.getPushType());
             }
             if (pc.getCollaborators() != null && !pc.getCollaborators().isEmpty()) {
-                installRequest.addOption("collaborators", pc.getCollaborators());
+                options.put("collaborators", String.join(",", pc.getCollaborators()));
             }
         }
         
         if (request.getDriverConditions() != null && !request.getDriverConditions().isEmpty()) {
-            installRequest.addOption("driverConditions", request.getDriverConditions());
+            try {
+                options.put("driverConditions", new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(request.getDriverConditions()));
+            } catch (Exception e) {
+                log.warn("Failed to serialize driverConditions", e);
+            }
         }
         
         if (request.getLlmConfig() != null) {
             InstallSkillRequestDTO.LLMConfig llm = request.getLlmConfig();
             if (llm.getProvider() != null) {
-                installRequest.addOption("llmProvider", llm.getProvider());
+                options.put("llmProvider", llm.getProvider());
             }
             if (llm.getModel() != null) {
-                installRequest.addOption("llmModel", llm.getModel());
+                options.put("llmModel", llm.getModel());
             }
             if (llm.getSystemPrompt() != null) {
-                installRequest.addOption("systemPrompt", llm.getSystemPrompt());
+                options.put("systemPrompt", llm.getSystemPrompt());
             }
             if (llm.getEnableFunctionCall() != null) {
-                installRequest.addOption("enableFunctionCall", llm.getEnableFunctionCall());
+                options.put("enableFunctionCall", llm.getEnableFunctionCall().toString());
             }
             if (llm.getFunctionTools() != null && !llm.getFunctionTools().isEmpty()) {
-                installRequest.addOption("functionTools", llm.getFunctionTools());
+                try {
+                    options.put("functionTools", new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(llm.getFunctionTools()));
+                } catch (Exception e) {
+                    log.warn("Failed to serialize functionTools", e);
+                }
             }
             if (llm.getParameters() != null && !llm.getParameters().isEmpty()) {
-                installRequest.addOption("llmParameters", llm.getParameters());
+                try {
+                    options.put("llmParameters", new com.fasterxml.jackson.databind.ObjectMapper().writeValueAsString(llm.getParameters()));
+                } catch (Exception e) {
+                    log.warn("Failed to serialize llmParameters", e);
+                }
             }
             if (llm.getKnowledge() != null) {
                 InstallSkillRequestDTO.KnowledgeConfig kc = llm.getKnowledge();
                 if (kc.getEnabled() != null && kc.getEnabled()) {
-                    installRequest.addOption("knowledgeEnabled", true);
+                    options.put("knowledgeEnabled", "true");
                     if (kc.getTopK() != null) {
-                        installRequest.addOption("ragTopK", kc.getTopK());
+                        options.put("ragTopK", kc.getTopK().toString());
                     }
                     if (kc.getScoreThreshold() != null) {
-                        installRequest.addOption("ragThreshold", kc.getScoreThreshold());
+                        options.put("ragThreshold", kc.getScoreThreshold().toString());
                     }
                     if (kc.getBases() != null && !kc.getBases().isEmpty()) {
-                        installRequest.addOption("knowledgeBases", kc.getBases());
+                        options.put("knowledgeBases", String.join(",", kc.getBases()));
                     }
                 }
             }
+        }
+        
+        if (!options.isEmpty()) {
+            installRequest.setOptions(options);
         }
     }
 
@@ -897,14 +918,16 @@ public class GitDiscoveryController {
         if (skillId == null) {
             return false;
         }
-        if (skillPackageManager == null) {
-            return false;
+        if (capabilityStateService != null) {
+            return capabilityStateService.isInstalled(skillId);
         }
-        try {
-            return skillPackageManager.isInstalled(skillId).get();
-        } catch (Exception e) {
-            log.debug("[checkIfInstalled] Failed to check installation status for {}: {}", skillId, e.getMessage());
-            return false;
+        if (skillPackageManager != null) {
+            try {
+                return skillPackageManager.isInstalled(skillId).get();
+            } catch (Exception e) {
+                log.debug("[checkIfInstalled] Failed to check installation status for {}: {}", skillId, e.getMessage());
+            }
         }
+        return false;
     }
 }

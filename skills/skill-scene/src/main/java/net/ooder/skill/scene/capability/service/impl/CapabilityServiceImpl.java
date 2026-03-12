@@ -10,6 +10,7 @@ import net.ooder.skill.scene.capability.model.SkillForm;
 import net.ooder.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.skill.scene.capability.registry.CapabilityRegistry;
 import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.skill.scene.storage.JsonStorageService;
 
 import org.slf4j.Logger;
@@ -27,10 +28,12 @@ public class CapabilityServiceImpl implements CapabilityService {
 
     private final CapabilityRegistry registry;
     private final JsonStorageService storageService;
+    private final CapabilityStateService stateService;
     private ApplicationEventPublisher eventPublisher;
 
-    public CapabilityServiceImpl(JsonStorageService storageService) {
+    public CapabilityServiceImpl(JsonStorageService storageService, CapabilityStateService stateService) {
         this.storageService = storageService;
+        this.stateService = stateService;
         this.registry = new CapabilityRegistry();
         loadFromStorage();
         initDefaultCapabilities();
@@ -268,11 +271,20 @@ public class CapabilityServiceImpl implements CapabilityService {
     public void updateInstallStatus(String capabilityId, boolean installed) {
         Capability cap = registry.findById(capabilityId);
         if (cap != null) {
-            cap.setInstalled(installed);
-            registry.register(cap);
+            stateService.setInstalled(capabilityId, installed);
             log.info("[updateInstallStatus] Updated install status for {}: {}", capabilityId, installed);
         } else {
             log.warn("[updateInstallStatus] Capability not found: {}", capabilityId);
         }
+    }
+    
+    @Override
+    public boolean isInstalled(String capabilityId) {
+        return stateService.isInstalled(capabilityId);
+    }
+    
+    @Override
+    public CapabilityStatus getCapabilityStatus(String capabilityId) {
+        return stateService.getStatus(capabilityId);
     }
 }

@@ -7,6 +7,7 @@ import net.ooder.skill.scene.capability.model.SceneType;
 import net.ooder.skill.scene.capability.model.SkillForm;
 import net.ooder.skill.scene.capability.model.Visibility;
 import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.skill.scene.capability.service.SceneSkillLifecycleService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +18,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleService {
@@ -26,8 +26,9 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
 
     @Autowired
     private CapabilityService capabilityService;
-
-    private Map<String, CapabilityStatus> statusMap = new ConcurrentHashMap<String, CapabilityStatus>();
+    
+    @Autowired
+    private CapabilityStateService capabilityStateService;
 
     @Override
     public LifecycleResult activate(String capabilityId, String userId) {
@@ -58,7 +59,8 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
                 "Cannot activate from status: " + currentStatus + " to: " + targetStatus);
         }
         
-        statusMap.put(capabilityId, targetStatus);
+        capabilityStateService.setStatus(capabilityId, targetStatus);
+        capabilityStateService.setInstalled(capabilityId, true, userId, "activate");
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
         result.setSceneType(sceneType);
@@ -88,7 +90,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Can only pause from RUNNING or SCHEDULED status");
         }
         
-        statusMap.put(capabilityId, CapabilityStatus.PAUSED);
+        capabilityStateService.setStatus(capabilityId, CapabilityStatus.PAUSED);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.PAUSED);
         result.setSceneType(sceneType);
@@ -117,7 +119,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         CapabilityStatus targetStatus = (sceneType == SceneType.AUTO && isInternal) 
             ? CapabilityStatus.SCHEDULED : CapabilityStatus.RUNNING;
         
-        statusMap.put(capabilityId, targetStatus);
+        capabilityStateService.setStatus(capabilityId, targetStatus);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
         result.setSceneType(sceneType);
@@ -146,7 +148,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
                 "Can only trigger from PENDING or WAITING status, current: " + currentStatus);
         }
         
-        statusMap.put(capabilityId, CapabilityStatus.RUNNING);
+        capabilityStateService.setStatus(capabilityId, CapabilityStatus.RUNNING);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.RUNNING);
         result.setSceneType(sceneType);
@@ -172,7 +174,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
                 "Can only archive from COMPLETED or PAUSED status");
         }
         
-        statusMap.put(capabilityId, CapabilityStatus.ARCHIVED);
+        capabilityStateService.setStatus(capabilityId, CapabilityStatus.ARCHIVED);
         
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.ARCHIVED);
         result.setSceneType(sceneType);
@@ -241,8 +243,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
     }
 
     private CapabilityStatus getStatus(String capabilityId) {
-        CapabilityStatus status = statusMap.get(capabilityId);
-        return status != null ? status : CapabilityStatus.DRAFT;
+        return capabilityStateService.getStatus(capabilityId);
     }
 
     private CapabilityStatus determineActivateStatus(SceneType sceneType, boolean isInternal) {

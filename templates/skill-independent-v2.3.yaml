@@ -1,0 +1,208 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-mqtt
+  name: MQTT服务技能
+  version: 0.7.3
+  description: MQTT服务技能 - 独立能力示例，支持多场景组
+  author: Ooder Team
+  type: service-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - mqtt
+    - messaging
+    - iot
+    - independent-capability
+
+  category: messaging
+  ownership: independent
+
+spec:
+  type: service-skill
+  category: messaging
+  
+  # ============================================================
+  # 独立能力特性说明 (v2.3.3)
+  # ============================================================
+  # 独立能力 (IC) 特性:
+  # - 定义位置: 独立 skill 包
+  # - 可见性: supportedSceneTypes 定义范围
+  # - 生命周期: 独立运行
+  # - 数据隔离: 任务间严格隔离
+  # - 多场景组: 支持 (每个场景组独立数据空间)
+  # - 调用方式: 加入场景组后通过 CapabilityInvoker
+  # ============================================================
+
+  # 支持的场景类型 (静态基础列表)
+  supportedSceneTypes:
+    - iot-device           # IoT设备场景
+    - smart-home           # 智能家居场景
+    - industrial-monitor   # 工业监控场景
+    - recruitment          # 招聘场景 (用于通知推送)
+    
+  # 是否允许动态扩展场景类型
+  dynamicSceneTypes: true
+  
+  # 自主启动配置
+  autoStart:
+    enabled: true
+    delay: 5s              # 启动延迟
+    retry:
+      maxAttempts: 3
+      delay: 10s
+      
+  # 自主加入场景组配置
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true  # 自动匹配 supportedSceneTypes
+    maxSceneGroups: 10     # 最大同时加入的场景组数
+
+  capabilities:
+    # ============================================================
+    # 独立能力定义
+    # ============================================================
+    # 这些能力可以被多个场景组使用
+    # 每个场景组的数据空间相互隔离
+    # ============================================================
+    
+    - id: mqtt-broker
+      name: MQTT Broker
+      description: MQTT代理服务 - 独立能力
+      category: messaging
+      type: ATOMIC
+      # 隐式属性:
+      # - ownership: INDEPENDENT (独立能力)
+      # - visibility: supportedSceneTypes 定义范围
+      
+    - id: mqtt-publish
+      name: MQTT Publish
+      description: 消息发布能力
+      category: messaging
+      type: ATOMIC
+      
+    - id: mqtt-subscribe
+      name: MQTT Subscribe
+      description: 消息订阅能力
+      category: messaging
+      type: ATOMIC
+      
+    - id: mqtt-p2p
+      name: MQTT P2P
+      description: 点对点消息能力
+      category: messaging
+      type: ATOMIC
+      
+    - id: mqtt-topic
+      name: MQTT Topic
+      description: 主题管理能力
+      category: messaging
+      type: ATOMIC
+      
+    - id: mqtt-command
+      name: MQTT Command
+      description: 命令执行能力
+      category: messaging
+      type: ATOMIC
+
+  # 场景适配配置
+  sceneAdapters:
+    - sceneType: iot-device
+      capabilities:
+        - mqtt-broker
+        - mqtt-publish
+        - mqtt-subscribe
+        - mqtt-p2p
+        - mqtt-topic
+        - mqtt-command
+      config:
+        qos: 1
+        retain: false
+        
+    - sceneType: smart-home
+      capabilities:
+        - mqtt-publish
+        - mqtt-subscribe
+        - mqtt-command
+      config:
+        qos: 0
+        retain: true
+        
+    - sceneType: industrial-monitor
+      capabilities:
+        - mqtt-broker
+        - mqtt-publish
+        - mqtt-subscribe
+        - mqtt-topic
+      config:
+        qos: 2
+        retain: false
+        
+    - sceneType: recruitment
+      capabilities:
+        - mqtt-publish
+      config:
+        qos: 1
+        retain: false
+        topicPrefix: "recruitment/notification"
+
+  endpoints:
+    - path: /api/mqtt/publish
+      method: POST
+      description: 发布消息
+      capability: mqtt-publish
+      
+    - path: /api/mqtt/subscribe
+      method: POST
+      description: 订阅主题
+      capability: mqtt-subscribe
+      
+    - path: /api/mqtt/p2p
+      method: POST
+      description: 点对点消息
+      capability: mqtt-p2p
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.mqtt.MqttSkillApplication
+
+  config:
+    required:
+      - name: MQTT_BROKER_URL
+        type: string
+        description: MQTT Broker地址
+        
+    optional:
+      - name: MQTT_CLIENT_ID_PREFIX
+        type: string
+        default: "ooder-mqtt"
+        description: 客户端ID前缀
+        
+      - name: MQTT_DEFAULT_QOS
+        type: integer
+        default: 1
+        description: 默认QoS级别
+
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+    
+  # 多场景组数据隔离配置
+  dataIsolation:
+    enabled: true
+    strategy: per-scene-group
+    # 每个场景组独立:
+    # - 连接池
+    # - 订阅列表
+    # - 消息队列
+    # - 状态数据

@@ -1,0 +1,79 @@
+{
+  "apiVersion" : "skills.ooder.io/v1",
+  "kind" : "ProfileConfig",
+  "metadata" : {
+    "name" : "micro",
+    "description" : "微型部署，适合开发测试"
+  },
+  "spec" : {
+    "resources" : {
+      "cpu" : "2",
+      "memory" : "4Gi"
+    },
+    "capabilities" : {
+      "llm" : {
+        "enabled" : true,
+        "default" : "skill-llm-ollama",
+        "config" : {
+          "model" : "llama3"
+        }
+      },
+      "db" : {
+        "enabled" : true,
+        "default" : "skill-db-mysql",
+        "config" : {
+          "pool" : {
+            "maxActive" : 5
+          }
+        }
+      },
+      "vfs" : {
+        "enabled" : true,
+        "default" : "skill-vfs-local"
+      },
+      "know" : {
+        "enabled" : false
+      },
+      "org" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "comm" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "auth" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "mon" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "search" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "sched" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "sec" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "net" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "sys" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "util" : {
+        "enabled" : false,
+        "config" : { }
+      }
+    }
+  }
+}

@@ -47,4 +47,8 @@ public interface CapabilityService {
                                     CapabilityOwnership ownership, String keyword);
     
     void updateInstallStatus(String capabilityId, boolean installed);
+    
+    boolean isInstalled(String capabilityId);
+    
+    CapabilityStatus getCapabilityStatus(String capabilityId);
 }

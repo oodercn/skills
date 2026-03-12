@@ -96,7 +96,15 @@ spec:
         - file-delete
         - metadata
   
-  dependencies: []
+  dependencies:
+    - id: skill-vfs-base
+      version: ">=1.0.0"
+      required: true
+      description: "VFS基础服务"
+    - id: skill-common
+      version: ">=1.0.0"
+      required: false
+      description: "通用工具库(间接)"
   
   config:
     required:

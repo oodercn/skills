@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-scene-example
   name: 场景技能示例
-  version: 2.3.0
+  version: 2.3.3
   description: 场景技能模板 - 自驱业务场景(ABS)示例
   author: Ooder Team
   type: scene-skill
@@ -29,18 +29,32 @@ spec:
     mainFirst: true
     businessSemanticsScore: 9
     detectedAt: "2026-03-06T00:00:00Z"
-    detectionVersion: "2.3.0"
+    detectionVersion: "2.3.3"
     autoDetect: true
 
   dependencies:
-    - id: skill-dependency-example
-      version: ">=1.0.0"
+    # 独立能力依赖示例
+    # 独立能力定义在独立的 skill 包中，通过 dependencies 引用
+    - id: skill-mqtt
+      version: ">=0.7.0"
       required: true
       autoInstall: true
-      description: "依赖技能描述"
+      description: "MQTT服务技能 - 独立能力示例"
       capabilities:
-        - capability-1
-        - capability-2
+        - mqtt-push
+        - mqtt-subscribe
+      # 独立能力场景类型配置 (可选，由独立能力自身定义)
+      # supportedSceneTypes 由独立能力的 skill.yaml 定义
+      # 此处仅声明需要使用的能力
+
+    - id: skill-pdf-converter
+      version: ">=1.0.0"
+      required: false
+      autoInstall: false
+      description: "PDF转换技能 - 独立能力示例"
+      capabilities:
+        - pdf-to-text
+        - pdf-to-image
 
   sceneCapabilities:
     - id: scene-example
@@ -52,7 +66,7 @@ spec:
         selfCheck:
           - checkCapabilities: [capability-1, capability-2]
           - checkDriverCapabilities: [intent-receiver]
-          - checkDependencies: [skill-dependency-example]
+          - checkDependencies: [skill-mqtt]
           - onCheckFailed:
               action: degrade
               degradedCapabilities: []
@@ -98,21 +112,36 @@ spec:
           optional: true
 
   capabilities:
+    # ============================================================
+    # 能力归属说明 (v2.3.3)
+    # ============================================================
+    # 定义在 capabilities 列表中的能力 = 场景内部能力 (SIC)
+    # - 可见性: 仅场景内可见
+    # - 生命周期: 绑定场景
+    # - 调用方式: 场景命令 + 内部路由
+    # - 数据: 场景内共享
+    # ============================================================
+    
     - id: capability-1
       name: 能力1
-      description: 能力1描述
+      description: 场景内部能力示例 - 仅在本场景内可用
       category: service
       type: ATOMIC
+      # 隐式属性:
+      # - ownership: SCENE_INTERNAL (场景内部能力)
+      # - visibility: 仅场景内可见
+      # - parentSkill: skill-scene-example
+      # - parentScene: scene-example
       
     - id: capability-2
       name: 能力2
-      description: 能力2描述
+      description: 场景内部能力示例 - 仅在本场景内可用
       category: service
       type: ATOMIC
       
     - id: intent-receiver
       name: 意图接收
-      description: 接收用户意图
+      description: 驱动能力 - 接收用户意图
       category: driver
       type: DRIVER
       driverType: INTENT_RECEIVER
@@ -123,6 +152,8 @@ spec:
       capabilities:
         - capability-1
         - capability-2
+        # 独立能力绑定 (来自 dependencies)
+        # - mqtt-push (来自 skill-mqtt)
 
   endpoints:
     - path: /api/example/action

@@ -1197,6 +1197,364 @@
     color: #3b82f6;
 }
 
+/* ========== AI招聘助手额外样式 ========== */
+
+/* 浮动触发按钮 */
+.llm-floating-trigger {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ns-primary, #3b82f6), #8b5cf6);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 20px rgba(59, 130, 246, 0.4);
+    transition: all 0.3s ease;
+    z-index: 9999;
+}
+
+.llm-floating-trigger:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 24px rgba(59, 130, 246, 0.5);
+}
+
+.llm-floating-trigger i {
+    font-size: 24px;
+}
+
+.llm-trigger-badge {
+    position: absolute;
+    top: -4px;
+    right: -4px;
+    min-width: 18px;
+    height: 18px;
+    background: var(--ns-danger, #ef4444);
+    color: white;
+    font-size: 11px;
+    font-weight: 600;
+    border-radius: 9px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0 4px;
+}
+
+/* 浮动面板 */
+.llm-floating-panel {
+    position: fixed;
+    bottom: 96px;
+    right: 24px;
+    width: 480px;
+    height: 640px;
+    max-height: calc(100vh - 120px);
+    background: var(--ns-card-bg, var(--nx-bg-card));
+    border: 1px solid var(--ns-border, var(--nx-border));
+    border-radius: var(--nx-radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    z-index: 9998;
+    overflow: hidden;
+}
+
+.llm-floating-panel.llm-panel--open {
+    display: flex;
+    animation: slideUp 0.3s ease;
+}
+
+.llm-floating-panel.llm-panel--minimized {
+    height: auto;
+    max-height: 48px;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* 面板头部 */
+.llm-floating-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--nx-space-3) var(--nx-space-4);
+    background: linear-gradient(135deg, var(--ns-primary, #3b82f6), #8b5cf6);
+    color: white;
+}
+
+.llm-floating-title {
+    display: flex;
+    align-items: center;
+    gap: var(--nx-space-2);
+    font-weight: 600;
+}
+
+.llm-floating-title i {
+    font-size: 20px;
+}
+
+.llm-floating-actions {
+    display: flex;
+    gap: var(--nx-space-1);
+}
+
+.llm-floating-btn {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: var(--nx-space-1);
+    border-radius: var(--nx-radius);
+    opacity: 0.8;
+    transition: all 0.2s;
+}
+
+.llm-floating-btn:hover {
+    opacity: 1;
+    background: rgba(255, 255, 255, 0.2);
+}
+
+/* 面板主体 */
+.llm-floating-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+/* 模型选择栏 */
+.llm-model-bar {
+    display: flex;
+    gap: var(--nx-space-2);
+    padding: var(--nx-space-2) var(--nx-space-3);
+    background: var(--nx-bg-elevated);
+    border-bottom: 1px solid var(--nx-border);
+}
+
+.llm-model-select {
+    display: flex;
+    align-items: center;
+    gap: var(--nx-space-2);
+    flex: 1;
+}
+
+.llm-model-select i {
+    color: var(--ns-primary);
+    font-size: 16px;
+}
+
+.llm-model-select select {
+    flex: 1;
+    padding: var(--nx-space-1) var(--nx-space-2);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius);
+    background: var(--nx-bg-card);
+    color: var(--nx-text-primary);
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.llm-model-select select:focus {
+    outline: none;
+    border-color: var(--ns-primary);
+}
+
+/* 上下文栏 */
+.llm-context-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: var(--nx-space-2) var(--nx-space-3);
+    background: var(--nx-bg-elevated);
+    border-bottom: 1px solid var(--nx-border);
+    font-size: 12px;
+}
+
+.llm-context-info {
+    display: flex;
+    align-items: center;
+    gap: var(--nx-space-2);
+    color: var(--nx-text-secondary);
+}
+
+.llm-context-info i {
+    color: var(--ns-primary);
+}
+
+.llm-context-refresh {
+    background: none;
+    border: none;
+    color: var(--nx-text-secondary);
+    cursor: pointer;
+    padding: var(--nx-space-1);
+    border-radius: var(--nx-radius);
+    transition: all 0.2s;
+}
+
+.llm-context-refresh:hover {
+    background: var(--nx-bg-hover);
+    color: var(--ns-primary);
+}
+
+/* 消息样式增强 */
+.llm-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: var(--nx-space-3);
+    display: flex;
+    flex-direction: column;
+    gap: var(--nx-space-3);
+}
+
+.llm-message {
+    display: flex;
+    gap: var(--nx-space-3);
+    max-width: 90%;
+}
+
+.llm-message--user {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+.llm-message--user .llm-message-content {
+    background: var(--ns-primary);
+    color: white;
+    border-radius: var(--nx-radius-lg) var(--nx-radius-lg) 0 var(--nx-radius-lg);
+}
+
+.llm-message--assistant .llm-message-content,
+.llm-message--system .llm-message-content {
+    background: var(--nx-bg-elevated);
+    border-radius: 0 var(--nx-radius-lg) var(--nx-radius-lg) var(--nx-radius-lg);
+}
+
+.llm-message-avatar {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--ns-primary), #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+    flex-shrink: 0;
+}
+
+.llm-message--user .llm-message-avatar {
+    background: var(--ns-success);
+}
+
+.llm-message-content {
+    padding: var(--nx-space-3);
+    font-size: 14px;
+    line-height: 1.6;
+}
+
+.llm-message-content ul {
+    margin: var(--nx-space-2) 0;
+    padding-left: var(--nx-space-4);
+}
+
+.llm-message-content li {
+    margin: var(--nx-space-1) 0;
+}
+
+/* 快捷操作按钮 */
+.llm-quick-actions {
+    display: flex;
+    gap: var(--nx-space-2);
+    padding: var(--nx-space-2) var(--nx-space-3);
+    border-top: 1px solid var(--nx-border);
+    overflow-x: auto;
+}
+
+.llm-quick-btn {
+    display: flex;
+    align-items: center;
+    gap: var(--nx-space-1);
+    padding: var(--nx-space-1) var(--nx-space-2);
+    background: var(--nx-bg-elevated);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius);
+    font-size: 12px;
+    color: var(--nx-text-secondary);
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.llm-quick-btn:hover {
+    background: var(--ns-primary);
+    border-color: var(--ns-primary);
+    color: white;
+}
+
+.llm-quick-btn i {
+    font-size: 14px;
+}
+
+/* 输入区域 */
+.llm-input-area {
+    display: flex;
+    gap: var(--nx-space-2);
+    padding: var(--nx-space-3);
+    border-top: 1px solid var(--nx-border);
+}
+
+.llm-input {
+    flex: 1;
+    padding: var(--nx-space-2) var(--nx-space-3);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius);
+    background: var(--nx-bg-elevated);
+    color: var(--nx-text-primary);
+    font-size: 14px;
+    resize: none;
+    min-height: 40px;
+    max-height: 120px;
+}
+
+.llm-input:focus {
+    outline: none;
+    border-color: var(--ns-primary);
+}
+
+.llm-send-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    border-radius: var(--nx-radius);
+    background: var(--ns-primary);
+    color: white;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+}
+
+.llm-send-btn:hover:not(:disabled) {
+    background: var(--ns-primary-hover);
+}
+
+.llm-send-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 /* 响应式 */
 @media (max-width: 768px) {
     .stats-row {
@@ -1223,4 +1581,48 @@
     .nx-form-row {
         grid-template-columns: 1fr;
     }
+    
+    /* AI助手移动端适配 */
+    .llm-floating-panel {
+        width: calc(100vw - 48px);
+        right: 24px;
+        left: 24px;
+    }
+}
+
+/* ========== 主题切换按钮样式 ========== */
+.sidebar-footer {
+    margin-top: auto;
+    padding: var(--nx-space-4);
+    border-top: 1px solid var(--nx-border);
+}
+
+.theme-toggle-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: var(--nx-space-2);
+    width: 100%;
+    padding: var(--nx-space-3);
+    background: var(--nx-bg-elevated);
+    color: var(--nx-text-primary);
+    border: 1px solid var(--nx-border);
+    border-radius: var(--nx-radius);
+    cursor: pointer;
+    transition: all 0.2s;
+    font-size: 14px;
+}
+
+.theme-toggle-btn:hover {
+    background: var(--nx-bg-hover);
+    border-color: var(--ns-primary);
+}
+
+.theme-toggle-btn i {
+    font-size: 18px;
+}
+
+/* 深色主题时的图标切换 */
+[data-theme="dark"] .theme-toggle-btn .ri-sun-line::before {
+    content: "\ef72"; /* moon图标 */
 }

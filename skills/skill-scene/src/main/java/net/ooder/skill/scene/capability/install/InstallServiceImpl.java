@@ -1,7 +1,9 @@
 package net.ooder.skill.scene.capability.install;
 
 import net.ooder.skill.scene.capability.model.Capability;
+import net.ooder.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.skill.scene.capability.service.CapabilityService;
+import net.ooder.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.skill.scene.notification.SceneNotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +24,9 @@ public class InstallServiceImpl implements InstallService {
 
     @Autowired(required = false)
     private CapabilityService capabilityService;
+
+    @Autowired(required = false)
+    private CapabilityStateService capabilityStateService;
 
     @Autowired(required = false)
     private SceneNotificationService notificationService;
@@ -275,6 +280,18 @@ public class InstallServiceImpl implements InstallService {
                     capabilityService.updateInstallStatus(config.getCapabilityId(), true);
                 }
                 
+                if (capabilityStateService != null) {
+                    capabilityStateService.updateState(
+                        config.getCapabilityId(), 
+                        true, 
+                        determinePostCapabilityStatus(config),
+                        config.getParticipants() != null && config.getParticipants().getLeader() != null 
+                            ? config.getParticipants().getLeader().getUserId() : "system",
+                        config.getPushType() != null ? config.getPushType().name() : "INSTALL",
+                        null
+                    );
+                }
+                
                 InstallConfig.InstallStatus targetStatus = determinePostInstallStatus(config);
                 config.setStatus(targetStatus);
                 
@@ -334,15 +351,23 @@ public class InstallServiceImpl implements InstallService {
                 if (dep != null) {
                     depInfo.setName(dep.getName());
                     
-                    if (dep.isInstalled()) {
+                    boolean alreadyInstalled = capabilityStateService != null 
+                        ? capabilityStateService.isInstalled(capabilityId) 
+                        : dep.isInstalled();
+                    
+                    if (alreadyInstalled) {
                         depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
                         depInfo.setMessage("已安装");
                         log.info("[installDependency] Dependency already installed: {}", capabilityId);
                         return depInfo;
                     }
                     
-                    dep.setInstalled(true);
-                    capabilityService.update(dep);
+                    if (capabilityStateService != null) {
+                        capabilityStateService.setInstalled(capabilityId, true, "system", "dependency");
+                    } else {
+                        dep.setInstalled(true);
+                        capabilityService.update(dep);
+                    }
                     
                     depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
                     depInfo.setMessage("安装成功");
@@ -530,20 +555,24 @@ public class InstallServiceImpl implements InstallService {
     }
     
     private boolean rollbackDependency(String capabilityId) {
-        if (capabilityService == null) {
+        if (capabilityStateService == null && capabilityService == null) {
             log.info("[rollbackDependency] Mock rollback for: {}", capabilityId);
             return true;
         }
         
         try {
-            net.ooder.skill.scene.capability.model.Capability cap = capabilityService.findById(capabilityId);
-            if (cap == null) {
-                log.warn("[rollbackDependency] Capability not found: {}", capabilityId);
-                return true;
+            if (capabilityStateService != null) {
+                capabilityStateService.setInstalled(capabilityId, false);
+                capabilityStateService.setStatus(capabilityId, CapabilityStatus.DRAFT);
             }
             
-            cap.setInstalled(false);
-            capabilityService.update(cap);
+            if (capabilityService != null) {
+                net.ooder.skill.scene.capability.model.Capability cap = capabilityService.findById(capabilityId);
+                if (cap != null) {
+                    cap.setInstalled(false);
+                    capabilityService.update(cap);
+                }
+            }
             
             log.info("[rollbackDependency] Dependency uninstalled: {}", capabilityId);
             return true;
