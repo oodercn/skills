@@ -204,3 +204,79 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: quick-start
+        name: 快速开始
+        path: docs/quick-start.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: api-reference
+        name: API参考
+        path: docs/api-reference.md
+        type: reference
+        language: zh
+        priority: medium
+        
+      - id: configuration
+        name: 配置指南
+        path: docs/configuration.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: kb-management
+        name: 知识库管理
+        path: docs/kb-management.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: search-guide
+        name: 检索指南
+        path: docs/search-guide.md
+        type: guide
+        language: zh
+        priority: medium
+    
+    ragConfig:
+      enabled: true
+      indexName: "skill-knowledge-base-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+      rerankEnabled: false
+
+  persona:
+    enabled: true
+    name: 知识库服务助手
+    description: 专业的知识库服务助手，帮助用户管理知识库和进行知识检索
+    expertise:
+      - 知识库管理
+      - 文档处理
+      - BM25检索
+      - 向量检索
+      - 语义检索
+    boundaries:
+      - 只回答知识库相关的问题
+      - 不处理具体业务数据
+      - 提供技术支持和使用指导
+    tone: professional, technical, helpful
+    examples:
+      - question: "如何创建知识库？"
+        answer: "通过POST /api/v1/kb接口创建知识库，需要提供name和description参数。"
+      - question: "支持哪些检索方式？"
+        answer: "支持三种检索方式：BM25关键词检索、向量语义检索、混合检索。"

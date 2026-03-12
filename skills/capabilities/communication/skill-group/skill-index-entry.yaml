@@ -3,9 +3,9 @@ kind: SkillIndexEntry
 
 metadata:
   id: skill-group
-  name: 群组服务
+  name: 群组管理
   version: "0.7.3"
-  description: "群组服务，支持群组管理、成员管理、权限控制"
+  description: "群组管理服务，支持群组创建、成员管理"
 
 spec:
   skillForm: PROVIDER
@@ -17,15 +17,14 @@ spec:
   
   capabilityAddresses:
     required:
-      - address: 0x55
+      - address: 0x56
         name: COMM_GROUP
-        description: "群组服务"
+        description: "群组管理服务"
     optional: []
   
   tags:
     - group
     - team
-    - member
+    - collaboration
   
-  dependencies:
-    - skill-org-base
+  dependencies: []

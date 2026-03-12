@@ -49,7 +49,19 @@ spec:
     matchSceneTypes: true
     maxSceneGroups: 10
   
-  dependencies: []
+  dependencies:
+    - id: skill-common
+      version: ">=1.0.0"
+      required: false
+      description: "通用工具库(间接)"
+    - id: skill-protocol
+      version: ">=1.0.0"
+      required: false
+      description: "协议处理服务(间接)"
+    - id: skill-user-auth
+      version: ">=0.7.0"
+      required: false
+      description: "用户认证服务(间接)"
   
   providedInterfaces:
     - id: media-publish
@@ -113,3 +125,21 @@ spec:
   
   offline:
     enabled: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-media-wechat-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

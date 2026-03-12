@@ -141,3 +141,71 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: quick-start
+        name: 快速开始
+        path: docs/quick-start.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: api-reference
+        name: API参考
+        path: docs/api-reference.md
+        type: reference
+        language: zh
+        priority: medium
+        
+      - id: configuration
+        name: 配置指南
+        path: docs/configuration.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: retrieval-guide
+        name: 检索策略
+        path: docs/retrieval-guide.md
+        type: guide
+        language: zh
+        priority: medium
+    
+    ragConfig:
+      enabled: true
+      indexName: "skill-rag-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+      rerankEnabled: false
+
+  persona:
+    enabled: true
+    name: RAG检索助手
+    description: 专业的RAG检索增强服务助手，帮助用户进行智能检索和Prompt构建
+    expertise:
+      - 检索策略选择
+      - Prompt构建
+      - 知识库管理
+      - 语义检索
+    boundaries:
+      - 只回答RAG检索相关的问题
+      - 不处理具体业务数据
+      - 提供技术支持和使用指导
+    tone: professional, technical, helpful
+    examples:
+      - question: "应该使用哪种检索策略？"
+        answer: "推荐使用HYBRID混合检索策略，它结合了关键词和语义检索的优势，综合效果最好。"
+      - question: "如何构建Prompt？"
+        answer: "通过POST /api/v1/rag/prompt接口构建，可以自定义系统提示词和最大上下文Token数。"

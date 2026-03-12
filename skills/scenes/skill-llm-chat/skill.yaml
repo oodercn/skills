@@ -243,3 +243,88 @@ spec:
 
   offline:
     enabled: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: quick-start
+        name: 快速开始
+        path: docs/quick-start.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: api-reference
+        name: API参考
+        path: docs/api-reference.md
+        type: reference
+        language: zh
+        priority: medium
+        
+      - id: configuration
+        name: 配置指南
+        path: docs/configuration.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: troubleshooting
+        name: 故障排查
+        path: docs/troubleshooting.md
+        type: guide
+        language: zh
+        priority: low
+        
+      - id: faq
+        name: 常见问题
+        path: docs/faq.md
+        type: faq
+        language: zh
+        priority: low
+    
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-chat-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+      rerankEnabled: false
+
+  persona:
+    enabled: true
+    name: 智能对话助手
+    description: 专业的AI对话助手，帮助用户完成各种对话任务
+    expertise:
+      - 自然语言理解
+      - 多轮对话
+      - 上下文感知
+      - 任务规划
+    boundaries:
+      - 不处理涉及个人隐私的敏感信息
+      - 不提供医疗、法律等专业建议
+      - 超出知识范围时主动说明
+    tone: professional, friendly, concise
+    examples:
+      - question: "如何开始使用？"
+        answer: "您可以通过发送消息开始对话，我会根据您的需求提供帮助。"
+      - question: "支持哪些模型？"
+        answer: "支持百度文心一言、OpenAI、阿里千问、DeepSeek等多种LLM模型。"
+
+  llmAssistant:
+    enabled: true
+    welcomeMessage: "您好，我是智能对话助手，有什么可以帮助您的？"
+    suggestedQuestions:
+      - "如何配置LLM Provider？"
+      - "支持哪些对话功能？"
+      - "如何启用流式输出？"
+    contextWindow: 10
+    maxTokens: 2000

@@ -1,75 +1,55 @@
-# Message Service
+# skill-msg
 
-## Description
+消息服务，支持消息队列、订阅发布能力
 
-Message Service provides message sending, broadcast, group messaging and message management capabilities.
+## 功能特性
 
-## Features
+- 消息发布 - 发布消息到队列
+- 消息订阅 - 订阅消息队列
+- 队列管理 - 创建和管理队列
+- 消息持久化 - 消息持久化存储
 
-- **Message Sending**: Send messages to users
-- **Broadcast**: Broadcast messages to groups
-- **Message Management**: Mark read, recall messages
-- **Group Messaging**: Create groups, join groups, list groups
+## 快速开始
 
-## API Endpoints
-
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | /api/msg/send | Send message to user |
-| POST | /api/msg/broadcast | Broadcast message to group |
-| POST | /api/msg/list | Get message list |
-| POST | /api/msg/read | Mark message as read |
-| POST | /api/msg/recall | Recall message |
-| POST | /api/msg/group/create | Create message group |
-| POST | /api/msg/group/join | Join message group |
-| POST | /api/msg/group/list | List message groups |
-
-## Configuration
-
-| Property | Default | Description |
-|----------|---------|-------------|
-| msg.max-message-size | 65536 | Maximum message size in bytes |
-| msg.history-limit | 1000 | Message history limit |
-
-## Usage
+### 安装
 
 ```bash
-# Send message
-curl -X POST http://localhost:8093/api/msg/send \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fromUserId": "user001",
-    "fromUserName": "John",
-    "toUserId": "user002",
-    "content": "Hello!",
-    "type": "text"
-  }'
+skill install skill-msg
+```
 
-# Broadcast to group
-curl -X POST http://localhost:8093/api/msg/broadcast \
-  -H "Content-Type: application/json" \
-  -d '{
-    "fromUserId": "user001",
-    "groupId": "group-xxx",
-    "content": "Group announcement"
-  }'
+### 配置
 
-# Create group
-curl -X POST http://localhost:8093/api/msg/group/create \
+```yaml
+skill-msg:
+  msg-type: memory
+  max-queue-size: 10000
+  msg-ttl: 86400
+```
+
+### 使用示例
+
+```bash
+curl -X POST http://localhost:8080/api/msg/publish \
   -H "Content-Type: application/json" \
   -d '{
-    "name": "Project Team",
-    "type": "project",
-    "ownerId": "user001",
-    "ownerName": "John"
+    "queue": "notifications",
+    "message": "新消息内容"
   }'
 ```
 
-## Message Types
+## 文档目录
 
-| Type | Description |
-|------|-------------|
-| text | Text message |
-| image | Image message |
-| file | File message |
-| broadcast | Broadcast message |
+- [快速开始](docs/quick-start.md)
+- [消息流程](docs/message-flow.md)
+
+## 配置项
+
+| 配置项 | 类型 | 必填 | 说明 |
+|--------|------|------|------|
+| MSG_TYPE | string | 否 | 消息类型: memory/redis/kafka |
+| MAX_QUEUE_SIZE | integer | 否 | 最大队列大小 |
+| MSG_TTL | integer | 否 | 消息过期时间(秒) |
+
+## 许可证
+
+Apache-2.0

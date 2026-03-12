@@ -3,7 +3,7 @@ kind: SkillIndexEntry
 
 metadata:
   id: skill-im
-  name: 即时通讯服务
+  name: 即时通讯
   version: "0.7.3"
   description: "即时通讯服务，支持实时消息、群聊、在线状态"
 
@@ -17,15 +17,14 @@ spec:
   
   capabilityAddresses:
     required:
-      - address: 0x54
+      - address: 0x52
         name: COMM_IM
-        description: "即时通讯"
+        description: "即时通讯服务"
     optional: []
   
   tags:
     - im
     - chat
-    - realtime
+    - websocket
   
-  dependencies:
-    - skill-msg
+  dependencies: []

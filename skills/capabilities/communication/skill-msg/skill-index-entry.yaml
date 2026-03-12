@@ -17,9 +17,9 @@ spec:
   
   capabilityAddresses:
     required:
-      - address: 0x50
-        name: COMM_BASE
-        description: "通讯基础服务"
+      - address: 0x54
+        name: COMM_MSG
+        description: "消息服务"
     optional: []
   
   tags:

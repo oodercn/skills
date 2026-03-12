@@ -2,6 +2,8 @@ package net.ooder.skill.scene.capability.model;
 
 import net.ooder.skill.scene.dto.dict.Dict;
 import net.ooder.skill.scene.dto.dict.DictItem;
+import java.util.HashMap;
+import java.util.Map;
 
 @Dict(code = "capability_category", name = "能力地址分类", description = "能力地址空间分类")
 public enum CapabilityCategory implements DictItem {
@@ -51,9 +53,31 @@ public enum CapabilityCategory implements DictItem {
     @Override
     public int getSort() { return baseAddress; }
 
+    private static final Map<String, String> CODE_MAPPING = new HashMap<>();
+    static {
+        CODE_MAPPING.put("msg", "comm");
+        CODE_MAPPING.put("nexus-ui", "util");
+        CODE_MAPPING.put("ui", "util");
+        CODE_MAPPING.put("business", "util");
+        CODE_MAPPING.put("scheduler", "sched");
+        CODE_MAPPING.put("infrastructure", "sys");
+        CODE_MAPPING.put("collaboration", "comm");
+        CODE_MAPPING.put("system", "sys");
+        CODE_MAPPING.put("communication", "comm");
+        CODE_MAPPING.put("scene", "util");
+    }
+
     public static CapabilityCategory fromCode(String code) {
+        if (code == null) return UTIL;
+        
+        String normalizedCode = code.toLowerCase().trim();
+        
+        if (CODE_MAPPING.containsKey(normalizedCode)) {
+            normalizedCode = CODE_MAPPING.get(normalizedCode);
+        }
+        
         for (CapabilityCategory cat : values()) {
-            if (cat.code.equalsIgnoreCase(code)) {
+            if (cat.code.equalsIgnoreCase(normalizedCode)) {
                 return cat;
             }
         }

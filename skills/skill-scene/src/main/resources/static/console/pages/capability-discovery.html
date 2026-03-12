@@ -149,56 +149,19 @@
                                 </div>
                                 <div class="results-filter">
                                     <span class="filter-chip active" data-filter="all">全部 <span class="filter-count" id="filterCountAll">0</span></span>
-                                    <span class="filter-chip" data-filter="scene" title="场景应用 - 具有完整场景流程">
+                                    <span class="filter-chip" data-filter="scene" title="场景应用">
                                         <i class="ri-layout-grid-line"></i> 场景应用 <span class="filter-count" id="filterCountScene">0</span>
                                     </span>
-                                    <span class="filter-chip" data-filter="provider" title="能力服务 - 提供基础能力">
+                                    <span class="filter-chip" data-filter="provider" title="能力服务">
                                         <i class="ri-cpu-line"></i> 能力服务 <span class="filter-count" id="filterCountProvider">0</span>
                                     </span>
-                                    <span class="filter-chip" data-filter="driver" title="驱动适配 - 驱动场景运行">
+                                    <span class="filter-chip" data-filter="driver" title="驱动适配">
                                         <i class="ri-steering-line"></i> 驱动适配 <span class="filter-count" id="filterCountDriver">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="auto" title="自驱场景 - 自动驱动执行">
-                                        <i class="ri-rocket-line"></i> 自驱 <span class="filter-count" id="filterCountAuto">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="trigger" title="触发场景 - 需要外部触发">
-                                        <i class="ri-hand-coin-line"></i> 触发 <span class="filter-count" id="filterCountTrigger">0</span>
                                     </span>
                                     <span class="filter-chip" data-filter="new">新能力 <span class="filter-count" id="filterCountNew">0</span></span>
                                     <span class="filter-chip" data-filter="installed">已安装 <span class="filter-count" id="filterCountInstalled">0</span></span>
                                 </div>
-                                <div class="results-filter results-filter--business" style="margin-top: 8px;">
-                                    <span class="filter-label">业务领域:</span>
-                                    <span class="filter-chip" data-filter="ai_assistant" title="AI助手 - AI对话、知识问答、智能客服">
-                                        <i class="ri-robot-line"></i> AI助手 <span class="filter-count" id="filterCountAiAssistant">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="infrastructure" title="基础设施 - 调度服务、网络服务、认证服务">
-                                        <i class="ri-server-line"></i> 基础设施 <span class="filter-count" id="filterCountInfrastructure">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="system_tools" title="系统工具 - 存储、通知、定时任务、备份">
-                                        <i class="ri-tools-line"></i> 系统工具 <span class="filter-count" id="filterCountSystemTools">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="system_monitor" title="系统监控 - 监控告警、日志收集、健康检查">
-                                        <i class="ri-pulse-line"></i> 系统监控 <span class="filter-count" id="filterCountSystemMonitor">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="office_collaboration" title="办公协作 - 团队协作、日志、会议、审批">
-                                        <i class="ri-team-line"></i> 办公协作 <span class="filter-count" id="filterCountOfficeCollaboration">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="marketing_operations" title="营销运营 - 内容发布、社媒管理、活动">
-                                        <i class="ri-megaphone-line"></i> 营销运营 <span class="filter-count" id="filterCountMarketingOperations">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="security_audit" title="安全审计 - 访问控制、审计日志、安全检测">
-                                        <i class="ri-shield-check-line"></i> 安全审计 <span class="filter-count" id="filterCountSecurityAudit">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="data_processing" title="数据处理 - 报表、分析、同步、可视化">
-                                        <i class="ri-bar-chart-line"></i> 数据处理 <span class="filter-count" id="filterCountDataProcessing">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="human_resource" title="人力资源 - 招聘、绩效、培训、员工管理">
-                                        <i class="ri-user-add-line"></i> 人力资源 <span class="filter-count" id="filterCountHumanResource">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="finance_accounting" title="财务会计 - 财务报表、账务处理、成本管理">
-                                        <i class="ri-money-cny-box-line"></i> 财务会计 <span class="filter-count" id="filterCountFinanceAccounting">0</span>
-                                    </span>
+                                <div class="results-filter results-filter--business" id="businessCategoryFilter" style="margin-top: 8px;">
                                 </div>
                             </div>
                             <div class="results-body" id="resultsBody">
@@ -444,72 +407,414 @@
                         </div>
                         <div class="wizard-step-content">
                             <div class="llm-config-hint">
-                                配置场景所需的LLM助手，系统将自动生成场景专属提示语
+                                配置场景所需的LLM助手，按照三层配置规范逐级展开
                             </div>
-                            <div class="config-section">
-                                <div class="config-section-title">
-                                    <i class="ri-openai-line"></i>
-                                    选择LLM Provider
+                            
+                            <div class="llm-config-tabs">
+                                <div class="llm-tabs-header">
+                                    <div class="llm-tab active" data-tab="provider" onclick="switchLLMTab('provider')">
+                                        <i class="ri-cloud-line"></i>
+                                        <span>Provider</span>
+                                    </div>
+                                    <div class="llm-tab" data-tab="model" onclick="switchLLMTab('model')">
+                                        <i class="ri-cpu-line"></i>
+                                        <span>模型配置</span>
+                                    </div>
+                                    <div class="llm-tab" data-tab="function" onclick="switchLLMTab('function')">
+                                        <i class="ri-tools-line"></i>
+                                        <span>Function Calling</span>
+                                    </div>
+                                    <div class="llm-tab" data-tab="knowledge" onclick="switchLLMTab('knowledge')">
+                                        <i class="ri-database-2-line"></i>
+                                        <span>知识库</span>
+                                    </div>
                                 </div>
-                                <div class="llm-provider-list" id="llmProviderList">
-                                    <div class="llm-provider-item" data-provider="deepseek" onclick="selectLLMProvider('deepseek')">
-                                        <div class="provider-icon"><i class="ri-robot-2-line"></i></div>
-                                        <div class="provider-info">
-                                            <div class="provider-name">DeepSeek</div>
-                                            <div class="provider-desc">高性价比，适合通用场景</div>
+                                
+                                <div class="llm-tabs-content">
+                                    <div class="llm-tab-pane active" id="llmTabProvider">
+                                        <div class="llm-tab-header">
+                                            <h4>选择LLM Provider</h4>
+                                            <p class="llm-tab-desc">选择大模型服务提供商，系统将根据场景类型推荐最优配置</p>
                                         </div>
-                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                        
+                                        <div class="provider-tier-section">
+                                            <div class="tier-label">
+                                                <span class="tier-badge recommended">推荐</span>
+                                                <span class="tier-name">高性价比</span>
+                                            </div>
+                                            <div class="provider-cards">
+                                                <div class="provider-card selected" data-provider="deepseek" onclick="selectLLMProvider('deepseek')">
+                                                    <div class="card-header">
+                                                        <div class="provider-logo"><i class="ri-robot-2-line"></i></div>
+                                                        <div class="provider-status online"></div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="provider-name">DeepSeek</div>
+                                                        <div class="provider-models">deepseek-chat, deepseek-coder</div>
+                                                        <div class="provider-features">
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> Function Calling</span>
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 64K上下文</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <span class="price">¥0.001/1K tokens</span>
+                                                    </div>
+                                                </div>
+                                                <div class="provider-card" data-provider="qianwen" onclick="selectLLMProvider('qianwen')">
+                                                    <div class="card-header">
+                                                        <div class="provider-logo"><i class="ri-bubble-chart-line"></i></div>
+                                                        <div class="provider-status online"></div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="provider-name">通义千问</div>
+                                                        <div class="provider-models">qwen-max, qwen-plus</div>
+                                                        <div class="provider-features">
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 中文优化</span>
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 32K上下文</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <span class="price">¥0.002/1K tokens</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="provider-tier-section">
+                                            <div class="tier-label">
+                                                <span class="tier-badge premium">高级</span>
+                                                <span class="tier-name">最强能力</span>
+                                            </div>
+                                            <div class="provider-cards">
+                                                <div class="provider-card" data-provider="openai" onclick="selectLLMProvider('openai')">
+                                                    <div class="card-header">
+                                                        <div class="provider-logo"><i class="ri-openai-line"></i></div>
+                                                        <div class="provider-status online"></div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="provider-name">OpenAI</div>
+                                                        <div class="provider-models">gpt-4o, gpt-4-turbo</div>
+                                                        <div class="provider-features">
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 128K上下文</span>
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 多模态</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <span class="price">$0.005/1K tokens</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="provider-tier-section">
+                                            <div class="tier-label">
+                                                <span class="tier-badge local">本地</span>
+                                                <span class="tier-name">数据安全</span>
+                                            </div>
+                                            <div class="provider-cards">
+                                                <div class="provider-card" data-provider="ollama" onclick="selectLLMProvider('ollama')">
+                                                    <div class="card-header">
+                                                        <div class="provider-logo"><i class="ri-computer-line"></i></div>
+                                                        <div class="provider-status local"></div>
+                                                    </div>
+                                                    <div class="card-body">
+                                                        <div class="provider-name">Ollama</div>
+                                                        <div class="provider-models">llama3, qwen2, mistral</div>
+                                                        <div class="provider-features">
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 本地部署</span>
+                                                            <span class="feature-tag"><i class="ri-check-line"></i> 数据安全</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="card-footer">
+                                                        <span class="price">免费 (本地资源)</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="llm-provider-item" data-provider="baidu" onclick="selectLLMProvider('baidu')">
-                                        <div class="provider-icon"><i class="ri-baidu-line"></i></div>
-                                        <div class="provider-info">
-                                            <div class="provider-name">百度文心</div>
-                                            <div class="provider-desc">中文优化，企业级服务</div>
+                                    
+                                    <div class="llm-tab-pane" id="llmTabModel">
+                                        <div class="llm-tab-header">
+                                            <h4>模型配置</h4>
+                                            <p class="llm-tab-desc">选择模型并配置参数，优化场景性能</p>
                                         </div>
-                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                        
+                                        <div class="model-config-section">
+                                            <div class="config-row">
+                                                <label class="config-label">选择模型</label>
+                                                <div class="config-control">
+                                                    <select id="llmModelSelect" class="form-select" onchange="onModelChange()">
+                                                        <option value="deepseek-chat">DeepSeek Chat (推荐)</option>
+                                                        <option value="deepseek-coder">DeepSeek Coder</option>
+                                                    </select>
+                                                    <div class="model-meta" id="modelMeta">
+                                                        <span class="meta-item"><i class="ri-text"></i> 上下文: 64K</span>
+                                                        <span class="meta-item"><i class="ri-flashlight-line"></i> 支持 Function Calling</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="model-config-section">
+                                            <div class="section-title">
+                                                <i class="ri-settings-3-line"></i>
+                                                <span>模型参数</span>
+                                                <button class="btn-reset" onclick="resetModelParams()">重置默认</button>
+                                            </div>
+                                            
+                                            <div class="param-grid">
+                                                <div class="param-item">
+                                                    <div class="param-header">
+                                                        <label>Temperature</label>
+                                                        <span class="param-value" id="temperatureValue">0.7</span>
+                                                    </div>
+                                                    <div class="param-control">
+                                                        <input type="range" id="temperature" min="0" max="100" value="70" oninput="updateParamDisplay('temperature')">
+                                                        <div class="param-hints">
+                                                            <span>精确 (0)</span>
+                                                            <span>创意 (1)</span>
+                                                        </div>
+                                                    </div>
+                                                    <div class="param-desc">控制输出的随机性，值越低输出越确定</div>
+                                                </div>
+                                                
+                                                <div class="param-item">
+                                                    <div class="param-header">
+                                                        <label>Max Tokens</label>
+                                                        <span class="param-value" id="maxTokensValue">4096</span>
+                                                    </div>
+                                                    <div class="param-control">
+                                                        <input type="number" id="maxTokens" value="4096" min="256" max="32000" onchange="updateParamDisplay('maxTokens')">
+                                                    </div>
+                                                    <div class="param-desc">单次对话最大输出token数</div>
+                                                </div>
+                                                
+                                                <div class="param-item">
+                                                    <div class="param-header">
+                                                        <label>Top P</label>
+                                                        <span class="param-value" id="topPValue">0.9</span>
+                                                    </div>
+                                                    <div class="param-control">
+                                                        <input type="range" id="topP" min="0" max="100" value="90" oninput="updateParamDisplay('topP')">
+                                                    </div>
+                                                    <div class="param-desc">核采样参数，控制输出多样性</div>
+                                                </div>
+                                                
+                                                <div class="param-item">
+                                                    <div class="param-header">
+                                                        <label>Frequency Penalty</label>
+                                                        <span class="param-value" id="freqPenaltyValue">0</span>
+                                                    </div>
+                                                    <div class="param-control">
+                                                        <input type="range" id="freqPenalty" min="0" max="20" value="0" oninput="updateParamDisplay('freqPenalty')">
+                                                    </div>
+                                                    <div class="param-desc">降低重复内容的概率</div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="model-config-section">
+                                            <div class="section-title">
+                                                <i class="ri-magic-line"></i>
+                                                <span>系统提示语</span>
+                                            </div>
+                                            <div class="prompt-config">
+                                                <div class="prompt-actions">
+                                                    <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="generatePrompt()">
+                                                        <i class="ri-ai-generate"></i> AI生成
+                                                    </button>
+                                                    <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="resetPrompt()">
+                                                        <i class="ri-refresh-line"></i> 重置
+                                                    </button>
+                                                </div>
+                                                <textarea id="systemPrompt" class="form-textarea" rows="4" placeholder="系统将根据场景信息自动生成提示语..."></textarea>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div class="llm-provider-item" data-provider="mock" onclick="selectLLMProvider('mock')">
-                                        <div class="provider-icon"><i class="ri-test-tube-line"></i></div>
-                                        <div class="provider-info">
-                                            <div class="provider-name">Mock测试</div>
-                                            <div class="provider-desc">测试环境，无需API Key</div>
+                                    
+                                    <div class="llm-tab-pane" id="llmTabFunction">
+                                        <div class="llm-tab-header">
+                                            <h4>Function Calling 配置</h4>
+                                            <p class="llm-tab-desc">配置LLM可调用的工具函数，扩展场景能力</p>
                                         </div>
-                                        <div class="provider-check"><i class="ri-check-line"></i></div>
+                                        
+                                        <div class="function-config-section">
+                                            <div class="function-toggle-row">
+                                                <label class="toggle-switch">
+                                                    <input type="checkbox" id="enableFunctionCall" checked onchange="toggleFunctionCallTools()">
+                                                    <span class="toggle-slider"></span>
+                                                </label>
+                                                <div class="toggle-info">
+                                                    <span class="toggle-label">启用 Function Calling</span>
+                                                    <span class="toggle-desc">允许LLM调用预定义的工具函数</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="functionCallTools" class="function-tools-section">
+                                            <div class="tools-category">
+                                                <div class="category-header">
+                                                    <i class="ri-database-2-line"></i>
+                                                    <span>知识检索</span>
+                                                </div>
+                                                <div class="tool-item">
+                                                    <div class="tool-check">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" name="fcTool" value="query_knowledge" checked>
+                                                            <span class="checkbox-mark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="tool-info">
+                                                        <div class="tool-name">query_knowledge</div>
+                                                        <div class="tool-desc">从知识库中检索相关信息，支持语义搜索</div>
+                                                        <div class="tool-params">
+                                                            <span class="param-tag">query: string</span>
+                                                            <span class="param-tag">top_k: number</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tools-category">
+                                                <div class="category-header">
+                                                    <i class="ri-notification-3-line"></i>
+                                                    <span>通知推送</span>
+                                                </div>
+                                                <div class="tool-item">
+                                                    <div class="tool-check">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" name="fcTool" value="send_notification" checked>
+                                                            <span class="checkbox-mark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="tool-info">
+                                                        <div class="tool-name">send_notification</div>
+                                                        <div class="tool-desc">向用户发送系统通知消息</div>
+                                                        <div class="tool-params">
+                                                            <span class="param-tag">message: string</span>
+                                                            <span class="param-tag">type: enum</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="tools-category">
+                                                <div class="category-header">
+                                                    <i class="ri-play-circle-line"></i>
+                                                    <span>场景操作</span>
+                                                </div>
+                                                <div class="tool-item">
+                                                    <div class="tool-check">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" name="fcTool" value="execute_action">
+                                                            <span class="checkbox-mark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="tool-info">
+                                                        <div class="tool-name">execute_action</div>
+                                                        <div class="tool-desc">调用场景中定义的操作</div>
+                                                        <div class="tool-params">
+                                                            <span class="param-tag">action_id: string</span>
+                                                            <span class="param-tag">params: object</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <div class="tool-item">
+                                                    <div class="tool-check">
+                                                        <label class="checkbox-label">
+                                                            <input type="checkbox" name="fcTool" value="update_context">
+                                                            <span class="checkbox-mark"></span>
+                                                        </label>
+                                                    </div>
+                                                    <div class="tool-info">
+                                                        <div class="tool-name">update_context</div>
+                                                        <div class="tool-desc">更新场景上下文数据</div>
+                                                        <div class="tool-params">
+                                                            <span class="param-tag">key: string</span>
+                                                            <span class="param-tag">value: any</span>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="llm-tab-pane" id="llmTabKnowledge">
+                                        <div class="llm-tab-header">
+                                            <h4>知识库配置</h4>
+                                            <p class="llm-tab-desc">配置RAG知识增强，让LLM具备领域知识</p>
+                                        </div>
+                                        
+                                        <div class="knowledge-config-section">
+                                            <div class="knowledge-toggle-row">
+                                                <label class="toggle-switch">
+                                                    <input type="checkbox" id="enableKnowledge" onchange="toggleKnowledgeConfig()">
+                                                    <span class="toggle-slider"></span>
+                                                </label>
+                                                <div class="toggle-info">
+                                                    <span class="toggle-label">启用知识库增强 (RAG)</span>
+                                                    <span class="toggle-desc">检索增强生成，让LLM基于知识库回答</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="knowledgeConfigPanel" class="knowledge-panel" style="display: none;">
+                                            <div class="knowledge-bases-section">
+                                                <div class="section-header">
+                                                    <span>绑定知识库</span>
+                                                    <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addKnowledgeBase()">
+                                                        <i class="ri-add-line"></i> 添加知识库
+                                                    </button>
+                                                </div>
+                                                <div class="knowledge-bases" id="knowledgeBases">
+                                                    <div class="knowledge-base-empty">
+                                                        <i class="ri-database-line"></i>
+                                                        <span>暂无绑定的知识库</span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            
+                                            <div class="rag-config-section">
+                                                <div class="section-header">
+                                                    <span>RAG参数配置</span>
+                                                </div>
+                                                <div class="rag-params">
+                                                    <div class="rag-param-item">
+                                                        <label>Top K</label>
+                                                        <div class="param-input-group">
+                                                            <input type="number" id="ragTopK" value="5" min="1" max="20">
+                                                            <span class="param-unit">条</span>
+                                                        </div>
+                                                        <div class="param-desc">检索返回的最大文档数</div>
+                                                    </div>
+                                                    <div class="rag-param-item">
+                                                        <label>相似度阈值</label>
+                                                        <div class="param-input-group">
+                                                            <input type="number" id="ragThreshold" value="0.7" min="0" max="1" step="0.1">
+                                                        </div>
+                                                        <div class="param-desc">低于此阈值的文档将被过滤</div>
+                                                    </div>
+                                                    <div class="rag-param-item">
+                                                        <label>Rerank</label>
+                                                        <label class="toggle-switch sm">
+                                                            <input type="checkbox" id="ragRerank" checked>
+                                                            <span class="toggle-slider"></span>
+                                                        </label>
+                                                        <div class="param-desc">启用重排序提升检索精度</div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
-                            <div class="config-section">
-                                <div class="config-section-title">
-                                    <i class="ri-magic-line"></i>
-                                    系统提示语
-                                </div>
-                                <div class="llm-prompt-config">
-                                    <div class="prompt-actions">
-                                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="generatePrompt()">
-                                            <i class="ri-ai-generate"></i> AI生成
-                                        </button>
-                                        <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="resetPrompt()">
-                                            <i class="ri-refresh-line"></i> 重置
-                                        </button>
-                                    </div>
-                                    <textarea id="systemPrompt" class="form-textarea" rows="6" placeholder="系统将根据场景信息自动生成提示语..."></textarea>
-                                    <div class="prompt-hint">提示语将帮助LLM更好地理解场景上下文</div>
-                                </div>
-                            </div>
-                            <div class="config-section">
-                                <div class="config-section-title">
-                                    <i class="ri-tools-line"></i>
-                                    Function Calling
-                                </div>
-                                <div class="function-call-config">
-                                    <div class="function-call-toggle">
-                                        <label class="toggle-switch">
-                                            <input type="checkbox" id="enableFunctionCall" checked>
-                                            <span class="toggle-slider"></span>
-                                        </label>
-                                        <span class="toggle-label">启用工具调用</span>
-                                    </div>
-                                    <div class="function-call-hint">启用后，LLM可以调用场景中的工具函数</div>
+                            
+                            <div class="llm-config-summary">
+                                <div class="summary-title">当前配置</div>
+                                <div class="summary-items" id="llmConfigSummary">
+                                    <span class="summary-item"><i class="ri-cloud-line"></i> DeepSeek</span>
+                                    <span class="summary-item"><i class="ri-cpu-line"></i> deepseek-chat</span>
+                                    <span class="summary-item"><i class="ri-tools-line"></i> 2 工具</span>
                                 </div>
                             </div>
                         </div>

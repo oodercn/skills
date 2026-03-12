@@ -17,9 +17,6 @@ spec:
   
   capabilityAddresses:
     required:
-      - address: 0x38
-        name: KNOW_BASE
-        description: "知识库基础服务"
       - address: 0x3A
         name: KNOW_RAG
         description: "RAG检索服务"

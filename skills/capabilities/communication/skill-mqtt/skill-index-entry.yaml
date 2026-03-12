@@ -5,7 +5,7 @@ metadata:
   id: skill-mqtt
   name: MQTT服务
   version: "0.7.3"
-  description: "MQTT消息服务，支持消息发布、订阅、推送"
+  description: "MQTT消息服务，支持消息订阅发布"
 
 spec:
   skillForm: PROVIDER
@@ -17,14 +17,14 @@ spec:
   
   capabilityAddresses:
     required:
-      - address: 0x51
+      - address: 0x57
         name: COMM_MQTT
-        description: "MQTT服务"
+        description: "MQTT消息服务"
     optional: []
   
   tags:
     - mqtt
-    - message
     - pubsub
+    - iot
   
   dependencies: []

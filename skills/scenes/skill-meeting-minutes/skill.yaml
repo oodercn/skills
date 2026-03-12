@@ -255,3 +255,21 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-meeting-minutes-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

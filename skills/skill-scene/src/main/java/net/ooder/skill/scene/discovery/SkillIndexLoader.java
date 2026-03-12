@@ -145,35 +145,56 @@ public class SkillIndexLoader {
             Object typeObj = skill.get("type");
             String type = typeObj != null ? String.valueOf(typeObj) : null;
             
-            boolean isScene = "SCENE".equals(type) || "scene".equals(type) || "scene-skill".equals(type);
+            Object sceneIdObj = skill.get("sceneId");
+            String sceneId = sceneIdObj != null ? String.valueOf(sceneIdObj) : null;
+            
+            boolean isScene = "SCENE".equals(type) || "scene".equals(type) || "scene-skill".equals(type) || sceneId != null;
             
             cap.setType(isScene ? "SCENE" : "SKILL");
             cap.setSceneCapability(isScene);
+            
+            Object skillFormObj = skill.get("skillForm");
+            String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : null;
+            if (skillFormCode == null) {
+                skillFormCode = isScene ? "SCENE" : "PROVIDER";
+            }
+            cap.setSkillForm(skillFormCode);
+            
+            Object businessCategoryObj = skill.get("businessCategory");
+            if (businessCategoryObj != null) {
+                cap.setBusinessCategory(String.valueOf(businessCategoryObj));
+            }
+            
+            Object categoryObj = skill.get("category");
+            if (categoryObj != null) {
+                cap.setCategory(String.valueOf(categoryObj));
+            }
+            
+            Object capabilityCategoryObj = skill.get("capabilityCategory");
+            if (capabilityCategoryObj != null) {
+                cap.setCapabilityCategory(String.valueOf(capabilityCategoryObj));
+            }
+            
+            Object visibilityObj = skill.get("visibility");
+            if (visibilityObj == null) {
+                Object labelsObj = skill.get("labels");
+                if (labelsObj instanceof Map) {
+                    @SuppressWarnings("unchecked")
+                    Map<String, Object> labels = (Map<String, Object>) labelsObj;
+                    visibilityObj = labels.get("scene.visibility");
+                }
+            }
+            cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
+                MetadataCompat.getVisibility(skill));
             
             if (isScene) {
                 Object sceneTypeObj = skill.get("sceneType");
                 String sceneTypeCode = sceneTypeObj != null ? String.valueOf(sceneTypeObj) : "MANUAL";
                 
-                Object skillFormObj = skill.get("skillForm");
-                String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : "STANDALONE";
-                
                 boolean hasSelfDrive = "AUTO".equals(sceneTypeCode);
                 
                 cap.setSceneType(sceneTypeCode);
-                cap.setSkillForm(skillFormCode);
                 cap.setMainFirst(hasSelfDrive);
-                
-                Object visibilityObj = skill.get("visibility");
-                if (visibilityObj == null) {
-                    Object labelsObj = skill.get("labels");
-                    if (labelsObj instanceof Map) {
-                        @SuppressWarnings("unchecked")
-                        Map<String, Object> labels = (Map<String, Object>) labelsObj;
-                        visibilityObj = labels.get("scene.visibility");
-                    }
-                }
-                cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : 
-                    MetadataCompat.getVisibility(skill));
                 
                 Object driverConditionsObj = skill.get("driverConditions");
                 if (driverConditionsObj instanceof List) {
@@ -202,6 +223,118 @@ public class SkillIndexLoader {
             result.add(new HashMap<>(item));
         }
         return result;
+    }
+    
+    @SuppressWarnings("unchecked")
+    public List<CapabilityDTO> getSkillsFromEntryFiles(String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        List<File> entryFiles = findSkillIndexEntryFiles();
+        log.info("[getSkillsFromEntryFiles] Found {} skill-index-entry.yaml files", entryFiles.size());
+        
+        Yaml yaml = new Yaml();
+        
+        for (File entryFile : entryFiles) {
+            try (InputStream is = new FileInputStream(entryFile)) {
+                Map<String, Object> entry = yaml.load(is);
+                if (entry == null) continue;
+                
+                Map<String, Object> metadata = (Map<String, Object>) entry.get("metadata");
+                Map<String, Object> spec = (Map<String, Object>) entry.get("spec");
+                
+                if (metadata == null || spec == null) continue;
+                
+                CapabilityDTO cap = new CapabilityDTO();
+                String skillId = (String) metadata.get("id");
+                cap.setId(skillId);
+                cap.setName((String) metadata.get("name"));
+                cap.setDescription((String) metadata.get("description"));
+                cap.setVersion((String) metadata.get("version"));
+                cap.setSource(source);
+                
+                boolean isInstalled = checkIfInstalled(skillId);
+                cap.setStatus(isInstalled ? "installed" : "available");
+                
+                String skillForm = (String) spec.get("skillForm");
+                cap.setSkillForm(skillForm != null ? skillForm : "PROVIDER");
+                
+                String sceneType = (String) spec.get("sceneType");
+                cap.setSceneType(sceneType);
+                
+                String visibility = (String) spec.get("visibility");
+                cap.setVisibility(visibility != null ? visibility : "public");
+                
+                String businessCategory = (String) spec.get("businessCategory");
+                cap.setBusinessCategory(businessCategory);
+                
+                String capabilityCategory = (String) spec.get("capabilityCategory");
+                cap.setCapabilityCategory(capabilityCategory);
+                
+                String category = (String) spec.get("category");
+                cap.setCategory(category);
+                
+                String subCategory = (String) spec.get("subCategory");
+                cap.setSubCategory(subCategory);
+                
+                Object tagsObj = spec.get("tags");
+                if (tagsObj instanceof List) {
+                    cap.setTags((List<String>) tagsObj);
+                }
+                
+                Object dependenciesObj = spec.get("dependencies");
+                if (dependenciesObj instanceof List) {
+                    cap.setDependencies((List<String>) dependenciesObj);
+                }
+                
+                boolean isScene = "SCENE".equals(skillForm);
+                cap.setType(isScene ? "SCENE" : "SKILL");
+                cap.setSceneCapability(isScene);
+                
+                capabilities.add(cap);
+                
+            } catch (Exception e) {
+                log.warn("[getSkillsFromEntryFiles] Failed to load {}: {}", entryFile.getAbsolutePath(), e.getMessage());
+            }
+        }
+        
+        return capabilities;
+    }
+    
+    private List<File> findSkillIndexEntryFiles() {
+        List<File> files = new ArrayList<>();
+        
+        String[] searchPaths = {
+            "E:/github/ooder-skills/skills",
+            "../skills",
+            "../../skills",
+            "../../../skills"
+        };
+        
+        for (String searchPath : searchPaths) {
+            File rootDir = new File(searchPath);
+            if (rootDir.exists() && rootDir.isDirectory()) {
+                findFilesRecursive(rootDir, "skill-index-entry.yaml", files);
+                if (!files.isEmpty()) {
+                    log.info("[findSkillIndexEntryFiles] Found {} files in {}", files.size(), searchPath);
+                    break;
+                }
+            }
+        }
+        
+        return files;
+    }
+    
+    private void findFilesRecursive(File dir, String fileName, List<File> result) {
+        File[] children = dir.listFiles();
+        if (children == null) return;
+        
+        for (File child : children) {
+            if (child.isDirectory()) {
+                findFilesRecursive(child, fileName, result);
+            } else if (fileName.equals(child.getName())) {
+                result.add(child);
+            }
+        }
     }
     
     private boolean checkIfInstalled(String skillId) {

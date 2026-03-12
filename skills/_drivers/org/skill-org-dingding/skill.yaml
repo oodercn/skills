@@ -51,7 +51,19 @@ spec:
         - org-data-read
         - user-auth
   
-  dependencies: []
+  dependencies:
+    - id: skill-org-base
+      version: ">=1.0.0"
+      required: true
+      description: "组织基础服务"
+    - id: skill-user-auth
+      version: ">=0.7.0"
+      required: false
+      description: "用户认证服务(间接)"
+    - id: skill-common
+      version: ">=1.0.0"
+      required: false
+      description: "通用工具库(间接)"
   
   config:
     required:
@@ -94,3 +106,21 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-org-dingding-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

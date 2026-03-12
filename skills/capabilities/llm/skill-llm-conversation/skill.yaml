@@ -149,3 +149,78 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: quick-start
+        name: 快速开始
+        path: docs/quick-start.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: api-reference
+        name: API参考
+        path: docs/api-reference.md
+        type: reference
+        language: zh
+        priority: medium
+        
+      - id: configuration
+        name: 配置指南
+        path: docs/configuration.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: session-management
+        name: 会话管理
+        path: docs/session-management.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: streaming
+        name: 流式输出
+        path: docs/streaming.md
+        type: guide
+        language: zh
+        priority: medium
+    
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-conversation-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+      rerankEnabled: false
+
+  persona:
+    enabled: true
+    name: LLM对话服务助手
+    description: 专业的LLM对话服务助手，帮助用户理解和使用对话功能
+    expertise:
+      - 智能对话
+      - 会话管理
+      - 流式输出
+      - Function Calling
+    boundaries:
+      - 只回答对话服务相关的问题
+      - 不处理具体的对话内容
+      - 提供技术支持和使用指导
+    tone: professional, technical, helpful
+    examples:
+      - question: "如何启用流式输出？"
+        answer: "您可以通过设置ENABLE_STREAMING=true或在请求中使用stream参数启用流式输出。"
+      - question: "会话超时如何配置？"
+        answer: "通过SESSION_TIMEOUT参数配置，默认3600秒(1小时)。"

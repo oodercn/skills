@@ -158,4 +158,42 @@ spec:
     storage: "10Mi"
   
   offline:
-    enabled: false
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-qianwen-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-qianwen-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

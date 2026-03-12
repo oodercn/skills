@@ -240,3 +240,88 @@ spec:
     enabled: true
     cacheStrategy: local
     syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: quick-start
+        name: 快速开始
+        path: docs/quick-start.md
+        type: guide
+        language: zh
+        priority: high
+        
+      - id: api-reference
+        name: API参考
+        path: docs/api-reference.md
+        type: reference
+        language: zh
+        priority: medium
+        
+      - id: configuration
+        name: 配置指南
+        path: docs/configuration.md
+        type: guide
+        language: zh
+        priority: medium
+        
+      - id: troubleshooting
+        name: 故障排查
+        path: docs/troubleshooting.md
+        type: guide
+        language: zh
+        priority: low
+        
+      - id: faq
+        name: 常见问题
+        path: docs/faq.md
+        type: faq
+        language: zh
+        priority: low
+    
+    ragConfig:
+      enabled: true
+      indexName: "skill-knowledge-qa-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+      rerankEnabled: false
+
+  persona:
+    enabled: true
+    name: 知识问答助手
+    description: 专业的知识问答助手，帮助用户从知识库中检索和获取信息
+    expertise:
+      - 知识检索
+      - 语义理解
+      - RAG问答
+      - 文档管理
+    boundaries:
+      - 只回答知识库中已有的内容
+      - 不提供知识库之外的信息
+      - 无法找到答案时明确告知
+    tone: professional, accurate, helpful
+    examples:
+      - question: "如何创建知识库？"
+        answer: "您可以通过POST /api/knowledge/bases接口创建知识库，需要提供name和description参数。"
+      - question: "支持哪些文档格式？"
+        answer: "目前支持PDF、Word(.docx)、Markdown(.md)和纯文本(.txt)格式。"
+
+  llmAssistant:
+    enabled: true
+    welcomeMessage: "您好，我是知识问答助手，可以帮您从知识库中检索信息。"
+    suggestedQuestions:
+      - "如何上传文档到知识库？"
+      - "如何进行知识检索？"
+      - "支持哪些文档格式？"
+    contextWindow: 10
+    maxTokens: 2000

@@ -13,6 +13,9 @@ public class InstallResultDTO {
     private List<String> installedDependencies;
     private List<String> existingDependencies;
     private List<String> failedDependencies;
+    private String selectedRole;
+    private List<String> driverConditions;
+    private String llmProvider;
 
     public InstallResultDTO() {
         this.installedDependencies = new ArrayList<>();
@@ -82,5 +85,29 @@ public class InstallResultDTO {
 
     public void setFailedDependencies(List<String> failedDependencies) {
         this.failedDependencies = failedDependencies != null ? failedDependencies : new ArrayList<>();
+    }
+
+    public String getSelectedRole() {
+        return selectedRole;
+    }
+
+    public void setSelectedRole(String selectedRole) {
+        this.selectedRole = selectedRole;
+    }
+
+    public List<String> getDriverConditions() {
+        return driverConditions;
+    }
+
+    public void setDriverConditions(List<String> driverConditions) {
+        this.driverConditions = driverConditions;
+    }
+
+    public String getLlmProvider() {
+        return llmProvider;
+    }
+
+    public void setLlmProvider(String llmProvider) {
+        this.llmProvider = llmProvider;
     }
 }

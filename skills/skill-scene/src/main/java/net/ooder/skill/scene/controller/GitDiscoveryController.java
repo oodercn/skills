@@ -324,8 +324,19 @@ public class GitDiscoveryController {
 
     @PostMapping("/install")
     public ResultModel<InstallResultDTO> installSkill(@RequestBody @Valid InstallSkillRequestDTO request) {
-        log.info("[installSkill] skillId: {}, source: {}, repoUrl: {}, mockEnabled: {}", 
-            request.getSkillId(), request.getSource(), request.getRepoUrl(), mockEnabled);
+        log.info("[installSkill] skillId: {}, source: {}, selectedRole: {}, mockEnabled: {}", 
+            request.getSkillId(), request.getSource(), request.getSelectedRole(), mockEnabled);
+        
+        log.info("[installSkill] Participants: leader={}, pushType={}, collaborators={}", 
+            request.getParticipants() != null ? request.getParticipants().getLeader() : null,
+            request.getParticipants() != null ? request.getParticipants().getPushType() : null,
+            request.getParticipants() != null ? request.getParticipants().getCollaborators() : null);
+        
+        log.info("[installSkill] DriverConditions: {}", request.getDriverConditions());
+        
+        log.info("[installSkill] LLMConfig: provider={}, enableFunctionCall={}", 
+            request.getLlmConfig() != null ? request.getLlmConfig().getProvider() : null,
+            request.getLlmConfig() != null ? request.getLlmConfig().getEnableFunctionCall() : null);
         
         InstallResultDTO result = new InstallResultDTO();
         result.setSkillId(request.getSkillId());
@@ -337,6 +348,8 @@ public class GitDiscoveryController {
             result.setStatus("installed");
             result.setMessage("Skill installed successfully (mock mode)");
             result.setCapabilities(getCapabilitiesForSkill(request.getSkillId()));
+            result.setSelectedRole(request.getSelectedRole());
+            result.setDriverConditions(request.getDriverConditions());
             return ResultModel.success(result);
         }
         
@@ -350,6 +363,8 @@ public class GitDiscoveryController {
                 installRequest.setDownloadUrl(downloadUrl);
                 installRequest.setMode(InstallRequest.InstallMode.FULL_INSTALL);
                 
+                applyInstallConfig(installRequest, request);
+                
                 InstallResult installResult = skillPackageManager.install(installRequest).get();
                 
                 if (installResult != null && installResult.isSuccess()){
@@ -360,6 +375,9 @@ public class GitDiscoveryController {
                     if (manifest != null) {
                         result.setCapabilities(convertManifestToCapabilities(manifest));
                     }
+                    
+                    result.setSelectedRole(request.getSelectedRole());
+                    result.setDriverConditions(request.getDriverConditions());
                     
                     log.info("[installSkill] Skill {} installed successfully from URL", request.getSkillId());
                 } else {
@@ -392,6 +410,8 @@ public class GitDiscoveryController {
                     
                     result.setInstalledDependencies(installResult.getInstalledDependencies());
                     result.setExistingDependencies(installResult.getExistingDependencies());
+                    result.setSelectedRole(request.getSelectedRole());
+                    result.setDriverConditions(request.getDriverConditions());
                     
                     log.info("[installSkill] Skill {} installed successfully with {} dependencies", 
                         request.getSkillId(), installResult.getInstalledDependencies().size());
@@ -422,6 +442,9 @@ public class GitDiscoveryController {
                         result.setCapabilities(convertManifestToCapabilities(manifest));
                     }
                     
+                    result.setSelectedRole(request.getSelectedRole());
+                    result.setDriverConditions(request.getDriverConditions());
+                    
                     log.info("[installSkill] Skill {} installed successfully via SkillService", request.getSkillId());
                 } else {
                     result.setStatus("failed");
@@ -439,10 +462,72 @@ public class GitDiscoveryController {
             result.setStatus(mockEnabled ? "installed" : "unavailable");
             if (mockEnabled) {
                 result.setCapabilities(getCapabilitiesForSkill(request.getSkillId()));
+                result.setSelectedRole(request.getSelectedRole());
+                result.setDriverConditions(request.getDriverConditions());
             }
         }
         
         return ResultModel.success(result);
+    }
+    
+    private void applyInstallConfig(InstallRequest installRequest, InstallSkillRequestDTO request) {
+        if (request.getSelectedRole() != null) {
+            installRequest.addOption("selectedRole", request.getSelectedRole());
+        }
+        
+        if (request.getParticipants() != null) {
+            InstallSkillRequestDTO.ParticipantConfig pc = request.getParticipants();
+            if (pc.getLeader() != null) {
+                installRequest.addOption("leader", pc.getLeader());
+            }
+            if (pc.getPushType() != null) {
+                installRequest.addOption("pushType", pc.getPushType());
+            }
+            if (pc.getCollaborators() != null && !pc.getCollaborators().isEmpty()) {
+                installRequest.addOption("collaborators", pc.getCollaborators());
+            }
+        }
+        
+        if (request.getDriverConditions() != null && !request.getDriverConditions().isEmpty()) {
+            installRequest.addOption("driverConditions", request.getDriverConditions());
+        }
+        
+        if (request.getLlmConfig() != null) {
+            InstallSkillRequestDTO.LLMConfig llm = request.getLlmConfig();
+            if (llm.getProvider() != null) {
+                installRequest.addOption("llmProvider", llm.getProvider());
+            }
+            if (llm.getModel() != null) {
+                installRequest.addOption("llmModel", llm.getModel());
+            }
+            if (llm.getSystemPrompt() != null) {
+                installRequest.addOption("systemPrompt", llm.getSystemPrompt());
+            }
+            if (llm.getEnableFunctionCall() != null) {
+                installRequest.addOption("enableFunctionCall", llm.getEnableFunctionCall());
+            }
+            if (llm.getFunctionTools() != null && !llm.getFunctionTools().isEmpty()) {
+                installRequest.addOption("functionTools", llm.getFunctionTools());
+            }
+            if (llm.getParameters() != null && !llm.getParameters().isEmpty()) {
+                installRequest.addOption("llmParameters", llm.getParameters());
+            }
+            if (llm.getKnowledge() != null) {
+                InstallSkillRequestDTO.KnowledgeConfig kc = llm.getKnowledge();
+                if (kc.getEnabled() != null && kc.getEnabled()) {
+                    installRequest.addOption("knowledgeEnabled", true);
+                    if (kc.getTopK() != null) {
+                        installRequest.addOption("ragTopK", kc.getTopK());
+                    }
+                    if (kc.getScoreThreshold() != null) {
+                        installRequest.addOption("ragThreshold", kc.getScoreThreshold());
+                    }
+                    if (kc.getBases() != null && !kc.getBases().isEmpty()) {
+                        installRequest.addOption("knowledgeBases", kc.getBases());
+                    }
+                }
+            }
+        }
     }
 
     private List<CapabilityDTO> convertManifestToCapabilities(SkillManifest manifest) {
@@ -737,53 +822,32 @@ public class GitDiscoveryController {
         log.info("[discoverFromLocal] Filters - form: {}, sceneType: {}, category: {}", 
             formFilter, sceneTypeFilter, categoryFilter);
         
-        if (capabilityService != null) {
-            try {
-                List<net.ooder.skill.scene.capability.model.Capability> registeredCaps = capabilityService.findAll();
-                log.info("[discoverFromLocal] Found {} registered capabilities", registeredCaps.size());
-                
-                for (net.ooder.skill.scene.capability.model.Capability cap : registeredCaps) {
-                    net.ooder.skill.scene.capability.service.CapabilityClassificationService.ClassificationResult classification =
-                        classificationService.classify(cap);
-                    
-                    if (classification.isInternal()) {
-                        continue;
-                    }
-                    
-                    if (!classificationService.matchesFilter(cap, formFilter, sceneTypeFilter, categoryFilter)) {
-                        continue;
-                    }
-                    
-                    CapabilityDTO dto = new CapabilityDTO();
-                    dto.setId(cap.getCapabilityId());
-                    dto.setName(cap.getName());
-                    dto.setDescription(cap.getDescription());
-                    dto.setVersion(cap.getVersion() != null ? cap.getVersion() : "1.0.0");
-                    dto.setType(cap.getType() != null ? cap.getType().name() : "SERVICE");
-                    dto.setSource("LOCAL_FS");
-                    dto.setStatus("installed");
-                    
-                    dto.setSkillForm(classification.getSkillForm().getCode());
-                    dto.setSceneType(classification.getSceneType() != null ? classification.getSceneType().getCode() : null);
-                    dto.setVisibility(classification.getVisibility().getCode());
-                    dto.setCapabilityCategory(classification.getCapabilityCategory().getCode());
-                    dto.setSceneCapability(classification.getSkillForm() == SkillForm.SCENE);
-                    dto.setSkillId(cap.getSkillId());
-                    dto.setCategory(cap.getCategory());
-                    dto.setBusinessCategory(cap.getBusinessCategory());
-                    dto.setSubCategory(cap.getSubCategory());
-                    dto.setTags(cap.getTags());
-                    dto.setHasSelfDrive(cap.isHasSelfDrive());
-                    dto.setBusinessSemanticsScore(cap.getBusinessSemanticsScore());
-                    dto.setInstalled(true);
-                    capabilities.add(dto);
-                }
-                
-                log.info("[discoverFromLocal] Returning {} capabilities after classification filters", capabilities.size());
-            } catch (Exception e) {
-                log.error("[discoverFromLocal] Error loading registered capabilities: {}", e.getMessage());
+        List<CapabilityDTO> entryCapabilities = skillIndexLoader.getSkillsFromEntryFiles("LOCAL");
+        log.info("[discoverFromLocal] Found {} capabilities through skill-index-entry.yaml", entryCapabilities.size());
+        
+        for (CapabilityDTO cap : entryCapabilities) {
+            String skillForm = cap.getSkillForm();
+            if (formFilter != null && skillForm != null && !formFilter.getCode().equals(skillForm)) {
+                continue;
             }
+            
+            String sceneType = cap.getSceneType();
+            if (sceneTypeFilter != null && sceneType != null && !sceneTypeFilter.getCode().equals(sceneType)) {
+                continue;
+            }
+            
+            String capabilityCategory = cap.getCapabilityCategory();
+            if (categoryFilter != null && capabilityCategory != null && !categoryFilter.getCode().equalsIgnoreCase(capabilityCategory)) {
+                continue;
+            }
+            
+            cap.setSource("LOCAL_FS");
+            cap.setStatus("available");
+            cap.setInstalled(checkIfInstalled(cap.getId()));
+            capabilities.add(cap);
         }
+        
+        log.info("[discoverFromLocal] Returning {} capabilities after filters", capabilities.size());
         
         result.setCapabilities(capabilities);
         result.setScanTime(System.currentTimeMillis());
@@ -827,5 +891,20 @@ public class GitDiscoveryController {
         role.put("icon", icon);
         role.put("permissions", permissions);
         return role;
+    }
+    
+    private boolean checkIfInstalled(String skillId) {
+        if (skillId == null) {
+            return false;
+        }
+        if (skillPackageManager == null) {
+            return false;
+        }
+        try {
+            return skillPackageManager.isInstalled(skillId).get();
+        } catch (Exception e) {
+            log.debug("[checkIfInstalled] Failed to check installation status for {}: {}", skillId, e.getMessage());
+            return false;
+        }
     }
 }
