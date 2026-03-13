@@ -41,7 +41,16 @@ public class SkillPackage {
         try (JarFile jarFile = new JarFile(file)) {
             JarEntry entry = jarFile.getJarEntry(path);
             if (entry != null) {
-                return jarFile.getInputStream(entry);
+                // 读取数据到内存，避免流被关闭
+                try (InputStream is = jarFile.getInputStream(entry)) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[8192];
+                    int len;
+                    while ((len = is.read(buffer)) != -1) {
+                        baos.write(buffer, 0, len);
+                    }
+                    return new ByteArrayInputStream(baos.toByteArray());
+                }
             }
         }
         return null;
@@ -83,20 +92,13 @@ public class SkillPackage {
     // ==================== 私有方法 ====================
 
     private static SkillMetadata loadMetadata(File jarFile) throws IOException {
-        try (JarFile jar = new JarFile(jarFile)) {
-            // 尝试读取skill.yaml
-            JarEntry entry = jar.getJarEntry("skill.yaml");
-            if (entry == null) {
-                entry = jar.getJarEntry("META-INF/skill.yaml");
-            }
-
-            if (entry == null) {
+        // 使用 getResource 方法读取 skill.yaml（已修复流关闭问题）
+        SkillPackage tempPackage = new SkillPackage(jarFile, null);
+        try (InputStream is = tempPackage.getResource("skill.yaml")) {
+            if (is == null) {
                 throw new IOException("skill.yaml not found in: " + jarFile);
             }
-
-            try (InputStream is = jar.getInputStream(entry)) {
-                return SkillMetadata.loadFromYaml(is);
-            }
+            return SkillMetadata.loadFromYaml(is);
         }
     }
 

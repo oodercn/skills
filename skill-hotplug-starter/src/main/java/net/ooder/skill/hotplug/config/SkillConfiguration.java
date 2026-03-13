@@ -35,6 +35,15 @@ public class SkillConfiguration {
 
     /**
      * 从YAML加载
+     * 支持标准 skill.yaml 格式：
+     * metadata:
+     *   id: xxx
+     *   name: xxx
+     * spec:
+     *   routes:
+     *     ...
+     *   services:
+     *     ...
      */
     @SuppressWarnings("unchecked")
     public static SkillConfiguration load(InputStream is, ClassLoader classLoader) {
@@ -42,39 +51,54 @@ public class SkillConfiguration {
         Map<String, Object> data = yaml.load(is);
 
         SkillConfiguration config = new SkillConfiguration();
-        config.id = (String) data.get("id");
-        config.name = (String) data.get("name");
-        config.version = (String) data.get("version");
-        config.description = (String) data.get("description");
-        config.author = (String) data.get("author");
-        config.type = (String) data.get("type");
-        config.dependencies = (List<String>) data.get("dependencies");
-        config.config = (Map<String, Object>) data.get("config");
-
-        // 解析生命周期配置
-        Map<String, Object> lifecycleData = (Map<String, Object>) data.get("lifecycle");
-        if (lifecycleData != null) {
-            config.lifecycle = new LifecycleConfiguration();
-            config.lifecycle.setStartup((String) lifecycleData.get("startup"));
-            config.lifecycle.setShutdown((String) lifecycleData.get("shutdown"));
+        
+        // 解析 metadata 部分
+        Map<String, Object> metadata = (Map<String, Object>) data.get("metadata");
+        if (metadata != null) {
+            config.id = (String) metadata.get("id");
+            config.name = (String) metadata.get("name");
+            config.version = (String) metadata.get("version");
+            config.description = (String) metadata.get("description");
+            config.author = (String) metadata.get("author");
+            config.type = (String) metadata.get("type");
+            config.dependencies = (List<String>) metadata.get("dependencies");
         }
+        
+        // 解析 spec 部分
+        Map<String, Object> spec = (Map<String, Object>) data.get("spec");
+        if (spec != null) {
+            config.config = (Map<String, Object>) spec.get("config");
+            
+            // 从 spec 中解析 type（如果 metadata 中没有）
+            if (config.type == null) {
+                config.type = (String) spec.get("type");
+            }
 
-        // 解析路由配置
-        List<Map<String, Object>> routesData = (List<Map<String, Object>>) data.get("routes");
-        if (routesData != null) {
-            config.routes = RouteDefinition.fromList(routesData);
-        }
+            // 解析生命周期配置
+            Map<String, Object> lifecycleData = (Map<String, Object>) spec.get("lifecycle");
+            if (lifecycleData != null) {
+                config.lifecycle = new LifecycleConfiguration();
+                config.lifecycle.setStartup((String) lifecycleData.get("startup"));
+                config.lifecycle.setShutdown((String) lifecycleData.get("shutdown"));
+            }
 
-        // 解析服务配置
-        List<Map<String, Object>> servicesData = (List<Map<String, Object>>) data.get("services");
-        if (servicesData != null) {
-            config.services = ServiceDefinition.fromList(servicesData);
-        }
+            // 解析路由配置
+            List<Map<String, Object>> routesData = (List<Map<String, Object>>) spec.get("routes");
+            if (routesData != null) {
+                config.routes = RouteDefinition.fromList(routesData);
+            }
 
-        // 解析UI配置
-        Map<String, Object> uiData = (Map<String, Object>) data.get("ui");
-        if (uiData != null) {
-            config.ui = UIConfiguration.fromMap(uiData);
+            // 解析服务配置
+            List<Map<String, Object>> servicesData = (List<Map<String, Object>>) spec.get("services");
+            if (servicesData != null) {
+                config.services = ServiceDefinition.fromList(servicesData);
+            }
+
+            // 解析UI配置
+            Map<String, Object> uiData = (Map<String, Object>) spec.get("ui");
+            if (uiData != null) {
+                config.ui = UIConfiguration.fromMap(uiData);
+            }
         }
 
         return config;

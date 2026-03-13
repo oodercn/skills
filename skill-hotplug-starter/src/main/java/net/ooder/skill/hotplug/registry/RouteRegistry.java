@@ -5,6 +5,7 @@ import net.ooder.skill.hotplug.config.RouteDefinition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -28,6 +29,7 @@ public class RouteRegistry {
     private static final Logger logger = LoggerFactory.getLogger(RouteRegistry.class);
 
     @Autowired
+    @Qualifier("requestMappingHandlerMapping")
     private RequestMappingHandlerMapping handlerMapping;
 
     // Skill ID -> 注册的路由信息映射
@@ -153,17 +155,19 @@ public class RouteRegistry {
 
     private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes) throws NoSuchMethodException {
         if (parameterTypes == null || parameterTypes.length == 0) {
-            // 查找无参方法
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals(methodName)) {
                     return method;
                 }
             }
         } else {
-            // 根据参数类型查找
             Class<?>[] paramClasses = new Class<?>[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
-                paramClasses[i] = loadClass(parameterTypes[i]);
+                try {
+                    paramClasses[i] = loadClass(parameterTypes[i]);
+                } catch (ClassNotFoundException e) {
+                    throw new RuntimeException("Class not found: " + parameterTypes[i], e);
+                }
             }
             return clazz.getMethod(methodName, paramClasses);
         }
@@ -171,6 +175,11 @@ public class RouteRegistry {
     }
 
     private RequestMappingInfo createMappingInfo(RouteDefinition routeDef) {
+        // 创建 BuilderConfiguration 并设置 PathPatternParser
+        RequestMappingInfo.BuilderConfiguration config = new RequestMappingInfo.BuilderConfiguration();
+        config.setPatternParser(new PathPatternParser());
+
+        // 使用 builder() 方法创建，这是 Spring Boot 2.7 兼容的方式
         RequestMappingInfo.Builder builder = RequestMappingInfo
                 .paths(routeDef.getPath())
                 .methods(RequestMethod.valueOf(routeDef.getMethod().toUpperCase()));
@@ -191,11 +200,18 @@ public class RouteRegistry {
             builder.headers(routeDef.getHeaders());
         }
 
+        // 设置 options 以确保与 Spring Boot 2.7 兼容
+        builder.options(config);
+
         return builder.build();
     }
 
     private Class<?> loadClass(String className) throws ClassNotFoundException {
-        return Class.forName(className);
+        try {
+            return Class.forName(className);
+        } catch (ClassNotFoundException e) {
+            throw new RuntimeException("Class not found: " + className, e);
+        }
     }
 
     /**
