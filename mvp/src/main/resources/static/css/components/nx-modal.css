@@ -1,0 +1,188 @@
+/**
+ * NX Modal Component
+ * 弹窗组件样式
+ */
+
+.nx-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--nx-bg-overlay);
+  z-index: var(--nx-z-index-modal-backdrop);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--nx-transition-normal);
+}
+
+.nx-modal-backdrop--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nx-modal {
+  background: var(--nx-bg-primary);
+  border-radius: var(--nx-radius-xl);
+  box-shadow: var(--nx-shadow-2xl);
+  max-width: 90vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  transform: scale(0.95);
+  transition: var(--nx-transition-normal);
+}
+
+.nx-modal-backdrop--visible .nx-modal {
+  transform: scale(1);
+}
+
+.nx-modal--sm { width: 400px; }
+.nx-modal--md { width: 560px; }
+.nx-modal--lg { width: 720px; }
+.nx-modal--xl { width: 900px; }
+.nx-modal--full { width: 95vw; height: 95vh; }
+
+.nx-modal__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nx-space-5);
+  border-bottom: 1px solid var(--nx-border-color-light);
+}
+
+.nx-modal__title {
+  font-size: var(--nx-font-size-lg);
+  font-weight: var(--nx-font-weight-semibold);
+  color: var(--nx-text-primary);
+  margin: 0;
+}
+
+.nx-modal__close {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--nx-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nx-text-tertiary);
+  transition: var(--nx-transition-normal);
+}
+
+.nx-modal__close:hover {
+  background: var(--nx-bg-hover);
+  color: var(--nx-text-primary);
+}
+
+.nx-modal__body {
+  flex: 1;
+  padding: var(--nx-space-5);
+  overflow-y: auto;
+}
+
+.nx-modal__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--nx-space-3);
+  padding: var(--nx-space-4) var(--nx-space-5);
+  border-top: 1px solid var(--nx-border-color-light);
+  background: var(--nx-bg-secondary);
+  border-radius: 0 0 var(--nx-radius-xl) var(--nx-radius-xl);
+}
+
+/* Drawer */
+.nx-drawer-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: var(--nx-bg-overlay);
+  z-index: var(--nx-z-index-modal-backdrop);
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--nx-transition-normal);
+}
+
+.nx-drawer-backdrop--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.nx-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 400px;
+  background: var(--nx-bg-primary);
+  box-shadow: var(--nx-shadow-2xl);
+  z-index: var(--nx-z-index-modal);
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: var(--nx-transition-normal);
+}
+
+.nx-drawer-backdrop--visible .nx-drawer {
+  transform: translateX(0);
+}
+
+.nx-drawer--lg { width: 560px; }
+.nx-drawer--full { width: 100%; }
+
+.nx-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--nx-space-4) var(--nx-space-5);
+  border-bottom: 1px solid var(--nx-border-color-light);
+}
+
+.nx-drawer__title {
+  font-size: var(--nx-font-size-lg);
+  font-weight: var(--nx-font-weight-semibold);
+  color: var(--nx-text-primary);
+  margin: 0;
+}
+
+.nx-drawer__close {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border: none;
+  border-radius: var(--nx-radius-md);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--nx-text-tertiary);
+  transition: var(--nx-transition-normal);
+}
+
+.nx-drawer__close:hover {
+  background: var(--nx-bg-hover);
+  color: var(--nx-text-primary);
+}
+
+.nx-drawer__body {
+  flex: 1;
+  padding: var(--nx-space-5);
+  overflow-y: auto;
+}
+
+.nx-drawer__footer {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--nx-space-3);
+  padding: var(--nx-space-4) var(--nx-space-5);
+  border-top: 1px solid var(--nx-border-color-light);
+}

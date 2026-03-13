@@ -1,0 +1,225 @@
+/**
+ * NX Page Layout
+ * 页面布局样式
+ */
+
+.nx-page {
+  display: flex;
+  min-height: 100vh;
+  background: var(--nx-bg-secondary);
+}
+
+.nx-page__main {
+  flex: 1;
+  margin-left: var(--nx-sidebar-width, 260px);
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  transition: var(--nx-transition-normal);
+}
+
+.nx-page--sidebar-collapsed .nx-page__main {
+  margin-left: var(--nx-sidebar-collapsed-width, 64px);
+}
+
+.nx-page__content {
+  flex: 1;
+  padding: var(--nx-space-6);
+  overflow-y: auto;
+}
+
+.nx-page__header {
+  margin-bottom: var(--nx-space-6);
+}
+
+.nx-page__title {
+  font-size: var(--nx-font-size-2xl);
+  font-weight: var(--nx-font-weight-semibold);
+  color: var(--nx-text-primary);
+  margin: 0 0 var(--nx-space-2) 0;
+}
+
+.nx-page__subtitle {
+  font-size: var(--nx-font-size-md);
+  color: var(--nx-text-secondary);
+  margin: 0;
+}
+
+.nx-page__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-3);
+  margin-bottom: var(--nx-space-6);
+}
+
+.nx-page__body {
+  background: var(--nx-bg-primary);
+  border-radius: var(--nx-radius-lg);
+  padding: var(--nx-space-6);
+  box-shadow: var(--nx-shadow-sm);
+  border: 1px solid var(--nx-border-color-light);
+}
+
+.nx-page__footer {
+  margin-top: var(--nx-space-6);
+  padding-top: var(--nx-space-6);
+  border-top: 1px solid var(--nx-border-color-light);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--nx-space-3);
+}
+
+/* Grid Layout */
+.nx-grid {
+  display: grid;
+  gap: var(--nx-space-6);
+}
+
+.nx-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.nx-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.nx-grid--4 {
+  grid-template-columns: repeat(4, 1fr);
+}
+
+.nx-grid--auto {
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+/* Flex Layout */
+.nx-flex {
+  display: flex;
+}
+
+.nx-flex--center {
+  align-items: center;
+  justify-content: center;
+}
+
+.nx-flex--between {
+  align-items: center;
+  justify-content: space-between;
+}
+
+.nx-flex--column {
+  flex-direction: column;
+}
+
+.nx-flex--wrap {
+  flex-wrap: wrap;
+}
+
+.nx-flex__item {
+  flex: 1;
+}
+
+.nx-flex__item--fixed {
+  flex: none;
+}
+
+/* Section */
+.nx-section {
+  margin-bottom: var(--nx-space-8);
+}
+
+.nx-section__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: var(--nx-space-4);
+}
+
+.nx-section__title {
+  font-size: var(--nx-font-size-lg);
+  font-weight: var(--nx-font-weight-semibold);
+  color: var(--nx-text-primary);
+  margin: 0;
+}
+
+/* Divider */
+.nx-divider {
+  height: 1px;
+  background: var(--nx-border-color-light);
+  margin: var(--nx-space-6) 0;
+}
+
+.nx-divider--vertical {
+  width: 1px;
+  height: auto;
+  margin: 0 var(--nx-space-4);
+}
+
+/* Empty State */
+.nx-empty {
+  text-align: center;
+  padding: var(--nx-space-12) var(--nx-space-6);
+}
+
+.nx-empty__icon {
+  font-size: 48px;
+  color: var(--nx-text-tertiary);
+  margin-bottom: var(--nx-space-4);
+}
+
+.nx-empty__title {
+  font-size: var(--nx-font-size-lg);
+  font-weight: var(--nx-font-weight-medium);
+  color: var(--nx-text-primary);
+  margin: 0 0 var(--nx-space-2) 0;
+}
+
+.nx-empty__description {
+  font-size: var(--nx-font-size-md);
+  color: var(--nx-text-secondary);
+  margin: 0 0 var(--nx-space-6) 0;
+}
+
+/* Loading */
+.nx-loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--nx-space-8);
+}
+
+.nx-loading__spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid var(--nx-border-color);
+  border-top-color: var(--nx-color-primary);
+  border-radius: 50%;
+  animation: nx-spin 0.8s linear infinite;
+}
+
+@keyframes nx-spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .nx-grid--4 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .nx-page__main {
+    margin-left: 0;
+  }
+  
+  .nx-page__content {
+    padding: var(--nx-space-4);
+  }
+  
+  .nx-grid--2,
+  .nx-grid--3,
+  .nx-grid--4 {
+    grid-template-columns: 1fr;
+  }
+}
