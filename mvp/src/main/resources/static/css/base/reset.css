@@ -1,0 +1,119 @@
+/**
+ * NX Reset Styles
+ * 基础重置样式
+ */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 16px;
+  line-height: 1.5;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  font-family: var(--nx-font-family);
+  font-size: var(--nx-font-size-md);
+  line-height: var(--nx-line-height-normal);
+  color: var(--nx-text-primary);
+  background-color: var(--nx-bg-secondary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+a {
+  color: var(--nx-color-primary);
+  text-decoration: none;
+  transition: var(--nx-transition-normal);
+}
+
+a:hover {
+  color: var(--nx-color-primary-hover);
+}
+
+img,
+svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+button,
+input,
+optgroup,
+select,
+textarea {
+  font-family: inherit;
+  font-size: inherit;
+  line-height: inherit;
+}
+
+button {
+  cursor: pointer;
+  background: transparent;
+  border: none;
+}
+
+ul,
+ol {
+  list-style: none;
+}
+
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-weight: var(--nx-font-weight-semibold);
+  line-height: var(--nx-line-height-tight);
+}
+
+h1 { font-size: var(--nx-font-size-4xl); }
+h2 { font-size: var(--nx-font-size-3xl); }
+h3 { font-size: var(--nx-font-size-2xl); }
+h4 { font-size: var(--nx-font-size-xl); }
+h5 { font-size: var(--nx-font-size-lg); }
+h6 { font-size: var(--nx-font-size-md); }
+
+p {
+  margin-bottom: var(--nx-space-4);
+}
+
+code,
+pre,
+kbd,
+samp {
+  font-family: var(--nx-font-family-mono);
+  font-size: var(--nx-font-size-sm);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--nx-bg-secondary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--nx-gray-300);
+  border-radius: var(--nx-radius-full);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--nx-gray-400);
+}
+
+::selection {
+  background: var(--nx-color-primary-light);
+  color: var(--nx-color-primary-dark);
+}

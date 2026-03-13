@@ -1,0 +1,146 @@
+/**
+ * NX Card Component
+ * 卡片组件样式
+ */
+
+.nx-card {
+  background: var(--nx-bg-primary);
+  border-radius: var(--nx-radius-lg);
+  box-shadow: var(--nx-shadow-sm);
+  border: 1px solid var(--nx-border-color-light);
+  overflow: hidden;
+  transition: var(--nx-transition-normal);
+}
+
+.nx-card--hover:hover {
+  box-shadow: var(--nx-shadow-md);
+  transform: translateY(-2px);
+}
+
+.nx-card--clickable {
+  cursor: pointer;
+}
+
+.nx-card--clickable:hover {
+  box-shadow: var(--nx-shadow-md);
+}
+
+.nx-card__header {
+  padding: var(--nx-space-4) var(--nx-space-5);
+  border-bottom: 1px solid var(--nx-border-color-light);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--nx-space-4);
+}
+
+.nx-card__title {
+  font-size: var(--nx-font-size-lg);
+  font-weight: var(--nx-font-weight-semibold);
+  color: var(--nx-text-primary);
+  margin: 0;
+}
+
+.nx-card__subtitle {
+  font-size: var(--nx-font-size-sm);
+  color: var(--nx-text-secondary);
+  margin-top: var(--nx-space-1);
+}
+
+.nx-card__actions {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-2);
+}
+
+.nx-card__body {
+  padding: var(--nx-space-5);
+}
+
+.nx-card__footer {
+  padding: var(--nx-space-4) var(--nx-space-5);
+  border-top: 1px solid var(--nx-border-color-light);
+  background: var(--nx-bg-secondary);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--nx-space-3);
+}
+
+/* 卡片变体 */
+.nx-card--flat {
+  box-shadow: none;
+  border: 1px solid var(--nx-border-color);
+}
+
+.nx-card--bordered {
+  border: 2px solid var(--nx-border-color);
+}
+
+.nx-card--primary {
+  border-color: var(--nx-color-primary);
+  border-width: 2px;
+}
+
+.nx-card--success {
+  border-color: var(--nx-color-success);
+  border-width: 2px;
+}
+
+.nx-card--danger {
+  border-color: var(--nx-color-danger);
+  border-width: 2px;
+}
+
+/* 统计卡片 */
+.nx-stat-card {
+  display: flex;
+  align-items: center;
+  gap: var(--nx-space-4);
+  padding: var(--nx-space-5);
+}
+
+.nx-stat-card__icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--nx-radius-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  flex-shrink: 0;
+}
+
+.nx-stat-card__icon--primary {
+  background: var(--nx-color-primary-light);
+  color: var(--nx-color-primary);
+}
+
+.nx-stat-card__icon--success {
+  background: var(--nx-color-success-light);
+  color: var(--nx-color-success);
+}
+
+.nx-stat-card__icon--danger {
+  background: var(--nx-color-danger-light);
+  color: var(--nx-color-danger);
+}
+
+.nx-stat-card__icon--warning {
+  background: var(--nx-color-warning-light);
+  color: var(--nx-color-warning);
+}
+
+.nx-stat-card__info h3 {
+  font-size: var(--nx-font-size-3xl);
+  font-weight: var(--nx-font-weight-bold);
+  color: var(--nx-text-primary);
+  margin: 0;
+  line-height: 1.2;
+}
+
+.nx-stat-card__info p {
+  font-size: var(--nx-font-size-sm);
+  color: var(--nx-text-secondary);
+  margin: var(--nx-space-1) 0 0 0;
+}

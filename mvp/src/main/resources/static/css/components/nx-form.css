@@ -1,0 +1,231 @@
+/**
+ * NX Form Component
+ * 表单组件样式
+ */
+
+.nx-form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nx-space-4);
+}
+
+.nx-form--inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: flex-end;
+}
+
+.nx-form-group {
+  display: flex;
+  flex-direction: column;
+  gap: var(--nx-space-2);
+}
+
+.nx-form-group--horizontal {
+  flex-direction: row;
+  align-items: center;
+}
+
+.nx-form-label {
+  display: block;
+  font-size: var(--nx-font-size-sm);
+  font-weight: var(--nx-font-weight-medium);
+  color: var(--nx-text-primary);
+}
+
+.nx-form-label--required::after {
+  content: ' *';
+  color: var(--nx-color-danger);
+}
+
+.nx-form-hint {
+  font-size: var(--nx-font-size-xs);
+  color: var(--nx-text-tertiary);
+  margin-top: var(--nx-space-1);
+}
+
+.nx-form-error {
+  font-size: var(--nx-font-size-xs);
+  color: var(--nx-color-danger);
+  margin-top: var(--nx-space-1);
+}
+
+/* 输入框 */
+.nx-input {
+  width: 100%;
+  padding: var(--nx-space-2) var(--nx-space-3);
+  font-family: var(--nx-font-family);
+  font-size: var(--nx-font-size-md);
+  line-height: 1.5;
+  color: var(--nx-text-primary);
+  background: var(--nx-bg-primary);
+  border: 1px solid var(--nx-border-color);
+  border-radius: var(--nx-radius-md);
+  transition: var(--nx-transition-normal);
+}
+
+.nx-input:focus {
+  outline: none;
+  border-color: var(--nx-color-primary);
+  box-shadow: var(--nx-shadow-focus);
+}
+
+.nx-input::placeholder {
+  color: var(--nx-text-tertiary);
+}
+
+.nx-input:disabled {
+  background: var(--nx-bg-secondary);
+  color: var(--nx-text-disabled);
+  cursor: not-allowed;
+}
+
+.nx-input--error {
+  border-color: var(--nx-color-danger);
+}
+
+.nx-input--error:focus {
+  box-shadow: 0 0 0 3px var(--nx-color-danger-light);
+}
+
+.nx-input--sm {
+  padding: var(--nx-space-1) var(--nx-space-2);
+  font-size: var(--nx-font-size-sm);
+}
+
+.nx-input--lg {
+  padding: var(--nx-space-3) var(--nx-space-4);
+  font-size: var(--nx-font-size-lg);
+}
+
+/* 文本域 */
+.nx-textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* 选择框 */
+.nx-select {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right var(--nx-space-2) center;
+  background-repeat: no-repeat;
+  background-size: 20px;
+  padding-right: var(--nx-space-8);
+  cursor: pointer;
+}
+
+/* 复选框和单选框 */
+.nx-checkbox,
+.nx-radio {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nx-space-2);
+  cursor: pointer;
+  user-select: none;
+}
+
+.nx-checkbox__input,
+.nx-radio__input {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+  accent-color: var(--nx-color-primary);
+}
+
+.nx-checkbox__label,
+.nx-radio__label {
+  font-size: var(--nx-font-size-md);
+  color: var(--nx-text-primary);
+}
+
+/* 开关 */
+.nx-switch {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--nx-space-2);
+  cursor: pointer;
+}
+
+.nx-switch__track {
+  width: 44px;
+  height: 24px;
+  background: var(--nx-gray-300);
+  border-radius: var(--nx-radius-full);
+  transition: var(--nx-transition-normal);
+  position: relative;
+}
+
+.nx-switch__thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 20px;
+  height: 20px;
+  background: var(--nx-color-white);
+  border-radius: 50%;
+  transition: var(--nx-transition-normal);
+  box-shadow: var(--nx-shadow-sm);
+}
+
+.nx-switch__input {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.nx-switch__input:checked + .nx-switch__track {
+  background: var(--nx-color-primary);
+}
+
+.nx-switch__input:checked + .nx-switch__track .nx-switch__thumb {
+  left: 22px;
+}
+
+.nx-switch__input:disabled + .nx-switch__track {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* 输入框组 */
+.nx-input-group {
+  display: flex;
+}
+
+.nx-input-group .nx-input {
+  border-radius: 0;
+}
+
+.nx-input-group .nx-input:first-child {
+  border-top-left-radius: var(--nx-radius-md);
+  border-bottom-left-radius: var(--nx-radius-md);
+}
+
+.nx-input-group .nx-input:last-child {
+  border-top-right-radius: var(--nx-radius-md);
+  border-bottom-right-radius: var(--nx-radius-md);
+}
+
+.nx-input-group__addon {
+  padding: var(--nx-space-2) var(--nx-space-3);
+  background: var(--nx-bg-secondary);
+  border: 1px solid var(--nx-border-color);
+  color: var(--nx-text-secondary);
+  font-size: var(--nx-font-size-md);
+  display: flex;
+  align-items: center;
+}
+
+.nx-input-group__addon:first-child {
+  border-right: none;
+  border-top-left-radius: var(--nx-radius-md);
+  border-bottom-left-radius: var(--nx-radius-md);
+}
+
+.nx-input-group__addon:last-child {
+  border-left: none;
+  border-top-right-radius: var(--nx-radius-md);
+  border-bottom-right-radius: var(--nx-radius-md);
+}

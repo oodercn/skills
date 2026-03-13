@@ -1,0 +1,220 @@
+/**
+ * NX CSS Variables
+ * 统一前缀: --nx-
+ * 版本: 2.3.1
+ */
+
+:root {
+  /* ========== 颜色系统 ========== */
+  
+  /* 主色调 */
+  --nx-color-primary: #667eea;
+  --nx-color-primary-hover: #5a6fd6;
+  --nx-color-primary-light: rgba(102, 126, 234, 0.1);
+  --nx-color-primary-dark: #4c5dc7;
+  
+  /* 功能色 */
+  --nx-color-success: #10b981;
+  --nx-color-success-light: #d1fae5;
+  --nx-color-success-dark: #059669;
+  
+  --nx-color-danger: #ef4444;
+  --nx-color-danger-light: #fee2e2;
+  --nx-color-danger-dark: #dc2626;
+  
+  --nx-color-warning: #f59e0b;
+  --nx-color-warning-light: #fef3c7;
+  --nx-color-warning-dark: #d97706;
+  
+  --nx-color-info: #3b82f6;
+  --nx-color-info-light: #dbeafe;
+  --nx-color-info-dark: #2563eb;
+  
+  /* 中性色 */
+  --nx-color-white: #ffffff;
+  --nx-color-black: #000000;
+  --nx-color-transparent: transparent;
+  
+  /* 灰度 */
+  --nx-gray-50: #f9fafb;
+  --nx-gray-100: #f3f4f6;
+  --nx-gray-200: #e5e7eb;
+  --nx-gray-300: #d1d5db;
+  --nx-gray-400: #9ca3af;
+  --nx-gray-500: #6b7280;
+  --nx-gray-600: #4b5563;
+  --nx-gray-700: #374151;
+  --nx-gray-800: #1f2937;
+  --nx-gray-900: #111827;
+  
+  /* ========== 语义化颜色 ========== */
+  
+  /* 背景 */
+  --nx-bg-primary: #ffffff;
+  --nx-bg-secondary: #f8f9fa;
+  --nx-bg-tertiary: #f0f0f0;
+  --nx-bg-elevated: #ffffff;
+  --nx-bg-overlay: rgba(0, 0, 0, 0.5);
+  --nx-bg-hover: rgba(0, 0, 0, 0.04);
+  --nx-bg-active: rgba(0, 0, 0, 0.08);
+  --nx-bg-selected: var(--nx-color-primary-light);
+  
+  /* 文本 */
+  --nx-text-primary: #1a1a2e;
+  --nx-text-secondary: #666666;
+  --nx-text-tertiary: #999999;
+  --nx-text-disabled: #c0c0c0;
+  --nx-text-inverse: #ffffff;
+  
+  /* 边框 */
+  --nx-border-color: #e0e0e0;
+  --nx-border-color-light: #eeeeee;
+  --nx-border-color-dark: #d0d0d0;
+  --nx-border-color-focus: var(--nx-color-primary);
+  
+  /* ========== 间距系统 (4px 基准) ========== */
+  
+  --nx-space-0: 0;
+  --nx-space-1: 4px;
+  --nx-space-2: 8px;
+  --nx-space-3: 12px;
+  --nx-space-4: 16px;
+  --nx-space-5: 20px;
+  --nx-space-6: 24px;
+  --nx-space-8: 32px;
+  --nx-space-10: 40px;
+  --nx-space-12: 48px;
+  --nx-space-16: 64px;
+  --nx-space-20: 80px;
+  --nx-space-24: 96px;
+  
+  /* ========== 圆角系统 ========== */
+  
+  --nx-radius-none: 0;
+  --nx-radius-sm: 4px;
+  --nx-radius-md: 8px;
+  --nx-radius-lg: 12px;
+  --nx-radius-xl: 16px;
+  --nx-radius-2xl: 20px;
+  --nx-radius-full: 9999px;
+  
+  /* ========== 阴影系统 ========== */
+  
+  --nx-shadow-none: none;
+  --nx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --nx-shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --nx-shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.15);
+  --nx-shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.2);
+  --nx-shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --nx-shadow-inner: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+  --nx-shadow-focus: 0 0 0 3px var(--nx-color-primary-light);
+  
+  /* ========== 字体系统 ========== */
+  
+  --nx-font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --nx-font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
+  
+  --nx-font-size-xs: 12px;
+  --nx-font-size-sm: 13px;
+  --nx-font-size-md: 14px;
+  --nx-font-size-lg: 16px;
+  --nx-font-size-xl: 18px;
+  --nx-font-size-2xl: 20px;
+  --nx-font-size-3xl: 24px;
+  --nx-font-size-4xl: 28px;
+  --nx-font-size-5xl: 32px;
+  
+  --nx-font-weight-normal: 400;
+  --nx-font-weight-medium: 500;
+  --nx-font-weight-semibold: 600;
+  --nx-font-weight-bold: 700;
+  
+  --nx-line-height-tight: 1.25;
+  --nx-line-height-normal: 1.5;
+  --nx-line-height-relaxed: 1.75;
+  
+  /* ========== 过渡动画 ========== */
+  
+  --nx-transition-none: none;
+  --nx-transition-fast: all 0.1s ease;
+  --nx-transition-normal: all 0.2s ease;
+  --nx-transition-slow: all 0.3s ease;
+  --nx-transition-slower: all 0.5s ease;
+  
+  /* ========== Z-Index 层级 ========== */
+  
+  --nx-z-index-dropdown: 1000;
+  --nx-z-index-sticky: 1020;
+  --nx-z-index-fixed: 1030;
+  --nx-z-index-modal-backdrop: 1040;
+  --nx-z-index-modal: 1050;
+  --nx-z-index-popover: 1060;
+  --nx-z-index-tooltip: 1070;
+  --nx-z-index-toast: 1080;
+  
+  /* ========== 布局尺寸 ========== */
+  
+  --nx-sidebar-width: 260px;
+  --nx-sidebar-collapsed-width: 64px;
+  --nx-header-height: 60px;
+  --nx-footer-height: 48px;
+  --nx-page-max-width: 1200px;
+  --nx-card-min-width: 280px;
+  
+  /* ========== 断点 ========== */
+  
+  --nx-breakpoint-xs: 480px;
+  --nx-breakpoint-sm: 640px;
+  --nx-breakpoint-md: 768px;
+  --nx-breakpoint-lg: 1024px;
+  --nx-breakpoint-xl: 1280px;
+  --nx-breakpoint-2xl: 1536px;
+}
+
+/* ========== 深色主题 ========== */
+
+[data-theme="dark"],
+.nx-theme--dark {
+  --nx-bg-primary: #121212;
+  --nx-bg-secondary: #1e1e1e;
+  --nx-bg-tertiary: #2a2a2a;
+  --nx-bg-elevated: #1e1e1e;
+  --nx-bg-hover: rgba(255, 255, 255, 0.05);
+  --nx-bg-active: rgba(255, 255, 255, 0.1);
+  
+  --nx-text-primary: #ffffff;
+  --nx-text-secondary: #a0a0a0;
+  --nx-text-tertiary: #707070;
+  --nx-text-disabled: #505050;
+  
+  --nx-border-color: #2a2a2a;
+  --nx-border-color-light: #333333;
+  --nx-border-color-dark: #1e1e1e;
+  
+  --nx-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --nx-shadow-md: 0 4px 6px rgba(0, 0, 0, 0.4);
+  --nx-shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.5);
+  --nx-shadow-xl: 0 20px 25px rgba(0, 0, 0, 0.6);
+}
+
+/* ========== 兼容层（过渡期使用） ========== */
+
+:root {
+  --ns-primary: var(--nx-color-primary);
+  --ns-success: var(--nx-color-success);
+  --ns-danger: var(--nx-color-danger);
+  --ns-warning: var(--nx-color-warning);
+  --ns-info: var(--nx-color-info);
+  
+  --nexus-primary: var(--nx-color-primary);
+  --nexus-success: var(--nx-color-success);
+  --nexus-danger: var(--nx-color-danger);
+  --nexus-warning: var(--nx-color-warning);
+  --nexus-info: var(--nx-color-info);
+  
+  --ooder-primary: var(--nx-color-primary);
+  --ooder-success: var(--nx-color-success);
+  --ooder-danger: var(--nx-color-danger);
+  --ooder-warning: var(--nx-color-warning);
+  --ooder-info: var(--nx-color-info);
+}
