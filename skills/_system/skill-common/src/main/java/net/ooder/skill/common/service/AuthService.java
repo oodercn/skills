@@ -73,12 +73,21 @@ public class AuthService {
 
         log.info("[login] Login attempt: username={}, role={}", username, requestedRole);
 
-        if (username == null || password == null) {
-            log.warn("[login] Login failed: missing credentials");
+        if (username == null || username.isEmpty()) {
+            log.warn("[login] Login failed: missing username");
             return null;
         }
 
-        if (!"admin".equals(username) && !"user".equals(username)) {
+        if (password == null || password.isEmpty()) {
+            log.warn("[login] Login failed: missing password");
+            return null;
+        }
+
+        Set<String> allowedUsers = new HashSet<>(Arrays.asList(
+            "admin", "user", "installer", "leader", "collaborator"
+        ));
+        
+        if (!allowedUsers.contains(username.toLowerCase())) {
             log.warn("[login] Login failed for user: {}", username);
             return null;
         }
