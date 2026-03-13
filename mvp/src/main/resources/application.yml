@@ -6,6 +6,9 @@ spring:
     name: mvp-core
   profiles:
     active: micro
+  web:
+    resources:
+      static-locations: classpath:/static/
 
 app:
   storage:
