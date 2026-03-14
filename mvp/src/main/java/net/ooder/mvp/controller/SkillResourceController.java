@@ -15,10 +15,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 @RestController
 @RequestMapping("/console/skills")
@@ -47,6 +50,8 @@ public class SkillResourceController {
         CONTENT_TYPES.put("eot", "application/vnd.ms-fontobject");
     }
 
+    private Properties registryProps;
+
     @GetMapping("/{skillId}/**")
     public ResponseEntity<byte[]> getSkillResource(
             @PathVariable String skillId,
@@ -64,38 +69,88 @@ public class SkillResourceController {
 
         try {
             PluginClassLoader classLoader = pluginManager.getClassLoader(skillId);
-            if (classLoader == null) {
-                log.warn("Skill not found: {}", skillId);
-                return ResponseEntity.notFound().build();
-            }
-
-            URL resourceUrl = classLoader.getResource(resourcePath);
-
-            if (resourceUrl == null) {
-                log.warn("Resource not found: {}", resourcePath);
-                return ResponseEntity.notFound().build();
-            }
-
-            try (InputStream is = resourceUrl.openStream()) {
-                java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
-                byte[] buffer = new byte[4096];
-                int len;
-                while ((len = is.read(buffer)) != -1) {
-                    baos.write(buffer, 0, len);
+            if (classLoader != null) {
+                URL resourceUrl = classLoader.getResource(resourcePath);
+                if (resourceUrl != null) {
+                    try (InputStream is = resourceUrl.openStream()) {
+                        return readResource(resourcePath, is);
+                    }
                 }
-                byte[] content = baos.toByteArray();
-
-                HttpHeaders headers = new HttpHeaders();
-                String contentType = getContentType(resourcePath);
-                headers.setContentType(MediaType.parseMediaType(contentType));
-
-                return new ResponseEntity<>(content, headers, HttpStatus.OK);
             }
+
+            ResponseEntity<byte[]> sourceResource = loadFromSourceDirectory(skillId, resourcePath);
+            if (sourceResource != null) {
+                return sourceResource;
+            }
+
+            log.warn("Resource not found: {}/{}", skillId, resourcePath);
+            return ResponseEntity.notFound().build();
 
         } catch (Exception e) {
             log.error("Failed to load resource: {}/{}", skillId, resourcePath, e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    private ResponseEntity<byte[]> loadFromSourceDirectory(String skillId, String resourcePath) {
+        if (registryProps == null) {
+            loadRegistry();
+        }
+        
+        if (registryProps == null) {
+            return null;
+        }
+        
+        String skillPath = registryProps.getProperty(skillId + ".path");
+        if (skillPath == null) {
+            log.debug("Skill path not found in registry: {}", skillId);
+            return null;
+        }
+        
+        File resourceFile = new File(skillPath, "src/main/resources/" + resourcePath);
+        if (!resourceFile.exists()) {
+            log.debug("Resource file not found: {}", resourceFile.getAbsolutePath());
+            return null;
+        }
+        
+        try (FileInputStream fis = new FileInputStream(resourceFile)) {
+            log.debug("Loading resource from source: {}", resourceFile.getAbsolutePath());
+            return readResource(resourcePath, fis);
+        } catch (Exception e) {
+            log.error("Failed to load resource from source: {}", resourceFile.getAbsolutePath(), e);
+            return null;
+        }
+    }
+
+    private void loadRegistry() {
+        File registryFile = new File("data/installed-skills/registry.properties");
+        if (!registryFile.exists()) {
+            return;
+        }
+        
+        try (FileInputStream fis = new FileInputStream(registryFile)) {
+            registryProps = new Properties();
+            registryProps.load(fis);
+            log.debug("Loaded registry with {} entries", registryProps.size());
+        } catch (Exception e) {
+            log.error("Failed to load registry", e);
+        }
+    }
+
+    private ResponseEntity<byte[]> readResource(String resourcePath, InputStream is) throws Exception {
+        java.io.ByteArrayOutputStream baos = new java.io.ByteArrayOutputStream();
+        byte[] buffer = new byte[4096];
+        int len;
+        while ((len = is.read(buffer)) != -1) {
+            baos.write(buffer, 0, len);
+        }
+        byte[] content = baos.toByteArray();
+
+        HttpHeaders headers = new HttpHeaders();
+        String contentType = getContentType(resourcePath);
+        headers.setContentType(MediaType.parseMediaType(contentType));
+
+        return new ResponseEntity<>(content, headers, HttpStatus.OK);
     }
 
     private String getContentType(String path) {
