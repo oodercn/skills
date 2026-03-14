@@ -7,12 +7,12 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-common-all</artifactId>
-        <version>2.3</version>
+        <version>2.3.1</version>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-s3</artifactId>
-    <version>2.3</version>
+    <version>2.3.1</version>
     <name>Skill VFS S3 - S3 Compatible Object Storage Implementation</name>
     <description>S3 compatible object storage implementation for OoderAgent VFS (supports MinIO, AWS S3, Aliyun OSS, Tencent COS)</description>
 
@@ -95,3 +95,4 @@
     </build>
 
 </project>
+

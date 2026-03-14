@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OODER Skills Console</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .loading-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            background: var(--ns-background);
+        }
+        .loading-logo {
+            font-size: 48px;
+            color: var(--ns-primary);
+            margin-bottom: 24px;
+        }
+        .loading-text {
+            color: var(--ns-text);
+            font-size: 18px;
+            opacity: 0.9;
+        }
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--ns-border);
+            border-top-color: var(--ns-primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-top: 24px;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-container">
+        <div class="loading-logo"><i class="ri-loader-4-line"></i></div>
+        <div class="loading-text">Loading Skills...</div>
+        <div class="loading-spinner"></div>
+    </div>
+    <script>
+        (function() {
+            fetch('/api/v1/menu')
+                .then(r => r.json())
+                .then(data => {
+                    if (data && data.data && data.data.length > 0) {
+                        const firstMenu = data.data[0];
+                        let targetUrl = firstMenu.url;
+                        
+                        if (firstMenu.children && firstMenu.children.length > 0) {
+                            targetUrl = firstMenu.children[0].url;
+                        }
+                        
+                        if (targetUrl && targetUrl !== '/' && targetUrl !== '/console/') {
+                            window.location.href = targetUrl;
+                        } else {
+                            showEmptyState();
+                        }
+                    } else {
+                        showEmptyState();
+                    }
+                })
+                .catch(err => {
+                    console.error('Failed to load menus:', err);
+                    showEmptyState();
+                });
+            
+            function showEmptyState() {
+                document.body.innerHTML = `
+                    <div class="nx-app">
+                        <div class="nx-empty-state" style="display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;background:var(--ns-background);">
+                            <i class="ri-inbox-line" style="font-size:64px;color:var(--ns-secondary);"></i>
+                            <h3 style="color:var(--ns-text);margin:16px 0;">No Skills Installed</h3>
+                            <p style="color:var(--ns-secondary);margin-bottom:24px;">Please install skills to get started.</p>
+                            <a href="/setup/" class="nx-btn nx-btn-primary">Go to Setup</a>
+                        </div>
+                    </div>
+                `;
+            }
+        })();
+    </script>
+</body>
+</html>

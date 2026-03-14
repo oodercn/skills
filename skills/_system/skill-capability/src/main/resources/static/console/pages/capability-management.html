@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>能力管理 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="nx-page__title">
+                        <h1><i class="ri-puzzle-line" aria-hidden="true"></i> 能力管理</h1>
+                        <p>管理系统能力，注册和配置能力提供者</p>
+                    </div>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
+                    <button class="nx-btn nx-btn--primary" onclick="CapabilityManager.showCreateDialog()">
+                        <i class="ri-add-line"></i> 注册能力
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-grid nx-grid-cols-3 nx-mb-6">
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--primary">
+                                <i class="ri-puzzle-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">总能力数</div>
+                                <div class="nx-stat-card__value" id="totalCount">0</div>
+                            </div>
+                        </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--success">
+                                <i class="ri-checkbox-circle-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">已激活</div>
+                                <div class="nx-stat-card__value" id="activeCount">0</div>
+                            </div>
+                        </div>
+                        <div class="nx-stat-card">
+                            <div class="nx-stat-card__icon nx-stat-card__icon--warning">
+                                <i class="ri-download-line"></i>
+                            </div>
+                            <div class="nx-stat-card__content">
+                                <div class="nx-stat-card__label">已安装</div>
+                                <div class="nx-stat-card__value" id="installedCount">0</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">能力列表</h3>
+                            <div class="nx-flex nx-gap-3">
+                                <input type="text" id="searchInput" placeholder="搜索能力..." class="nx-input" style="width: 200px;">
+                                <select id="typeFilter" class="nx-select">
+                                    <option value="">全部类型</option>
+                                    <option value="SCENE">场景能力</option>
+                                    <option value="SKILL">技能包</option>
+                                    <option value="TOOL">工具能力</option>
+                                    <option value="DRIVER">驱动能力</option>
+                                    <option value="LLM">LLM能力</option>
+                                </select>
+                                <select id="statusFilter" class="nx-select">
+                                    <option value="">全部状态</option>
+                                    <option value="REGISTERED">已注册</option>
+                                    <option value="INSTALLED">已安装</option>
+                                    <option value="ACTIVE">已激活</option>
+                                    <option value="INACTIVE">未激活</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="nx-card__body">
+                            <table class="nx-table">
+                                <thead>
+                                    <tr>
+                                        <th>ID</th>
+                                        <th>名称</th>
+                                        <th>类型</th>
+                                        <th>版本</th>
+                                        <th>状态</th>
+                                        <th>提供者</th>
+                                        <th>创建时间</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="capabilityList">
+                                    <tr>
+                                        <td colspan="8" style="text-align: center; padding: 40px;">加载中...</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+    const CapabilityManager = {
+        capabilities: [],
+        allCapabilities: [],
+        
+        async init() {
+            await this.loadCapabilities();
+            this.bindEvents();
+        },
+        
+        async loadCapabilities() {
+            try {
+                const response = await fetch('/api/v1/capabilities');
+                const result = await response.json();
+                
+                if (result.code === 200 || result.status === 'success') {
+                    this.capabilities = result.data || [];
+                    this.allCapabilities = [...this.capabilities];
+                    this.renderList();
+                    this.updateStats();
+                }
+            } catch (e) {
+                console.error('Failed to load capabilities:', e);
+                document.getElementById('capabilityList').innerHTML = 
+                    '<tr><td colspan="8" style="text-align: center; padding: 40px;">加载失败</td></tr>';
+            }
+        },
+        
+        renderList() {
+            const tbody = document.getElementById('capabilityList');
+            
+            if (this.capabilities.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 40px; color: var(--nx-text-tertiary);">暂无能力数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = this.capabilities.map(cap => `
+                <tr>
+                    <td><code style="font-size: 0.875rem;">${cap.capabilityId}</code></td>
+                    <td>${cap.name || '-'}</td>
+                    <td><span class="nx-badge">${cap.type || '-'}</span></td>
+                    <td>${cap.version || '-'}</td>
+                    <td><span class="nx-badge nx-badge--${this.getStatusClass(cap.status)}">${this.getStatusText(cap.status)}</span></td>
+                    <td>${cap.provider || '-'}</td>
+                    <td>${this.formatDate(cap.createdAt)}</td>
+                    <td>
+                        <div class="nx-flex nx-gap-2">
+                            <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="CapabilityManager.viewDetail('${cap.capabilityId}')" title="查看">
+                                <i class="ri-eye-line"></i>
+                            </button>
+                            <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="CapabilityManager.editCapability('${cap.capabilityId}')" title="编辑">
+                                <i class="ri-edit-line"></i>
+                            </button>
+                            <button class="nx-btn nx-btn--ghost nx-btn--sm nx-btn--danger" onclick="CapabilityManager.deleteCapability('${cap.capabilityId}')" title="删除">
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        },
+        
+        updateStats() {
+            document.getElementById('totalCount').textContent = this.allCapabilities.length;
+            document.getElementById('activeCount').textContent = 
+                this.allCapabilities.filter(c => c.status === 'ACTIVE').length;
+            document.getElementById('installedCount').textContent = 
+                this.allCapabilities.filter(c => c.status === 'INSTALLED').length;
+        },
+        
+        getStatusClass(status) {
+            const classes = {
+                'ACTIVE': 'success',
+                'INSTALLED': 'info',
+                'REGISTERED': 'warning',
+                'INACTIVE': 'default',
+                'ERROR': 'danger'
+            };
+            return classes[status] || 'default';
+        },
+        
+        getStatusText(status) {
+            const texts = {
+                'ACTIVE': '已激活',
+                'INSTALLED': '已安装',
+                'REGISTERED': '已注册',
+                'INACTIVE': '未激活',
+                'ERROR': '错误'
+            };
+            return texts[status] || status;
+        },
+        
+        formatDate(dateStr) {
+            if (!dateStr) return '-';
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('zh-CN');
+        },
+        
+        bindEvents() {
+            document.getElementById('searchInput').addEventListener('input', () => this.filterCapabilities());
+            document.getElementById('typeFilter').addEventListener('change', () => this.filterCapabilities());
+            document.getElementById('statusFilter').addEventListener('change', () => this.filterCapabilities());
+        },
+        
+        filterCapabilities() {
+            const keyword = document.getElementById('searchInput').value.toLowerCase();
+            const type = document.getElementById('typeFilter').value;
+            const status = document.getElementById('statusFilter').value;
+            
+            let filtered = [...this.allCapabilities];
+            
+            if (keyword) {
+                filtered = filtered.filter(c => 
+                    (c.name && c.name.toLowerCase().includes(keyword)) ||
+                    (c.capabilityId && c.capabilityId.toLowerCase().includes(keyword))
+                );
+            }
+            
+            if (type) {
+                filtered = filtered.filter(c => c.type === type);
+            }
+            
+            if (status) {
+                filtered = filtered.filter(c => c.status === status);
+            }
+            
+            this.capabilities = filtered;
+            this.renderList();
+        },
+        
+        showCreateDialog() {
+            alert('创建能力功能开发中...');
+        },
+        
+        viewDetail(id) {
+            window.location.href = `/console/pages/capability-detail.html?id=${id}`;
+        },
+        
+        editCapability(id) {
+            alert('编辑能力: ' + id);
+        },
+        
+        async deleteCapability(id) {
+            if (!confirm('确定要删除此能力吗？')) return;
+            
+            try {
+                const response = await fetch(`/api/v1/capabilities/${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                
+                if (result.code === 200 || result.status === 'success') {
+                    await this.loadCapabilities();
+                } else {
+                    alert('删除失败: ' + result.message);
+                }
+            } catch (e) {
+                alert('删除失败: ' + e.message);
+            }
+        }
+    };
+    
+    document.addEventListener('DOMContentLoaded', () => {
+        CapabilityManager.init();
+    });
+    </script>
+</body>
+</html>

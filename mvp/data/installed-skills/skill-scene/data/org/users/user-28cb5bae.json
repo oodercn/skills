@@ -1,0 +1,14 @@
+{
+  "userId" : "user-28cb5bae",
+  "username" : "installer",
+  "nickname" : "系统安装者",
+  "email" : "installer@ooder.local",
+  "phone" : null,
+  "status" : "active",
+  "token" : null,
+  "refreshToken" : null,
+  "roles" : [ "installer" ],
+  "roleIds" : null,
+  "orgId" : "root",
+  "orgName" : null
+}

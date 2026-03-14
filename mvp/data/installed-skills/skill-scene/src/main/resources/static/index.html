@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Ooder Skill Scene - 场景技能管理平台">
+    <meta name="theme-color" content="#1890ff">
+    <title>Ooder - 场景技能管理平台</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            width: 100%;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 48px;
+            color: white;
+        }
+        
+        .header h1 {
+            font-size: 3rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header h1 i {
+            margin-right: 12px;
+        }
+        
+        .header p {
+            font-size: 1.25rem;
+            opacity: 0.9;
+        }
+        
+        .nav-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 48px;
+        }
+        
+        .nav-card {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            text-decoration: none;
+            color: inherit;
+            transition: all 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+        }
+        
+        .nav-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+        }
+        
+        .nav-card .icon {
+            width: 72px;
+            height: 72px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+            font-size: 32px;
+            color: white;
+        }
+        
+        .nav-card.console .icon { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); }
+        .nav-card.templates .icon { background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%); }
+        .nav-card.discovery .icon { background: linear-gradient(135deg, #fc4a1a 0%, #f7b733 100%); }
+        .nav-card.api .icon { background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%); }
+        
+        .nav-card h3 {
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: #1a1a2e;
+        }
+        
+        .nav-card p {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .nav-card .arrow {
+            margin-top: 16px;
+            color: #1890ff;
+            font-size: 1.25rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        
+        .nav-card:hover .arrow {
+            opacity: 1;
+        }
+        
+        .quick-links {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 16px;
+            padding: 24px 32px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 16px;
+        }
+        
+        .quick-link {
+            color: white;
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            transition: background 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .quick-link:hover {
+            background: rgba(255,255,255,0.2);
+        }
+        
+        .quick-link i {
+            font-size: 1.1rem;
+        }
+        
+        .status-bar {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.95);
+            border-radius: 12px;
+            padding: 12px 20px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        
+        .status-dot {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #52c41a;
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        .version {
+            color: #999;
+            font-size: 0.85rem;
+        }
+        
+        @media (max-width: 768px) {
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .nav-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .status-bar {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="ri-robot-2-line"></i> Ooder</h1>
+            <p>场景技能管理平台 - 零配置安装，一键部署场景</p>
+        </div>
+        
+        <div class="nav-grid">
+            <a href="/console/index.html" class="nav-card console">
+                <div class="icon"><i class="ri-dashboard-3-line"></i></div>
+                <h3>管理控制台</h3>
+                <p>场景管理、能力绑定、模板部署、系统配置</p>
+                <i class="ri-arrow-right-line arrow"></i>
+            </a>
+            
+            <a href="/console/pages/template-management.html" class="nav-card templates">
+                <div class="icon"><i class="ri-layout-grid-line"></i></div>
+                <h3>场景模板</h3>
+                <p>一键部署知识问答、LLM助手等预置场景模板</p>
+                <i class="ri-arrow-right-line arrow"></i>
+            </a>
+            
+            <a href="/console/pages/capability-discovery.html" class="nav-card discovery">
+                <div class="icon"><i class="ri-compass-3-line"></i></div>
+                <h3>能力发现</h3>
+                <p>从Gitee/GitHub发现并安装新的技能组件</p>
+                <i class="ri-arrow-right-line arrow"></i>
+            </a>
+            
+            <a href="/swagger-ui.html" class="nav-card api">
+                <div class="icon"><i class="ri-code-s-slash-line"></i></div>
+                <h3>API 文档</h3>
+                <p>REST API接口文档与在线测试工具</p>
+                <i class="ri-arrow-right-line arrow"></i>
+            </a>
+        </div>
+        
+        <div class="quick-links">
+            <a href="/console/pages/my-scenes.html" class="quick-link">
+                <i class="ri-folder-line"></i> 我的场景
+            </a>
+            <a href="/console/pages/my-todos.html" class="quick-link">
+                <i class="ri-task-line"></i> 我的待办
+            </a>
+            <a href="/console/pages/capability-management.html" class="quick-link">
+                <i class="ri-puzzle-line"></i> 能力管理
+            </a>
+            <a href="/console/pages/scene-group-management.html" class="quick-link">
+                <i class="ri-team-line"></i> 场景群组
+            </a>
+            <a href="/actuator/health" class="quick-link">
+                <i class="ri-heart-pulse-line"></i> 健康检查
+            </a>
+        </div>
+    </div>
+    
+    <div class="status-bar">
+        <div class="status-dot"></div>
+        <span>服务运行中</span>
+        <span class="version">v2.3</span>
+    </div>
+</body>
+</html>

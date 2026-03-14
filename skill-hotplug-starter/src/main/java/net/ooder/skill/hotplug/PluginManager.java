@@ -1,6 +1,8 @@
 package net.ooder.skill.hotplug;
 
 import net.ooder.skill.hotplug.classloader.ClassLoaderManager;
+import net.ooder.skill.hotplug.classloader.PluginClassLoader;
+import net.ooder.skill.hotplug.config.ServiceDefinition;
 import net.ooder.skill.hotplug.config.SkillConfiguration;
 import net.ooder.skill.hotplug.exception.PluginException;
 import net.ooder.skill.hotplug.model.*;
@@ -213,6 +215,14 @@ public class PluginManager {
     public PluginInfo getSkillInfo(String skillId) {
         PluginContext context = activePlugins.get(skillId);
         return context != null ? toPluginInfo(context) : null;
+    }
+
+    /**
+     * 获取指定Skill的类加载器
+     */
+    public PluginClassLoader getClassLoader(String skillId) {
+        PluginContext context = activePlugins.get(skillId);
+        return context != null ? context.getClassLoader() : null;
     }
 
     /**

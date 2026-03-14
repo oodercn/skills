@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的能力 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/stat-cards.css">
+    <style>
+        .my-cap-page { padding: 20px; }
+        
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .page-title i { color: var(--nx-primary); }
+        
+        .page-subtitle {
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .category-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 20px;
+            padding: 12px;
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+        }
+        
+        .category-tab {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13px;
+            cursor: pointer;
+            background: var(--nx-bg);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            color: var(--nx-text-secondary);
+        }
+        
+        .category-tab:hover {
+            background: var(--nx-bg-hover);
+            border-color: var(--nx-border);
+        }
+        
+        .category-tab.active {
+            background: var(--nx-primary);
+            color: white;
+            border-color: var(--nx-primary);
+        }
+        
+        .category-tab i {
+            font-size: 16px;
+        }
+        
+        .category-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+        
+        .toolbar-left {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            padding: 8px 12px;
+            min-width: 280px;
+        }
+        
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        .search-box i { color: var(--nx-text-secondary); }
+        
+        .filter-group {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+        }
+        
+        .filter-label {
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+            font-weight: 500;
+        }
+        
+        .filter-chips {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .filter-chip {
+            padding: 6px 14px;
+            border-radius: 16px;
+            font-size: 13px;
+            cursor: pointer;
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            transition: all 0.2s;
+        }
+        
+        .filter-chip:hover { border-color: var(--nx-primary); }
+        .filter-chip.active { background: var(--nx-primary); color: white; border-color: var(--nx-primary); }
+        
+        .cap-table {
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+        
+        .cap-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .cap-table th {
+            background: var(--nx-bg);
+            padding: 14px 16px;
+            text-align: left;
+            font-weight: 500;
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .cap-table td {
+            padding: 16px;
+            border-bottom: 1px solid var(--nx-border);
+            vertical-align: middle;
+        }
+        
+        .cap-table tr:last-child td { border-bottom: none; }
+        .cap-table tr:hover td { background: var(--nx-bg-hover); }
+        
+        .cap-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .cap-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            flex-shrink: 0;
+        }
+        
+        .cap-icon.ownership-SIC { background: #fce7f3; color: #db2777; }
+        .cap-icon.ownership-IC { background: #d1fae5; color: #059669; }
+        .cap-icon.ownership-PC { background: #fef3c7; color: #d97706; }
+        .cap-icon.ownership-TOOL { background: #e0e7ff; color: #4f46e5; }
+        
+        .cap-name { font-weight: 500; }
+        .cap-id { font-size: 12px; color: var(--nx-text-secondary); font-family: monospace; }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .detail-panel {
+            position: fixed;
+            top: 0;
+            right: -520px;
+            width: 520px;
+            height: 100%;
+            background: var(--nx-bg-elevated);
+            border-left: 1px solid var(--nx-border);
+            box-shadow: -4px 0 20px rgba(0,0,0,0.1);
+            z-index: 1000;
+            transition: right 0.3s;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .detail-panel.open { right: 0; }
+        
+        .detail-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        
+        .detail-title { font-size: 18px; font-weight: 600; }
+        
+        .detail-body {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        
+        .detail-section { margin-bottom: 24px; }
+        .detail-section-title {
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--nx-text-secondary);
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .detail-row:last-child { border-bottom: none; }
+        .detail-row-label { color: var(--nx-text-secondary); }
+        .detail-row-value { font-weight: 500; }
+        
+        .binding-list {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .binding-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px;
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .binding-item:last-child { border-bottom: none; }
+        
+        .binding-info { display: flex; align-items: center; gap: 12px; }
+        .binding-icon { width: 32px; height: 32px; border-radius: 8px; background: var(--nx-primary-light); display: flex; align-items: center; justify-content: center; color: var(--nx-primary); }
+        .binding-name { font-weight: 500; font-size: 14px; }
+        .binding-scene { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.3);
+            z-index: 999;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .overlay.open { opacity: 1; visibility: visible; }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state-title { font-size: 16px; font-weight: 500; margin-bottom: 8px; }
+        .empty-state-desc { font-size: 14px; margin-bottom: 16px; }
+        
+        .scene-types-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 8px;
+        }
+        
+        .scene-type-tag {
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            background: var(--nx-bg);
+            color: var(--nx-text-secondary);
+        }
+        
+        .classification-info {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .classification-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .classification-row:last-child { border-bottom: none; }
+        .classification-label { color: var(--nx-text-secondary); font-size: 13px; }
+        .classification-value { font-weight: 500; font-size: 13px; }
+        
+        .info-tip {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 8px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: flex-start;
+            gap: 12px;
+        }
+        
+        .info-tip i {
+            color: #2563eb;
+            font-size: 18px;
+            margin-top: 2px;
+        }
+        
+        .info-tip-content {
+            flex: 1;
+        }
+        
+        .info-tip-title {
+            font-weight: 500;
+            color: #1e40af;
+            margin-bottom: 4px;
+        }
+        
+        .info-tip-desc {
+            font-size: 13px;
+            color: #3b82f6;
+        }
+        
+        .info-tip a {
+            color: #2563eb;
+            text-decoration: underline;
+        }
+
+        .feature-tag {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            background: var(--nx-bg);
+            color: var(--nx-text-secondary);
+            margin: 2px;
+        }
+
+        .feature-tag i {
+            font-size: 14px;
+        }
+
+        .features-grid {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 8px;
+        }
+
+        .bind-section {
+            background: var(--nx-bg);
+            border-radius: 8px;
+            padding: 16px;
+            margin-top: 16px;
+        }
+
+        .bind-title {
+            font-weight: 500;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bind-options {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .bind-option {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            background: var(--nx-bg-elevated);
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .bind-option:hover {
+            border-color: var(--nx-primary);
+        }
+
+        .bind-option.selected {
+            border-color: var(--nx-primary);
+            background: rgba(59, 130, 246, 0.05);
+        }
+
+        .bind-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--nx-border);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .bind-option.selected .bind-checkbox {
+            background: var(--nx-primary);
+            border-color: var(--nx-primary);
+        }
+
+        .bind-option.selected .bind-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 12px;
+        }
+
+        .bind-option-info {
+            flex: 1;
+        }
+
+        .bind-option-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .bind-option-desc {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+        }
+
+        .bind-action {
+            margin-top: 12px;
+            display: flex;
+            justify-content: flex-end;
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <div class="my-cap-page">
+                <header class="nx-page__header" style="border-bottom: none;">
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                            <i class="ri-menu-line"></i>
+                        </button>
+                        <div>
+                            <h2 class="page-title">
+                                <i class="ri-user-star-line"></i>
+                                我的能力
+                            </h2>
+                            <p class="page-subtitle">查看和管理已安装的能力</p>
+                        </div>
+                    </div>
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                            <i class="ri-sun-line"></i>
+                        </button>
+                        <div class="nx-relative">
+                            <div class="nx-page__user-menu" id="user-menu">
+                                <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                                <span class="nx-page__user-name" id="user-name">加载中...</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </div>
+                            <div class="nx-page__dropdown-menu" id="user-dropdown">
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                    <i class="ri-user-line"></i> 个人中心
+                                </div>
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                    <i class="ri-puzzle-line"></i> 我的能力
+                                </div>
+                                <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                    <i class="ri-logout-box-line"></i> 退出登录
+                                </div>
+                            </div>
+                        </div>
+                        <a href="/console/pages/capability-discovery.html" class="nx-btn nx-btn--secondary">
+                            <i class="ri-compass-discover-line"></i> 发现能力
+                        </a>
+                        <a href="/console/pages/capability-create.html" class="nx-btn nx-btn--primary">
+                            <i class="ri-add-line"></i> 新建能力
+                        </a>
+                    </div>
+                </header>
+                
+                <div class="stats-row">
+                    <div class="stat-card" data-category="all" onclick="filterByCategory('all')">
+                        <div class="stat-icon total"><i class="ri-flashlight-line"></i></div>
+                        <div class="stat-value" id="statTotal">0</div>
+                        <div class="stat-label">总能力数</div>
+                    </div>
+                    <div class="stat-card" onclick="filterByStatus('installed')">
+                        <div class="stat-icon installed"><i class="ri-download-cloud-line"></i></div>
+                        <div class="stat-value" id="statInstalled">0</div>
+                        <div class="stat-label">已安装</div>
+                    </div>
+                    <div class="stat-card" onclick="filterByStatus('active')">
+                        <div class="stat-icon active"><i class="ri-play-circle-line"></i></div>
+                        <div class="stat-value" id="statActive">0</div>
+                        <div class="stat-label">运行中</div>
+                    </div>
+                    <div class="stat-card" data-category="llm" onclick="filterByCategory('llm')">
+                        <div class="stat-icon llm"><i class="ri-robot-line"></i></div>
+                        <div class="stat-value" id="statLLM">0</div>
+                        <div class="stat-label">LLM</div>
+                        <div class="stat-desc">0x30 大语言模型</div>
+                    </div>
+                    <div class="stat-card" data-category="db" onclick="filterByCategory('db')">
+                        <div class="stat-icon db"><i class="ri-database-2-line"></i></div>
+                        <div class="stat-value" id="statDB">0</div>
+                        <div class="stat-label">数据库</div>
+                        <div class="stat-desc">0x28 数据存储</div>
+                    </div>
+                    <div class="stat-card" data-category="vfs" onclick="filterByCategory('vfs')">
+                        <div class="stat-icon vfs"><i class="ri-folder-line"></i></div>
+                        <div class="stat-value" id="statVFS">0</div>
+                        <div class="stat-label">文件存储</div>
+                        <div class="stat-desc">0x20 虚拟文件系统</div>
+                    </div>
+                    <div class="stat-card" data-category="know" onclick="filterByCategory('know')">
+                        <div class="stat-icon know"><i class="ri-book-line"></i></div>
+                        <div class="stat-value" id="statKnow">0</div>
+                        <div class="stat-label">知识库</div>
+                        <div class="stat-desc">0x38 RAG检索增强</div>
+                    </div>
+                </div>
+                
+                <div class="category-tabs" id="categoryTabs"></div>
+                
+                <div class="toolbar">
+                    <div class="toolbar-left">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                            <input type="text" placeholder="搜索能力名称或ID..." id="searchInput" oninput="searchKeyword=this.value;filterCapabilities()">
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">状态:</span>
+                            <div class="filter-chips" id="statusFilterChips">
+                                <span class="filter-chip active" data-status="all" onclick="filterByStatus('all')">全部</span>
+                                <span class="filter-chip" data-status="ENABLED" onclick="filterByStatus('ENABLED')">已启用</span>
+                                <span class="filter-chip" data-status="DISABLED" onclick="filterByStatus('DISABLED')">已停用</span>
+                                <span class="filter-chip" data-status="ERROR" onclick="filterByStatus('ERROR')">异常</span>
+                            </div>
+                        </div>
+                        <div class="filter-group">
+                            <span class="filter-label">类型:</span>
+                            <div class="filter-chips" id="typeFilterChips">
+                                <span class="filter-chip active" data-type="all" onclick="filterByType('all')">全部</span>
+                                <span class="filter-chip" data-type="SERVICE" onclick="filterByType('SERVICE')">服务</span>
+                                <span class="filter-chip" data-type="AI" onclick="filterByType('AI')">AI</span>
+                                <span class="filter-chip" data-type="DATA" onclick="filterByType('DATA')">数据</span>
+                                <span class="filter-chip" data-type="CONNECTOR" onclick="filterByType('CONNECTOR')">连接器</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="toolbar-right">
+                        <button class="nx-btn nx-btn--secondary" onclick="refreshCapabilities()">
+                            <i class="ri-refresh-line"></i> 刷新
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="cap-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>能力</th>
+                                <th>归属类型</th>
+                                <th>能力类型</th>
+                                <th>状态</th>
+                                <th>版本</th>
+                                <th>支持场景</th>
+                                <th>最后调用</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="capabilityTableBody">
+                        </tbody>
+                    </table>
+                </div>
+                <div id="pagination-container" class="nx-flex nx-items-center nx-justify-center nx-mt-4 nx-gap-4"></div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="overlay" id="overlay" onclick="closeDetailPanel()"></div>
+    
+    <div class="detail-panel" id="detailPanel">
+        <div class="detail-header">
+            <span class="detail-title" id="detailTitle">能力详情</span>
+            <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="closeDetailPanel()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="detail-body" id="detailBody">
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/capability-config.js"></script>
+    <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/llm-assistant.js"></script>
+    <script src="/console/js/capability-service.js"></script>
+    <script src="/console/js/pages/my-capabilities.js"></script>
+</body>
+</html>

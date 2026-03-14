@@ -1,0 +1,47 @@
+{
+    "menu": [
+        {
+            "id": "capability-center",
+            "name": "能力中心",
+            "icon": "ri-puzzle-line",
+            "url": "/console/skills/skill-capability/pages/capability-management.html",
+            "roles": ["personal", "enterprise", "admin"],
+            "status": "implemented",
+            "description": "能力发现与管理",
+            "children": [
+                {
+                    "id": "capability-list",
+                    "name": "能力列表",
+                    "icon": "ri-list-check",
+                    "url": "/console/skills/skill-capability/pages/capability-management.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "capability-discovery",
+                    "name": "能力发现",
+                    "icon": "ri-compass-discover-line",
+                    "url": "/console/skills/skill-capability/pages/capability-discovery.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "capability-binding",
+                    "name": "能力绑定",
+                    "icon": "ri-link",
+                    "url": "/console/skills/skill-capability/pages/capability-binding.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "my-capabilities",
+                    "name": "我的能力",
+                    "icon": "ri-apps-line",
+                    "url": "/console/skills/skill-capability/pages/my-capabilities.html",
+                    "roles": ["personal", "enterprise", "admin"],
+                    "status": "implemented"
+                }
+            ]
+        }
+    ]
+}

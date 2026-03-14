@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统安装者 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/profile-cards.css">
+    <link rel="stylesheet" href="/console/css/components/capability-config.css">
+    <link rel="stylesheet" href="/console/css/components/stat-cards.css">
+    <style>
+        .installer-page { padding: 20px; }
+        
+        .installer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+        
+        .installer-title {
+            font-size: 24px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .installer-title i { color: var(--nx-primary); }
+        
+        .installer-subtitle {
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+        
+        .installer-main {
+            display: flex;
+            flex-direction: column;
+            gap: 24px;
+        }
+        
+        .checklist-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .panel-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .panel-title {
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .panel-title i { color: var(--nx-primary); }
+        
+        .checklist-body { padding: 0; }
+        
+        .checklist-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            transition: background 0.2s;
+        }
+        
+        .checklist-item:last-child { border-bottom: none; }
+        .checklist-item:hover { background: var(--nx-bg-hover); }
+        
+        .checklist-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            background: var(--nx-bg);
+            color: var(--nx-text-secondary);
+        }
+        
+        .checklist-item.completed .checklist-icon {
+            background: var(--nx-success-light);
+            color: var(--nx-success);
+        }
+        
+        .checklist-info { flex: 1; }
+        
+        .checklist-name {
+            font-weight: 500;
+            font-size: 14px;
+        }
+        
+        .checklist-item.completed .checklist-name {
+            text-decoration: line-through;
+            opacity: 0.6;
+        }
+        
+        .checklist-desc {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 2px;
+        }
+        
+        .log-panel {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .log-body {
+            padding: 16px;
+            max-height: 200px;
+            overflow-y: auto;
+            background: var(--nx-bg);
+            font-family: 'SF Mono', Monaco, monospace;
+            font-size: 12px;
+        }
+        
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+            padding: 4px 0;
+        }
+        
+        .log-item i { margin-top: 2px; }
+        .log-item.info { color: var(--nx-text-secondary); }
+        .log-item.success { color: var(--nx-success); }
+        .log-item.error { color: var(--nx-danger); }
+        
+        .log-time {
+            color: var(--nx-text-secondary);
+            margin-right: 8px;
+        }
+        
+        .user-badge {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 6px 12px;
+            background: var(--nx-primary-light);
+            border-radius: 20px;
+            font-size: 13px;
+            color: var(--nx-primary);
+        }
+        
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .icon-btn {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            border: 1px solid var(--nx-border);
+            background: var(--nx-bg-elevated);
+            color: var(--nx-text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .icon-btn:hover {
+            background: var(--nx-bg-hover);
+            color: var(--nx-text-primary);
+        }
+        
+        .completion-banner {
+            background: linear-gradient(135deg, var(--nx-success-light), var(--nx-primary-light));
+            border: 1px solid var(--nx-success);
+            border-radius: 12px;
+            padding: 24px;
+            text-align: center;
+            margin-top: 24px;
+        }
+        
+        .completion-banner h3 {
+            color: var(--nx-success);
+            margin: 0 0 8px 0;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .completion-banner p {
+            color: var(--nx-text-secondary);
+            margin: 0 0 16px 0;
+        }
+        
+        .completion-banner .nx-btn {
+            padding: 12px 24px;
+            font-size: 15px;
+        }
+        
+        .capabilities-config {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            margin-bottom: 24px;
+        }
+        
+        .capabilities-header {
+            padding: 16px 20px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .capabilities-header h3 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .capabilities-header h3 i {
+            color: var(--nx-primary);
+        }
+        
+        .capabilities-list {
+            padding: 16px 20px;
+        }
+        
+        .step-wizard {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            margin-bottom: 24px;
+            overflow: hidden;
+        }
+        
+        .step-wizard-header {
+            display: flex;
+            background: var(--nx-bg);
+            border-bottom: 1px solid var(--nx-border);
+            padding: 0;
+        }
+        
+        .step-wizard-step {
+            flex: 1;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border-right: 1px solid var(--nx-border);
+            position: relative;
+        }
+        
+        .step-wizard-step:last-child {
+            border-right: none;
+        }
+        
+        .step-wizard-step:hover {
+            background: var(--nx-bg-hover);
+        }
+        
+        .step-wizard-step.active {
+            background: var(--nx-primary-light);
+        }
+        
+        .step-wizard-step.completed {
+            background: var(--nx-success-light);
+        }
+        
+        .step-wizard-step.completed .step-number {
+            background: var(--nx-success);
+            color: white;
+        }
+        
+        .step-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: var(--nx-border);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--nx-text-secondary);
+            transition: all 0.2s;
+        }
+        
+        .step-wizard-step.active .step-number {
+            background: var(--nx-primary);
+            color: white;
+        }
+        
+        .step-info {
+            flex: 1;
+        }
+        
+        .step-title {
+            font-weight: 500;
+            font-size: 14px;
+            color: var(--nx-text-primary);
+        }
+        
+        .step-desc {
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+            margin-top: 2px;
+        }
+        
+        .step-wizard-content {
+            padding: 24px;
+        }
+        
+        .step-wizard-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 24px;
+            background: var(--nx-bg);
+            border-top: 1px solid var(--nx-border);
+        }
+        
+        .step-nav-buttons {
+            display: flex;
+            gap: 12px;
+        }
+        
+        .required-mark {
+            color: var(--nx-danger);
+            margin-left: 2px;
+            font-weight: bold;
+        }
+        
+        .recommended-mark {
+            color: var(--nx-warning);
+            margin-left: 4px;
+            font-size: 11px;
+        }
+        
+        .field-label {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .field-label .required-mark {
+            font-size: 12px;
+        }
+        
+        .validation-error {
+            color: var(--nx-danger);
+            font-size: 12px;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+        
+        .validation-error i {
+            font-size: 14px;
+        }
+        
+        .form-group.has-error input,
+        .form-group.has-error select,
+        .form-group.has-error textarea {
+            border-color: var(--nx-danger);
+            box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+        }
+        
+        .db-required-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: var(--nx-warning-light);
+            color: var(--nx-warning);
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            margin-left: 8px;
+        }
+        
+        .db-required-badge i {
+            font-size: 12px;
+        }
+        
+        .extended-config-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--nx-bg);
+            border-radius: 8px;
+            border: 1px solid var(--nx-border);
+        }
+        
+        .extended-config-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-weight: 500;
+            color: var(--nx-text-primary);
+        }
+        
+        .extended-config-header i {
+            color: var(--nx-primary);
+        }
+        
+        .extended-config-tabs {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+        }
+        
+        .extended-config-tab {
+            padding: 8px 16px;
+            border-radius: 6px;
+            border: 1px solid var(--nx-border);
+            background: var(--nx-bg-elevated);
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .extended-config-tab:hover {
+            background: var(--nx-bg-hover);
+        }
+        
+        .extended-config-tab.active {
+            background: var(--nx-primary);
+            color: white;
+            border-color: var(--nx-primary);
+        }
+        
+        .extended-config-content {
+            display: none;
+        }
+        
+        .extended-config-content.active {
+            display: block;
+        }
+        
+        .config-field-row {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .config-field-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .config-field-label {
+            min-width: 140px;
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .config-field-input {
+            flex: 1;
+        }
+        
+        .config-field-input input,
+        .config-field-input select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid var(--nx-border);
+            border-radius: 6px;
+            font-size: 13px;
+            background: var(--nx-bg-elevated);
+            color: var(--nx-text-primary);
+            transition: all 0.2s;
+        }
+        
+        .config-field-input input:focus,
+        .config-field-input select:focus {
+            outline: none;
+            border-color: var(--nx-primary);
+            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+        }
+        
+        .validation-summary {
+            background: rgba(220, 38, 38, 0.1);
+            border: 1px solid var(--nx-danger);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .validation-summary.show {
+            display: block;
+        }
+        
+        .validation-summary-title {
+            color: var(--nx-danger);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .validation-summary-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .validation-summary-list li {
+            padding: 4px 0;
+            color: var(--nx-text-secondary);
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        
+        .validation-summary-list li i {
+            color: var(--nx-danger);
+            font-size: 12px;
+        }
+        
+        .save-success-banner {
+            background: linear-gradient(135deg, var(--nx-success-light), rgba(34, 197, 94, 0.2));
+            border: 1px solid var(--nx-success);
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .save-success-banner.show {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .save-success-banner i {
+            font-size: 24px;
+            color: var(--nx-success);
+        }
+        
+        .save-success-banner-text h4 {
+            margin: 0 0 4px 0;
+            color: var(--nx-success);
+        }
+        
+        .save-success-banner-text p {
+            margin: 0;
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .profile-section {
+            margin-bottom: 24px;
+        }
+        
+        .profile-section h3 {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .profile-section h3 i {
+            color: var(--nx-primary);
+        }
+        
+        .step-complete-icon {
+            display: none;
+        }
+        
+        .step-wizard-step.completed .step-complete-icon {
+            display: inline;
+        }
+        
+        .step-wizard-step.completed .step-number-text {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="nx-page__title">
+                        <h1><i class="ri-install-line" aria-hidden="true"></i> 系统安装者工作台</h1>
+                        <p>闭环一：安装基础技能包，初始化系统环境</p>
+                    </div>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
+                                <i class="ri-puzzle-line"></i> 我的能力
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="installer-main">
+                    
+                    <div class="profile-section">
+                        <h3><i class="ri-stack-line"></i> 选择部署规模</h3>
+                        <div class="profile-cards">
+                            <div class="profile-card selected" data-profile="micro" onclick="selectProfile('micro')">
+                                <div class="profile-icon">🖥️</div>
+                                <div class="profile-name">微型</div>
+                                <div class="profile-desc">开发测试环境</div>
+                                <div class="profile-resources">
+                                    <div class="resource-item"><i class="ri-cpu-line"></i> 2核</div>
+                                    <div class="resource-item"><i class="ri-ram-line"></i> 4GB</div>
+                                </div>
+                            </div>
+                            <div class="profile-card" data-profile="small" onclick="selectProfile('small')">
+                                <div class="profile-icon">🏢</div>
+                                <div class="profile-name">小型</div>
+                                <div class="profile-desc">小团队生产</div>
+                                <div class="profile-resources">
+                                    <div class="resource-item"><i class="ri-cpu-line"></i> 4核</div>
+                                    <div class="resource-item"><i class="ri-ram-line"></i> 8GB</div>
+                                </div>
+                            </div>
+                            <div class="profile-card" data-profile="large" onclick="selectProfile('large')">
+                                <div class="profile-icon">🏭</div>
+                                <div class="profile-name">大型</div>
+                                <div class="profile-desc">企业生产环境</div>
+                                <div class="profile-resources">
+                                    <div class="resource-item"><i class="ri-cpu-line"></i> 8核</div>
+                                    <div class="resource-item"><i class="ri-ram-line"></i> 16GB</div>
+                                </div>
+                            </div>
+                            <div class="profile-card" data-profile="enterprise" onclick="selectProfile('enterprise')">
+                                <div class="profile-icon">🌐</div>
+                                <div class="profile-name">企业</div>
+                                <div class="profile-desc">大规模部署</div>
+                                <div class="profile-resources">
+                                    <div class="resource-item"><i class="ri-cpu-line"></i> 16核+</div>
+                                    <div class="resource-item"><i class="ri-ram-line"></i> 32GB+</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="step-wizard" id="stepWizard">
+                        <div class="step-wizard-header" id="stepWizardHeader">
+                        </div>
+                        <div class="validation-summary" id="validationSummary">
+                            <div class="validation-summary-title">
+                                <i class="ri-error-warning-line"></i> 请完成以下必填项
+                            </div>
+                            <ul class="validation-summary-list" id="validationSummaryList">
+                            </ul>
+                        </div>
+                        <div class="save-success-banner" id="saveSuccessBanner">
+                            <i class="ri-checkbox-circle-line"></i>
+                            <div class="save-success-banner-text">
+                                <h4>配置保存成功</h4>
+                                <p>系统配置已成功保存到SDK存储</p>
+                            </div>
+                        </div>
+                        <div class="step-wizard-content" id="stepWizardContent">
+                        </div>
+                        <div class="step-wizard-footer">
+                            <div class="step-info" id="stepInfo">
+                                <span id="stepHint">请完成当前步骤的配置</span>
+                            </div>
+                            <div class="step-nav-buttons">
+                                <button class="nx-btn nx-btn--ghost" id="prevStepBtn" onclick="prevStep()" disabled>
+                                    <i class="ri-arrow-left-line"></i> 上一步
+                                </button>
+                                <button class="nx-btn nx-btn--primary" id="nextStepBtn" onclick="nextStep()">
+                                    下一步 <i class="ri-arrow-right-line"></i>
+                                </button>
+                                <button class="nx-btn nx-btn--success" id="saveConfigBtn" onclick="saveAllConfig()" style="display:none;">
+                                    <i class="ri-save-line"></i> 保存配置
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="capabilities-config">
+                        <div class="capabilities-header">
+                            <h3><i class="ri-puzzle-line"></i> 能力配置 (17种能力)</h3>
+                            <div>
+                                <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="expandAllCapabilities()">展开全部</button>
+                                <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="collapseAllCapabilities()">收起全部</button>
+                            </div>
+                        </div>
+                        <div class="capabilities-list" id="capabilitiesList">
+                        </div>
+                    </div>
+                    
+                    <div class="checklist-panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="ri-checkbox-circle-line"></i> <span id="checklist-title">闭环一检查清单</span>
+                            </div>
+                            <span class="nx-badge nx-badge--warning">系统初始化</span>
+                        </div>
+                        <div class="checklist-body">
+                            <div class="checklist-item" id="check-1">
+                                <div class="checklist-icon"><i class="ri-checkbox-blank-line"></i></div>
+                                <div class="checklist-info">
+                                    <div class="checklist-name">skill-scene 基础场景技能包</div>
+                                    <div class="checklist-desc">核心场景管理功能</div>
+                                </div>
+                                <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installSkill('skill-scene')">安装</button>
+                            </div>
+                            <div class="checklist-item" id="check-2">
+                                <div class="checklist-icon"><i class="ri-checkbox-blank-line"></i></div>
+                                <div class="checklist-info">
+                                    <div class="checklist-name">skill-capability 能力管理包</div>
+                                    <div class="checklist-desc">能力发现与管理功能</div>
+                                </div>
+                                <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installSkill('skill-capability')">安装</button>
+                            </div>
+                            <div class="checklist-item" id="check-3">
+                                <div class="checklist-icon"><i class="ri-checkbox-blank-line"></i></div>
+                                <div class="checklist-info">
+                                    <div class="checklist-name">skill-health 健康检查包</div>
+                                    <div class="checklist-desc">系统健康监控功能</div>
+                                </div>
+                                <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installSkill('skill-health')">安装</button>
+                            </div>
+                            <div class="checklist-item" id="check-4">
+                                <div class="checklist-icon"><i class="ri-checkbox-blank-line"></i></div>
+                                <div class="checklist-info">
+                                    <div class="checklist-name">skill-llm-chat LLM对话包</div>
+                                    <div class="checklist-desc">大语言模型对话功能</div>
+                                </div>
+                                <button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installSkill('skill-llm-chat')">安装</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon"><i class="ri-download-cloud-line"></i></div>
+                            <div class="stat-content">
+                                <h4>已安装技能</h4>
+                                <div class="stat-value" id="installed-count">0</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success"><i class="ri-checkbox-circle-line"></i></div>
+                            <div class="stat-content">
+                                <h4>完成进度</h4>
+                                <div class="stat-value" id="progress-percent">0%</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning"><i class="ri-error-warning-line"></i></div>
+                            <div class="stat-content">
+                                <h4>待处理</h4>
+                                <div class="stat-value" id="pending-count">4</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="log-panel">
+                        <div class="panel-header">
+                            <div class="panel-title">
+                                <i class="ri-history-line"></i> 安装日志
+                            </div>
+                        </div>
+                        <div class="log-body" id="install-log">
+                            <div class="log-item info"><i class="ri-information-line"></i> 等待开始安装...</div>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/capability-config.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="/console/js/pages/role-installer.js"></script>
+</body>
+</html>

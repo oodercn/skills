@@ -13,6 +13,8 @@ import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.PostConstruct;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -24,7 +26,7 @@ public class MenuController {
 
     private static final Logger log = LoggerFactory.getLogger(MenuController.class);
 
-    @Autowired
+    @Autowired(required = false)
     private AuthService authService;
 
     private JSONObject menuConfig;
@@ -49,11 +51,13 @@ public class MenuController {
             @RequestParam(required = false) String role,
             javax.servlet.http.HttpServletRequest request) {
         
-        UserSession user = authService.getCurrentUser(request);
         String roleType = role;
         
-        if (roleType == null && user != null) {
-            roleType = user.getRoleType();
+        if (authService != null) {
+            UserSession user = authService.getCurrentUser(request);
+            if (roleType == null && user != null) {
+                roleType = user.getRoleType();
+            }
         }
         
         if (roleType == null) {
@@ -62,6 +66,12 @@ public class MenuController {
 
         List<Map<String, Object>> menus = buildMenuForRole(roleType);
         return ResultModel.success(menus);
+    }
+    
+    @GetMapping("/skills")
+    public ResultModel<List<Map<String, Object>>> getInstalledSkillMenus() {
+        List<Map<String, Object>> skillMenus = loadInstalledSkillMenus();
+        return ResultModel.success(skillMenus);
     }
 
     @GetMapping("/config")
@@ -89,38 +99,161 @@ public class MenuController {
     private List<Map<String, Object>> buildMenuForRole(String roleType) {
         List<Map<String, Object>> menus = new ArrayList<>();
 
-        menus.add(createMenuItem("home", "首页", "ri-home-line", "/", null));
+        List<Map<String, Object>> skillMenus = loadInstalledSkillMenus();
+        menus.addAll(skillMenus);
         
-        if ("installer".equals(roleType)) {
-            menus.add(createMenuItem("install", "安装向导", "ri-install-line", "/pages/install", null));
-            menus.add(createMenuItem("capabilities", "能力管理", "ri-puzzle-line", "/pages/capabilities", null));
-        }
-        
-        if ("admin".equals(roleType)) {
-            menus.add(createMenuItem("dashboard", "仪表盘", "ri-dashboard-line", "/pages/dashboard", null));
-            menus.add(createMenuItem("capabilities", "能力管理", "ri-puzzle-line", "/pages/capabilities", 
-                Arrays.asList(
-                    createMenuItem("capability-list", "能力列表", "ri-list-check", "/pages/capabilities", null),
-                    createMenuItem("capability-discover", "发现能力", "ri-search-line", "/pages/capability-discovery", null)
-                )));
-            menus.add(createMenuItem("scenes", "场景管理", "ri-git-branch-line", "/pages/scenes", null));
-            menus.add(createMenuItem("users", "用户管理", "ri-user-settings-line", "/pages/users", null));
-            menus.add(createMenuItem("config", "系统配置", "ri-settings-3-line", "/pages/config", null));
-        }
-        
-        if ("leader".equals(roleType)) {
-            menus.add(createMenuItem("dashboard", "仪表盘", "ri-dashboard-line", "/pages/dashboard", null));
-            menus.add(createMenuItem("my-scenes", "我的场景", "ri-folder-line", "/pages/my-scenes", null));
-            menus.add(createMenuItem("tasks", "任务管理", "ri-task-line", "/pages/tasks", null));
-        }
-        
-        if ("collaborator".equals(roleType)) {
-            menus.add(createMenuItem("dashboard", "仪表盘", "ri-dashboard-line", "/pages/dashboard", null));
-            menus.add(createMenuItem("my-tasks", "我的任务", "ri-task-line", "/pages/my-tasks", null));
-            menus.add(createMenuItem("history", "操作历史", "ri-history-line", "/pages/history", null));
+        if (skillMenus.isEmpty()) {
+            if ("installer".equals(roleType)) {
+                menus.add(createMenuItem("install", "安装向导", "ri-install-line", "/setup/", null));
+            }
         }
 
         return menus;
+    }
+    
+    private List<Map<String, Object>> loadInstalledSkillMenus() {
+        List<Map<String, Object>> menus = new ArrayList<>();
+        
+        File registryFile = new File("data/installed-skills/registry.properties");
+        if (!registryFile.exists()) {
+            return menus;
+        }
+        
+        try {
+            Properties props = new Properties();
+            try (FileInputStream fis = new FileInputStream(registryFile)) {
+                props.load(fis);
+            }
+            
+            Set<String> skillIds = new HashSet<>();
+            for (String key : props.stringPropertyNames()) {
+                int dotIndex = key.indexOf('.');
+                if (dotIndex > 0) {
+                    skillIds.add(key.substring(0, dotIndex));
+                }
+            }
+            
+            for (String skillId : skillIds) {
+                String path = props.getProperty(skillId + ".path");
+                if (path != null) {
+                    Map<String, Object> skillMenu = loadSkillMenu(skillId, path);
+                    if (skillMenu != null) {
+                        menus.add(skillMenu);
+                    }
+                }
+            }
+            
+        } catch (Exception e) {
+            log.warn("Failed to load installed skill menus: {}", e.getMessage());
+        }
+        
+        return menus;
+    }
+    
+    private Map<String, Object> loadSkillMenu(String skillId, String skillPath) {
+        File skillDir = new File(skillPath).getAbsoluteFile();
+        File skillYaml = new File(skillDir, "skill.yaml");
+        if (!skillYaml.exists()) {
+            skillYaml = new File(skillDir, "src/main/resources/skill.yaml");
+        }
+        
+        String skillName = skillId;
+        String skillIcon = "ri-puzzle-line";
+        
+        if (skillYaml.exists()) {
+            try {
+                String content = StreamUtils.copyToString(new FileInputStream(skillYaml), StandardCharsets.UTF_8);
+                
+                java.util.regex.Matcher nameMatcher = java.util.regex.Pattern.compile("name:\\s*(.+)")
+                    .matcher(content);
+                if (nameMatcher.find()) {
+                    skillName = nameMatcher.group(1).trim();
+                }
+            } catch (Exception e) {
+                log.debug("Failed to parse skill.yaml: {}", e.getMessage());
+            }
+        }
+        
+        List<Map<String, Object>> subMenus = loadSkillSubMenuConfig(skillDir.getAbsolutePath(), skillId);
+        log.info("Loaded {} subMenus for skill: {}", subMenus.size(), skillId);
+        
+        if (!subMenus.isEmpty()) {
+            Map<String, Object> firstMenu = subMenus.get(0);
+            Map<String, Object> menu = new LinkedHashMap<>();
+            menu.put("id", skillId);
+            menu.put("name", skillName);
+            menu.put("icon", skillIcon);
+            menu.put("url", firstMenu.get("url"));
+            if (subMenus.size() > 1) {
+                menu.put("children", subMenus);
+            }
+            log.info("Created skill menu with url: {}", firstMenu.get("url"));
+            return menu;
+        }
+        
+        log.warn("No submenus found for skill: {}, using default url", skillId);
+        return createMenuItem(skillId, skillName, skillIcon, "/console/skills/" + skillId + "/", null);
+    }
+    
+    private List<Map<String, Object>> loadSkillSubMenuConfig(String skillPath, String skillId) {
+        List<Map<String, Object>> subMenus = new ArrayList<>();
+        
+        log.info("Loading menu config for skill: {} from path: {}", skillId, skillPath);
+        
+        File menuConfigFile = new File(skillPath, "src/main/resources/static/console/menu-config.json");
+        log.info("Checking menu config file: {} exists: {}", menuConfigFile.getAbsolutePath(), menuConfigFile.exists());
+        
+        if (menuConfigFile.exists()) {
+            try {
+                String content = StreamUtils.copyToString(new FileInputStream(menuConfigFile), StandardCharsets.UTF_8);
+                log.info("Loaded menu config from: {}", menuConfigFile.getAbsolutePath());
+                JSONObject config = JSON.parseObject(content);
+                List<Map> items = config != null && config.containsKey("menu") 
+                    ? config.getList("menu", Map.class) 
+                    : JSON.parseArray(content, Map.class);
+                
+                if (items != null) {
+                    log.info("Found {} menu items", items.size());
+                    for (Map item : items) {
+                        Map<String, Object> subMenu = convertMenuItem(item, skillId);
+                        subMenus.add(subMenu);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("Failed to load skill menu config: {}", e.getMessage(), e);
+            }
+        } else {
+            log.warn("Menu config not found at: {}", menuConfigFile.getAbsolutePath());
+        }
+        
+        return subMenus;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> convertMenuItem(Map item, String skillId) {
+        Map<String, Object> menu = new LinkedHashMap<>();
+        menu.put("id", item.get("id"));
+        menu.put("name", item.get("name"));
+        menu.put("icon", item.get("icon"));
+        
+        String url = (String) item.get("url");
+        if (url != null && !url.startsWith("/console/skills/")) {
+            url = "/console/skills/" + skillId + url.substring("/console".length());
+        }
+        menu.put("url", url);
+        
+        if (item.containsKey("children")) {
+            List<Map> children = (List<Map>) item.get("children");
+            if (children != null && !children.isEmpty()) {
+                List<Map<String, Object>> convertedChildren = new ArrayList<>();
+                for (Map child : children) {
+                    convertedChildren.add(convertMenuItem(child, skillId));
+                }
+                menu.put("children", convertedChildren);
+            }
+        }
+        
+        return menu;
     }
 
     private Map<String, Object> createMenuItem(String id, String name, String icon, String url, List<Map<String, Object>> children) {

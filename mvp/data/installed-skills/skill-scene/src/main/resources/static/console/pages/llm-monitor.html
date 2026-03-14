@@ -1,0 +1,495 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM监控 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .monitor-page { padding: 20px; }
+        .stats-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 20px; }
+        .stat-card { background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 12px; padding: 20px; }
+        .stat-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .stat-card-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .stat-card-icon i { font-size: 24px; }
+        .stat-card-icon.calls { background: #dbeafe; color: #2563eb; }
+        .stat-card-icon.tokens { background: #d1fae5; color: #059669; }
+        .stat-card-icon.cost { background: #fef3c7; color: #d97706; }
+        .stat-card-icon.latency { background: #fce7f3; color: #db2777; }
+        .stat-card-value { font-size: 28px; font-weight: 600; }
+        .stat-card-label { font-size: 12px; color: var(--nx-text-secondary); margin-top: 4px; }
+        .stat-card-trend { font-size: 12px; display: flex; align-items: center; gap: 4px; }
+        .stat-card-trend.up { color: #059669; }
+        .stat-card-trend.down { color: #dc2626; }
+        
+        .charts-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; margin-bottom: 20px; }
+        .chart-card { background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 12px; padding: 20px; }
+        .chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+        .chart-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .chart-title i { color: var(--nx-primary); }
+        .chart-body { height: 200px; display: flex; align-items: center; justify-content: center; color: var(--nx-text-secondary); }
+        
+        .logs-card { background: var(--nx-bg-elevated); border: 1px solid var(--nx-border); border-radius: 12px; overflow: hidden; }
+        .logs-header { padding: 16px 20px; border-bottom: 1px solid var(--nx-border); display: flex; justify-content: space-between; align-items: center; }
+        .logs-title { font-size: 16px; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .logs-title i { color: var(--nx-primary); }
+        .logs-filters { display: flex; gap: 12px; }
+        .logs-filter { padding: 6px 12px; border: 1px solid var(--nx-border); border-radius: 6px; background: var(--nx-bg); font-size: 13px; }
+        
+        .logs-table { width: 100%; border-collapse: collapse; }
+        .logs-table th, .logs-table td { padding: 12px 16px; text-align: left; border-bottom: 1px solid var(--nx-border); }
+        .logs-table th { background: var(--nx-bg); font-weight: 600; font-size: 13px; color: var(--nx-text-secondary); }
+        .logs-table td { font-size: 14px; }
+        .logs-table tr:hover { background: var(--nx-bg-hover); }
+        
+        .status-badge { padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .status-badge.success { background: #d1fae5; color: #059669; }
+        .status-badge.error { background: #fef2f2; color: #dc2626; }
+        .status-badge.pending { background: #fef3c7; color: #d97706; }
+        
+        .provider-badge { display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 4px; font-size: 12px; }
+        .provider-badge.deepseek { background: #dbeafe; color: #2563eb; }
+        .provider-badge.baidu { background: #fef3c7; color: #d97706; }
+        .provider-badge.openai { background: #d1fae5; color: #059669; }
+        
+        .modal { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+        .modal.open { display: flex; }
+        .modal-content { background: var(--nx-bg-elevated); border-radius: 16px; width: 640px; max-height: 90vh; overflow-y: auto; }
+        .modal-header { padding: 20px; border-bottom: 1px solid var(--nx-border); display: flex; justify-content: space-between; align-items: center; }
+        .modal-title { font-size: 18px; font-weight: 600; }
+        .modal-close { background: none; border: none; font-size: 24px; cursor: pointer; color: var(--nx-text-secondary); }
+        .modal-body { padding: 20px; }
+        .modal-footer { padding: 16px 20px; border-top: 1px solid var(--nx-border); display: flex; justify-content: flex-end; gap: 12px; }
+        
+        .log-detail-row { display: flex; padding: 12px 0; border-bottom: 1px solid var(--nx-border); }
+        .log-detail-label { width: 120px; color: var(--nx-text-secondary); font-size: 13px; }
+        .log-detail-value { flex: 1; font-size: 14px; }
+        .log-detail-prompt { background: var(--nx-bg); padding: 12px; border-radius: 8px; font-family: monospace; font-size: 13px; white-space: pre-wrap; max-height: 200px; overflow-y: auto; }
+        
+        .pagination { display: flex; justify-content: center; gap: 8px; padding: 16px; }
+        .pagination button { padding: 8px 16px; border: 1px solid var(--nx-border); border-radius: 6px; background: var(--nx-bg); cursor: pointer; }
+        .pagination button.active { background: var(--nx-primary); color: white; border-color: var(--nx-primary); }
+        
+        .toast { position: fixed; bottom: 24px; right: 24px; padding: 12px 20px; border-radius: 8px; font-size: 14px; z-index: 10000; opacity: 0; transform: translateY(20px); transition: all 0.3s; }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        .toast.success { background: #059669; color: white; }
+        .toast.error { background: #dc2626; color: white; }
+        
+        @media (max-width: 900px) {
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .charts-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <div class="monitor-page">
+                <header class="nx-page__header" style="border-bottom: none;">
+                    <div class="nx-flex nx-items-center nx-gap-3">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                            <i class="ri-menu-line"></i>
+                        </button>
+                        <div class="nx-page__title">
+                            <h1><i class="ri-line-chart-line" aria-hidden="true"></i> LLM 监控</h1>
+                            <p>LLM调用统计、Token消耗、成本分析</p>
+                        </div>
+                    </div>
+                    <div class="nx-page__actions">
+                        <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                            <i class="ri-sun-line"></i>
+                        </button>
+                        <div class="nx-relative">
+                            <div class="nx-page__user-menu" id="user-menu">
+                                <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                                <span class="nx-page__user-name" id="user-name">加载中...</span>
+                                <i class="ri-arrow-down-s-line"></i>
+                            </div>
+                            <div class="nx-page__dropdown-menu" id="user-dropdown">
+                                <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                    <i class="ri-user-line"></i> 个人中心
+                                </div>
+                                <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                    <i class="ri-logout-box-line"></i> 退出登录
+                                </div>
+                            </div>
+                        </div>
+                        <button class="nx-btn nx-btn--secondary" onclick="refreshData()">
+                            <i class="ri-refresh-line"></i> <span>刷新</span>
+                        </button>
+                    </div>
+                </header>
+                
+                <div class="stats-grid" id="statsGrid"></div>
+                
+                <div class="charts-grid">
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="ri-line-chart-line"></i> 调用趋势</div>
+                            <select class="logs-filter" onchange="loadChartData()">
+                                <option value="24h">最近24小时</option>
+                                <option value="7d">最近7天</option>
+                                <option value="30d">最近30天</option>
+                            </select>
+                        </div>
+                        <div class="chart-body" id="callsChart">
+                            <div style="text-align: center;">
+                                <i class="ri-line-chart-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                <p>调用趋势图表</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="chart-card">
+                        <div class="chart-header">
+                            <div class="chart-title"><i class="ri-pie-chart-line"></i> 提供者分布</div>
+                        </div>
+                        <div class="chart-body" id="providerChart">
+                            <div style="text-align: center;">
+                                <i class="ri-pie-chart-line" style="font-size: 48px; opacity: 0.3;"></i>
+                                <p>提供者使用分布</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="logs-card">
+                    <div class="logs-header">
+                        <div class="logs-title"><i class="ri-file-list-3-line"></i> 调用日志</div>
+                        <div class="logs-filters">
+                            <select class="logs-filter" id="providerFilter" onchange="filterLogs()">
+                                <option value="">全部提供者</option>
+                                <option value="deepseek">DeepSeek</option>
+                                <option value="baidu">百度文心</option>
+                                <option value="openai">OpenAI</option>
+                            </select>
+                            <select class="logs-filter" id="statusFilter" onchange="filterLogs()">
+                                <option value="">全部状态</option>
+                                <option value="success">成功</option>
+                                <option value="error">失败</option>
+                            </select>
+                            <input type="text" class="logs-filter" id="searchInput" placeholder="搜索..." oninput="filterLogs()" style="width: 160px;">
+                        </div>
+                    </div>
+                    <table class="logs-table">
+                        <thead>
+                            <tr>
+                                <th>时间</th>
+                                <th>提供者</th>
+                                <th>模型</th>
+                                <th>输入Token</th>
+                                <th>输出Token</th>
+                                <th>延迟(ms)</th>
+                                <th>成本($)</th>
+                                <th>状态</th>
+                                <th>操作</th>
+                            </tr>
+                        </thead>
+                        <tbody id="logsBody"></tbody>
+                    </table>
+                    <div class="pagination" id="pagination"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="logDetailModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">调用详情</div>
+                <button class="modal-close" onclick="closeModal('logDetailModal')">&times;</button>
+            </div>
+            <div class="modal-body" id="logDetailContent"></div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('logDetailModal')">关闭</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="toast" id="toast"></div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        let logs = [];
+        let stats = {};
+        let currentPage = 1;
+        let pageSize = 10;
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+            loadLogs();
+        });
+        
+        function loadStats() {
+            fetch('/api/v1/llm/monitor/stats')
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success' && result.data) {
+                        stats = result.data;
+                        renderStats();
+                    } else {
+                        loadMockStats();
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load stats:', error);
+                    loadMockStats();
+                });
+        }
+        
+        function loadMockStats() {
+            stats = {
+                totalCalls: 1256,
+                totalTokens: 156000,
+                totalCost: 12.56,
+                avgLatency: 245,
+                successRate: 98.5,
+                errorCount: 19
+            };
+            renderStats();
+        }
+        
+        function renderStats() {
+            const container = document.getElementById('statsGrid');
+            container.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon calls"><i class="ri-phone-line"></i></div>
+                        <div class="stat-card-trend up"><i class="ri-arrow-up-line"></i> 12%</div>
+                    </div>
+                    <div class="stat-card-value">${stats.totalCalls || 0}</div>
+                    <div class="stat-card-label">总调用次数</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon tokens"><i class="ri-text"></i></div>
+                        <div class="stat-card-trend up"><i class="ri-arrow-up-line"></i> 8%</div>
+                    </div>
+                    <div class="stat-card-value">${(stats.totalTokens || 0).toLocaleString()}</div>
+                    <div class="stat-card-label">总Token消耗</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon cost"><i class="ri-money-dollar-circle-line"></i></div>
+                        <div class="stat-card-trend down"><i class="ri-arrow-down-line"></i> 5%</div>
+                    </div>
+                    <div class="stat-card-value">$${(stats.totalCost || 0).toFixed(2)}</div>
+                    <div class="stat-card-label">总成本</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-card-header">
+                        <div class="stat-card-icon latency"><i class="ri-timer-line"></i></div>
+                        <div class="stat-card-trend up"><i class="ri-arrow-up-line"></i> 3%</div>
+                    </div>
+                    <div class="stat-card-value">${stats.avgLatency || 0}ms</div>
+                    <div class="stat-card-label">平均延迟</div>
+                </div>
+            `;
+        }
+        
+        function loadLogs() {
+            fetch('/api/v1/llm/monitor/logs?pageNum=' + currentPage + '&pageSize=' + pageSize)
+                .then(response => response.json())
+                .then(result => {
+                    if (result.status === 'success' && result.data) {
+                        logs = result.data.list || result.data;
+                        renderLogs();
+                    } else {
+                        loadMockLogs();
+                    }
+                })
+                .catch(error => {
+                    console.error('Failed to load logs:', error);
+                    loadMockLogs();
+                });
+        }
+        
+        function loadMockLogs() {
+            logs = [];
+            const providers = ['deepseek', 'baidu', 'openai'];
+            const models = {
+                deepseek: ['deepseek-chat', 'deepseek-coder'],
+                baidu: ['ernie-bot-4', 'ernie-bot-turbo'],
+                openai: ['gpt-4-turbo', 'gpt-3.5-turbo']
+            };
+            
+            for (let i = 0; i < 50; i++) {
+                const provider = providers[Math.floor(Math.random() * providers.length)];
+                const model = models[provider][Math.floor(Math.random() * models[provider].length)];
+                const inputTokens = Math.floor(Math.random() * 2000) + 100;
+                const outputTokens = Math.floor(Math.random() * 1000) + 50;
+                const status = Math.random() > 0.05 ? 'success' : 'error';
+                
+                logs.push({
+                    logId: 'log-' + (i + 1),
+                    providerId: provider,
+                    providerName: provider === 'deepseek' ? 'DeepSeek' : (provider === 'baidu' ? '百度文心' : 'OpenAI'),
+                    model: model,
+                    inputTokens: inputTokens,
+                    outputTokens: outputTokens,
+                    totalTokens: inputTokens + outputTokens,
+                    latency: Math.floor(Math.random() * 2000) + 100,
+                    cost: ((inputTokens + outputTokens) * 0.00001).toFixed(4),
+                    status: status,
+                    createTime: Date.now() - Math.floor(Math.random() * 86400000)
+                });
+            }
+            
+            renderLogs();
+        }
+        
+        function renderLogs() {
+            const tbody = document.getElementById('logsBody');
+            const providerFilter = document.getElementById('providerFilter').value;
+            const statusFilter = document.getElementById('statusFilter').value;
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            
+            let filtered = logs.filter(log => {
+                if (providerFilter && log.providerId !== providerFilter) return false;
+                if (statusFilter && log.status !== statusFilter) return false;
+                if (searchTerm && !log.model.toLowerCase().includes(searchTerm)) return false;
+                return true;
+            });
+            
+            const start = (currentPage - 1) * pageSize;
+            const paged = filtered.slice(start, start + pageSize);
+            
+            if (paged.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="9" style="text-align: center; padding: 40px; color: var(--nx-text-secondary);">暂无数据</td></tr>';
+                return;
+            }
+            
+            tbody.innerHTML = paged.map(log => {
+                const time = new Date(log.createTime).toLocaleString('zh-CN');
+                const providerClass = log.providerId;
+                return `
+                    <tr>
+                        <td>${time}</td>
+                        <td><span class="provider-badge ${providerClass}">${log.providerName}</span></td>
+                        <td>${log.model}</td>
+                        <td>${log.inputTokens}</td>
+                        <td>${log.outputTokens}</td>
+                        <td>${log.latency}</td>
+                        <td>$${log.cost}</td>
+                        <td><span class="status-badge ${log.status}">${log.status === 'success' ? '成功' : '失败'}</span></td>
+                        <td><button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="showLogDetail('${log.logId}')" title="查看详情"><i class="ri-eye-line"></i></button></td>
+                    </tr>
+                `;
+            }).join('');
+            
+            renderPagination(filtered.length);
+        }
+        
+        function renderPagination(total) {
+            const totalPages = Math.ceil(total / pageSize);
+            const container = document.getElementById('pagination');
+            
+            let html = '';
+            if (currentPage > 1) {
+                html += `<button onclick="goToPage(${currentPage - 1})"><i class="ri-arrow-left-line"></i></button>`;
+            }
+            
+            for (let i = 1; i <= Math.min(totalPages, 5); i++) {
+                html += `<button class="${i === currentPage ? 'active' : ''}" onclick="goToPage(${i})">${i}</button>`;
+            }
+            
+            if (currentPage < totalPages) {
+                html += `<button onclick="goToPage(${currentPage + 1})"><i class="ri-arrow-right-line"></i></button>`;
+            }
+            
+            container.innerHTML = html;
+        }
+        
+        function goToPage(page) {
+            currentPage = page;
+            renderLogs();
+        }
+        
+        function filterLogs() {
+            currentPage = 1;
+            renderLogs();
+        }
+        
+        function showLogDetail(logId) {
+            const log = logs.find(l => l.logId === logId);
+            if (!log) return;
+            
+            const time = new Date(log.createTime).toLocaleString('zh-CN');
+            
+            document.getElementById('logDetailContent').innerHTML = `
+                <div class="log-detail-row">
+                    <div class="log-detail-label">调用ID</div>
+                    <div class="log-detail-value">${log.logId}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">调用时间</div>
+                    <div class="log-detail-value">${time}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">提供者</div>
+                    <div class="log-detail-value">${log.providerName}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">模型</div>
+                    <div class="log-detail-value">${log.model}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">输入Token</div>
+                    <div class="log-detail-value">${log.inputTokens}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">输出Token</div>
+                    <div class="log-detail-value">${log.outputTokens}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">延迟</div>
+                    <div class="log-detail-value">${log.latency} ms</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">成本</div>
+                    <div class="log-detail-value">$${log.cost}</div>
+                </div>
+                <div class="log-detail-row">
+                    <div class="log-detail-label">状态</div>
+                    <div class="log-detail-value"><span class="status-badge ${log.status}">${log.status === 'success' ? '成功' : '失败'}</span></div>
+                </div>
+            `;
+            
+            document.getElementById('logDetailModal').classList.add('open');
+        }
+        
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('open');
+        }
+        
+        function refreshData() {
+            loadStats();
+            loadLogs();
+            showToast('数据已刷新', 'success');
+        }
+        
+        function showToast(message, type) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.className = 'toast ' + type;
+            toast.classList.add('show');
+            
+            setTimeout(function() {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>

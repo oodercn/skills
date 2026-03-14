@@ -1,0 +1,114 @@
+apiVersion: scene.ooder.net/v1
+kind: SceneTemplate
+
+metadata:
+  id: org-integration
+  name: 组织集成场景
+  description: 企业组织架构集成，支持钉钉、飞书、企业微信、LDAP等
+  category: org
+  icon: ri-team-line
+  version: 1.0.0
+  author: ooder Team
+
+spec:
+  skills:
+    - id: skill-org-base
+      version: ">=1.0.0"
+      required: true
+      description: "组织架构基础服务"
+      
+    - id: skill-org-dingding
+      version: ">=1.0.0"
+      required: false
+      description: "钉钉集成（可选）"
+      
+    - id: skill-org-feishu
+      version: ">=1.0.0"
+      required: false
+      description: "飞书集成（可选）"
+      
+    - id: skill-org-wecom
+      version: ">=1.0.0"
+      required: false
+      description: "企业微信集成（可选）"
+      
+    - id: skill-org-ldap
+      version: ">=1.0.0"
+      required: false
+      description: "LDAP集成（可选）"
+      
+    - id: skill-user-auth
+      version: ">=1.0.0"
+      required: true
+      description: "用户认证服务"
+      
+  capabilities:
+    - id: org-sync
+      name: 组织同步
+      description: 同步组织架构数据
+      category: service
+      
+    - id: user-manage
+      name: 用户管理
+      description: 管理用户信息
+      category: service
+      
+    - id: auth-login
+      name: 登录认证
+      description: 用户登录认证
+      category: security
+      
+    - id: sso
+      name: 单点登录
+      description: 支持SSO单点登录
+      category: security
+      
+  scene:
+    type: org
+    name: 组织集成
+    description: 企业组织架构集成场景
+    
+    config:
+      org:
+        defaultProvider: "local"
+        syncInterval: 3600000
+        
+      providers:
+        dingding:
+          enabled: false
+          appKey: ""
+          appSecret: ""
+        feishu:
+          enabled: false
+          appId: ""
+          appSecret: ""
+        wecom:
+          enabled: false
+          corpId: ""
+          agentId: ""
+          secret: ""
+        ldap:
+          enabled: false
+          url: ""
+          baseDn: ""
+          
+      auth:
+        methods:
+          - password
+          - oauth2
+        sessionTimeout: 7200
+        
+  installOrder:
+    - skill-org-base
+    - skill-user-auth
+    - skill-org-dingding
+    - skill-org-feishu
+    - skill-org-wecom
+    - skill-org-ldap
+    
+  estimatedResources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+    
+  estimatedDuration: "5-10分钟"

@@ -1,12 +1,10 @@
 package net.ooder.skill.hotplug;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.stereotype.Component;
 
 /**
  * 热插拔配置属性
  */
-@Component
 @ConfigurationProperties(prefix = "ooder.skill.hotplug")
 public class HotPlugProperties {
 

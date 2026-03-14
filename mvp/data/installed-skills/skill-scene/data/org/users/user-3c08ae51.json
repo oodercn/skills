@@ -1,0 +1,14 @@
+{
+  "userId" : "user-3c08ae51",
+  "username" : "developer",
+  "nickname" : "开发者",
+  "email" : "developer@ooder.local",
+  "phone" : null,
+  "status" : "active",
+  "token" : null,
+  "refreshToken" : null,
+  "roles" : [ "developer" ],
+  "roleIds" : null,
+  "orgId" : "root",
+  "orgName" : null
+}

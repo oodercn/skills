@@ -12,25 +12,33 @@ import java.util.concurrent.ConcurrentMap;
 
 /**
  * Skill专用类加载器
- * 实现类隔离和双亲委派机制的灵活控制
+ * 
+ * <p>实现类隔离和双亲委派机制的灵活控制</p>
+ * 
+ * <p>核心功能：</p>
+ * <ul>
+ *   <li>优先从主应用加载 SE 核心类，确保类型一致性</li>
+ *   <li>支持插件加载自定义类</li>
+ *   <li>线程安全的类加载</li>
+ * </ul>
+ * 
+ * <p>SE 核心包配置由 {@link SeCorePackages} 提供</p>
+ * 
+ * @author ooder Team
+ * @since 2.3.1
  */
 public class PluginClassLoader extends URLClassLoader {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginClassLoader.class);
 
-    // 父类加载器（通常是ApplicationClassLoader）
     private final ClassLoader parent;
 
-    // Skill ID
     private final String skillId;
 
-    // 已加载的类缓存
     private final ConcurrentMap<String, Class<?>> loadedClasses = new ConcurrentHashMap<>();
 
-    // 已加载的资源缓存
     private final ConcurrentMap<String, URL> resourceCache = new ConcurrentHashMap<>();
 
-    // 父类优先的包前缀列表
     private static final String[] PARENT_FIRST_PACKAGES = {
             "java.",
             "javax.",
@@ -55,7 +63,6 @@ public class PluginClassLoader extends URLClassLoader {
             "io.netty."
     };
 
-    // 父类优先的类列表
     private static final String[] PARENT_FIRST_CLASSES = {
             "net.ooder.skill.hotplug.SkillLifecycle",
             "net.ooder.skill.hotplug.PluginContext",
@@ -72,22 +79,18 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Override
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        // 检查已加载的类
         Class<?> clazz = loadedClasses.get(name);
         if (clazz != null) {
             return clazz;
         }
 
-        // 同步加载
         synchronized (getClassLoadingLock(name)) {
-            // 双重检查
             clazz = loadedClasses.get(name);
             if (clazz != null) {
                 return clazz;
             }
 
             try {
-                // 判断是否应该由父类加载器加载
                 if (shouldLoadFromParent(name)) {
                     clazz = loadFromParent(name);
                     if (clazz != null) {
@@ -99,7 +102,6 @@ public class PluginClassLoader extends URLClassLoader {
                     }
                 }
 
-                // 尝试自己加载
                 clazz = findClass(name);
                 if (clazz != null) {
                     loadedClasses.put(name, clazz);
@@ -111,7 +113,6 @@ public class PluginClassLoader extends URLClassLoader {
                 }
 
             } catch (ClassNotFoundException e) {
-                // 如果自己加载失败，尝试父类加载器
                 clazz = loadFromParent(name);
                 if (clazz != null) {
                     loadedClasses.put(name, clazz);
@@ -127,32 +128,38 @@ public class PluginClassLoader extends URLClassLoader {
         throw new ClassNotFoundException(name);
     }
 
-    /**
-     * 从父类加载器加载
-     */
     private Class<?> loadFromParent(String name) {
         try {
             if (parent != null) {
                 return parent.loadClass(name);
             }
         } catch (ClassNotFoundException e) {
-            // 忽略，继续尝试
         }
         return null;
     }
 
     /**
      * 判断是否应该从父类加载器加载
+     * 
+     * <p>包括：</p>
+     * <ul>
+     *   <li>Java 核心类</li>
+     *   <li>Spring 等框架类</li>
+     *   <li>SE 核心类（通过 {@link SeCorePackages} 判断）</li>
+     *   <li>Skill 框架核心类</li>
+     * </ul>
      */
     private boolean shouldLoadFromParent(String name) {
-        // 检查包前缀
+        if (SeCorePackages.isSeCoreClass(name)) {
+            return true;
+        }
+
         for (String prefix : PARENT_FIRST_PACKAGES) {
             if (name.startsWith(prefix)) {
                 return true;
             }
         }
 
-        // 检查具体类
         for (String className : PARENT_FIRST_CLASSES) {
             if (name.equals(className)) {
                 return true;
@@ -164,13 +171,11 @@ public class PluginClassLoader extends URLClassLoader {
 
     @Override
     public URL findResource(String name) {
-        // 先检查缓存
         URL resource = resourceCache.get(name);
         if (resource != null) {
             return resource;
         }
 
-        // 查找资源
         resource = super.findResource(name);
         if (resource != null) {
             resourceCache.put(name, resource);
@@ -184,30 +189,18 @@ public class PluginClassLoader extends URLClassLoader {
         return super.findResources(name);
     }
 
-    /**
-     * 获取已加载的类数量
-     */
     public int getLoadedClassCount() {
         return loadedClasses.size();
     }
 
-    /**
-     * 获取Skill ID
-     */
     public String getSkillId() {
         return skillId;
     }
 
-    /**
-     * 获取已加载的类名列表
-     */
     public java.util.Set<String> getLoadedClassNames() {
         return new java.util.HashSet<>(loadedClasses.keySet());
     }
 
-    /**
-     * 清理资源
-     */
     public void cleanup() {
         logger.debug("Cleaning up PluginClassLoader for skill: {}", skillId);
         loadedClasses.clear();

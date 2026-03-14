@@ -7,12 +7,12 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-common-all</artifactId>
-        <version>2.3</version>
+        <version>2.3.1</version>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-oss</artifactId>
-    <version>2.3</version>
+    <version>2.3.1</version>
     <name>Skill VFS OSS - Aliyun OSS Storage Implementation</name>
     <description>Aliyun OSS object storage implementation for OoderAgent VFS</description>
 
@@ -76,3 +76,4 @@
     </build>
 
 </project>
+

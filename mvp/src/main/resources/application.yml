@@ -6,6 +6,8 @@ spring:
     name: mvp-core
   profiles:
     active: micro
+  main:
+    allow-circular-references: true
   web:
     resources:
       static-locations: classpath:/static/

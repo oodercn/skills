@@ -1,0 +1,14 @@
+{
+  "userId" : "admin",
+  "username" : "admin",
+  "nickname" : "管理员",
+  "email" : "admin@ooder.net",
+  "phone" : null,
+  "status" : "active",
+  "token" : null,
+  "refreshToken" : null,
+  "roles" : [ "admin", "user" ],
+  "roleIds" : null,
+  "orgId" : "root",
+  "orgName" : "默认组织"
+}

@@ -9,82 +9,6 @@
             "status": "implemented"
         },
         {
-            "id": "capability-center",
-            "name": "能力中心",
-            "icon": "ri-puzzle-line",
-            "url": "/console/pages/capability-discovery.html",
-            "roles": ["personal", "enterprise", "admin"],
-            "status": "implemented",
-            "description": "能力发现与管理",
-            "children": [
-                {
-                    "id": "skill-market",
-                    "name": "技能市场",
-                    "icon": "ri-store-2-line",
-                    "url": "/console/pages/capability-discovery.html",
-                    "roles": ["personal", "enterprise", "admin"],
-                    "status": "implemented",
-                    "description": "发现和安装新能力"
-                },
-                {
-                    "id": "my-capabilities",
-                    "name": "我的能力",
-                    "icon": "ri-apps-line",
-                    "url": "/console/pages/my-capabilities.html",
-                    "roles": ["personal", "enterprise", "admin"],
-                    "status": "implemented",
-                    "description": "已安装的能力（场景能力、技能、工具）",
-                    "children": [
-                        {
-                            "id": "my-scene-caps",
-                            "name": "场景能力",
-                            "icon": "ri-layout-grid-line",
-                            "url": "/console/pages/my-capabilities.html?type=SCENE",
-                            "roles": ["personal", "enterprise", "admin"],
-                            "status": "implemented",
-                            "description": "开箱即用的业务功能"
-                        },
-                        {
-                            "id": "my-skills",
-                            "name": "技能包",
-                            "icon": "ri-tools-line",
-                            "url": "/console/pages/my-capabilities.html?type=SKILL",
-                            "roles": ["enterprise", "admin"],
-                            "status": "implemented",
-                            "description": "底层技能包"
-                        },
-                        {
-                            "id": "my-tools",
-                            "name": "工具能力",
-                            "icon": "ri-hammer-line",
-                            "url": "/console/pages/my-capabilities.html?type=TOOL",
-                            "roles": ["enterprise", "admin"],
-                            "status": "implemented",
-                            "description": "独立工具能力"
-                        }
-                    ]
-                },
-                {
-                    "id": "capability-binding",
-                    "name": "能力绑定",
-                    "icon": "ri-link",
-                    "url": "/console/pages/capability-binding.html",
-                    "roles": ["enterprise", "admin"],
-                    "status": "implemented",
-                    "description": "配置能力与场景组的关联"
-                },
-                {
-                    "id": "capability-create",
-                    "name": "创建能力",
-                    "icon": "ri-add-circle-line",
-                    "url": "/console/pages/capability-create.html",
-                    "roles": ["admin"],
-                    "status": "implemented",
-                    "description": "手动创建或LLM生成能力"
-                }
-            ]
-        },
-        {
             "id": "scene-group-management",
             "name": "场景组管理",
             "icon": "ri-folder-line",
@@ -153,44 +77,6 @@
                     "roles": ["personal", "enterprise", "admin"],
                     "status": "implemented",
                     "description": "历史场景执行记录"
-                }
-            ]
-        },
-        {
-            "id": "capability-stats",
-            "name": "能力统计",
-            "icon": "ri-bar-chart-box-line",
-            "url": "/console/pages/capability-stats.html",
-            "roles": ["personal", "enterprise", "admin"],
-            "status": "implemented",
-            "description": "能力调用统计和性能监控"
-        },
-        {
-            "id": "audit-management",
-            "name": "审计管理",
-            "icon": "ri-shield-check-line",
-            "url": "/console/pages/audit-logs.html",
-            "roles": ["enterprise", "admin"],
-            "status": "implemented",
-            "description": "系统审计和日志管理",
-            "children": [
-                {
-                    "id": "audit-logs",
-                    "name": "审计日志",
-                    "icon": "ri-file-list-3-line",
-                    "url": "/console/pages/audit-logs.html",
-                    "roles": ["enterprise", "admin"],
-                    "status": "implemented",
-                    "description": "查看系统审计日志"
-                },
-                {
-                    "id": "security-config",
-                    "name": "安全配置",
-                    "icon": "ri-shield-line",
-                    "url": "/console/pages/security-config.html",
-                    "roles": ["admin"],
-                    "status": "implemented",
-                    "description": "审计策略和安全配置"
                 }
             ]
         }

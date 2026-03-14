@@ -60,6 +60,38 @@ spec:
       category: security
   
   routes:
+    # Discovery APIs
+    - path: /api/v1/discovery/local
+      method: POST
+      controller: net.ooder.skill.capability.controller.DiscoveryController
+      methodName: discoverLocal
+      produces: application/json
+      
+    - path: /api/v1/discovery/github
+      method: POST
+      controller: net.ooder.skill.capability.controller.DiscoveryController
+      methodName: discoverFromGitHub
+      produces: application/json
+      
+    - path: /api/v1/discovery/gitee
+      method: POST
+      controller: net.ooder.skill.capability.controller.DiscoveryController
+      methodName: discoverFromGitee
+      produces: application/json
+      
+    - path: /api/v1/discovery/install
+      method: POST
+      controller: net.ooder.skill.capability.controller.DiscoveryController
+      methodName: installCapability
+      produces: application/json
+      
+    - path: /api/v1/discovery/statistics
+      method: GET
+      controller: net.ooder.skill.capability.controller.DiscoveryController
+      methodName: getStatistics
+      produces: application/json
+    
+    # Capability APIs
     - path: /api/v1/capabilities
       method: GET
       controller: net.ooder.skill.capability.controller.CapabilityController

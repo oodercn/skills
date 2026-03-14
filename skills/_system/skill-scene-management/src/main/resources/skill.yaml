@@ -1,0 +1,99 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-scene-management
+  name: 场景管理
+  version: 2.3.1
+  description: 场景管理技能 - 场景定义、会话管理、能力验证
+  author: ooder Team
+  license: Apache-2.0
+  type: service-skill
+
+spec:
+  type: service-skill
+  
+  ownership: platform
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  dependencies:
+    - skill-common
+    
+  capabilities:
+    - id: scene-definition
+      name: 场景定义
+      description: 创建、更新、删除场景定义
+      category: management
+      
+    - id: scene-session
+      name: 会话管理
+      description: 启动、结束场景会话
+      category: management
+      
+    - id: scene-validation
+      name: 能力验证
+      description: 验证场景所需能力是否可用
+      category: management
+  
+  routes:
+    - path: /api/v1/scenes
+      method: GET
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: listScenes
+      produces: application/json
+      
+    - path: /api/v1/scenes
+      method: POST
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: createScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}
+      method: GET
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: getScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}
+      method: PUT
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: updateScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}
+      method: DELETE
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: deleteScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}/start
+      method: POST
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: startScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}/stop
+      method: POST
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: stopScene
+      produces: application/json
+      
+    - path: /api/v1/scenes/{sceneId}/validate
+      method: POST
+      controller: net.ooder.skill.scene.controller.SceneController
+      methodName: validateScene
+      produces: application/json
+  
+  services:
+    - name: sceneService
+      interface: net.ooder.skill.scene.service.SceneService
+      implementation: net.ooder.skill.scene.service.impl.SceneServiceImpl
+      singleton: true
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
