@@ -24,8 +24,15 @@ public class CapabilityStateServiceImpl implements CapabilityStateService {
     
     private final Map<String, CapabilityState> stateCache = new ConcurrentHashMap<>();
     
-    @Autowired
     private JsonStorageService jsonStorageService;
+
+    public CapabilityStateServiceImpl() {
+    }
+
+    @Autowired
+    public void setJsonStorageService(JsonStorageService jsonStorageService) {
+        this.jsonStorageService = jsonStorageService;
+    }
 
     @PostConstruct
     public void init() {
@@ -79,6 +86,11 @@ public class CapabilityStateServiceImpl implements CapabilityStateService {
         state.setStatus(status);
         persistState(state);
         log.info("[setStatus] Capability {} status={}", capabilityId, status);
+    }
+
+    @Override
+    public void updateState(String capabilityId, boolean installed, CapabilityStatus status) {
+        updateState(capabilityId, installed, status, null, null, null);
     }
 
     @Override

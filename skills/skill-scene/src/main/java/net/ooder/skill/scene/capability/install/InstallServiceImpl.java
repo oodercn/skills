@@ -111,7 +111,7 @@ public class InstallServiceImpl implements InstallService {
         
         String skillForm = config.getSkillForm();
         String sceneType = config.getSceneType();
-        String visibility = config.getVisibility();
+        String visibility = config.getVisibility(); 
         
         if (!"SCENE".equals(skillForm)) {
             steps.add("安装独立能力");
@@ -597,5 +597,27 @@ public class InstallServiceImpl implements InstallService {
             ? "安装已回滚" : "安装未回滚");
         
         return result;
+    }
+    
+    private CapabilityStatus determinePostCapabilityStatus(InstallConfig config) {
+        if (config == null) {
+            return CapabilityStatus.REGISTERED;
+        }
+        
+        String sceneType = config.getSceneType();
+        if (sceneType == null) {
+            return CapabilityStatus.REGISTERED;
+        }
+        
+        switch (sceneType.toUpperCase()) {
+            case "FULL_AUTO":
+            case "SEMI_AUTO":
+                return CapabilityStatus.PENDING;
+            case "SCHEDULED":
+                return CapabilityStatus.SCHEDULED;
+            case "INTERACTIVE":
+            default:
+                return CapabilityStatus.ENABLED;
+        }
     }
 }

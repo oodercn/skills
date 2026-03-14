@@ -6,6 +6,7 @@ import net.ooder.skill.scene.capability.model.CapabilityType;
 import net.ooder.skill.scene.capability.model.SceneType;
 import net.ooder.skill.scene.capability.model.SkillForm;
 import net.ooder.skill.scene.capability.model.CapabilityCategory;
+import net.ooder.skill.scene.capability.model.CapabilityStatus;
 
 import java.util.List;
 

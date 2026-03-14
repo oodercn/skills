@@ -96,6 +96,12 @@
             <artifactId>fastjson2</artifactId>
             <version>${fastjson2.version}</version>
         </dependency>
+        
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>scene-engine</artifactId>
+            <version>${project.version}</version>
+        </dependency>
 
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
