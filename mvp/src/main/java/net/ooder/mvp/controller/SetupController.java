@@ -190,15 +190,26 @@ public class SetupController {
     }
     
     private File findSkillJar(String skillId) {
-        // 首先检查 target 目录
-        File targetJar = new File("../skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar");
-        if (targetJar.exists()) {
-            return targetJar;
+        // 首先检查 skills 目录下的 target 目录
+        String[] jarPaths = {
+            "../skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "../skills/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "skills/" + skillId + "/target/" + skillId + "-2.3.1.jar"
+        };
+        
+        for (String jarPath : jarPaths) {
+            File jarFile = new File(jarPath);
+            if (jarFile.exists()) {
+                System.out.println("[SetupController] Found skill JAR: " + jarFile.getAbsolutePath());
+                return jarFile;
+            }
         }
         
         // 检查本地 Maven 仓库
         File mavenJar = new File(System.getProperty("user.home") + "/.m2/repository/net/ooder/" + skillId + "/2.3.1/" + skillId + "-2.3.1.jar");
         if (mavenJar.exists()) {
+            System.out.println("[SetupController] Found skill JAR in Maven repo: " + mavenJar.getAbsolutePath());
             return mavenJar;
         }
         
@@ -209,8 +220,13 @@ public class SetupController {
         try {
             System.out.println("[SetupController] Packaging skill: " + skillId);
             
-            // 使用 Maven 打包
-            ProcessBuilder pb = new ProcessBuilder("mvn", "package", "-DskipTests", "-q");
+            String mvnCmd = findMavenCommand();
+            if (mvnCmd == null) {
+                System.err.println("[SetupController] Maven not found, skipping package step");
+                return null;
+            }
+            
+            ProcessBuilder pb = new ProcessBuilder(mvnCmd, "package", "-DskipTests", "-q");
             pb.directory(new File(skillPath));
             pb.inheritIO();
             Process process = pb.start();
@@ -221,7 +237,6 @@ public class SetupController {
                 return null;
             }
             
-            // 返回打包后的 JAR 文件
             File jarFile = new File(skillPath + "/target/" + skillId + "-2.3.1.jar");
             if (jarFile.exists()) {
                 return jarFile;
@@ -232,6 +247,32 @@ public class SetupController {
             System.err.println("[SetupController] Failed to package skill: " + e.getMessage());
             return null;
         }
+    }
+    
+    private String findMavenCommand() {
+        String[] possiblePaths = {
+            "mvn",
+            "mvn.cmd",
+            System.getenv("MAVEN_HOME") != null ? System.getenv("MAVEN_HOME") + "/bin/mvn.cmd" : null,
+            "D:/maven/apache-maven-3.6.0-bin/bin/mvn.cmd"
+        };
+        
+        for (String path : possiblePaths) {
+            if (path == null) continue;
+            try {
+                ProcessBuilder pb = new ProcessBuilder(path, "-version");
+                pb.redirectErrorStream(true);
+                Process process = pb.start();
+                int exitCode = process.waitFor();
+                if (exitCode == 0) {
+                    System.out.println("[SetupController] Found Maven at: " + path);
+                    return path;
+                }
+            } catch (Exception e) {
+                // continue to next path
+            }
+        }
+        return null;
     }
     
     private boolean installSkillFromJar(File jarFile) {
