@@ -15,7 +15,7 @@
             enabled: true,
             position: 'bottom-right',
             title: 'AI助手',
-            sessionId: 'session-default'
+            sessionId: null
         },
 
         async init() {
@@ -30,11 +30,41 @@
 
             if (!this.config.enabled) return;
 
+            await this.ensureSession();
             this.render();
             this.bindEvents();
             this.initialized = true;
 
-            console.log('[LLMChatFloat] Initialized');
+            console.log('[LLMChatFloat] Initialized with sessionId:', this.config.sessionId);
+        },
+
+        async ensureSession() {
+            if (this.config.sessionId) {
+                try {
+                    const response = await fetch(`/api/v1/chat/sessions/${this.config.sessionId}`);
+                    if (response.ok) {
+                        return;
+                    }
+                } catch (e) {}
+            }
+
+            try {
+                const response = await fetch('/api/v1/chat/sessions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        userId: 'float-user',
+                        title: 'AI助手对话'
+                    })
+                });
+                const result = await response.json();
+                if (result.status === 'success' && result.data && result.data.sessionId) {
+                    this.config.sessionId = result.data.sessionId;
+                    this.saveConfig();
+                }
+            } catch (e) {
+                console.error('[LLMChatFloat] Failed to create session:', e);
+            }
         },
 
         render() {
@@ -490,6 +520,14 @@
         async sendMessage() {
             if (this.isStreaming) return;
             
+            if (!this.config.sessionId) {
+                await this.ensureSession();
+                if (!this.config.sessionId) {
+                    this.addMessage('assistant', '抱歉，无法创建会话，请刷新页面重试。');
+                    return;
+                }
+            }
+
             const input = document.getElementById('llmChatInput');
             const content = input.value.trim();
             
@@ -505,7 +543,6 @@
             this.addStreamingMessage(messageId);
 
             try {
-                // 直接使用非流式 API，更可靠
                 const response = await fetch(`/api/v1/chat/sessions/${this.config.sessionId}/messages`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -515,7 +552,6 @@
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data && result.data.content) {
-                    // 打字机效果显示
                     await this.typeWriterEffect(messageId, result.data.content);
                 } else {
                     this.updateStreamingMessage(messageId, '抱歉，未收到有效回复。');
