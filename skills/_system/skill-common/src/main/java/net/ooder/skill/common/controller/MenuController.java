@@ -174,21 +174,38 @@ public class MenuController {
             }
         }
         
-        List<Map<String, Object>> subMenus = loadSkillSubMenuConfig(skillDir.getAbsolutePath(), skillId);
-        log.info("Loaded {} subMenus for skill: {}", subMenus.size(), skillId);
+        List<Map<String, Object>> menuItems = loadSkillSubMenuConfig(skillDir.getAbsolutePath(), skillId);
+        log.info("Loaded {} menu items for skill: {}", menuItems.size(), skillId);
         
-        if (!subMenus.isEmpty()) {
-            Map<String, Object> firstMenu = subMenus.get(0);
-            Map<String, Object> menu = new LinkedHashMap<>();
-            menu.put("id", skillId);
-            menu.put("name", skillName);
-            menu.put("icon", skillIcon);
-            menu.put("url", firstMenu.get("url"));
-            if (subMenus.size() > 1) {
-                menu.put("children", subMenus);
+        if (!menuItems.isEmpty()) {
+            Map<String, Object> firstItem = menuItems.get(0);
+            
+            if (firstItem.containsKey("children") && firstItem.get("children") instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> children = (List<Map<String, Object>>) firstItem.get("children");
+                
+                Map<String, Object> menu = new LinkedHashMap<>();
+                menu.put("id", firstItem.get("id"));
+                menu.put("name", firstItem.get("name"));
+                menu.put("icon", firstItem.get("icon"));
+                menu.put("url", children.isEmpty() ? firstItem.get("url") : children.get(0).get("url"));
+                menu.put("children", children);
+                
+                log.info("Created skill menu '{}' with {} children, first url: {}", 
+                    firstItem.get("name"), children.size(), menu.get("url"));
+                return menu;
+            } else {
+                Map<String, Object> menu = new LinkedHashMap<>();
+                menu.put("id", firstItem.get("id"));
+                menu.put("name", firstItem.get("name"));
+                menu.put("icon", firstItem.get("icon"));
+                menu.put("url", firstItem.get("url"));
+                if (menuItems.size() > 1) {
+                    menu.put("children", menuItems);
+                }
+                log.info("Created skill menu with url: {}", firstItem.get("url"));
+                return menu;
             }
-            log.info("Created skill menu with url: {}", firstMenu.get("url"));
-            return menu;
         }
         
         log.warn("No submenus found for skill: {}, using default url", skillId);
