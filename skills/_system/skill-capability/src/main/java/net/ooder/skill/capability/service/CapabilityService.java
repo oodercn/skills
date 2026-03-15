@@ -3,6 +3,7 @@ package net.ooder.skill.capability.service;
 import net.ooder.skill.capability.model.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CapabilityService {
     
@@ -23,4 +24,34 @@ public interface CapabilityService {
     void unregister(String capabilityId);
     
     void updateStatus(String capabilityId, String status);
+    
+    List<Capability> findByOwnerId(String ownerId);
+    
+    List<Capability> findByCategory(String category);
+    
+    List<Capability> findByVisibility(String visibility);
+    
+    List<Capability> findInstalled();
+    
+    List<Capability> findActive();
+    
+    long count();
+    
+    long countByType(String type);
+    
+    long countByStatus(CapabilityStatus status);
+    
+    long countInstalled();
+    
+    long countActive();
+    
+    Map<String, Long> getStatistics();
+    
+    void install(String capabilityId);
+    
+    void uninstall(String capabilityId);
+    
+    void enable(String capabilityId);
+    
+    void disable(String capabilityId);
 }

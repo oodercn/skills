@@ -1,6 +1,7 @@
 /**
  * LLM Chat Float Component
  * LLM聊天悬浮窗口组件
+ * 支持：Session级别对话、Skills上下文注入、多轮对话、Script执行
  */
 
 (function() {
@@ -11,11 +12,15 @@
         isOpen: false,
         useKnowledge: false,
         isStreaming: false,
+        messages: [],
+        sessionId: null,
         config: {
             enabled: true,
             position: 'bottom-right',
             title: 'AI助手',
-            sessionId: null
+            provider: 'mock',
+            model: 'default',
+            maxHistory: 10
         },
 
         async init() {
@@ -30,41 +35,93 @@
 
             if (!this.config.enabled) return;
 
-            await this.ensureSession();
+            await this.loadLlmConfig();
+            this.sessionId = this.generateSessionId();
             this.render();
             this.bindEvents();
             this.initialized = true;
 
-            console.log('[LLMChatFloat] Initialized with sessionId:', this.config.sessionId);
+            console.log('[LLMChatFloat] Initialized with provider:', this.config.provider, 'model:', this.config.model);
         },
 
-        async ensureSession() {
-            if (this.config.sessionId) {
-                try {
-                    const response = await fetch(`/api/v1/chat/sessions/${this.config.sessionId}`);
-                    if (response.ok) {
-                        return;
+        generateSessionId() {
+            return 'session-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
+        },
+
+        async loadLlmConfig() {
+            try {
+                const response = await fetch('/api/v1/llm/config');
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.status === 'success' && result.data) {
+                        this.config.provider = result.data.provider || 'mock';
+                        this.config.model = result.data.model || 'default';
                     }
+                }
+            } catch (e) {
+                console.error('[LLMChatFloat] Failed to load LLM config:', e);
+            }
+        },
+
+        getSkillContext() {
+            const context = {
+                pageUrl: window.location.href,
+                pageTitle: document.title,
+                skillId: null,
+                skillName: null,
+                pageData: null
+            };
+
+            if (window.__OODER_SKILL_CONTEXT__) {
+                context.skillId = window.__OODER_SKILL_CONTEXT__.skillId;
+                context.skillName = window.__OODER_SKILL_CONTEXT__.skillName;
+                context.pageData = window.__OODER_SKILL_CONTEXT__.data;
+            }
+
+            const pathParts = window.location.pathname.split('/');
+            const skillsIndex = pathParts.indexOf('skills');
+            if (skillsIndex !== -1 && pathParts.length > skillsIndex + 1) {
+                context.skillId = context.skillId || pathParts[skillsIndex + 1];
+            }
+
+            return context;
+        },
+
+        buildContextString() {
+            const ctx = this.getSkillContext();
+            const parts = [];
+            
+            if (ctx.skillName) {
+                parts.push(`当前Skill: ${ctx.skillName}`);
+            }
+            if (ctx.skillId) {
+                parts.push(`Skill ID: ${ctx.skillId}`);
+            }
+            parts.push(`页面: ${ctx.pageTitle}`);
+            parts.push(`URL: ${ctx.pageUrl}`);
+            
+            if (ctx.pageData) {
+                try {
+                    parts.push(`页面数据: ${JSON.stringify(ctx.pageData).substring(0, 200)}`);
                 } catch (e) {}
             }
 
-            try {
-                const response = await fetch('/api/v1/chat/sessions', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        userId: 'float-user',
-                        title: 'AI助手对话'
-                    })
+            return parts.join('\n');
+        },
+
+        getHistoryMessages() {
+            const history = [];
+            const start = Math.max(0, this.messages.length - this.config.maxHistory);
+            
+            for (let i = start; i < this.messages.length; i++) {
+                const msg = this.messages[i];
+                history.push({
+                    role: msg.role,
+                    content: msg.content
                 });
-                const result = await response.json();
-                if (result.status === 'success' && result.data && result.data.sessionId) {
-                    this.config.sessionId = result.data.sessionId;
-                    this.saveConfig();
-                }
-            } catch (e) {
-                console.error('[LLMChatFloat] Failed to create session:', e);
             }
+            
+            return history;
         },
 
         render() {
@@ -82,8 +139,8 @@
                             <span>${this.config.title}</span>
                         </div>
                         <div class="llm-chat-float-actions">
-                            <button class="llm-chat-float-action-btn" id="llmChatKnowledgeBtn" title="知识资料库">
-                                <i class="ri-book-2-line"></i>
+                            <button class="llm-chat-float-action-btn" id="llmChatContextBtn" title="查看上下文">
+                                <i class="ri-information-line"></i>
                             </button>
                             <button class="llm-chat-float-action-btn" id="llmChatNewBtn" title="新对话">
                                 <i class="ri-add-line"></i>
@@ -104,10 +161,9 @@
                         </div>
                     </div>
                     <div class="llm-chat-float-input-area">
-                        <div class="llm-chat-float-knowledge-toggle" id="llmChatKnowledgeToggle">
-                            <input type="checkbox" id="llmChatUseKnowledge" class="llm-chat-float-checkbox">
-                            <i class="ri-database-2-line"></i>
-                            <span>使用知识库</span>
+                        <div class="llm-chat-float-context-indicator" id="llmChatContextIndicator">
+                            <i class="ri-link"></i>
+                            <span>已获取页面上下文</span>
                         </div>
                         <div class="llm-chat-float-input-wrapper">
                             <textarea class="llm-chat-float-input" id="llmChatInput" 
@@ -179,8 +235,8 @@
                     position: fixed;
                     bottom: 96px;
                     right: 24px;
-                    width: 380px;
-                    height: 520px;
+                    width: 400px;
+                    height: 540px;
                     background: var(--nx-bg-primary, #fff);
                     border-radius: 16px;
                     box-shadow: 0 8px 32px rgba(0, 0, 0, 0.15);
@@ -288,6 +344,7 @@
                     background: var(--nx-bg-elevated, #fff);
                     border: 1px solid var(--nx-border-color, #e0e0e0);
                     color: var(--nx-text-primary, #333);
+                    word-break: break-word;
                 }
 
                 .llm-chat-float-message--user .llm-chat-float-content {
@@ -296,40 +353,84 @@
                     border: none;
                 }
 
+                .llm-chat-float-content pre {
+                    background: rgba(0,0,0,0.05);
+                    padding: 8px 12px;
+                    border-radius: 6px;
+                    overflow-x: auto;
+                    margin: 8px 0;
+                    font-size: 13px;
+                }
+
+                .llm-chat-float-content code {
+                    font-family: 'Fira Code', 'Consolas', monospace;
+                    font-size: 13px;
+                }
+
+                .llm-chat-float-script-block {
+                    margin: 8px 0;
+                    border: 1px solid #667eea;
+                    border-radius: 8px;
+                    overflow: hidden;
+                }
+
+                .llm-chat-float-script-header {
+                    background: rgba(102, 126, 234, 0.1);
+                    padding: 6px 10px;
+                    font-size: 12px;
+                    color: #667eea;
+                    display: flex;
+                    justify-content: space-between;
+                    align-items: center;
+                }
+
+                .llm-chat-float-script-run {
+                    background: #667eea;
+                    color: white;
+                    border: none;
+                    padding: 4px 12px;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 4px;
+                }
+
+                .llm-chat-float-script-run:hover {
+                    background: #5a6fd6;
+                }
+
+                .llm-chat-float-script-run.executed {
+                    background: #4caf50;
+                }
+
+                .llm-chat-float-script-code {
+                    padding: 10px;
+                    background: #1e1e2e;
+                    color: #cdd6f4;
+                    font-family: 'Fira Code', 'Consolas', monospace;
+                    font-size: 12px;
+                    overflow-x: auto;
+                    white-space: pre-wrap;
+                }
+
                 .llm-chat-float-input-area {
                     padding: 12px 16px;
                     border-top: 1px solid var(--nx-border-color, #e0e0e0);
                     background: var(--nx-bg-primary, #fff);
                 }
 
-                .llm-chat-float-knowledge-toggle {
+                .llm-chat-float-context-indicator {
                     display: flex;
                     align-items: center;
-                    gap: 8px;
+                    gap: 6px;
                     font-size: 12px;
-                    color: var(--nx-text-secondary, #666);
-                    cursor: pointer;
-                    margin-bottom: 8px;
-                    padding: 6px 10px;
-                    border-radius: 6px;
-                    transition: all 0.2s;
-                    user-select: none;
-                }
-
-                .llm-chat-float-knowledge-toggle:hover {
-                    background: var(--nx-bg-tertiary, #eee);
-                }
-
-                .llm-chat-float-knowledge-toggle.active {
-                    background: rgba(102, 126, 234, 0.15);
                     color: #667eea;
-                }
-
-                .llm-chat-float-checkbox {
-                    width: 16px;
-                    height: 16px;
-                    cursor: pointer;
-                    accent-color: #667eea;
+                    margin-bottom: 8px;
+                    padding: 4px 8px;
+                    background: rgba(102, 126, 234, 0.1);
+                    border-radius: 4px;
                 }
 
                 .llm-chat-float-input-wrapper {
@@ -407,7 +508,23 @@
                     40% { transform: scale(1); }
                 }
 
-                /* 深色主题 - 使用 CSS 变量自动适配 */
+                .llm-chat-float-result {
+                    margin-top: 8px;
+                    padding: 8px 12px;
+                    background: rgba(76, 175, 80, 0.1);
+                    border-left: 3px solid #4caf50;
+                    border-radius: 4px;
+                    font-size: 12px;
+                    color: #2e7d32;
+                }
+
+                .llm-chat-float-result.error {
+                    background: rgba(244, 67, 54, 0.1);
+                    border-color: #f44336;
+                    color: #c62828;
+                }
+
+                /* 深色主题 */
                 [data-theme="dark"] .llm-chat-float-window,
                 .nx-theme-dark .llm-chat-float-window {
                     background: var(--nx-bg-primary, #1a1a2e) !important;
@@ -444,20 +561,15 @@
                     color: var(--nx-text-tertiary, #666) !important;
                 }
 
-                [data-theme="dark"] .llm-chat-float-knowledge-toggle,
-                .nx-theme-dark .llm-chat-float-knowledge-toggle {
-                    color: var(--nx-text-secondary, #a0a0a0) !important;
-                }
-
-                [data-theme="dark"] .llm-chat-float-knowledge-toggle:hover,
-                .nx-theme-dark .llm-chat-float-knowledge-toggle:hover {
-                    background: var(--nx-bg-tertiary, #2a2a3e) !important;
-                }
-
                 [data-theme="dark"] .llm-chat-float-avatar,
                 .nx-theme-dark .llm-chat-float-avatar {
                     background: var(--nx-bg-tertiary, #2a2a3e) !important;
                     color: var(--nx-text-secondary, #a0a0a0) !important;
+                }
+
+                [data-theme="dark"] .llm-chat-float-content pre,
+                .nx-theme-dark .llm-chat-float-content pre {
+                    background: rgba(0,0,0,0.3);
                 }
             `;
 
@@ -469,10 +581,8 @@
             const closeBtn = document.getElementById('llmChatCloseBtn');
             const sendBtn = document.getElementById('llmChatSendBtn');
             const input = document.getElementById('llmChatInput');
-            const knowledgeToggle = document.getElementById('llmChatKnowledgeToggle');
-            const knowledgeBtn = document.getElementById('llmChatKnowledgeBtn');
+            const contextBtn = document.getElementById('llmChatContextBtn');
             const newBtn = document.getElementById('llmChatNewBtn');
-            const checkbox = document.getElementById('llmChatUseKnowledge');
 
             btn.addEventListener('click', () => this.toggle());
             closeBtn.addEventListener('click', () => this.close());
@@ -485,21 +595,8 @@
                 }
             });
 
-            knowledgeToggle.addEventListener('click', (e) => {
-                if (e.target.type !== 'checkbox') {
-                    checkbox.checked = !checkbox.checked;
-                }
-                this.useKnowledge = checkbox.checked;
-                knowledgeToggle.classList.toggle('active', this.useKnowledge);
-            });
-
-            knowledgeBtn.addEventListener('click', () => {
-                window.open('/console/skills/skill-llm-chat/pages/chat.html', '_blank');
-            });
-
-            newBtn.addEventListener('click', () => {
-                this.clearChat();
-            });
+            contextBtn.addEventListener('click', () => this.showContext());
+            newBtn.addEventListener('click', () => this.clearChat());
         },
 
         toggle() {
@@ -517,23 +614,22 @@
             document.getElementById('llmChatFloatWindow').classList.remove('open');
         },
 
+        showContext() {
+            const ctx = this.getSkillContext();
+            const ctxStr = this.buildContextString();
+            alert('当前上下文信息:\n\n' + ctxStr);
+        },
+
         async sendMessage() {
             if (this.isStreaming) return;
             
-            if (!this.config.sessionId) {
-                await this.ensureSession();
-                if (!this.config.sessionId) {
-                    this.addMessage('assistant', '抱歉，无法创建会话，请刷新页面重试。');
-                    return;
-                }
-            }
-
             const input = document.getElementById('llmChatInput');
             const content = input.value.trim();
             
             if (!content) return;
 
             this.addMessage('user', content);
+            this.messages.push({ role: 'user', content });
             input.value = '';
             
             this.isStreaming = true;
@@ -543,16 +639,30 @@
             this.addStreamingMessage(messageId);
 
             try {
-                const response = await fetch(`/api/v1/chat/sessions/${this.config.sessionId}/messages`, {
+                const skillContext = this.buildContextString();
+                const history = this.getHistoryMessages();
+
+                const response = await fetch('/api/llm/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, useKnowledge: this.useKnowledge })
+                    body: JSON.stringify({ 
+                        message: content,
+                        provider: this.config.provider,
+                        model: this.config.model,
+                        sessionId: this.sessionId,
+                        skillContext: skillContext,
+                        history: history
+                    })
                 });
 
                 const result = await response.json();
 
                 if (result.status === 'success' && result.data && result.data.content) {
-                    await this.typeWriterEffect(messageId, result.data.content);
+                    const responseContent = result.data.content;
+                    this.messages.push({ role: 'assistant', content: responseContent });
+                    await this.renderMessage(messageId, responseContent);
+                } else if (result.message) {
+                    this.updateStreamingMessage(messageId, result.message);
                 } else {
                     this.updateStreamingMessage(messageId, '抱歉，未收到有效回复。');
                 }
@@ -566,26 +676,106 @@
             }
         },
 
-        async typeWriterEffect(messageId, text) {
+        async renderMessage(messageId, text) {
             const messageEl = document.getElementById(messageId);
             if (!messageEl) return;
 
             const contentEl = messageEl.querySelector('.llm-chat-float-content');
             if (!contentEl) return;
 
-            let displayText = '';
-            const chars = text.split('');
+            const processedHtml = this.processContent(text);
+            contentEl.innerHTML = processedHtml;
+
+            this.bindScriptButtons(contentEl);
+
+            const container = document.getElementById('llmChatMessages');
+            container.scrollTop = container.scrollHeight;
+        },
+
+        processContent(text) {
+            let html = this.escapeHtml(text);
             
-            for (let i = 0; i < chars.length; i++) {
-                displayText += chars[i];
-                contentEl.innerHTML = this.escapeHtml(displayText);
-                
-                const container = document.getElementById('llmChatMessages');
-                container.scrollTop = container.scrollHeight;
-                
-                // 随机延迟，模拟真实打字效果
-                await new Promise(resolve => setTimeout(resolve, 20 + Math.random() * 30));
+            html = html.replace(/```script\n([\s\S]*?)```/g, (match, code) => {
+                const scriptId = 'script-' + Date.now() + '-' + Math.random().toString(36).substr(2, 6);
+                return `<div class="llm-chat-float-script-block" data-script-id="${scriptId}">
+                    <div class="llm-chat-float-script-header">
+                        <span><i class="ri-code-line"></i> 可执行脚本</span>
+                        <button class="llm-chat-float-script-run" data-script="${this.escapeAttr(code)}">
+                            <i class="ri-play-line"></i> 执行
+                        </button>
+                    </div>
+                    <pre class="llm-chat-float-script-code">${this.escapeHtml(code)}</pre>
+                </div>`;
+            });
+
+            html = html.replace(/```(\w*)\n([\s\S]*?)```/g, (match, lang, code) => {
+                if (lang === 'script') return match;
+                return `<pre><code class="language-${lang}">${this.escapeHtml(code)}</code></pre>`;
+            });
+
+            html = html.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+            html = html.replace(/\*(.*?)\*/g, '<em>$1</em>');
+            html = html.replace(/^### (.*$)/gm, '<h4>$1</h4>');
+            html = html.replace(/^## (.*$)/gm, '<h3>$1</h3>');
+            html = html.replace(/^# (.*$)/gm, '<h2>$1</h2>');
+            html = html.replace(/^- (.*$)/gm, '<li>$1</li>');
+            html = html.replace(/\n/g, '<br>');
+
+            return html;
+        },
+
+        bindScriptButtons(container) {
+            const buttons = container.querySelectorAll('.llm-chat-float-script-run');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', async () => {
+                    const script = btn.getAttribute('data-script');
+                    const result = await this.executeScript(script);
+                    
+                    const scriptBlock = btn.closest('.llm-chat-float-script-block');
+                    let resultEl = scriptBlock.querySelector('.llm-chat-float-result');
+                    
+                    if (!resultEl) {
+                        resultEl = document.createElement('div');
+                        resultEl.className = 'llm-chat-float-result';
+                        scriptBlock.appendChild(resultEl);
+                    }
+                    
+                    if (result.success) {
+                        resultEl.className = 'llm-chat-float-result';
+                        resultEl.innerHTML = `<i class="ri-check-line"></i> 执行成功: ${this.formatResult(result.data)}`;
+                        btn.classList.add('executed');
+                        btn.innerHTML = '<i class="ri-check-line"></i> 已执行';
+                    } else {
+                        resultEl.className = 'llm-chat-float-result error';
+                        resultEl.innerHTML = `<i class="ri-error-warning-line"></i> 执行失败: ${result.error}`;
+                    }
+                });
+            });
+        },
+
+        async executeScript(script) {
+            try {
+                const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+                const fn = new AsyncFunction(script);
+                const result = await fn();
+                return { success: true, data: result };
+            } catch (e) {
+                console.error('[LLMChatFloat] Script execution error:', e);
+                return { success: false, error: e.message };
             }
+        },
+
+        formatResult(data) {
+            if (data === undefined) return 'undefined';
+            if (data === null) return 'null';
+            if (typeof data === 'object') {
+                try {
+                    return JSON.stringify(data).substring(0, 100);
+                } catch (e) {
+                    return String(data);
+                }
+            }
+            return String(data);
         },
 
         addMessage(role, content) {
@@ -648,10 +838,16 @@
         escapeHtml(text) {
             const div = document.createElement('div');
             div.textContent = text;
-            return div.innerHTML.replace(/\n/g, '<br>');
+            return div.innerHTML;
+        },
+
+        escapeAttr(text) {
+            return text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         },
 
         clearChat() {
+            this.messages = [];
+            this.sessionId = this.generateSessionId();
             document.getElementById('llmChatMessages').innerHTML = `
                 <div class="llm-chat-float-message llm-chat-float-message--assistant">
                     <div class="llm-chat-float-avatar">
@@ -689,6 +885,8 @@
     };
 
     window.LLMChatFloat = LLMChatFloat;
+
+    window.__OODER_SKILL_CONTEXT__ = window.__OODER_SKILL_CONTEXT__ || {};
 
     document.addEventListener('DOMContentLoaded', () => {
         LLMChatFloat.init();

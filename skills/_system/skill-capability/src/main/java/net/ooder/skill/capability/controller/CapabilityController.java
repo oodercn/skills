@@ -81,6 +81,12 @@ public class CapabilityController {
         return ResultModel.success(types);
     }
 
+    @GetMapping("/statistics")
+    public ResultModel<Map<String, Long>> getStatistics() {
+        Map<String, Long> stats = capabilityService.getStatistics();
+        return ResultModel.success(stats);
+    }
+
     @GetMapping("/{capabilityId}")
     public ResultModel<Capability> getCapability(@PathVariable String capabilityId) {
         Capability capability = capabilityService.findById(capabilityId);
@@ -151,5 +157,33 @@ public class CapabilityController {
         log.info("List bindings by agent: {}", agentId);
         List<CapabilityBinding> bindings = bindingService.listByAgent(agentId);
         return ResultModel.success(bindings);
+    }
+
+    @PostMapping("/{capabilityId}/install")
+    public ResultModel<Boolean> installCapability(@PathVariable String capabilityId) {
+        log.info("Install capability: {}", capabilityId);
+        capabilityService.install(capabilityId);
+        return ResultModel.success(true);
+    }
+
+    @PostMapping("/{capabilityId}/uninstall")
+    public ResultModel<Boolean> uninstallCapability(@PathVariable String capabilityId) {
+        log.info("Uninstall capability: {}", capabilityId);
+        capabilityService.uninstall(capabilityId);
+        return ResultModel.success(true);
+    }
+
+    @PostMapping("/{capabilityId}/enable")
+    public ResultModel<Boolean> enableCapability(@PathVariable String capabilityId) {
+        log.info("Enable capability: {}", capabilityId);
+        capabilityService.enable(capabilityId);
+        return ResultModel.success(true);
+    }
+
+    @PostMapping("/{capabilityId}/disable")
+    public ResultModel<Boolean> disableCapability(@PathVariable String capabilityId) {
+        log.info("Disable capability: {}", capabilityId);
+        capabilityService.disable(capabilityId);
+        return ResultModel.success(true);
     }
 }
