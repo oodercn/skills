@@ -17,8 +17,7 @@ public class CapabilityServiceImpl implements CapabilityService {
     
     private final Map<String, Capability> capabilities = new ConcurrentHashMap<>();
     
-    @PostConstruct
-    public void init() {
+    public CapabilityServiceImpl() {
         initDefaultCapabilities();
         log.info("Initialized {} capabilities", capabilities.size());
     }

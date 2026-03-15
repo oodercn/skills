@@ -81,9 +81,47 @@ public class CapabilityController {
         return ResultModel.success(types);
     }
 
-    @GetMapping("/statistics")
+    @GetMapping("/stats")
     public ResultModel<Map<String, Long>> getStatistics() {
         Map<String, Long> stats = capabilityService.getStatistics();
+        return ResultModel.success(stats);
+    }
+    
+    @GetMapping("/stats/overview")
+    public ResultModel<Map<String, Object>> getStatsOverview() {
+        Map<String, Object> overview = new LinkedHashMap<>();
+        overview.put("total", capabilityService.count());
+        overview.put("installed", capabilityService.countInstalled());
+        overview.put("active", capabilityService.countActive());
+        overview.put("llm", capabilityService.countByType("llm"));
+        overview.put("knowledge", capabilityService.countByType("knowledge"));
+        overview.put("vfs", capabilityService.countByType("vfs"));
+        overview.put("driver", capabilityService.countByType("driver"));
+        return ResultModel.success(overview);
+    }
+    
+    @GetMapping("/stats/by-skill-form")
+    public ResultModel<Map<String, Long>> getStatsBySkillForm() {
+        Map<String, Long> stats = new LinkedHashMap<>();
+        stats.put("SCENE", capabilityService.countByType("scene"));
+        stats.put("STANDALONE", capabilityService.count() - capabilityService.countByType("scene"));
+        return ResultModel.success(stats);
+    }
+    
+    @GetMapping("/stats/by-scene-type")
+    public ResultModel<Map<String, Long>> getStatsBySceneType() {
+        Map<String, Long> stats = new LinkedHashMap<>();
+        stats.put("AUTO", capabilityService.countByType("scene"));
+        stats.put("TRIGGER", 0L);
+        return ResultModel.success(stats);
+    }
+    
+    @GetMapping("/stats/by-ownership")
+    public ResultModel<Map<String, Long>> getStatsByOwnership() {
+        Map<String, Long> stats = new LinkedHashMap<>();
+        stats.put("SIC", 0L);
+        stats.put("IC", capabilityService.count());
+        stats.put("PC", 0L);
         return ResultModel.success(stats);
     }
 
