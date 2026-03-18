@@ -17,6 +17,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationEventPublisher;
 
+import javax.annotation.PostConstruct;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -30,13 +31,21 @@ public class CapabilityServiceImpl implements CapabilityService {
     private final JsonStorageService storageService;
     private final CapabilityStateService stateService;
     private ApplicationEventPublisher eventPublisher;
+    private boolean initialized = false;
 
     public CapabilityServiceImpl(JsonStorageService storageService, CapabilityStateService stateService) {
         this.storageService = storageService;
         this.stateService = stateService;
         this.registry = new CapabilityRegistry();
-        loadFromStorage();
-        initDefaultCapabilities();
+    }
+    
+    @PostConstruct
+    public void init() {
+        if (!initialized) {
+            loadFromStorage();
+            initialized = true;
+            log.info("[init] CapabilityServiceImpl initialized with {} capabilities", registry.size());
+        }
     }
     
     public void setEventPublisher(ApplicationEventPublisher eventPublisher) {

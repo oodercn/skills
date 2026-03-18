@@ -1,4 +1,4 @@
-﻿apiVersion: ooder.io/v1
+﻿﻿﻿apiVersion: ooder.io/v1
 kind: SkillIndex
 
 metadata:

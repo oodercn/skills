@@ -1,6 +1,7 @@
 package net.ooder.mvp.skill.scene.capability.service;
 
 import net.ooder.mvp.skill.scene.capability.model.Capability;
+import net.ooder.mvp.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityType;
 import net.ooder.mvp.skill.scene.capability.model.SceneType;
@@ -135,6 +136,18 @@ public class SkillCapabilitySyncService {
             Map<String, Object> spec = (Map<String, Object>) skillData.get("spec");
             String skillType = spec != null ? (String) spec.get("type") : "service-skill";
             
+            // 【新增】从 spec.capability.category 读取技能级别的分类
+            String skillCategory = null;
+            if (spec != null) {
+                Map<String, Object> capability = (Map<String, Object>) spec.get("capability");
+                if (capability != null) {
+                    skillCategory = (String) capability.get("category");
+                    if (skillCategory != null) {
+                        log.info("[processSkillYaml] Found skill-level category '{}' for skill: {}", skillCategory, skillId);
+                    }
+                }
+            }
+            
             Boolean specMainFirst = spec != null ? Boolean.TRUE.equals(spec.get("mainFirst")) : false;
             Boolean specHasSelfDrive = spec != null ? Boolean.TRUE.equals(spec.get("hasSelfDrive")) : null;
             Integer specBusinessScore = null;
@@ -158,7 +171,7 @@ public class SkillCapabilitySyncService {
                 return;
             }
 
-            syncSkillCapabilities(skillId, capabilities, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill);
+            syncSkillCapabilities(skillId, capabilities, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill, skillCategory);
             syncedCount++;
 
         } catch (Exception e) {
@@ -167,11 +180,11 @@ public class SkillCapabilitySyncService {
         }
     }
 
-    private void syncSkillCapabilities(String skillId, List<Map<String, Object>> capabilities, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill) {
+    private void syncSkillCapabilities(String skillId, List<Map<String, Object>> capabilities, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill, String skillCategory) {
         List<Capability> caps = new ArrayList<>();
 
         for (Map<String, Object> capData : capabilities) {
-            Capability cap = createCapabilityFromYaml(skillId, capData, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill);
+            Capability cap = createCapabilityFromYaml(skillId, capData, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill, skillCategory);
             caps.add(cap);
         }
 
@@ -189,7 +202,7 @@ public class SkillCapabilitySyncService {
         }
     }
 
-    private Capability createCapabilityFromYaml(String skillId, Map<String, Object> capData, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill) {
+    private Capability createCapabilityFromYaml(String skillId, Map<String, Object> capData, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill, String skillCategory) {
         Capability cap = new Capability();
         
         String capId = (String) capData.get("id");
@@ -232,6 +245,19 @@ public class SkillCapabilitySyncService {
             cap.setSceneCapability(true);
         } else {
             cap.setSceneCapability("scene-skill".equals(skillType));
+        }
+        
+        // 【修复】优先使用能力级别的 category，如果没有则使用技能级别的 skillCategory
+        Object categoryObj = capData.get("category");
+        if (categoryObj != null) {
+            String categoryStr = String.valueOf(categoryObj);
+            CapabilityCategory category = CapabilityCategory.fromCode(categoryStr);
+            cap.setCapabilityCategory(category);
+            log.debug("[createCapabilityFromYaml] Set category '{}' from capability for {}", categoryStr, capId);
+        } else if (skillCategory != null && !skillCategory.isEmpty()) {
+            CapabilityCategory category = CapabilityCategory.fromCode(skillCategory);
+            cap.setCapabilityCategory(category);
+            log.info("[createCapabilityFromYaml] Set category '{}' from skill-level for {}", skillCategory, capId);
         }
         
         @SuppressWarnings("unchecked")

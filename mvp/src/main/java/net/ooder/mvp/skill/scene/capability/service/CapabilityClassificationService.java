@@ -93,8 +93,8 @@ public class CapabilityClassificationService {
         
         if (cap.getCapabilityCategory() != null) {
             CapabilityCategory cat = cap.getCapabilityCategory();
-            if (cat == CapabilityCategory.LLM || cat == CapabilityCategory.KNOW || 
-                cat == CapabilityCategory.DB || cat == CapabilityCategory.VFS) {
+            if (cat == CapabilityCategory.LLM || cat == CapabilityCategory.KNOWLEDGE || 
+                cat == CapabilityCategory.VFS) {
                 return SkillForm.PROVIDER;
             }
         }

@@ -121,6 +121,13 @@
         .filter-group {
             display: flex;
             gap: 8px;
+            align-items: flex-start;
+            flex-direction: column;
+        }
+        
+        .filter-group-row {
+            display: flex;
+            gap: 8px;
             align-items: center;
         }
         
@@ -133,6 +140,12 @@
         .filter-chips {
             display: flex;
             gap: 8px;
+        }
+        
+        .filter-chips-row {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
         }
         
         .filter-chip {
@@ -562,39 +575,34 @@
                         <div class="stat-value" id="statActive">0</div>
                         <div class="stat-label">运行中</div>
                     </div>
-                    <div class="stat-card" data-category="llm" onclick="filterByCategory('llm')">
-                        <div class="stat-icon llm"><i class="ri-robot-line"></i></div>
-                        <div class="stat-value" id="statLLM">0</div>
-                        <div class="stat-label">LLM</div>
-                        <div class="stat-desc">0x30 大语言模型</div>
-                    </div>
-                    <div class="stat-card" data-category="db" onclick="filterByCategory('db')">
-                        <div class="stat-icon db"><i class="ri-database-2-line"></i></div>
-                        <div class="stat-value" id="statDB">0</div>
-                        <div class="stat-label">数据库</div>
-                        <div class="stat-desc">0x28 数据存储</div>
-                    </div>
-                    <div class="stat-card" data-category="vfs" onclick="filterByCategory('vfs')">
-                        <div class="stat-icon vfs"><i class="ri-folder-line"></i></div>
-                        <div class="stat-value" id="statVFS">0</div>
-                        <div class="stat-label">文件存储</div>
-                        <div class="stat-desc">0x20 虚拟文件系统</div>
-                    </div>
-                    <div class="stat-card" data-category="know" onclick="filterByCategory('know')">
-                        <div class="stat-icon know"><i class="ri-book-line"></i></div>
-                        <div class="stat-value" id="statKnow">0</div>
-                        <div class="stat-label">知识库</div>
-                        <div class="stat-desc">0x38 RAG检索增强</div>
-                    </div>
                 </div>
-                
-                <div class="category-tabs" id="categoryTabs"></div>
                 
                 <div class="toolbar">
                     <div class="toolbar-left">
                         <div class="search-box">
                             <i class="ri-search-line"></i>
                             <input type="text" placeholder="搜索能力名称或ID..." id="searchInput" oninput="searchKeyword=this.value;filterCapabilities()">
+                        </div>
+                        <div class="filter-group">
+                            <div class="filter-group-row">
+                                <span class="filter-label">分类:</span>
+                            </div>
+                            <div class="filter-chips-row" id="categoryFilterChipsRow1">
+                                <span class="filter-chip active" data-category="all" onclick="filterByCategory('all')">全部</span>
+                                <span class="filter-chip" data-category="org" onclick="filterByCategory('org')">组织服务</span>
+                                <span class="filter-chip" data-category="vfs" onclick="filterByCategory('vfs')">存储服务</span>
+                                <span class="filter-chip" data-category="llm" onclick="filterByCategory('llm')">LLM服务</span>
+                                <span class="filter-chip" data-category="knowledge" onclick="filterByCategory('knowledge')">知识服务</span>
+                                <span class="filter-chip" data-category="sys" onclick="filterByCategory('sys')">系统管理</span>
+                            </div>
+                            <div class="filter-chips-row" id="categoryFilterChipsRow2">
+                                <span class="filter-chip" data-category="msg" onclick="filterByCategory('msg')">消息通讯</span>
+                                <span class="filter-chip" data-category="ui" onclick="filterByCategory('ui')">UI生成</span>
+                                <span class="filter-chip" data-category="payment" onclick="filterByCategory('payment')">支付服务</span>
+                                <span class="filter-chip" data-category="media" onclick="filterByCategory('media')">媒体发布</span>
+                                <span class="filter-chip" data-category="util" onclick="filterByCategory('util')">工具服务</span>
+                                <span class="filter-chip" data-category="nexus-ui" onclick="filterByCategory('nexus-ui')">Nexus界面</span>
+                            </div>
                         </div>
                         <div class="filter-group">
                             <span class="filter-label">状态:</span>

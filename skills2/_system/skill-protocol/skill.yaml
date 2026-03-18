@@ -1,0 +1,240 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-protocol
+  name: 协议处理服务
+  version: 1.0.0
+  description: 协议处理服务 - 提供协议解析、协议适配、协议转换能力
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - protocol
+    - adapter
+    - converter
+    - parser
+
+spec:
+  type: service-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x03
+    category: sys
+    code: SYS_PROTOCOL
+    operations: [parse, adapt, convert]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+                description: "详情级别"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+                description: "执行上下文"
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+                description: "表单类型"
+              fields:
+                type: array
+                items:
+                  type: object
+                description: "表单字段定义"
+              defaults:
+                type: object
+                description: "默认值"
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+                description: "操作类型"
+              items:
+                type: array
+                items:
+                  type: object
+                description: "操作项列表"
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+                description: "要执行的动作"
+              parameters:
+                type: object
+                description: "动作参数"
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 50
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: protocol-parser
+      version: "1.0"
+      description: "协议解析接口"
+    - id: protocol-adapter
+      version: "1.0"
+      description: "协议适配接口"
+    - id: protocol-converter
+      version: "1.0"
+      description: "协议转换接口"
+  
+  capabilities:
+    - id: protocol-parse
+      name: 协议解析
+      description: 解析各种协议格式(JSON/XML/YAML/Protobuf)
+      category: service
+    - id: protocol-adapt
+      name: 协议适配
+      description: 适配不同协议版本和格式
+      category: service
+    - id: protocol-convert
+      name: 协议转换
+      description: 协议格式转换
+      category: service
+  
+  supportedProtocols:
+    - name: JSON
+      version: "1.0"
+      operations: [parse, serialize]
+    - name: XML
+      version: "1.0"
+      operations: [parse, serialize]
+    - name: YAML
+      version: "1.2"
+      operations: [parse, serialize]
+    - name: Protobuf
+      version: "3.0"
+      operations: [parse, serialize]
+    - name: MessagePack
+      version: "1.0"
+      operations: [parse, serialize]
+  
+  endpoints:
+    - path: /api/protocol/parse
+      method: POST
+      description: 解析协议数据
+      capability: protocol-parse
+    - path: /api/protocol/convert
+      method: POST
+      description: 转换协议格式
+      capability: protocol-convert
+    - path: /api/protocol/adapt
+      method: POST
+      description: 适配协议版本
+      capability: protocol-adapt
+    - path: /api/protocol/serialize
+      method: POST
+      description: 序列化数据
+      capability: protocol-parse
+  
+  config:
+    optional:
+      - name: DEFAULT_PROTOCOL
+        type: string
+        default: "JSON"
+        description: 默认协议格式
+      - name: STRICT_MODE
+        type: boolean
+        default: false
+        description: 严格模式
+      - name: PRETTY_PRINT
+        type: boolean
+        default: true
+        description: 美化输出
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-protocol-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

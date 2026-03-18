@@ -1,4 +1,4 @@
-ï»¿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Skills
 metadata:
   name: media-skills
@@ -7,7 +7,7 @@ metadata:
 
 skills:
 
-    - id: skill-media-wechat
+    - skillId: skill-media-wechat
       name: WeChat MP Publish Provider
       version: "0.7.3"
       capabilityCategory: media
@@ -17,7 +17,7 @@ skills:
         - wechat
         - mp
         - official-account
-      description: å¾®ä¿¡å…¬ä¼—å·å‘å¸ƒProvider - æä¾›å›¾æ–‡å‘å¸ƒã€ç´ æç®¡ç†èƒ½åŠ›
+      description: Î¢ĞÅ¹«ÖÚºÅ·¢²¼Provider - Ìá¹©Í¼ÎÄ·¢²¼¡¢ËØ²Ä¹ÜÀíÄÜÁ¦
       sceneId: media
       path: skills/skill-media-wechat
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-wechat-0.7.3.jar
@@ -25,7 +25,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-media-weibo
+    - skillId: skill-media-weibo
       name: Weibo Publish Provider
       version: "0.7.3"
       capabilityCategory: media
@@ -35,7 +35,7 @@ skills:
         - weibo
         - sina
         - microblog
-      description: å¾®åšå‘å¸ƒProvider - æä¾›å¾®åšå‘å¸ƒã€æ–‡ç« ç®¡ç†èƒ½åŠ›
+      description: Î¢²©·¢²¼Provider - Ìá¹©Î¢²©·¢²¼¡¢ÎÄÕÂ¹ÜÀíÄÜÁ¦
       sceneId: media
       path: skills/skill-media-weibo
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-weibo-0.7.3.jar
@@ -43,7 +43,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-media-zhihu
+    - skillId: skill-media-zhihu
       name: Zhihu Publish Provider
       version: "0.7.3"
       capabilityCategory: media
@@ -53,7 +53,7 @@ skills:
         - zhihu
         - article
         - q&a
-      description: çŸ¥ä¹å‘å¸ƒProvider - æä¾›ä¸“æ æ–‡ç« ã€å›ç­”å‘å¸ƒèƒ½åŠ›
+      description: Öªºõ·¢²¼Provider - Ìá¹©×¨À¸ÎÄÕÂ¡¢»Ø´ğ·¢²¼ÄÜÁ¦
       sceneId: media
       path: skills/skill-media-zhihu
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-zhihu-0.7.3.jar
@@ -61,7 +61,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-media-toutiao
+    - skillId: skill-media-toutiao
       name: Toutiao Publish Provider
       version: "0.7.3"
       capabilityCategory: media
@@ -71,7 +71,7 @@ skills:
         - toutiao
         - bytedance
         - news
-      description: å¤´æ¡å‘å¸ƒProvider - æä¾›å¤´æ¡å·æ–‡ç« å‘å¸ƒèƒ½åŠ›
+      description: Í·Ìõ·¢²¼Provider - Ìá¹©Í·ÌõºÅÎÄÕÂ·¢²¼ÄÜÁ¦
       sceneId: media
       path: skills/skill-media-toutiao
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-toutiao-0.7.3.jar
@@ -79,7 +79,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-media-xiaohongshu
+    - skillId: skill-media-xiaohongshu
       name: Xiaohongshu Publish Provider
       version: "0.7.3"
       capabilityCategory: media
@@ -89,7 +89,7 @@ skills:
         - xiaohongshu
         - red
         - note
-      description: å°çº¢ä¹¦å‘å¸ƒProvider - æä¾›ç¬”è®°å‘å¸ƒã€å›¾æ–‡ç®¡ç†èƒ½åŠ›
+      description: Ğ¡ºìÊé·¢²¼Provider - Ìá¹©±Ê¼Ç·¢²¼¡¢Í¼ÎÄ¹ÜÀíÄÜÁ¦
       sceneId: media
       path: skills/skill-media-xiaohongshu
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-media-xiaohongshu-0.7.3.jar

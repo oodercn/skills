@@ -454,47 +454,97 @@
                 return;
             }
             
-            if (currentEditProvider) {
-                currentEditProvider.name = name;
-                currentEditProvider.type = type;
-                currentEditProvider.defaultModel = document.getElementById('editDefaultModel').value;
-                currentEditProvider.timeout = parseInt(document.getElementById('editTimeout').value);
-                currentEditProvider.maxRetries = parseInt(document.getElementById('editMaxRetries').value);
-                currentEditProvider.functionCallingEnabled = document.getElementById('editFunctionCalling').checked;
-                currentEditProvider.enabled = document.getElementById('editEnabled').checked;
-            } else {
-                const newProvider = {
-                    providerId: 'provider-' + Date.now(),
-                    name: name,
-                    type: type,
-                    enabled: document.getElementById('editEnabled').checked,
-                    defaultModel: document.getElementById('editDefaultModel').value,
-                    timeout: parseInt(document.getElementById('editTimeout').value),
-                    maxRetries: parseInt(document.getElementById('editMaxRetries').value),
-                    functionCallingEnabled: document.getElementById('editFunctionCalling').checked,
-                    models: []
-                };
-                providers.push(newProvider);
+            const providerData = {
+                name: name,
+                type: type,
+                defaultModel: document.getElementById('editDefaultModel').value,
+                timeout: parseInt(document.getElementById('editTimeout').value) || 60000,
+                maxRetries: parseInt(document.getElementById('editMaxRetries').value) || 3,
+                functionCallingEnabled: document.getElementById('editFunctionCalling').checked,
+                enabled: document.getElementById('editEnabled').checked,
+                models: []
+            };
+            
+            if (apiKey && apiKey !== '******') {
+                providerData.providerConfig = { apiKey: apiKey };
             }
             
-            renderProviders();
-            closeModal('editProviderModal');
-            showToast('保存成功', 'success');
+            const url = currentEditProvider 
+                ? '/api/v1/llm/providers/' + currentEditProvider.providerId
+                : '/api/v1/llm/providers';
+            const method = currentEditProvider ? 'PUT' : 'POST';
+            
+            fetch(url, {
+                method: method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(providerData)
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    loadProviders();
+                    closeModal('editProviderModal');
+                    showToast('保存成功', 'success');
+                } else {
+                    showToast('保存失败: ' + (result.message || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Save provider error:', error);
+                showToast('保存失败: ' + error.message, 'error');
+            });
         }
         
         function deleteProvider(providerId) {
-            if (confirm('确定要删除此提供者吗？')) {
-                providers = providers.filter(p => p.providerId !== providerId);
-                renderProviders();
-                showToast('删除成功', 'success');
+            if (!confirm('确定要删除此提供者吗？')) {
+                return;
             }
+            
+            fetch('/api/v1/llm/providers/' + providerId, {
+                method: 'DELETE'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    loadProviders();
+                    showToast('删除成功', 'success');
+                } else {
+                    showToast('删除失败: ' + (result.message || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Delete provider error:', error);
+                showToast('删除失败: ' + error.message, 'error');
+            });
         }
         
         function testProvider(providerId) {
             showToast('正在测试连接...', 'success');
-            setTimeout(function() {
-                showToast('连接成功', 'success');
-            }, 1500);
+            
+            fetch('/api/v1/llm/providers/' + providerId + '/test', {
+                method: 'POST'
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success' && result.data) {
+                    var testData = result.data;
+                    if (testData.success === true) {
+                        var message = testData.message || '连接成功';
+                        if (testData.elapsed) {
+                            message += ' (耗时: ' + testData.elapsed + 'ms)';
+                        }
+                        showToast(message, 'success');
+                    } else {
+                        showToast('连接失败: ' + (testData.message || '未知错误'), 'error');
+                    }
+                } else {
+                    showToast('连接失败: ' + (result.message || '未知错误'), 'error');
+                }
+            })
+            .catch(error => {
+                console.error('Test provider error:', error);
+                showToast('连接失败: ' + error.message, 'error');
+            });
         }
         
         function showToast(message, type) {

@@ -243,23 +243,17 @@
     ];
 
     var CATEGORY_CONFIG = {
-        'sys': { name: '系统', icon: 'ri-settings-3-line', color: '#6366f1', desc: '系统管理' },
-        'org': { name: '组织', icon: 'ri-team-line', color: '#8b5cf6', desc: '组织管理' },
-        'auth': { name: '认证', icon: 'ri-shield-line', color: '#10b981', desc: '认证授权' },
-        'vfs': { name: '文件存储', icon: 'ri-folder-line', color: '#f5970b', desc: '虚拟文件系统' },
-        'db': { name: '数据库', icon: 'ri-database-2-line', color: '#db2777', desc: '数据存储' },
-        'llm': { name: 'LLM', icon: 'ri-robot-line', color: '#9334ff', desc: '大语言模型' },
-        'know': { name: '知识库', icon: 'ri-book-line', color: '#f5970b', desc: 'RAG检索增强' },
-        'comm': { name: '通信', icon: 'ri-message-3-line', color: '#f97b72', desc: '消息通信' },
-        'mon': { name: '监控', icon: 'ri-line-chart-line', color: '#10b981', desc: '系统监控' },
-        'payment': { name: '支付', icon: 'ri-bank-card-line', color: '#8b5cf6', desc: '支付功能' },
-        'media': { name: '媒体', icon: 'ri-image-line', color: '#f5970b', desc: '媒体处理' },
-        'search': { name: '搜索', icon: 'ri-search-line', color: '#f97b72', desc: '搜索功能' },
-        'sched': { name: '调度', icon: 'ri-calendar-line', color: '#f5970b', desc: '任务调度' },
-        'sec': { name: '安全', icon: 'ri-lock-line', color: '#db2777', desc: '安全认证' },
-        'iot': { name: 'IoT', icon: 'ri-cpu-line', color: '#8b5cf6', desc: '物联网' },
-        'net': { name: '网络', icon: 'ri-global-line', color: '#10b981', desc: '网络代理' },
-        'util': { name: '工具', icon: 'ri-tools-line', color: '#4f46e5', desc: '工具类' }
+        'org': { name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', desc: '企业组织架构、用户认证相关服务' },
+        'vfs': { name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', desc: '文件存储、对象存储相关服务' },
+        'llm': { name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', desc: '大语言模型服务、对话、配置、上下文管理' },
+        'knowledge': { name: '知识服务', icon: 'ri-book-line', color: '#10b981', desc: '知识库、RAG、向量存储、文档处理' },
+        'sys': { name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', desc: '系统监控、网络管理、安全审计' },
+        'msg': { name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', desc: '消息队列、通讯协议服务' },
+        'ui': { name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', desc: '界面生成、设计转代码服务' },
+        'payment': { name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', desc: '支付渠道、退款管理、交易处理' },
+        'media': { name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', desc: '自媒体文章发布、内容管理、数据分析' },
+        'util': { name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', desc: '通用工具、辅助服务、业务工具' },
+        'nexus-ui': { name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', desc: 'Nexus管理界面、仪表盘、监控页面' }
     };
 
     var PROFILE_DEFAULTS = {

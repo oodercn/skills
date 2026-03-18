@@ -2,6 +2,7 @@ package net.ooder.mvp.skill.scene.discovery;
 
 import net.ooder.scene.skill.model.SceneType;
 import net.ooder.scene.skill.model.SkillForm;
+import net.ooder.mvp.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.mvp.skill.scene.capability.service.MetadataCompat;
 import net.ooder.mvp.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.mvp.skill.scene.dto.discovery.RepositoryDTO;
@@ -168,6 +169,9 @@ public class SkillIndexLoader {
         for (Map<String, Object> skill : skills) {
             CapabilityDTO cap = new CapabilityDTO();
             String skillId = (String) skill.get("skillId");
+            if (skillId == null) {
+                skillId = (String) skill.get("id");
+            }
             cap.setId(skillId);
             cap.setName((String) skill.get("name"));
             cap.setDescription((String) skill.get("description"));
@@ -206,13 +210,14 @@ public class SkillIndexLoader {
             }
             
             Object categoryObj = skill.get("category");
-            if (categoryObj != null) {
-                cap.setCategory(String.valueOf(categoryObj));
+            if (categoryObj == null) {
+                categoryObj = skill.get("capabilityCategory");
             }
-            
-            Object capabilityCategoryObj = skill.get("capabilityCategory");
-            if (capabilityCategoryObj != null) {
-                cap.setCapabilityCategory(String.valueOf(capabilityCategoryObj));
+            if (categoryObj != null) {
+                String categoryStr = String.valueOf(categoryObj);
+                CapabilityCategory category = CapabilityCategory.fromCode(categoryStr);
+                cap.setCategory(category.getCode());
+                cap.setCapabilityCategory(category.getCode());
             }
             
             Object visibilityObj = skill.get("visibility");
@@ -311,6 +316,16 @@ public class SkillIndexLoader {
                 cap.setCapabilityCategory(capabilityCategory);
                 
                 String category = (String) spec.get("category");
+                
+                // 【修复】从实际 skill.yaml 文件读取 spec.capability.category
+                if (category == null || category.isEmpty()) {
+                    String categoryFromSkillYaml = readCategoryFromSkillYaml(entryFile, skillId, yaml);
+                    if (categoryFromSkillYaml != null && !categoryFromSkillYaml.isEmpty()) {
+                        category = categoryFromSkillYaml;
+                        log.info("[getSkillsFromEntryFiles] Read category '{}' from skill.yaml for skill {}", category, skillId);
+                    }
+                }
+                
                 cap.setCategory(category);
                 
                 String subCategory = (String) spec.get("subCategory");
@@ -457,7 +472,11 @@ public class SkillIndexLoader {
         
         for (Map<String, Object> scene : scenes) {
             CapabilityDTO cap = new CapabilityDTO();
-            cap.setId((String) scene.get("sceneId"));
+            String sceneId = (String) scene.get("sceneId");
+            if (sceneId == null) {
+                sceneId = (String) scene.get("id");
+            }
+            cap.setId(sceneId);
             cap.setName((String) scene.get("name"));
             cap.setDescription((String) scene.get("description"));
             cap.setVersion((String) scene.get("version"));
@@ -534,5 +553,68 @@ public class SkillIndexLoader {
             return giteeUrl != null ? giteeUrl : githubUrl;
         }
         return null;
+    }
+    
+    /**
+     * 从实际 skill.yaml 文件读取 spec.capability.category
+     * 
+     * @param entryFile entry 文件
+     * @param skillId skill ID
+     * @param yaml Yaml 解析器
+     * @return category 值，如果未找到则返回 null
+     */
+    private String readCategoryFromSkillYaml(File entryFile, String skillId, Yaml yaml) {
+        try {
+            // 从 entry 文件路径推断 skill.yaml 路径
+            // entry 文件路径示例: .../skills/capabilities/auth/skill-user-auth/skill-index-entry.yaml
+            // skill.yaml 路径示例: .../skills/capabilities/auth/skill-user-auth/src/main/resources/skill.yaml
+            String entryPath = entryFile.getAbsolutePath();
+            File skillDir = entryFile.getParentFile();
+            
+            // 尝试多个可能的 skill.yaml 路径
+            String[] possiblePaths = {
+                skillDir.getAbsolutePath() + "/src/main/resources/skill.yaml",
+                skillDir.getAbsolutePath() + "/skill.yaml",
+                skillDir.getParentFile().getAbsolutePath() + "/src/main/resources/skill.yaml",
+                skillDir.getParentFile().getAbsolutePath() + "/skill.yaml"
+            };
+            
+            for (String skillYamlPath : possiblePaths) {
+                File skillYamlFile = new File(skillYamlPath);
+                if (skillYamlFile.exists()) {
+                    try (InputStream skillIs = new FileInputStream(skillYamlFile)) {
+                        Map<String, Object> skillData = yaml.load(skillIs);
+                        if (skillData != null) {
+                            Map<String, Object> spec = (Map<String, Object>) skillData.get("spec");
+                            if (spec != null) {
+                                // 首先尝试从 spec.capability.category 读取
+                                Map<String, Object> capability = (Map<String, Object>) spec.get("capability");
+                                if (capability != null) {
+                                    String category = (String) capability.get("category");
+                                    if (category != null && !category.isEmpty()) {
+                                        log.debug("[readCategoryFromSkillYaml] Found category '{}' in spec.capability.category for {}", category, skillId);
+                                        return category;
+                                    }
+                                }
+                                
+                                // 然后尝试从 spec.category 读取（废弃字段，但可能还存在）
+                                String category = (String) spec.get("category");
+                                if (category != null && !category.isEmpty()) {
+                                    log.debug("[readCategoryFromSkillYaml] Found category '{}' in spec.category (deprecated) for {}", category, skillId);
+                                    return category;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            log.debug("[readCategoryFromSkillYaml] Category not found in skill.yaml for {}", skillId);
+            return null;
+            
+        } catch (Exception e) {
+            log.debug("[readCategoryFromSkillYaml] Error reading category from skill.yaml for {}: {}", skillId, e.getMessage());
+            return null;
+        }
     }
 }

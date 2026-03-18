@@ -217,6 +217,18 @@ public class CapabilityBindingServiceImpl implements CapabilityBindingService {
         return null;
     }
 
+    
+    @Override
+    public List<CapabilityBinding> listAll() {
+        List<CapabilityBinding> result = new ArrayList<CapabilityBinding>();
+        for (CapabilityBinding binding : bindings.values()) {
+            if (binding.getStatus() != CapabilityBindingStatus.RELEASED) {
+                result.add(binding);
+            }
+        }
+        return result;
+    }
+
     @Override
     public void updateInvokeStats(String bindingId, boolean success) {
         CapabilityBinding binding = bindings.get(bindingId);

@@ -1,4 +1,4 @@
-ï»¿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Skills
 metadata:
   name: payment-skills
@@ -7,7 +7,7 @@ metadata:
 
 skills:
 
-    - id: skill-payment-alipay
+    - skillId: skill-payment-alipay
       name: Alipay Payment Provider
       version: "0.7.3"
       capabilityCategory: payment
@@ -17,7 +17,7 @@ skills:
         - alipay
         - zhifubao
         - mobile-pay
-      description: æ”¯ä»˜å®æ”¯ä»˜Provider - æä¾›æ”¯ä»˜å®æ”¯ä»˜ã€é€€æ¬¾ã€å›è°ƒå¤„ç†èƒ½åŠ›
+      description: Ö§¸¶±¦Ö§¸¶Provider - Ìá¹©Ö§¸¶±¦Ö§¸¶¡¢ÍË¿î¡¢»Øµ÷´¦ÀíÄÜÁ¦
       sceneId: payment
       path: skills/skill-payment-alipay
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
@@ -25,7 +25,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-payment-wechat
+    - skillId: skill-payment-wechat
       name: WeChat Pay Provider
       version: "0.7.3"
       capabilityCategory: payment
@@ -35,7 +35,7 @@ skills:
         - wechat
         - weixin
         - wxpay
-      description: å¾®ä¿¡æ”¯ä»˜Provider - æä¾›å¾®ä¿¡æ”¯ä»˜ã€é€€æ¬¾ã€å›è°ƒå¤„ç†èƒ½åŠ›
+      description: Î¢ĞÅÖ§¸¶Provider - Ìá¹©Î¢ĞÅÖ§¸¶¡¢ÍË¿î¡¢»Øµ÷´¦ÀíÄÜÁ¦
       sceneId: payment
       path: skills/skill-payment-wechat
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
@@ -43,7 +43,7 @@ skills:
       checksum: ""
       
 
-    - id: skill-payment-unionpay
+    - skillId: skill-payment-unionpay
       name: UnionPay Payment Provider
       version: "0.7.3"
       capabilityCategory: payment
@@ -53,7 +53,7 @@ skills:
         - unionpay
         - yinlian
         - bank-card
-      description: é“¶è”æ”¯ä»˜Provider - æä¾›é“¶è”æ”¯ä»˜ã€é€€æ¬¾ã€å›è°ƒå¤„ç†èƒ½åŠ›
+      description: ÒøÁªÖ§¸¶Provider - Ìá¹©ÒøÁªÖ§¸¶¡¢ÍË¿î¡¢»Øµ÷´¦ÀíÄÜÁ¦
       sceneId: payment
       path: skills/skill-payment-unionpay
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar

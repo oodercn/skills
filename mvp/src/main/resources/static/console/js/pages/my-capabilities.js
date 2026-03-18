@@ -18,28 +18,9 @@
     var MyCapabilities = {
         init: function() {
             console.log('我的能力页面初始化');
-            MyCapabilities.renderCategoryTabs();
             MyCapabilities.parseUrlParams();
             MyCapabilities.loadCapabilities();
             MyCapabilities.loadBindings();
-        },
-
-        renderCategoryTabs: function() {
-            var container = document.getElementById('categoryTabs');
-            if (!container) return;
-            
-            var html = '';
-            
-            html += '<div class="category-tab active" data-category="all" onclick="filterByCategory(\'all\')">' +
-                '<i class="ri-apps-line"></i> 全部</div>';
-            
-            Object.keys(CATEGORY_CONFIG).forEach(function(cat) {
-                var config = CATEGORY_CONFIG[cat];
-                html += '<div class="category-tab" data-category="' + cat + '" onclick="filterByCategory(\'' + cat + '\')">' +
-                    '<i class="' + config.icon + '"></i> ' + config.name + '</div>';
-            });
-            
-            container.innerHTML = html;
         },
 
         parseUrlParams: function() {
@@ -82,7 +63,7 @@
         },
 
         loadBindings: function() {
-            fetch('/api/v1/capabilities/bindings', {
+            fetch('/api/v1/scene/capabilities/bindings', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'
@@ -131,10 +112,15 @@
                 activeEl.textContent = activeCount;
             }
             
-            Object.keys(counts).forEach(function(cat) {
-                var el = document.getElementById('stat' + cat.toUpperCase());
-                if (el) {
-                    el.textContent = counts[cat];
+            document.querySelectorAll('#categoryFilterChipsRow1 .filter-chip, #categoryFilterChipsRow2 .filter-chip').forEach(function(chip) {
+                var cat = chip.getAttribute('data-category');
+                if (cat === 'all') {
+                    chip.innerHTML = '全部 (' + totalCount + ')';
+                } else if (counts[cat] !== undefined) {
+                    var config = CATEGORY_CONFIG[cat];
+                    if (config) {
+                        chip.innerHTML = config.name + ' (' + counts[cat] + ')';
+                    }
                 }
             });
         },
@@ -236,18 +222,18 @@
 
             var actionsCell = document.createElement('td');
             actionsCell.style.textAlign = 'right';
-            actionsCell.appendChild(MyCapabilities.getActionButtons(cap));
+            actionsCell.innerHTML = MyCapabilities.getActionButtons(cap);
             tr.appendChild(actionsCell);
 
             return tr;
         },
 
         getActionButtons: function(cap) {
-            var buttons = '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="drillDownSkill(\'' + cap.skillId + '\')">' +
+            var buttons = '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="event.stopPropagation(); drillDownSkill(\'' + cap.capabilityId + '\')">' +
                 '<i class="ri-eye-line"></i> 详情</button> ';
             
             if (cap.installed === true) {
-                buttons += '<button class="nx-btn nx-btn--sm nx-btn--primary" onclick="showBindDialog(\'' + cap.skillId + '\')">' +
+                buttons += '<button class="nx-btn nx-btn--sm nx-btn--primary" onclick="event.stopPropagation(); showBindDialog(\'' + cap.capabilityId + '\')">' +
                     '<i class="ri-link"></i> 绑定</button>';
             }
             
@@ -273,6 +259,120 @@
             pageSize = newSize;
             currentPage = 1;
             MyCapabilities.renderTable();
+        },
+
+        showDetailPanel: function(cap) {
+            var detailPanel = document.getElementById('detailPanel');
+            var detailTitle = document.getElementById('detailTitle');
+            var detailBody = document.getElementById('detailBody');
+            var overlay = document.getElementById('overlay');
+
+            if (!detailPanel || !detailBody) {
+                console.error('详情面板元素未找到');
+                return;
+            }
+
+            detailTitle.textContent = cap.name || '能力详情';
+
+            var categoryConfig = CATEGORY_CONFIG[cap.category] || CATEGORY_CONFIG['util'];
+            
+            var statusText = '';
+            var statusClass = '';
+            if (cap.installed === true && cap.enabled === true) {
+                statusText = '运行中';
+                statusClass = 'status-active';
+            } else if (cap.installed === true) {
+                statusText = '已安装';
+                statusClass = 'status-installed';
+            } else if (cap.enabled === false) {
+                statusText = '已禁用';
+                statusClass = 'status-disabled';
+            } else {
+                statusText = cap.status || '未安装';
+                statusClass = 'status-other';
+            }
+
+            var html = '';
+            
+            html += '<div class="detail-section">';
+            html += '<div class="detail-section-title"><i class="ri-information-line"></i> 基本信息</div>';
+            html += '<div class="detail-row"><span class="detail-row-label">能力ID</span><span class="detail-row-value">' + (cap.capabilityId || '-') + '</span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">描述</span><span class="detail-row-value">' + (cap.description || '-') + '</span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">分类</span><span class="detail-row-value"><span style="background:' + categoryConfig.color + ';color:white;padding:2px 8px;border-radius:4px;font-size:12px;">' + categoryConfig.name + '</span></span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">状态</span><span class="detail-row-value status-badge ' + statusClass + '">' + statusText + '</span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">版本</span><span class="detail-row-value">' + (cap.version || '-') + '</span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">类型</span><span class="detail-row-value">' + (cap.type || '-') + '</span></div>';
+            html += '</div>';
+
+            if (cap.skillId) {
+                html += '<div class="detail-section">';
+                html += '<div class="detail-section-title"><i class="ri-puzzle-line"></i> 技能信息</div>';
+                html += '<div class="detail-row"><span class="detail-row-label">技能ID</span><span class="detail-row-value">' + cap.skillId + '</span></div>';
+                html += '<div class="detail-row"><span class="detail-row-label">技能形态</span><span class="detail-row-value">' + (cap.skillForm || '-') + '</span></div>';
+                html += '</div>';
+            }
+
+            if (cap.supportedSceneTypes && cap.supportedSceneTypes.length > 0) {
+                html += '<div class="detail-section">';
+                html += '<div class="detail-section-title"><i class="ri-artboard-line"></i> 支持场景类型</div>';
+                html += '<div class="scene-types-list">';
+                cap.supportedSceneTypes.forEach(function(st) {
+                    html += '<span class="scene-type-tag">' + st + '</span>';
+                });
+                html += '</div>';
+                html += '</div>';
+            }
+
+            if (cap.features && cap.features.length > 0) {
+                html += '<div class="detail-section">';
+                html += '<div class="detail-section-title"><i class="ri-star-line"></i> 功能特性</div>';
+                html += '<div class="features-grid">';
+                cap.features.forEach(function(f) {
+                    html += '<span class="feature-tag"><i class="ri-check-line"></i> ' + f + '</span>';
+                });
+                html += '</div>';
+                html += '</div>';
+            }
+
+            var capBindings = bindings.filter(function(b) { return b.capabilityId === cap.capabilityId; });
+            if (capBindings.length > 0) {
+                html += '<div class="detail-section">';
+                html += '<div class="detail-section-title"><i class="ri-link"></i> 绑定场景 (' + capBindings.length + ')</div>';
+                html += '<div class="binding-list">';
+                capBindings.forEach(function(b) {
+                    html += '<div class="binding-item">';
+                    html += '<div class="binding-info">';
+                    html += '<div class="binding-icon"><i class="ri-artboard-line"></i></div>';
+                    html += '<div><div class="binding-name">' + (b.sceneName || b.sceneId) + '</div>';
+                    html += '<div class="binding-scene">' + (b.sceneType || '') + '</div></div>';
+                    html += '</div>';
+                    html += '</div>';
+                });
+                html += '</div>';
+                html += '</div>';
+            }
+
+            html += '<div class="detail-section">';
+            html += '<div class="detail-section-title"><i class="ri-time-line"></i> 时间信息</div>';
+            html += '<div class="detail-row"><span class="detail-row-label">创建时间</span><span class="detail-row-value">' + (cap.createTime ? MyCapabilities.formatTime(cap.createTime) : '-') + '</span></div>';
+            html += '<div class="detail-row"><span class="detail-row-label">更新时间</span><span class="detail-row-value">' + (cap.updateTime ? MyCapabilities.formatTime(cap.updateTime) : '-') + '</span></div>';
+            html += '</div>';
+
+            detailBody.innerHTML = html;
+            detailPanel.classList.add('open');
+            overlay.classList.add('open');
+        },
+
+        formatTime: function(timestamp) {
+            if (!timestamp) return '-';
+            var date = new Date(timestamp);
+            return date.toLocaleString('zh-CN', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
         }
     };
 
@@ -280,17 +380,11 @@
         currentCategoryFilter = category;
         currentFilter = 'all';
         
-        document.querySelectorAll('.category-tab').forEach(function(tab) {
-            tab.classList.remove('active');
+        document.querySelectorAll('#categoryFilterChipsRow1 .filter-chip, #categoryFilterChipsRow2 .filter-chip').forEach(function(chip) {
+            chip.classList.remove('active');
         });
-        var activeTab = document.querySelector('.category-tab[data-category="' + category + '"]');
-        if (activeTab) activeTab.classList.add('active');
-        
-        document.querySelectorAll('.stat-card').forEach(function(card) {
-            card.classList.remove('active');
-        });
-        var activeCard = document.querySelector('.stat-card[data-category="' + category + '"]');
-        if (activeCard) activeCard.classList.add('active');
+        var activeChip = document.querySelector('#categoryFilterChipsRow1 .filter-chip[data-category="' + category + '"], #categoryFilterChipsRow2 .filter-chip[data-category="' + category + '"]');
+        if (activeChip) activeChip.classList.add('active');
         
         MyCapabilities.renderTable();
     };
@@ -310,17 +404,24 @@
         MyCapabilities.renderTable();
     };
 
-    global.drillDownSkill = function(skillId) {
-        currentDrillDown = skillId;
-        var pkg = allCapabilities.find(function(p) { return p.skillId === skillId; });
+    global.drillDownSkill = function(capabilityId) {
+        currentDrillDown = capabilityId;
+        var cap = allCapabilities.find(function(p) { return p.capabilityId === capabilityId; });
         
-        if (pkg) {
-            console.log('查看技能包详情:', pkg);
+        if (cap) {
+            console.log('查看能力详情:', cap);
+            MyCapabilities.showDetailPanel(cap);
+        } else {
+            console.warn('未找到能力:', capabilityId);
         }
     };
 
-    global.showBindDialog = function(skillId) {
-        console.log('显示绑定对话框:', skillId);
+    global.showBindDialog = function(capabilityId) {
+        console.log('显示绑定对话框:', capabilityId);
+        var cap = allCapabilities.find(function(p) { return p.capabilityId === capabilityId; });
+        if (cap) {
+            alert('绑定功能开发中...\n能力: ' + cap.name);
+        }
     };
 
     global.refreshCapabilities = function() {

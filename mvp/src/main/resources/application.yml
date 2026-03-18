@@ -19,6 +19,9 @@ app:
 ooder:
   sdk:
     enabled: true
+  skills:
+    path: ../skills
+    auto-sync: true
   mock:
     enabled: false
   jds:

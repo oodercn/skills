@@ -88,6 +88,15 @@ public class RoleManagementService {
             createMenuItem("menu-developer-5", "能力统计", "/console/pages/capability-stats.html", "ri-bar-chart-box-line", 5, false)
         );
         roleMenus.put("developer", developerMenus);
+        
+        List<MenuItemDTO> collaboratorMenus = Arrays.asList(
+            createMenuItem("menu-collab-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true),
+            createMenuItem("menu-collab-2", "我的能力", "/console/pages/my-capabilities.html", "ri-puzzle-line", 2, false),
+            createMenuItem("menu-collab-3", "能力发现", "/console/pages/capability-discovery.html", "ri-search-line", 3, false),
+            createMenuItem("menu-collab-4", "场景管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false),
+            createMenuItem("menu-collab-5", "LLM配置", "/console/pages/llm-config.html", "ri-robot-line", 5, false)
+        );
+        roleMenus.put("collaborator", collaboratorMenus);
     }
 
     private void initDefaultUsers() {
@@ -131,6 +140,8 @@ public class RoleManagementService {
         item.setUrl(url);
         item.setIcon(icon);
         item.setSort(sort);
+        item.setOrder(sort);
+        item.setVisible(true);
         item.setActive(active);
         return item;
     }

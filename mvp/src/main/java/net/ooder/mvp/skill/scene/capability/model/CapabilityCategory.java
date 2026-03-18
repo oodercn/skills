@@ -8,23 +8,17 @@ import java.util.Map;
 @Dict(code = "capability_category", name = "能力地址分类", description = "能力地址空间分类")
 public enum CapabilityCategory implements DictItem {
 
-    SYS("sys", "系统核心", 0x00, "系统级能力", "ri-settings-4-line"),
-    ORG("org", "组织服务", 0x08, "组织、用户管理", "ri-team-line"),
-    AUTH("auth", "认证服务", 0x10, "认证、授权", "ri-shield-user-line"),
-    VFS("vfs", "文件存储", 0x18, "虚拟文件系统", "ri-folder-line"),
-    DB("db", "数据库", 0x20, "数据库操作", "ri-database-2-line"),
-    LLM("llm", "大语言模型", 0x28, "LLM调用", "ri-brain-line"),
-    KNOW("know", "知识库", 0x30, "知识检索", "ri-book-open-line"),
-    PAYMENT("payment", "支付服务", 0x38, "支付、计费", "ri-bank-card-line"),
-    MEDIA("media", "媒体服务", 0x40, "音视频处理", "ri-movie-line"),
-    COMM("comm", "通讯服务", 0x48, "消息、通知", "ri-message-3-line"),
-    MON("mon", "监控服务", 0x50, "监控、告警", "ri-pulse-line"),
-    IOT("iot", "物联网", 0x58, "设备管理", "ri-router-line"),
-    SEARCH("search", "搜索服务", 0x60, "搜索引擎", "ri-search-line"),
-    SCHED("sched", "调度服务", 0x68, "定时任务", "ri-timer-line"),
-    SEC("sec", "安全服务", 0x70, "安全审计", "ri-lock-line"),
-    NET("net", "网络服务", 0x78, "网络管理", "ri-wifi-line"),
-    UTIL("util", "工具服务", 0x08, "通用工具", "ri-tools-line");
+    ORG("org", "组织服务", 0x00, "企业组织架构、用户认证相关服务", "ri-team-line"),
+    VFS("vfs", "存储服务", 0x08, "文件存储、对象存储相关服务", "ri-database-2-line"),
+    LLM("llm", "LLM服务", 0x10, "大语言模型服务、对话、配置、上下文管理", "ri-brain-line"),
+    KNOWLEDGE("knowledge", "知识服务", 0x18, "知识库、RAG、向量存储、文档处理", "ri-book-line"),
+    SYS("sys", "系统管理", 0x20, "系统监控、网络管理、安全审计", "ri-settings-3-line"),
+    MSG("msg", "消息通讯", 0x28, "消息队列、通讯协议服务", "ri-message-3-line"),
+    UI("ui", "UI生成", 0x30, "界面生成、设计转代码服务", "ri-palette-line"),
+    PAYMENT("payment", "支付服务", 0x38, "支付渠道、退款管理、交易处理", "ri-bank-card-line"),
+    MEDIA("media", "媒体发布", 0x40, "自媒体文章发布、内容管理、数据分析", "ri-edit-line"),
+    UTIL("util", "工具服务", 0x48, "通用工具、辅助服务、业务工具", "ri-tools-line"),
+    NEXUS_UI("nexus-ui", "Nexus界面", 0x50, "Nexus管理界面、仪表盘、监控页面", "ri-layout-line");
 
     private final String code;
     private final String name;
@@ -55,33 +49,77 @@ public enum CapabilityCategory implements DictItem {
 
     private static final Map<String, String> CODE_MAPPING = new HashMap<>();
     static {
-        CODE_MAPPING.put("msg", "comm");
-        CODE_MAPPING.put("nexus-ui", "util");
-        CODE_MAPPING.put("ui", "util");
+        // 废弃的场景技能类型 -> knowledge
+        CODE_MAPPING.put("abs", "knowledge");
+        CODE_MAPPING.put("tbs", "knowledge");
+        CODE_MAPPING.put("ass", "knowledge");
+        
+        // 大写格式 -> 小写
+        CODE_MAPPING.put("ORG", "org");
+        CODE_MAPPING.put("VFS", "vfs");
+        CODE_MAPPING.put("LLM", "llm");
+        CODE_MAPPING.put("KNOWLEDGE", "knowledge");
+        CODE_MAPPING.put("SYS", "sys");
+        CODE_MAPPING.put("MSG", "msg");
+        CODE_MAPPING.put("UI", "ui");
+        CODE_MAPPING.put("PAYMENT", "payment");
+        CODE_MAPPING.put("MEDIA", "media");
+        CODE_MAPPING.put("UTIL", "util");
+        CODE_MAPPING.put("NEXUS-UI", "nexus-ui");
+        CODE_MAPPING.put("SYSTEM", "sys");
+        CODE_MAPPING.put("COMMUNICATION", "msg");
+        CODE_MAPPING.put("COLLABORATION", "util");
+        
+        // 未定义分类 -> 标准分类
         CODE_MAPPING.put("business", "util");
-        CODE_MAPPING.put("scheduler", "sched");
         CODE_MAPPING.put("infrastructure", "sys");
-        CODE_MAPPING.put("collaboration", "comm");
-        CODE_MAPPING.put("system", "sys");
-        CODE_MAPPING.put("communication", "comm");
+        CODE_MAPPING.put("scheduler", "sys");
+        CODE_MAPPING.put("auth", "org");
+        CODE_MAPPING.put("db", "vfs");
+        CODE_MAPPING.put("know", "knowledge");
+        CODE_MAPPING.put("comm", "msg");
+        CODE_MAPPING.put("mon", "sys");
+        CODE_MAPPING.put("search", "sys");
+        CODE_MAPPING.put("sched", "sys");
+        CODE_MAPPING.put("sec", "sys");
+        CODE_MAPPING.put("iot", "sys");
+        CODE_MAPPING.put("net", "sys");
+        CODE_MAPPING.put("service", "util");
         CODE_MAPPING.put("scene", "util");
+        CODE_MAPPING.put("nexus-ui", "nexus-ui");
     }
 
     public static CapabilityCategory fromCode(String code) {
-        if (code == null) return UTIL;
+        if (code == null) return SYS;
         
         String normalizedCode = code.toLowerCase().trim();
         
-        if (CODE_MAPPING.containsKey(normalizedCode)) {
-            normalizedCode = CODE_MAPPING.get(normalizedCode);
+        // 先检查原始code（大写格式）
+        if (CODE_MAPPING.containsKey(code)) {
+            String mappedValue = CODE_MAPPING.get(code);
+            // 不再转换为小写，直接使用映射后的值
+            for (CapabilityCategory cat : values()) {
+                if (cat.code.equalsIgnoreCase(mappedValue)) {
+                    return cat;
+                }
+            }
+        } else if (CODE_MAPPING.containsKey(normalizedCode)) {
+            String mappedValue = CODE_MAPPING.get(normalizedCode);
+            for (CapabilityCategory cat : values()) {
+                if (cat.code.equalsIgnoreCase(mappedValue)) {
+                    return cat;
+                }
+            }
         }
         
+        // 直接匹配枚举值
         for (CapabilityCategory cat : values()) {
             if (cat.code.equalsIgnoreCase(normalizedCode)) {
                 return cat;
             }
         }
-        return UTIL;
+        
+        return SYS;
     }
 
     public static CapabilityCategory fromAddress(int address) {
@@ -90,6 +128,6 @@ public enum CapabilityCategory implements DictItem {
                 return cat;
             }
         }
-        return UTIL;
+        return SYS;
     }
 }

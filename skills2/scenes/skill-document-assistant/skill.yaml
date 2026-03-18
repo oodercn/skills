@@ -1,0 +1,398 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-document-assistant
+  name: 智能文档助手
+  version: 1.0.0
+  description: 企业文档智能问答场景能力，支持员工通过自然语言查询公司制度、流程文档
+  author: Ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - document
+    - assistant
+    - rag
+    - knowledge
+    - qa
+  # category 已废弃，请在 skill-index 中定义
+  # sceneType: abs
+
+spec:
+  type: scene-skill
+  # category 已废弃，请在 skill-index 中定义
+  
+  classification:
+    # category 已废弃
+    categoryName: 自驱业务场景
+    mainFirst: true
+    businessSemanticsScore: 9
+    detectedAt: "2026-03-06T00:00:00Z"
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies:
+    - id: skill-knowledge-base
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "知识库核心服务"
+      capabilities:
+        - knowledge-base
+        - document-management
+        
+    - id: skill-rag
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "RAG检索增强服务"
+      capabilities:
+        - rag-retrieval
+        - rag-generation
+        
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "LLM对话服务"
+      capabilities:
+        - llm-chat
+        - conversation
+        
+    - id: skill-document-processor
+      version: ">=1.0.0"
+      required: false
+      autoInstall: false
+      description: "文档处理服务（可选）"
+      capabilities:
+        - document-parse
+        - document-chunk
+
+  sceneCapabilities:
+    - id: scene-document-assistant
+      name: 智能文档助手场景能力
+      type: SCENE
+      mainFirst: true
+      
+      mainFirstConfig:
+        selfCheck:
+          - checkCapabilities: [query-document, upload-document, manage-kb]
+          - checkDriverCapabilities: [intent-receiver]
+          - checkDependencies: [skill-knowledge-base, skill-rag, skill-llm-conversation]
+          - onCheckFailed:
+              action: degrade
+              degradedCapabilities: []
+              retry:
+                maxAttempts: 3
+                delay: 5s
+          
+        selfStart:
+          - installDependencies: auto
+          - initDriverCapabilities: [intent-receiver]
+          - initCapabilities: [query-document, upload-document, manage-kb]
+          - bindAddresses: auto
+          
+        startCollaboration:
+          - startScene: scene-knowledge-share
+            optional: true
+            timeout: 10s
+            bindInterface: knowledge-share-service
+          
+        selfDrive:
+          eventRules:
+            - event: user.query
+              action: query-flow
+            - event: user.upload
+              action: upload-flow
+            - event: user.createKb
+              action: create-kb-flow
+              
+          capabilityChains:
+            query-flow:
+              - capability: query-document
+                input:
+                  query: "${event.query}"
+                  kbId: "${event.kbId}"
+                  topK: 5
+                  
+            upload-flow:
+              - capability: upload-document
+                input:
+                  file: "${event.file}"
+                  kbId: "${event.kbId}"
+                  autoProcess: true
+                  
+            create-kb-flow:
+              - capability: manage-kb
+                input:
+                  action: create
+                  name: "${event.kbName}"
+                  visibility: "${event.visibility}"
+
+      capabilities:
+        - query-document
+        - upload-document
+        - manage-kb
+        
+      collaborativeCapabilities:
+        - capabilityId: knowledge-share
+          role: PROVIDER
+          interface: knowledge-share-service
+          autoStart: false
+          optional: true
+
+  capabilities:
+    - id: query-document
+      name: 文档查询
+      description: 基于RAG的智能文档问答
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+            description: 知识库ID
+          query:
+            type: string
+            description: 查询内容
+          topK:
+            type: integer
+            default: 5
+            description: 返回结果数量
+      outputSchema:
+        type: object
+        properties:
+          answer:
+            type: string
+            description: 生成的回答
+          sources:
+            type: array
+            description: 来源文档列表
+          confidence:
+            type: number
+            description: 置信度
+            
+    - id: upload-document
+      name: 文档上传
+      description: 上传文档到知识库并自动处理
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+            description: 知识库ID
+          file:
+            type: file
+            description: 上传的文件
+          autoProcess:
+            type: boolean
+            default: true
+            description: 是否自动处理文档
+      outputSchema:
+        type: object
+        properties:
+          docId:
+            type: string
+            description: 文档ID
+          status:
+            type: string
+            description: 处理状态
+            
+    - id: manage-kb
+      name: 知识库管理
+      description: 创建、更新、删除知识库
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          action:
+            type: string
+            enum: [create, update, delete, list]
+            description: 操作类型
+          name:
+            type: string
+            description: 知识库名称
+          visibility:
+            type: string
+            enum: [private, team, public]
+            default: private
+            description: 可见性
+      outputSchema:
+        type: object
+        properties:
+          kbId:
+            type: string
+            description: 知识库ID
+          status:
+            type: string
+            description: 操作状态
+
+  capabilityBindings:
+    - sceneCapabilityType: document-assistant
+      autoBind: true
+      capabilities:
+        - query-document
+        - upload-document
+        - manage-kb
+
+  endpoints:
+    - path: /api/v1/document-assistant/query
+      method: POST
+      description: 文档查询接口
+      capability: query-document
+      
+    - path: /api/v1/document-assistant/upload
+      method: POST
+      description: 文档上传接口
+      capability: upload-document
+      
+    - path: /api/v1/document-assistant/kb
+      method: POST
+      description: 知识库管理接口
+      capability: manage-kb
+      
+    - path: /api/v1/document-assistant/kb/{kbId}
+      method: GET
+      description: 获取知识库详情
+      capability: manage-kb
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.document.assistant.DocumentAssistantApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+
+  config:
+    required:
+      - name: LLM_PROVIDER
+        type: string
+        description: LLM服务提供者
+      - name: EMBEDDING_MODEL
+        type: string
+        default: "text-embedding-ada-002"
+        description: 嵌入模型
+    optional:
+      - name: CHUNK_SIZE
+        type: integer
+        default: 500
+        description: 文档分块大小
+      - name: CHUNK_OVERLAP
+        type: integer
+        default: 50
+        description: 分块重叠大小
+      - name: MAX_HISTORY_LENGTH
+        type: integer
+        default: 20
+        description: 对话历史最大长度
+
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "1Gi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-document-assistant-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

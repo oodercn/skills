@@ -21,6 +21,8 @@ public interface CapabilityBindingService {
     List<CapabilityBinding> listByAgent(String agentId);
     
     List<CapabilityBinding> listByLink(String linkId);
+    
+    List<CapabilityBinding> listAll();
 
     void updateStatus(String bindingId, String status);
 

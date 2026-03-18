@@ -107,26 +107,36 @@
             navMenu.innerHTML = '';
             
             this.menuConfig.forEach(item => {
-                const li = this.createMenuItem(item, currentPath);
+                const li = this.createMenuItem(item, currentPath, 0);
                 navMenu.appendChild(li);
             });
         },
 
-        createMenuItem(item, currentPath) {
+        createMenuItem(item, currentPath, level) {
             const li = document.createElement('li');
             li.className = 'nav-menu__item';
+            li.setAttribute('data-menu-id', item.id);
             
             const isActive = this.isMenuItemActive(item, currentPath);
+            const hasActiveChild = this.hasActiveChild(item, currentPath);
+            
             if (isActive) {
                 li.classList.add('nav-menu__item--active');
             }
+            
+            if (hasActiveChild) {
+                li.classList.add('nav-menu__item--has-active-child');
+            }
 
             if (item.children && item.children.length > 0) {
-                const isExpanded = this.expandedMenus.includes(item.id) || isActive;
-                
+                const isExpanded = this.expandedMenus.includes(item.id) || isActive || hasActiveChild;
+                if (isExpanded) {
+                    li.classList.add('nav-menu__item--expanded');
+                }
+
                 const a = document.createElement('a');
-                a.href = `#${item.id}`;
-                a.innerHTML = `<i class="${item.icon}"></i> ${item.name}`;
+                a.href = 'javascript:void(0)';
+                a.innerHTML = `<i class="${item.icon}"></i><span>${item.name}</span><i class="ri-arrow-right-s-line nav-menu__arrow"></i>`;
                 a.addEventListener('click', (e) => {
                     e.preventDefault();
                     this.toggleSubmenu(item.id, li);
@@ -140,7 +150,7 @@
                 }
                 
                 item.children.forEach(child => {
-                    const childLi = this.createMenuItem(child, currentPath);
+                    const childLi = this.createMenuItem(child, currentPath, level + 1);
                     submenu.appendChild(childLi);
                 });
                 
@@ -148,7 +158,7 @@
             } else {
                 const a = document.createElement('a');
                 a.href = item.url || '#';
-                a.innerHTML = `<i class="${item.icon}"></i> ${item.name}`;
+                a.innerHTML = `<i class="${item.icon}"></i><span>${item.name}</span>`;
                 li.appendChild(a);
             }
 
@@ -158,10 +168,14 @@
         isMenuItemActive(item, currentPath) {
             if (item.active) return true;
             if (item.url && currentPath.includes(item.url)) return true;
-            if (item.children) {
-                return item.children.some(child => this.isMenuItemActive(child, currentPath));
-            }
             return false;
+        },
+
+        hasActiveChild(item, currentPath) {
+            if (!item.children) return false;
+            return item.children.some(child => 
+                this.isMenuItemActive(child, currentPath) || this.hasActiveChild(child, currentPath)
+            );
         },
 
         toggleSubmenu(itemId, li) {
@@ -170,9 +184,11 @@
 
             if (submenu.classList.contains('nav-menu__submenu--open')) {
                 submenu.classList.remove('nav-menu__submenu--open');
+                li.classList.remove('nav-menu__item--expanded');
                 this.expandedMenus = this.expandedMenus.filter(id => id !== itemId);
             } else {
                 submenu.classList.add('nav-menu__submenu--open');
+                li.classList.add('nav-menu__item--expanded');
                 if (!this.expandedMenus.includes(itemId)) {
                     this.expandedMenus.push(itemId);
                 }
@@ -194,7 +210,7 @@
                 const isActive = window.location.pathname.includes(item.url);
                 return `
                     <li class="nav-menu__item ${isActive ? 'nav-menu__item--active' : ''}">
-                        <a href="${item.url}"><i class="${item.icon}"></i> ${item.name}</a>
+                        <a href="${item.url}"><i class="${item.icon}"></i><span>${item.name}</span></a>
                     </li>
                 `;
             }).join('');

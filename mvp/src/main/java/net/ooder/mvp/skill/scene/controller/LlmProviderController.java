@@ -1,9 +1,14 @@
 package net.ooder.mvp.skill.scene.controller;
 
 import net.ooder.mvp.skill.scene.dto.llm.LlmProviderConfigDTO;
+import net.ooder.mvp.skill.scene.llm.DeepSeekLlmProvider;
+import net.ooder.mvp.skill.scene.llm.BaiduLlmProvider;
+import net.ooder.mvp.skill.scene.llm.AliyunBailianLlmProvider;
 import net.ooder.mvp.skill.scene.model.ResultModel;
+import net.ooder.scene.skill.LlmProvider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -14,6 +19,18 @@ import java.util.*;
 public class LlmProviderController {
 
     private static final Logger log = LoggerFactory.getLogger(LlmProviderController.class);
+    
+    @Value("${ooder.llm.deepseek.api-key:}")
+    private String deepseekApiKey;
+    
+    @Value("${ooder.llm.baidu.api-key:}")
+    private String baiduApiKey;
+    
+    @Value("${ooder.llm.baidu.secret-key:}")
+    private String baiduSecretKey;
+    
+    @Value("${ooder.llm.qianwen.api-key:}")
+    private String qianwenApiKey;
     
     private Map<String, LlmProviderConfigDTO> providers = new HashMap<String, LlmProviderConfigDTO>();
     
@@ -200,15 +217,140 @@ public class LlmProviderController {
     }
     
     @PostMapping("/providers/{providerId}/test")
-    public ResultModel<Boolean> testProvider(@PathVariable String providerId) {
+    public ResultModel<Map<String, Object>> testProvider(@PathVariable String providerId) {
         log.info("[testProvider] providerId: {}", providerId);
         
-        LlmProviderConfigDTO provider = providers.get(providerId);
-        if (provider == null) {
+        LlmProviderConfigDTO providerConfig = providers.get(providerId);
+        if (providerConfig == null) {
             return ResultModel.notFound("Provider not found: " + providerId);
         }
         
-        return ResultModel.success(true);
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("providerId", providerId);
+        result.put("providerName", providerConfig.getName());
+        
+        try {
+            LlmProvider provider = createProviderInstance(providerConfig);
+            
+            if (provider == null) {
+                result.put("success", false);
+                result.put("message", "无法创建提供者实例，请检查API Key配置");
+                return ResultModel.success(result);
+            }
+            
+            String testModel = providerConfig.getDefaultModel();
+            if (testModel == null || testModel.isEmpty()) {
+                List<String> supportedModels = provider.getSupportedModels();
+                if (!supportedModels.isEmpty()) {
+                    testModel = supportedModels.get(0);
+                }
+            }
+            
+            if (testModel == null) {
+                testModel = "default";
+            }
+            
+            List<Map<String, Object>> messages = new ArrayList<Map<String, Object>>();
+            Map<String, Object> userMessage = new HashMap<String, Object>();
+            userMessage.put("role", "user");
+            userMessage.put("content", "Hello, this is a connection test. Please respond with 'OK'.");
+            messages.add(userMessage);
+            
+            long startTime = System.currentTimeMillis();
+            Map<String, Object> chatResult = provider.chat(testModel, messages, null);
+            long elapsed = System.currentTimeMillis() - startTime;
+            
+            String responseContent = (String) chatResult.get("content");
+            boolean hasError = chatResult.containsKey("error") && Boolean.TRUE.equals(chatResult.get("error"));
+            
+            if (hasError) {
+                result.put("success", false);
+                result.put("message", "连接失败: " + responseContent);
+                result.put("elapsed", elapsed);
+            } else {
+                result.put("success", true);
+                result.put("message", "连接成功");
+                result.put("model", testModel);
+                result.put("elapsed", elapsed);
+                result.put("response", responseContent != null && responseContent.length() > 100 
+                    ? responseContent.substring(0, 100) + "..." 
+                    : responseContent);
+            }
+            
+        } catch (Exception e) {
+            log.error("[testProvider] Test failed for provider: {}", providerId, e);
+            result.put("success", false);
+            result.put("message", "连接测试失败: " + e.getMessage());
+        }
+        
+        return ResultModel.success(result);
+    }
+    
+    private LlmProvider createProviderInstance(LlmProviderConfigDTO config) {
+        String type = config.getType();
+        
+        if ("deepseek".equals(type)) {
+            DeepSeekLlmProvider provider = new DeepSeekLlmProvider();
+            String apiKey = getApiKeyFromConfig(config, "deepseek");
+            if (apiKey == null || apiKey.isEmpty()) {
+                return null;
+            }
+            provider.setApiKey(apiKey);
+            return provider;
+        } else if ("baidu".equals(type)) {
+            BaiduLlmProvider provider = new BaiduLlmProvider();
+            String apiKey = getApiKeyFromConfig(config, "baidu");
+            String secretKey = getSecretKeyFromConfig(config);
+            if (apiKey == null || apiKey.isEmpty() || secretKey == null || secretKey.isEmpty()) {
+                return null;
+            }
+            provider.setAccessKey(apiKey);
+            provider.setSecretKey(secretKey);
+            return provider;
+        } else if ("qianwen".equals(type) || "aliyun-bailian".equals(type)) {
+            AliyunBailianLlmProvider provider = new AliyunBailianLlmProvider();
+            String apiKey = getApiKeyFromConfig(config, "qianwen");
+            if (apiKey == null || apiKey.isEmpty()) {
+                return null;
+            }
+            provider.setApiKey(apiKey);
+            return provider;
+        }
+        
+        log.warn("[createProviderInstance] Unknown provider type: {}", type);
+        return null;
+    }
+    
+    private String getApiKeyFromConfig(LlmProviderConfigDTO config, String defaultKey) {
+        Map<String, Object> providerConfig = config.getProviderConfig();
+        if (providerConfig != null && providerConfig.containsKey("apiKey")) {
+            return (String) providerConfig.get("apiKey");
+        }
+        
+        if ("deepseek".equals(defaultKey) && deepseekApiKey != null && !deepseekApiKey.isEmpty()) {
+            return deepseekApiKey;
+        }
+        if ("baidu".equals(defaultKey) && baiduApiKey != null && !baiduApiKey.isEmpty()) {
+            return baiduApiKey;
+        }
+        if ("qianwen".equals(defaultKey) && qianwenApiKey != null && !qianwenApiKey.isEmpty()) {
+            return qianwenApiKey;
+        }
+        
+        return null;
+    }
+    
+    private String getSecretKeyFromConfig(LlmProviderConfigDTO config) {
+        Map<String, Object> providerConfig = config.getProviderConfig();
+        if (providerConfig != null && providerConfig.containsKey("secretKey")) {
+            return (String) providerConfig.get("secretKey");
+        }
+        
+        if (baiduSecretKey != null && !baiduSecretKey.isEmpty()) {
+            return baiduSecretKey;
+        }
+        
+        return null;
     }
     
     @GetMapping("/providers/{providerId}/models")

@@ -5,14 +5,14 @@
             "name": "首页",
             "icon": "ri-home-line",
             "url": "/console/pages/scene-management.html",
-            "roles": ["personal", "enterprise", "admin"],
+            "roles": ["personal", "enterprise", "admin", "collaborator"],
             "status": "implemented"
         },
         {
             "id": "capability-center",
             "name": "能力中心",
             "icon": "ri-puzzle-line",
-            "roles": ["personal", "enterprise", "admin"],
+            "roles": ["personal", "enterprise", "admin", "collaborator"],
             "status": "implemented",
             "children": [
                 {
@@ -20,7 +20,7 @@
                     "name": "能力发现",
                     "icon": "ri-search-line",
                     "url": "/console/pages/capability-discovery.html",
-                    "roles": ["personal", "enterprise", "admin"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -28,7 +28,7 @@
                     "name": "我的能力",
                     "icon": "ri-user-star-line",
                     "url": "/console/pages/my-capabilities.html",
-                    "roles": ["personal", "enterprise", "admin"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -46,7 +46,7 @@
             "name": "场景管理",
             "icon": "ri-folder-line",
             "url": "/console/pages/scene-group-management.html",
-            "roles": ["enterprise", "admin"],
+            "roles": ["enterprise", "admin", "collaborator"],
             "status": "implemented",
             "children": [
                 {
@@ -54,7 +54,7 @@
                     "name": "场景组列表",
                     "icon": "ri-list-check",
                     "url": "/console/pages/scene-group-management.html",
-                    "roles": ["enterprise", "admin"],
+                    "roles": ["enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -78,7 +78,7 @@
                     "name": "执行历史",
                     "icon": "ri-history-line",
                     "url": "/console/pages/my-history.html",
-                    "roles": ["enterprise", "admin"],
+                    "roles": ["enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 }
             ]
@@ -87,7 +87,7 @@
             "id": "llm-service",
             "name": "LLM 服务",
             "icon": "ri-robot-line",
-            "roles": ["enterprise", "admin"],
+            "roles": ["enterprise", "admin", "collaborator"],
             "status": "implemented",
             "children": [
                 {
@@ -95,7 +95,7 @@
                     "name": "LLM 配置",
                     "icon": "ri-settings-3-line",
                     "url": "/console/pages/llm-config.html",
-                    "roles": ["enterprise", "admin"],
+                    "roles": ["enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -113,7 +113,7 @@
             "name": "我的工作台",
             "icon": "ri-user-line",
             "url": "/console/pages/my-todos.html",
-            "roles": ["personal", "enterprise", "admin"],
+            "roles": ["personal", "enterprise", "admin", "collaborator"],
             "status": "implemented",
             "children": [
                 {
@@ -121,7 +121,7 @@
                     "name": "我的待办",
                     "icon": "ri-task-line",
                     "url": "/console/pages/my-todos.html",
-                    "roles": ["personal", "enterprise", "admin"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -129,7 +129,7 @@
                     "name": "我的场景",
                     "icon": "ri-artboard-line",
                     "url": "/console/pages/my-scenes.html",
-                    "roles": ["personal", "enterprise", "admin"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 },
                 {
@@ -137,7 +137,7 @@
                     "name": "执行历史",
                     "icon": "ri-history-line",
                     "url": "/console/pages/my-history.html",
-                    "roles": ["personal", "enterprise", "admin"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator"],
                     "status": "implemented"
                 }
             ]

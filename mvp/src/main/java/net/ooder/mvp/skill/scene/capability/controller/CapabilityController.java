@@ -153,6 +153,12 @@ public class CapabilityController {
         return ResultModel.success(bindings);
     }
 
+    @GetMapping("/bindings")
+    public ResultModel<List<CapabilityBinding>> listAllBindings() {
+        List<CapabilityBinding> bindings = bindingService.listAll();
+        return ResultModel.success(bindings);
+    }
+    
     @PostMapping("/bindings")
     public ResultModel<CapabilityBinding> createBinding(@RequestBody CapabilityBindingService.CapabilityBindingRequest request) {
         String sceneGroupId = request.getCapabilityId();
