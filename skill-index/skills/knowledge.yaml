@@ -1,8 +1,8 @@
 apiVersion: ooder.io/v1
 kind: Skills
 metadata:
-  name: know-skills
-  category: know
+  name: knowledge-skills
+  category: knowledge
   count: 1
 
 skills:
@@ -10,7 +10,7 @@ skills:
     - skillId: skill-knowledge-qa
       name: 知识问答场景能力
       version: "2.3.1"
-      capabilityCategory: know
+      capabilityCategory: knowledge
       subCategory: qa
       tags:
         - knowledge
