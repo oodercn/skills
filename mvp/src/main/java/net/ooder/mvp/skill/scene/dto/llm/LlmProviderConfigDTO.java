@@ -18,6 +18,7 @@ public class LlmProviderConfigDTO {
     private Map<String, Object> providerConfig;
     private long createTime;
     private long updateTime;
+    private boolean configured;
     
     public String getProviderId() { return providerId; }
     public void setProviderId(String providerId) { this.providerId = providerId; }
@@ -45,6 +46,8 @@ public class LlmProviderConfigDTO {
     public void setCreateTime(long createTime) { this.createTime = createTime; }
     public long getUpdateTime() { return updateTime; }
     public void setUpdateTime(long updateTime) { this.updateTime = updateTime; }
+    public boolean isConfigured() { return configured; }
+    public void setConfigured(boolean configured) { this.configured = configured; }
     
     public static class ModelConfigDTO {
         private String modelId;
