@@ -1,0 +1,300 @@
+{
+	"version": "2.3.1",
+	"description": "Ooder场景技能平台菜单配置",
+	"updatedAt": 1773616000000,
+	"roles": {
+		"admin": {
+			"id": "admin",
+			"name": "管理员",
+			"icon": "ri-admin-line",
+			"description": "系统运维、能力管理、用户管理",
+			"menus": [
+				{
+					"id": "admin-dashboard",
+					"name": "工作台",
+					"icon": "ri-home-line",
+					"url": "/console/pages/role-admin.html",
+					"sort": 1,
+					"active": true
+				},
+				{
+					"id": "capability-center",
+					"name": "能力中心",
+					"icon": "ri-puzzle-line",
+					"sort": 2,
+					"active": false,
+					"children": [
+						{
+							"id": "capability-market",
+							"name": "能力市场",
+							"icon": "ri-store-2-line",
+							"url": "/console/pages/capability-discovery.html",
+							"sort": 1
+						},
+						{
+							"id": "installed-capabilities",
+							"name": "已安装能力",
+							"icon": "ri-download-cloud-line",
+							"url": "/console/pages/installed-scene-capabilities.html",
+							"sort": 2
+						},
+						{
+							"id": "capability-stats",
+							"name": "能力统计",
+							"icon": "ri-bar-chart-box-line",
+							"url": "/console/pages/capability-stats.html",
+							"sort": 3
+						}
+					]
+				},
+				{
+					"id": "scene-management",
+					"name": "场景管理",
+					"icon": "ri-folder-line",
+					"sort": 3,
+					"active": false,
+					"children": [
+						{
+							"id": "scene-groups",
+							"name": "场景组管理",
+							"icon": "ri-list-check",
+							"url": "/console/pages/scene-group-management.html",
+							"sort": 1
+						},
+						{
+							"id": "scene-templates",
+							"name": "场景模板",
+							"icon": "ri-file-copy-line",
+							"url": "/console/pages/template-management.html",
+							"sort": 2
+						},
+						{
+							"id": "scene-activation",
+							"name": "激活管理",
+							"icon": "ri-play-circle-line",
+							"url": "/console/pages/capability-activation.html",
+							"sort": 3
+						}
+					]
+				},
+				{
+					"id": "org-management",
+					"name": "组织管理",
+					"icon": "ri-organization-chart",
+					"sort": 4,
+					"active": false,
+					"children": [
+						{
+							"id": "org-users",
+							"name": "用户管理",
+							"icon": "ri-user-line",
+							"url": "/console/pages/org-management.html",
+							"sort": 1
+						},
+						{
+							"id": "org-departments",
+							"name": "部门管理",
+							"icon": "ri-team-line",
+							"url": "/console/pages/org-management.html?tab=departments",
+							"sort": 2
+						},
+						{
+							"id": "org-roles",
+							"name": "角色权限",
+							"icon": "ri-shield-user-line",
+							"url": "/console/pages/menu-auth.html",
+							"sort": 3
+						}
+					]
+				},
+				{
+					"id": "system-config",
+					"name": "系统配置",
+					"icon": "ri-settings-3-line",
+					"sort": 5,
+					"active": false,
+					"children": [
+						{
+							"id": "llm-config",
+							"name": "LLM配置",
+							"icon": "ri-robot-line",
+							"url": "/console/pages/llm-config.html",
+							"sort": 1
+						},
+						{
+							"id": "knowledge-config",
+							"name": "知识库配置",
+							"icon": "ri-book-2-line",
+							"url": "/console/pages/knowledge-base.html",
+							"sort": 2
+						},
+						{
+							"id": "driver-config",
+							"name": "驱动配置",
+							"icon": "ri-plug-line",
+							"url": "/console/pages/driver-config.html",
+							"sort": 3
+						}
+					]
+				},
+				{
+					"id": "system-monitor",
+					"name": "系统监控",
+					"icon": "ri-line-chart-line",
+					"sort": 6,
+					"active": false,
+					"children": [
+						{
+							"id": "system-status",
+							"name": "系统状态",
+							"icon": "ri-heart-pulse-line",
+							"url": "/console/skills/skill-llm/pages/llm-monitor.html",
+							"sort": 1
+						},
+						{
+							"id": "health-check",
+							"name": "健康检查",
+							"icon": "ri-heart-line",
+							"url": "/console/pages/arch-check.html",
+							"sort": 2
+						},
+						{
+							"id": "agent-management",
+							"name": "Agent管理",
+							"icon": "ri-robot-2-line",
+							"url": "/console/pages/agent-list.html",
+							"sort": 3
+						}
+					]
+				},
+				{
+					"id": "security-audit",
+					"name": "安全审计",
+					"icon": "ri-shield-check-line",
+					"sort": 7,
+					"active": false,
+					"children": [
+						{
+							"id": "audit-logs",
+							"name": "审计日志",
+							"icon": "ri-file-list-3-line",
+							"url": "/console/pages/audit-logs.html",
+							"sort": 1
+						},
+						{
+							"id": "access-control",
+							"name": "访问控制",
+							"icon": "ri-lock-line",
+							"url": "/console/pages/key-management.html",
+							"sort": 2
+						}
+					]
+				}
+			]
+		},
+		"user": {
+			"id": "user",
+			"name": "普通用户",
+			"icon": "ri-user-line",
+			"description": "场景参与、任务执行、业务流转",
+			"menus": [
+				{
+					"id": "user-dashboard",
+					"name": "工作台",
+					"icon": "ri-home-line",
+					"url": "/console/pages/role-user.html",
+					"sort": 1,
+					"active": true
+				},
+				{
+					"id": "my-todos",
+					"name": "我的待办",
+					"icon": "ri-task-line",
+					"url": "/console/pages/my-todos.html",
+					"sort": 2,
+					"active": false,
+					"description": "协作邀请、领导委派的任务"
+				},
+				{
+					"id": "my-scenes",
+					"name": "我的场景",
+					"icon": "ri-artboard-line",
+					"url": "/console/pages/my-scenes.html",
+					"sort": 3,
+					"active": false,
+					"description": "我创建的、我启动的场景"
+				},
+				{
+					"id": "my-history",
+					"name": "历史记录",
+					"icon": "ri-history-line",
+					"url": "/console/pages/my-history.html",
+					"sort": 4,
+					"active": false,
+					"description": "历史场景执行记录"
+				},
+				{
+					"id": "key-management",
+					"name": "密钥管理",
+					"icon": "ri-key-2-line",
+					"url": "/console/pages/key-management.html",
+					"sort": 5,
+					"active": false,
+					"description": "管理个人API密钥"
+				}
+			]
+		},
+		"developer": {
+			"id": "developer",
+			"name": "开发者",
+			"icon": "ri-code-line",
+			"description": "能力开发、测试、发布",
+			"menus": [
+				{
+					"id": "developer-dashboard",
+					"name": "工作台",
+					"icon": "ri-home-line",
+					"url": "/console/pages/role-developer.html",
+					"sort": 1,
+					"active": true
+				},
+				{
+					"id": "my-capabilities",
+					"name": "我的能力",
+					"icon": "ri-puzzle-line",
+					"url": "/console/pages/my-capabilities.html",
+					"sort": 2,
+					"active": false,
+					"description": "我开发的能力列表"
+				},
+				{
+					"id": "capability-create",
+					"name": "创建能力",
+					"icon": "ri-add-circle-line",
+					"url": "/console/pages/capability-create.html",
+					"sort": 3,
+					"active": false,
+					"description": "创建新的能力包"
+				},
+				{
+					"id": "arch-check",
+					"name": "架构检查",
+					"icon": "ri-shield-check-line",
+					"url": "/console/pages/arch-check.html",
+					"sort": 4,
+					"active": false,
+					"description": "检查能力架构规范"
+				},
+				{
+					"id": "capability-stats",
+					"name": "能力统计",
+					"icon": "ri-bar-chart-box-line",
+					"url": "/console/pages/capability-stats.html",
+					"sort": 5,
+					"active": false,
+					"description": "能力使用统计分析"
+				}
+			]
+		}
+	}
+}

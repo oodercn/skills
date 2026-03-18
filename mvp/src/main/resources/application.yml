@@ -24,6 +24,18 @@ ooder:
   jds:
     config:
       name: mvp
+  llm:
+    provider: qianwen
+    model: qwen-plus
+    qianwen:
+      api-key: sk-f403a6a32efd4b00b75ee4874eec3b6b
+      model: qwen-plus
+  skill:
+    hotplug:
+      enabled: true
+      auto-load: true
+      plugin-directory: ./plugins
+    index-path: ../skill-index.yaml
 
 management:
   endpoints:

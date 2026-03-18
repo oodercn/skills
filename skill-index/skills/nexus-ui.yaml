@@ -1,0 +1,161 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: nexus-ui-skills
+  category: nexus-ui
+  count: 8
+
+skills:
+
+    - id: skill-knowledge-ui
+      name: 知识库管理界面
+      version: "2.3.0"
+      capabilityCategory: nexus-ui
+      subCategory: knowledge
+      tags:
+        - knowledge
+        - ui
+        - management
+        - scene-capability
+        - mainFirst
+      description: 知识库管理场景能力，支持知识库创建、文档上传、检索测试
+      sceneId: knowledge-ui
+      path: skills/skill-knowledge-ui
+      mainFirst: true
+      dependencies:
+        - id: skill-knowledge-base
+          version: ">=1.0.0"
+          required: true
+      
+
+    - id: skill-llm-assistant-ui
+      name: LLM智能助手界面
+      version: "2.3.0"
+      capabilityCategory: nexus-ui
+      subCategory: llm
+      tags:
+        - llm
+        - assistant
+        - ui
+        - scene-capability
+        - mainFirst
+      description: LLM智能助手场景能力，提供上下文感知的智能对话和辅助功能
+      sceneId: llm-assistant
+      path: skills/skill-llm-assistant-ui
+      mainFirst: true
+      dependencies:
+        - id: skill-llm-conversation
+          version: ">=1.0.0"
+          required: true
+        - id: skill-llm-context-builder
+          version: ">=1.0.0"
+          required: true
+      
+
+    - id: skill-llm-management-ui
+      name: LLM管理界面
+      version: "1.0.0"
+      capabilityCategory: nexus-ui
+      subCategory: llm
+      tags:
+        - llm
+        - management
+        - ui
+      description: LLM管理界面，提供模型配置、Provider管理、对话监控功能
+      sceneId: llm-management
+      path: skills/skill-llm-management-ui
+      dependencies:
+        - id: skill-llm-conversation
+          version: ">=1.0.0"
+          required: true
+      
+
+    - id: skill-nexus-dashboard-nexus-ui
+      name: Nexus Dashboard UI
+      version: "0.7.3"
+      capabilityCategory: nexus-ui
+      subCategory: dashboard
+      tags:
+        - nexus
+        - dashboard
+        - ui
+        - monitor
+      description: Nexus仪表盘界面 - 提供系统概览、实时监控、快捷操作入口
+      sceneId: nexus-ui
+      path: skills/skill-nexus-dashboard-nexus-ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-dashboard-nexus-ui-0.7.3.zip
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-dashboard-nexus-ui-0.7.3.zip
+      checksum: ""
+      
+
+    - id: skill-nexus-system-status-nexus-ui
+      name: Nexus System Status UI
+      version: "0.7.3"
+      capabilityCategory: nexus-ui
+      subCategory: status
+      tags:
+        - nexus
+        - system
+        - status
+        - ui
+      description: Nexus系统状态界面 - 提供系统运行状态、资源使用、服务健康监控
+      sceneId: nexus-ui
+      path: skills/skill-nexus-system-status-nexus-ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-system-status-nexus-ui-0.7.3.zip
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-system-status-nexus-ui-0.7.3.zip
+      checksum: ""
+      
+
+    - id: skill-personal-dashboard-nexus-ui
+      name: Personal Dashboard UI
+      version: "0.7.3"
+      capabilityCategory: nexus-ui
+      subCategory: personal
+      tags:
+        - nexus
+        - personal
+        - dashboard
+        - ui
+      description: 个人仪表盘界面 - 提供个人工作台、任务概览、快捷入口
+      sceneId: nexus-ui
+      path: skills/skill-personal-dashboard-nexus-ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-personal-dashboard-nexus-ui-0.7.3.zip
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-personal-dashboard-nexus-ui-0.7.3.zip
+      checksum: ""
+      
+
+    - id: skill-nexus-health-check-nexus-ui
+      name: Nexus Health Check UI
+      version: "0.7.3"
+      capabilityCategory: nexus-ui
+      subCategory: health
+      tags:
+        - nexus
+        - health
+        - check
+        - ui
+      description: Nexus健康检查界面 - 提供健康检查配置、执行、报告查看
+      sceneId: nexus-ui
+      path: skills/skill-nexus-health-check-nexus-ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-health-check-nexus-ui-0.7.3.zip
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-nexus-health-check-nexus-ui-0.7.3.zip
+      checksum: ""
+      
+
+    - id: skill-storage-management-nexus-ui
+      name: Storage Management UI
+      version: "0.7.3"
+      capabilityCategory: nexus-ui
+      subCategory: storage
+      tags:
+        - nexus
+        - storage
+        - management
+        - ui
+      description: 存储管理界面 - 提供存储配置、文件浏览、容量监控
+      sceneId: nexus-ui
+      path: skills/skill-storage-management-nexus-ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-storage-management-nexus-ui-0.7.3.zip
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-storage-management-nexus-ui-0.7.3.zip
+      checksum: ""
+

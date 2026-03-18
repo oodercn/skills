@@ -1,255 +1,176 @@
-/**
- * Scene Management Page Script
- * 场景管理页面脚本
- */
-
-(function() {
+(function(global) {
     'use strict';
 
-    const SceneManagement = {
-        initialized: false,
-        scenes: [],
+    var scenes = [];
 
-        async init() {
-            if (this.initialized) return;
-            
-            console.log('[SceneManagement] Initializing...');
-            
-            this.bindEvents();
-            await this.loadScenes();
-            
-            this.initialized = true;
-            console.log('[SceneManagement] Initialized');
+    var SceneManagement = {
+        init: function() {
+            window.onPageInit = function() {
+                console.log('场景管理页面初始化完成');
+                SceneManagement.loadScenes();
+                SceneManagement.initLlmAssistant();
+            };
         },
 
-        bindEvents() {
-            const refreshBtn = document.querySelector('[onclick="refreshScenes()"]');
-            if (refreshBtn) {
-                refreshBtn.removeAttribute('onclick');
-                refreshBtn.addEventListener('click', () => this.loadScenes());
+        initLlmAssistant: function() {
+            if (typeof LlmAssistant !== 'undefined') {
+                LlmAssistant.init();
             }
         },
 
-        async loadScenes() {
+        loadScenes: async function() {
             try {
-                const response = await fetch('/api/v1/scenes');
-                if (!response.ok) {
-                    console.warn('[SceneManagement] Scenes API not available');
-                    this.renderEmptyState();
-                    return;
-                }
-                const result = await response.json();
+                var result = await ApiClient.post('/api/v1/scenes/list', { pageNum: 1, pageSize: 100 });
                 
-                if (result.status === 'success') {
-                    this.scenes = result.data || [];
-                    this.renderScenes(this.scenes);
-                    this.updateStats(this.scenes);
+                if (result.status === 'success' && result.data) {
+                    scenes = result.data.list || [];
+                    SceneManagement.renderScenes(scenes);
+                    SceneManagement.updateStatusOverview(scenes);
                 } else {
-                    this.renderEmptyState();
+                    console.error('加载场景数据失败:', result.message || '未知错误');
+                    scenes = [];
+                    SceneManagement.renderScenes(scenes);
+                    SceneManagement.updateStatusOverview(scenes);
                 }
-            } catch (e) {
-                console.warn('[SceneManagement] Failed to load scenes:', e);
-                this.renderEmptyState();
+            } catch (error) {
+                console.error('加载场景数据失败:', error);
+                scenes = [];
+                SceneManagement.renderScenes(scenes);
+                SceneManagement.updateStatusOverview(scenes);
             }
         },
 
-        updateStats(scenes) {
-            const totalEl = document.getElementById('totalScenes');
-            const activeEl = document.getElementById('activeScenes');
-            const typesEl = document.getElementById('sceneTypes');
+        renderScenes: function(scenes) {
+            var tbody = document.getElementById('sceneTableBody');
+            tbody.innerHTML = '';
             
-            if (totalEl) totalEl.textContent = scenes.length;
-            
-            const activeCount = scenes.filter(s => s.status === 'ACTIVE').length;
-            if (activeEl) activeEl.textContent = activeCount;
-            
-            const types = new Set(scenes.map(s => s.type).filter(Boolean));
-            if (typesEl) typesEl.textContent = types.size;
-        },
-
-        renderScenes(scenes) {
-            const tbody = document.getElementById('sceneTableBody');
-            if (!tbody) return;
-
-            if (scenes.length === 0) {
-                this.renderEmptyState();
+            if (!scenes || scenes.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" class="nx-text-center nx-text-secondary">暂无数据</td></tr>';
                 return;
             }
-
-            tbody.innerHTML = scenes.map(scene => `
-                <tr>
-                    <td>
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <i class="ri-artboard-line" style="color: var(--nx-primary);"></i>
-                            <span>${scene.name || '未命名'}</span>
-                        </div>
-                    </td>
-                    <td>${this.getTypeLabel(scene.type)}</td>
-                    <td><span class="nx-badge nx-badge--${this.getStatusBadge(scene.status)}">${this.getStatusLabel(scene.status)}</span></td>
-                    <td>${(scene.capabilities || []).length}</td>
-                    <td>${this.formatDate(scene.createdAt)}</td>
-                    <td>
-                        <div class="nx-flex nx-gap-2">
-                            <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="startScene('${scene.sceneId}')" title="启动">
-                                <i class="ri-play-line"></i>
-                            </button>
-                            <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="editScene('${scene.sceneId}')" title="编辑">
-                                <i class="ri-edit-line"></i>
-                            </button>
-                            <button class="nx-btn nx-btn--ghost nx-btn--sm nx-btn--danger" onclick="deleteScene('${scene.sceneId}')" title="删除">
-                                <i class="ri-delete-bin-line"></i>
-                            </button>
-                        </div>
-                    </td>
-                </tr>
-            `).join('');
-        },
-
-        renderEmptyState() {
-            const tbody = document.getElementById('sceneTableBody');
-            if (!tbody) return;
-
-            tbody.innerHTML = `
-                <tr>
-                    <td colspan="6" style="text-align: center; padding: 40px;">
-                        <div style="color: var(--nx-text-tertiary);">
-                            <i class="ri-folder-open-line" style="font-size: 48px; margin-bottom: 16px; display: block;"></i>
-                            <p>暂无场景数据</p>
-                            <p style="font-size: 12px;">点击"创建场景"按钮添加新场景</p>
-                        </div>
-                    </td>
-                </tr>
-            `;
-        },
-
-        getTypeLabel(type) {
-            const types = {
-                'automation': '自动化',
-                'collaboration': '协作',
-                'knowledge': '知识库',
-                'enterprise': '企业',
-                'personal': '个人',
-                'test': '测试',
-                'development': '开发'
-            };
-            return types[type] || type || '未分类';
-        },
-
-        getStatusLabel(status) {
-            const labels = {
-                'DRAFT': '草稿',
-                'ACTIVE': '活跃',
-                'PAUSED': '暂停',
-                'COMPLETED': '已完成',
-                'ARCHIVED': '已归档'
-            };
-            return labels[status] || status || '未知';
-        },
-
-        getStatusBadge(status) {
-            const badges = {
-                'DRAFT': 'default',
-                'ACTIVE': 'success',
-                'PAUSED': 'warning',
-                'COMPLETED': 'info',
-                'ARCHIVED': 'default'
-            };
-            return badges[status] || 'default';
-        },
-
-        formatDate(dateStr) {
-            if (!dateStr) return '-';
-            const date = new Date(dateStr);
-            return date.toLocaleDateString('zh-CN', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit',
-                hour: '2-digit',
-                minute: '2-digit'
+            
+            scenes.forEach(function(scene) {
+                var isActive = scene.active === true;
+                var statusClass = isActive ? 'nx-badge--success' : 'nx-badge--secondary';
+                var statusText = isActive ? '活跃' : '非活跃';
+                
+                var createdAt = scene.createTime 
+                    ? new Date(scene.createTime).toISOString().split('T')[0] 
+                    : '-';
+                
+                var row = document.createElement('tr');
+                row.innerHTML = '<td>' + scene.name + '</td>' +
+                    '<td>' + SceneManagement.getTypeName(scene.type) + '</td>' +
+                    '<td><span class="nx-badge ' + statusClass + '">' + statusText + '</span></td>' +
+                    '<td>' + (scene.capabilities ? scene.capabilities.length : 0) + '</td>' +
+                    '<td>' + createdAt + '</td>' +
+                    '<td>' +
+                    '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="viewSceneDetail(\'' + scene.sceneId + '\')">详情</button> ' +
+                    '<button class="nx-btn nx-btn--sm nx-btn--danger" onclick="deleteScene(\'' + scene.sceneId + '\')">删除</button>' +
+                    '</td>';
+                tbody.appendChild(row);
             });
-        }
-    };
+        },
 
-    window.SceneManagement = SceneManagement;
+        getTypeName: function(type) {
+            var typeMap = {
+                'enterprise': '企业网络',
+                'personal': '个人网络',
+                'test': '测试网络',
+                'development': '开发环境'
+            };
+            return typeMap[type] || type;
+        },
 
-    window.refreshScenes = function() {
-        SceneManagement.loadScenes();
-    };
-
-    window.createScene = function() {
-        const modal = document.getElementById('sceneModal');
-        const title = document.getElementById('modalTitle');
-        if (modal && title) {
-            title.textContent = '创建场景';
-            modal.style.display = 'flex';
-        }
-    };
-
-    window.closeModal = function() {
-        const modal = document.getElementById('sceneModal');
-        if (modal) {
-            modal.style.display = 'none';
-        }
-    };
-
-    window.saveScene = async function() {
-        const name = document.getElementById('sceneName').value;
-        const type = document.getElementById('sceneType').value;
-        const description = document.getElementById('sceneDescription').value;
-
-        if (!name) {
-            alert('请输入场景名称');
-            return;
-        }
-
-        try {
-            const response = await fetch('/api/v1/scenes', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, type, description })
+        updateStatusOverview: function(scenes) {
+            document.getElementById('totalScenes').textContent = scenes.length;
+            var activeCount = 0;
+            var types = {};
+            scenes.forEach(function(s) {
+                if (s.active === true) activeCount++;
+                types[s.type] = true;
             });
+            document.getElementById('activeScenes').textContent = activeCount;
+            document.getElementById('sceneTypes').textContent = Object.keys(types).length;
+        },
 
-            if (response.ok) {
-                closeModal();
-                SceneManagement.loadScenes();
-            } else {
-                alert('创建失败');
+        createScene: function() {
+            document.getElementById('modalTitle').textContent = '创建场景';
+            document.getElementById('sceneForm').reset();
+            document.getElementById('sceneModal').style.display = 'flex';
+        },
+
+        closeModal: function() {
+            document.getElementById('sceneModal').style.display = 'none';
+        },
+
+        saveScene: async function() {
+            var name = document.getElementById('sceneName').value;
+            var type = document.getElementById('sceneType').value;
+            var description = document.getElementById('sceneDescription').value;
+            
+            if (!name) {
+                alert('请输入场景名称');
+                return;
             }
-        } catch (e) {
-            alert('创建失败: ' + e.message);
+            
+            var sceneData = {
+                name: name,
+                type: type,
+                description: description,
+                version: '1.0.0'
+            };
+            
+            try {
+                var result = await ApiClient.post('/api/v1/scenes/create', sceneData);
+                
+                if (result.status === 'success') {
+                    SceneManagement.closeModal();
+                    SceneManagement.loadScenes();
+                    alert('场景创建成功');
+                } else {
+                    alert('创建失败: ' + (result.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('创建场景失败:', error);
+                alert('创建失败: ' + error.message);
+            }
+        },
+
+        viewSceneDetail: function(sceneId) {
+            window.location.href = '/console/pages/scene-detail.html?id=' + sceneId;
+        },
+
+        deleteScene: async function(sceneId) {
+            if (!confirm('确定要删除该场景吗？')) return;
+            
+            try {
+                var result = await ApiClient.post('/api/v1/scenes/delete', { sceneId: sceneId });
+                
+                if (result.status === 'success') {
+                    SceneManagement.loadScenes();
+                    alert('场景已删除');
+                } else {
+                    alert('删除失败: ' + (result.message || '未知错误'));
+                }
+            } catch (error) {
+                console.error('删除场景失败:', error);
+                alert('删除失败: ' + error.message);
+            }
+        },
+
+        refreshScenes: function() {
+            SceneManagement.loadScenes();
         }
     };
 
-    window.startScene = async function(sceneId) {
-        try {
-            const response = await fetch(`/api/v1/scenes/${sceneId}/start`, { method: 'POST' });
-            if (response.ok) {
-                SceneManagement.loadScenes();
-            }
-        } catch (e) {
-            alert('启动失败');
-        }
-    };
+    SceneManagement.init();
 
-    window.editScene = function(sceneId) {
-        alert('编辑场景: ' + sceneId + ' (功能开发中)');
-    };
+    global.createScene = SceneManagement.createScene;
+    global.closeModal = SceneManagement.closeModal;
+    global.saveScene = SceneManagement.saveScene;
+    global.viewSceneDetail = SceneManagement.viewSceneDetail;
+    global.deleteScene = SceneManagement.deleteScene;
+    global.refreshScenes = SceneManagement.refreshScenes;
 
-    window.deleteScene = async function(sceneId) {
-        if (!confirm('确定要删除此场景吗？')) return;
-        
-        try {
-            const response = await fetch(`/api/v1/scenes/${sceneId}`, { method: 'DELETE' });
-            if (response.ok) {
-                SceneManagement.loadScenes();
-            }
-        } catch (e) {
-            alert('删除失败');
-        }
-    };
-
-    document.addEventListener('DOMContentLoaded', () => {
-        SceneManagement.init();
-    });
-
-})();
+})(typeof window !== 'undefined' ? window : this);

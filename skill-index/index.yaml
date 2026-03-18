@@ -1,0 +1,27 @@
+apiVersion: ooder.io/v1
+kind: SkillIndex
+
+metadata:
+  name: ooder-skills
+  version: "2.3.1"
+  description: Ooder Skills Repository - Shared skills for Ooder Agent Platform
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://github.com/ooderCN/skills
+  repository: https://github.com/ooderCN/skills.git
+  giteeMirror: https://gitee.com/ooderCN/skills
+  createdAt: "2026-02-16T00:00:00Z"
+  updatedAt: "2026-02-20T00:00:00Z"
+
+spec:
+  includes:
+    - categories.yaml
+    - scene-drivers.yaml
+    - skills/*.yaml
+    - scenes/*.yaml
+  
+  statistics:
+    totalSkills: 83
+    totalScenes: 50
+    totalCategories: 17
+    totalSceneDrivers: 6

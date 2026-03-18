@@ -50,12 +50,17 @@
     <modules>
         <!-- MVP Core -->
         <module>mvp</module>
+        
         <!-- System Skills -->
         <module>skills/_system/skill-common</module>
         <module>skills/_system/skill-capability</module>
+        <module>skills/_system/skill-capability-coordinator</module>
         <module>skills/_system/skill-llm</module>
+        <module>skills/_system/skill-llm-chat</module>
         <module>skills/_system/skill-management</module>
         <module>skills/_system/skill-protocol</module>
+        <module>skills/_system/skill-scene-management</module>
+        
         <!-- LLM Drivers -->
         <module>skills/_drivers/llm/skill-llm-base</module>
         <module>skills/_drivers/llm/skill-llm-deepseek</module>
@@ -63,12 +68,14 @@
         <module>skills/_drivers/llm/skill-llm-openai</module>
         <module>skills/_drivers/llm/skill-llm-qianwen</module>
         <module>skills/_drivers/llm/skill-llm-volcengine</module>
+        
         <!-- Org Drivers -->
         <module>skills/_drivers/org/skill-org-base</module>
         <module>skills/_drivers/org/skill-org-dingding</module>
         <module>skills/_drivers/org/skill-org-feishu</module>
         <module>skills/_drivers/org/skill-org-ldap</module>
         <module>skills/_drivers/org/skill-org-wecom</module>
+        
         <!-- VFS Drivers -->
         <module>skills/_drivers/vfs/skill-vfs-base</module>
         <module>skills/_drivers/vfs/skill-vfs-database</module>
@@ -76,34 +83,56 @@
         <module>skills/_drivers/vfs/skill-vfs-minio</module>
         <module>skills/_drivers/vfs/skill-vfs-oss</module>
         <module>skills/_drivers/vfs/skill-vfs-s3</module>
+        
+        <!-- IoT Drivers - TODO: implement these modules -->
+        <!-- <module>skills/_drivers/iot/skill-openwrt</module>
+        <module>skills/_drivers/iot/skill-hosting</module>
+        <module>skills/_drivers/iot/skill-k8s</module> -->
+        
         <!-- Media Drivers -->
         <module>skills/_drivers/media/skill-media-toutiao</module>
         <module>skills/_drivers/media/skill-media-wechat</module>
         <module>skills/_drivers/media/skill-media-weibo</module>
         <module>skills/_drivers/media/skill-media-xiaohongshu</module>
         <module>skills/_drivers/media/skill-media-zhihu</module>
+        
         <!-- Payment Drivers -->
         <module>skills/_drivers/payment/skill-payment-alipay</module>
         <module>skills/_drivers/payment/skill-payment-unionpay</module>
         <module>skills/_drivers/payment/skill-payment-wechat</module>
-        <!-- Capabilities -->
+        
+        <!-- Capabilities - Auth -->
         <module>skills/capabilities/auth/skill-user-auth</module>
+        
+        <!-- Capabilities - Communication -->
         <module>skills/capabilities/communication/skill-email</module>
         <module>skills/capabilities/communication/skill-group</module>
         <module>skills/capabilities/communication/skill-im</module>
         <module>skills/capabilities/communication/skill-mqtt</module>
         <module>skills/capabilities/communication/skill-msg</module>
+        <module>skills/capabilities/communication/skill-notification</module>
         <module>skills/capabilities/communication/skill-notify</module>
+        
+        <!-- Capabilities - Infrastructure -->
         <module>skills/capabilities/infrastructure/skill-hosting</module>
         <module>skills/capabilities/infrastructure/skill-k8s</module>
         <module>skills/capabilities/infrastructure/skill-openwrt</module>
+        <module>skills/capabilities/infrastructure/skill-failover-manager</module>
+        <module>skills/capabilities/infrastructure/skill-httpclient-okhttp</module>
+        <module>skills/capabilities/infrastructure/skill-load-balancer</module>
+        
+        <!-- Capabilities - Knowledge -->
         <module>skills/capabilities/knowledge/skill-knowledge-base</module>
         <module>skills/capabilities/knowledge/skill-local-knowledge</module>
         <module>skills/capabilities/knowledge/skill-rag</module>
         <module>skills/capabilities/knowledge/skill-vector-sqlite</module>
+        
+        <!-- Capabilities - LLM -->
         <module>skills/capabilities/llm/skill-llm-config-manager</module>
         <module>skills/capabilities/llm/skill-llm-context-builder</module>
         <module>skills/capabilities/llm/skill-llm-conversation</module>
+        
+        <!-- Capabilities - Monitor -->
         <module>skills/capabilities/monitor/skill-agent</module>
         <module>skills/capabilities/monitor/skill-cmd-service</module>
         <module>skills/capabilities/monitor/skill-health</module>
@@ -111,36 +140,40 @@
         <module>skills/capabilities/monitor/skill-network</module>
         <module>skills/capabilities/monitor/skill-remote-terminal</module>
         <module>skills/capabilities/monitor/skill-res-service</module>
+        
+        <!-- Capabilities - Scheduler -->
         <module>skills/capabilities/scheduler/skill-scheduler-quartz</module>
         <module>skills/capabilities/scheduler/skill-task</module>
+        
+        <!-- Capabilities - Search -->
         <module>skills/capabilities/search/skill-search</module>
+        
+        <!-- Capabilities - Security -->
         <module>skills/capabilities/security/skill-access-control</module>
         <module>skills/capabilities/security/skill-audit</module>
         <module>skills/capabilities/security/skill-security</module>
+        
         <!-- Scenes -->
+        <module>skills/scenes/skill-agent-recommendation</module>
         <module>skills/scenes/skill-business</module>
         <module>skills/scenes/skill-collaboration</module>
         <module>skills/scenes/skill-document-assistant</module>
+        <!-- TODO: implement these modules
         <module>skills/scenes/skill-knowledge-qa</module>
         <module>skills/scenes/skill-knowledge-share</module>
-        <module>skills/scenes/skill-llm-chat</module>
         <module>skills/scenes/skill-meeting-minutes</module>
         <module>skills/scenes/skill-onboarding-assistant</module>
         <module>skills/scenes/skill-project-knowledge</module>
+        -->
+        
         <!-- Tools -->
+        <module>skills/tools/skill-command-shortcut</module>
         <module>skills/tools/skill-document-processor</module>
         <module>skills/tools/skill-market</module>
         <module>skills/tools/skill-report</module>
         <module>skills/tools/skill-share</module>
-        <!-- Other Skills -->
-        <module>skills/skill-scene</module>
-        <module>skills/skill-update-checker</module>
-        <module>skills/skill-capability-coordinator</module>
-        <module>skills/skill-load-balancer</module>
-        <module>skills/skill-failover-manager</module>
-        <module>skills/skill-agent-recommendation</module>
-        <module>skills/skill-command-shortcut</module>
-        <module>skills/skill-httpclient-okhttp</module>
+        <module>skills/tools/skill-update-checker</module>
+        
         <!-- Hot Plug Support -->
         <module>skill-hotplug-starter</module>
     </modules>
@@ -198,6 +231,26 @@
                 <groupId>com.alibaba.fastjson2</groupId>
                 <artifactId>fastjson2</artifactId>
                 <version>2.0.43</version>
+            </dependency>
+            <dependency>
+                <groupId>org.projectlombok</groupId>
+                <artifactId>lombok</artifactId>
+                <version>1.18.24</version>
+            </dependency>
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>agent-sdk-core</artifactId>
+                <version>${agent-sdk.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>scene-engine</artifactId>
+                <version>${scene-engine.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-starter-mail</artifactId>
+                <version>${spring-boot.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

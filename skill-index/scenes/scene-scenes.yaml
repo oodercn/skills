@@ -1,0 +1,27 @@
+﻿apiVersion: ooder.io/v1
+kind: Scenes
+metadata:
+  name: scene-scenes
+  category: scene
+  count: 1
+
+scenes:
+
+    - sceneId: llm-chat
+      name: LLM智能对话场景
+      description: LLM智能对话场景能力，自驱型SuperAgent，支持多轮对话、上下文感知、流式输出
+      version: "2.3.0"
+      capabilityCategory: scene
+      mainFirst: true
+      requiredCapabilities:
+        - llm-chat
+        - session-manage
+        - history-record
+        - context-extraction
+        - context-merging
+      driverCapabilities:
+        - intent-receiver
+      collaborativeCapabilities:
+        - scene-knowledge-qa
+      maxMembers: 100
+      

@@ -1,0 +1,26 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: scheduler-skills
+  category: scheduler
+  count: 1
+
+skills:
+
+    - id: skill-scheduler-quartz
+      name: Quartz Scheduler Service
+      version: "0.7.3"
+      capabilityCategory: scheduler
+      subCategory: quartz
+      tags:
+        - scheduler
+        - quartz
+        - cron
+        - task
+      description: Quartz调度服务 - 提供任务调度、执行历史管理能力
+      sceneId: scheduling
+      path: skills/skill-scheduler-quartz
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      checksum: ""
+      

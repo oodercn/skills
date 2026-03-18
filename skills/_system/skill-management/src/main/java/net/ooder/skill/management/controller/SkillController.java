@@ -179,7 +179,7 @@ public class SkillController {
             .stream()
             .map(SkillDefinition::getCategory)
             .distinct()
-            .toList());
+            .collect(java.util.stream.Collectors.toList()));
         return result;
     }
 

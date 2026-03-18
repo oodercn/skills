@@ -50,6 +50,11 @@ public class ServiceRegistry {
 
             // 创建服务实例
             Object serviceInstance = createServiceInstance(implClass);
+            
+            if (serviceInstance == null) {
+                logger.info("Skipping service registration for: {} (requires Spring injection)", serviceDef.getName());
+                return;
+            }
 
             // 创建动态代理
             Object proxy = createProxy(interfaceClass, serviceInstance, classLoader, skillId);
@@ -178,8 +183,8 @@ public class ServiceRegistry {
         try {
             return implClass.newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
-            logger.error("Failed to create service instance: {}", implClass.getName(), e);
-            throw e;
+            logger.warn("Could not create service instance via default constructor: {}, skipping service registration", implClass.getName());
+            return null;
         }
     }
 

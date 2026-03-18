@@ -1,11 +1,7 @@
 package net.ooder.skill.protocol.provider;
 
 import lombok.extern.slf4j.Slf4j;
-import net.ooder.scene.core.Result;
-import net.ooder.scene.core.SceneEngine;
-import net.ooder.scene.provider.ProtocolProvider;
-import net.ooder.scene.provider.model.protocol.ProtocolHandler;
-import net.ooder.scene.provider.model.protocol.ProtocolCommandResult;
+import net.ooder.skill.common.Result;
 import org.springframework.stereotype.Component;
 
 import java.util.*;
@@ -13,52 +9,41 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Slf4j
 @Component
-public class ProtocolProviderImpl implements ProtocolProvider {
+public class ProtocolProviderImpl {
     
     private boolean initialized = false;
     private boolean running = false;
-    private SceneEngine engine;
     
-    private final Map<String, ProtocolHandler> handlers = new ConcurrentHashMap<>();
+    private final Map<String, ProtocolHandlerInfo> handlers = new ConcurrentHashMap<>();
     
-    @Override
     public String getProviderName() {
         return "skill-protocol";
     }
     
-    @Override
     public String getVersion() {
-        return "0.7.3";
+        return "2.3.1";
     }
     
-    @Override
-    public void initialize(SceneEngine engine) {
-        this.engine = engine;
+    public void initialize() {
         this.initialized = true;
-        
         registerDefaultHandlers();
-        
         log.info("ProtocolProvider initialized");
     }
     
-    @Override
     public void start() {
         this.running = true;
         log.info("ProtocolProvider started");
     }
     
-    @Override
     public void stop() {
         this.running = false;
         log.info("ProtocolProvider stopped");
     }
     
-    @Override
     public boolean isInitialized() {
         return initialized;
     }
     
-    @Override
     public boolean isRunning() {
         return running;
     }
@@ -72,7 +57,7 @@ public class ProtocolProviderImpl implements ProtocolProvider {
     }
     
     private void registerHandler(String type, String name, String handlerClass, List<String> schemes) {
-        ProtocolHandler handler = new ProtocolHandler();
+        ProtocolHandlerInfo handler = new ProtocolHandlerInfo();
         handler.setHandlerId(UUID.randomUUID().toString());
         handler.setType(type);
         handler.setName(name);
@@ -84,15 +69,13 @@ public class ProtocolProviderImpl implements ProtocolProvider {
         handlers.put(type, handler);
     }
     
-    @Override
-    public Result<List<ProtocolHandler>> getProtocolHandlers() {
-        List<ProtocolHandler> handlerList = new ArrayList<>(handlers.values());
+    public Result<List<ProtocolHandlerInfo>> getProtocolHandlers() {
+        List<ProtocolHandlerInfo> handlerList = new ArrayList<>(handlers.values());
         log.debug("Retrieved {} protocol handlers", handlerList.size());
         return Result.success(handlerList);
     }
     
-    @Override
-    public Result<ProtocolHandler> registerProtocolHandler(Map<String, Object> handlerData) {
+    public Result<ProtocolHandlerInfo> registerProtocolHandler(Map<String, Object> handlerData) {
         try {
             String type = (String) handlerData.get("type");
             if (type == null || type.isEmpty()) {
@@ -103,7 +86,7 @@ public class ProtocolProviderImpl implements ProtocolProvider {
                 return Result.error("Handler already exists: " + type);
             }
             
-            ProtocolHandler handler = new ProtocolHandler();
+            ProtocolHandlerInfo handler = new ProtocolHandlerInfo();
             handler.setHandlerId(UUID.randomUUID().toString());
             handler.setType(type);
             handler.setName((String) handlerData.getOrDefault("name", type));
@@ -123,9 +106,8 @@ public class ProtocolProviderImpl implements ProtocolProvider {
         }
     }
     
-    @Override
     public Result<Boolean> removeProtocolHandler(String handlerType) {
-        ProtocolHandler removed = handlers.remove(handlerType);
+        ProtocolHandlerInfo removed = handlers.remove(handlerType);
         if (removed == null) {
             return Result.error("Handler not found: " + handlerType);
         }
@@ -134,8 +116,7 @@ public class ProtocolProviderImpl implements ProtocolProvider {
         return Result.success(true);
     }
     
-    @Override
-    public Result<ProtocolCommandResult> handleProtocolCommand(Map<String, Object> commandData) {
+    public Result<Map<String, Object>> handleProtocolCommand(Map<String, Object> commandData) {
         try {
             String protocol = (String) commandData.get("protocol");
             String command = (String) commandData.get("command");
@@ -145,7 +126,7 @@ public class ProtocolProviderImpl implements ProtocolProvider {
                 return Result.error("Protocol is required");
             }
             
-            ProtocolHandler handler = handlers.get(protocol);
+            ProtocolHandlerInfo handler = handlers.get(protocol);
             if (handler == null) {
                 return Result.error("Handler not found for protocol: " + protocol);
             }
@@ -154,34 +135,24 @@ public class ProtocolProviderImpl implements ProtocolProvider {
                 return Result.error("Handler is disabled: " + protocol);
             }
             
-            ProtocolCommandResult result = new ProtocolCommandResult();
-            result.setCommandId(UUID.randomUUID().toString());
-            result.setProtocol(protocol);
-            result.setCommand(command);
-            result.setSuccess(true);
-            result.setStatus("completed");
-            
             Map<String, Object> output = new HashMap<>();
-            output.put("message", "Command executed successfully");
+            output.put("commandId", UUID.randomUUID().toString());
             output.put("protocol", protocol);
             output.put("command", command);
+            output.put("success", true);
+            output.put("status", "completed");
+            output.put("message", "Command executed successfully");
             output.put("params", params);
             output.put("timestamp", System.currentTimeMillis());
-            result.setOutput(output);
-            
-            result.setError(null);
-            result.setExecutedAt(System.currentTimeMillis());
-            result.setDuration(50L);
             
             log.info("Protocol command executed: {} - {}", protocol, command);
-            return Result.success(result);
+            return Result.success(output);
         } catch (Exception e) {
             log.error("Failed to handle protocol command", e);
             return Result.error("Failed to handle protocol command: " + e.getMessage());
         }
     }
     
-    @Override
     public Result<Boolean> refreshProtocolHandlers() {
         try {
             handlers.clear();
@@ -195,11 +166,23 @@ public class ProtocolProviderImpl implements ProtocolProvider {
         }
     }
     
-    public ProtocolHandler getHandler(String type) {
+    public ProtocolHandlerInfo getHandler(String type) {
         return handlers.get(type);
     }
     
     public boolean hasHandler(String type) {
         return handlers.containsKey(type);
+    }
+    
+    @lombok.Data
+    public static class ProtocolHandlerInfo {
+        private String handlerId;
+        private String type;
+        private String name;
+        private String handlerClass;
+        private List<String> schemes;
+        private boolean enabled;
+        private long registeredAt;
+        private Map<String, Object> metadata;
     }
 }

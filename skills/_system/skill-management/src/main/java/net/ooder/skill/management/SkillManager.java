@@ -1,5 +1,6 @@
 package net.ooder.skill.management;
 
+import net.ooder.skill.management.lifecycle.SkillLifecycleListener;
 import net.ooder.skill.management.lifecycle.SkillLifecycleManager;
 import net.ooder.skill.management.model.SkillContext;
 import net.ooder.skill.management.model.SkillDefinition;

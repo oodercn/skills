@@ -33,7 +33,7 @@ public class LlmConfigServiceImpl implements LlmConfigService {
         secretKey = new SecretKeySpec(keyBytes, ENCRYPTION_ALGORITHM);
         
         initDefaultConfigs();
-        log.info("LlmConfigService initialized with {} configs, SDK LlmConfig integrated", configStore.size());
+        log.info("LlmConfigService initialized with {} configs", configStore.size());
     }
     
     private void initDefaultConfigs() {
@@ -53,86 +53,6 @@ public class LlmConfigServiceImpl implements LlmConfigService {
         enterpriseConfig.setOptions(options);
         
         configStore.put(enterpriseConfig.getId(), enterpriseConfig);
-    }
-    
-    public net.ooder.llm.api.LlmConfig toSdkLlmConfig(LlmConfig config) {
-        net.ooder.llm.api.LlmConfig sdkConfig = new net.ooder.llm.api.LlmConfig();
-        sdkConfig.setDefaultModel(config.getModel());
-        
-        if (config.getOptions() != null) {
-            if (config.getOptions().containsKey("temperature")) {
-                sdkConfig.setTemperature(((Number) config.getOptions().get("temperature")).doubleValue());
-            }
-            if (config.getOptions().containsKey("max_tokens")) {
-                sdkConfig.setMaxTokens(((Number) config.getOptions().get("max_tokens")).intValue());
-            }
-        }
-        
-        if (config.getProviderConfig() != null) {
-            if (config.getProviderConfig().containsKey("baseUrl")) {
-                sdkConfig.setBaseUrl((String) config.getProviderConfig().get("baseUrl"));
-            }
-            if (config.getProviderConfig().containsKey("apiKey")) {
-                String apiKey = (String) config.getProviderConfig().get("apiKey");
-                if (apiKey != null && apiKey.startsWith("enc:")) {
-                    apiKey = decryptApiKey(apiKey);
-                }
-                sdkConfig.setApiKey(apiKey);
-            }
-            sdkConfig.setExtraConfig(config.getProviderConfig());
-        }
-        
-        return sdkConfig;
-    }
-    
-    public LlmConfig fromSdkLlmConfig(net.ooder.llm.api.LlmConfig sdkConfig, LlmConfig.ConfigLevel level, String scopeId) {
-        LlmConfig config = new LlmConfig();
-        config.setId(UUID.randomUUID().toString());
-        config.setLevel(level);
-        config.setScopeId(scopeId);
-        config.setModel(sdkConfig.getDefaultModel());
-        config.setEnabled(true);
-        config.setCreatedAt(System.currentTimeMillis());
-        config.setCreatedBy("sdk-import");
-        
-        Map<String, Object> options = new HashMap<>();
-        options.put("temperature", sdkConfig.getTemperature());
-        options.put("max_tokens", sdkConfig.getMaxTokens());
-        config.setOptions(options);
-        
-        Map<String, Object> providerConfig = new HashMap<>();
-        if (sdkConfig.getBaseUrl() != null) {
-            providerConfig.put("baseUrl", sdkConfig.getBaseUrl());
-        }
-        if (sdkConfig.getApiKey() != null) {
-            providerConfig.put("apiKey", encryptApiKey(sdkConfig.getApiKey()));
-        }
-        if (sdkConfig.getExtraConfig() != null) {
-            providerConfig.putAll(sdkConfig.getExtraConfig());
-        }
-        config.setProviderConfig(providerConfig);
-        
-        return config;
-    }
-    
-    public net.ooder.llm.api.LlmConfig resolveSdkConfig(String userId, String sceneId, String departmentId) {
-        ResolvedConfig resolved = resolveConfig(userId, sceneId, departmentId);
-        
-        net.ooder.llm.api.LlmConfig sdkConfig = new net.ooder.llm.api.LlmConfig();
-        sdkConfig.setDefaultModel(resolved.getModel());
-        sdkConfig.setApiKey(resolved.getApiKey());
-        sdkConfig.setBaseUrl(resolved.getBaseUrl());
-        
-        if (resolved.getOptions() != null) {
-            if (resolved.getOptions().containsKey("temperature")) {
-                sdkConfig.setTemperature(((Number) resolved.getOptions().get("temperature")).doubleValue());
-            }
-            if (resolved.getOptions().containsKey("max_tokens")) {
-                sdkConfig.setMaxTokens(((Number) resolved.getOptions().get("max_tokens")).intValue());
-            }
-        }
-        
-        return sdkConfig;
     }
 
     @Override

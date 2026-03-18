@@ -1,0 +1,374 @@
+{
+	"cap-llm-vision":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-llm-vision",
+		"icon":"ri-eye-line",
+		"description":"大语言模型视觉理解能力",
+		"type":"llm",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533648,
+		"capabilityCategory":"communication",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533648,
+		"name":"LLM视觉",
+		"status":"REGISTERED"
+	},
+	"cap-knowledge-index":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-knowledge-index",
+		"icon":"ri-database-2-line",
+		"description":"知识库索引管理能力",
+		"type":"knowledge",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533668,
+		"capabilityCategory":"knowledge",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533668,
+		"name":"知识索引",
+		"status":"REGISTERED"
+	},
+	"cap-db-query":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-db-query",
+		"icon":"ri-database-2-line",
+		"description":"数据库查询能力",
+		"type":"driver",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533685,
+		"capabilityCategory":"storage",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533685,
+		"name":"数据库查询",
+		"status":"REGISTERED"
+	},
+	"cap-http-request":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-http-request",
+		"icon":"ri-global-line",
+		"description":"HTTP请求能力",
+		"type":"tool",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533690,
+		"capabilityCategory":"integration",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533690,
+		"name":"HTTP请求",
+		"status":"REGISTERED"
+	},
+	"cap-llm-embedding":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-llm-embedding",
+		"icon":"ri-code-line",
+		"description":"文本嵌入向量生成能力",
+		"type":"llm",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533655,
+		"capabilityCategory":"communication",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533655,
+		"name":"LLM嵌入",
+		"status":"REGISTERED"
+	},
+	"cap-vfs-write":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-vfs-write",
+		"icon":"ri-file-edit-line",
+		"description":"虚拟文件系统写入能力",
+		"type":"vfs",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533681,
+		"capabilityCategory":"storage",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533681,
+		"name":"文件写入",
+		"status":"REGISTERED"
+	},
+	"cap-scene-manage":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-scene-manage",
+		"icon":"ri-settings-3-line",
+		"description":"场景管理能力",
+		"type":"scene",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533703,
+		"capabilityCategory":"business",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533703,
+		"name":"场景管理",
+		"status":"REGISTERED"
+	},
+	"cap-knowledge-search":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-knowledge-search",
+		"icon":"ri-search-line",
+		"description":"知识库检索能力",
+		"type":"knowledge",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533659,
+		"capabilityCategory":"knowledge",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533659,
+		"name":"知识检索",
+		"status":"REGISTERED"
+	},
+	"cap-scene-create":{
+		"installed":false,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-scene-create",
+		"icon":"ri-apps-line",
+		"description":"创建新场景能力",
+		"type":"scene",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773743504265,
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773743504265,
+		"name":"场景创建",
+		"status":"REGISTERED"
+	},
+	"cap-vfs-read":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-vfs-read",
+		"icon":"ri-file-read-line",
+		"description":"虚拟文件系统读取能力",
+		"type":"vfs",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533673,
+		"capabilityCategory":"storage",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533673,
+		"name":"文件读取",
+		"status":"REGISTERED"
+	},
+	"cap-llm-chat":{
+		"installed":true,
+		"metadata":{
+			
+		},
+		"capabilityId":"cap-llm-chat",
+		"icon":"ri-chat-3-line",
+		"description":"大语言模型对话能力",
+		"type":"llm",
+		"ownerId":"system",
+		"mainFirst":false,
+		"supportedSceneTypes":[
+			
+		],
+		"skillForm":"provider",
+		"dynamicSceneTypes":false,
+		"capabilities":[
+			
+		],
+		"accessLevel":"SCENE",
+		"visibility":"public",
+		"updateTime":1773734533352,
+		"capabilityCategory":"communication",
+		"version":"1.0.0",
+		"dependencies":[
+			
+		],
+		"tags":[
+			
+		],
+		"createTime":1773734533352,
+		"name":"LLM对话",
+		"status":"REGISTERED"
+	}
+}

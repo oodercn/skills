@@ -235,7 +235,7 @@ var CapabilityDiscovery = {
         scanStats.found = discoveredCapabilities.length;
         scanStats.new = newCount;
         scanStats.installed = installedCount;
-        scanStats.scanned = 100;
+        scanStats.scanned = data.total || caps.length;
         CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个能力（已过滤内部服务）');
         CapabilityDiscovery.renderResults();
         CapabilityDiscovery.addRadarDots();
@@ -257,7 +257,7 @@ var CapabilityDiscovery = {
     showEmptyResult: function() {
         discoveredCapabilities = [];
         scanStats.found = 0;
-        scanStats.scanned = 100;
+        scanStats.scanned = 0;
         CapabilityDiscovery.renderResults();
     },
 
@@ -897,7 +897,59 @@ var CapabilityDiscovery = {
                 '<span>场景已成功安装并激活</span></div>';
         }
         
+        CapabilityDiscovery.saveInstallConfig(cap);
         CapabilityDiscovery.addMenuForInstalledCapability(cap);
+    },
+
+    saveInstallConfig: function(cap) {
+        var sceneGroupId = cap.id || ('sg-' + Date.now());
+        var installConfig = CapabilityDiscovery.collectInstallConfig(cap);
+        
+        if (installConfig.llmConfig) {
+            ApiClient.put('/api/v1/scene-groups/' + sceneGroupId + '/llm/config', installConfig.llmConfig)
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        console.log('[saveInstallConfig] LLM config saved successfully');
+                        CapabilityDiscovery.addLog('success', 'LLM配置保存成功');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('[saveInstallConfig] Failed to save LLM config:', error);
+                });
+        }
+        
+        if (installConfig.participants && installConfig.participants.length > 0) {
+            installConfig.participants.forEach(function(participant) {
+                ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/participants', participant)
+                    .then(function(result) {
+                        if (result.status === 'success') {
+                            console.log('[saveInstallConfig] Participant added:', participant.userId);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('[saveInstallConfig] Failed to add participant:', error);
+                    });
+            });
+        }
+        
+        if (installConfig.llmConfig && installConfig.llmConfig.knowledge && installConfig.llmConfig.knowledge.bases) {
+            installConfig.llmConfig.knowledge.bases.forEach(function(kb) {
+                ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/knowledge', {
+                    kbId: kb.id || kb,
+                    layer: kb.layer || 'GENERAL'
+                })
+                    .then(function(result) {
+                        if (result.status === 'success') {
+                            console.log('[saveInstallConfig] Knowledge base bound:', kb);
+                        }
+                    })
+                    .catch(function(error) {
+                        console.error('[saveInstallConfig] Failed to bind knowledge:', error);
+                    });
+            });
+        }
+        
+        console.log('[saveInstallConfig] All configurations saved for scene group:', sceneGroupId);
     },
 
     addMenuForInstalledCapability: function(cap) {

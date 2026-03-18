@@ -286,7 +286,7 @@
                     }
                 });
 
-            fetch('/api/llm/providers', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            fetch('/api/v1/llm/providers', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
                 .then(function(response) { return response.json(); })
                 .then(function(result) {
                     var data = result.data || result.Data || [];

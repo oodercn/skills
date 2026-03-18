@@ -1,0 +1,97 @@
+{
+  "apiVersion" : "skills.ooder.io/v1",
+  "kind" : "SystemConfig",
+  "metadata" : {
+    "name" : "ooder-skills-system",
+    "version" : "1.0.0",
+    "profile" : "micro",
+    "createdAt" : "2026-03-18T04:04:54.040Z",
+    "updatedAt" : "2026-03-18T04:04:54.041Z"
+  },
+  "spec" : {
+    "capabilities" : {
+      "llm" : {
+        "enabled" : true,
+        "default" : "skill-llm-aliyun-bailian",
+        "config" : { }
+      },
+      "db" : {
+        "enabled" : true,
+        "default" : "skill-db-mysql",
+        "config" : { }
+      },
+      "vfs" : {
+        "enabled" : true,
+        "default" : "skill-vfs-local",
+        "config" : { }
+      },
+      "org" : {
+        "enabled" : true,
+        "default" : "skill-org-local",
+        "config" : { }
+      },
+      "know" : {
+        "enabled" : true,
+        "default" : "skill-know-rag",
+        "config" : { }
+      },
+      "comm" : {
+        "enabled" : true,
+        "default" : "skill-comm-notify",
+        "config" : { }
+      },
+      "auth" : {
+        "enabled" : true,
+        "default" : "skill-auth-user",
+        "config" : { }
+      },
+      "mon" : {
+        "enabled" : true,
+        "default" : "skill-mon-health",
+        "config" : { }
+      },
+      "payment" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "media" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "search" : {
+        "enabled" : true,
+        "default" : "skill-search-es",
+        "config" : { }
+      },
+      "sched" : {
+        "enabled" : true,
+        "default" : "skill-sched-quartz",
+        "config" : { }
+      },
+      "sec" : {
+        "enabled" : true,
+        "default" : "skill-sec-access",
+        "config" : { }
+      },
+      "iot" : {
+        "enabled" : false,
+        "config" : { }
+      },
+      "net" : {
+        "enabled" : true,
+        "default" : "skill-net-proxy",
+        "config" : { }
+      },
+      "sys" : {
+        "enabled" : true,
+        "default" : "skill-sys-registry",
+        "config" : { }
+      },
+      "util" : {
+        "enabled" : true,
+        "default" : "skill-util-report",
+        "config" : { }
+      }
+    }
+  }
+}

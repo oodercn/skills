@@ -1,7 +1,7 @@
 package net.ooder.skill.protocol.api;
 
-import net.ooder.sdk.infra.utils.Result;
-import net.ooder.sdk.api.scene.SkillContext;
+import net.ooder.skill.common.Result;
+import net.ooder.skill.common.SkillContext;
 
 import java.util.List;
 import java.util.Map;

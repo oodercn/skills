@@ -1,8 +1,0 @@
-server:
-  port: 8095
-
-vector:
-  sqlite:
-    dbPath: ./data/vectors.db
-    embeddingDimension: 1536
-    defaultTopK: 10

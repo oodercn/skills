@@ -25,28 +25,53 @@ spec:
     - id: skill-knowledge-base
       version: ">=1.0.0"
       required: true
+      autoInstall: true
+      installSource: https://gitee.com/ooderCN/ooder-skills/releases
+      fallback: embedded
+      timeout: 30s
       description: "知识库核心服务"
       capabilities:
         - kb-management
         - document-management
         - kb-search
         
+    - id: skill-indexing
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      installSource: https://gitee.com/ooderCN/ooder-skills/releases
+      fallback: embedded
+      timeout: 30s
+      description: "文档索引服务"
+        
     - id: skill-rag
       version: ">=1.0.0"
       required: false
+      autoInstall: false
       description: "RAG检索增强（可选）"
       
-    - id: skill-llm-assistant-ui
-      version: ">=2.3.0"
+    - id: skill-llm-chat
+      version: ">=2.0.0"
       required: false
       autoInstall: false
-      description: "LLM智能助手（可选）"
-      
-    - id: skill-vector-sqlite
+      description: "LLM智能对话场景能力（可选）"
+      capabilities:
+        - llm-chat
+        - session-manage
+        - context-extraction
+        
+    - id: skill-llm-baidu
       version: ">=1.0.0"
       required: false
       autoInstall: false
-      description: "向量存储服务（可选）"
+      description: "百度千帆LLM Provider（可选）"
+      capabilities:
+        - llm-chat
+        - llm-embed
+      configMapping:
+        apiKey: "${BAIDU_API_KEY:-${ooder.llm.api-key}}"
+        baseUrl: "${BAIDU_BASE_URL:-${ooder.llm.base-url}}"
+        model: "${BAIDU_MODEL:-${ooder.llm.model}}"
 
   sceneCapabilities:
     - id: scene-knowledge-qa
@@ -56,18 +81,29 @@ spec:
       
       mainFirstConfig:
         selfCheck:
-          - checkCapabilities: [kb-management, document-management, kb-search]
-          - checkDriverCapabilities: [intent-receiver, event-listener]
-          - checkCollaborative: [scene-indexing]
+          checkCapabilities: [kb-management, document-management, kb-search]
+          checkDriverCapabilities: [intent-receiver, event-listener]
+          checkDependencies: [skill-knowledge-base, skill-indexing]
+          checkConfig: [ooder.llm.api-key]
+          checkCollaborative: [scene-indexing]
+          onCheckFailed:
+            action: degrade
+            degradedCapabilities: [rag-retrieval]
+            retry:
+              maxAttempts: 3
+              delay: 5s
           
         selfStart:
-          - initDriverCapabilities: [intent-receiver, event-listener, capability-invoker]
-          - initCapabilities: [kb-management, document-management, kb-search]
-          - bindAddresses: auto
+          installDependencies: auto
+          initDriverCapabilities: [intent-receiver, event-listener, capability-invoker]
+          initCapabilities: [kb-management, document-management, kb-search]
+          bindAddresses: auto
           
         startCollaboration:
-          - startScene: scene-indexing
-          - bindInterface: indexing-service
+          startScene: scene-indexing
+          optional: true
+          timeout: 10s
+          bindInterface: indexing-service
           
         selfDrive:
           scheduleRules:
@@ -114,10 +150,13 @@ spec:
           role: PROVIDER
           interface: indexing-service
           autoStart: true
+          optional: true
+          timeout: 10000
         - capabilityId: scene-llm-assistant
           role: PROVIDER
           interface: llm-service
           autoStart: false
+          optional: true
 
   capabilities:
     - id: kb-management
@@ -241,87 +280,17 @@ spec:
     cacheStrategy: local
     syncOnReconnect: true
 
-  knowledge:
-    documents:
-      - id: overview
-        name: 功能概述
-        path: README.md
-        type: guide
-        language: zh
-        priority: high
-        
-      - id: quick-start
-        name: 快速开始
-        path: docs/quick-start.md
-        type: guide
-        language: zh
-        priority: high
-        
-      - id: api-reference
-        name: API参考
-        path: docs/api-reference.md
-        type: reference
-        language: zh
-        priority: medium
-        
-      - id: configuration
-        name: 配置指南
-        path: docs/configuration.md
-        type: guide
-        language: zh
-        priority: medium
-        
-      - id: troubleshooting
-        name: 故障排查
-        path: docs/troubleshooting.md
-        type: guide
-        language: zh
-        priority: low
-        
-      - id: faq
-        name: 常见问题
-        path: docs/faq.md
-        type: faq
-        language: zh
-        priority: low
-    
-    ragConfig:
-      enabled: true
-      indexName: "skill-knowledge-qa-knowledge"
-      embeddingModel: text-embedding-3-small
-      chunkSize: 1000
-      chunkOverlap: 200
-      searchStrategy: hybrid
-      topK: 5
-      threshold: 0.7
-      rerankEnabled: false
-
-  persona:
-    enabled: true
-    name: 知识问答助手
-    description: 专业的知识问答助手，帮助用户从知识库中检索和获取信息
-    expertise:
-      - 知识检索
-      - 语义理解
-      - RAG问答
-      - 文档管理
-    boundaries:
-      - 只回答知识库中已有的内容
-      - 不提供知识库之外的信息
-      - 无法找到答案时明确告知
-    tone: professional, accurate, helpful
-    examples:
-      - question: "如何创建知识库？"
-        answer: "您可以通过POST /api/knowledge/bases接口创建知识库，需要提供name和description参数。"
-      - question: "支持哪些文档格式？"
-        answer: "目前支持PDF、Word(.docx)、Markdown(.md)和纯文本(.txt)格式。"
-
-  llmAssistant:
-    enabled: true
-    welcomeMessage: "您好，我是知识问答助手，可以帮您从知识库中检索信息。"
-    suggestedQuestions:
-      - "如何上传文档到知识库？"
-      - "如何进行知识检索？"
-      - "支持哪些文档格式？"
-    contextWindow: 10
-    maxTokens: 2000
+  ui:
+    nexusUi:
+      entry:
+        page: index.html
+        title: 知识问答
+        icon: ri-book-3-line
+      menu:
+        position: sidebar
+        category: knowledge-qa
+        order: 10
+      layout:
+        type: default
+        sidebar: true
+        header: true

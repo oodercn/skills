@@ -29,7 +29,12 @@ public class MvcConfig implements WebMvcConfigurer {
                     "/actuator/**",
                     "/error",
                     "/favicon.svg",
-                    "/console/**",
+                    "/console/css/**",
+                    "/console/js/**",
+                    "/console/images/**",
+                    "/console/fonts/**",
+                    "/console/skills/**",
+                    "/console/pages/**",
                     "/css/**",
                     "/js/**",
                     "/images/**"

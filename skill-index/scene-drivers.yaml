@@ -1,0 +1,78 @@
+apiVersion: ooder.io/v1
+kind: SceneDrivers
+
+metadata:
+  name: ooder-scene-drivers
+  version: "2.3.1"
+  description: Ooder 场景驱动定义
+  author: Ooder Team
+
+sceneDrivers:
+  - id: org
+    name: Organization Driver
+    description: 组织管理场景驱动，提供用户认证、组织架构、角色管理能力
+    capabilities:
+      - user-auth
+      - user-manage
+      - org-manage
+      - role-manage
+    builtIn: true
+    location: scene-engine
+    
+  - id: vfs
+    name: Virtual File System Driver
+    description: 虚拟文件系统场景驱动，提供文件操作、版本管理能力
+    capabilities:
+      - file-operations
+      - folder-operations
+      - stream-operations
+      - version-operations
+      - search-operations
+    builtIn: true
+    location: scene-engine
+    
+  - id: msg
+    name: Messaging Driver
+    description: 消息服务场景驱动，提供消息队列、订阅发布能力
+    capabilities:
+      - message-operations
+      - queue-operations
+      - subscription-operations
+    builtIn: true
+    location: scene-engine
+    
+  - id: payment
+    name: Payment Driver
+    description: 支付场景驱动，提供支付、退款、回调处理能力
+    capabilities:
+      - create-payment
+      - query-payment
+      - close-payment
+      - create-refund
+      - query-refund
+      - handle-callback
+    builtIn: false
+    location: ooder-skills
+    
+  - id: media
+    name: Media Publish Driver
+    description: 媒体发布场景驱动，提供文章发布、更新、删除、统计能力
+    capabilities:
+      - publish-article
+      - update-article
+      - delete-article
+      - get-article
+      - list-articles
+      - get-stats
+    builtIn: false
+    location: ooder-skills
+    
+  - id: sys
+    name: System Driver
+    description: 系统管理场景驱动，提供监控、网络、安全能力
+    capabilities:
+      - system-monitor
+      - network-manage
+      - security-audit
+    builtIn: true
+    location: scene-engine

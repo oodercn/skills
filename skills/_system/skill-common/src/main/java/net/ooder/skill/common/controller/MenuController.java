@@ -134,6 +134,7 @@ public class MenuController {
             }
             
             for (String skillId : skillIds) {
+                if (skillId == null) continue;
                 String path = props.getProperty(skillId + ".path");
                 if (path != null) {
                     Map<String, Object> skillMenu = loadSkillMenu(skillId, path);
@@ -208,8 +209,8 @@ public class MenuController {
             }
         }
         
-        log.warn("No submenus found for skill: {}, using default url", skillId);
-        return createMenuItem(skillId, skillName, skillIcon, "/console/skills/" + skillId + "/", null);
+        log.warn("No submenus found for skill: {}, skipping menu entry", skillId);
+        return null;
     }
     
     private List<Map<String, Object>> loadSkillSubMenuConfig(String skillPath, String skillId) {

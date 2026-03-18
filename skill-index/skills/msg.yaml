@@ -1,0 +1,136 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: msg-skills
+  category: msg
+  count: 7
+
+skills:
+
+    - id: skill-mqtt
+      name: MQTT Service Skill
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: mqtt
+      tags:
+        - mqtt
+        - messaging
+        - iot
+      description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
+      sceneId: mqtt-messaging
+      path: skills/skill-mqtt
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-mqtt-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-im
+      name: Instant Messaging Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: im
+      tags:
+        - im
+        - messaging
+        - conversation
+        - contact
+        - chat
+      description: 即时通讯服务 - 提供会话管理和联系人管理能力
+      sceneId: im
+      path: skills/skill-im
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-im-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-group
+      name: Group Management Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: group
+      tags:
+        - group
+        - team
+        - member
+        - management
+        - collaboration
+      description: 群组管理服务 - 提供群组创建、成员管理和群组设置能力
+      sceneId: group
+      path: skills/skill-group
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-group-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-msg-service
+      name: Message Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: message
+      tags:
+        - message
+        - push
+        - topic
+        - p2p
+        - subscription
+      description: 消息服务 - 提供消息推送、Topic管理和P2P通信能力
+      sceneId: msg
+      path: skills/skill-msg-service
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-service-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-service-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-notify
+      name: Notification Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: notify
+      tags:
+        - notify
+        - notification
+        - push
+        - alert
+      description: 通知服务 - 提供多渠道消息推送、模板管理、订阅管理能力
+      sceneId: messaging
+      path: skills/skill-notify
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-notify-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-email
+      name: Email Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: email
+      tags:
+        - email
+        - smtp
+        - mail
+        - template
+      description: 邮件服务 - 提供邮件发送、模板管理、附件支持能力
+      sceneId: messaging
+      path: skills/skill-email
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-email-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-msg
+      name: Message Service
+      version: "0.7.3"
+      capabilityCategory: msg
+      subCategory: message
+      tags:
+        - message
+        - msg
+        - broadcast
+        - group
+      description: 消息服务 - 提供消息发送、广播、群组消息能力
+      sceneId: messaging
+      path: skills/skill-msg
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-msg-0.7.3.jar
+      checksum: ""
+      

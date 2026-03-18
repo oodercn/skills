@@ -1,0 +1,93 @@
+﻿apiVersion: ooder.io/v1
+kind: Scenes
+metadata:
+  name: collaboration-scenes
+  category: collaboration
+  count: 7
+
+scenes:
+
+    - sceneId: ui-generation
+      name: UI Generation
+      description: UI生成场景，支持图转代码、组件生成等能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - generate-ui
+        - preview-ui
+      maxMembers: 10
+      
+
+    - sceneId: meeting
+      name: Meeting Collaboration
+      description: 会议协作场景，提供会议、白板、共享等协作能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - meeting-create
+        - whiteboard-share
+        - screen-share
+      maxMembers: 100
+      
+
+    - sceneId: document
+      name: Document Collaboration
+      description: 文档协作场景，提供文档编辑、评论、版本等协作能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - document-edit
+        - document-comment
+        - version-manage
+      maxMembers: 500
+      
+
+    - sceneId: task
+      name: Task Collaboration
+      description: 任务协作场景，提供任务分配、跟踪、报告等协作能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - task-create
+        - task-assign
+        - task-track
+        - task-report
+      maxMembers: 500
+      
+
+    - sceneId: share
+      name: Skill Share
+      description: 技能分享场景，提供技能分享、接收管理能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - skill-sharing
+        - skill-receiving
+        - share-management
+      maxMembers: 500
+      
+
+    - sceneId: skill-market
+      name: Skill Market
+      description: 技能市场场景，提供技能发现、搜索、安装和管理能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - skill-discovery
+        - skill-search
+        - skill-installation
+        - skill-auth
+      maxMembers: 1000
+      
+
+    - sceneId: collaboration
+      name: Collaboration Scene
+      description: 协作场景，提供场景创建、成员管理、密钥管理能力
+      version: "1.0.0"
+      capabilityCategory: collaboration
+      requiredCapabilities:
+        - scene-management
+        - member-management
+        - key-management
+      maxMembers: 500
+      

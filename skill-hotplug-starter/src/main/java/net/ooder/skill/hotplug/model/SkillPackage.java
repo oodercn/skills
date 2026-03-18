@@ -28,7 +28,6 @@ public class SkillPackage {
             throw new IllegalArgumentException("Invalid skill package file: " + file);
         }
 
-        // 读取skill.yaml中的元数据
         SkillMetadata metadata = loadMetadata(file);
 
         return new SkillPackage(file, metadata);
@@ -41,7 +40,20 @@ public class SkillPackage {
         try (JarFile jarFile = new JarFile(file)) {
             JarEntry entry = jarFile.getJarEntry(path);
             if (entry != null) {
-                // 读取数据到内存，避免流被关闭
+                try (InputStream is = jarFile.getInputStream(entry)) {
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    byte[] buffer = new byte[8192];
+                    int len;
+                    while ((len = is.read(buffer)) != -1) {
+                        baos.write(buffer, 0, len);
+                    }
+                    return new ByteArrayInputStream(baos.toByteArray());
+                }
+            }
+            
+            String bootPath = "BOOT-INF/classes/" + path;
+            entry = jarFile.getJarEntry(bootPath);
+            if (entry != null) {
                 try (InputStream is = jarFile.getInputStream(entry)) {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     byte[] buffer = new byte[8192];
@@ -64,6 +76,12 @@ public class SkillPackage {
             JarEntry entry = jarFile.getJarEntry(path);
             if (entry != null) {
                 return new URL("jar:file:" + file.getAbsolutePath() + "!/" + path);
+            }
+            
+            String bootPath = "BOOT-INF/classes/" + path;
+            entry = jarFile.getJarEntry(bootPath);
+            if (entry != null) {
+                return new URL("jar:file:" + file.getAbsolutePath() + "!/" + bootPath);
             }
         }
         return null;
@@ -89,20 +107,17 @@ public class SkillPackage {
         return resources;
     }
 
-    // ==================== 私有方法 ====================
-
     private static SkillMetadata loadMetadata(File jarFile) throws IOException {
-        // 使用 getResource 方法读取 skill.yaml（已修复流关闭问题）
         SkillPackage tempPackage = new SkillPackage(jarFile, null);
+        
         try (InputStream is = tempPackage.getResource("skill.yaml")) {
-            if (is == null) {
-                throw new IOException("skill.yaml not found in: " + jarFile);
+            if (is != null) {
+                return SkillMetadata.loadFromYaml(is);
             }
-            return SkillMetadata.loadFromYaml(is);
         }
+        
+        throw new IOException("skill.yaml not found in: " + jarFile);
     }
-
-    // Getters
 
     public File getFile() {
         return file;

@@ -56,7 +56,7 @@
                 keyword: searchKeyword || null
             };
 
-            fetch('/api/v1/capabilities', {
+            fetch('/api/v1/scene/capabilities', {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json'

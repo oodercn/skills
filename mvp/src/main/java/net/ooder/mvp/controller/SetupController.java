@@ -119,6 +119,28 @@ public class SetupController {
         return result;
     }
 
+    @PostMapping("/api/v1/setup/reinstall")
+    @ResponseBody
+    public Map<String, Object> reinstall() {
+        Map<String, Object> result = new HashMap<>();
+        try {
+            File markerFile = new File("data/.installed");
+            if (markerFile.exists()) {
+                markerFile.delete();
+            }
+            File registryFile = new File("data/installed-skills/registry.properties");
+            if (registryFile.exists()) {
+                registryFile.delete();
+            }
+            result.put("status", "success");
+            result.put("message", "Ready for reinstallation");
+        } catch (Exception e) {
+            result.put("status", "error");
+            result.put("message", "Failed: " + e.getMessage());
+        }
+        return result;
+    }
+
     private boolean isInstalled() {
         File markerFile = new File("data/.installed");
         return markerFile.exists();
@@ -135,8 +157,44 @@ public class SetupController {
             java.io.FileWriter writer = new java.io.FileWriter(markerFile);
             writer.write("installed=" + System.currentTimeMillis());
             writer.close();
+            
+            registerSkillCapability();
         } catch (Exception e) {
             e.printStackTrace();
+        }
+    }
+    
+    private void registerSkillCapability() {
+        try {
+            File registryDir = new File("data/installed-skills");
+            if (!registryDir.exists()) {
+                registryDir.mkdirs();
+            }
+            
+            File registryFile = new File("data/installed-skills/registry.properties");
+            Properties props = new Properties();
+            
+            if (registryFile.exists()) {
+                try (FileInputStream fis = new FileInputStream(registryFile)) {
+                    props.load(fis);
+                }
+            }
+            
+            if (!props.containsKey("skill-capability.id")) {
+                String capabilityPath = findSkillPath("skill-capability");
+                if (capabilityPath != null) {
+                    props.setProperty("skill-capability.id", "skill-capability");
+                    props.setProperty("skill-capability.path", capabilityPath);
+                    props.setProperty("skill-capability.installedAt", String.valueOf(System.currentTimeMillis()));
+                    
+                    try (java.io.FileOutputStream fos = new java.io.FileOutputStream(registryFile)) {
+                        props.store(fos, "Installed Skills Registry");
+                    }
+                    System.out.println("[SetupController] Registered skill-capability in registry");
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[SetupController] Failed to register skill-capability: " + e.getMessage());
         }
     }
 
@@ -162,14 +220,12 @@ public class SetupController {
         System.out.println("[SetupController] Installing skill: " + skillId);
         System.out.println("========================================");
         
-        // 首先尝试从本地 JAR 文件加载
         File jarFile = findSkillJar(skillId);
         if (jarFile != null && jarFile.exists()) {
             System.out.println("[SetupController] Found skill JAR: " + jarFile.getAbsolutePath());
-            return installSkillFromJar(jarFile);
+            return installSkillFromJar(jarFile, skillId);
         }
         
-        // 如果没有 JAR，尝试从目录打包
         String skillPath = findSkillPath(skillId);
         if (skillPath == null) {
             System.err.println("[SetupController] Skill not found: " + skillId);
@@ -178,11 +234,10 @@ public class SetupController {
         
         System.out.println("[SetupController] Found skill at: " + skillPath);
         
-        // 尝试打包成 JAR
         File packagedJar = packageSkill(skillPath, skillId);
         if (packagedJar != null && packagedJar.exists()) {
             System.out.println("[SetupController] Skill packaged to JAR: " + packagedJar.getAbsolutePath());
-            return installSkillFromJar(packagedJar);
+            return installSkillFromJar(packagedJar, skillId);
         }
         
         System.err.println("[SetupController] Failed to package skill: " + skillId);
@@ -190,12 +245,15 @@ public class SetupController {
     }
     
     private File findSkillJar(String skillId) {
-        // 首先检查 skills 目录下的 target 目录
         String[] jarPaths = {
             "../skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "../skills/_system/" + skillId + "/target/" + skillId + "-2.3.2.jar",
             "../skills/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "../skills/" + skillId + "/target/" + skillId + "-2.3.2.jar",
             "skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
-            "skills/" + skillId + "/target/" + skillId + "-2.3.1.jar"
+            "skills/_system/" + skillId + "/target/" + skillId + "-2.3.2.jar",
+            "skills/" + skillId + "/target/" + skillId + "-2.3.1.jar",
+            "skills/" + skillId + "/target/" + skillId + "-2.3.2.jar"
         };
         
         for (String jarPath : jarPaths) {
@@ -206,11 +264,16 @@ public class SetupController {
             }
         }
         
-        // 检查本地 Maven 仓库
         File mavenJar = new File(System.getProperty("user.home") + "/.m2/repository/net/ooder/" + skillId + "/2.3.1/" + skillId + "-2.3.1.jar");
         if (mavenJar.exists()) {
             System.out.println("[SetupController] Found skill JAR in Maven repo: " + mavenJar.getAbsolutePath());
             return mavenJar;
+        }
+        
+        File mavenJar2 = new File(System.getProperty("user.home") + "/.m2/repository/net/ooder/" + skillId + "/2.3.2/" + skillId + "-2.3.2.jar");
+        if (mavenJar2.exists()) {
+            System.out.println("[SetupController] Found skill JAR in Maven repo: " + mavenJar2.getAbsolutePath());
+            return mavenJar2;
         }
         
         return null;
@@ -269,21 +332,35 @@ public class SetupController {
                     return path;
                 }
             } catch (Exception e) {
-                // continue to next path
             }
         }
         return null;
     }
     
-    private boolean installSkillFromJar(File jarFile) {
+    private boolean installSkillFromJar(File jarFile, String skillId) {
         try {
             System.out.println("[SetupController] Installing skill from JAR: " + jarFile.getAbsolutePath());
             
-            SkillPackage skillPackage = SkillPackage.fromFile(jarFile);
+            File pluginsDir = new File("plugins");
+            if (!pluginsDir.exists()) {
+                pluginsDir.mkdirs();
+                System.out.println("[SetupController] Created plugins directory: " + pluginsDir.getAbsolutePath());
+            }
+            
+            File destJar = new File(pluginsDir, jarFile.getName());
+            if (!destJar.exists()) {
+                Files.copy(jarFile.toPath(), destJar.toPath(), StandardCopyOption.REPLACE_EXISTING);
+                System.out.println("[SetupController] Copied JAR to plugins: " + destJar.getAbsolutePath());
+            }
+            
+            SkillPackage skillPackage = SkillPackage.fromFile(destJar);
             PluginInstallResult result = pluginManager.installSkill(skillPackage);
             
             if (result.isSuccess()) {
                 System.out.println("[SetupController] Skill installed successfully via PluginManager");
+                File skillDir = jarFile.getParentFile() != null ? jarFile.getParentFile().getParentFile() : null;
+                String skillPath = skillDir != null ? skillDir.getAbsolutePath() : jarFile.getParent();
+                registerSkillInRegistry(skillId, skillPath);
                 return true;
             } else {
                 System.err.println("[SetupController] PluginManager install failed: " + result.getMessage());
@@ -293,6 +370,36 @@ public class SetupController {
             System.err.println("[SetupController] Failed to install skill from JAR: " + e.getMessage());
             e.printStackTrace();
             return false;
+        }
+    }
+    
+    private void registerSkillInRegistry(String skillId, String skillPath) {
+        try {
+            File registryDir = new File("data/installed-skills");
+            if (!registryDir.exists()) {
+                registryDir.mkdirs();
+            }
+            
+            File registryFile = new File("data/installed-skills/registry.properties");
+            Properties props = new Properties();
+            
+            if (registryFile.exists()) {
+                try (FileInputStream fis = new FileInputStream(registryFile)) {
+                    props.load(fis);
+                }
+            }
+            
+            props.setProperty(skillId + ".id", skillId);
+            props.setProperty(skillId + ".path", skillPath);
+            props.setProperty(skillId + ".installedAt", String.valueOf(System.currentTimeMillis()));
+            
+            java.io.FileOutputStream fos = new java.io.FileOutputStream(registryFile);
+            props.store(fos, "Installed Skills Registry");
+            fos.close();
+            
+            System.out.println("[SetupController] Registered skill in registry: " + skillId + " -> " + skillPath);
+        } catch (Exception e) {
+            System.err.println("[SetupController] Failed to register skill: " + e.getMessage());
         }
     }
     

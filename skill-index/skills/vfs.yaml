@@ -1,0 +1,110 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: vfs-skills
+  category: vfs
+  count: 6
+
+skills:
+
+    - id: skill-vfs-base
+      name: VFS基础服务
+      version: "1.0.0"
+      capabilityCategory: vfs
+      subCategory: base
+      tags:
+        - vfs
+        - base
+        - storage
+      description: VFS基础服务，提供文件操作基础接口
+      sceneId: vfs
+      path: skills/skill-vfs-base
+      
+
+    - id: skill-vfs-database
+      name: Database VFS Service
+      version: "0.7.3"
+      capabilityCategory: vfs
+      subCategory: database
+      tags:
+        - vfs
+        - database
+        - storage
+      description: 数据库存储服务 - 将文件存储在数据库中，支持元数据管理
+      sceneId: vfs-database
+      path: skills/skill-vfs-database
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-vfs-local
+      name: Local VFS Service
+      version: "0.7.3"
+      capabilityCategory: vfs
+      subCategory: local
+      tags:
+        - vfs
+        - local
+        - storage
+      description: 本地文件系统存储服务 - 提供基本的文件操作和版本管理
+      sceneId: vfs-local
+      path: skills/skill-vfs-local
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-vfs-minio
+      name: MinIO VFS Service
+      version: "0.7.3"
+      capabilityCategory: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - minio
+        - object-storage
+        - s3
+      description: MinIO存储服务 - 提供对象存储能力，支持S3兼容接口
+      sceneId: vfs-minio
+      path: skills/skill-vfs-minio
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-vfs-oss
+      name: Aliyun OSS VFS Service
+      version: "0.7.3"
+      capabilityCategory: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - oss
+        - aliyun
+        - object-storage
+      description: 阿里云OSS存储服务 - 提供对象存储能力，支持阿里云OSS接口
+      sceneId: vfs-oss
+      path: skills/skill-vfs-oss
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-vfs-s3
+      name: AWS S3 VFS Service
+      version: "0.7.3"
+      capabilityCategory: vfs
+      subCategory: object-storage
+      tags:
+        - vfs
+        - s3
+        - aws
+        - object-storage
+      description: AWS S3存储服务 - 提供对象存储能力，支持AWS S3接口
+      sceneId: vfs-s3
+      path: skills/skill-vfs-s3
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
+      checksum: ""
+      

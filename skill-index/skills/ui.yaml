@@ -1,0 +1,25 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: ui-skills
+  category: ui
+  count: 1
+
+skills:
+
+    - id: skill-a2ui
+      name: A2UI Skill
+      version: "0.7.3"
+      capabilityCategory: ui
+      subCategory: code-gen
+      tags:
+        - a2ui
+        - ui-generation
+        - design-to-code
+      description: A2UI图转代码技能，支持将设计图转换为前端代码
+      sceneId: ui-generation
+      path: skills/skill-a2ui
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-a2ui-0.7.3.jar
+      checksum: ""
+      

@@ -1,0 +1,127 @@
+apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: sys-skills
+  category: sys
+  count: 8
+  builtInExcluded:
+    - skill-capability
+    - skill-scene-management
+
+skills:
+
+    - id: skill-network
+      name: Network Management Skill
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: network
+      tags:
+        - network
+        - ip
+        - dhcp
+        - dns
+      description: 网络管理技能 - 提供网络配置、IP管理、设备扫描能力
+      sceneId: network
+      path: skills/capabilities/monitor/skill-network
+
+    - id: skill-protocol
+      name: Protocol Management Skill
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: protocol
+      tags:
+        - protocol
+        - handler
+        - mcp
+      description: 协议管理技能 - 提供协议处理器注册、命令分发能力
+      sceneId: protocol
+      path: skills/_system/skill-protocol
+
+    - id: skill-openwrt
+      name: OpenWrt Management Skill
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: router
+      tags:
+        - openwrt
+        - router
+        - network
+      description: OpenWrt管理技能 - 提供OpenWrt路由器连接、配置、命令执行能力
+      sceneId: openwrt
+      path: skills/capabilities/infrastructure/skill-openwrt
+
+    - id: skill-monitor
+      name: Monitoring Service
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: monitor
+      tags:
+        - monitor
+        - metrics
+        - alert
+        - observation
+        - logging
+      description: 监控服务 - 提供指标采集、告警管理、日志查询和观测能力
+      sceneId: monitor
+      path: skills/capabilities/monitor/skill-monitor
+
+    - id: skill-health
+      name: Health Check Service
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: health
+      tags:
+        - health
+        - check
+        - monitor
+        - service
+        - report
+      description: 健康检查服务 - 提供系统健康检查、服务检查和报告生成能力
+      sceneId: health
+      path: skills/capabilities/monitor/skill-health
+
+    - id: skill-remote-terminal
+      name: Remote Terminal Service
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: remote
+      tags:
+        - remote
+        - terminal
+        - ssh
+        - shell
+        - command
+        - sftp
+      description: 远程终端服务 - 提供SSH远程连接、命令执行和文件传输能力
+      sceneId: remote
+      path: skills/capabilities/monitor/skill-remote-terminal
+
+    - id: skill-cmd-service
+      name: Command Monitoring Service
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: cmd
+      tags:
+        - command
+        - monitor
+        - dispatch
+        - task
+        - schedule
+      description: 命令监控服务 - 提供命令分发、任务调度和执行追踪能力
+      sceneId: cmd
+      path: skills/capabilities/monitor/skill-cmd-service
+
+    - id: skill-res-service
+      name: Resource Management Service
+      version: "2.3.1"
+      capabilityCategory: sys
+      subCategory: res
+      tags:
+        - resource
+        - organization
+        - department
+        - management
+        - hierarchy
+      description: 资源管理服务 - 提供组织、部门和资源管理能力
+      sceneId: res
+      path: skills/capabilities/monitor/skill-res-service

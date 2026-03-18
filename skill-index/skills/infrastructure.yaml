@@ -1,0 +1,26 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: infrastructure-skills
+  category: infrastructure
+  count: 1
+
+skills:
+
+    - id: skill-k8s
+      name: Kubernetes Cluster Management
+      version: "0.7.3"
+      capabilityCategory: infrastructure
+      subCategory: kubernetes
+      tags:
+        - kubernetes
+        - k8s
+        - cluster
+        - container
+      description: Kubernetes集群管理服务 - 提供集群、节点、命名空间、Pod管理能力
+      sceneId: kubernetes
+      path: skills/skill-k8s
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      checksum: ""
+      

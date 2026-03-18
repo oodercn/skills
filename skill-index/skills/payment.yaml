@@ -1,0 +1,62 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: payment-skills
+  category: payment
+  count: 3
+
+skills:
+
+    - id: skill-payment-alipay
+      name: Alipay Payment Provider
+      version: "0.7.3"
+      capabilityCategory: payment
+      subCategory: alipay
+      tags:
+        - payment
+        - alipay
+        - zhifubao
+        - mobile-pay
+      description: 支付宝支付Provider - 提供支付宝支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-alipay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-alipay-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-payment-wechat
+      name: WeChat Pay Provider
+      version: "0.7.3"
+      capabilityCategory: payment
+      subCategory: wechat
+      tags:
+        - payment
+        - wechat
+        - weixin
+        - wxpay
+      description: 微信支付Provider - 提供微信支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-wechat
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-wechat-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-payment-unionpay
+      name: UnionPay Payment Provider
+      version: "0.7.3"
+      capabilityCategory: payment
+      subCategory: unionpay
+      tags:
+        - payment
+        - unionpay
+        - yinlian
+        - bank-card
+      description: 银联支付Provider - 提供银联支付、退款、回调处理能力
+      sceneId: payment
+      path: skills/skill-payment-unionpay
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-payment-unionpay-0.7.3.jar
+      checksum: ""
+      

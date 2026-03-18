@@ -2,7 +2,8 @@ package net.ooder.skill.common.config;
 
 import net.ooder.skill.common.api.AuthApi;
 import net.ooder.skill.common.api.ConfigApi;
-import net.ooder.skill.common.api.OrgApi;
+import net.ooder.skill.common.discovery.DiscoveryOrchestrator;
+import net.ooder.skill.common.discovery.SkillIndexLoader;
 import net.ooder.skill.common.service.AuthService;
 import net.ooder.skill.common.service.OrgService;
 import net.ooder.skill.common.storage.JsonStorageService;
@@ -47,13 +48,20 @@ public class SkillCommonAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public OrgApi orgApi() {
-        return new OrgApi();
-    }
-
-    @Bean
-    @ConditionalOnMissingBean
     public ConfigApi configApi() {
         return new ConfigApi();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public SkillIndexLoader skillIndexLoader() {
+        return new SkillIndexLoader();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    public DiscoveryOrchestrator discoveryOrchestrator(SkillIndexLoader skillIndexLoader) {
+        DiscoveryOrchestrator orchestrator = new DiscoveryOrchestrator();
+        return orchestrator;
     }
 }

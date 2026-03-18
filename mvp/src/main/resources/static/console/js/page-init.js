@@ -397,40 +397,6 @@
       } else {
         this._loadLlmAssistantScript();
       }
-      
-      // 初始化 LLM Chat Float 悬浮窗口
-      this._initLlmChatFloat();
-    },
-    
-    /**
-     * 初始化 LLM Chat Float 悬浮窗口
-     * @private
-     */
-    _initLlmChatFloat() {
-      if (typeof LLMChatFloat !== 'undefined') {
-        LLMChatFloat.init();
-      } else {
-        this._loadLlmChatFloatScript();
-      }
-    },
-    
-    /**
-     * 加载 LLM Chat Float 脚本
-     * @private
-     */
-    _loadLlmChatFloatScript() {
-      const script = document.createElement('script');
-      script.src = '/console/js/llm-chat-float.js';
-      script.onload = function() {
-        console.log('[PageInit] LLM Chat Float 脚本加载完成');
-        if (typeof LLMChatFloat !== 'undefined') {
-          LLMChatFloat.init();
-        }
-      };
-      script.onerror = function() {
-        console.warn('[PageInit] LLM Chat Float 脚本加载失败');
-      };
-      document.head.appendChild(script);
     },
     
     /**

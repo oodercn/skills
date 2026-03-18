@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agent 管理 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .agents-page { padding: 0; }
+        
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+        
+        .stat-card {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .stat-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+        }
+        
+        .stat-icon.primary { background: var(--nx-primary-light); color: var(--nx-primary); }
+        .stat-icon.success { background: var(--nx-success-light); color: var(--nx-success); }
+        .stat-icon.warning { background: var(--nx-warning-light); color: var(--nx-warning); }
+        .stat-icon.danger { background: var(--nx-danger-light); color: var(--nx-danger); }
+        
+        .stat-content h4 { margin: 0; font-size: 12px; color: var(--nx-text-secondary); font-weight: 500; }
+        .stat-value { margin: 4px 0 0 0; font-size: 28px; font-weight: 600; }
+        
+        .filter-bar {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            padding: 16px 20px;
+            margin-bottom: 24px;
+            display: flex;
+            gap: 16px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .search-box {
+            flex: 1;
+            min-width: 200px;
+            position: relative;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 12px 10px 36px;
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            background: var(--nx-bg);
+            color: var(--nx-text-primary);
+            font-size: 14px;
+        }
+        
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--nx-primary);
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--nx-text-secondary);
+        }
+        
+        .filter-select {
+            padding: 10px 12px;
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            background: var(--nx-bg);
+            color: var(--nx-text-primary);
+            font-size: 14px;
+            min-width: 120px;
+        }
+        
+        .agents-table {
+            background: var(--nx-bg-elevated);
+            border-radius: 12px;
+            border: 1px solid var(--nx-border);
+            overflow: hidden;
+        }
+        
+        .agents-table table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        .agents-table th,
+        .agents-table td {
+            padding: 14px 16px;
+            text-align: left;
+            border-bottom: 1px solid var(--nx-border);
+        }
+        
+        .agents-table th {
+            background: var(--nx-bg);
+            font-weight: 600;
+            font-size: 13px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .agents-table tr:last-child td {
+            border-bottom: none;
+        }
+        
+        .agents-table tr:hover td {
+            background: var(--nx-bg-hover);
+        }
+        
+        .agent-name {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .agent-icon {
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+        }
+        
+        .agent-info h4 { margin: 0; font-size: 14px; font-weight: 600; }
+        .agent-info span { font-size: 12px; color: var(--nx-text-secondary); }
+        
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .status-badge.online { background: var(--nx-success-light); color: var(--nx-success); }
+        .status-badge.offline { background: var(--nx-bg); color: var(--nx-text-secondary); }
+        .status-badge.busy { background: var(--nx-warning-light); color: var(--nx-warning); }
+        .status-badge.error { background: var(--nx-danger-light); color: var(--nx-danger); }
+        
+        .status-badge i { font-size: 8px; }
+        
+        .type-badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+            background: var(--nx-info-light);
+            color: var(--nx-info);
+        }
+        
+        .action-btns {
+            display: flex;
+            gap: 8px;
+        }
+        
+        .action-btn {
+            width: 32px;
+            height: 32px;
+            border-radius: 6px;
+            border: 1px solid var(--nx-border);
+            background: var(--nx-bg);
+            color: var(--nx-text-secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .action-btn:hover {
+            background: var(--nx-bg-hover);
+            color: var(--nx-text-primary);
+        }
+        
+        .action-btn.danger:hover {
+            background: var(--nx-danger-light);
+            color: var(--nx-danger);
+            border-color: var(--nx-danger);
+        }
+        
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+        .empty-state h3 { margin: 0 0 8px 0; font-size: 18px; }
+        .empty-state p { margin: 0; font-size: 14px; }
+        
+        .binding-count {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 8px;
+            background: var(--nx-bg);
+            border-radius: 12px;
+            font-size: 12px;
+            color: var(--nx-text-secondary);
+        }
+        
+        .binding-count.has-bindings {
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+        }
+        
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s;
+        }
+        
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        
+        .modal {
+            background: var(--nx-bg-elevated);
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: auto;
+            transform: scale(0.9);
+            transition: transform 0.3s;
+        }
+        
+        .modal-overlay.active .modal {
+            transform: scale(1);
+        }
+        
+        .modal-header {
+            padding: 20px 24px;
+            border-bottom: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .modal-header h3 { margin: 0; font-size: 18px; }
+        
+        .modal-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            border: none;
+            background: transparent;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--nx-text-secondary);
+        }
+        
+        .modal-close:hover {
+            background: var(--nx-bg-hover);
+        }
+        
+        .modal-body { padding: 24px; }
+        
+        .detail-row {
+            display: flex;
+            margin-bottom: 16px;
+        }
+        
+        .detail-label {
+            width: 120px;
+            color: var(--nx-text-secondary);
+            font-size: 14px;
+            flex-shrink: 0;
+        }
+        
+        .detail-value {
+            flex: 1;
+            font-size: 14px;
+        }
+        
+        .bindings-list {
+            margin-top: 16px;
+            border: 1px solid var(--nx-border);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .bindings-list-header {
+            background: var(--nx-bg);
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 13px;
+        }
+        
+        .binding-item {
+            padding: 12px 16px;
+            border-top: 1px solid var(--nx-border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .binding-item:hover {
+            background: var(--nx-bg-hover);
+        }
+    </style>
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <div class="nx-page__title">
+                        <h1><i class="ri-robot-line" aria-hidden="true"></i> Agent 管理</h1>
+                        <p>管理智能体和执行节点</p>
+                    </div>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container agents-page">
+                    <div class="stats-row" id="stats-row">
+                        <div class="stat-card">
+                            <div class="stat-icon primary"><i class="ri-robot-line"></i></div>
+                            <div class="stat-content">
+                                <h4>总 Agent 数</h4>
+                                <div class="stat-value" id="stat-total">-</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon success"><i class="ri-checkbox-circle-line"></i></div>
+                            <div class="stat-content">
+                                <h4>在线</h4>
+                                <div class="stat-value" id="stat-online">-</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon warning"><i class="ri-time-line"></i></div>
+                            <div class="stat-content">
+                                <h4>忙碌</h4>
+                                <div class="stat-value" id="stat-busy">-</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon danger"><i class="ri-wifi-off-line"></i></div>
+                            <div class="stat-content">
+                                <h4>离线</h4>
+                                <div class="stat-value" id="stat-offline">-</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="filter-bar">
+                        <div class="search-box">
+                            <i class="ri-search-line"></i>
+                            <input type="text" id="search-input" placeholder="搜索 Agent 名称、ID 或 IP...">
+                        </div>
+                        <select class="filter-select" id="type-filter">
+                            <option value="">全部类型</option>
+                            <option value="LLM">LLM</option>
+                            <option value="WORKER">Worker</option>
+                            <option value="DEVICE">Device</option>
+                            <option value="PLATFORM">Platform</option>
+                        </select>
+                        <select class="filter-select" id="status-filter">
+                            <option value="">全部状态</option>
+                            <option value="online">在线</option>
+                            <option value="busy">忙碌</option>
+                            <option value="offline">离线</option>
+                            <option value="error">错误</option>
+                        </select>
+                    </div>
+                    
+                    <div id="agent-container">
+                        <div class="agents-table">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Agent</th>
+                                        <th>类型</th>
+                                        <th>状态</th>
+                                        <th>IP 地址</th>
+                                        <th>绑定数</th>
+                                        <th>最后心跳</th>
+                                        <th>操作</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="agent-list"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal-overlay" id="detail-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3>Agent 详情</h3>
+                <button class="modal-close" onclick="closeDetailModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="detail-content"></div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script>
+        (function() {
+            'use strict';
+            
+            let allAgents = [];
+            let bindingCounts = {};
+            let searchKeyword = '';
+            let typeFilter = '';
+            let statusFilter = '';
+            
+            async function loadAgents() {
+                try {
+                    const response = await fetch('/api/agent/list');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        allAgents = result.data;
+                        await loadBindingCounts();
+                        updateStats();
+                        renderAgents();
+                    } else {
+                        showEmpty();
+                    }
+                } catch (e) {
+                    console.error('Failed to load agents:', e);
+                    showError();
+                }
+            }
+            
+            async function loadBindingCounts() {
+                try {
+                    const response = await fetch('/api/v1/capabilities/bindings');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        bindingCounts = {};
+                        result.data.forEach(binding => {
+                            if (binding.agentId) {
+                                bindingCounts[binding.agentId] = (bindingCounts[binding.agentId] || 0) + 1;
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('Failed to load binding counts:', e);
+                }
+            }
+            
+            function updateStats() {
+                const stats = {
+                    total: allAgents.length,
+                    online: 0,
+                    busy: 0,
+                    offline: 0
+                };
+                
+                allAgents.forEach(agent => {
+                    const status = (agent.status || 'offline').toLowerCase();
+                    if (status === 'online' || status === 'running') stats.online++;
+                    else if (status === 'busy') stats.busy++;
+                    else stats.offline++;
+                });
+                
+                document.getElementById('stat-total').textContent = stats.total;
+                document.getElementById('stat-online').textContent = stats.online;
+                document.getElementById('stat-busy').textContent = stats.busy;
+                document.getElementById('stat-offline').textContent = stats.offline;
+            }
+            
+            function filterAgents() {
+                return allAgents.filter(agent => {
+                    if (typeFilter && agent.agentType !== typeFilter) return false;
+                    if (statusFilter) {
+                        const status = (agent.status || 'offline').toLowerCase();
+                        if (statusFilter === 'online' && status !== 'online' && status !== 'running') return false;
+                        if (statusFilter === 'offline' && status !== 'offline') return false;
+                        if (statusFilter === 'busy' && status !== 'busy') return false;
+                        if (statusFilter === 'error' && status !== 'error') return false;
+                    }
+                    if (searchKeyword) {
+                        const keyword = searchKeyword.toLowerCase();
+                        const name = (agent.agentName || agent.name || '').toLowerCase();
+                        const id = (agent.agentId || '').toLowerCase();
+                        const ip = (agent.ipAddress || '').toLowerCase();
+                        return name.includes(keyword) || id.includes(keyword) || ip.includes(keyword);
+                    }
+                    return true;
+                });
+            }
+            
+            function renderAgents() {
+                const filtered = filterAgents();
+                const container = document.getElementById('agent-list');
+                
+                if (filtered.length === 0) {
+                    container.innerHTML = `
+                        <tr>
+                            <td colspan="7">
+                                <div class="empty-state">
+                                    <i class="ri-robot-line"></i>
+                                    <h3>暂无 Agent</h3>
+                                    <p>没有找到匹配的 Agent</p>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                container.innerHTML = filtered.map(agent => renderAgentRow(agent)).join('');
+            }
+            
+            function renderAgentRow(agent) {
+                const agentId = agent.agentId || agent.id;
+                const name = agent.agentName || agent.name || '未命名';
+                const type = agent.agentType || agent.type || 'UNKNOWN';
+                const status = (agent.status || 'offline').toLowerCase();
+                const ip = agent.ipAddress || '-';
+                const port = agent.port || '';
+                const lastHeartbeat = agent.lastHeartbeat ? formatTime(agent.lastHeartbeat) : '-';
+                const bindingCount = bindingCounts[agentId] || 0;
+                
+                const statusClass = status === 'online' || status === 'running' ? 'online' : 
+                                   status === 'busy' ? 'busy' : 
+                                   status === 'error' ? 'error' : 'offline';
+                const statusText = status === 'online' || status === 'running' ? '在线' :
+                                  status === 'busy' ? '忙碌' :
+                                  status === 'error' ? '错误' : '离线';
+                
+                return `
+                    <tr>
+                        <td>
+                            <div class="agent-name">
+                                <div class="agent-icon"><i class="ri-robot-line"></i></div>
+                                <div class="agent-info">
+                                    <h4>${name}</h4>
+                                    <span>${agentId}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><span class="type-badge">${type}</span></td>
+                        <td>
+                            <span class="status-badge ${statusClass}">
+                                <i class="ri-checkbox-blank-circle-fill"></i>
+                                ${statusText}
+                            </span>
+                        </td>
+                        <td>${ip}${port ? ':' + port : ''}</td>
+                        <td>
+                            <span class="binding-count ${bindingCount > 0 ? 'has-bindings' : ''}" onclick="showAgentBindings('${agentId}')">
+                                <i class="ri-link"></i> ${bindingCount}
+                            </span>
+                        </td>
+                        <td>${lastHeartbeat}</td>
+                        <td>
+                            <div class="action-btns">
+                                <button class="action-btn" onclick="showAgentDetail('${agentId}')" title="查看详情">
+                                    <i class="ri-eye-line"></i>
+                                </button>
+                                <button class="action-btn" onclick="sendHeartbeat('${agentId}')" title="发送心跳">
+                                    <i class="ri-heart-pulse-line"></i>
+                                </button>
+                                <button class="action-btn danger" onclick="deleteAgent('${agentId}')" title="删除">
+                                    <i class="ri-delete-bin-line"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            function formatTime(timestamp) {
+                if (!timestamp) return '-';
+                const date = new Date(timestamp);
+                const now = new Date();
+                const diff = now - date;
+                
+                if (diff < 60000) return '刚刚';
+                if (diff < 3600000) return Math.floor(diff / 60000) + ' 分钟前';
+                if (diff < 86400000) return Math.floor(diff / 3600000) + ' 小时前';
+                return date.toLocaleDateString();
+            }
+            
+            async function showAgentDetail(agentId) {
+                try {
+                    const response = await fetch(`/api/agent/${agentId}`);
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        const agent = result.data;
+                        const bindingCount = bindingCounts[agentId] || 0;
+                        
+                        document.getElementById('detail-content').innerHTML = `
+                            <div class="detail-row">
+                                <div class="detail-label">Agent ID</div>
+                                <div class="detail-value">${agent.agentId || agentId}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">名称</div>
+                                <div class="detail-value">${agent.agentName || agent.name || '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">类型</div>
+                                <div class="detail-value">${agent.agentType || agent.type || '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">状态</div>
+                                <div class="detail-value">${agent.status || '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">IP 地址</div>
+                                <div class="detail-value">${agent.ipAddress || '-'}${agent.port ? ':' + agent.port : ''}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">版本</div>
+                                <div class="detail-value">${agent.version || '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">注册时间</div>
+                                <div class="detail-value">${agent.registerTime ? new Date(agent.registerTime).toLocaleString() : '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">最后心跳</div>
+                                <div class="detail-value">${agent.lastHeartbeat ? new Date(agent.lastHeartbeat).toLocaleString() : '-'}</div>
+                            </div>
+                            <div class="detail-row">
+                                <div class="detail-label">绑定数</div>
+                                <div class="detail-value">${bindingCount}</div>
+                            </div>
+                        `;
+                        
+                        document.getElementById('detail-modal').classList.add('active');
+                    }
+                } catch (e) {
+                    console.error('Failed to load agent detail:', e);
+                }
+            }
+            
+            function closeDetailModal() {
+                document.getElementById('detail-modal').classList.remove('active');
+            }
+            
+            async function showAgentBindings(agentId) {
+                try {
+                    const response = await fetch(`/api/v1/capabilities/bindings`);
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        const bindings = result.data.filter(b => b.agentId === agentId);
+                        
+                        let bindingsHtml = '';
+                        if (bindings.length === 0) {
+                            bindingsHtml = '<p style="color: var(--nx-text-secondary); text-align: center; padding: 20px;">暂无绑定</p>';
+                        } else {
+                            bindingsHtml = `
+                                <div class="bindings-list">
+                                    <div class="bindings-list-header">关联的能力绑定 (${bindings.length})</div>
+                                    ${bindings.map(b => `
+                                        <div class="binding-item">
+                                            <div>
+                                                <strong>${b.capId || b.capabilityId}</strong>
+                                                <br><small style="color: var(--nx-text-secondary);">${b.sceneGroupId || '-'}</small>
+                                            </div>
+                                            <span class="status-badge ${b.status === 'ACTIVE' ? 'online' : 'offline'}">${b.status || '-'}</span>
+                                        </div>
+                                    `).join('')}
+                                </div>
+                            `;
+                        }
+                        
+                        document.getElementById('detail-content').innerHTML = `
+                            <h4 style="margin: 0 0 16px 0;">Agent: ${agentId}</h4>
+                            ${bindingsHtml}
+                        `;
+                        
+                        document.getElementById('detail-modal').classList.add('active');
+                    }
+                } catch (e) {
+                    console.error('Failed to load agent bindings:', e);
+                }
+            }
+            
+            async function sendHeartbeat(agentId) {
+                try {
+                    const response = await fetch(`/api/agent/${agentId}/heartbeat`, { method: 'POST' });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        alert('心跳发送成功');
+                        loadAgents();
+                    } else {
+                        alert('心跳发送失败: ' + (result.message || '未知错误'));
+                    }
+                } catch (e) {
+                    alert('心跳发送失败: ' + e.message);
+                }
+            }
+            
+            async function deleteAgent(agentId) {
+                if (!confirm('确定要删除 Agent ' + agentId + ' 吗？')) return;
+                
+                try {
+                    const response = await fetch(`/api/agent/${agentId}`, { method: 'DELETE' });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        loadAgents();
+                    } else {
+                        alert('删除失败: ' + (result.message || '未知错误'));
+                    }
+                } catch (e) {
+                    alert('删除失败: ' + e.message);
+                }
+            }
+            
+            function initFilters() {
+                const searchInput = document.getElementById('search-input');
+                let debounceTimer;
+                searchInput.addEventListener('input', function() {
+                    clearTimeout(debounceTimer);
+                    debounceTimer = setTimeout(() => {
+                        searchKeyword = this.value.trim();
+                        renderAgents();
+                    }, 300);
+                });
+                
+                document.getElementById('type-filter').addEventListener('change', function() {
+                    typeFilter = this.value;
+                    renderAgents();
+                });
+                
+                document.getElementById('status-filter').addEventListener('change', function() {
+                    statusFilter = this.value;
+                    renderAgents();
+                });
+            }
+            
+            window.showAgentDetail = showAgentDetail;
+            window.showAgentBindings = showAgentBindings;
+            window.sendHeartbeat = sendHeartbeat;
+            window.deleteAgent = deleteAgent;
+            window.closeDetailModal = closeDetailModal;
+            
+            document.addEventListener('DOMContentLoaded', function() {
+                initFilters();
+                loadAgents();
+            });
+        })();
+    </script>
+</body>
+</html>

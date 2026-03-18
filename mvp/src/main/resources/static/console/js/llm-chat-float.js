@@ -642,12 +642,12 @@
                 const skillContext = this.buildContextString();
                 const history = this.getHistoryMessages();
 
-                const response = await fetch('/api/llm/chat', {
+                const response = await fetch('/api/v1/llm/chat', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         message: content,
-                        provider: this.config.provider,
+                        providerId: this.config.provider,
                         model: this.config.model,
                         sessionId: this.sessionId,
                         skillContext: skillContext,

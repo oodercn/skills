@@ -1,0 +1,110 @@
+﻿apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: org-skills
+  category: org
+  count: 6
+
+skills:
+
+    - id: skill-org-base
+      name: 组织基础服务
+      version: "1.0.0"
+      capabilityCategory: org
+      subCategory: base
+      tags:
+        - org
+        - base
+        - organization
+      description: 组织基础服务，提供组织架构、部门管理基础功能
+      sceneId: org
+      path: skills/skill-org-base
+      
+
+    - id: skill-org-dingding
+      name: DingTalk Organization Service
+      version: "0.7.3"
+      capabilityCategory: org
+      subCategory: dingtalk
+      tags:
+        - dingtalk
+        - dingding
+        - organization
+        - auth
+      description: 钉钉组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-dingding
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-org-feishu
+      name: Feishu Organization Service
+      version: "0.7.3"
+      capabilityCategory: org
+      subCategory: feishu
+      tags:
+        - feishu
+        - lark
+        - organization
+        - auth
+      description: 飞书组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-feishu
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-org-wecom
+      name: WeCom Organization Service
+      version: "0.7.3"
+      capabilityCategory: org
+      subCategory: wecom
+      tags:
+        - wecom
+        - enterprise-wechat
+        - organization
+        - auth
+      description: 企业微信组织数据集成服务，包括组织架构同步和用户认证
+      sceneId: auth
+      path: skills/skill-org-wecom
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-org-ldap
+      name: LDAP Organization Service
+      version: "0.7.3"
+      capabilityCategory: org
+      subCategory: ldap
+      tags:
+        - ldap
+        - organization
+        - auth
+      description: LDAP组织服务，提供基于LDAP的组织架构管理和用户认证
+      sceneId: auth
+      path: skills/skill-org-ldap
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-user-auth
+      name: User Authentication Service
+      version: "0.7.3"
+      capabilityCategory: org
+      subCategory: auth
+      tags:
+        - auth
+        - authentication
+        - user
+      description: 用户认证服务，支持多种认证方式
+      sceneId: auth
+      path: skills/skill-user-auth
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
+      checksum: ""
+      

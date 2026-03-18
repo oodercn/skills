@@ -1,0 +1,146 @@
+apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: util-skills
+  category: util
+  count: 8
+  builtInExcluded:
+    - skill-common
+
+skills:
+
+    - id: skill-document-processor
+      name: 文档处理服务
+      version: "1.0.0"
+      capabilityCategory: util
+      subCategory: document
+      tags:
+        - document
+        - processor
+        - parse
+      description: 文档处理服务，提供文档解析、转换、提取功能
+      sceneId: document
+      path: skills/skill-document-processor
+      
+
+    - id: skill-trae-solo
+      name: Trae Solo Service
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: general
+      tags:
+        - utility
+        - tools
+      description: 连接实用功能，运行结果通过A2UI节点展示
+      sceneId: utility
+      path: skills/skill-trae-solo
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-share
+      name: Skill Share Skill
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: share
+      tags:
+        - share
+        - collaboration
+      description: 技能分享技能 - 提供技能分享、接收管理能力
+      sceneId: share
+      path: skills/skill-share
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-llm-volcengine
+      name: VolcEngine (Doubao) LLM Provider
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: llm
+      tags:
+        - llm
+        - volcengine
+        - doubao
+        - bytedance
+      description: 火山引擎豆包LLM Provider - 提供Doubao模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-volcengine
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-llm-qianwen
+      name: Qianwen (Tongyi) LLM Provider
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: llm
+      tags:
+        - llm
+        - qianwen
+        - tongyi
+        - aliyun
+      description: 通义千问LLM Provider - 提供Qwen模型对话、补全、嵌入能力
+      sceneId: llm
+      path: skills/skill-llm-qianwen
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-llm-deepseek
+      name: DeepSeek LLM Provider
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: llm
+      tags:
+        - llm
+        - deepseek
+        - coder
+        - reasoning
+      description: DeepSeek LLM Provider - 提供DeepSeek模型对话、代码生成、推理能力
+      sceneId: llm
+      path: skills/skill-llm-deepseek
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-market
+      name: Skill Market Service
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: market
+      tags:
+        - market
+        - skill
+        - discovery
+        - install
+      description: 技能市场服务 - 提供技能发现、搜索、安装和管理能力
+      sceneId: skill-market
+      path: skills/skill-market
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
+      checksum: ""
+      
+
+    - id: skill-collaboration
+      name: Collaboration Scene Service
+      version: "0.7.3"
+      capabilityCategory: util
+      subCategory: collaboration
+      tags:
+        - collaboration
+        - scene
+        - member
+        - team
+      description: 协作场景服务 - 提供场景创建、成员管理和密钥管理能力
+      sceneId: collaboration
+      path: skills/skill-collaboration
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
+      checksum: ""
+      

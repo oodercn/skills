@@ -17,6 +17,8 @@ public class AuthService {
 
     private final Map<String, UserSession> sessions = new ConcurrentHashMap<>();
     private final Map<String, RoleConfig> roleConfigs = new LinkedHashMap<>();
+    
+    private UserInfoProvider userInfoProvider;
 
     private static class RoleConfig {
         String id;
@@ -35,9 +37,24 @@ public class AuthService {
             this.permissions = permissions;
         }
     }
+    
+    public interface UserInfoProvider {
+        Object login(String username, String password, String clientIp);
+        void logout(String token);
+        boolean validateToken(String token);
+        Object getUser(String userId);
+        List<?> getOrgTree();
+        List<?> getOrgUsers(String orgId);
+        Object registerUser(Object user);
+        void updateUser(String userId, Object user);
+    }
 
     public AuthService() {
         initRoleConfigs();
+    }
+    
+    public void setUserInfoProvider(UserInfoProvider provider) {
+        this.userInfoProvider = provider;
     }
 
     private void initRoleConfigs() {
@@ -72,6 +89,38 @@ public class AuthService {
         String requestedRole = request.getRole();
 
         log.info("[login] Login attempt: username={}, role={}", username, requestedRole);
+        
+        String clientIp = getClientIp(httpRequest);
+
+        if (userInfoProvider != null) {
+            Object userInfo = userInfoProvider.login(username, password, clientIp);
+            if (userInfo == null) {
+                log.warn("[login] Login failed for user: {}", username);
+                return null;
+            }
+            
+            RoleConfig config = roleConfigs.get(requestedRole);
+            if (config == null) {
+                config = roleConfigs.get("collaborator");
+            }
+            
+            UserSession session = createUserSessionFromInfo(userInfo, config);
+            String token = extractToken(userInfo);
+            if (token == null) {
+                token = UUID.randomUUID().toString().replace("-", "");
+            }
+            session.setToken(token);
+            sessions.put(token, session);
+
+            if (httpRequest != null) {
+                HttpSession httpSession = httpRequest.getSession(true);
+                httpSession.setAttribute(SESSION_USER_KEY, session);
+                log.info("[login] Session created for user: {}", session.getUserId());
+            }
+
+            log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.id);
+            return session;
+        }
 
         if (username == null || username.isEmpty()) {
             username = "demo";
@@ -96,6 +145,81 @@ public class AuthService {
         log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.id);
         return session;
     }
+    
+    private String getClientIp(HttpServletRequest request) {
+        if (request == null) {
+            return "unknown";
+        }
+        String ip = request.getHeader("X-Forwarded-For");
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getHeader("X-Real-IP");
+        }
+        if (ip == null || ip.isEmpty() || "unknown".equalsIgnoreCase(ip)) {
+            ip = request.getRemoteAddr();
+        }
+        return ip;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private UserSession createUserSessionFromInfo(Object userInfo, RoleConfig config) {
+        UserSession session = new UserSession();
+        
+        if (userInfo instanceof Map) {
+            Map<String, Object> info = (Map<String, Object>) userInfo;
+            session.setUserId(getStringValue(info, "userId", "userId"));
+            session.setUsername(getStringValue(info, "username", "username"));
+            session.setName(getStringValue(info, "nickname", "nickname"));
+            if (session.getName() == null) {
+                session.setName(getStringValue(info, "name", "name"));
+            }
+            session.setEmail(getStringValue(info, "email", "email"));
+            session.setDepartmentId(getStringValue(info, "orgId", "orgId"));
+            session.setDepartmentName(getStringValue(info, "orgName", "orgName"));
+            session.setTitle(getStringValue(info, "title", "title"));
+            session.setAvatar(getStringValue(info, "avatar", "avatar"));
+        } else {
+            try {
+                session.setUserId((String) userInfo.getClass().getMethod("getUserId").invoke(userInfo));
+                session.setUsername((String) userInfo.getClass().getMethod("getUsername").invoke(userInfo));
+                String nickname = (String) userInfo.getClass().getMethod("getNickname").invoke(userInfo);
+                session.setName(nickname != null ? nickname : session.getUsername());
+                session.setEmail((String) userInfo.getClass().getMethod("getEmail").invoke(userInfo));
+                session.setDepartmentId((String) userInfo.getClass().getMethod("getOrgId").invoke(userInfo));
+                session.setDepartmentName((String) userInfo.getClass().getMethod("getOrgName").invoke(userInfo));
+            } catch (Exception e) {
+                log.debug("Could not extract user info via reflection: {}", e.getMessage());
+            }
+        }
+        
+        session.setRole(config.orgRole);
+        session.setRoleType(config.id);
+        session.setPermissions(config.permissions);
+        session.setLoginTime(System.currentTimeMillis());
+        
+        return session;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private String getStringValue(Map<String, Object> map, String key1, String key2) {
+        Object value = map.get(key1);
+        if (value == null) {
+            value = map.get(key2);
+        }
+        return value != null ? String.valueOf(value) : null;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private String extractToken(Object userInfo) {
+        if (userInfo instanceof Map) {
+            Object token = ((Map<String, Object>) userInfo).get("token");
+            return token != null ? String.valueOf(token) : null;
+        }
+        try {
+            return (String) userInfo.getClass().getMethod("getToken").invoke(userInfo);
+        } catch (Exception e) {
+            return null;
+        }
+    }
 
     private UserSession createUserSession(String username, RoleConfig config) {
         UserSession session = new UserSession();
@@ -117,6 +241,9 @@ public class AuthService {
         if (session != null) {
             UserSession user = (UserSession) session.getAttribute(SESSION_USER_KEY);
             if (user != null && user.getToken() != null) {
+                if (userInfoProvider != null) {
+                    userInfoProvider.logout(user.getToken());
+                }
                 sessions.remove(user.getToken());
                 log.info("[logout] Removed session for user: {}", user.getUserId());
             }
@@ -137,7 +264,16 @@ public class AuthService {
         String token = request.getHeader("Authorization");
         if (token != null && token.startsWith("Bearer ")) {
             token = token.substring(7);
-            return sessions.get(token);
+            UserSession userSession = sessions.get(token);
+            if (userSession != null) {
+                if (userInfoProvider != null) {
+                    if (userInfoProvider.validateToken(token)) {
+                        return userSession;
+                    }
+                } else {
+                    return userSession;
+                }
+            }
         }
 
         return null;
@@ -152,9 +288,39 @@ public class AuthService {
         return permissions != null && permissions.contains(permission);
     }
 
+    public boolean hasAnyPermission(HttpServletRequest request, String... permissions) {
+        UserSession user = getCurrentUser(request);
+        if (user == null) {
+            return false;
+        }
+        List<String> userPermissions = user.getPermissions();
+        if (userPermissions == null) {
+            return false;
+        }
+        for (String permission : permissions) {
+            if (userPermissions.contains(permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public boolean hasRole(HttpServletRequest request, String roleType) {
         UserSession user = getCurrentUser(request);
         return user != null && roleType.equals(user.getRoleType());
+    }
+
+    public boolean hasAnyRole(HttpServletRequest request, String... roleTypes) {
+        UserSession user = getCurrentUser(request);
+        if (user == null) {
+            return false;
+        }
+        for (String roleType : roleTypes) {
+            if (roleType.equals(user.getRoleType())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public List<Map<String, Object>> getAvailableRoles() {
@@ -170,5 +336,147 @@ public class AuthService {
         }
 
         return roles;
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Object> getUsersByRole(String roleType) {
+        if (userInfoProvider == null) {
+            return new ArrayList<>();
+        }
+        
+        RoleConfig config = roleConfigs.get(roleType);
+        if (config != null) {
+            List<?> orgTree = userInfoProvider.getOrgTree();
+            List<Object> allUsers = new ArrayList<>();
+            for (Object org : orgTree) {
+                String orgId = null;
+                if (org instanceof Map) {
+                    orgId = (String) ((Map<String, Object>) org).get("orgId");
+                } else {
+                    try {
+                        orgId = (String) org.getClass().getMethod("getOrgId").invoke(org);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+                if (orgId != null) {
+                    allUsers.addAll(userInfoProvider.getOrgUsers(orgId));
+                }
+            }
+            List<Object> filtered = new ArrayList<>();
+            for (Object user : allUsers) {
+                List<String> roles = null;
+                if (user instanceof Map) {
+                    roles = (List<String>) ((Map<String, Object>) user).get("roles");
+                } else {
+                    try {
+                        roles = (List<String>) user.getClass().getMethod("getRoles").invoke(user);
+                    } catch (Exception e) {
+                        continue;
+                    }
+                }
+                if (roles != null && roles.contains(config.orgRole)) {
+                    filtered.add(user);
+                }
+            }
+            return filtered;
+        }
+        return new ArrayList<>();
+    }
+
+    public Object getUserById(String userId) {
+        if (userInfoProvider == null) {
+            return null;
+        }
+        return userInfoProvider.getUser(userId);
+    }
+
+    @SuppressWarnings("unchecked")
+    public List<Object> getAllUsers() {
+        if (userInfoProvider == null) {
+            return new ArrayList<>();
+        }
+        
+        List<?> orgTree = userInfoProvider.getOrgTree();
+        List<Object> allUsers = new ArrayList<>();
+        for (Object org : orgTree) {
+            String orgId = null;
+            if (org instanceof Map) {
+                orgId = (String) ((Map<String, Object>) org).get("orgId");
+            } else {
+                try {
+                    orgId = (String) org.getClass().getMethod("getOrgId").invoke(org);
+                } catch (Exception e) {
+                    continue;
+                }
+            }
+            if (orgId != null) {
+                allUsers.addAll(userInfoProvider.getOrgUsers(orgId));
+            }
+        }
+        return allUsers;
+    }
+
+    public Object createUser(String username, String nickname, String email, String orgId, List<String> roles) {
+        if (userInfoProvider == null) {
+            return null;
+        }
+        
+        Map<String, Object> user = new HashMap<>();
+        user.put("username", username);
+        user.put("nickname", nickname);
+        user.put("email", email);
+        user.put("orgId", orgId);
+        user.put("roles", roles);
+        user.put("status", "active");
+        return userInfoProvider.registerUser(user);
+    }
+
+    @SuppressWarnings("unchecked")
+    public boolean bindUserToRole(String userId, String roleType) {
+        if (userInfoProvider == null) {
+            return false;
+        }
+        
+        Object userObj = userInfoProvider.getUser(userId);
+        if (userObj == null) {
+            return false;
+        }
+        
+        RoleConfig config = roleConfigs.get(roleType);
+        if (config == null) {
+            return false;
+        }
+        
+        List<String> roles;
+        if (userObj instanceof Map) {
+            roles = new ArrayList<>((List<String>) ((Map<String, Object>) userObj).get("roles"));
+            if (roles == null) {
+                roles = new ArrayList<>();
+            }
+            if (!roles.contains(config.orgRole)) {
+                roles.add(config.orgRole);
+            }
+            ((Map<String, Object>) userObj).put("roles", roles);
+            userInfoProvider.updateUser(userId, userObj);
+        } else {
+            try {
+                roles = new ArrayList<>((List<String>) userObj.getClass().getMethod("getRoles").invoke(userObj));
+                if (roles == null) {
+                    roles = new ArrayList<>();
+                }
+                if (!roles.contains(config.orgRole)) {
+                    roles.add(config.orgRole);
+                }
+                userObj.getClass().getMethod("setRoles", List.class).invoke(userObj, roles);
+                userInfoProvider.updateUser(userId, userObj);
+            } catch (Exception e) {
+                log.warn("Failed to bind user to role via reflection: {}", e.getMessage());
+                return false;
+            }
+        }
+        
+        log.info("Bound user {} to role {}", userId, roleType);
+        return true;
     }
 }

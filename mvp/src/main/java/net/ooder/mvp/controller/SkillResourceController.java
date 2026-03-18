@@ -61,6 +61,12 @@ public class SkillResourceController {
         String prefix = "/console/skills/" + skillId + "/";
         String resourcePath = requestURI.substring(prefix.length());
         
+        if (resourcePath.isEmpty()) {
+            resourcePath = "index.html";
+        }
+        
+        log.debug("Request for skill resource: skillId={}, path={}", skillId, resourcePath);
+        
         return getResource(skillId, "static/console/" + resourcePath);
     }
 

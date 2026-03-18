@@ -65,35 +65,28 @@
                     this.currentUser = result.data;
                     console.log('[NexusMenu] 用户会话加载成功:', this.currentUser.name);
                 } else {
-                    console.warn('[NexusMenu] 无会话，使用演示模式');
-                    this.currentUser = {
-                        userId: 'demo',
-                        username: 'demo',
-                        name: '演示用户',
-                        roleType: 'admin'
-                    };
+                    console.warn('[NexusMenu] 会话无效，跳转到登录页');
+                    window.location.href = '/console/pages/login.html';
+                    throw new Error('会话无效');
                 }
             } catch (e) {
-                console.warn('[NexusMenu] 无法加载会话信息，使用演示模式:', e);
-                this.currentUser = {
-                    userId: 'demo',
-                    username: 'demo',
-                    name: '演示用户',
-                    roleType: 'admin'
-                };
+                console.warn('[NexusMenu] 无法加载会话信息:', e);
+                if (!window.location.pathname.includes('login.html')) {
+                    window.location.href = '/console/pages/login.html';
+                }
+                throw e;
             }
         },
 
         async loadMenuConfig() {
-            const response = await fetch('/api/v1/menu');
+            const response = await fetch('/api/v1/auth/menu-config');
             const result = await response.json();
             
             if (result.status === 'success' && result.data) {
                 this.menuConfig = result.data;
                 console.log('[NexusMenu] 菜单配置加载成功:', this.menuConfig.length, '项');
             } else {
-                console.warn('[NexusMenu] 菜单配置加载失败，使用默认菜单');
-                this.menuConfig = null;
+                throw new Error('菜单配置加载失败');
             }
         },
 
@@ -192,11 +185,9 @@
             if (!navMenu) return;
 
             const defaultMenus = [
-                { name: '工作台', url: '/console/pages/dashboard.html', icon: 'ri-home-line' },
-                { name: '发现能力', url: '/console/pages/capability-discovery.html', icon: 'ri-compass-discover-line' },
-                { name: 'LLM配置', url: '/console/pages/llm-config.html', icon: 'ri-robot-line' },
-                { name: '系统配置', url: '/console/pages/config-system.html', icon: 'ri-settings-4-line' },
-                { name: '用户管理', url: '/console/pages/user-management.html', icon: 'ri-team-line' }
+                { name: '工作台', url: '/console/pages/role-installer.html', icon: 'ri-home-line' },
+                { name: '技能市场', url: '/console/pages/capability-discovery.html', icon: 'ri-store-2-line' },
+                { name: '已安装技能', url: '/console/pages/my-capabilities.html', icon: 'ri-download-cloud-line' }
             ];
 
             navMenu.innerHTML = defaultMenus.map(item => {

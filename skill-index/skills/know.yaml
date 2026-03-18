@@ -1,0 +1,24 @@
+apiVersion: ooder.io/v1
+kind: Skills
+metadata:
+  name: know-skills
+  category: know
+  count: 1
+
+skills:
+
+    - id: skill-knowledge-qa
+      name: 知识问答场景能力
+      version: "2.3.1"
+      capabilityCategory: know
+      subCategory: qa
+      tags:
+        - knowledge
+        - qa
+        - rag
+        - scene-capability
+        - mainFirst
+      description: 知识问答场景能力，支持知识库管理、文档管理、语义检索、RAG智能问答
+      sceneId: knowledge-qa
+      path: skills/scenes/skill-knowledge-qa
+      mainFirst: true
