@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 
 @Service
 @Primary
@@ -207,5 +208,25 @@ public class SceneGroupServiceHybridImpl implements SceneGroupService {
     @Override
     public boolean unbindKnowledgeBase(String sceneGroupId, String kbId) {
         return memoryService.unbindKnowledgeBase(sceneGroupId, kbId);
+    }
+
+    @Override
+    public List<KnowledgeBindingDTO> listKnowledgeBindings(String sceneGroupId) {
+        return memoryService.listKnowledgeBindings(sceneGroupId);
+    }
+
+    @Override
+    public boolean updateKnowledgeConfig(String sceneGroupId, Map<String, Object> config) {
+        return memoryService.updateKnowledgeConfig(sceneGroupId, config);
+    }
+
+    @Override
+    public Map<String, Object> getLlmConfig(String sceneGroupId) {
+        return memoryService.getLlmConfig(sceneGroupId);
+    }
+
+    @Override
+    public boolean updateLlmConfig(String sceneGroupId, Map<String, Object> config) {
+        return memoryService.updateLlmConfig(sceneGroupId, config);
     }
 }

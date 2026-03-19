@@ -205,6 +205,12 @@ public class SkillIndexLoader {
             cap.setSkillForm(skillFormCode);
             
             Object businessCategoryObj = skill.get("businessCategory");
+            if (businessCategoryObj == null) {
+                businessCategoryObj = skill.get("capabilityCategory");
+            }
+            if (businessCategoryObj == null) {
+                businessCategoryObj = skill.get("category");
+            }
             if (businessCategoryObj != null) {
                 cap.setBusinessCategory(String.valueOf(businessCategoryObj));
             }
@@ -503,6 +509,17 @@ public class SkillIndexLoader {
             Object visibilityObj = scene.get("visibility");
             cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : "public");
             
+            Object businessCategoryObj = scene.get("businessCategory");
+            if (businessCategoryObj == null) {
+                businessCategoryObj = scene.get("capabilityCategory");
+            }
+            if (businessCategoryObj == null) {
+                businessCategoryObj = scene.get("category");
+            }
+            if (businessCategoryObj != null) {
+                cap.setBusinessCategory(String.valueOf(businessCategoryObj));
+            }
+            
             Object driverConditionsObj = scene.get("driverConditions");
             if (driverConditionsObj instanceof List) {
                 @SuppressWarnings("unchecked")
@@ -616,5 +633,120 @@ public class SkillIndexLoader {
             log.debug("[readCategoryFromSkillYaml] Error reading category from skill.yaml for {}: {}", skillId, e.getMessage());
             return null;
         }
+    }
+    
+    public Map<String, Long> getSkillCountByCategory() {
+        Map<String, Long> counts = new HashMap<>();
+        
+        for (CapabilityCategory cat : CapabilityCategory.values()) {
+            counts.put(cat.getCode(), 0L);
+        }
+        
+        for (Map<String, Object> skill : skills) {
+            String category = (String) skill.get("category");
+            if (category == null) {
+                category = (String) skill.get("capabilityCategory");
+            }
+            if (category == null) {
+                category = "sys";
+            }
+            CapabilityCategory cat = CapabilityCategory.fromCode(category);
+            counts.put(cat.getCode(), counts.getOrDefault(cat.getCode(), 0L) + 1);
+        }
+        
+        for (Map<String, Object> scene : scenes) {
+            String category = (String) scene.get("category");
+            if (category == null) {
+                category = (String) scene.get("capabilityCategory");
+            }
+            if (category == null) {
+                category = "biz";
+            }
+            CapabilityCategory cat = CapabilityCategory.fromCode(category);
+            counts.put(cat.getCode(), counts.getOrDefault(cat.getCode(), 0L) + 1);
+        }
+        
+        return counts;
+    }
+    
+    public List<Map<String, Object>> getUserFacingCategories() {
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        for (CapabilityCategory cat : CapabilityCategory.values()) {
+            if (cat.isUserFacing()) {
+                Map<String, Object> catMap = new LinkedHashMap<>();
+                catMap.put("id", cat.getCode());
+                catMap.put("name", cat.getName());
+                catMap.put("icon", cat.getIcon());
+                catMap.put("description", cat.getDescription());
+                catMap.put("userFacing", true);
+                result.add(catMap);
+            }
+        }
+        
+        return result;
+    }
+    
+    public List<Map<String, Object>> getAllCategoriesWithStats() {
+        Map<String, Long> counts = getSkillCountByCategory();
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        for (CapabilityCategory cat : CapabilityCategory.values()) {
+            Map<String, Object> catMap = new LinkedHashMap<>();
+            catMap.put("id", cat.getCode());
+            catMap.put("name", cat.getName());
+            catMap.put("icon", cat.getIcon());
+            catMap.put("description", cat.getDescription());
+            catMap.put("userFacing", cat.isUserFacing());
+            catMap.put("count", counts.getOrDefault(cat.getCode(), 0L));
+            result.add(catMap);
+        }
+        
+        return result;
+    }
+    
+    public List<Map<String, Object>> getSubCategories(String categoryId) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        
+        if ("biz".equals(categoryId)) {
+            for (Map.Entry<String, String> entry : CapabilityCategory.BIZ_SUBCATEGORY_MAPPING.entrySet()) {
+                Map<String, Object> subMap = new LinkedHashMap<>();
+                subMap.put("id", entry.getKey());
+                subMap.put("name", entry.getValue());
+                subMap.put("count", countBySubCategory(entry.getKey()));
+                result.add(subMap);
+            }
+        }
+        
+        return result;
+    }
+    
+    private long countBySubCategory(String subCategory) {
+        long count = 0;
+        
+        for (Map<String, Object> skill : skills) {
+            String sub = (String) skill.get("subCategory");
+            if (subCategory.equals(sub)) {
+                count++;
+            }
+        }
+        
+        for (Map<String, Object> scene : scenes) {
+            String sub = (String) scene.get("subCategory");
+            if (subCategory.equals(sub)) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+    
+    public Map<String, Object> getCategoryStats() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("total", skills.size() + scenes.size());
+        result.put("categories", getSkillCountByCategory());
+        result.put("userFacingCategories", getUserFacingCategories());
+        result.put("allCategories", getAllCategoriesWithStats());
+        return result;
     }
 }

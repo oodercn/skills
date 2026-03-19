@@ -502,20 +502,50 @@ function onUserSelect() {
 }
 
 function renderAgentSelector(container) {
-    const agents = [
+    container.innerHTML = '<p class="nx-text-secondary nx-p-3">加载中...</p>';
+    
+    fetch('/api/agent/list')
+        .then(response => response.json())
+        .then(result => {
+            let agents = [];
+            if (result.status === 'success' && result.data) {
+                agents = result.data;
+            }
+            
+            if (agents.length === 0) {
+                agents = getDefaultAgents();
+            }
+            
+            let html = '<select class="nx-input" id="agentSelect" onchange="onAgentSelect()"><option value="">请选择Agent</option>';
+            agents.forEach(agent => {
+                const exists = currentGroup.participants?.some(p => p.participantId === agent.agentId);
+                if (!exists) {
+                    html += '<option value="' + agent.agentId + '" data-name="' + (agent.name || agent.agentId) + '">' + (agent.name || agent.agentId) + ' (' + agent.agentId + ')</option>';
+                }
+            });
+            html += '</select>';
+            container.innerHTML = html;
+        })
+        .catch(error => {
+            console.error('Failed to load agents:', error);
+            const agents = getDefaultAgents();
+            let html = '<select class="nx-input" id="agentSelect" onchange="onAgentSelect()"><option value="">请选择Agent</option>';
+            agents.forEach(agent => {
+                const exists = currentGroup.participants?.some(p => p.participantId === agent.id);
+                if (!exists) {
+                    html += '<option value="' + agent.id + '" data-name="' + agent.name + '">' + agent.name + ' (' + agent.id + ')</option>';
+                }
+            });
+            html += '</select>';
+            container.innerHTML = html;
+        });
+}
+
+function getDefaultAgents() {
+    return [
         { id: 'agent-llm-001', name: 'LLM分析助手' },
         { id: 'agent-coordinator-001', name: '协调Agent' }
     ];
-    
-    let html = '<select class="nx-input" id="agentSelect" onchange="onAgentSelect()"><option value="">请选择Agent</option>';
-    agents.forEach(agent => {
-        const exists = currentGroup.participants?.some(p => p.participantId === agent.id);
-        if (!exists) {
-            html += '<option value="' + agent.id + '" data-name="' + agent.name + '">' + agent.name + ' (' + agent.id + ')</option>';
-        }
-    });
-    html += '</select>';
-    container.innerHTML = html;
 }
 
 function onAgentSelect() {
@@ -643,8 +673,22 @@ function bindCapability() {
     
     const providerSelect = document.getElementById('providerSelect');
     providerSelect.innerHTML = '<option value="">请选择提供者</option>';
-    providerSelect.innerHTML += '<option value="skill-daily-report">日报Skill</option>';
-    providerSelect.innerHTML += '<option value="agent-llm">LLM Agent</option>';
+    
+    const providerType = document.getElementById('providerType').value;
+    fetch('/api/v1/selectors/providers?type=' + providerType)
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success' && result.data) {
+                result.data.forEach(provider => {
+                    providerSelect.innerHTML += '<option value="' + provider.id + '">' + provider.name + ' (' + provider.type + ')</option>';
+                });
+            }
+        })
+        .catch(error => {
+            console.error('Failed to load providers:', error);
+            providerSelect.innerHTML += '<option value="skill-daily-report">日报Skill</option>';
+            providerSelect.innerHTML += '<option value="agent-llm">LLM Agent</option>';
+        });
     
     document.getElementById('capabilityModal').classList.add('nx-modal--open');
 }
@@ -779,9 +823,26 @@ async function updateCapabilityBindingConfig(bindingId, priority, fallback) {
     }
 }
 
-function startWorkflow() {
+async function startWorkflow() {
     if (!confirm('确定要启动工作流吗？')) return;
-    alert('工作流已启动');
+    
+    try {
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/workflow/start', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('工作流已启动: ' + (result.data?.message || '成功'));
+            loadSceneGroup(sceneGroupId);
+        } else {
+            alert('启动失败: ' + (result.message || '未知错误'));
+        }
+    } catch (error) {
+        console.error('Failed to start workflow:', error);
+        alert('启动失败: ' + error.message);
+    }
 }
 
 async function createSnapshot() {
@@ -1154,6 +1215,30 @@ function onLlmProviderChange() {
     const provider = document.getElementById('llmProvider').value;
     const modelSelect = document.getElementById('llmModel');
     
+    modelSelect.innerHTML = '<option value="">加载中...</option>';
+    
+    fetch('/api/v1/llm/providers/' + provider + '/models')
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success' && result.data) {
+                modelSelect.innerHTML = result.data.map(m => 
+                    '<option value="' + m.value + '">' + m.label + '</option>'
+                ).join('');
+            } else {
+                modelSelect.innerHTML = getDefaultModelsForProvider(provider).map(m => 
+                    '<option value="' + m.value + '">' + m.label + '</option>'
+                ).join('');
+            }
+        })
+        .catch(error => {
+            console.error('Failed to load models:', error);
+            modelSelect.innerHTML = getDefaultModelsForProvider(provider).map(m => 
+                '<option value="' + m.value + '">' + m.label + '</option>'
+            ).join('');
+        });
+}
+
+function getDefaultModelsForProvider(provider) {
     const models = {
         deepseek: [
             { value: 'deepseek-chat', label: 'DeepSeek Chat' },
@@ -1173,10 +1258,7 @@ function onLlmProviderChange() {
         ]
     };
     
-    const providerModels = models[provider] || [];
-    modelSelect.innerHTML = providerModels.map(m => 
-        '<option value="' + m.value + '">' + m.label + '</option>'
-    ).join('');
+    return models[provider] || [];
 }
 
 async function saveLlmConfig() {

@@ -4,6 +4,7 @@ import net.ooder.mvp.skill.scene.dto.PageResult;
 import net.ooder.mvp.skill.scene.dto.scene.*;
 import net.ooder.mvp.skill.scene.service.SceneGroupService;
 import net.ooder.mvp.skill.scene.service.SceneTemplateService;
+import net.ooder.mvp.skill.scene.service.TodoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class SceneGroupServiceMemoryImpl implements SceneGroupService {
     
     @Autowired(required = false)
     private SceneTemplateService templateService;
+    
+    @Autowired(required = false)
+    private TodoService todoService;
 
     public SceneGroupServiceMemoryImpl() {
         log.info("SceneGroupServiceMemoryImpl initialized");
@@ -320,6 +324,21 @@ public class SceneGroupServiceMemoryImpl implements SceneGroupService {
         if (group != null) {
             group.setStatus(SceneGroupStatus.ACTIVE);
             group.setLastUpdateTime(System.currentTimeMillis());
+            
+            if (todoService != null && group.getCreatorId() != null) {
+                try {
+                    todoService.createSceneNotificationTodo(
+                        sceneGroupId,
+                        group.getCreatorId(),
+                        "场景已激活",
+                        "场景组 " + group.getName() + " 已成功激活"
+                    );
+                    log.info("Created activation notification todo for creator: {}", group.getCreatorId());
+                } catch (Exception e) {
+                    log.error("Failed to create activation notification todo: {}", e.getMessage());
+                }
+            }
+            
             return true;
         }
         return false;
@@ -354,6 +373,21 @@ public class SceneGroupServiceMemoryImpl implements SceneGroupService {
         
         group.setMemberCount(list.size());
         group.setLastUpdateTime(System.currentTimeMillis());
+        
+        if (todoService != null && group.getCreatorId() != null && !group.getCreatorId().equals(participant.getParticipantId())) {
+            try {
+                String participantName = participant.getName() != null ? participant.getName() : participant.getParticipantId();
+                todoService.createSceneNotificationTodo(
+                    sceneGroupId,
+                    group.getCreatorId(),
+                    "新成员加入场景",
+                    participantName + " 加入了场景组 " + group.getName()
+                );
+                log.info("Created scene notification todo for creator: {}", group.getCreatorId());
+            } catch (Exception e) {
+                log.error("Failed to create scene notification todo: {}", e.getMessage());
+            }
+        }
         
         return true;
     }
@@ -697,5 +731,68 @@ public class SceneGroupServiceMemoryImpl implements SceneGroupService {
         }
         
         return removed;
+    }
+
+    @Override
+    public List<KnowledgeBindingDTO> listKnowledgeBindings(String sceneGroupId) {
+        return knowledgeBindings.getOrDefault(sceneGroupId, new ArrayList<>());
+    }
+
+    @Override
+    public boolean updateKnowledgeConfig(String sceneGroupId, Map<String, Object> config) {
+        SceneGroupDTO group = sceneGroups.get(sceneGroupId);
+        if (group == null) return false;
+        
+        if (group.getConfig() == null) {
+            group.setConfig(new SceneGroupConfigDTO());
+        }
+        
+        if (config.get("topK") != null) {
+            group.getConfig().setKnowledgeTopK(((Number) config.get("topK")).intValue());
+        }
+        if (config.get("threshold") != null) {
+            group.getConfig().setKnowledgeThreshold(((Number) config.get("threshold")).doubleValue());
+        }
+        if (config.get("crossLayerSearch") != null) {
+            group.getConfig().setCrossLayerSearch((Boolean) config.get("crossLayerSearch"));
+        }
+        
+        group.setLastUpdateTime(System.currentTimeMillis());
+        return true;
+    }
+
+    private final Map<String, Map<String, Object>> llmConfigs = new ConcurrentHashMap<>();
+
+    @Override
+    public Map<String, Object> getLlmConfig(String sceneGroupId) {
+        Map<String, Object> config = llmConfigs.get(sceneGroupId);
+        if (config == null) {
+            config = new HashMap<>();
+            config.put("provider", "deepseek");
+            config.put("model", "deepseek-chat");
+            config.put("decisionMode", "ONLINE_FIRST");
+            config.put("decisionTimeout", 30000);
+            config.put("decisionCache", true);
+            config.put("cacheTtl", 300000);
+            config.put("functionCalling", true);
+            config.put("maxIterations", 5);
+            config.put("llmTimeout", 60000);
+            config.put("dailyTokenLimit", 100000);
+            config.put("usedTokens", 0);
+            config.put("remainingTokens", 100000);
+        }
+        return config;
+    }
+
+    @Override
+    public boolean updateLlmConfig(String sceneGroupId, Map<String, Object> config) {
+        SceneGroupDTO group = sceneGroups.get(sceneGroupId);
+        if (group == null) return false;
+        
+        Map<String, Object> existingConfig = llmConfigs.computeIfAbsent(sceneGroupId, k -> new HashMap<>());
+        existingConfig.putAll(config);
+        
+        group.setLastUpdateTime(System.currentTimeMillis());
+        return true;
     }
 }

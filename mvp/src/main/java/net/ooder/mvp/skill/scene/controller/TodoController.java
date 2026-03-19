@@ -7,12 +7,16 @@ import net.ooder.mvp.skill.scene.service.TodoService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/my/todos")
@@ -25,10 +29,25 @@ public class TodoController {
     @GetMapping
     public ResultModel<PageResult<TodoDTO>> listMyTodos(
             @RequestParam(required = false) String status,
+            @RequestParam(required = false) String type,
             @RequestParam(defaultValue = "1") int pageNum,
             @RequestParam(defaultValue = "20") int pageSize) {
         String currentUserId = "current-user";
-        PageResult<TodoDTO> result = todoService.listMyTodos(currentUserId, status, pageNum, pageSize);
+        PageResult<TodoDTO> result = todoService.listMyTodos(currentUserId, status, type, pageNum, pageSize);
+        return ResultModel.success(result);
+    }
+
+    @GetMapping("/pending")
+    public ResultModel<List<TodoDTO>> listPendingTodos() {
+        String currentUserId = "current-user";
+        List<TodoDTO> result = todoService.listPendingTodos(currentUserId);
+        return ResultModel.success(result);
+    }
+
+    @GetMapping("/count")
+    public ResultModel<Map<String, Integer>> countByType() {
+        String currentUserId = "current-user";
+        Map<String, Integer> result = todoService.countByType(currentUserId);
         return ResultModel.success(result);
     }
 
@@ -79,5 +98,14 @@ public class TodoController {
             return ResultModel.success(true);
         }
         return ResultModel.error(400, "审批失败");
+    }
+
+    @DeleteMapping("/{todoId}")
+    public ResultModel<Boolean> deleteTodo(@PathVariable String todoId) {
+        boolean result = todoService.deleteTodo(todoId);
+        if (result) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error(400, "删除失败");
     }
 }

@@ -1,8 +1,8 @@
 (function(global) {
     'use strict';
 
-    var CATEGORY_CONFIG = OoderCapability.CATEGORY_CONFIG;
-    var getAddressHex = OoderCapability.getAddressHex;
+    var CATEGORY_CONFIG = null;
+    var getAddressHex = null;
 
     var allCapabilities = [];
     var bindings = [];
@@ -17,8 +17,16 @@
 
     var MyCapabilities = {
         init: function() {
+            if (typeof OoderCapability === 'undefined') {
+                console.error('OoderCapability 未加载，请确保 capability-config.js 已加载');
+                return;
+            }
+            CATEGORY_CONFIG = OoderCapability.CATEGORY_CONFIG;
+            getAddressHex = OoderCapability.getAddressHex;
+            
             console.log('我的能力页面初始化');
             MyCapabilities.parseUrlParams();
+            MyCapabilities.loadCategoryStats();
             MyCapabilities.loadCapabilities();
             MyCapabilities.loadBindings();
         },
@@ -26,9 +34,43 @@
         parseUrlParams: function() {
             var urlParams = new URLSearchParams(window.location.search);
             var categoryParam = urlParams.get('category');
-            if (categoryParam && CATEGORY_CONFIG[categoryParam]) {
+            if (categoryParam && CATEGORY_CONFIG && CATEGORY_CONFIG[categoryParam]) {
                 currentCategoryFilter = categoryParam;
             }
+        },
+
+        loadCategoryStats: function() {
+            fetch('/api/v1/discovery/categories/stats', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result && result.status === 'success' && result.data) {
+                    MyCapabilities.renderCategoryStats(result.data);
+                }
+            })
+            .catch(function(error) {
+                console.error('加载分类统计失败:', error);
+            });
+        },
+
+        renderCategoryStats: function(stats) {
+            var categories = stats.categories || {};
+            
+            document.querySelectorAll('#categoryFilterChipsRow1 .filter-chip, #categoryFilterChipsRow2 .filter-chip').forEach(function(chip) {
+                var cat = chip.getAttribute('data-category');
+                if (cat === 'all') {
+                    chip.innerHTML = '全部 (' + (stats.total || 0) + ')';
+                } else if (categories[cat] !== undefined) {
+                    var config = CATEGORY_CONFIG && CATEGORY_CONFIG[cat];
+                    if (config) {
+                        chip.innerHTML = config.name + ' (' + categories[cat] + ')';
+                    }
+                }
+            });
         },
 
         loadCapabilities: function() {
@@ -70,11 +112,16 @@
                 }
             })
             .then(function(response) { return response.json(); })
-            .then(function(data) {
-                bindings = data || [];
+            .then(function(result) {
+                if (result && result.status === 'success' && result.data) {
+                    bindings = result.data;
+                } else {
+                    bindings = [];
+                }
             })
             .catch(function(error) {
                 console.error('加载绑定失败:', error);
+                bindings = [];
             });
         },
 
@@ -85,9 +132,11 @@
             var installedCount = 0;
             var activeCount = 0;
             
-            Object.keys(CATEGORY_CONFIG).forEach(function(cat) {
-                counts[cat] = 0;
-            });
+            if (CATEGORY_CONFIG) {
+                Object.keys(CATEGORY_CONFIG).forEach(function(cat) {
+                    counts[cat] = 0;
+                });
+            }
             
             allCapabilities.forEach(function(cap) {
                 var category = cap.category || 'util';
@@ -116,7 +165,7 @@
                 var cat = chip.getAttribute('data-category');
                 if (cat === 'all') {
                     chip.innerHTML = '全部 (' + totalCount + ')';
-                } else if (counts[cat] !== undefined) {
+                } else if (counts[cat] !== undefined && CATEGORY_CONFIG) {
                     var config = CATEGORY_CONFIG[cat];
                     if (config) {
                         chip.innerHTML = config.name + ' (' + counts[cat] + ')';
@@ -137,6 +186,10 @@
 
         renderTable: function() {
             var tbody = document.getElementById('capabilityTableBody');
+            if (!tbody) {
+                console.error('capabilityTableBody 元素未找到');
+                return;
+            }
             tbody.innerHTML = '';
 
             var filtered = allCapabilities;
@@ -161,11 +214,11 @@
             }
 
             if (searchKeyword) {
+                var keyword = searchKeyword.toLowerCase();
                 filtered = filtered.filter(function(cap) {
-                    var name = cap.name.toLowerCase();
-                    var desc = cap.description.toLowerCase();
-                    return name.includes(searchKeyword) || 
-                           desc.includes(searchKeyword);
+                    var name = (cap.name || '').toLowerCase();
+                    var desc = (cap.description || '').toLowerCase();
+                    return name.includes(keyword) || desc.includes(keyword);
                 });
             }
 
@@ -180,23 +233,36 @@
 
         renderRow: function(cap) {
             var tr = document.createElement('tr');
-            tr.setAttribute('data-skill-id', cap.skillId);
+            var capId = cap.capabilityId || cap.id || cap.skillId;
+            tr.setAttribute('data-capability-id', capId);
             tr.style.cursor = 'pointer';
+            tr.onclick = function() { 
+                console.log('点击行, capId:', capId, 'cap:', cap);
+                drillDownSkill(capId); 
+            };
 
-            var categoryConfig = CATEGORY_CONFIG[cap.category] || CATEGORY_CONFIG['util'];
+            var categoryConfig = (CATEGORY_CONFIG && CATEGORY_CONFIG[cap.category]) || (CATEGORY_CONFIG && CATEGORY_CONFIG['util']) || { name: cap.category || '工具', color: '#6b7280' };
             
-            var categoryBadge = '<span class="category-badge" style="background-color: ' + categoryConfig.color + '; color: white;">' + categoryConfig.name + '</span>';
-
             var nameCell = document.createElement('td');
-            nameCell.innerHTML = '<strong>' + cap.name + '</strong>' + categoryBadge;
+            nameCell.innerHTML = '<strong>' + cap.name + '</strong>';
             nameCell.style.fontSize = '14px';
             tr.appendChild(nameCell);
 
-            var descCell = document.createElement('td');
-            descCell.innerHTML = cap.description || '-';
-            descCell.style.fontSize = '13px';
-            descCell.style.color = '#666';
-            tr.appendChild(descCell);
+            var ownershipCell = document.createElement('td');
+            var ownership = cap.ownership || 'INDEPENDENT';
+            var ownershipNames = {
+                'PLATFORM': '平台能力',
+                'INDEPENDENT': '独立能力',
+                'SCENE_INTERNAL': '场景内部'
+            };
+            ownershipCell.innerHTML = ownershipNames[ownership] || ownership;
+            ownershipCell.style.fontSize = '13px';
+            tr.appendChild(ownershipCell);
+
+            var typeCell = document.createElement('td');
+            var categoryBadge = '<span class="category-badge" style="background-color: ' + categoryConfig.color + '; color: white;">' + categoryConfig.name + '</span>';
+            typeCell.innerHTML = categoryBadge;
+            tr.appendChild(typeCell);
 
             var statusCell = document.createElement('td');
             var statusText = '';
@@ -220,6 +286,26 @@
             statusCell.innerHTML = statusText;
             tr.appendChild(statusCell);
 
+            var versionCell = document.createElement('td');
+            versionCell.innerHTML = cap.version || '-';
+            versionCell.style.fontSize = '13px';
+            tr.appendChild(versionCell);
+
+            var sceneTypesCell = document.createElement('td');
+            var sceneTypes = cap.supportedSceneTypes || [];
+            if (sceneTypes.length > 0) {
+                sceneTypesCell.innerHTML = sceneTypes.slice(0, 2).join(', ') + (sceneTypes.length > 2 ? '...' : '');
+            } else {
+                sceneTypesCell.innerHTML = '-';
+            }
+            sceneTypesCell.style.fontSize = '13px';
+            tr.appendChild(sceneTypesCell);
+
+            var lastCallCell = document.createElement('td');
+            lastCallCell.innerHTML = cap.updateTime ? MyCapabilities.formatTime(cap.updateTime) : '-';
+            lastCallCell.style.fontSize = '13px';
+            tr.appendChild(lastCallCell);
+
             var actionsCell = document.createElement('td');
             actionsCell.style.textAlign = 'right';
             actionsCell.innerHTML = MyCapabilities.getActionButtons(cap);
@@ -229,11 +315,12 @@
         },
 
         getActionButtons: function(cap) {
-            var buttons = '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="event.stopPropagation(); drillDownSkill(\'' + cap.capabilityId + '\')">' +
+            var capId = cap.capabilityId || cap.id || cap.skillId;
+            var buttons = '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="event.stopPropagation(); drillDownSkill(\'' + capId + '\')">' +
                 '<i class="ri-eye-line"></i> 详情</button> ';
             
             if (cap.installed === true) {
-                buttons += '<button class="nx-btn nx-btn--sm nx-btn--primary" onclick="event.stopPropagation(); showBindDialog(\'' + cap.capabilityId + '\')">' +
+                buttons += '<button class="nx-btn nx-btn--sm nx-btn--primary" onclick="event.stopPropagation(); showBindDialog(\'' + capId + '\')">' +
                     '<i class="ri-link"></i> 绑定</button>';
             }
             
@@ -243,7 +330,7 @@
         showError: function(message) {
             var tbody = document.getElementById('capabilityTableBody');
             if (tbody) {
-                tbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 60px; color: #ef4444;">' +
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center; padding: 60px; color: #ef4444;">' +
                     '<i class="ri-error-warning-line" style="font-size: 48px; display: block; margin-bottom: 16px;"></i>' +
                     '<div style="font-size: 16px; font-weight: 500;">' + message + '</div></td></tr>';
             }
@@ -274,7 +361,7 @@
 
             detailTitle.textContent = cap.name || '能力详情';
 
-            var categoryConfig = CATEGORY_CONFIG[cap.category] || CATEGORY_CONFIG['util'];
+            var categoryConfig = (CATEGORY_CONFIG && CATEGORY_CONFIG[cap.category]) || (CATEGORY_CONFIG && CATEGORY_CONFIG['util']) || { name: cap.category || '工具', color: '#6b7280' };
             
             var statusText = '';
             var statusClass = '';
@@ -334,7 +421,10 @@
                 html += '</div>';
             }
 
-            var capBindings = bindings.filter(function(b) { return b.capabilityId === cap.capabilityId; });
+            var capId = cap.capabilityId || cap.id || cap.skillId;
+            var capBindings = bindings.filter(function(b) { 
+                return b.capabilityId === capId || b.capabilityId === cap.capabilityId;
+            });
             if (capBindings.length > 0) {
                 html += '<div class="detail-section">';
                 html += '<div class="detail-section-title"><i class="ri-link"></i> 绑定场景 (' + capBindings.length + ')</div>';
@@ -406,13 +496,15 @@
 
     global.drillDownSkill = function(capabilityId) {
         currentDrillDown = capabilityId;
-        var cap = allCapabilities.find(function(p) { return p.capabilityId === capabilityId; });
+        var cap = allCapabilities.find(function(p) { 
+            return p.capabilityId === capabilityId || p.id === capabilityId || p.skillId === capabilityId;
+        });
         
         if (cap) {
             console.log('查看能力详情:', cap);
             MyCapabilities.showDetailPanel(cap);
         } else {
-            console.warn('未找到能力:', capabilityId);
+            console.warn('未找到能力:', capabilityId, 'allCapabilities:', allCapabilities);
         }
     };
 
@@ -441,6 +533,14 @@
         document.getElementById('overlay').classList.remove('open');
     };
 
-    MyCapabilities.init();
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('DOMContentLoaded, 初始化 MyCapabilities');
+            MyCapabilities.init();
+        });
+    } else {
+        console.log('DOM 已加载, 立即初始化 MyCapabilities');
+        MyCapabilities.init();
+    }
 
 })(typeof window !== 'undefined' ? window : this);

@@ -28,16 +28,18 @@ var DISCOVERY_METHODS = [
 ];
 
 var BUSINESS_CATEGORIES = [
-    { code: 'AI_ASSISTANT', name: 'AI助手', icon: 'ri-robot-line', color: '#722ed1' },
-    { code: 'INFRASTRUCTURE', name: '基础设施', icon: 'ri-server-line', color: '#1890ff' },
-    { code: 'SYSTEM_TOOLS', name: '系统工具', icon: 'ri-tools-line', color: '#52c41a' },
-    { code: 'SYSTEM_MONITOR', name: '系统监控', icon: 'ri-pulse-line', color: '#faad14' },
-    { code: 'OFFICE_COLLABORATION', name: '办公协作', icon: 'ri-team-line', color: '#13c2c2' },
-    { code: 'MARKETING_OPERATIONS', name: '营销运营', icon: 'ri-megaphone-line', color: '#eb2f96' },
-    { code: 'SECURITY_AUDIT', name: '安全审计', icon: 'ri-shield-check-line', color: '#f5222d' },
-    { code: 'DATA_PROCESSING', name: '数据处理', icon: 'ri-bar-chart-line', color: '#2f54eb' },
-    { code: 'HUMAN_RESOURCE', name: '人力资源', icon: 'ri-user-add-line', color: '#fa8c16' },
-    { code: 'FINANCE_ACCOUNTING', name: '财务会计', icon: 'ri-money-cny-box-line', color: '#a0d911' }
+    { code: 'org', name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', userFacing: false },
+    { code: 'vfs', name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', userFacing: false },
+    { code: 'llm', name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', userFacing: true },
+    { code: 'knowledge', name: '知识服务', icon: 'ri-book-line', color: '#10b981', userFacing: true },
+    { code: 'biz', name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', userFacing: true },
+    { code: 'sys', name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', userFacing: false },
+    { code: 'msg', name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', userFacing: false },
+    { code: 'ui', name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', userFacing: false },
+    { code: 'payment', name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', userFacing: false },
+    { code: 'media', name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', userFacing: false },
+    { code: 'util', name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', userFacing: true },
+    { code: 'nexus-ui', name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', userFacing: false }
 ];
 
 var CapabilityDiscovery = {
@@ -69,11 +71,44 @@ var CapabilityDiscovery = {
     renderBusinessCategoryFilter: function() {
         var container = document.getElementById('businessCategoryFilter');
         if (!container) return;
+        
+        fetch('/api/v1/discovery/categories/user-facing')
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result && result.status === 'success' && result.data) {
+                    CapabilityDiscovery.renderUserFacingCategories(result.data);
+                } else {
+                    CapabilityDiscovery.renderDefaultCategories();
+                }
+            })
+            .catch(function(error) {
+                console.error('加载用户可见分类失败:', error);
+                CapabilityDiscovery.renderDefaultCategories();
+            });
+    },
+
+    renderUserFacingCategories: function(categories) {
+        var container = document.getElementById('businessCategoryFilter');
+        if (!container) return;
+        var html = '<span class="filter-label">业务领域:</span>';
+        html += '<span class="filter-chip active" data-bc="" onclick="selectBusinessCategory(\'\')">全部</span>';
+        categories.forEach(function(cat) {
+            html += '<span class="filter-chip" data-bc="' + cat.id + '" onclick="selectBusinessCategory(\'' + cat.id + '\')">' +
+                '<i class="' + cat.icon + '"></i> ' + cat.name + '</span>';
+        });
+        container.innerHTML = html;
+    },
+
+    renderDefaultCategories: function() {
+        var container = document.getElementById('businessCategoryFilter');
+        if (!container) return;
         var html = '<span class="filter-label">业务领域:</span>';
         html += '<span class="filter-chip active" data-bc="" onclick="selectBusinessCategory(\'\')">全部</span>';
         BUSINESS_CATEGORIES.forEach(function(bc) {
-            html += '<span class="filter-chip" data-bc="' + bc.code + '" onclick="selectBusinessCategory(\'' + bc.code + '\')">' +
-                '<i class="' + bc.icon + '"></i> ' + bc.name + '</span>';
+            if (bc.userFacing) {
+                html += '<span class="filter-chip" data-bc="' + bc.code + '" onclick="selectBusinessCategory(\'' + bc.code + '\')">' +
+                    '<i class="' + bc.icon + '"></i> ' + bc.name + '</span>';
+            }
         });
         container.innerHTML = html;
     },

@@ -4,39 +4,46 @@ import net.ooder.mvp.skill.scene.dto.dict.Dict;
 import net.ooder.mvp.skill.scene.dto.dict.DictItem;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
 @Dict(code = "capability_category", name = "能力地址分类", description = "能力地址空间分类")
 public enum CapabilityCategory implements DictItem {
 
-    ORG("org", "组织服务", 0x00, "企业组织架构、用户认证相关服务", "ri-team-line"),
-    VFS("vfs", "存储服务", 0x08, "文件存储、对象存储相关服务", "ri-database-2-line"),
-    LLM("llm", "LLM服务", 0x10, "大语言模型服务、对话、配置、上下文管理", "ri-brain-line"),
-    KNOWLEDGE("knowledge", "知识服务", 0x18, "知识库、RAG、向量存储、文档处理", "ri-book-line"),
-    SYS("sys", "系统管理", 0x20, "系统监控、网络管理、安全审计", "ri-settings-3-line"),
-    MSG("msg", "消息通讯", 0x28, "消息队列、通讯协议服务", "ri-message-3-line"),
-    UI("ui", "UI生成", 0x30, "界面生成、设计转代码服务", "ri-palette-line"),
-    PAYMENT("payment", "支付服务", 0x38, "支付渠道、退款管理、交易处理", "ri-bank-card-line"),
-    MEDIA("media", "媒体发布", 0x40, "自媒体文章发布、内容管理、数据分析", "ri-edit-line"),
-    UTIL("util", "工具服务", 0x48, "通用工具、辅助服务、业务工具", "ri-tools-line"),
-    NEXUS_UI("nexus-ui", "Nexus界面", 0x50, "Nexus管理界面、仪表盘、监控页面", "ri-layout-line");
+    ORG("org", "组织服务", 0x00, "企业组织架构、用户认证相关服务", "ri-team-line", false),
+    VFS("vfs", "存储服务", 0x08, "文件存储、对象存储相关服务", "ri-database-2-line", false),
+    LLM("llm", "LLM服务", 0x10, "大语言模型服务、对话、配置、上下文管理", "ri-brain-line", true),
+    KNOWLEDGE("knowledge", "知识服务", 0x18, "知识库、RAG、向量存储、文档处理", "ri-book-line", true),
+    BIZ("biz", "业务场景", 0x20, "业务场景能力、智能助手、自动化流程", "ri-briefcase-line", true),
+    SYS("sys", "系统管理", 0x28, "系统监控、网络管理、安全审计", "ri-settings-3-line", false),
+    MSG("msg", "消息通讯", 0x30, "消息队列、通讯协议服务", "ri-message-3-line", false),
+    UI("ui", "UI生成", 0x38, "界面生成、设计转代码服务", "ri-palette-line", false),
+    PAYMENT("payment", "支付服务", 0x40, "支付渠道、退款管理、交易处理", "ri-bank-card-line", false),
+    MEDIA("media", "媒体发布", 0x48, "自媒体文章发布、内容管理、数据分析", "ri-edit-line", false),
+    UTIL("util", "工具服务", 0x50, "通用工具、辅助服务、业务工具", "ri-tools-line", true),
+    NEXUS_UI("nexus-ui", "Nexus界面", 0x58, "Nexus管理界面、仪表盘、监控页面", "ri-layout-line", false);
 
     private final String code;
     private final String name;
     private final int baseAddress;
     private final String description;
     private final String icon;
+    private final boolean userFacing;
 
-    CapabilityCategory(String code, String name, int baseAddress, String description, String icon) {
+    CapabilityCategory(String code, String name, int baseAddress, String description, String icon, boolean userFacing) {
         this.code = code;
         this.name = name;
         this.baseAddress = baseAddress;
         this.description = description;
         this.icon = icon;
+        this.userFacing = userFacing;
     }
 
     public String getName() { return name; }
     public String getDescription() { return description; }
     public int getBaseAddress() { return baseAddress; }
+    public boolean isUserFacing() { return userFacing; }
 
     @Override
     public String getCode() { return code; }
@@ -46,6 +53,30 @@ public enum CapabilityCategory implements DictItem {
 
     @Override
     public int getSort() { return baseAddress; }
+
+    public static final Set<String> USER_FACING_CATEGORIES;
+    static {
+        Set<String> set = new HashSet<>();
+        set.add("llm");
+        set.add("knowledge");
+        set.add("biz");
+        set.add("util");
+        USER_FACING_CATEGORIES = Collections.unmodifiableSet(set);
+    }
+
+    public static final Map<String, String> BIZ_SUBCATEGORY_MAPPING;
+    static {
+        Map<String, String> map = new HashMap<>();
+        map.put("hr", "人力资源");
+        map.put("crm", "客户管理");
+        map.put("finance", "财务管理");
+        map.put("approval", "审批流程");
+        map.put("project", "项目协作");
+        map.put("worklog", "工作日志");
+        map.put("qa", "质检管理");
+        map.put("scenario", "通用业务");
+        BIZ_SUBCATEGORY_MAPPING = Collections.unmodifiableMap(map);
+    }
 
     private static final Map<String, String> CODE_MAPPING = new HashMap<>();
     static {
@@ -71,7 +102,7 @@ public enum CapabilityCategory implements DictItem {
         CODE_MAPPING.put("COLLABORATION", "util");
         
         // 未定义分类 -> 标准分类
-        CODE_MAPPING.put("business", "util");
+        CODE_MAPPING.put("business", "biz");
         CODE_MAPPING.put("infrastructure", "sys");
         CODE_MAPPING.put("scheduler", "sys");
         CODE_MAPPING.put("auth", "org");

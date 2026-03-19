@@ -282,4 +282,32 @@ public class DiscoveryController {
         cap.put("installed", false);
         return cap;
     }
+    
+    @GetMapping("/categories/stats")
+    public ResultModel<Map<String, Object>> getCategoryStats() {
+        log.info("[getCategoryStats] Getting category statistics");
+        Map<String, Object> stats = skillIndexLoader.getCategoryStats();
+        return ResultModel.success(stats);
+    }
+    
+    @GetMapping("/categories/user-facing")
+    public ResultModel<List<Map<String, Object>>> getUserFacingCategories() {
+        log.info("[getUserFacingCategories] Getting user facing categories");
+        List<Map<String, Object>> categories = skillIndexLoader.getUserFacingCategories();
+        return ResultModel.success(categories);
+    }
+    
+    @GetMapping("/categories/all")
+    public ResultModel<List<Map<String, Object>>> getAllCategories() {
+        log.info("[getAllCategories] Getting all categories with stats");
+        List<Map<String, Object>> categories = skillIndexLoader.getAllCategoriesWithStats();
+        return ResultModel.success(categories);
+    }
+    
+    @GetMapping("/categories/{categoryId}/subcategories")
+    public ResultModel<List<Map<String, Object>>> getSubCategories(@PathVariable String categoryId) {
+        log.info("[getSubCategories] Getting subcategories for: {}", categoryId);
+        List<Map<String, Object>> subCategories = skillIndexLoader.getSubCategories(categoryId);
+        return ResultModel.success(subCategories);
+    }
 }

@@ -149,6 +149,10 @@ public class CapabilityDTO {
     public Boolean getInstalled() { return installed; }
     public void setInstalled(Boolean installed) { this.installed = installed; }
     
+    public boolean isInstalled() { 
+        return installed != null && installed; 
+    }
+    
     public String getInstallUrl() { return installUrl; }
     public void setInstallUrl(String installUrl) { this.installUrl = installUrl; }
     

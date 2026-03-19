@@ -4,6 +4,7 @@ import net.ooder.mvp.skill.scene.dto.PageResult;
 import net.ooder.mvp.skill.scene.dto.scene.*;
 
 import java.util.List;
+import java.util.Map;
 
 public interface SceneGroupService {
     
@@ -60,4 +61,12 @@ public interface SceneGroupService {
     boolean bindKnowledgeBase(String sceneGroupId, KnowledgeBindingDTO binding);
     
     boolean unbindKnowledgeBase(String sceneGroupId, String kbId);
+    
+    List<KnowledgeBindingDTO> listKnowledgeBindings(String sceneGroupId);
+    
+    boolean updateKnowledgeConfig(String sceneGroupId, Map<String, Object> config);
+    
+    Map<String, Object> getLlmConfig(String sceneGroupId);
+    
+    boolean updateLlmConfig(String sceneGroupId, Map<String, Object> config);
 }

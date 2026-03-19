@@ -566,6 +566,71 @@ public class LlmController extends BaseController {
         return result;
     }
 
+    private String getProviderDisplayName(String providerId) {
+        Map<String, String> names = new HashMap<String, String>();
+        names.put("deepseek", "DeepSeek");
+        names.put("baidu", "百度文心");
+        names.put("openai", "OpenAI");
+        names.put("qianwen", "通义千问");
+        names.put("aliyun-bailian", "阿里云百炼");
+        names.put("mock", "Mock Provider");
+        return names.getOrDefault(providerId, providerId);
+    }
+
+    private String getModelDisplayName(String modelId) {
+        Map<String, String> names = new HashMap<String, String>();
+        names.put("deepseek-chat", "DeepSeek Chat");
+        names.put("deepseek-coder", "DeepSeek Coder");
+        names.put("ernie-bot-4", "ERNIE Bot 4.0");
+        names.put("ernie-bot-turbo", "ERNIE Bot Turbo");
+        names.put("gpt-4-turbo", "GPT-4 Turbo");
+        names.put("gpt-3.5-turbo", "GPT-3.5 Turbo");
+        names.put("qwen-turbo", "通义千问 Turbo");
+        names.put("qwen-plus", "通义千问 Plus");
+        names.put("qwen-max", "通义千问 Max");
+        return names.getOrDefault(modelId, modelId);
+    }
+
+    private List<Map<String, Object>> getDefaultModelsForProvider(String provider) {
+        List<Map<String, Object>> models = new ArrayList<Map<String, Object>>();
+        
+        Map<String, List<String[]>> providerModels = new HashMap<String, List<String[]>>();
+        providerModels.put("deepseek", Arrays.asList(
+            new String[]{"deepseek-chat", "DeepSeek Chat"},
+            new String[]{"deepseek-coder", "DeepSeek Coder"}
+        ));
+        providerModels.put("baidu", Arrays.asList(
+            new String[]{"ernie-bot-4", "ERNIE Bot 4.0"},
+            new String[]{"ernie-bot-turbo", "ERNIE Bot Turbo"}
+        ));
+        providerModels.put("openai", Arrays.asList(
+            new String[]{"gpt-4-turbo", "GPT-4 Turbo"},
+            new String[]{"gpt-3.5-turbo", "GPT-3.5 Turbo"}
+        ));
+        providerModels.put("qianwen", Arrays.asList(
+            new String[]{"qwen-turbo", "通义千问 Turbo"},
+            new String[]{"qwen-plus", "通义千问 Plus"},
+            new String[]{"qwen-max", "通义千问 Max"}
+        ));
+        providerModels.put("aliyun-bailian", Arrays.asList(
+            new String[]{"qwen-turbo", "通义千问 Turbo"},
+            new String[]{"qwen-plus", "通义千问 Plus"}
+        ));
+        
+        List<String[]> modelList = providerModels.get(provider);
+        if (modelList != null) {
+            for (String[] model : modelList) {
+                Map<String, Object> modelInfo = new HashMap<String, Object>();
+                modelInfo.put("value", model[0]);
+                modelInfo.put("label", model[1]);
+                modelInfo.put("provider", provider);
+                models.add(modelInfo);
+            }
+        }
+        
+        return models;
+    }
+
     @PostMapping("/complete")
     @ResponseBody
     public ResultModel<String> complete(@RequestBody @Valid CompleteRequestDTO request) {

@@ -22,8 +22,10 @@ public class DeepSeekLlmProvider implements LlmProvider {
 
     private static final String PROVIDER_TYPE = "deepseek";
     private static final String DEFAULT_MODEL = "deepseek-chat";
+    private static final String DEFAULT_EMBED_MODEL = "deepseek-embed";
     
     private static final String API_URL = "https://api.deepseek.com/v1/chat/completions";
+    private static final String EMBED_API_URL = "https://api.deepseek.com/v1/embeddings";
     
     private String apiKey;
     private ToolRegistry toolRegistry;
@@ -402,7 +404,199 @@ public class DeepSeekLlmProvider implements LlmProvider {
         log.info("DeepSeek LLM embed called with model: {}, text count: {}", model, texts.size());
         
         List<double[]> result = new ArrayList<double[]>();
-        log.info("Embedding not implemented for DeepSeek");
+        
+        if (apiKey == null || apiKey.isEmpty()) {
+            log.warn("DeepSeek API key not configured, returning empty embeddings");
+            return result;
+        }
+        
+        if (texts == null || texts.isEmpty()) {
+            return result;
+        }
+        
+        try {
+            Map<String, Object> requestBody = new HashMap<String, Object>();
+            requestBody.put("model", model != null ? model : DEFAULT_EMBED_MODEL);
+            requestBody.put("input", texts);
+            
+            String response = sendEmbedRequest(EMBED_API_URL, requestBody);
+            result = parseEmbeddingResponse(response);
+            
+            log.info("DeepSeek embedding completed, returned {} vectors", result.size());
+        } catch (Exception e) {
+            log.error("DeepSeek embedding error: {}", e.getMessage());
+        }
+        
+        return result;
+    }
+    
+    private String sendEmbedRequest(String apiUrl, Map<String, Object> requestBody) throws Exception {
+        URL url = new URL(apiUrl);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("POST");
+        conn.setRequestProperty("Content-Type", "application/json");
+        conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+        
+        conn.setConnectTimeout(30000);
+        conn.setReadTimeout(60000);
+        conn.setDoOutput(true);
+        
+        String jsonBody = mapToJson(requestBody);
+        log.debug("Embed request body: {}", jsonBody);
+        
+        try (OutputStream os = conn.getOutputStream()) {
+            byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+            os.write(input, 0, input.length);
+        }
+        
+        int responseCode = conn.getResponseCode();
+        log.info("DeepSeek Embed API response code: {}", responseCode);
+        
+        BufferedReader reader;
+        if (responseCode == 200) {
+            reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+        } else {
+            InputStream errorStream = conn.getErrorStream();
+            if (errorStream != null) {
+                reader = new BufferedReader(new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+            } else {
+                reader = new BufferedReader(new InputStreamReader(conn.getInputStream(), StandardCharsets.UTF_8));
+            }
+        }
+        
+        StringBuilder response = new StringBuilder();
+        String line;
+        while ((line = reader.readLine()) != null) {
+            response.append(line);
+        }
+        reader.close();
+        
+        String responseBody = response.toString();
+        log.debug("Embed response body: {}", responseBody);
+        
+        if (responseCode != 200) {
+            log.error("DeepSeek Embed API error: {} - {}", responseCode, responseBody);
+            return "{\"error\": \"HTTP " + responseCode + "\", \"message\": \"" + escapeJson(responseBody) + "\"}";
+        }
+        
+        return responseBody;
+    }
+    
+    private List<double[]> parseEmbeddingResponse(String response) {
+        List<double[]> result = new ArrayList<double[]>();
+        
+        String dataKey = "\"data\":";
+        int dataStart = response.indexOf(dataKey);
+        if (dataStart == -1) {
+            log.warn("No 'data' field in embedding response");
+            return result;
+        }
+        
+        dataStart += dataKey.length();
+        while (dataStart < response.length() && (response.charAt(dataStart) == ' ' || response.charAt(dataStart) == '\t')) {
+            dataStart++;
+        }
+        
+        if (dataStart >= response.length() || response.charAt(dataStart) != '[') {
+            return result;
+        }
+        
+        dataStart++;
+        int bracketCount = 1;
+        int dataEnd = dataStart;
+        while (dataEnd < response.length() && bracketCount > 0) {
+            if (response.charAt(dataEnd) == '[') bracketCount++;
+            else if (response.charAt(dataEnd) == ']') bracketCount--;
+            dataEnd++;
+        }
+        
+        String dataArray = response.substring(dataStart, dataEnd - 1);
+        
+        int i = 0;
+        while (i < dataArray.length()) {
+            int objStart = dataArray.indexOf('{', i);
+            if (objStart == -1) break;
+            
+            int braceCount = 0;
+            int objEnd = objStart;
+            while (objEnd < dataArray.length()) {
+                if (dataArray.charAt(objEnd) == '{') braceCount++;
+                else if (dataArray.charAt(objEnd) == '}') braceCount--;
+                objEnd++;
+                if (braceCount == 0) break;
+            }
+            
+            String obj = dataArray.substring(objStart, objEnd);
+            
+            double[] embedding = parseSingleEmbedding(obj);
+            if (embedding != null && embedding.length > 0) {
+                result.add(embedding);
+            }
+            
+            i = objEnd;
+        }
+        
+        return result;
+    }
+    
+    private double[] parseSingleEmbedding(String obj) {
+        String embeddingKey = "\"embedding\":";
+        int embStart = obj.indexOf(embeddingKey);
+        if (embStart == -1) {
+            return null;
+        }
+        
+        embStart += embeddingKey.length();
+        while (embStart < obj.length() && (obj.charAt(embStart) == ' ' || obj.charAt(embStart) == '\t')) {
+            embStart++;
+        }
+        
+        if (embStart >= obj.length() || obj.charAt(embStart) != '[') {
+            return null;
+        }
+        
+        embStart++;
+        int bracketCount = 1;
+        int embEnd = embStart;
+        while (embEnd < obj.length() && bracketCount > 0) {
+            if (obj.charAt(embEnd) == '[') bracketCount++;
+            else if (obj.charAt(embEnd) == ']') bracketCount--;
+            embEnd++;
+        }
+        
+        String embeddingArray = obj.substring(embStart, embEnd - 1);
+        
+        List<Double> values = new ArrayList<Double>();
+        StringBuilder numBuilder = new StringBuilder();
+        
+        for (int i = 0; i < embeddingArray.length(); i++) {
+            char c = embeddingArray.charAt(i);
+            if (c == ',' || Character.isWhitespace(c)) {
+                if (numBuilder.length() > 0) {
+                    try {
+                        values.add(Double.parseDouble(numBuilder.toString().trim()));
+                    } catch (NumberFormatException e) {
+                        // skip invalid number
+                    }
+                    numBuilder = new StringBuilder();
+                }
+            } else {
+                numBuilder.append(c);
+            }
+        }
+        
+        if (numBuilder.length() > 0) {
+            try {
+                values.add(Double.parseDouble(numBuilder.toString().trim()));
+            } catch (NumberFormatException e) {
+                // skip invalid number
+            }
+        }
+        
+        double[] result = new double[values.size()];
+        for (int i = 0; i < values.size(); i++) {
+            result[i] = values.get(i);
+        }
         
         return result;
     }

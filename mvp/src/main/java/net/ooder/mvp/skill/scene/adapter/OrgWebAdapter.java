@@ -2,6 +2,12 @@ package net.ooder.mvp.skill.scene.adapter;
 
 import net.ooder.mvp.skill.scene.dto.OrgUserDTO;
 import net.ooder.mvp.skill.scene.dto.OrgDepartmentDTO;
+import net.ooder.mvp.skill.scene.dto.PageResult;
+import net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO;
+import net.ooder.mvp.skill.scene.dto.scene.SceneParticipantDTO;
+import net.ooder.mvp.skill.scene.service.SceneGroupService;
+import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
+import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.skill.common.storage.JsonStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,6 +35,12 @@ public class OrgWebAdapter {
 
     @Autowired
     private JsonStorageService storage;
+
+    @Autowired(required = false)
+    private SceneGroupService sceneGroupService;
+
+    @Autowired(required = false)
+    private CapabilityService capabilityService;
 
     private final Map<String, OrgUserDTO> users = new ConcurrentHashMap<>();
     private final Map<String, OrgDepartmentDTO> departments = new ConcurrentHashMap<>();
@@ -386,10 +398,68 @@ public class OrgWebAdapter {
     }
     
     public int getUserSceneCount(String userId) {
-        return 0;
+        if (sceneGroupService == null) {
+            log.debug("SceneGroupService not available, returning 0 for user scene count");
+            return 0;
+        }
+        
+        try {
+            int count = 0;
+            
+            PageResult<SceneGroupDTO> createdGroups = sceneGroupService.listByCreator(userId, 1, 1000);
+            if (createdGroups != null) {
+                count += createdGroups.getTotal();
+            }
+            
+            PageResult<SceneGroupDTO> participatedGroups = sceneGroupService.listByParticipant(userId, 1, 1000);
+            if (participatedGroups != null) {
+                Set<String> uniqueGroupIds = new HashSet<String>();
+                
+                if (createdGroups != null && createdGroups.getList() != null) {
+                    for (SceneGroupDTO group : createdGroups.getList()) {
+                        uniqueGroupIds.add(group.getSceneGroupId());
+                    }
+                }
+                
+                if (participatedGroups.getList() != null) {
+                    for (SceneGroupDTO group : participatedGroups.getList()) {
+                        uniqueGroupIds.add(group.getSceneGroupId());
+                    }
+                }
+                
+                count = uniqueGroupIds.size();
+            }
+            
+            log.debug("User {} has {} scenes", userId, count);
+            return count;
+        } catch (Exception e) {
+            log.warn("Failed to get scene count for user {}: {}", userId, e.getMessage());
+            return 0;
+        }
     }
     
     public int getUserCapabilityCount(String userId) {
-        return 0;
+        if (capabilityService == null) {
+            log.debug("CapabilityService not available, returning 0 for user capability count");
+            return 0;
+        }
+        
+        try {
+            List<Capability> allCapabilities = capabilityService.findAll();
+            
+            int count = 0;
+            for (Capability cap : allCapabilities) {
+                String ownerId = cap.getOwnerId();
+                if (ownerId != null && ownerId.equals(userId)) {
+                    count++;
+                }
+            }
+            
+            log.debug("User {} has {} capabilities", userId, count);
+            return count;
+        } catch (Exception e) {
+            log.warn("Failed to get capability count for user {}: {}", userId, e.getMessage());
+            return 0;
+        }
     }
 }

@@ -5,6 +5,7 @@ import net.ooder.mvp.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.mvp.skill.scene.notification.SceneNotificationService;
+import net.ooder.mvp.skill.scene.service.TodoService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,9 @@ public class InstallServiceImpl implements InstallService {
 
     @Autowired(required = false)
     private SceneNotificationService notificationService;
+
+    @Autowired(required = false)
+    private TodoService todoService;
 
     @Override
     public InstallConfig createInstall(CreateInstallRequest request) {
@@ -324,6 +328,18 @@ public class InstallServiceImpl implements InstallService {
                     }
                 }
                 
+                if (todoService != null && targetStatus == InstallConfig.InstallStatus.PENDING_ACTIVATION) {
+                    try {
+                        String leaderId = config.getParticipants() != null && config.getParticipants().getLeader() != null
+                            ? config.getParticipants().getLeader().getUserId() : "current-user";
+                        String capabilityName = capability != null ? capability.getName() : config.getCapabilityId();
+                        todoService.createActivationTodo(leaderId, installId, config.getCapabilityId(), capabilityName);
+                        log.info("[executeInstall] Created activation todo for user: {}", leaderId);
+                    } catch (Exception e) {
+                        log.error("[executeInstall] Failed to create activation todo: {}", e.getMessage());
+                    }
+                }
+                
                 log.info("[executeInstall] Install completed successfully: {}", installId);
                 
             } catch (Exception e) {
@@ -407,7 +423,7 @@ public class InstallServiceImpl implements InstallService {
         String visibility = config.getVisibility();
         
         if (!"SCENE".equals(skillForm)) {
-            return InstallConfig.InstallStatus.INSTALLED;
+            return InstallConfig.InstallStatus.PENDING_ACTIVATION;
         }
         
         if ("AUTO".equals(sceneType)) {
@@ -415,15 +431,15 @@ public class InstallServiceImpl implements InstallService {
                 log.info("[determinePostInstallStatus] AUTO+internal: auto-activating");
                 return InstallConfig.InstallStatus.RUNNING;
             } else {
-                log.info("[determinePostInstallStatus] AUTO+public: waiting for user activation");
-                return InstallConfig.InstallStatus.SCHEDULED;
+                log.info("[determinePostInstallStatus] AUTO+public: pending activation");
+                return InstallConfig.InstallStatus.PENDING_ACTIVATION;
             }
         } else if ("TRIGGER".equals(sceneType)) {
-            log.info("[determinePostInstallStatus] TRIGGER: waiting for trigger");
-            return InstallConfig.InstallStatus.PENDING;
+            log.info("[determinePostInstallStatus] TRIGGER: pending activation");
+            return InstallConfig.InstallStatus.PENDING_ACTIVATION;
         }
         
-        return InstallConfig.InstallStatus.INSTALLED;
+        return InstallConfig.InstallStatus.PENDING_ACTIVATION;
     }
 
     @Override

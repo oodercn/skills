@@ -5,10 +5,16 @@ public class TodoDTO {
     private String id;
     private String type;
     private String title;
+    private String description;
     private String sceneGroupId;
     private String sceneGroupName;
     private String fromUser;
+    private String toUser;
     private String role;
+    private String installId;
+    private String capabilityId;
+    private String priority;
+    private String actionType;
     private Long deadline;
     private Long createTime;
     private String status;
@@ -112,5 +118,53 @@ public class TodoDTO {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getToUser() {
+        return toUser;
+    }
+
+    public void setToUser(String toUser) {
+        this.toUser = toUser;
+    }
+
+    public String getInstallId() {
+        return installId;
+    }
+
+    public void setInstallId(String installId) {
+        this.installId = installId;
+    }
+
+    public String getCapabilityId() {
+        return capabilityId;
+    }
+
+    public void setCapabilityId(String capabilityId) {
+        this.capabilityId = capabilityId;
+    }
+
+    public String getPriority() {
+        return priority;
+    }
+
+    public void setPriority(String priority) {
+        this.priority = priority;
+    }
+
+    public String getActionType() {
+        return actionType;
+    }
+
+    public void setActionType(String actionType) {
+        this.actionType = actionType;
     }
 }

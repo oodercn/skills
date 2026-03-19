@@ -243,18 +243,32 @@
     ];
 
     var CATEGORY_CONFIG = {
-        'org': { name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', desc: '企业组织架构、用户认证相关服务' },
-        'vfs': { name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', desc: '文件存储、对象存储相关服务' },
-        'llm': { name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', desc: '大语言模型服务、对话、配置、上下文管理' },
-        'knowledge': { name: '知识服务', icon: 'ri-book-line', color: '#10b981', desc: '知识库、RAG、向量存储、文档处理' },
-        'sys': { name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', desc: '系统监控、网络管理、安全审计' },
-        'msg': { name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', desc: '消息队列、通讯协议服务' },
-        'ui': { name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', desc: '界面生成、设计转代码服务' },
-        'payment': { name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', desc: '支付渠道、退款管理、交易处理' },
-        'media': { name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', desc: '自媒体文章发布、内容管理、数据分析' },
-        'util': { name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', desc: '通用工具、辅助服务、业务工具' },
-        'nexus-ui': { name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', desc: 'Nexus管理界面、仪表盘、监控页面' }
+        'org': { name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', desc: '企业组织架构、用户认证相关服务', userFacing: false },
+        'vfs': { name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', desc: '文件存储、对象存储相关服务', userFacing: false },
+        'llm': { name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', desc: '大语言模型服务、对话、配置、上下文管理', userFacing: true },
+        'knowledge': { name: '知识服务', icon: 'ri-book-line', color: '#10b981', desc: '知识库、RAG、向量存储、文档处理', userFacing: true },
+        'biz': { name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', desc: '业务场景能力、智能助手、自动化流程', userFacing: true },
+        'sys': { name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', desc: '系统监控、网络管理、安全审计', userFacing: false },
+        'msg': { name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', desc: '消息队列、通讯协议服务', userFacing: false },
+        'ui': { name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', desc: '界面生成、设计转代码服务', userFacing: false },
+        'payment': { name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', desc: '支付渠道、退款管理、交易处理', userFacing: false },
+        'media': { name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', desc: '自媒体文章发布、内容管理、数据分析', userFacing: false },
+        'util': { name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', desc: '通用工具、辅助服务、业务工具', userFacing: true },
+        'nexus-ui': { name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', desc: 'Nexus管理界面、仪表盘、监控页面', userFacing: false }
     };
+    
+    var USER_FACING_CATEGORIES = ['llm', 'knowledge', 'biz', 'util'];
+    
+    var BIZ_SUBCATEGORIES = [
+        { id: 'hr', name: '人力资源', icon: 'ri-user-add-line', desc: '招聘、入职、培训、绩效管理' },
+        { id: 'crm', name: '客户管理', icon: 'ri-contacts-line', desc: '客户信息、跟进、转化管理' },
+        { id: 'finance', name: '财务管理', icon: 'ri-money-cny-box-line', desc: '报销、预算、财务审批' },
+        { id: 'approval', name: '审批流程', icon: 'ri-checkbox-line', desc: '各类审批流程自动化' },
+        { id: 'project', name: '项目协作', icon: 'ri-folder-line', desc: '项目管理、任务分配、进度跟踪' },
+        { id: 'worklog', name: '工作日志', icon: 'ri-file-text-line', desc: '日志汇报、提醒、汇总分析' },
+        { id: 'qa', name: '质检管理', icon: 'ri-clipboard-check-line', desc: '质量检查、问题追踪' },
+        { id: 'scenario', name: '通用业务', icon: 'ri-briefcase-line', desc: '通用业务场景能力' }
+    ];
 
     var PROFILE_DEFAULTS = {
         micro: {

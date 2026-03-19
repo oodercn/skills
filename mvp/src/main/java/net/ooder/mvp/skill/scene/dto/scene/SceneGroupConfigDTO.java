@@ -13,6 +13,9 @@ public class SceneGroupConfigDTO {
     private Long heartbeatInterval;
     private Long heartbeatTimeout;
     private Map<String, Object> extendedConfig;
+    private Integer knowledgeTopK;
+    private Double knowledgeThreshold;
+    private Boolean crossLayerSearch;
 
     public String getName() { return name; }
     public void setName(String name) { this.name = name; }
@@ -34,4 +37,10 @@ public class SceneGroupConfigDTO {
     public void setHeartbeatTimeout(Long heartbeatTimeout) { this.heartbeatTimeout = heartbeatTimeout; }
     public Map<String, Object> getExtendedConfig() { return extendedConfig; }
     public void setExtendedConfig(Map<String, Object> extendedConfig) { this.extendedConfig = extendedConfig; }
+    public Integer getKnowledgeTopK() { return knowledgeTopK; }
+    public void setKnowledgeTopK(Integer knowledgeTopK) { this.knowledgeTopK = knowledgeTopK; }
+    public Double getKnowledgeThreshold() { return knowledgeThreshold; }
+    public void setKnowledgeThreshold(Double knowledgeThreshold) { this.knowledgeThreshold = knowledgeThreshold; }
+    public Boolean getCrossLayerSearch() { return crossLayerSearch; }
+    public void setCrossLayerSearch(Boolean crossLayerSearch) { this.crossLayerSearch = crossLayerSearch; }
 }

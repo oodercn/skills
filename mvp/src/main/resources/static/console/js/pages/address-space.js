@@ -1,22 +1,17 @@
 var AddressSpace = {
     categories: [
-        { code: 'sys', name: '系统核心', range: '0x00-0x07', base: 0x00, color: '#1890ff', icon: 'ri-settings-3-line' },
-        { code: 'org', name: '组织服务', range: '0x08-0x0F', base: 0x08, color: '#722ed1', icon: 'ri-team-line' },
-        { code: 'auth', name: '认证服务', range: '0x10-0x17', base: 0x10, color: '#eb2f96', icon: 'ri-shield-keyhole-line' },
-        { code: 'net', name: '网络服务', range: '0x18-0x1F', base: 0x18, color: '#13c2c2', icon: 'ri-global-line' },
-        { code: 'vfs', name: '文件存储', range: '0x20-0x27', base: 0x20, color: '#fa8c16', icon: 'ri-folder-line' },
-        { code: 'db', name: '数据库', range: '0x28-0x2F', base: 0x28, color: '#52c41a', icon: 'ri-database-2-line' },
-        { code: 'llm', name: '大语言模型', range: '0x30-0x37', base: 0x30, color: '#2f54eb', icon: 'ri-robot-line' },
-        { code: 'know', name: '知识库', range: '0x38-0x3F', base: 0x38, color: '#faad14', icon: 'ri-book-2-line' },
-        { code: 'payment', name: '支付服务', range: '0x40-0x47', base: 0x40, color: '#f5222d', icon: 'ri-bank-card-line' },
-        { code: 'media', name: '媒体服务', range: '0x48-0x4F', base: 0x48, color: '#eb2f96', icon: 'ri-video-line' },
-        { code: 'comm', name: '通讯服务', range: '0x50-0x57', base: 0x50, color: '#1890ff', icon: 'ri-message-3-line' },
-        { code: 'mon', name: '监控服务', range: '0x58-0x5F', base: 0x58, color: '#595959', icon: 'ri-line-chart-line' },
-        { code: 'iot', name: '物联网', range: '0x60-0x67', base: 0x60, color: '#52c41a', icon: 'ri-cpu-line' },
-        { code: 'search', name: '搜索服务', range: '0x68-0x6F', base: 0x68, color: '#722ed1', icon: 'ri-search-line' },
-        { code: 'sched', name: '调度服务', range: '0x70-0x77', base: 0x70, color: '#fa8c16', icon: 'ri-time-line' },
-        { code: 'sec', name: '安全服务', range: '0x78-0x7F', base: 0x78, color: '#f5222d', icon: 'ri-lock-line' },
-        { code: 'util', name: '工具服务', range: '0xF0-0xFF', base: 0xF0, color: '#8c8c8c', icon: 'ri-tools-line' }
+        { code: 'org', name: '组织服务', range: '0x00-0x07', base: 0x00, color: '#8b5cf6', icon: 'ri-team-line', userFacing: false },
+        { code: 'vfs', name: '存储服务', range: '0x08-0x0F', base: 0x08, color: '#f5970b', icon: 'ri-database-2-line', userFacing: false },
+        { code: 'llm', name: 'LLM服务', range: '0x10-0x17', base: 0x10, color: '#9334ff', icon: 'ri-brain-line', userFacing: true },
+        { code: 'knowledge', name: '知识服务', range: '0x18-0x1F', base: 0x18, color: '#10b981', icon: 'ri-book-line', userFacing: true },
+        { code: 'biz', name: '业务场景', range: '0x20-0x27', base: 0x20, color: '#f97316', icon: 'ri-briefcase-line', userFacing: true },
+        { code: 'sys', name: '系统管理', range: '0x28-0x2F', base: 0x28, color: '#6366f1', icon: 'ri-settings-3-line', userFacing: false },
+        { code: 'msg', name: '消息通讯', range: '0x30-0x37', base: 0x30, color: '#f97b72', icon: 'ri-message-3-line', userFacing: false },
+        { code: 'ui', name: 'UI生成', range: '0x38-0x3F', base: 0x38, color: '#ec4899', icon: 'ri-palette-line', userFacing: false },
+        { code: 'payment', name: '支付服务', range: '0x40-0x47', base: 0x40, color: '#8b5cf6', icon: 'ri-bank-card-line', userFacing: false },
+        { code: 'media', name: '媒体发布', range: '0x48-0x4F', base: 0x48, color: '#f5970b', icon: 'ri-edit-line', userFacing: false },
+        { code: 'util', name: '工具服务', range: '0x50-0x57', base: 0x50, color: '#4f46e5', icon: 'ri-tools-line', userFacing: true },
+        { code: 'nexus-ui', name: 'Nexus界面', range: '0x58-0x5F', base: 0x58, color: '#6366f1', icon: 'ri-layout-line', userFacing: false }
     ],
     
     addresses: [],
@@ -24,19 +19,38 @@ var AddressSpace = {
     
     init: function() {
         this.loadAddresses();
-        this.renderCategoryFilter();
-        this.renderCategoryTree();
-        this.renderLegend();
         this.loadStatus();
+    },
+    
+    getCategoryColor: function(categoryId) {
+        var colors = {
+            'org': '#8b5cf6',
+            'vfs': '#f5970b',
+            'llm': '#9334ff',
+            'knowledge': '#10b981',
+            'biz': '#f97316',
+            'sys': '#6366f1',
+            'msg': '#f97b72',
+            'ui': '#ec4899',
+            'payment': '#8b5cf6',
+            'media': '#f5970b',
+            'util': '#4f46e5',
+            'nexus-ui': '#6366f1'
+        };
+        return colors[categoryId] || '#6b7280';
     },
     
     loadAddresses: function() {
         var self = this;
-        ApiClient.get('/api/v1/config/addresses')
+        fetch('/api/v1/config/addresses')
+            .then(function(response) { return response.json(); })
             .then(function(result) {
                 if (result.status === 'success' && result.data) {
                     self.addresses = result.data.addresses || [];
                     self.renderMap();
+                    self.renderCategoryFilter();
+                    self.renderCategoryTree();
+                    self.renderLegend();
                 } else {
                     self.loadMockAddresses();
                 }
@@ -106,11 +120,15 @@ var AddressSpace = {
             { address: 0xF1, name: 'UTIL_REPORT', category: 'util', description: '报表服务' }
         ];
         this.renderMap();
+        this.renderCategoryFilter();
+        this.renderCategoryTree();
+        this.renderLegend();
     },
     
     loadStatus: function() {
         var self = this;
-        ApiClient.get('/api/v1/capabilities/status')
+        fetch('/api/v1/capabilities/status')
+            .then(function(response) { return response.json(); })
             .then(function(result) {
                 if (result.status === 'success' && result.data) {
                     self.statusData = result.data;
