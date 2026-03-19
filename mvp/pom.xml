@@ -22,17 +22,10 @@
     <properties>
         <java.version>1.8</java.version>
         <ooder.sdk.version>2.3.1</ooder.sdk.version>
-        <ooder.mvp.api.version>2.3.1</ooder.mvp.api.version>
         <fastjson2.version>2.0.43</fastjson2.version>
     </properties>
 
     <dependencies>
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-mvp-api</artifactId>
-            <version>${ooder.mvp.api.version}</version>
-        </dependency>
-
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>

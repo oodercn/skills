@@ -9,7 +9,9 @@ public class TodoDTO {
     private String sceneGroupId;
     private String sceneGroupName;
     private String fromUser;
+    private String fromUserName;
     private String toUser;
+    private String toUserName;
     private String role;
     private String installId;
     private String capabilityId;
@@ -19,6 +21,7 @@ public class TodoDTO {
     private Long createTime;
     private String status;
     private Long completedTime;
+    private Long completedBy;
     private String errorMessage;
 
     public TodoDTO() {
@@ -166,5 +169,29 @@ public class TodoDTO {
 
     public void setActionType(String actionType) {
         this.actionType = actionType;
+    }
+
+    public String getFromUserName() {
+        return fromUserName;
+    }
+
+    public void setFromUserName(String fromUserName) {
+        this.fromUserName = fromUserName;
+    }
+
+    public String getToUserName() {
+        return toUserName;
+    }
+
+    public void setToUserName(String toUserName) {
+        this.toUserName = toUserName;
+    }
+
+    public Long getCompletedBy() {
+        return completedBy;
+    }
+
+    public void setCompletedBy(Long completedBy) {
+        this.completedBy = completedBy;
     }
 }
