@@ -15,6 +15,7 @@ categories:
     icon: users
     order: 1
     sceneDriver: org
+    userFacing: false
     
   - id: vfs
     name: 存储服务
@@ -23,6 +24,7 @@ categories:
     icon: database
     order: 2
     sceneDriver: vfs
+    userFacing: false
     
   - id: llm
     name: LLM服务
@@ -31,6 +33,7 @@ categories:
     icon: brain
     order: 3
     sceneDriver: null
+    userFacing: true
     
   - id: knowledge
     name: 知识服务
@@ -39,59 +42,101 @@ categories:
     icon: book
     order: 4
     sceneDriver: null
+    userFacing: true
+    
+  - id: biz
+    name: 业务场景
+    nameEn: Business
+    description: 人力资源、客户管理、财务审批、项目管理等业务场景
+    icon: briefcase
+    order: 5
+    sceneDriver: null
+    userFacing: true
+    subCategories:
+      - id: hr
+        name: 人力资源
+        description: 员工管理、考勤、薪酬、招聘
+      - id: crm
+        name: 客户管理
+        description: 客户、联系人、商机、合同
+      - id: finance
+        name: 财务管理
+        description: 账务、报销、预算、结算
+      - id: approval
+        name: 审批流程
+        description: 流程定义、审批、流转
+      - id: project
+        name: 项目协作
+        description: 项目、任务、文档、进度
+      - id: worklog
+        name: 工作日志
+        description: 日报、周报、工时统计
+      - id: qa
+        name: 质检管理
+        description: 质量检查、审核、分析
+      - id: scenario
+        name: 通用业务
+        description: 业务场景服务
     
   - id: sys
     name: 系统管理
     nameEn: System
     description: 系统监控、网络管理、安全审计
     icon: settings
-    order: 5
+    order: 6
     sceneDriver: sys
+    userFacing: false
     
   - id: msg
     name: 消息通讯
     nameEn: Messaging
     description: 消息队列、通讯协议服务
     icon: message
-    order: 6
+    order: 7
     sceneDriver: msg
+    userFacing: false
     
   - id: ui
     name: UI生成
     nameEn: UI Generation
     description: 界面生成、设计转代码服务
     icon: palette
-    order: 7
+    order: 8
     sceneDriver: null
+    userFacing: false
     
   - id: payment
     name: 支付服务
     nameEn: Payment
     description: 支付渠道、退款管理、交易处理
     icon: credit-card
-    order: 8
+    order: 9
     sceneDriver: payment
+    userFacing: false
     
   - id: media
     name: 媒体发布
     nameEn: Media Publishing
     description: 自媒体文章发布、内容管理、数据分析
     icon: edit
-    order: 9
+    order: 10
     sceneDriver: media
+    userFacing: false
     
   - id: util
     name: 工具服务
     nameEn: Utility
-    description: 通用工具、辅助功能、业务场景
+    description: 通用工具、辅助功能
     icon: tool
-    order: 10
+    order: 11
     sceneDriver: null
+    userFacing: true
     
   - id: nexus-ui
     name: Nexus界面
     nameEn: Nexus UI
     description: Nexus管理界面、仪表盘、监控页面
     icon: layout
-    order: 11
+    order: 12
     sceneDriver: null
+    userFacing: false

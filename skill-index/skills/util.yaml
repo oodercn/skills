@@ -3,7 +3,7 @@ kind: Skills
 metadata:
   name: util-skills
   category: util
-  count: 13
+  count: 8
   builtInExcluded:
     - skill-common
 
@@ -21,7 +21,6 @@ skills:
       description: 文档处理服务，提供文档解析、转换、提取功能
       sceneId: document
       path: skills/skill-document-processor
-      
 
     - skillId: skill-trae-solo
       name: Trae Solo Service
@@ -37,7 +36,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-trae-solo-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-share
       name: Skill Share Skill
@@ -53,7 +51,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-share-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
@@ -71,7 +68,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-volcengine-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-llm-qianwen
       name: Qianwen (Tongyi) LLM Provider
@@ -89,7 +85,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-qianwen-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-llm-deepseek
       name: DeepSeek LLM Provider
@@ -107,7 +102,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-llm-deepseek-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-market
       name: Skill Market Service
@@ -125,7 +119,6 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-market-0.7.3.jar
       checksum: ""
-      
 
     - skillId: skill-collaboration
       name: Collaboration Scene Service
@@ -143,75 +136,3 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-collaboration-0.7.3.jar
       checksum: ""
-      
-
-    - skillId: skill-business
-      name: Business Scene Service
-      version: "2.3.1"
-      capabilityCategory: util
-      subCategory: business
-      tags:
-        - business
-        - scenario
-        - workflow
-        - process
-      description: 业务场景服务 - 提供业务场景管理、工作流执行、数据处理能力
-      sceneId: business
-      path: skills/scenes/skill-business
-
-    - skillId: skill-recruitment-management
-      name: 招聘管理系统
-      version: "1.0.0"
-      capabilityCategory: util
-      subCategory: hr
-      tags:
-        - recruitment
-        - hr
-        - hiring
-        - interview
-        - resume
-      description: 企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批
-      sceneId: recruitment
-      path: skills/scenes/skill-recruitment-management
-
-    - skillId: skill-approval-form
-      name: 审批表单系统
-      version: "1.0.0"
-      capabilityCategory: util
-      subCategory: approval
-      tags:
-        - approval
-        - form
-        - workflow
-        - process
-      description: 通用审批表单系统，支持自定义审批流程、多级审批、审批模板
-      sceneId: approval
-      path: skills/scenes/skill-approval-form
-
-    - skillId: skill-real-estate-form
-      name: 房产中介房源表单
-      version: "1.0.0"
-      capabilityCategory: util
-      subCategory: realestate
-      tags:
-        - realestate
-        - property
-        - form
-        - valuation
-      description: 房产中介房源信息采集表单，支持房源录入、图片上传、地图定位、智能估值
-      sceneId: realestate
-      path: skills/scenes/skill-real-estate-form
-
-    - skillId: skill-recording-qa
-      name: 录音质检系统
-      version: "1.0.0"
-      capabilityCategory: util
-      subCategory: qa
-      tags:
-        - recording
-        - qa
-        - quality
-        - audit
-      description: 录音质检系统，支持录音上传、人工审核、质检分析
-      sceneId: recording-qa
-      path: skills/scenes/skill-recording-qa

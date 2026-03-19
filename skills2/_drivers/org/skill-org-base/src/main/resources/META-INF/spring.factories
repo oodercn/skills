@@ -1,2 +1,0 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
-net.ooder.skill.org.base.OrgSkillAutoConfiguration
