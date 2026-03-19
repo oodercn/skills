@@ -1,0 +1,338 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-project-knowledge
+  name: 项目知识沉淀
+  version: 1.0.0
+  description: 项目知识自动沉淀场景能力，将项目文档自动分类整理，形成可复用知识资产
+  author: Ooder Team
+  type: scene-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - project
+    - knowledge
+    - extraction
+    - classification
+    - archive
+  # category 已废弃，请在 skill-index 中定义
+  # sceneType: tbs
+
+spec:
+  type: scene-skill
+  category: tbs
+  
+  classification:
+    category: tbs
+    categoryName: 触发业务场景
+    mainFirst: false
+    businessSemanticsScore: 8
+    detectedAt: "2026-03-06T00:00:00Z"
+    detectionVersion: "2.3.0"
+    autoDetect: true
+
+  dependencies:
+    - id: skill-knowledge-base
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "知识库核心服务"
+      capabilities:
+        - knowledge-base
+        
+    - id: skill-document-processor
+      version: ">=1.0.0"
+      required: true
+      autoInstall: true
+      description: "文档处理服务"
+      capabilities:
+        - document-parse
+        - document-chunk
+        
+    - id: skill-llm-conversation
+      version: ">=1.0.0"
+      required: false
+      autoInstall: false
+      description: "LLM对话服务（用于分类）"
+      capabilities:
+        - text-classification
+
+  sceneCapabilities:
+    - id: scene-project-knowledge
+      name: 项目知识沉淀场景能力
+      type: SCENE
+      mainFirst: false
+      
+      capabilities:
+        - import-project-docs
+        - classify-document
+        - discover-similar
+        - generate-graph
+        
+      participants:
+        - role: PROJECT_MANAGER
+          permissions: [READ, WRITE, DELETE]
+        - role: TEAM_MEMBER
+          permissions: [READ, WRITE]
+        - role: STAKEHOLDER
+          permissions: [READ]
+          
+      visibility: TEAM
+
+  capabilities:
+    - id: import-project-docs
+      name: 导入项目文档
+      description: 批量导入项目文档并自动处理
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          projectId:
+            type: string
+          archiveFile:
+            type: file
+          autoClassify:
+            type: boolean
+            default: true
+      outputSchema:
+        type: object
+        properties:
+          taskId:
+            type: string
+          totalFiles:
+            type: integer
+          processedFiles:
+            type: integer
+          status:
+            type: string
+            
+    - id: classify-document
+      name: 文档分类
+      description: 自动识别文档类型并打标签
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          docId:
+            type: string
+          content:
+            type: string
+      outputSchema:
+        type: object
+        properties:
+          docType:
+            type: string
+            enum: [requirement, design, test, summary, other]
+          tags:
+            type: array
+          confidence:
+            type: number
+            
+    - id: discover-similar
+      name: 发现相似项目
+      description: 基于项目特征推荐相似项目
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          projectId:
+            type: string
+          topK:
+            type: integer
+            default: 5
+      outputSchema:
+        type: array
+        items:
+          type: object
+          properties:
+            projectId:
+              type: string
+            projectName:
+              type: string
+            similarityScore:
+              type: number
+            
+    - id: generate-graph
+      name: 生成知识图谱
+      description: 提取实体和关系生成知识图谱
+      category: service
+      type: ATOMIC
+      inputSchema:
+        type: object
+        properties:
+          projectId:
+            type: string
+      outputSchema:
+        type: object
+        properties:
+          nodes:
+            type: array
+          edges:
+            type: array
+
+  capabilityBindings:
+    - sceneCapabilityType: project-knowledge
+      autoBind: true
+      capabilities:
+        - import-project-docs
+        - classify-document
+        - discover-similar
+        - generate-graph
+
+  endpoints:
+    - path: /api/v1/project-knowledge/import
+      method: POST
+      description: 导入项目文档
+      capability: import-project-docs
+      
+    - path: /api/v1/project-knowledge/classify
+      method: POST
+      description: 文档分类
+      capability: classify-document
+      
+    - path: /api/v1/project-knowledge/similar/{projectId}
+      method: GET
+      description: 发现相似项目
+      capability: discover-similar
+      
+    - path: /api/v1/project-knowledge/graph/{projectId}
+      method: GET
+      description: 生成知识图谱
+      capability: generate-graph
+      
+    - path: /api/v1/project-knowledge/task/{taskId}
+      method: GET
+      description: 查询导入任务状态
+      capability: import-project-docs
+
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.project.knowledge.ProjectKnowledgeApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+
+  config:
+    optional:
+      - name: CLASSIFICATION_CONFIDENCE_THRESHOLD
+        type: number
+        default: 0.8
+        description: 分类置信度阈值
+      - name: MAX_IMPORT_FILES
+        type: integer
+        default: 100
+        description: 单次最大导入文件数
+      - name: SIMILARITY_THRESHOLD
+        type: number
+        default: 0.7
+        description: 相似度阈值
+
+  resources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "1Gi"
+
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-project-knowledge-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

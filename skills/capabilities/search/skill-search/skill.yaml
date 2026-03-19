@@ -1,0 +1,189 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-search
+  name: 搜索服务
+  version: 0.7.3
+  description: 搜索服务，提供全文搜索、语义搜索功能
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - search
+    - elasticsearch
+    - fulltext
+    - semantic
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x68
+    category: SEARCH
+    code: SEARCH_BASE
+    operations: [index, search, delete]
+  
+  providerType: data
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  supportedSceneTypes:
+    - knowledge-base
+    - document-management
+    - search
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: search-service
+      version: "1.0"
+      description: "搜索服务接口"
+  
+  capabilities:
+    - id: index
+      name: 索引管理
+      description: 管理索引
+      category: service
+    - id: search
+      name: 搜索
+      description: 执行搜索
+      category: service
+    - id: delete
+      name: 删除文档
+      description: 删除文档
+      category: service
+  
+  endpoints:
+    - path: /api/search/index
+      method: POST
+      description: 索引文档
+      capability: index
+    - path: /api/search
+      method: GET
+      description: 搜索
+      capability: search
+    - path: /api/search/{id}
+      method: DELETE
+      description: 删除文档
+      capability: delete
+  
+  config:
+    optional:
+      - name: SEARCH_ENGINE
+        type: string
+        default: "elasticsearch"
+        description: 搜索引擎类型
+      - name: INDEX_NAME
+        type: string
+        default: "default"
+        description: 默认索引名
+      - name: MAX_RESULTS
+        type: integer
+        default: 100
+        description: 最大结果数
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "200Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

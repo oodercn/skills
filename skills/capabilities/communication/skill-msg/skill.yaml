@@ -1,0 +1,207 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-msg
+  name: 消息服务
+  version: 0.7.3
+  description: 消息服务，支持消息队列、订阅发布能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - message
+    - queue
+    - pubsub
+    - mq
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x50
+    category: COMM
+    code: COMM_BASE
+    operations: [publish, subscribe, queue]
+  
+  providerType: communication
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  supportedSceneTypes:
+    - notification
+    - event-driven
+    - workflow
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 1s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 50
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: message-service
+      version: "1.0"
+      description: "消息服务接口"
+  
+  capabilities:
+    - id: publish
+      name: 消息发布
+      description: 发布消息到队列
+      category: service
+    - id: subscribe
+      name: 消息订阅
+      description: 订阅消息队列
+      category: service
+    - id: queue
+      name: 队列管理
+      description: 管理消息队列
+      category: service
+  
+  endpoints:
+    - path: /api/msg/publish
+      method: POST
+      description: 发布消息
+      capability: publish
+    - path: /api/msg/subscribe
+      method: POST
+      description: 订阅消息
+      capability: subscribe
+    - path: /api/msg/queues
+      method: GET
+      description: 获取队列列表
+      capability: queue
+  
+  config:
+    optional:
+      - name: MSG_TYPE
+        type: string
+        default: "memory"
+        description: 消息类型 (memory/redis/kafka)
+      - name: MAX_QUEUE_SIZE
+        type: integer
+        default: 10000
+        description: 最大队列大小
+      - name: MSG_TTL
+        type: integer
+        default: 86400
+        description: 消息过期时间(秒)
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-msg-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

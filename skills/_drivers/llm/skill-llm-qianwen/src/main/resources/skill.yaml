@@ -1,0 +1,277 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-qianwen
+  name: 通义千问 LLM Provider
+  version: 2.3
+  description: 通义千问(Tongyi Qianwen) LLM Provider - 支持qwen-turbo、qwen-plus、qwen-max等模型，提供对话、补全、嵌入能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - qianwen
+    - tongyi
+    - aliyun
+    - embedding
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0x2A
+    category: LLM
+    code: LLM_QIANWEN
+    operations: [chat, completion, embedding, streaming, function-calling]
+  
+  providerType: llm
+  
+  supportedSceneTypes:
+    - llm-chat
+    - knowledge-qa
+    - document-assistant
+    - onboarding-assistant
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 20
+  
+  dependencies:
+    - id: llm-sdk
+      version: ">=2.3"
+      required: true
+      description: "LLM SDK"
+  
+  providedInterfaces:
+    - id: llm-provider
+      version: "1.0"
+      description: "LLM Provider接口"
+  
+  supportedModels:
+    - id: qwen-turbo
+      name: 通义千问-Turbo
+      type: chat
+      maxTokens: 8192
+      supportsFunctionCalling: true
+      supportsStreaming: true
+    - id: qwen-plus
+      name: 通义千问-Plus
+      type: chat
+      maxTokens: 32768
+      supportsFunctionCalling: true
+      supportsStreaming: true
+    - id: qwen-max
+      name: 通义千问-Max
+      type: chat
+      maxTokens: 32768
+      supportsFunctionCalling: true
+      supportsStreaming: true
+    - id: qwen2.5-72b-instruct
+      name: Qwen2.5-72B-Instruct
+      type: chat
+      maxTokens: 32768
+      supportsFunctionCalling: true
+      supportsStreaming: true
+    - id: text-embedding-v2
+      name: Text Embedding V2
+      type: embedding
+      dimension: 1536
+  
+  capabilities:
+    - id: chat-completion
+      name: 对话补全
+      description: 支持多轮对话补全
+      category: ai
+    - id: text-completion
+      name: 文本补全
+      description: 文本生成补全
+      category: ai
+    - id: embedding
+      name: 向量嵌入
+      description: 文本向量嵌入
+      category: ai
+    - id: function-calling
+      name: 函数调用
+      description: 支持Function Calling
+      category: ai
+    - id: streaming
+      name: 流式输出
+      description: 支持SSE流式输出
+      category: ai
+  
+  endpoints:
+    - path: /api/llm/chat
+      method: POST
+      description: 对话补全
+      capability: chat-completion
+    - path: /api/llm/chat/stream
+      method: POST
+      description: 流式对话
+      capability: streaming
+    - path: /api/llm/embed
+      method: POST
+      description: 向量嵌入
+      capability: embedding
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  config:
+    required:
+      - name: QIANWEN_API_KEY
+        type: string
+        description: 通义千问 API Key
+        secret: true
+    optional:
+      - name: QIANWEN_BASE_URL
+        type: string
+        default: "https://dashscope.aliyuncs.com/api/v1"
+        description: API基础URL
+      - name: DEFAULT_MODEL
+        type: string
+        default: "qwen-plus"
+        description: 默认模型
+      - name: TIMEOUT
+        type: integer
+        default: 60000
+        description: 请求超时(毫秒)
+      - name: MAX_RETRIES
+        type: integer
+        default: 3
+        description: 最大重试次数
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-qianwen-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-llm-qianwen-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

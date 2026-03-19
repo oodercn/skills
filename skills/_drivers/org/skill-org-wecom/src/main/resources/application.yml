@@ -1,0 +1,29 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: skill-org-wecom
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+wecom:
+  corp-id: ${WECOM_CORP_ID:}
+  agent-id: ${WECOM_AGENT_ID:}
+  secret: ${WECOM_SECRET:}
+  api-base-url: https://qyapi.weixin.qq.com
+  timeout: 30000
+  cache-enabled: true
+  cache-ttl: 300000
+
+logging:
+  level:
+    net.ooder: DEBUG
+    org.springframework: INFO

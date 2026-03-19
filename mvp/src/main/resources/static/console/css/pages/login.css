@@ -1,158 +1,177 @@
 /**
  * 登录页面样式
- * Ooder-Rad 风格基础样式 - 纯黑色系暗色主题
+ * Nexus Console 风格
  */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+.login-page {
     min-height: 100vh;
     display: flex;
-    justify-content: center;
     align-items: center;
-    color: #ffffff;
+    justify-content: center;
+    background: var(--nx-bg);
 }
 
 .login-container {
-    background: rgba(255, 255, 255, 0.05);
-    backdrop-filter: blur(10px);
-    border-radius: 16px;
-    padding: 40px;
     width: 100%;
-    max-width: 450px;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    max-width: 400px;
+    padding: 40px;
+    background: var(--nx-bg-elevated);
+    border-radius: 16px;
+    border: 1px solid var(--nx-border);
+    box-shadow: var(--nx-shadow-xl);
 }
 
 .login-header {
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 32px;
 }
 
-.login-header h1 {
-    font-size: 28px;
-    margin-bottom: 10px;
-    color: #4facfe;
+.login-logo {
+    width: 64px;
+    height: 64px;
+    background: var(--nx-primary-light);
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
 }
 
-.login-header p {
-    font-size: 16px;
-    color: #b0b0b0;
+.login-logo i {
+    font-size: 32px;
+    color: var(--nx-primary);
+}
+
+.login-title {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--nx-text-primary);
+    margin: 0 0 8px 0;
+}
+
+.login-subtitle {
+    font-size: 14px;
+    color: var(--nx-text-secondary);
+    margin: 0;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
 }
 
 .form-group {
-    margin-bottom: 20px;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-    color: #e0e0e0;
-}
-
-.form-group input {
-    width: 100%;
-    padding: 12px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: 8px;
-    color: #ffffff;
-    font-size: 14px;
-    transition: all 0.3s ease;
-}
-
-.form-group input:focus {
-    outline: none;
-    border-color: #4facfe;
-    box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.3);
-}
-
-.form-group input::placeholder {
-    color: #666666;
-}
-
-.button-group {
     display: flex;
-    gap: 12px;
-    margin-top: 30px;
+    flex-direction: column;
+    gap: 8px;
 }
 
-.btn {
-    flex: 1;
-    padding: 12px 24px;
+.form-label {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--nx-text-primary);
+}
+
+.form-input {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    border: 1px solid var(--nx-border);
+    border-radius: 8px;
+    background: var(--nx-bg);
+    color: var(--nx-text-primary);
+    transition: all 0.2s;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: var(--nx-primary);
+    box-shadow: 0 0 0 3px var(--nx-primary-light);
+}
+
+.form-select {
+    width: 100%;
+    padding: 12px 16px;
+    font-size: 14px;
+    border: 1px solid var(--nx-border);
+    border-radius: 8px;
+    background: var(--nx-bg);
+    color: var(--nx-text-primary);
+    cursor: pointer;
+}
+
+.login-btn {
+    width: 100%;
+    padding: 14px;
+    font-size: 16px;
+    font-weight: 600;
     border: none;
     border-radius: 8px;
-    font-size: 14px;
-    font-weight: 600;
+    background: var(--nx-primary);
+    color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.2s;
 }
 
-.btn-primary {
-    background: linear-gradient(45deg, #4facfe, #00f2fe);
-    color: #1a1a2e;
+.login-btn:hover {
+    background: var(--nx-primary-hover);
+    transform: translateY(-1px);
 }
 
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(79, 172, 254, 0.4);
+.login-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
 }
 
-.btn-secondary {
-    background: rgba(255, 255, 255, 0.1);
-    color: #ffffff;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn-secondary:hover {
-    background: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-}
-
-.message {
-    padding: 12px;
+.login-error {
+    padding: 12px 16px;
+    background: var(--nx-danger-light);
     border-radius: 8px;
-    margin-bottom: 20px;
+    color: var(--nx-danger);
+    font-size: 14px;
     display: none;
 }
 
-.success-message {
-    background: rgba(34, 197, 94, 0.2);
-    border: 1px solid rgba(34, 197, 94, 0.3);
-    color: #22c55e;
+.login-error.show {
+    display: block;
 }
 
-.error-message {
-    background: rgba(239, 68, 68, 0.2);
-    border: 1px solid rgba(239, 68, 68, 0.3);
-    color: #ef4444;
+.demo-accounts {
+    margin-top: 24px;
+    padding-top: 24px;
+    border-top: 1px solid var(--nx-border);
 }
 
-.login-footer {
-    text-align: center;
-    margin-top: 30px;
-    color: #b0b0b0;
-    font-size: 14px;
+.demo-title {
+    font-size: 12px;
+    color: var(--nx-text-secondary);
+    margin-bottom: 12px;
 }
 
-.install-link {
-    color: #4facfe;
-    text-decoration: none;
+.demo-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.demo-btn {
+    padding: 6px 12px;
+    font-size: 12px;
+    border: 1px solid var(--nx-border);
+    border-radius: 6px;
+    background: var(--nx-bg);
+    color: var(--nx-text-secondary);
     cursor: pointer;
+    transition: all 0.2s;
 }
 
-.install-link:hover {
-    text-decoration: underline;
+.demo-btn:hover {
+    border-color: var(--nx-primary);
+    color: var(--nx-primary);
 }
 
-/* 响应式设计 */
 @media (max-width: 768px) {
     .login-container {
         padding: 20px;
@@ -160,12 +179,12 @@ body {
         margin: 20px;
     }
     
-    .login-header h1 {
-        font-size: 24px;
+    .login-title {
+        font-size: 20px;
     }
     
-    .btn {
-        padding: 10px 20px;
+    .login-btn {
+        padding: 12px;
         font-size: 14px;
     }
 }

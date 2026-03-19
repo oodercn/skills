@@ -1,0 +1,215 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-market
+  name: 技能市场服务
+  version: 0.7.3
+  description: 技能市场服务，提供技能发布、搜索、安装、更新能力
+  author: ooder Team
+  type: provider-skill
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - market
+    - skill
+    - install
+    - update
+    - publish
+
+spec:
+  type: provider-skill
+  
+  ownership: independent
+  
+  capability:
+    address: 0xF3
+    category: UTIL
+    code: UTIL_MARKET
+    operations: [publish, search, install, update]
+  
+  providerType: tool
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  supportedSceneTypes:
+    - skill-management
+    - devops
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies:
+    - id: skill-capability
+      version: ">=1.0.0"
+      required: true
+      description: "能力服务依赖"
+  
+  providedInterfaces:
+    - id: market-service
+      version: "1.0"
+      description: "市场服务接口"
+  
+  capabilities:
+    - id: publish
+      name: 技能发布
+      description: 发布技能到市场
+      category: service
+    - id: search
+      name: 技能搜索
+      description: 搜索市场技能
+      category: service
+    - id: install
+      name: 技能安装
+      description: 安装技能
+      category: service
+    - id: update
+      name: 技能更新
+      description: 更新技能
+      category: service
+  
+  endpoints:
+    - path: /api/market/skills
+      method: POST
+      description: 发布技能
+      capability: publish
+    - path: /api/market/skills
+      method: GET
+      description: 搜索技能
+      capability: search
+    - path: /api/market/skills/{id}/install
+      method: POST
+      description: 安装技能
+      capability: install
+    - path: /api/market/skills/{id}/update
+      method: POST
+      description: 更新技能
+      capability: update
+  
+  config:
+    optional:
+      - name: MARKET_URL
+        type: string
+        default: "https://market.ooder.net"
+        description: 市场地址
+      - name: CACHE_TTL
+        type: integer
+        default: 3600
+        description: 缓存时间(秒)
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "500Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-market-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

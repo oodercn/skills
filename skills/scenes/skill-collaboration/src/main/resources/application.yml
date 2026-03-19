@@ -1,0 +1,16 @@
+server:
+  port: 8092
+
+spring:
+  application:
+    name: skill-collaboration
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+collaboration:
+  max-members: 500
+  key-ttl: 86400

@@ -1,0 +1,58 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-config-manager
+  name: LLM Config Manager
+  version: 1.0.0
+  description: LLM配置管理 - 多级配置、加密存储、配置解析
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - config
+    - security
+
+spec:
+  type: service-skill
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+  
+  capabilities:
+    - id: multi-level-config
+      name: Multi-level Config
+      description: 支持企业级、部门级、场景级、个人级配置
+      category: config
+    - id: config-resolution
+      name: Config Resolution
+      description: 按优先级自动解析最终配置
+      category: config
+    - id: key-encryption
+      name: Key Encryption
+      description: API Key加密存储
+      category: security
+  
+  config:
+    optional:
+      - name: ENCRYPTION_ALGORITHM
+        type: string
+        default: AES
+        description: 加密算法
+      - name: DEFAULT_PROVIDER
+        type: string
+        default: qianwen
+        description: 默认LLM提供商
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

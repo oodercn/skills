@@ -1,0 +1,16 @@
+server:
+  port: 8089
+
+spring:
+  application:
+    name: skill-share
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+share:
+  max-skills: 100
+  expiration-days: 30

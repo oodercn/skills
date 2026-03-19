@@ -1,0 +1,251 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-document-processor
+  name: 文档处理器
+  version: 2.3
+  description: 文档处理服务 - 支持多格式文档解析(TXT/MD/PDF/DOCX)、智能分块、元数据提取、Token估算
+  author: ooder Team
+  type: utility-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - document
+    - parsing
+    - chunking
+    - rag
+    - knowledge
+
+spec:
+  type: service-skill
+  
+  ownership: independent
+  
+  supportedSceneTypes:
+    - document-assistant
+    - knowledge-qa
+    - meeting-minutes
+    - project-knowledge
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 3s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 15
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: document-processing
+      version: "1.0"
+      description: "文档处理接口"
+    - id: text-chunking
+      version: "1.0"
+      description: "文本分块接口"
+  
+  supportedFormats:
+    - extension: .txt
+      mimeType: text/plain
+      description: 纯文本
+    - extension: .md
+      mimeType: text/markdown
+      description: Markdown文档
+    - extension: .pdf
+      mimeType: application/pdf
+      description: PDF文档
+    - extension: .docx
+      mimeType: application/vnd.openxmlformats-officedocument.wordprocessingml.document
+      description: Word文档
+    - extension: .html
+      mimeType: text/html
+      description: HTML文档
+  
+  capabilities:
+    - id: document-parsing
+      name: 文档解析
+      description: 支持TXT/MD/PDF/DOCX/HTML多种格式文档解析
+      category: document
+    - id: text-chunking
+      name: 文本分块
+      description: 智能分块，支持固定大小/语义/句子边界分块策略
+      category: document
+    - id: metadata-extraction
+      name: 元数据提取
+      description: 提取标题、关键词、摘要、作者等元数据
+      category: document
+    - id: token-estimation
+      name: Token估算
+      description: 估算文本Token数量，支持多种模型
+      category: document
+    - id: encoding-detection
+      name: 编码检测
+      description: 自动检测文档编码格式
+      category: document
+  
+  endpoints:
+    - path: /api/v1/document/parse
+      method: POST
+      description: 解析文档
+      capability: document-parsing
+    - path: /api/v1/document/chunk
+      method: POST
+      description: 文本分块
+      capability: text-chunking
+    - path: /api/v1/document/metadata
+      method: POST
+      description: 提取元数据
+      capability: metadata-extraction
+    - path: /api/v1/document/token-count
+      method: POST
+      description: 计算Token数
+      capability: token-estimation
+    - path: /api/v1/document/formats
+      method: GET
+      description: 获取支持的格式
+      capability: document-parsing
+  
+  chunkingStrategies:
+    - FIXED_SIZE
+    - SEMANTIC
+    - SENTENCE_BOUNDARY
+    - PARAGRAPH
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  config:
+    optional:
+      - name: CHUNK_SIZE
+        type: integer
+        default: 500
+        description: 分块大小(字符数)
+      - name: CHUNK_OVERLAP
+        type: integer
+        default: 50
+        description: 分块重叠(字符数)
+      - name: MAX_FILE_SIZE
+        type: integer
+        default: 10485760
+        description: 最大文件大小(字节)
+      - name: DEFAULT_ENCODING
+        type: string
+        default: "UTF-8"
+        description: 默认编码
+      - name: CHUNKING_STRATEGY
+        type: string
+        default: "FIXED_SIZE"
+        description: 分块策略
+  
+  resources:
+    cpu: "200m"
+    memory: "256Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-document-processor-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

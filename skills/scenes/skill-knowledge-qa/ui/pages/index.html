@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>知识问答 - Knowledge QA</title>
+    <link href="/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/skills/skill-knowledge-qa/ui/css/skill-knowledge-qa.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-justify-between">
+                    <h2 class="nx-text-xl nx-font-semibold">
+                        <i class="ri-book-3-line"></i> 知识问答
+                    </h2>
+                    <div class="header-actions">
+                        <button class="theme-toggle" id="themeToggle" title="切换主题">
+                            <i class="ri-moon-line" id="themeIcon"></i>
+                        </button>
+                        <button class="nx-btn nx-btn--secondary" id="settingsBtn">
+                            <i class="ri-settings-3-line"></i> 设置
+                        </button>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="kb-page">
+                        <div class="kb-tabs">
+                            <button class="kb-tab active" data-tab="kb"><i class="ri-database-2-line"></i> 知识库管理</button>
+                            <button class="kb-tab" data-tab="docs"><i class="ri-file-text-line"></i> 文档管理</button>
+                            <button class="kb-tab" data-tab="search"><i class="ri-search-line"></i> 知识检索</button>
+                            <button class="kb-tab" data-tab="qa"><i class="ri-chat-3-line"></i> 智能问答</button>
+                        </div>
+                        
+                        <div class="kb-content">
+                            <div id="tab-kb" class="kb-tab-content active">
+                                <div class="kb-toolbar">
+                                    <button class="nx-btn nx-btn--primary" id="createKbBtn"><i class="ri-add-line"></i> 新建知识库</button>
+                                    <div class="kb-search-box">
+                                        <input type="text" placeholder="搜索知识库..." id="kbSearchInput">
+                                        <button class="nx-btn nx-btn--secondary" id="kbSearchBtn"><i class="ri-search-line"></i></button>
+                                    </div>
+                                </div>
+                                <div class="kb-grid" id="kbGrid"></div>
+                            </div>
+                            
+                            <div id="tab-docs" class="kb-tab-content">
+                                <div class="kb-toolbar">
+                                    <button class="nx-btn nx-btn--primary" id="uploadDocBtn"><i class="ri-upload-line"></i> 上传文档</button>
+                                    <button class="nx-btn nx-btn--secondary" id="createFolderBtn"><i class="ri-folder-add-line"></i> 新建文件夹</button>
+                                    <div class="kb-search-box">
+                                        <input type="text" placeholder="搜索文档..." id="docSearchInput">
+                                        <button class="nx-btn nx-btn--secondary" id="docSearchBtn"><i class="ri-search-line"></i></button>
+                                    </div>
+                                </div>
+                                <div class="doc-list" id="docList"></div>
+                            </div>
+                            
+                            <div id="tab-search" class="kb-tab-content">
+                                <div class="kb-toolbar">
+                                    <div class="kb-search-box">
+                                        <input type="text" placeholder="输入关键词搜索知识库..." id="searchInput">
+                                        <button class="nx-btn nx-btn--primary" id="searchBtn"><i class="ri-search-line"></i> 搜索</button>
+                                    </div>
+                                </div>
+                                <div id="searchResults">
+                                    <div class="empty-state">
+                                        <i class="ri-search-line"></i>
+                                        <h3>输入关键词开始搜索</h3>
+                                        <p>支持语义检索和关键词匹配</p>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div id="tab-qa" class="kb-tab-content">
+                                <div class="chat-container">
+                                    <div class="chat-sidebar">
+                                        <h3>选择知识库</h3>
+                                        <select class="kb-select" id="kbSelect">
+                                            <option value="">全部知识库</option>
+                                        </select>
+                                        <h3 style="margin-top: 16px;">选择模型</h3>
+                                        <select class="kb-select" id="modelSelect">
+                                            <option value="deepseek-chat">DeepSeek Chat</option>
+                                            <option value="deepseek-coder">DeepSeek Coder</option>
+                                            <option value="deepseek-reasoner">DeepSeek Reasoner</option>
+                                            <option value="ernie-4.0-8k">百度 ERNIE 4.0 (8K)</option>
+                                            <option value="ernie-4.0-turbo-8k">百度 ERNIE 4.0 Turbo (8K)</option>
+                                            <option value="ernie-3.5-8k">百度 ERNIE 3.5 (8K)</option>
+                                            <option value="ernie-3.5-turbo-8k">百度 ERNIE 3.5 Turbo (8K)</option>
+                                            <option value="ernie-speed-8k">百度 ERNIE Speed (8K)</option>
+                                            <option value="ernie-lite-8k">百度 ERNIE Lite (8K)</option>
+                                            <option value="ernie-tiny-8k">百度 ERNIE Tiny (8K)</option>
+                                        </select>
+                                        <div id="modelStatus" style="margin-top: 8px; font-size: 12px;"></div>
+                                        <h3 style="margin-top: 16px;">检索设置</h3>
+                                        <p style="font-size: 12px; color: var(--ns-secondary); margin-bottom: 8px;">返回结果数量: <span id="topKValue">10</span></p>
+                                        <input type="range" min="1" max="20" value="10" id="topKSlider" style="width: 100%;">
+                                        <p style="font-size: 12px; color: var(--ns-secondary); margin-top: 16px;">相似度阈值: <span id="thresholdValue">70%</span></p>
+                                        <input type="range" min="0" max="100" value="70" id="thresholdSlider" style="width: 100%;">
+                                    </div>
+                                    <div class="chat-main">
+                                        <div class="chat-messages" id="chatMessages">
+                                            <div class="message">
+                                                <div class="message-avatar"><i class="ri-robot-line"></i></div>
+                                                <div class="message-content">
+                                                    您好！我是知识问答助手，可以帮您从知识库中检索信息并回答问题。请问有什么可以帮您的？
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="chat-input">
+                                            <input type="text" placeholder="输入您的问题..." id="questionInput">
+                                            <button class="nx-btn nx-btn--primary" id="sendBtn"><i class="ri-send-plane-line"></i></button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="nx-modal" id="createKbModal">
+        <div class="nx-modal__content">
+            <div class="nx-modal__header">
+                <h3><i class="ri-database-2-line"></i> 新建知识库</h3>
+                <button class="nx-modal__close" onclick="closeModal('createKbModal')"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="form-group">
+                    <label>知识库名称 *</label>
+                    <input type="text" id="newKbName" placeholder="请输入知识库名称">
+                </div>
+                <div class="form-group">
+                    <label>描述</label>
+                    <textarea id="newKbDesc" rows="3" placeholder="请输入知识库描述"></textarea>
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('createKbModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" id="confirmCreateKb"><i class="ri-check-line"></i> 创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nx-modal" id="uploadDocModal">
+        <div class="nx-modal__content">
+            <div class="nx-modal__header">
+                <h3><i class="ri-upload-line"></i> 上传文档</h3>
+                <button class="nx-modal__close" onclick="closeModal('uploadDocModal')"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="form-group">
+                    <label>选择知识库</label>
+                    <select id="uploadKbSelect"></select>
+                </div>
+                <div class="file-upload" id="fileUploadArea">
+                    <i class="ri-file-upload-line"></i>
+                    <p>点击或拖拽文件到此处上传</p>
+                    <p style="font-size: 12px; margin-top: 8px;">支持 PDF、Word、TXT、Markdown 格式</p>
+                    <input type="file" id="fileInput" multiple accept=".pdf,.doc,.docx,.txt,.md">
+                </div>
+                <div id="fileList" style="margin-top: 12px;"></div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('uploadDocModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" id="confirmUpload"><i class="ri-upload-line"></i> 上传</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="nx-modal" id="settingsModal">
+        <div class="nx-modal__content">
+            <div class="nx-modal__header">
+                <h3><i class="ri-settings-3-line"></i> 设置</h3>
+                <button class="nx-modal__close" onclick="closeModal('settingsModal')"><i class="ri-close-line"></i></button>
+            </div>
+            <div class="nx-modal__body">
+                <div class="form-group">
+                    <label>默认检索数量</label>
+                    <input type="number" id="defaultTopK" value="10" min="1" max="50">
+                </div>
+                <div class="form-group">
+                    <label>默认相似度阈值</label>
+                    <input type="number" id="defaultThreshold" value="70" min="0" max="100">
+                </div>
+            </div>
+            <div class="nx-modal__footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('settingsModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" id="saveSettings"><i class="ri-check-line"></i> 保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="/console/skills/skill-knowledge-qa/ui/js/skill-knowledge-qa.js"></script>
+</body>
+</html>

@@ -1,0 +1,20 @@
+server:
+  port: 8095
+
+spring:
+  application:
+    name: skill-cmd-service
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  cmd:
+    max-retry-count: 3
+    command-timeout: 60000

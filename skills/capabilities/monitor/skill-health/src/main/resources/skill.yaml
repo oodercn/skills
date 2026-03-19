@@ -1,0 +1,203 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-health
+  name: 健康检查服务
+  version: 2.3.0
+  description: 系统健康检查、服务状态监控、报告生成
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN
+  repository: https://gitee.com/ooderCN/ooder-skills
+  keywords:
+    - health
+    - check
+    - monitor
+    - service
+    - report
+
+spec:
+  type: system-service
+  
+  ownership: platform
+  
+  capability:
+    address: 0x51
+    category: MON
+    code: MON_LOG
+    operations: [health-check, service-check, report, schedule]
+  
+  dependencies: []
+  
+  capabilities:
+    - id: health-check
+      name: 健康检查
+      description: 执行系统健康检查
+      category: monitoring
+      type: ATOMIC
+      
+    - id: service-check
+      name: 服务检查
+      description: 检查各服务状态
+      category: monitoring
+      type: ATOMIC
+      
+    - id: health-report
+      name: 报告生成
+      description: 生成健康报告
+      category: monitoring
+      type: ATOMIC
+      
+    - id: health-schedule
+      name: 健康调度
+      description: 调度健康检查任务
+      category: monitoring
+      type: ATOMIC
+      
+    - id: health-status
+      name: 状态获取
+      description: 获取系统健康状态
+      category: monitoring
+      type: ATOMIC
+  
+  endpoints:
+    - path: /api/health/check
+      method: POST
+      description: 执行健康检查
+      capability: health-check
+      
+    - path: /api/health/services
+      method: GET
+      description: 获取服务列表
+      capability: service-check
+      
+    - path: /api/health/services/{serviceName}/check
+      method: POST
+      description: 检查指定服务
+      capability: service-check
+      
+    - path: /api/health/report
+      method: POST
+      description: 生成健康报告
+      capability: health-report
+      
+    - path: /api/health/schedule
+      method: POST
+      description: 调度健康检查
+      capability: health-schedule
+      
+    - path: /api/health/status
+      method: GET
+      description: 获取健康状态
+      capability: health-status
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.health.HealthSkillApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  config:
+    optional:
+      - name: CHECK_INTERVAL
+        type: integer
+        default: 60000
+        description: 检查间隔（毫秒）
+      - name: TIMEOUT
+        type: integer
+        default: 5000
+        description: 超时时间（毫秒）
+      - name: REPORT_FORMAT
+        type: string
+        default: "json"
+        description: 报告格式
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: true

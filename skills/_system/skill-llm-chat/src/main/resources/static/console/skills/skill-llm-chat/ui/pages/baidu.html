@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>百度千帆LLM配置 - Nexus Console</title>
+    <link href="/console/css/remixicon/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/components/index.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle>
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <h2 class="nx-text-xl nx-font-semibold">
+                        <i class="ri-baidu-line"></i> 百度千帆LLM配置
+                    </h2>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle>
+                        <i class="ri-sun-line"></i>
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div class="nx-card nx-mb-4">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-key-2-line"></i> API配置
+                            </h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div class="nx-form-group">
+                                <label class="nx-label">API Key <span class="nx-text-danger">*</span></label>
+                                <input type="password" class="nx-input" id="apiKey" placeholder="bce-v3/ALTAK-xxx">
+                                <p class="nx-text-secondary nx-text-sm nx-mt-1">从百度智能云控制台获取API Key</p>
+                            </div>
+                            
+                            <div class="nx-form-group">
+                                <label class="nx-label">Base URL</label>
+                                <input type="text" class="nx-input" id="baseUrl" value="https://qianfan.baidubce.com/v2">
+                            </div>
+                            
+                            <div class="nx-form-group">
+                                <label class="nx-label">默认模型</label>
+                                <select class="nx-select" id="defaultModel">
+                                    <option value="ernie-4.0-8k">ERNIE 4.0 8K</option>
+                                    <option value="ernie-3.5-8k">ERNIE 3.5 8K</option>
+                                </select>
+                            </div>
+                            
+                            <div class="nx-form-group">
+                                <label class="nx-label">嵌入模型</label>
+                                <select class="nx-select" id="embeddingModel">
+                                    <option value="embedding-v1">Embedding V1</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="nx-card__footer">
+                            <button class="nx-btn nx-btn--secondary" id="testBtn">
+                                <i class="ri-test-tube-line"></i> 测试连接
+                            </button>
+                            <button class="nx-btn nx-btn--primary" id="saveBtn">
+                                <i class="ri-save-line"></i> 保存配置
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card nx-mb-4">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-settings-4-line"></i> 高级参数
+                            </h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div class="nx-row">
+                                <div class="nx-col-6">
+                                    <div class="nx-form-group">
+                                        <label class="nx-label">温度 (Temperature)</label>
+                                        <div class="nx-flex nx-items-center nx-gap-2">
+                                            <input type="range" class="nx-range" id="temperature" min="0" max="1" step="0.1" value="0.7">
+                                            <span class="nx-text-secondary" id="temperatureValue">0.7</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="nx-col-6">
+                                    <div class="nx-form-group">
+                                        <label class="nx-label">最大Token数</label>
+                                        <input type="number" class="nx-input" id="maxTokens" value="4096" min="100" max="8192">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="nx-form-group">
+                                <label class="nx-label">请求超时 (ms)</label>
+                                <input type="number" class="nx-input" id="timeout" value="60000" min="1000" max="300000">
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="nx-card">
+                        <div class="nx-card__header">
+                            <h3 class="nx-card__title">
+                                <i class="ri-heart-pulse-line"></i> 服务状态
+                            </h3>
+                        </div>
+                        <div class="nx-card__body">
+                            <div id="statusPanel" class="nx-alert nx-alert--info">
+                                <i class="ri-loader-4-line ri-spin"></i> 检测中...
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="/console/common/index.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const temperature = document.getElementById('temperature');
+            const temperatureValue = document.getElementById('temperatureValue');
+            
+            temperature.addEventListener('input', function() {
+                temperatureValue.textContent = this.value;
+            });
+            
+            document.getElementById('testBtn').addEventListener('click', testConnection);
+            document.getElementById('saveBtn').addEventListener('click', saveConfig);
+            
+            checkStatus();
+        });
+        
+        function checkStatus() {
+            const panel = document.getElementById('statusPanel');
+            
+            fetch('/api/llm/baidu/health')
+                .then(r => r.json())
+                .then(data => {
+                    if (data.status === 'success' && data.data && data.data.healthy) {
+                        panel.className = 'nx-alert nx-alert--success';
+                        panel.innerHTML = '<i class="ri-check-line"></i> 服务正常 - Provider: ' + (data.data.provider || 'baidu');
+                    } else {
+                        panel.className = 'nx-alert nx-alert--warning';
+                        panel.innerHTML = '<i class="ri-error-warning-line"></i> 服务异常 - ' + (data.message || '未知错误');
+                    }
+                })
+                .catch(e => {
+                    panel.className = 'nx-alert nx-alert--danger';
+                    panel.innerHTML = '<i class="ri-close-circle-line"></i> 连接失败 - ' + e.message;
+                });
+        }
+        
+        function testConnection() {
+            const btn = document.getElementById('testBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="ri-loader-4-line ri-spin"></i> 测试中...';
+            
+            const config = {
+                apiKey: document.getElementById('apiKey').value,
+                baseUrl: document.getElementById('baseUrl').value,
+                model: document.getElementById('defaultModel').value
+            };
+            
+            fetch('/api/llm/baidu/chat', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    message: 'Hello',
+                    test: true
+                })
+            })
+            .then(r => r.json())
+            .then(data => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-test-tube-line"></i> 测试连接';
+                
+                if (data.status === 'success') {
+                    alert('连接成功！');
+                } else {
+                    alert('连接失败: ' + (data.message || data.error || '未知错误'));
+                }
+            })
+            .catch(e => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="ri-test-tube-line"></i> 测试连接';
+                alert('连接失败: ' + e.message);
+            });
+        }
+        
+        function saveConfig() {
+            alert('配置已保存到本地存储');
+        }
+    </script>
+</body>
+</html>

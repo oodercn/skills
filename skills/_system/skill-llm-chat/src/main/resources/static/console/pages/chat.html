@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LLM聊天助手</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .chat-container {
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+            background: var(--nx-bg-primary);
+        }
+        
+        .chat-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--nx-space-3) var(--nx-space-4);
+            background: var(--nx-bg-secondary);
+            border-bottom: 1px solid var(--nx-border-color);
+        }
+        
+        .chat-title {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-2);
+            font-weight: 600;
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--nx-space-4);
+        }
+        
+        .message {
+            display: flex;
+            gap: var(--nx-space-3);
+            margin-bottom: var(--nx-space-4);
+        }
+        
+        .message--user {
+            flex-direction: row-reverse;
+        }
+        
+        .message__avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .message--user .message__avatar {
+            background: var(--nx-primary);
+            color: white;
+        }
+        
+        .message--assistant .message__avatar {
+            background: var(--nx-bg-tertiary);
+        }
+        
+        .message__content {
+            max-width: 70%;
+            padding: var(--nx-space-3) var(--nx-space-4);
+            border-radius: var(--nx-radius-lg);
+            line-height: 1.6;
+        }
+        
+        .message--user .message__content {
+            background: var(--nx-primary);
+            color: white;
+        }
+        
+        .message--assistant .message__content {
+            background: var(--nx-bg-secondary);
+            border: 1px solid var(--nx-border-color);
+        }
+        
+        .chat-input-area {
+            padding: var(--nx-space-4);
+            background: var(--nx-bg-secondary);
+            border-top: 1px solid var(--nx-border-color);
+        }
+        
+        .chat-input-wrapper {
+            display: flex;
+            gap: var(--nx-space-2);
+            align-items: flex-end;
+        }
+        
+        .chat-input {
+            flex: 1;
+            resize: none;
+            min-height: 44px;
+            max-height: 120px;
+        }
+        
+        .knowledge-toggle {
+            display: flex;
+            align-items: center;
+            gap: var(--nx-space-2);
+            padding: var(--nx-space-2) var(--nx-space-3);
+            background: var(--nx-bg-tertiary);
+            border-radius: var(--nx-radius);
+            font-size: 0.875rem;
+            cursor: pointer;
+            margin-bottom: var(--nx-space-2);
+        }
+        
+        .knowledge-toggle.active {
+            background: var(--nx-primary-light);
+            color: var(--nx-primary);
+        }
+        
+        .knowledge-panel {
+            position: fixed;
+            right: 0;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background: var(--nx-bg-primary);
+            border-left: 1px solid var(--nx-border-color);
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .knowledge-panel.open {
+            transform: translateX(0);
+        }
+        
+        .knowledge-panel__header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: var(--nx-space-4);
+            border-bottom: 1px solid var(--nx-border-color);
+        }
+        
+        .knowledge-panel__content {
+            flex: 1;
+            overflow-y: auto;
+            padding: var(--nx-space-4);
+        }
+        
+        .knowledge-item {
+            padding: var(--nx-space-3);
+            background: var(--nx-bg-secondary);
+            border-radius: var(--nx-radius);
+            margin-bottom: var(--nx-space-2);
+            cursor: pointer;
+        }
+        
+        .knowledge-item:hover {
+            background: var(--nx-bg-tertiary);
+        }
+        
+        .knowledge-item__title {
+            font-weight: 500;
+            margin-bottom: var(--nx-space-1);
+        }
+        
+        .knowledge-item__preview {
+            font-size: 0.875rem;
+            color: var(--nx-text-tertiary);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <header class="chat-header">
+            <div class="chat-title">
+                <i class="ri-robot-2-line"></i>
+                <span>LLM聊天助手</span>
+            </div>
+            <div class="nx-flex nx-gap-2">
+                <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="toggleKnowledgePanel()" title="知识资料库">
+                    <i class="ri-book-2-line"></i>
+                </button>
+                <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="clearChat()" title="清空对话">
+                    <i class="ri-delete-bin-line"></i>
+                </button>
+            </div>
+        </header>
+        
+        <div class="chat-messages" id="chatMessages">
+            <div class="message message--assistant">
+                <div class="message__avatar">
+                    <i class="ri-robot-2-line"></i>
+                </div>
+                <div class="message__content">
+                    您好！我是LLM聊天助手，我可以帮助您解答问题。您还可以开启知识库功能，让我基于您上传的资料来回答问题。
+                </div>
+            </div>
+        </div>
+        
+        <div class="chat-input-area">
+            <div class="knowledge-toggle" id="knowledgeToggle" onclick="toggleKnowledge()">
+                <i class="ri-database-2-line"></i>
+                <span>使用知识资料库</span>
+                <input type="checkbox" id="useKnowledge" style="margin-left: auto;">
+            </div>
+            <div class="chat-input-wrapper">
+                <textarea class="nx-input chat-input" id="messageInput" 
+                    placeholder="输入您的问题..." rows="1"
+                    onkeydown="handleKeyDown(event)"></textarea>
+                <button class="nx-btn nx-btn--primary" onclick="sendMessage()">
+                    <i class="ri-send-plane-line"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="knowledge-panel" id="knowledgePanel">
+        <div class="knowledge-panel__header">
+            <h3><i class="ri-book-2-line"></i> 知识资料库</h3>
+            <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="toggleKnowledgePanel()">
+                <i class="ri-close-line"></i>
+            </button>
+        </div>
+        <div class="knowledge-panel__content">
+            <div class="nx-mb-4">
+                <button class="nx-btn nx-btn--primary nx-btn--block" onclick="showUploadModal()">
+                    <i class="ri-upload-line"></i> 上传文档
+                </button>
+            </div>
+            <div id="knowledgeList">
+                <div class="nx-text-center nx-text-tertiary nx-py-4">
+                    加载中...
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="uploadModal" style="display: none;">
+        <div class="modal-content" style="max-width: 500px;">
+            <div class="modal-header">
+                <h3>上传文档</h3>
+                <button class="modal-close" onclick="closeUploadModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>文档标题</label>
+                    <input type="text" class="nx-input" id="docTitle" placeholder="输入文档标题">
+                </div>
+                <div class="form-group">
+                    <label>文档内容</label>
+                    <textarea class="nx-textarea" id="docContent" rows="6" placeholder="输入或粘贴文档内容"></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeUploadModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="uploadDocument()">上传</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api-client.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        let currentSessionId = 'session-default';
+        let useKnowledge = false;
+
+        async function init() {
+            await loadKnowledge();
+        }
+
+        function toggleKnowledge() {
+            useKnowledge = !useKnowledge;
+            document.getElementById('useKnowledge').checked = useKnowledge;
+            document.getElementById('knowledgeToggle').classList.toggle('active', useKnowledge);
+        }
+
+        function toggleKnowledgePanel() {
+            document.getElementById('knowledgePanel').classList.toggle('open');
+        }
+
+        async function loadKnowledge() {
+            try {
+                const response = await fetch('/api/v1/knowledge/documents');
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    renderKnowledgeList(result.data || []);
+                }
+            } catch (e) {
+                document.getElementById('knowledgeList').innerHTML = 
+                    '<div class="nx-text-center nx-text-tertiary">暂无文档</div>';
+            }
+        }
+
+        function renderKnowledgeList(documents) {
+            const container = document.getElementById('knowledgeList');
+            
+            if (documents.length === 0) {
+                container.innerHTML = '<div class="nx-text-center nx-text-tertiary">暂无文档，点击上方按钮上传</div>';
+                return;
+            }
+            
+            container.innerHTML = documents.map(doc => `
+                <div class="knowledge-item" onclick="viewDocument('${doc.docId}')">
+                    <div class="knowledge-item__title">
+                        <i class="ri-file-text-line"></i> ${doc.title}
+                    </div>
+                    <div class="knowledge-item__preview">${doc.content || '无内容'}</div>
+                </div>
+            `).join('');
+        }
+
+        function showUploadModal() {
+            document.getElementById('uploadModal').style.display = 'flex';
+        }
+
+        function closeUploadModal() {
+            document.getElementById('uploadModal').style.display = 'none';
+            document.getElementById('docTitle').value = '';
+            document.getElementById('docContent').value = '';
+        }
+
+        async function uploadDocument() {
+            const title = document.getElementById('docTitle').value;
+            const content = document.getElementById('docContent').value;
+            
+            if (!title || !content) {
+                alert('请填写标题和内容');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/v1/knowledge/documents', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title, content, type: 'text' })
+                });
+                
+                if (response.ok) {
+                    closeUploadModal();
+                    loadKnowledge();
+                }
+            } catch (e) {
+                alert('上传失败');
+            }
+        }
+
+        function handleKeyDown(event) {
+            if (event.key === 'Enter' && !event.shiftKey) {
+                event.preventDefault();
+                sendMessage();
+            }
+        }
+
+        async function sendMessage() {
+            const input = document.getElementById('messageInput');
+            const content = input.value.trim();
+            
+            if (!content) return;
+            
+            addMessage('user', content);
+            input.value = '';
+            
+            const currentPage = document.title || 'LLM 聊天';
+            const currentUrl = window.location.href;
+            
+            try {
+                const response = await fetch(`/api/v1/chat/sessions/${currentSessionId}/messages`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ 
+                        content, 
+                        useKnowledge,
+                        skillId: 'skill-llm-chat',
+                        userId: 'default-user',
+                        currentPage,
+                        currentUrl
+                    })
+                });
+                
+                const result = await response.json();
+                
+                if (result.status === 'success') {
+                    addMessage('assistant', result.data.content);
+                }
+            } catch (e) {
+                addMessage('assistant', '抱歉，发生了错误，请稍后重试。');
+            }
+        }
+
+        function addMessage(role, content) {
+            const container = document.getElementById('chatMessages');
+            const isUser = role === 'user';
+            
+            const messageHtml = `
+                <div class="message message--${isUser ? 'user' : 'assistant'}">
+                    <div class="message__avatar">
+                        <i class="ri-${isUser ? 'user' : 'robot-2'}-line"></i>
+                    </div>
+                    <div class="message__content">${escapeHtml(content)}</div>
+                </div>
+            `;
+            
+            container.insertAdjacentHTML('beforeend', messageHtml);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML.replace(/\n/g, '<br>');
+        }
+
+        function clearChat() {
+            if (confirm('确定要清空对话记录吗？')) {
+                document.getElementById('chatMessages').innerHTML = `
+                    <div class="message message--assistant">
+                        <div class="message__avatar">
+                            <i class="ri-robot-2-line"></i>
+                        </div>
+                        <div class="message__content">对话已清空，有什么可以帮助您的？</div>
+                    </div>
+                `;
+            }
+        }
+
+        function viewDocument(docId) {
+            alert('查看文档: ' + docId + ' (功能开发中)');
+        }
+
+        init();
+    </script>
+</body>
+</html>

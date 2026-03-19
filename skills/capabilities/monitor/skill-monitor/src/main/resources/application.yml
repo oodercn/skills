@@ -1,0 +1,21 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: skill-monitor
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+
+skill:
+  monitor:
+    metrics-interval: 60000
+    alert-check-interval: 30000
+    log-retention-days: 7
