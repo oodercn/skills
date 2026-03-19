@@ -4,6 +4,7 @@ metadata:
   name: sys-skills
   category: sys
   count: 10
+  version: "2.3.1"
   builtInExcluded:
     - skill-capability
     - skill-scene-management
@@ -128,7 +129,7 @@ skills:
 
     - skillId: skill-k8s
       name: Kubernetes Cluster Management
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: sys
       subCategory: kubernetes
       tags:
@@ -139,13 +140,13 @@ skills:
       description: Kubernetes集群管理服务 - 提供集群管理、节点、命名空间、Pod管理能力
       sceneId: kubernetes
       path: skills/skill-k8s
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-k8s-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-k8s-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-k8s-2.3.1.jar
       checksum: ""
 
     - skillId: skill-scheduler-quartz
       name: Quartz Scheduler Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: sys
       subCategory: scheduler
       tags:
@@ -156,6 +157,6 @@ skills:
       description: Quartz调度服务 - 提供任务调度、执行、历史查询能力
       sceneId: scheduling
       path: skills/skill-scheduler-quartz
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-scheduler-quartz-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-scheduler-quartz-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-scheduler-quartz-2.3.1.jar
       checksum: ""

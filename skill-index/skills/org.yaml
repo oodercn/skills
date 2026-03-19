@@ -4,26 +4,26 @@ metadata:
   name: org-skills
   category: org
   count: 6
+  version: "2.3.1"
 
 skills:
 
     - skillId: skill-org-base
-      name: ×éÖ¯»ù´¡·şÎñ
-      version: "1.0.0"
+      name: ç»„ç»‡åŸºç¡€æœåŠ¡
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: base
       tags:
         - org
         - base
         - organization
-      description: ×éÖ¯»ù´¡·şÎñ£¬Ìá¹©×éÖ¯¼Ü¹¹¡¢²¿ÃÅ¹ÜÀí»ù´¡¹¦ÄÜ
+      description: ç»„ç»‡åŸºç¡€æœåŠ¡ï¼Œæä¾›ç»„ç»‡æ¶æ„ã€å²—ä½ç®¡ç†ç­‰åŸºç¡€èƒ½åŠ›
       sceneId: org
       path: skills/skill-org-base
-      
 
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: dingtalk
       tags:
@@ -31,17 +31,16 @@ skills:
         - dingding
         - organization
         - auth
-      description: ¶¤¶¤×éÖ¯Êı¾İ¼¯³É·şÎñ£¬°üÀ¨×éÖ¯¼Ü¹¹Í¬²½ºÍÓÃ»§ÈÏÖ¤
+      description: é’‰é’‰ç»„ç»‡æ•°æ®é›†æˆæœåŠ¡ï¼ŒåŒ…æ‹¬ç»„ç»‡æ¶æ„åŒæ­¥ã€ç”¨æˆ·è®¤è¯
       sceneId: auth
       path: skills/skill-org-dingding
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-dingding-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-org-feishu
       name: Feishu Organization Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: feishu
       tags:
@@ -49,17 +48,16 @@ skills:
         - lark
         - organization
         - auth
-      description: ·ÉÊé×éÖ¯Êı¾İ¼¯³É·şÎñ£¬°üÀ¨×éÖ¯¼Ü¹¹Í¬²½ºÍÓÃ»§ÈÏÖ¤
+      description: é£ä¹¦ç»„ç»‡æ•°æ®é›†æˆæœåŠ¡ï¼ŒåŒ…æ‹¬ç»„ç»‡æ¶æ„åŒæ­¥ã€ç”¨æˆ·è®¤è¯
       sceneId: auth
       path: skills/skill-org-feishu
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-feishu-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-org-wecom
       name: WeCom Organization Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: wecom
       tags:
@@ -67,44 +65,41 @@ skills:
         - enterprise-wechat
         - organization
         - auth
-      description: ÆóÒµÎ¢ĞÅ×éÖ¯Êı¾İ¼¯³É·şÎñ£¬°üÀ¨×éÖ¯¼Ü¹¹Í¬²½ºÍÓÃ»§ÈÏÖ¤
+      description: ä¼ä¸šå¾®ä¿¡ç»„ç»‡æ•°æ®é›†æˆæœåŠ¡ï¼ŒåŒ…æ‹¬ç»„ç»‡æ¶æ„åŒæ­¥ã€ç”¨æˆ·è®¤è¯
       sceneId: auth
       path: skills/skill-org-wecom
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-wecom-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-org-ldap
       name: LDAP Organization Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: ldap
       tags:
         - ldap
         - organization
         - auth
-      description: LDAP×éÖ¯·şÎñ£¬Ìá¹©»ùÓÚLDAPµÄ×éÖ¯¼Ü¹¹¹ÜÀíºÍÓÃ»§ÈÏÖ¤
+      description: LDAPç»„ç»‡æœåŠ¡ï¼Œæä¾›åŸºäºLDAPçš„ç»„ç»‡æ¶æ„å’Œç”¨æˆ·è®¤è¯
       sceneId: auth
       path: skills/skill-org-ldap
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-org-ldap-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-user-auth
       name: User Authentication Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: org
       subCategory: auth
       tags:
         - auth
         - authentication
         - user
-      description: ÓÃ»§ÈÏÖ¤·şÎñ£¬Ö§³Ö¶àÖÖÈÏÖ¤·½Ê½
+      description: ç”¨æˆ·è®¤è¯æœåŠ¡ï¼Œæ”¯æŒå¤šç§è®¤è¯æ–¹å¼
       sceneId: auth
       path: skills/skill-user-auth
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-user-auth-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-user-auth-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-user-auth-2.3.1.jar
       checksum: ""
-      

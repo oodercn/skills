@@ -4,6 +4,7 @@ metadata:
   name: knowledge-skills
   category: knowledge
   count: 1
+  version: "2.3.1"
 
 skills:
 

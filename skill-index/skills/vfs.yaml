@@ -4,60 +4,58 @@ metadata:
   name: vfs-skills
   category: vfs
   count: 6
+  version: "2.3.1"
 
 skills:
 
     - skillId: skill-vfs-base
-      name: VFS»ù´¡·şÎñ
-      version: "1.0.0"
+      name: VFSåŸºç¡€æœåŠ¡
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: base
       tags:
         - vfs
         - base
         - storage
-      description: VFS»ù´¡·şÎñ£¬Ìá¹©ÎÄ¼ş²Ù×÷»ù´¡½Ó¿Ú
+      description: VFSåŸºç¡€æœåŠ¡ï¼Œæä¾›æ–‡ä»¶ç³»ç»ŸæŠ½è±¡æ¥å£
       sceneId: vfs
       path: skills/skill-vfs-base
-      
 
     - skillId: skill-vfs-database
       name: Database VFS Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: database
       tags:
         - vfs
         - database
         - storage
-      description: Êı¾İ¿â´æ´¢·şÎñ - ½«ÎÄ¼ş´æ´¢ÔÚÊı¾İ¿âÖĞ£¬Ö§³ÖÔªÊı¾İ¹ÜÀí
+      description: æ•°æ®åº“å­˜å‚¨æœåŠ¡ - å°†æ–‡ä»¶å­˜å‚¨åˆ°æ•°æ®åº“ä¸­ï¼Œæ”¯æŒå…ƒæ•°æ®ç®¡ç†
       sceneId: vfs-database
       path: skills/skill-vfs-database
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-database-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-database-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-database-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-vfs-local
       name: Local VFS Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: local
       tags:
         - vfs
         - local
         - storage
-      description: ±¾µØÎÄ¼şÏµÍ³´æ´¢·şÎñ - Ìá¹©»ù±¾µÄÎÄ¼ş²Ù×÷ºÍ°æ±¾¹ÜÀí
+      description: æœ¬åœ°æ–‡ä»¶ç³»ç»Ÿå­˜å‚¨æœåŠ¡ - æä¾›æœ¬åœ°æ–‡ä»¶å­˜å–å’Œç‰ˆæœ¬ç®¡ç†
       sceneId: vfs-local
       path: skills/skill-vfs-local
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-local-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-local-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-local-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-vfs-minio
       name: MinIO VFS Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
       tags:
@@ -65,17 +63,16 @@ skills:
         - minio
         - object-storage
         - s3
-      description: MinIO´æ´¢·şÎñ - Ìá¹©¶ÔÏó´æ´¢ÄÜÁ¦£¬Ö§³ÖS3¼æÈİ½Ó¿Ú
+      description: MinIOå­˜å‚¨æœåŠ¡ - æä¾›å¯¹è±¡å­˜å‚¨æœåŠ¡ï¼Œæ”¯æŒS3æ•°æ®æ¥å£
       sceneId: vfs-minio
       path: skills/skill-vfs-minio
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-minio-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-minio-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-minio-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-vfs-oss
       name: Aliyun OSS VFS Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
       tags:
@@ -83,17 +80,16 @@ skills:
         - oss
         - aliyun
         - object-storage
-      description: °¢ÀïÔÆOSS´æ´¢·şÎñ - Ìá¹©¶ÔÏó´æ´¢ÄÜÁ¦£¬Ö§³Ö°¢ÀïÔÆOSS½Ó¿Ú
+      description: é˜¿é‡Œäº‘OSSå­˜å‚¨æœåŠ¡ - æä¾›å¯¹è±¡å­˜å‚¨æœåŠ¡ï¼Œæ”¯æŒé˜¿é‡Œäº‘OSSæ¥å£
       sceneId: vfs-oss
       path: skills/skill-vfs-oss
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-oss-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-oss-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-oss-2.3.1.jar
       checksum: ""
-      
 
     - skillId: skill-vfs-s3
       name: AWS S3 VFS Service
-      version: "0.7.3"
+      version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
       tags:
@@ -101,10 +97,9 @@ skills:
         - s3
         - aws
         - object-storage
-      description: AWS S3´æ´¢·şÎñ - Ìá¹©¶ÔÏó´æ´¢ÄÜÁ¦£¬Ö§³ÖAWS S3½Ó¿Ú
+      description: AWS S3å­˜å‚¨æœåŠ¡ - æä¾›å¯¹è±¡å­˜å‚¨æœåŠ¡ï¼Œæ”¯æŒAWS S3æ¥å£
       sceneId: vfs-s3
       path: skills/skill-vfs-s3
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v0.7.3/skill-vfs-s3-0.7.3.jar
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-s3-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-s3-2.3.1.jar
       checksum: ""
-      
