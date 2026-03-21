@@ -1,296 +1,243 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-knowledge-qa
-  name: 知识问答场景能力包
-  version: 2.3.0
+  name: 知识问答场景能力
+  version: "2.3.1"
+  category: knowledge
+  subCategory: qa
   description: 知识问答场景能力，支持知识库管理、文档管理、语义检索、RAG智能问答
-  author: ooder Team
-  type: scene-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN
-  repository: https://gitee.com/ooderCN/ooder-skills
-  keywords:
-    - knowledge
-    - qa
-    - rag
-    - search
-    - scene-capability
+  author: Ooder Team
+  icon: ri-book-3-line
 
 spec:
-  type: scene-skill
-  
-  dependencies:
-    - id: skill-knowledge-base
-      version: ">=1.0.0"
-      required: true
-      autoInstall: true
-      installSource: https://gitee.com/ooderCN/ooder-skills/releases
-      fallback: embedded
-      timeout: 30s
-      description: "知识库核心服务"
-      capabilities:
-        - kb-management
-        - document-management
-        - kb-search
-        
-    - id: skill-indexing
-      version: ">=1.0.0"
-      required: true
-      autoInstall: true
-      installSource: https://gitee.com/ooderCN/ooder-skills/releases
-      fallback: embedded
-      timeout: 30s
-      description: "文档索引服务"
-        
-    - id: skill-rag
-      version: ">=1.0.0"
-      required: false
-      autoInstall: false
-      description: "RAG检索增强（可选）"
-      
-    - id: skill-llm-chat
-      version: ">=2.0.0"
-      required: false
-      autoInstall: false
-      description: "LLM智能对话场景能力（可选）"
-      capabilities:
-        - llm-chat
-        - session-manage
-        - context-extraction
-        
-    - id: skill-llm-baidu
-      version: ">=1.0.0"
-      required: false
-      autoInstall: false
-      description: "百度千帆LLM Provider（可选）"
-      capabilities:
-        - llm-chat
-        - llm-embed
-      configMapping:
-        apiKey: "${BAIDU_API_KEY:-${ooder.llm.api-key}}"
-        baseUrl: "${BAIDU_BASE_URL:-${ooder.llm.base-url}}"
-        model: "${BAIDU_MODEL:-${ooder.llm.model}}"
-
-  sceneCapabilities:
-    - id: scene-knowledge-qa
-      name: 知识问答场景能力
-      type: SCENE
-      mainFirst: true
-      
-      mainFirstConfig:
-        selfCheck:
-          checkCapabilities: [kb-management, document-management, kb-search]
-          checkDriverCapabilities: [intent-receiver, event-listener]
-          checkDependencies: [skill-knowledge-base, skill-indexing]
-          checkConfig: [ooder.llm.api-key]
-          checkCollaborative: [scene-indexing]
-          onCheckFailed:
-            action: degrade
-            degradedCapabilities: [rag-retrieval]
-            retry:
-              maxAttempts: 3
-              delay: 5s
-          
-        selfStart:
-          installDependencies: auto
-          initDriverCapabilities: [intent-receiver, event-listener, capability-invoker]
-          initCapabilities: [kb-management, document-management, kb-search]
-          bindAddresses: auto
-          
-        startCollaboration:
-          startScene: scene-indexing
-          optional: true
-          timeout: 10s
-          bindInterface: indexing-service
-          
-        selfDrive:
-          scheduleRules:
-            - trigger: "0 0 * * *"
-              action: reindex-flow
-              
-          eventRules:
-            - event: document.uploaded
-              condition: "status == 'completed'"
-              action: index-document-flow
-            - event: knowledge.query
-              action: query-knowledge-flow
-              
-          capabilityChains:
-            index-document-flow:
-              - capability: document-management
-                input:
-                  action: parse
-              - capability: scene-indexing
-                input:
-                  action: index
-                  
-            query-knowledge-flow:
-              - capability: kb-search
-                input:
-                  topK: 10
-              - capability: rag-retrieval
-                input:
-                  context: "${previous.results}"
-                  
-            reindex-flow:
-              - capability: kb-management
-                input:
-                  action: reindex
-
-      capabilities:
-        - kb-management
-        - document-management
-        - kb-search
-        - rag-retrieval
-        
-      collaborativeCapabilities:
-        - capabilityId: scene-indexing
-          role: PROVIDER
-          interface: indexing-service
-          autoStart: true
-          optional: true
-          timeout: 10000
-        - capabilityId: scene-llm-assistant
-          role: PROVIDER
-          interface: llm-service
-          autoStart: false
-          optional: true
-
   capabilities:
     - id: kb-management
       name: 知识库管理
       description: 创建、更新、删除知识库
-      category: data
-      type: ATOMIC
+      category: service
+      autoBind: true
       
     - id: document-management
       name: 文档管理
       description: 上传、管理知识库文档
-      category: data
-      type: ATOMIC
+      category: service
+      autoBind: true
       
     - id: kb-search
       name: 知识检索
       description: BM25语义检索
       category: ai
-      type: ATOMIC
+      autoBind: true
       
     - id: rag-retrieval
       name: RAG检索
       description: 检索增强生成
       category: ai
-      type: COMPOSITE
+      autoBind: false
       
-    - id: intent-receiver
-      name: 意图接收
-      description: 接收用户查询意图
-      category: driver
-      type: DRIVER
-      driverType: INTENT_RECEIVER
+  dependencies:
+    - skillId: skill-knowledge-base
+      version: ">=2.3.1"
+      required: true
+      description: 知识库核心服务
+    - skillId: skill-indexing
+      version: ">=2.3.1"
+      required: true
+      description: 文档索引服务
+    - skillId: skill-rag
+      version: ">=2.3.1"
+      required: false
+      description: RAG检索增强（可选）
       
-    - id: event-listener
-      name: 事件监听
-      description: 监听文档和知识库事件
-      category: driver
-      type: DRIVER
-      driverType: EVENT_LISTENER
-      
-    - id: capability-invoker
-      name: 能力调用
-      description: 管理能力调用链
-      category: driver
-      type: DRIVER
-      driverType: CAPABILITY_INVOKER
-
-  capabilityBindings:
-    - sceneCapabilityType: knowledge
-      autoBind: true
-      capabilities:
-        - kb-management
-        - document-management
-        - kb-search
-        - rag-retrieval
-
-  endpoints:
-    - path: /api/knowledge/bases
-      method: GET
-      description: 获取知识库列表
-      capability: kb-management
-      
-    - path: /api/knowledge/bases
-      method: POST
-      description: 创建知识库
-      capability: kb-management
-      
-    - path: /api/knowledge/documents
-      method: GET
-      description: 获取文档列表
-      capability: document-management
-      
-    - path: /api/knowledge/documents
-      method: POST
-      description: 上传文档
-      capability: document-management
-      
-    - path: /api/knowledge/search
-      method: POST
-      description: 知识检索
-      capability: kb-search
-      
-    - path: /api/knowledge/rag
-      method: POST
-      description: RAG检索
-      capability: rag-retrieval
-
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-    mainClass: net.ooder.skill.knowledge.KnowledgeQaSkillApplication
-
-  config:
-    required:
-      - name: STORAGE_PATH
-        type: string
-        description: 知识库存储路径
+  skillForm: SCENE
+  
+  scene:
+    type: INTERACTIVE
+    visibility: public
+    name: 知识问答
+    description: 知识库智能问答场景
+    
+  roles:
+    - id: admin
+      name: 知识库管理员
+      description: 知识库管理员，负责知识库配置和文档管理
+      required: true
+      minCount: 1
+      maxCount: 5
+      permissions:
+        - manage-kb
+        - manage-documents
+        - configure-search
+        - view-all
+    - id: editor
+      name: 内容编辑
+      description: 文档编辑和上传
+      required: false
+      minCount: 0
+      maxCount: 50
+      permissions:
+        - upload-documents
+        - edit-documents
+        - view-assigned
+    - id: user
+      name: 知识用户
+      description: 使用知识库进行检索和问答
+      required: true
+      minCount: 1
+      maxCount: 1000
+      permissions:
+        - search
+        - query
+        - view-public
         
-    optional:
-      - name: MAX_DOCUMENT_SIZE
+  activationSteps:
+    admin:
+      - stepId: create-kb
+        step: 1
+        action: create-kb
+        title: 创建知识库
+        description: 创建第一个知识库
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-storage
+        step: 2
+        action: configure-storage
+        title: 配置存储
+        description: 设置文档存储位置
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-llm
+        step: 3
+        action: configure-llm
+        title: 配置LLM
+        description: 配置问答使用的LLM服务
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: invite-users
+        step: 4
+        action: invite-users
+        title: 邀请用户
+        description: 添加知识库用户
+        required: false
+        skippable: true
+        autoExecute: false
+    editor:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入知识库团队
+        required: true
+        skippable: false
+        autoExecute: false
+    user:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入知识库
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    admin:
+      - id: dashboard
+        name: 知识概览
+        icon: ri-dashboard-line
+        path: /knowledge/dashboard
+        order: 1
+        visible: true
+      - id: knowledge-bases
+        name: 知识库管理
+        icon: ri-database-2-line
+        path: /knowledge/bases
+        order: 2
+        visible: true
+      - id: documents
+        name: 文档管理
+        icon: ri-folder-line
+        path: /knowledge/documents
+        order: 3
+        visible: true
+      - id: search-config
+        name: 检索配置
+        icon: ri-search-line
+        path: /knowledge/search-config
+        order: 4
+        visible: true
+      - id: settings
+        name: 场景设置
+        icon: ri-settings-line
+        path: /knowledge/settings
+        order: 5
+        visible: true
+    editor:
+      - id: my-documents
+        name: 我的文档
+        icon: ri-folder-line
+        path: /knowledge/my-documents
+        order: 1
+        visible: true
+      - id: upload
+        name: 上传文档
+        icon: ri-upload-line
+        path: /knowledge/upload
+        order: 2
+        visible: true
+    user:
+      - id: search
+        name: 知识检索
+        icon: ri-search-line
+        path: /knowledge/search
+        order: 1
+        visible: true
+      - id: qa
+        name: 智能问答
+        icon: ri-question-line
+        path: /knowledge/qa
+        order: 2
+        visible: true
+        
+  configSchema:
+    type: object
+    properties:
+      storageType:
+        type: string
+        enum: [local, database, oss]
+        default: database
+        title: 存储类型
+      maxDocumentSize:
         type: integer
         default: 10485760
-        description: 最大文档大小（字节）
-      - name: SEARCH_TOP_K
+        title: 最大文档大小(字节)
+      searchTopK:
         type: integer
         default: 10
-        description: 检索返回数量
-      - name: EMBEDDING_MODEL
+        title: 检索返回数量
+      embeddingModel:
         type: string
-        default: "text-embedding-ada-002"
-        description: 嵌入模型
-
-  resources:
+        default: text-embedding-3-small
+        title: 嵌入模型
+      enableRAG:
+        type: boolean
+        default: true
+        title: 启用RAG
+        
+  installOrder:
+    - skill-knowledge-base
+    - skill-indexing
+    - skill-rag
+    - skill-knowledge-qa
+    
+  estimatedResources:
     cpu: "500m"
     memory: "512Mi"
     storage: "1Gi"
-
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: true
-
-  ui:
-    nexusUi:
-      entry:
-        page: index.html
-        title: 知识问答
-        icon: ri-book-3-line
-      menu:
-        position: sidebar
-        category: knowledge-qa
-        order: 10
-      layout:
-        type: default
-        sidebar: true
-        header: true
+    
+  estimatedDuration: "5-10分钟"

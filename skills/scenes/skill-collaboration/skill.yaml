@@ -1,192 +1,188 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-collaboration
   name: 协作场景服务
-  version: 0.7.3
-  description: 协作场景服务，提供团队协作、任务分配、进度跟踪能力
-  author: ooder Team
-  type: scene-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - collaboration
-    - teamwork
-    - workflow
-    - scene
+  version: "2.3.1"
+  category: util
+  subCategory: collaboration
+  description: 协作场景服务，提供场景创建、成员管理、密钥管理能力
+  author: Ooder Team
+  icon: ri-team-line
 
 spec:
-  type: scene-skill
-  
-  ownership: independent
-  
-  capability:
-    address: 0xF0
-    category: UTIL
-    code: UTIL_BASE
-    operations: [collaborate, assign, track]
-  
-  sceneType: TRIGGER
-  
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-
-  llmConfig:
-    required: false
-    defaultProvider: "deepseek"
-    defaultModel: "deepseek-chat"
-    capabilities:
-      - chat
-      - streaming
-      - function-calling
-    modelSelection:
-      allowUserOverride: true
-      availableProviders:
-        - deepseek
-        - openai
-        - qianwen
-        - volcengine
-        - ollama
-    functionCalling:
-      enabled: true
-      tools:
-        - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
-          parameters:
-            type: object
-            properties:
-              capability:
-                type: string
-                description: "能力名称"
-              detail:
-                type: string
-                enum: [brief, detailed, examples]
-                default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
-          parameters:
-            type: object
-            properties:
-              expression:
-                type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
-          parameters:
-            type: object
-            properties:
-              formType:
-                type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
-          parameters:
-            type: object
-            properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-
-  
-  mainFirst: false
-  
+  capabilities:
+    - id: scene-management
+      name: 场景管理
+      description: 创建、配置、管理协作场景
+      category: service
+      autoBind: true
+      
+    - id: member-management
+      name: 成员管理
+      description: 添加、移除、管理场景成员
+      category: service
+      autoBind: true
+      
+    - id: key-management
+      name: 密钥管理
+      description: 管理场景访问密钥和权限
+      category: service
+      autoBind: true
+      
+    - id: collaboration
+      name: 团队协作
+      description: 支持团队协作和任务分配
+      category: service
+      autoBind: false
+      
   dependencies:
-    - id: skill-msg
-      version: ">=0.7.0"
+    - skillId: skill-msg
+      version: ">=2.3.1"
       required: true
-      description: "消息服务依赖"
-    - id: skill-notify
-      version: ">=0.7.0"
+      description: 消息服务依赖
+    - skillId: skill-notify
+      version: ">=2.3.1"
       required: true
-      description: "通知服务依赖"
+      description: 通知服务依赖
+      
+  skillForm: SCENE
   
-  sceneCapabilities:
-    mainFirst: false
-    capabilities:
-      - skill-msg
-      - skill-notify
-  
+  scene:
+    type: INTERACTIVE
+    visibility: public
+    name: 协作管理
+    description: 团队协作场景管理
+    
   roles:
-    - name: MANAGER
-      displayName: 场景管理员
+    - id: manager
+      name: 场景管理员
+      description: 场景管理员，负责场景配置和成员管理
+      required: true
       minCount: 1
       maxCount: 1
-      permissions: [READ, WRITE, CONFIG, DELETE]
-    - name: MEMBER
-      displayName: 场景成员
+      permissions:
+        - manage-scene
+        - manage-members
+        - manage-keys
+        - view-all
+        - configure
+    - id: member
+      name: 场景成员
+      description: 场景成员，参与协作活动
+      required: false
       minCount: 0
       maxCount: 100
-      permissions: [READ, WRITE]
-  
-  capabilities:
-    - id: collaborate
-      name: 团队协作
-      description: 支持团队协作
-      category: service
-    - id: assign
-      name: 任务分配
-      description: 分配任务给成员
-      category: service
-    - id: track
-      name: 进度跟踪
-      description: 跟踪任务进度
-      category: service
-  
-  endpoints:
-    - path: /api/collaboration/teams
-      method: POST
-      description: 创建团队
-      capability: collaborate
-    - path: /api/collaboration/tasks/{id}/assign
-      method: POST
-      description: 分配任务
-      capability: assign
-    - path: /api/collaboration/tasks/{id}/progress
-      method: GET
-      description: 获取进度
-      capability: track
-  
-  config:
-    optional:
-      - name: MAX_TEAM_SIZE
+      permissions:
+        - view
+        - participate
+        - collaborate
+        
+  activationSteps:
+    manager:
+      - stepId: configure-scene
+        step: 1
+        action: configure-scene
+        title: 配置场景
+        description: 设置场景基本信息和参数
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: generate-keys
+        step: 2
+        action: generate-keys
+        title: 生成密钥
+        description: 生成场景访问密钥
+        required: true
+        skippable: false
+        autoExecute: true
+      - stepId: invite-members
+        step: 3
+        action: invite-members
+        title: 邀请成员
+        description: 邀请团队成员加入
+        required: false
+        skippable: true
+        autoExecute: false
+    member:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入协作场景
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    manager:
+      - id: overview
+        name: 场景概览
+        icon: ri-dashboard-line
+        path: /collaboration/overview
+        order: 1
+        visible: true
+      - id: members
+        name: 成员管理
+        icon: ri-user-settings-line
+        path: /collaboration/members
+        order: 2
+        visible: true
+      - id: keys
+        name: 密钥管理
+        icon: ri-key-line
+        path: /collaboration/keys
+        order: 3
+        visible: true
+      - id: settings
+        name: 场景设置
+        icon: ri-settings-line
+        path: /collaboration/settings
+        order: 4
+        visible: true
+    member:
+      - id: overview
+        name: 场景概览
+        icon: ri-dashboard-line
+        path: /collaboration/overview
+        order: 1
+        visible: true
+      - id: my-tasks
+        name: 我的任务
+        icon: ri-task-line
+        path: /collaboration/my-tasks
+        order: 2
+        visible: true
+        
+  configSchema:
+    type: object
+    properties:
+      maxMembers:
         type: integer
-        default: 50
-        description: 最大团队人数
-      - name: NOTIFICATION_ENABLED
+        default: 100
+        title: 最大成员数
+      keyExpiryDays:
+        type: integer
+        default: 365
+        title: 密钥有效期(天)
+      enableNotification:
         type: boolean
         default: true
-        description: 启用通知
-  
-  resources:
+        title: 启用通知
+      autoAcceptInvitation:
+        type: boolean
+        default: false
+        title: 自动接受邀请
+        
+  installOrder:
+    - skill-msg
+    - skill-notify
+    - skill-collaboration
+    
+  estimatedResources:
     cpu: "100m"
     memory: "256Mi"
     storage: "100Mi"
-  
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: true
+    
+  estimatedDuration: "2-3分钟"

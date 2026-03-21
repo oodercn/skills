@@ -1,238 +1,254 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-recruitment-management
   name: 招聘管理系统
-  version: 1.0.0
-  description: 企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批，含状态看板与数据统计
-  author: ooder Team
-  type: scene-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN
-  repository: https://gitee.com/ooderCN/ooder-skills
-  keywords:
-    - recruitment
-    - hr
-    - hiring
-    - job-posting
-    - resume
-    - interview
-    - scene-capability
+  version: "2.3.1"
+  category: biz
+  subCategory: hr
+  description: 企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批
+  author: Ooder Team
+  icon: ri-team-line
 
 spec:
-  type: scene-skill
-  
-  dependencies:
-    - id: skill-form-builder
-      version: ">=1.0.0"
-      required: true
-      autoInstall: true
-      description: "表单构建服务"
-      capabilities:
-        - form-render
-        - form-validate
-        - form-submit
-        
-    - id: skill-storage-management-nexus-ui
-      version: ">=1.0.0"
-      required: true
-      autoInstall: true
-      description: "文件存储服务"
-      capabilities:
-        - file-upload
-        - document-storage
-        
-    - id: skill-llm-chat
-      version: ">=1.0.0"
-      required: false
-      autoInstall: false
-      description: "LLM智能对话（用于简历智能筛选）"
-      capabilities:
-        - llm-chat
-        - text-analysis
-
   capabilities:
-    - id: job-position-management
+    - id: job-management
       name: 职位管理
-      description: 职位发布、编辑、下架管理
-      category: business
-      type: COMPOSITE
+      description: 创建、发布、管理招聘职位
+      category: service
+      autoBind: true
       
     - id: resume-management
       name: 简历管理
-      description: 简历收集、筛选、归档
-      category: business
-      type: COMPOSITE
+      description: 收集、筛选、管理候选人简历
+      category: service
+      autoBind: true
       
-    - id: interview-management
-      name: 面试管理
-      description: 面试安排、评价、反馈
-      category: business
-      type: COMPOSITE
+    - id: interview-scheduling
+      name: 面试安排
+      description: 安排面试时间、地点、面试官
+      category: service
+      autoBind: true
       
-    - id: offer-approval
-      name: 录用审批
-      description: 录用申请、审批流程
-      category: workflow
-      type: COMPOSITE
+    - id: offer-management
+      name: 录用管理
+      description: 发放录用通知、跟踪录用状态
+      category: service
+      autoBind: true
       
-    - id: recruitment-dashboard
-      name: 招聘看板
-      description: 招聘状态可视化看板
-      category: dashboard
-      type: ATOMIC
-      
-    - id: recruitment-statistics
-      name: 数据统计
-      description: 招聘数据统计分析
-      category: analytics
-      type: ATOMIC
-      
-    - id: resume-parser
-      name: 简历解析
-      description: 智能解析简历信息
+    - id: recruitment-analytics
+      name: 招聘分析
+      description: 招聘数据统计和分析报告
       category: ai
-      type: ATOMIC
-
-  capabilityChains:
-    - name: full-recruitment-flow
-      description: 完整招聘流程
-      capabilities:
-        - job-position-management
-        - resume-management
-        - interview-management
-        - offer-approval
-        
-    - name: resume-screening-flow
-      description: 简历筛选流程
-      capabilities:
-        - resume-parser
-        - resume-management
-
-  endpoints:
-    - path: /api/recruitment/jobs
-      method: GET
-      description: 获取职位列表
-      capability: job-position-management
+      autoBind: false
       
-    - path: /api/recruitment/jobs
-      method: POST
-      description: 创建职位
-      capability: job-position-management
+  dependencies:
+    - skillId: skill-vfs-base
+      version: ">=2.3.1"
+      required: true
+      description: 文件存储服务（简历存储）
       
-    - path: /api/recruitment/jobs/{id}
-      method: PUT
-      description: 更新职位
-      capability: job-position-management
+    - skillId: skill-approval-form
+      version: ">=2.3.1"
+      required: true
+      description: 审批流程服务（录用审批）
       
-    - path: /api/recruitment/jobs/{id}
-      method: DELETE
-      description: 删除职位
-      capability: job-position-management
+    - skillId: skill-msg
+      version: ">=2.3.1"
+      required: false
+      description: 消息通知服务（面试提醒）
       
-    - path: /api/recruitment/resumes
-      method: GET
-      description: 获取简历列表
-      capability: resume-management
-      
-    - path: /api/recruitment/resumes
-      method: POST
-      description: 上传简历
-      capability: resume-management
-      
-    - path: /api/recruitment/resumes/{id}
-      method: PUT
-      description: 更新简历状态
-      capability: resume-management
-      
-    - path: /api/recruitment/interviews
-      method: GET
-      description: 获取面试列表
-      capability: interview-management
-      
-    - path: /api/recruitment/interviews
-      method: POST
-      description: 安排面试
-      capability: interview-management
-      
-    - path: /api/recruitment/interviews/{id}
-      method: PUT
-      description: 更新面试信息
-      capability: interview-management
-      
-    - path: /api/recruitment/offers
-      method: GET
-      description: 获取录用审批列表
-      capability: offer-approval
-      
-    - path: /api/recruitment/offers
-      method: POST
-      description: 提交录用申请
-      capability: offer-approval
-      
-    - path: /api/recruitment/offers/{id}/approve
-      method: POST
-      description: 审批录用
-      capability: offer-approval
-      
-    - path: /api/recruitment/dashboard
-      method: GET
-      description: 获取看板数据
-      capability: recruitment-dashboard
-      
-    - path: /api/recruitment/statistics
-      method: GET
-      description: 获取统计数据
-      capability: recruitment-statistics
-
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-    mainClass: net.ooder.skill.ui.SkillUiTestApplication
-
-  config:
-    required: []
+  skillForm: SCENE
+  
+  scene:
+    type: INTERACTIVE
+    visibility: public
+    name: 招聘管理
+    description: 企业招聘全流程管理
     
-    optional:
-      - name: MAX_RESUME_SIZE
-        type: integer
-        default: 10485760
-        description: 简历文件最大大小(字节)
-      - name: SUPPORTED_RESUME_TYPES
+  roles:
+    - id: hr-manager
+      name: HR管理员
+      description: 管理招聘流程和职位
+      permissions:
+        - manage-jobs
+        - view-all-resumes
+        - schedule-interviews
+        - approve-offers
+        - view-analytics
+    - id: hiring-manager
+      name: 招聘经理
+      description: 管理本部门招聘
+      permissions:
+        - view-department-jobs
+        - view-department-resumes
+        - submit-interview-feedback
+        - approve-department-offers
+    - id: interviewer
+      name: 面试官
+      description: 参与面试评估
+      permissions:
+        - view-assigned-resumes
+        - submit-feedback
+    - id: candidate
+      name: 候选人
+      description: 查看职位和提交简历
+      permissions:
+        - view-public-jobs
+        - submit-resume
+        - view-application-status
+        
+  activationSteps:
+    hr-manager:
+      - step: 1
+        action: configure-departments
+        title: 配置部门
+        description: 设置招聘部门和团队
+        required: true
+      - step: 2
+        action: configure-workflow
+        title: 配置审批流程
+        description: 设置录用审批流程
+        required: true
+      - step: 3
+        action: configure-notification
+        title: 配置通知
+        description: 设置面试提醒方式
+        required: false
+      - step: 4
+        action: invite-team
+        title: 邀请团队成员
+        description: 添加招聘经理和面试官
+        required: false
+    hiring-manager:
+      - step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入招聘团队
+        required: true
+    interviewer:
+      - step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入面试团队
+        required: true
+    candidate:
+      - step: 1
+        action: register
+        title: 注册账号
+        description: 创建候选人账号
+        required: true
+        
+  menus:
+    hr-manager:
+      - id: dashboard
+        name: 招聘概览
+        icon: ri-dashboard-line
+        path: /recruitment/dashboard
+        order: 1
+      - id: jobs
+        name: 职位管理
+        icon: ri-briefcase-line
+        path: /recruitment/jobs
+        order: 2
+      - id: resumes
+        name: 简历管理
+        icon: ri-file-user-line
+        path: /recruitment/resumes
+        order: 3
+      - id: interviews
+        name: 面试安排
+        icon: ri-calendar-line
+        path: /recruitment/interviews
+        order: 4
+      - id: offers
+        name: 录用管理
+        icon: ri-user-follow-line
+        path: /recruitment/offers
+        order: 5
+      - id: analytics
+        name: 招聘分析
+        icon: ri-bar-chart-line
+        path: /recruitment/analytics
+        order: 6
+    hiring-manager:
+      - id: my-jobs
+        name: 我的职位
+        icon: ri-briefcase-line
+        path: /recruitment/my-jobs
+        order: 1
+      - id: my-resumes
+        name: 部门简历
+        icon: ri-file-user-line
+        path: /recruitment/my-resumes
+        order: 2
+      - id: my-interviews
+        name: 待面试
+        icon: ri-calendar-check-line
+        path: /recruitment/my-interviews
+        order: 3
+    interviewer:
+      - id: my-interviews
+        name: 我的面试
+        icon: ri-calendar-check-line
+        path: /recruitment/my-interviews
+        order: 1
+      - id: feedback
+        name: 面试反馈
+        icon: ri-chat-check-line
+        path: /recruitment/feedback
+        order: 2
+    candidate:
+      - id: jobs
+        name: 浏览职位
+        icon: ri-search-line
+        path: /recruitment/jobs
+        order: 1
+      - id: my-application
+        name: 我的申请
+        icon: ri-file-list-line
+        path: /recruitment/my-application
+        order: 2
+        
+  configSchema:
+    type: object
+    properties:
+      resumeStorage:
         type: string
-        default: "pdf,doc,docx"
-        description: 支持的简历格式
-      - name: ENABLE_AI_SCREENING
+        enum: [local, database, oss]
+        default: database
+        title: 简历存储位置
+      maxResumeSize:
+        type: integer
+        default: 10
+        title: 最大简历大小(MB)
+      allowedFileTypes:
+        type: array
+        default: [pdf, doc, docx]
+        title: 允许的简历格式
+      interviewReminder:
         type: boolean
         default: true
-        description: 启用AI简历筛选
-      - name: INTERVIEW_REMINDER_HOURS
+        title: 面试提醒
+      reminderAdvance:
         type: integer
         default: 24
-        description: 面试提醒提前小时数
-
-  resources:
-    cpu: "100m"
-    memory: "256Mi"
-    storage: "100Mi"
-
-  offline:
-    enabled: true
-    cacheStrategy: localStorage
-
-  ui:
-    nexusUi:
-      entry:
-        page: index.html
-        title: 招聘管理
-        icon: ri-briefcase-line
-      menu:
-        position: sidebar
-        category: business
-        order: 2
-      layout:
-        type: default
-        sidebar: true
-        header: true
+        title: 提醒提前时间(小时)
+      approvalWorkflow:
+        type: string
+        default: default
+        title: 录用审批流程
+        
+  installOrder:
+    - skill-vfs-base
+    - skill-approval-form
+    - skill-msg
+    - skill-recruitment-management
+    
+  estimatedResources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+    
+  estimatedDuration: "5-10分钟"

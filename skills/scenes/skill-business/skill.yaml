@@ -1,200 +1,210 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-business
   name: 业务场景服务
-  version: 0.7.3
-  description: 业务场景服务，提供通用业务流程管理能力
-  author: ooder Team
-  type: scene-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - business
-    - workflow
-    - scene
-    - process
+  version: "2.3.1"
+  category: biz
+  subCategory: scenario
+  description: 业务场景服务，提供业务场景管理、工作流执行、数据处理能力
+  author: Ooder Team
+  icon: ri-briefcase-line
 
 spec:
-  type: scene-skill
-  
-  ownership: independent
-  
-  capability:
-    address: 0xF0
-    category: UTIL
-    code: UTIL_BASE
-    operations: [create, execute, monitor]
-  
-  sceneType: TRIGGER
-  
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-
-  llmConfig:
-    required: false
-    defaultProvider: "deepseek"
-    defaultModel: "deepseek-chat"
-    capabilities:
-      - chat
-      - streaming
-      - function-calling
-    modelSelection:
-      allowUserOverride: true
-      availableProviders:
-        - deepseek
-        - openai
-        - qianwen
-        - volcengine
-        - ollama
-    functionCalling:
-      enabled: true
-      tools:
-        - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
-          parameters:
-            type: object
-            properties:
-              capability:
-                type: string
-                description: "能力名称"
-              detail:
-                type: string
-                enum: [brief, detailed, examples]
-                default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
-          parameters:
-            type: object
-            properties:
-              expression:
-                type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
-          parameters:
-            type: object
-            properties:
-              formType:
-                type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
-          parameters:
-            type: object
-            properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-
-  
-  mainFirst: false
-  
-  dependencies: []
-  
-  sceneCapabilities:
-    mainFirst: false
-    capabilities: []
-  
-  roles:
-    - name: MANAGER
-      displayName: 场景管理员
-      minCount: 1
-      maxCount: 1
-      permissions: [READ, WRITE, CONFIG, DELETE]
-    - name: MEMBER
-      displayName: 场景成员
-      minCount: 0
-      maxCount: 100
-      permissions: [READ, WRITE]
-  
   capabilities:
-    - id: process
-      name: 流程管理
-      description: 管理业务流程
+    - id: scenario-management
+      name: 场景管理
+      description: 创建、配置、管理业务场景
       category: service
-    - id: task
-      name: 任务管理
-      description: 管理业务任务
+      autoBind: true
+      
+    - id: workflow-execution
+      name: 工作流执行
+      description: 执行业务工作流和自动化任务
       category: service
-    - id: monitor
+      autoBind: true
+      
+    - id: data-processing
+      name: 数据处理
+      description: 业务数据采集、转换、分析
+      category: service
+      autoBind: true
+      
+    - id: process-monitoring
       name: 流程监控
-      description: 监控业务流程
+      description: 监控业务流程执行状态
       category: service
+      autoBind: false
+      
+  dependencies: []
+      
+  skillForm: SCENE
   
-  endpoints:
-    - path: /api/business/processes
-      method: POST
-      description: 创建流程
-      capability: process
-    - path: /api/business/processes/{id}/execute
-      method: POST
-      description: 执行流程
-      capability: process
-    - path: /api/business/tasks
-      method: GET
-      description: 获取任务
-      capability: task
-  
-  config:
-    optional:
-      - name: MAX_PROCESS_INSTANCES
+  scene:
+    type: TRIGGER
+    visibility: public
+    name: 业务管理
+    description: 通用业务场景管理
+    
+  roles:
+    - id: manager
+      name: 业务管理员
+      description: 业务场景管理员，负责场景配置和流程管理
+      required: true
+      minCount: 1
+      maxCount: 5
+      permissions:
+        - manage-scenarios
+        - manage-workflows
+        - view-all
+        - configure
+    - id: operator
+      name: 业务操作员
+      description: 执行业务操作的用户
+      required: true
+      minCount: 1
+      maxCount: 100
+      permissions:
+        - execute
+        - view-assigned
+        - submit-data
+    - id: viewer
+      name: 查看者
+      description: 只读访问业务数据
+      required: false
+      minCount: 0
+      maxCount: 1000
+      permissions:
+        - view
+        
+  activationSteps:
+    manager:
+      - stepId: configure-scenario
+        step: 1
+        action: configure-scenario
+        title: 配置场景
+        description: 设置业务场景基本信息
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: define-workflow
+        step: 2
+        action: define-workflow
+        title: 定义工作流
+        description: 创建业务工作流模板
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-triggers
+        step: 3
+        action: configure-triggers
+        title: 配置触发器
+        description: 设置工作流触发条件
+        required: false
+        skippable: true
+        autoExecute: false
+    operator:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入业务场景
+        required: true
+        skippable: false
+        autoExecute: false
+    viewer:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入业务场景
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    manager:
+      - id: overview
+        name: 业务概览
+        icon: ri-dashboard-line
+        path: /business/overview
+        order: 1
+        visible: true
+      - id: scenarios
+        name: 场景管理
+        icon: ri-layout-line
+        path: /business/scenarios
+        order: 2
+        visible: true
+      - id: workflows
+        name: 工作流管理
+        icon: ri-flow-chart
+        path: /business/workflows
+        order: 3
+        visible: true
+      - id: monitoring
+        name: 流程监控
+        icon: ri-line-chart-line
+        path: /business/monitoring
+        order: 4
+        visible: true
+      - id: settings
+        name: 场景设置
+        icon: ri-settings-line
+        path: /business/settings
+        order: 5
+        visible: true
+    operator:
+      - id: my-tasks
+        name: 我的任务
+        icon: ri-task-line
+        path: /business/my-tasks
+        order: 1
+        visible: true
+      - id: submit-data
+        name: 提交数据
+        icon: ri-upload-line
+        path: /business/submit-data
+        order: 2
+        visible: true
+    viewer:
+      - id: overview
+        name: 业务概览
+        icon: ri-dashboard-line
+        path: /business/overview
+        order: 1
+        visible: true
+      - id: reports
+        name: 报表查看
+        icon: ri-file-chart-line
+        path: /business/reports
+        order: 2
+        visible: true
+        
+  configSchema:
+    type: object
+    properties:
+      maxScenarios:
         type: integer
-        default: 1000
-        description: 最大流程实例数
-      - name: TASK_TIMEOUT
+        default: 100
+        title: 最大场景数
+      workflowTimeout:
         type: integer
         default: 86400
-        description: 任务超时(秒)
-  
-  resources:
+        title: 工作流超时(秒)
+      enableAutoTrigger:
+        type: boolean
+        default: true
+        title: 启用自动触发
+      dataRetentionDays:
+        type: integer
+        default: 365
+        title: 数据保留天数
+        
+  estimatedResources:
     cpu: "100m"
     memory: "256Mi"
     storage: "100Mi"
-  
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: true
-
-  knowledge:
-    documents:
-      - id: overview
-        name: 功能概述
-        path: README.md
-        type: guide
-        language: zh
-        priority: high
-    ragConfig:
-      enabled: true
-      indexName: "skill-business-knowledge"
-      embeddingModel: text-embedding-3-small
-      chunkSize: 1000
-      chunkOverlap: 200
-      searchStrategy: hybrid
-      topK: 5
-      threshold: 0.7
+    
+  estimatedDuration: "2-3分钟"
