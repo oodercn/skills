@@ -377,19 +377,55 @@ sceneDrivers:
 
 ---
 
-## 九、相关文档
+## 九、SE SDK 协作事项
 
-### 9.1 规范文档
-- [分类规范](./v2.3.1/volume-02-classification/SCENE_SKILL_CLASSIFICATION.md)
-- [能力地址空间](./v2.3.1/volume-01-specification/CAPABILITY_ADDRESS_SPACE.md)
-- [开发指南](./v2.3.1/volume-05-development/CAPABILITY_MODULE_GUIDE.md)
+### 9.1 includes 格式支持（P0 - 阻塞）
 
-### 9.2 归档文档
-- [分析报告](./v2.3.1/archive/analysis/)
-- [协作文档](./v2.3.1/archive/collaboration/)
-- [执行计划](./v2.3.1/archive/execution/)
+**问题**: SE SDK 远程发现不支持 `includes` 格式，导致 Gitee 发现返回 0 个技能。
+
+**详细协作申请**: [SE_SDK_INCLUDES_SUPPORT_REQUEST.md](../../mvp/docs/collaboration/SE_SDK_INCLUDES_SUPPORT_REQUEST.md)
+
+**状态**: 待 SE SDK 团队处理
+
+### 9.2 格式规范
+
+v2.3.1 标准使用 `includes` 引用格式：
+
+```yaml
+apiVersion: ooder.io/v1
+kind: SkillIndex
+
+metadata:
+  name: ooder-skills
+  version: "2.3.1"
+
+spec:
+  includes:
+    - categories.yaml
+    - scene-drivers.yaml
+    - skills/*.yaml
+    - scenes/*.yaml
+```
+
+---
+
+## 十、相关文档
+
+### 10.1 规范文档
+- [分类规范](./volume-02-classification/SCENE_SKILL_CLASSIFICATION.md)
+- [能力地址空间](./volume-01-specification/CAPABILITY_ADDRESS_SPACE.md)
+- [开发指南](./volume-05-development/CAPABILITY_MODULE_GUIDE.md)
+
+### 10.2 归档文档
+- [分析报告](./archive/analysis/)
+- [协作文档](./archive/collaboration/)
+- [执行计划](./archive/execution/)
+
+### 10.3 协作申请
+- [SE SDK Includes 支持协作申请](../../mvp/docs/collaboration/SE_SDK_INCLUDES_SUPPORT_REQUEST.md)
+- [skill-index 格式对齐](../../mvp/docs/collaboration/SKILL_INDEX_FORMAT_ALIGNMENT.md)
 
 ---
 
 **文档维护**: Ooder Team  
-**最后更新**: 2026-03-18
+**最后更新**: 2026-03-21
