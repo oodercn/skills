@@ -1,278 +1,248 @@
-﻿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Scenes
 metadata:
   name: sys-scenes
   category: sys
-  count: 23
+  count: 22
+  version: "2.3.1"
 
 scenes:
 
-    - sceneId: auth
-      name: Authentication
-      description: 认证场景，支持用户认证和组织数据访问
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - user-auth
-        - org-data-read
-      maxMembers: 100
-      
+    - sceneId: auth
+      name: Authentication
+      description: 认证场景，支持用户认证和组织数据访问
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - user-auth
+        - org-data-read
+      maxMembers: 100
 
-    - sceneId: utility
-      name: Utility
-      description: 实用工具场景，提供各种实用功能
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - execute-task
-      
+    - sceneId: utility
+      name: Utility
+      description: 实用工具场景，提供各种实用功能
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - execute-task
 
-    - sceneId: scheduling
-      name: Task Scheduling
-      description: 任务调度场景，提供任务调度、执行历史管理能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - schedule-task
-        - manage-execution
-        - history-query
-      maxMembers: 100
-      
+    - sceneId: scheduling
+      name: Task Scheduling
+      description: 任务调度场景，提供任务调度、执行历史管理能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - schedule-task
+        - manage-execution
+        - history-query
+      maxMembers: 100
 
-    - sceneId: vfs-database
-      name: Database VFS
-      description: 数据库存储场景，支持将文件存储在数据库中
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - vfs-storage
-        - metadata
-      maxMembers: 100
-      
+    - sceneId: vfs-database
+      name: Database VFS
+      description: 数据库存储场景，支持将文件存储在数据库中
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 100
 
-    - sceneId: vfs-local
-      name: Local VFS
-      description: 本地文件系统存储场景，提供基本的文件操作
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - vfs-storage
-        - file-read
-        - file-write
-      maxMembers: 100
-      
+    - sceneId: vfs-local
+      name: Local VFS
+      description: 本地文件系统存储场景，提供基本的文件操作
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - vfs-storage
+        - file-read
+        - file-write
+      maxMembers: 100
 
-    - sceneId: vfs-minio
-      name: MinIO VFS
-      description: MinIO存储场景，提供对象存储能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - vfs-storage
-        - metadata
-      maxMembers: 500
-      
+    - sceneId: vfs-minio
+      name: MinIO VFS
+      description: MinIO存储场景，提供对象存储能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
 
-    - sceneId: vfs-oss
-      name: Aliyun OSS VFS
-      description: 阿里云OSS存储场景，提供对象存储能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - vfs-storage
-        - metadata
-      maxMembers: 500
-      
+    - sceneId: vfs-oss
+      name: Aliyun OSS VFS
+      description: 阿里云OSS存储场景，提供对象存储能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
 
-    - sceneId: vfs-s3
-      name: AWS S3 VFS
-      description: AWS S3存储场景，提供对象存储能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - vfs-storage
-        - metadata
-      maxMembers: 500
-    
+    - sceneId: vfs-s3
+      name: AWS S3 VFS
+      description: AWS S3存储场景，提供对象存储能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - vfs-storage
+        - metadata
+      maxMembers: 500
 
-    - sceneId: sys
-      name: System Management
-      description: 系统管理场景，提供用户、权限、配置等系统管理能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - user-manage
-        - permission-manage
-        - config-manage
-      maxMembers: 50
-      
+    - sceneId: sys
+      name: System Management
+      description: 系统管理场景，提供用户、权限、配置等系统管理能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - user-manage
+        - permission-manage
+        - config-manage
+      maxMembers: 50
 
-    - sceneId: monitor
-      name: Monitoring & Operations
-      description: 监控运维场景，提供监控、告警、日志等运维能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - monitor-metrics
-        - monitor-alert
-        - log-query
-      maxMembers: 100
-      
+    - sceneId: monitor
+      name: Monitoring & Operations
+      description: 监控运维场景，提供监控、告警、日志等运维能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - monitor-metrics
+        - monitor-alert
+        - log-query
+      maxMembers: 100
 
-    - sceneId: security
-      name: Security & Audit
-      description: 安全审计场景，提供安全、审计、合规等安全能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - security-auth
-        - audit-log
-        - compliance-check
-      maxMembers: 50
-      
+    - sceneId: security
+      name: Security & Audit
+      description: 安全审计场景，提供安全、审计、合规等安全能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - security-auth
+        - audit-log
+        - compliance-check
+        - permission-management
+        - role-management
+        - access-control
+      maxMembers: 100
 
-    - sceneId: network
-      name: Network Management
-      description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - network-config
-        - ip-management
-        - device-scanning
-      maxMembers: 100
-      
+    - sceneId: network
+      name: Network Management
+      description: 网络管理场景，提供网络配置、IP管理、设备扫描能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - network-config
+        - ip-management
+        - device-scanning
+      maxMembers: 100
 
-    - sceneId: agent
-      name: Agent Management
-      description: 代理管理场景，提供终端代理注册、管理、命令执行能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - agent-management
-        - command-execution
-        - network-status
-      maxMembers: 1000
-      
+    - sceneId: agent
+      name: Agent Management
+      description: 代理管理场景，提供终端代理注册、管理、命令执行能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - agent-management
+        - command-execution
+        - network-status
+      maxMembers: 1000
 
-    - sceneId: health
-      name: Health Check
-      description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - health-check
-        - service-check
-        - report-generation
-      maxMembers: 100
-      
+    - sceneId: health
+      name: Health Check
+      description: 健康检查场景，提供系统健康检查、服务检查、报告生成能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - health-check
+        - service-check
+        - report-generation
+      maxMembers: 100
 
-    - sceneId: protocol
-      name: Protocol Management
-      description: 协议管理场景，提供协议处理器注册、命令分发能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - handler-registration
-        - command-dispatch
-        - handler-management
-      maxMembers: 100
-      
+    - sceneId: protocol
+      name: Protocol Management
+      description: 协议管理场景，提供协议处理器注册、命令分发能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - handler-registration
+        - command-dispatch
+        - handler-management
+      maxMembers: 100
 
-    - sceneId: openwrt
-      name: OpenWrt Management
-      description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - router-connection
-        - uci-config
-        - command-execution
-      maxMembers: 50
-      
+    - sceneId: openwrt
+      name: OpenWrt Management
+      description: OpenWrt管理场景，提供OpenWrt路由器连接、配置、命令执行能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - router-connection
+        - uci-config
+        - command-execution
+      maxMembers: 50
 
-    - sceneId: audit
-      name: Audit Log
-      description: 审计日志场景，提供审计日志记录、查询、导出和统计分析能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - audit-log
-        - audit-export
-        - audit-statistics
-      maxMembers: 100
-      
+    - sceneId: audit
+      name: Audit Log
+      description: 审计日志场景，提供审计日志记录、查询、导出和统计分析能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - audit-log
+        - audit-export
+        - audit-statistics
+      maxMembers: 100
 
-    - sceneId: security
-      name: Security Management
-      description: 安全管理场景，提供权限管理、角色管理和访问控制能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - permission-management
-        - role-management
-        - access-control
-      maxMembers: 100
-      
+    - sceneId: remote
+      name: Remote Management
+      description: 远程管理场景，提供SSH远程连接、命令执行和文件传输能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - ssh-connection
+        - command-execution
+        - file-transfer
+        - session-management
+      maxMembers: 100
 
-    - sceneId: remote
-      name: Remote Management
-      description: 远程管理场景，提供SSH远程连接、命令执行和文件传输能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - ssh-connection
-        - command-execution
-        - file-transfer
-        - session-management
-      maxMembers: 100
-      
+    - sceneId: cmd
+      name: Command Monitoring
+      description: 命令监控场景，提供命令分发、任务调度和执行追踪能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - command-dispatch
+        - task-scheduling
+        - execution-tracking
+      maxMembers: 100
 
-    - sceneId: cmd
-      name: Command Monitoring
-      description: 命令监控场景，提供命令分发、任务调度和执行追踪能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - command-dispatch
-        - task-scheduling
-        - execution-tracking
-      maxMembers: 100
-      
+    - sceneId: res
+      name: Resource Management
+      description: 资源管理场景，提供组织、部门和资源管理能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - organization-management
+        - department-management
+        - resource-allocation
+      maxMembers: 100
 
-    - sceneId: res
-      name: Resource Management
-      description: 资源管理场景，提供组织、部门和资源管理能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - organization-management
-        - department-management
-        - resource-allocation
-      maxMembers: 100
-      
+    - sceneId: hosting
+      name: Hosting Service
+      description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - instance-management
+        - instance-scaling
+        - instance-health
+        - cloud-provider
+      maxMembers: 100
 
-    - sceneId: hosting
-      name: Hosting Service
-      description: 托管服务场景，提供云托管管理能力，支持Kubernetes、阿里云、腾讯云
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - instance-management
-        - instance-scaling
-        - instance-health
-        - cloud-provider
-      maxMembers: 100
-      
-
-    - sceneId: nexus-ui
-      name: Nexus UI
-      description: Nexus界面场景，提供管理界面、仪表盘、监控页面能力
-      version: "1.0.0"
-      capabilityCategory: sys
-      requiredCapabilities:
-        - ui-rendering
-        - menu-integration
-        - data-display
-      maxMembers: 100
-
+    - sceneId: nexus-ui
+      name: Nexus UI
+      description: Nexus界面场景，提供管理界面、仪表盘、监控页面能力
+      version: "2.3.1"
+      capabilityCategory: sys
+      requiredCapabilities:
+        - ui-rendering
+        - menu-integration
+        - data-display
+      maxMembers: 100

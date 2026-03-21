@@ -1,20 +1,20 @@
-﻿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Scenes
 metadata:
   name: messaging-scenes
   category: messaging
   count: 1
+  version: "2.3.1"
 
 scenes:
 
-    - sceneId: msg
-      name: Message Service
-      description: 消息服务场景，提供消息推送、Topic管理和P2P通信能力
-      version: "1.0.0"
-      capabilityCategory: messaging
-      requiredCapabilities:
-        - message-push
-        - topic-management
-        - p2p-communication
-      maxMembers: 100
-      
+    - sceneId: msg
+      name: Message Service
+      description: 消息服务场景，提供消息推送、Topic管理和P2P通信能力
+      version: "2.3.1"
+      capabilityCategory: messaging
+      requiredCapabilities:
+        - message-push
+        - topic-management
+        - p2p-communication
+      maxMembers: 100

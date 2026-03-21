@@ -1,21 +1,21 @@
-﻿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Scenes
 metadata:
   name: infrastructure-scenes
   category: infrastructure
   count: 1
+  version: "2.3.1"
 
 scenes:
 
-    - sceneId: kubernetes
-      name: Kubernetes Management
-      description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
-      version: "1.0.0"
-      capabilityCategory: infrastructure
-      requiredCapabilities:
-        - cluster-management
-        - node-management
-        - namespace-management
-        - pod-management
-      maxMembers: 50
-      
+    - sceneId: kubernetes
+      name: Kubernetes Management
+      description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
+      version: "2.3.1"
+      capabilityCategory: infrastructure
+      requiredCapabilities:
+        - cluster-management
+        - node-management
+        - namespace-management
+        - pod-management
+      maxMembers: 50

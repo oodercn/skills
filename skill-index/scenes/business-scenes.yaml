@@ -1,96 +1,90 @@
-﻿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Scenes
 metadata:
   name: business-scenes
   category: business
   count: 7
+  version: "2.3.1"
 
 scenes:
 
-    - sceneId: hr
-      name: Human Resources
-      description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - employee-create
-        - employee-update
-        - employee-query
-        - department-query
-      maxMembers: 1000
-      
+    - sceneId: hr
+      name: Human Resources
+      description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - employee-create
+        - employee-update
+        - employee-query
+        - department-query
+      maxMembers: 1000
 
-    - sceneId: crm
-      name: Customer Relationship Management
-      description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - customer-create
-        - customer-update
-        - customer-query
-        - contact-manage
-      maxMembers: 500
-      
+    - sceneId: crm
+      name: Customer Relationship Management
+      description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - customer-create
+        - customer-update
+        - customer-query
+        - contact-manage
+      maxMembers: 500
 
-    - sceneId: finance
-      name: Financial Management
-      description: 财务管理场景，提供账务、报销、预算、结算等财务能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - account-manage
-        - expense-manage
-        - budget-manage
-      maxMembers: 200
-      
+    - sceneId: finance
+      name: Financial Management
+      description: 财务管理场景，提供账务、报销、预算、结算等财务能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - account-manage
+        - expense-manage
+        - budget-manage
+      maxMembers: 200
 
-    - sceneId: approval
-      name: Approval Workflow
-      description: 审批流程场景，提供流程定义、审批、流转等工作流能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - flow-start
-        - flow-query
-        - approval-submit
-        - approval-approve
-      maxMembers: 1000
-      
+    - sceneId: approval
+      name: Approval Workflow
+      description: 审批流程场景，提供流程定义、审批、流转等工作流能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - flow-start
+        - flow-query
+        - approval-submit
+        - approval-approve
+      maxMembers: 1000
 
-    - sceneId: project
-      name: Project Management
-      description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - project-create
-        - task-create
-        - task-assign
-        - progress-track
-      maxMembers: 500
-      
+    - sceneId: project
+      name: Project Management
+      description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - project-create
+        - task-create
+        - task-assign
+        - progress-track
+      maxMembers: 500
 
-    - sceneId: knowledge
-      name: Knowledge Management
-      description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - knowledge-create
-        - document-search
-        - knowledge-share
-      maxMembers: 1000
-      
+    - sceneId: knowledge
+      name: Knowledge Management
+      description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - knowledge-create
+        - document-search
+        - knowledge-share
+      maxMembers: 1000
 
-    - sceneId: business
-      name: Business
-      description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
-      version: "1.0.0"
-      capabilityCategory: business
-      requiredCapabilities:
-        - scenario-management
-        - workflow-execution
-        - data-processing
-      maxMembers: 100
-      
+    - sceneId: business
+      name: Business
+      description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
+      version: "2.3.1"
+      capabilityCategory: business
+      requiredCapabilities:
+        - scenario-management
+        - workflow-execution
+        - data-processing
+      maxMembers: 100

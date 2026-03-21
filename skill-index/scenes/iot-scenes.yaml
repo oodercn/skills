@@ -1,55 +1,52 @@
-﻿apiVersion: ooder.io/v1
+apiVersion: ooder.io/v1
 kind: Scenes
 metadata:
   name: iot-scenes
   category: iot
   count: 4
+  version: "2.3.1"
 
 scenes:
 
-    - sceneId: iot-device
-      name: IoT Device
-      description: IoT设备场景，提供设备连接、数据上报和命令控制能力
-      version: "1.0.0"
-      capabilityCategory: iot
-      requiredCapabilities:
-        - mqtt-broker
-        - mqtt-command
-      maxMembers: 10000
-      
+    - sceneId: iot-device
+      name: IoT Device
+      description: IoT设备场景，提供设备连接、数据上报和命令控制能力
+      version: "2.3.1"
+      capabilityCategory: iot
+      requiredCapabilities:
+        - mqtt-broker
+        - mqtt-command
+      maxMembers: 10000
 
-    - sceneId: device
-      name: Device Management
-      description: 设备管理场景，提供设备注册、监控、控制等IoT能力
-      version: "1.0.0"
-      capabilityCategory: iot
-      requiredCapabilities:
-        - device-register
-        - device-monitor
-        - device-control
-      maxMembers: 10000
-      
+    - sceneId: device
+      name: Device Management
+      description: 设备管理场景，提供设备注册、监控、控制等IoT能力
+      version: "2.3.1"
+      capabilityCategory: iot
+      requiredCapabilities:
+        - device-register
+        - device-monitor
+        - device-control
+      maxMembers: 10000
 
-    - sceneId: collection
-      name: Data Collection
-      description: 数据采集场景，提供数据采集、存储、分析等IoT能力
-      version: "1.0.0"
-      capabilityCategory: iot
-      requiredCapabilities:
-        - data-collect
-        - data-store
-        - data-analyze
-      maxMembers: 5000
-      
+    - sceneId: collection
+      name: Data Collection
+      description: 数据采集场景，提供数据采集、存储、分析等IoT能力
+      version: "2.3.1"
+      capabilityCategory: iot
+      requiredCapabilities:
+        - data-collect
+        - data-store
+        - data-analyze
+      maxMembers: 5000
 
-    - sceneId: edge
-      name: Edge Computing
-      description: 边缘计算场景，提供边缘节点、边缘应用等边缘计算能力
-      version: "1.0.0"
-      capabilityCategory: iot
-      requiredCapabilities:
-        - edge-node
-        - edge-compute
-        - edge-sync
-      maxMembers: 1000
-      
+    - sceneId: edge
+      name: Edge Computing
+      description: 边缘计算场景，提供边缘节点、边缘应用等边缘计算能力
+      version: "2.3.1"
+      capabilityCategory: iot
+      requiredCapabilities:
+        - edge-node
+        - edge-compute
+        - edge-sync
+      maxMembers: 1000
