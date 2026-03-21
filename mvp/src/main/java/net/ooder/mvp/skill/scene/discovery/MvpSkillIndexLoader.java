@@ -229,6 +229,7 @@ public class MvpSkillIndexLoader {
             
             boolean isInstalled = checkIfInstalled(skillId);
             cap.setStatus(isInstalled ? "installed" : "available");
+            cap.setInstalled(isInstalled);
             
             Object caps = skill.get("capabilities");
             if (caps instanceof List) {
@@ -557,7 +558,11 @@ public class MvpSkillIndexLoader {
             cap.setDescription((String) scene.get("description"));
             cap.setVersion((String) scene.get("version"));
             cap.setSource(source);
-            cap.setStatus("available");
+            
+            boolean isInstalled = checkIfInstalled(sceneId);
+            cap.setStatus(isInstalled ? "installed" : "available");
+            cap.setInstalled(isInstalled);
+            
             cap.setType("SCENE");
             cap.setSceneCapability(true);
             
