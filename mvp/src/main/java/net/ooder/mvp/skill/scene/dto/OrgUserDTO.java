@@ -8,6 +8,7 @@ public class OrgUserDTO {
     private String email;
     private String phone;
     private String departmentId;
+    private String departmentName;
     private String role;
     private String title;
     private String avatar;
@@ -27,6 +28,8 @@ public class OrgUserDTO {
     public void setPhone(String phone) { this.phone = phone; }
     public String getDepartmentId() { return departmentId; }
     public void setDepartmentId(String departmentId) { this.departmentId = departmentId; }
+    public String getDepartmentName() { return departmentName; }
+    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
     public String getRole() { return role; }
     public void setRole(String role) { this.role = role; }
     public String getTitle() { return title; }

@@ -7,6 +7,13 @@ import net.ooder.mvp.skill.scene.model.ResultModel;
 import net.ooder.mvp.skill.scene.service.SceneGroupService;
 import net.ooder.mvp.skill.scene.service.SceneTemplateService;
 import net.ooder.mvp.skill.scene.dto.PageResult;
+import net.ooder.mvp.skill.scene.dto.selector.CapabilityItemDTO;
+import net.ooder.mvp.skill.scene.dto.selector.CapabilityTypeDTO;
+import net.ooder.mvp.skill.scene.dto.selector.OrgNodeDTO;
+import net.ooder.mvp.skill.scene.dto.selector.ProviderItemDTO;
+import net.ooder.mvp.skill.scene.dto.selector.SceneGroupItemDTO;
+import net.ooder.mvp.skill.scene.dto.selector.TemplateItemDTO;
+import net.ooder.mvp.skill.scene.dto.selector.UserNodeDTO;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -31,67 +38,48 @@ public class SelectorController {
     private SceneTemplateService templateService;
 
     @GetMapping("/org-tree")
-    public ResultModel<List<Map<String, Object>>> getOrgTree() {
-        List<Map<String, Object>> tree = new ArrayList<Map<String, Object>>();
+    public ResultModel<List<OrgNodeDTO>> getOrgTree() {
+        List<OrgNodeDTO> tree = new ArrayList<OrgNodeDTO>();
 
-        Map<String, Object> rd = new HashMap<String, Object>();
-        rd.put("id", "dept-rd");
-        rd.put("name", "研发部");
-        rd.put("type", "department");
-        List<Map<String, Object>> rdChildren = new ArrayList<Map<String, Object>>();
+        OrgNodeDTO rd = new OrgNodeDTO("dept-rd", "研发部", "department");
+        List<OrgNodeDTO> rdChildren = new ArrayList<OrgNodeDTO>();
         rdChildren.add(createUserNode("user-manager-001", "张经理", "manager"));
         rdChildren.add(createUserNode("user-employee-001", "李员工", "employee"));
         rdChildren.add(createUserNode("user-employee-002", "王员工", "employee"));
         rdChildren.add(createUserNode("user-employee-003", "赵员工", "employee"));
-        rd.put("children", rdChildren);
+        rd.setChildren(rdChildren);
         tree.add(rd);
 
-        Map<String, Object> hr = new HashMap<String, Object>();
-        hr.put("id", "dept-hr");
-        hr.put("name", "人力资源部");
-        hr.put("type", "department");
-        List<Map<String, Object>> hrChildren = new ArrayList<Map<String, Object>>();
+        OrgNodeDTO hr = new OrgNodeDTO("dept-hr", "人力资源部", "department");
+        List<OrgNodeDTO> hrChildren = new ArrayList<OrgNodeDTO>();
         hrChildren.add(createUserNode("user-hr-001", "刘HR", "hr"));
-        hr.put("children", hrChildren);
+        hr.setChildren(hrChildren);
         tree.add(hr);
 
         return ResultModel.success(tree);
     }
 
-    private Map<String, Object> createUserNode(String id, String name, String role) {
-        Map<String, Object> user = new HashMap<String, Object>();
-        user.put("id", id);
-        user.put("name", name);
-        user.put("type", "user");
-        user.put("role", role);
-        user.put("icon", "ri-user-line");
+    private OrgNodeDTO createUserNode(String id, String name, String role) {
+        OrgNodeDTO user = new OrgNodeDTO(id, name, "user");
+        user.setRole(role);
         return user;
     }
 
     @GetMapping("/users")
-    public ResultModel<List<Map<String, Object>>> getUsers() {
-        List<Map<String, Object>> users = new ArrayList<Map<String, Object>>();
+    public ResultModel<List<UserNodeDTO>> getUsers() {
+        List<UserNodeDTO> users = new ArrayList<UserNodeDTO>();
 
-        users.add(createUserItem("user-manager-001", "张经理", "manager", "dept-rd"));
-        users.add(createUserItem("user-employee-001", "李员工", "employee", "dept-rd"));
-        users.add(createUserItem("user-employee-002", "王员工", "employee", "dept-rd"));
-        users.add(createUserItem("user-employee-003", "赵员工", "employee", "dept-rd"));
-        users.add(createUserItem("user-hr-001", "刘HR", "hr", "dept-hr"));
+        users.add(new UserNodeDTO("user-manager-001", "张经理", "manager", "dept-rd"));
+        users.add(new UserNodeDTO("user-employee-001", "李员工", "employee", "dept-rd"));
+        users.add(new UserNodeDTO("user-employee-002", "王员工", "employee", "dept-rd"));
+        users.add(new UserNodeDTO("user-employee-003", "赵员工", "employee", "dept-rd"));
+        users.add(new UserNodeDTO("user-hr-001", "刘HR", "hr", "dept-hr"));
 
         return ResultModel.success(users);
     }
 
-    private Map<String, Object> createUserItem(String id, String name, String role, String dept) {
-        Map<String, Object> user = new HashMap<String, Object>();
-        user.put("id", id);
-        user.put("name", name);
-        user.put("role", role);
-        user.put("departmentId", dept);
-        return user;
-    }
-
     @GetMapping("/capabilities")
-    public ResultModel<List<Map<String, Object>>> getCapabilities(
+    public ResultModel<List<CapabilityItemDTO>> getCapabilities(
             @RequestParam(required = false) String type) {
         
         List<Capability> capabilities;
@@ -102,14 +90,15 @@ public class SelectorController {
             capabilities = capabilityService.findAll();
         }
 
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        List<CapabilityItemDTO> result = new ArrayList<CapabilityItemDTO>();
         for (Capability cap : capabilities) {
-            Map<String, Object> item = new HashMap<String, Object>();
-            item.put("id", cap.getCapabilityId());
-            item.put("name", cap.getName());
-            item.put("description", cap.getDescription());
-            item.put("type", cap.getType() != null ? cap.getType().name() : "CUSTOM");
-            item.put("status", cap.getStatus() != null ? cap.getStatus().name() : "ENABLED");
+            CapabilityItemDTO item = new CapabilityItemDTO(
+                cap.getCapabilityId(),
+                cap.getName(),
+                cap.getDescription(),
+                cap.getCapabilityType() != null ? cap.getCapabilityType().name() : "CUSTOM",
+                cap.getStatus() != null ? cap.getStatus().name() : "ENABLED"
+            );
             result.add(item);
         }
 
@@ -117,23 +106,24 @@ public class SelectorController {
     }
 
     @GetMapping("/capability-types")
-    public ResultModel<List<Map<String, Object>>> getCapabilityTypes() {
-        List<Map<String, Object>> types = new ArrayList<Map<String, Object>>();
+    public ResultModel<List<CapabilityTypeDTO>> getCapabilityTypes() {
+        List<CapabilityTypeDTO> types = new ArrayList<CapabilityTypeDTO>();
 
         Map<String, Integer> typeCounts = new HashMap<String, Integer>();
         List<Capability> allCapabilities = capabilityService.findAll();
         for (Capability cap : allCapabilities) {
-            String typeName = cap.getType() != null ? cap.getType().name() : "CUSTOM";
+            String typeName = cap.getCapabilityType() != null ? cap.getCapabilityType().name() : "CUSTOM";
             typeCounts.put(typeName, typeCounts.getOrDefault(typeName, 0) + 1);
         }
 
         for (net.ooder.mvp.skill.scene.capability.model.CapabilityType type : 
                 net.ooder.mvp.skill.scene.capability.model.CapabilityType.values()) {
-            Map<String, Object> typeInfo = new HashMap<String, Object>();
-            typeInfo.put("id", type.name());
-            typeInfo.put("name", type.getName());
-            typeInfo.put("description", type.getDescription());
-            typeInfo.put("count", typeCounts.getOrDefault(type.name(), 0));
+            CapabilityTypeDTO typeInfo = new CapabilityTypeDTO(
+                type.name(),
+                type.getName(),
+                type.getDescription(),
+                typeCounts.getOrDefault(type.name(), 0)
+            );
             types.add(typeInfo);
         }
 
@@ -141,112 +131,98 @@ public class SelectorController {
     }
 
     @GetMapping("/scene-groups")
-    public ResultModel<List<Map<String, Object>>> getSceneGroups() {
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+    public ResultModel<List<SceneGroupItemDTO>> getSceneGroups() {
+        List<SceneGroupItemDTO> result = new ArrayList<SceneGroupItemDTO>();
 
         try {
             PageResult<?> pageResult = sceneGroupService.listAll(1, 100);
             List<?> groups = pageResult.getList();
             for (Object obj : groups) {
-                Map<String, Object> item = new HashMap<String, Object>();
+                SceneGroupItemDTO item;
                 if (obj instanceof Map) {
                     Map<?, ?> map = (Map<?, ?>) obj;
-                    item.put("id", map.get("sceneGroupId"));
-                    item.put("name", map.get("name"));
-                    item.put("description", map.get("description"));
-                    item.put("status", map.get("status"));
+                    item = new SceneGroupItemDTO(
+                        (String) map.get("sceneGroupId"),
+                        (String) map.get("name"),
+                        (String) map.get("description"),
+                        map.get("status") != null ? map.get("status").toString() : null
+                    );
                 } else if (obj instanceof net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO) {
                     net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO dto = 
                         (net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO) obj;
-                    item.put("id", dto.getSceneGroupId());
-                    item.put("name", dto.getName());
-                    item.put("description", dto.getDescription());
-                    item.put("status", dto.getStatus() != null ? dto.getStatus().name() : null);
+                    item = new SceneGroupItemDTO(
+                        dto.getSceneGroupId(),
+                        dto.getName(),
+                        dto.getDescription(),
+                        dto.getStatus() != null ? dto.getStatus().name() : null
+                    );
                 } else {
-                    item.put("id", obj.toString());
-                    item.put("name", obj.toString());
+                    item = new SceneGroupItemDTO(obj.toString(), obj.toString());
                 }
                 result.add(item);
             }
         } catch (Exception e) {
-            result.add(createDefaultItem("sg-daily-report", "日志汇报组"));
-            result.add(createDefaultItem("sg-project-alpha", "项目Alpha组"));
+            result.add(new SceneGroupItemDTO("sg-daily-report", "日志汇报组"));
+            result.add(new SceneGroupItemDTO("sg-project-alpha", "项目Alpha组"));
         }
 
         return ResultModel.success(result);
     }
 
     @GetMapping("/templates")
-    public ResultModel<List<Map<String, Object>>> getTemplates() {
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+    public ResultModel<List<TemplateItemDTO>> getTemplates() {
+        List<TemplateItemDTO> result = new ArrayList<TemplateItemDTO>();
 
         try {
             PageResult<?> pageResult = templateService.listAll(1, 100);
             List<?> templates = pageResult.getList();
             for (Object obj : templates) {
-                Map<String, Object> item = new HashMap<String, Object>();
+                TemplateItemDTO item;
                 if (obj instanceof Map) {
                     Map<?, ?> map = (Map<?, ?>) obj;
-                    item.put("id", map.get("templateId"));
-                    item.put("name", map.get("name"));
-                    item.put("description", map.get("description"));
+                    item = new TemplateItemDTO(
+                        (String) map.get("templateId"),
+                        (String) map.get("name"),
+                        (String) map.get("description")
+                    );
                 } else if (obj instanceof net.ooder.mvp.skill.scene.dto.scene.SceneTemplateDTO) {
                     net.ooder.mvp.skill.scene.dto.scene.SceneTemplateDTO dto = 
                         (net.ooder.mvp.skill.scene.dto.scene.SceneTemplateDTO) obj;
-                    item.put("id", dto.getTemplateId());
-                    item.put("name", dto.getName());
-                    item.put("description", dto.getDescription());
+                    item = new TemplateItemDTO(dto.getTemplateId(), dto.getName(), dto.getDescription());
                 } else {
-                    item.put("id", obj.toString());
-                    item.put("name", obj.toString());
+                    item = new TemplateItemDTO(obj.toString(), obj.toString());
                 }
                 result.add(item);
             }
         } catch (Exception e) {
-            result.add(createDefaultItem("tpl-daily-report", "日志汇报模板"));
-            result.add(createDefaultItem("tpl-meeting", "会议模板"));
+            result.add(new TemplateItemDTO("tpl-daily-report", "日志汇报模板"));
+            result.add(new TemplateItemDTO("tpl-meeting", "会议模板"));
         }
 
         return ResultModel.success(result);
     }
 
     @GetMapping("/providers")
-    public ResultModel<List<Map<String, Object>>> getProviders(
+    public ResultModel<List<ProviderItemDTO>> getProviders(
             @RequestParam(required = false) String type) {
         
-        List<Map<String, Object>> result = new ArrayList<Map<String, Object>>();
+        List<ProviderItemDTO> result = new ArrayList<ProviderItemDTO>();
 
         if ("SKILL".equals(type) || type == null) {
-            result.add(createProviderItem("skill-daily-report", "日志汇报技能", "SKILL"));
-            result.add(createProviderItem("skill-notification", "通知技能", "SKILL"));
+            result.add(new ProviderItemDTO("skill-daily-report", "日志汇报技能", "SKILL"));
+            result.add(new ProviderItemDTO("skill-notification", "通知技能", "SKILL"));
         }
         if ("AGENT".equals(type) || type == null) {
-            result.add(createProviderItem("agent-llm-001", "LLM分析助手", "AGENT"));
-            result.add(createProviderItem("agent-coordinator-001", "协调Agent", "AGENT"));
+            result.add(new ProviderItemDTO("agent-llm-001", "LLM分析助手", "AGENT"));
+            result.add(new ProviderItemDTO("agent-coordinator-001", "协调Agent", "AGENT"));
         }
         if ("SUPER_AGENT".equals(type) || type == null) {
-            result.add(createProviderItem("super-agent-001", "超级Agent", "SUPER_AGENT"));
+            result.add(new ProviderItemDTO("super-agent-001", "超级Agent", "SUPER_AGENT"));
         }
         if ("DEVICE".equals(type) || type == null) {
-            result.add(createProviderItem("device-sensor-001", "传感器设备", "DEVICE"));
+            result.add(new ProviderItemDTO("device-sensor-001", "传感器设备", "DEVICE"));
         }
 
         return ResultModel.success(result);
-    }
-
-    private Map<String, Object> createProviderItem(String id, String name, String type) {
-        Map<String, Object> item = new HashMap<String, Object>();
-        item.put("id", id);
-        item.put("name", name);
-        item.put("type", type);
-        item.put("description", type + " 提供者");
-        return item;
-    }
-
-    private Map<String, Object> createDefaultItem(String id, String name) {
-        Map<String, Object> item = new HashMap<String, Object>();
-        item.put("id", id);
-        item.put("name", name);
-        return item;
     }
 }

@@ -38,6 +38,8 @@ public class InstallConfig {
     public enum InstallStatus {
         DRAFT,
         PENDING,
+        DOWNLOADING,
+        DOWNLOADED,
         INSTALLING,
         INSTALLED,
         PENDING_ACTIVATION,
@@ -49,7 +51,12 @@ public class InstallConfig {
         PAUSED,
         WAITING,
         COMPLETED,
-        ARCHIVED
+        ARCHIVED,
+        DEV,
+        PUBLISHING,
+        PUBLISHED,
+        UNINSTALLING,
+        DEACTIVATING
     }
     
     public enum PushType {

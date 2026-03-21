@@ -65,12 +65,7 @@ async function loadAllUsers() {
 }
 
 function getDefaultUsers() {
-    return [
-        { userId: 'user-manager-001', name: '张经理', role: 'manager', departmentId: 'dept-rd' },
-        { userId: 'user-employee-001', name: '李员工', role: 'employee', departmentId: 'dept-rd' },
-        { userId: 'user-employee-002', name: '王员工', role: 'employee', departmentId: 'dept-rd' },
-        { userId: 'user-employee-003', name: '赵员工', role: 'employee', departmentId: 'dept-rd' }
-    ];
+    return [];
 }
 
 async function loadCapabilities() {
@@ -92,12 +87,7 @@ async function loadCapabilities() {
 }
 
 function getDefaultCapabilities() {
-    return [
-        { id: 'report-remind', name: '日志提醒', type: 'COMMUNICATION', description: '定时提醒员工提交日志' },
-        { id: 'report-submit', name: '日志提交', type: 'SERVICE', description: '员工提交工作日志' },
-        { id: 'report-aggregate', name: '日志汇总', type: 'SERVICE', description: '汇总所有员工日志' },
-        { id: 'report-analyze', name: '日志分析', type: 'AI', description: 'AI分析日志内容' }
-    ];
+    return [];
 }
 
 async function loadSceneGroup(id) {
@@ -128,7 +118,7 @@ async function loadLogs() {
     if (!sceneGroupId) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/logs/recent?limit=50');
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/event-log?limit=50');
         const result = await response.json();
         
         if (result.status === 'success' && result.data) {
@@ -149,60 +139,55 @@ function renderLogList(logs) {
         return;
     }
     
-    let html = '<div class="nx-flex nx-flex-col nx-gap-2">';
-    logs.forEach(log => {
-        const levelClass = log.status === 'ERROR' ? 'nx-badge--danger' : 
-                          log.status === 'WARN' ? 'nx-badge--warning' : 
-                          log.status === 'SUCCESS' ? 'nx-badge--success' : 'nx-badge--info';
-        html += '<div class="nx-flex nx-items-start nx-gap-3 nx-p-2 nx-bg-elevated nx-rounded">' +
-            '<span class="nx-text-sm nx-text-secondary" style="min-width: 80px;">' + formatTime(log.timestamp) + '</span>' +
-            '<span class="nx-badge ' + levelClass + '">' + (log.status || 'INFO') + '</span>' +
-            '<span class="nx-text-sm" style="min-width: 100px;">[' + (log.action || '-') + ']</span>' +
-            '<span class="nx-text-sm">' + (log.message || '-') + '</span>' +
-            '</div>';
+    const eventTypeConfig = {
+        'PARTICIPANT_JOIN': { icon: 'ri-user-add-line', color: '#4CAF50' },
+        'PARTICIPANT_LEAVE': { icon: 'ri-user-unfollow-line', color: '#f44336' },
+        'CAPABILITY_BIND': { icon: 'ri-link', color: '#2196F3' },
+        'CAPABILITY_UNBIND': { icon: 'ri-link-unlink', color: '#FF9800' },
+        'CAPABILITY_INVOKE': { icon: 'ri-flashlight-line', color: '#9C27B0' },
+        'SCENE_CREATE': { icon: 'ri-add-circle-line', color: '#4CAF50' },
+        'SCENE_START': { icon: 'ri-play-line', color: '#2196F3' },
+        'SCENE_STOP': { icon: 'ri-stop-line', color: '#FF9800' },
+        'SCENE_DELETE': { icon: 'ri-delete-bin-line', color: '#f44336' },
+        'SNAPSHOT_CREATE': { icon: 'ri-camera-line', color: '#00BCD4' },
+        'SNAPSHOT_RESTORE': { icon: 'ri-restore-line', color: '#9C27B0' },
+        'STATUS_CHANGE': { icon: 'ri-exchange-line', color: '#FF9800' },
+        'ROLE_CHANGE': { icon: 'ri-user-settings-line', color: '#3F51B5' }
+    };
+    
+    let html = '<div class="nx-relative" style="padding-left: 24px;">' +
+        '<div style="position: absolute; left: 8px; top: 0; bottom: 0; width: 2px; background: var(--nx-border-color);"></div>';
+    
+    logs.forEach((log, idx) => {
+        const config = eventTypeConfig[log.eventType] || { icon: 'ri-information-line', color: '#666' };
+        const statusColor = log.status === 'SUCCESS' ? '#4CAF50' : log.status === 'ERROR' ? '#f44336' : log.status === 'WARN' ? '#FF9800' : '#2196F3';
+        
+        html += '<div class="nx-relative nx-mb-3">' +
+            '<div style="position: absolute; left: -20px; top: 4px; width: 16px; height: 16px; border-radius: 50%; background: ' + statusColor + '; display: flex; align-items: center; justify-content: center;">' +
+            '<i class="' + config.icon + '" style="font-size: 10px; color: white;"></i></div>' +
+            '<div class="nx-p-3 nx-bg-elevated nx-rounded" style="border-left: 3px solid ' + config.color + ';">' +
+            '<div class="nx-flex nx-items-center nx-justify-between nx-mb-1">' +
+            '<span class="nx-text-sm nx-font-medium">' + (log.eventType || log.action || '事件') + '</span>' +
+            '<span class="nx-text-xs nx-text-secondary">' + formatTime(log.timestamp) + '</span>' +
+            '</div>' +
+            '<div class="nx-text-sm nx-text-secondary">' + (log.message || '-') + '</div>' +
+            (log.participantId ? '<div class="nx-text-xs nx-text-secondary nx-mt-1"><i class="ri-user-line"></i> ' + log.participantId + '</div>' : '') +
+            '</div></div>';
     });
+    
     html += '</div>';
     container.innerHTML = html;
 }
 
 function renderMockLogs() {
     const container = document.getElementById('logList');
-    const logs = [
-        { time: Date.now() - 60000, level: 'INFO', source: 'scene-manager', message: '场景状态更新: 活跃' },
-        { time: Date.now() - 120000, level: 'INFO', source: 'capability-exec', message: '能力执行完成' },
-        { time: Date.now() - 180000, level: 'WARN', source: 'session', message: '参与者心跳超时' }
-    ];
-    
-    let html = '<div class="nx-flex nx-flex-col nx-gap-2">';
-    logs.forEach(log => {
-        const levelClass = log.level === 'ERROR' ? 'nx-badge--danger' : log.level === 'WARN' ? 'nx-badge--warning' : 'nx-badge--info';
-        html += '<div class="nx-flex nx-items-start nx-gap-3 nx-p-2 nx-bg-elevated nx-rounded">' +
-            '<span class="nx-text-sm nx-text-secondary" style="min-width: 80px;">' + formatTime(log.time) + '</span>' +
-            '<span class="nx-badge ' + levelClass + '">' + log.level + '</span>' +
-            '<span class="nx-text-sm" style="min-width: 100px;">[' + log.source + ']</span>' +
-            '<span class="nx-text-sm">' + log.message + '</span>' +
-            '</div>';
-    });
-    html += '</div>';
-    container.innerHTML = html;
+    container.innerHTML = '<p class="nx-text-secondary">暂无日志记录</p>';
 }
 
 function loadMockSceneGroup() {
-    currentGroup = {
-        sceneGroupId: sceneGroupId || 'sg-new',
-        templateId: 'tpl-daily-report',
-        name: '新场景组',
-        description: '场景组描述',
-        status: 'ACTIVE',
-        creatorId: 'user-admin',
-        creatorType: 'USER',
-        memberCount: 0,
-        createTime: Date.now(),
-        participants: [],
-        capabilityBindings: [],
-        snapshots: []
-    };
-    renderSceneGroup();
+    console.warn('[loadMockSceneGroup] No mock data - redirecting to list');
+    alert('场景组不存在或已被删除');
+    window.location.href = '/console/pages/scene-groups.html';
 }
 
 function renderSceneGroup() {
@@ -230,9 +215,13 @@ function renderSceneGroup() {
     
     renderParticipantOverview();
     renderParticipants();
+    renderNetworkTopology();
     renderCapabilityBindings();
     renderSnapshots();
     renderLogs();
+    renderCollaborationFlow();
+    renderCollaborationMessages();
+    renderCollaborationHistory();
 }
 
 function getStatusText(status) {
@@ -264,13 +253,37 @@ function renderParticipantOverview() {
         byRole[p.role].push(p);
     });
     
+    const roleConfig = {
+        'OWNER': { icon: 'ri-vip-crown-line', color: '#FFD700', bg: '#FFF8E1', label: '创建者' },
+        'MANAGER': { icon: 'ri-shield-star-line', color: '#2196F3', bg: '#E3F2FD', label: '管理者' },
+        'EMPLOYEE': { icon: 'ri-user-line', color: '#4CAF50', bg: '#E8F5E9', label: '员工' },
+        'LLM_ASSISTANT': { icon: 'ri-robot-line', color: '#9C27B0', bg: '#F3E5F5', label: 'LLM助手' },
+        'COORDINATOR': { icon: 'ri-git-merge-line', color: '#FF9800', bg: '#FFF3E0', label: '协调者' },
+        'OBSERVER': { icon: 'ri-eye-line', color: '#9E9E9E', bg: '#FAFAFA', label: '观察者' }
+    };
+    
     let html = '';
     Object.entries(byRole).forEach(([role, participants]) => {
-        html += '<div class="nx-mb-3">' +
-            '<div class="nx-text-sm nx-font-medium nx-mb-2">' + role + ' (' + participants.length + ')</div>' +
-            '<div class="nx-flex nx-flex-wrap nx-gap-2">' +
-            participants.map(p => '<span class="nx-badge nx-badge--secondary">' + (p.name || p.participantId) + '</span>').join('') +
-            '</div></div>';
+        const config = roleConfig[role] || { icon: 'ri-user-line', color: '#666', bg: '#f5f5f5', label: role };
+        html += '<div class="nx-mb-4" style="border-left: 3px solid ' + config.color + '; padding-left: 12px;">' +
+            '<div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">' +
+            '<i class="' + config.icon + '" style="color: ' + config.color + ';"></i>' +
+            '<span class="nx-text-sm nx-font-medium">' + config.label + '</span>' +
+            '<span class="nx-badge nx-badge--secondary nx-text-xs">' + participants.length + '</span>' +
+            '</div>' +
+            '<div class="nx-flex nx-flex-wrap nx-gap-2">';
+        
+        participants.forEach(p => {
+            const typeIcon = p.participantType === 'AGENT' ? 'ri-robot-line' : 'ri-user-line';
+            const statusColor = p.status === 'ACTIVE' ? '#4CAF50' : p.status === 'SUSPENDED' ? '#f44336' : '#9E9E9E';
+            html += '<div class="nx-flex nx-items-center nx-gap-1 nx-px-2 nx-py-1 nx-rounded" style="background: ' + config.bg + ';">' +
+                '<span style="width: 6px; height: 6px; border-radius: 50%; background: ' + statusColor + ';"></span>' +
+                '<i class="' + typeIcon + ' nx-text-xs"></i>' +
+                '<span class="nx-text-sm">' + (p.name || p.participantId) + '</span>' +
+                '</div>';
+        });
+        
+        html += '</div></div>';
     });
     container.innerHTML = html;
 }
@@ -288,11 +301,16 @@ function renderParticipants() {
     
     let html = '';
     currentGroup.participants.forEach(p => {
-        const avatarIcon = p.participantType === 'USER' ? 'ri-user-line' : 'ri-robot-line';
-        const avatarBg = p.participantType === 'USER' ? 'var(--nx-primary-light)' : 'var(--nx-success-light)';
+        const isAgent = p.participantType === 'AGENT' || p.participantType === 'SUPER_AGENT';
+        const avatarIcon = isAgent ? 'ri-robot-line' : 'ri-user-line';
+        const avatarBg = isAgent ? 'var(--nx-success-light)' : 'var(--nx-primary-light)';
         
         const userInfo = userMap[p.participantId];
         const displayName = p.userName || p.name || (userInfo ? userInfo.name : p.participantId);
+        
+        const agentLink = isAgent 
+            ? '<a href="agent-detail.html?id=' + p.participantId + '" class="nx-btn nx-btn--ghost nx-btn--sm nx-mr-1" title="查看Agent详情"><i class="ri-external-link-line"></i></a>'
+            : '';
         
         html += '<div class="nx-card nx-mb-3">' +
             '<div class="nx-card__body">' +
@@ -303,9 +321,11 @@ function renderParticipants() {
             '<div class="nx-flex nx-items-center nx-gap-2">' +
             '<span class="nx-font-medium">' + displayName + '</span>' +
             '<span class="nx-badge nx-badge--secondary" id="role-badge-' + p.participantId + '">' + p.role + '</span>' +
+            (isAgent ? '<span class="nx-badge nx-badge--info nx-text-xs">Agent</span>' : '') +
             '</div>' +
             '<div class="nx-text-sm nx-text-secondary">类型: ' + p.participantType + (p.participantId !== displayName ? ' | ID: ' + p.participantId : '') + '</div>' +
             '</div>' +
+            agentLink +
             '<button class="nx-btn nx-btn--ghost nx-btn--sm nx-mr-1" onclick="showChangeRoleModal(\'' + p.participantId + '\', \'' + p.role + '\')" title="变更角色">' +
             '<i class="ri-user-settings-line"></i></button>' +
             '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="removeParticipant(\'' + p.participantId + '\')" title="移除">' +
@@ -313,6 +333,239 @@ function renderParticipants() {
             '</div></div></div>';
     });
     container.innerHTML = html;
+}
+
+function renderNetworkTopology() {
+    const container = document.getElementById('networkTopology');
+    if (!container) return;
+    
+    const participants = currentGroup.participants || [];
+    
+    if (participants.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary nx-text-center nx-py-12">暂无参与者</p>';
+        return;
+    }
+    
+    const agents = participants.filter(p => 
+        p.participantType === 'AGENT' || p.participantType === 'SUPER_AGENT'
+    );
+    const users = participants.filter(p => p.participantType === 'USER');
+    
+    const centerX = 300;
+    const centerY = 150;
+    const radius = 120;
+    
+    const roleColors = {
+        'OWNER': '#FFD700',
+        'MANAGER': '#2196F3',
+        'EMPLOYEE': '#4CAF50',
+        'LLM_ASSISTANT': '#9C27B0',
+        'COORDINATOR': '#FF9800',
+        'OBSERVER': '#9E9E9E'
+    };
+    
+    const roleLabels = {
+        'OWNER': '创建者',
+        'MANAGER': '管理者',
+        'EMPLOYEE': '员工',
+        'LLM_ASSISTANT': 'LLM助手',
+        'COORDINATOR': '协调者',
+        'OBSERVER': '观察者'
+    };
+    
+    let svg = `<svg width="100%" height="300" viewBox="0 0 600 300" style="overflow: visible;">
+        <defs>
+            <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#999"/>
+            </marker>
+            <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+                <feDropShadow dx="1" dy="1" stdDeviation="2" flood-opacity="0.2"/>
+            </filter>
+        </defs>
+        
+        <circle cx="${centerX}" cy="${centerY}" r="45" fill="var(--nx-primary-light)" stroke="var(--nx-primary)" stroke-width="2" filter="url(#shadow)"/>
+        <text x="${centerX}" y="${centerY - 5}" text-anchor="middle" font-size="11" font-weight="500" fill="var(--nx-text)">场景组</text>
+        <text x="${centerX}" y="${centerY + 12}" text-anchor="middle" font-size="9" fill="var(--nx-text-secondary)">${currentGroup.name || sceneGroupId}</text>`;
+    
+    const allParticipants = [...users, ...agents];
+    const totalNodes = allParticipants.length;
+    
+    allParticipants.forEach((p, idx) => {
+        const angle = (2 * Math.PI * idx / totalNodes) - Math.PI / 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        
+        const role = p.role || 'EMPLOYEE';
+        const color = roleColors[role] || '#666';
+        const roleLabel = roleLabels[role] || role;
+        const isAgent = p.participantType === 'AGENT' || p.participantType === 'SUPER_AGENT';
+        const icon = isAgent ? '🤖' : '👤';
+        const name = p.name || p.userName || p.participantId;
+        const shortName = name.length > 6 ? name.substring(0, 6) + '...' : name;
+        
+        svg += `<line x1="${centerX}" y1="${centerY}" x2="${x}" y2="${y}" stroke="#ddd" stroke-width="1.5" stroke-dasharray="4,2"/>`;
+        
+        svg += `<circle cx="${x}" cy="${y}" r="28" fill="white" stroke="${color}" stroke-width="2" filter="url(#shadow)"/>`;
+        svg += `<text x="${x}" y="${y - 3}" text-anchor="middle" font-size="14">${icon}</text>`;
+        svg += `<text x="${x}" y="${y + 12}" text-anchor="middle" font-size="8" fill="var(--nx-text)">${shortName}</text>`;
+        
+        svg += `<title>${name} (${roleLabel})</title>`;
+    });
+    
+    agents.forEach((agent, idx) => {
+        const otherAgents = agents.filter(a => a.participantId !== agent.participantId);
+        otherAgents.forEach(other => {
+            const agentIdx = allParticipants.findIndex(p => p.participantId === agent.participantId);
+            const otherIdx = allParticipants.findIndex(p => p.participantId === other.participantId);
+            
+            if (agentIdx < otherIdx) {
+                const angle1 = (2 * Math.PI * agentIdx / totalNodes) - Math.PI / 2;
+                const angle2 = (2 * Math.PI * otherIdx / totalNodes) - Math.PI / 2;
+                const x1 = centerX + radius * Math.cos(angle1);
+                const y1 = centerY + radius * Math.sin(angle1);
+                const x2 = centerX + radius * Math.cos(angle2);
+                const y2 = centerY + radius * Math.sin(angle2);
+                
+                svg += `<path d="M ${x1} ${y1} Q ${centerX} ${centerY - 30} ${x2} ${y2}" 
+                    fill="none" stroke="#9C27B0" stroke-width="1" stroke-opacity="0.4" stroke-dasharray="3,3"/>`;
+            }
+        });
+    });
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+function renderCollaborationFlow() {
+    const container = document.getElementById('collaborationFlow');
+    if (!container) return;
+    
+    const participants = currentGroup.participants || [];
+    const bindings = currentGroup.capabilityBindings || [];
+    
+    if (participants.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary nx-text-center nx-py-12">暂无参与者，无法展示协作流程</p>';
+        return;
+    }
+    
+    const agents = participants.filter(p => p.participantType === 'AGENT' || p.participantType === 'SUPER_AGENT');
+    const users = participants.filter(p => p.participantType === 'USER');
+    
+    let svg = `<svg width="100%" height="250" viewBox="0 0 600 250" style="overflow: visible;">
+        <defs>
+            <marker id="flowArrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" fill="#666"/>
+            </marker>
+        </defs>`;
+    
+    const steps = [
+        { x: 80, y: 125, label: '用户请求', icon: '👤', color: '#2196F3' },
+        { x: 200, y: 125, label: '场景协调', icon: '🎯', color: '#FF9800' },
+        { x: 350, y: 125, label: '能力调用', icon: '⚡', color: '#4CAF50' },
+        { x: 500, y: 125, label: '结果返回', icon: '📤', color: '#9C27B0' }
+    ];
+    
+    steps.forEach((step, idx) => {
+        svg += `<rect x="${step.x - 50}" y="${step.y - 40}" width="100" height="80" rx="8" fill="white" stroke="${step.color}" stroke-width="2"/>`;
+        svg += `<text x="${step.x}" y="${step.y - 10}" text-anchor="middle" font-size="20">${step.icon}</text>`;
+        svg += `<text x="${step.x}" y="${step.y + 15}" text-anchor="middle" font-size="10" fill="var(--nx-text)">${step.label}</text>`;
+        
+        if (idx < steps.length - 1) {
+            const nextStep = steps[idx + 1];
+            svg += `<line x1="${step.x + 50}" y1="${step.y}" x2="${nextStep.x - 50}" y2="${nextStep.y}" stroke="#999" stroke-width="1.5" marker-end="url(#flowArrow)"/>`;
+        }
+    });
+    
+    if (agents.length > 0) {
+        svg += `<text x="350" y="70" text-anchor="middle" font-size="9" fill="var(--nx-text-secondary)">参与Agent: ${agents.length}</text>`;
+        agents.slice(0, 3).forEach((agent, idx) => {
+            const name = (agent.name || agent.participantId).substring(0, 8);
+            svg += `<text x="${300 + idx * 50}" y="85" text-anchor="middle" font-size="8" fill="#9C27B0">${name}</text>`;
+        });
+    }
+    
+    if (bindings.length > 0) {
+        svg += `<text x="350" y="185" text-anchor="middle" font-size="9" fill="var(--nx-text-secondary)">绑定能力: ${bindings.length}</text>`;
+    }
+    
+    svg += '</svg>';
+    container.innerHTML = svg;
+}
+
+function renderCollaborationMessages() {
+    const container = document.getElementById('collaborationMessages');
+    if (!container) return;
+    
+    const logs = currentGroup.eventLogs || [];
+    const collaborationLogs = logs.filter(log => 
+        ['CAPABILITY_CALL', 'CAPABILITY_RESULT', 'PARTICIPANT_JOIN', 'PARTICIPANT_LEAVE', 'ROLE_CHANGE'].includes(log.eventType)
+    ).slice(0, 20);
+    
+    if (collaborationLogs.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary">暂无协作消息</p>';
+        return;
+    }
+    
+    let html = '<div class="nx-space-y-2">';
+    collaborationLogs.forEach(log => {
+        const icon = getEventIcon(log.eventType);
+        const time = formatTime(log.eventTime);
+        html += `<div class="nx-flex nx-items-start nx-gap-2 nx-p-2 nx-rounded" style="background: var(--nx-bg-elevated);">
+            <span class="nx-text-lg">${icon}</span>
+            <div class="nx-flex-1">
+                <div class="nx-flex nx-justify-between nx-items-center">
+                    <span class="nx-text-sm nx-font-medium">${log.eventName || log.eventType}</span>
+                    <span class="nx-text-xs nx-text-secondary">${time}</span>
+                </div>
+                <p class="nx-text-xs nx-text-secondary">${log.description || '-'}</p>
+            </div>
+        </div>`;
+    });
+    html += '</div>';
+    container.innerHTML = html;
+}
+
+function renderCollaborationHistory() {
+    const container = document.getElementById('collaborationHistory');
+    if (!container) return;
+    
+    const logs = currentGroup.eventLogs || [];
+    const historyLogs = logs.filter(log => 
+        ['SCENE_CREATE', 'SCENE_ACTIVATE', 'SCENE_DEACTIVATE', 'SNAPSHOT_CREATE', 'SNAPSHOT_RESTORE'].includes(log.eventType)
+    );
+    
+    if (historyLogs.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary">暂无协作历史记录</p>';
+        return;
+    }
+    
+    let html = '<table class="nx-table"><thead><tr><th>时间</th><th>事件</th><th>操作者</th><th>描述</th></tr></thead><tbody>';
+    historyLogs.forEach(log => {
+        html += `<tr>
+            <td>${formatTime(log.eventTime)}</td>
+            <td><span class="nx-badge nx-badge--info">${log.eventName || log.eventType}</span></td>
+            <td>${log.operatorName || log.operatorId || '-'}</td>
+            <td>${log.description || '-'}</td>
+        </tr>`;
+    });
+    html += '</tbody></table>';
+    container.innerHTML = html;
+}
+
+function getEventIcon(eventType) {
+    const icons = {
+        'CAPABILITY_CALL': '⚡',
+        'CAPABILITY_RESULT': '✅',
+        'PARTICIPANT_JOIN': '👋',
+        'PARTICIPANT_LEAVE': '👋',
+        'ROLE_CHANGE': '🔄',
+        'SCENE_CREATE': '🎬',
+        'SCENE_ACTIVATE': '▶️',
+        'SCENE_DEACTIVATE': '⏸️',
+        'SNAPSHOT_CREATE': '📸',
+        'SNAPSHOT_RESTORE': '🔙'
+    };
+    return icons[eventType] || '📌';
 }
 
 function renderCapabilityBindings() {
@@ -329,6 +582,7 @@ function renderCapabilityBindings() {
             groupedBindings[key] = {
                 capId: b.capId,
                 capName: b.capName,
+                capType: b.capType,
                 providers: []
             };
         }
@@ -339,6 +593,10 @@ function renderCapabilityBindings() {
     Object.values(groupedBindings).forEach(group => {
         const mainProvider = group.providers.find(p => p.priority === 1) || group.providers[0];
         const hasMultipleProviders = group.providers.length > 1;
+        const isSkill = group.capType === 'SKILL' || group.capId.startsWith('skill-');
+        const skillLink = isSkill 
+            ? '<a href="skill-detail.html?id=' + group.capId + '" class="nx-btn nx-btn--ghost nx-btn--sm" title="查看Skill详情"><i class="ri-external-link-line"></i></a>'
+            : '';
         
         html += '<div class="nx-card nx-mb-3">' +
             '<div class="nx-card__body">' +
@@ -347,6 +605,7 @@ function renderCapabilityBindings() {
             '<div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">' +
             '<i class="ri-flashlight-line" style="color: var(--nx-primary);"></i>' +
             '<span class="nx-font-medium">' + (group.capName || group.capId) + '</span>' +
+            (isSkill ? '<span class="nx-badge nx-badge--info nx-text-xs">Skill</span>' : '') +
             '<span class="nx-badge nx-badge--secondary">' + group.providers.length + '个提供者</span>' +
             '</div>' +
             '<div class="nx-text-sm nx-text-secondary nx-mb-2">能力ID: ' + group.capId + '</div>';
@@ -357,11 +616,15 @@ function renderCapabilityBindings() {
             const statusClass = p.status === 'ACTIVE' ? 'nx-badge--success' : p.status === 'ERROR' ? 'nx-badge--danger' : 'nx-badge--secondary';
             const badge = isPrimary ? '<span class="nx-badge nx-badge--primary nx-text-xs">主</span>' : '<span class="nx-badge nx-badge--info nx-text-xs">备用</span>';
             const fallbackIcon = p.fallback ? '<i class="ri-refresh-line" title="故障转移: 已启用"></i>' : '';
+            const providerIsAgent = p.providerType === 'AGENT';
+            const providerLink = providerIsAgent 
+                ? '<a href="agent-detail.html?id=' + p.providerId + '" class="nx-text-sm" style="color: var(--nx-primary);">' + (p.providerType || '-') + ': ' + (p.providerId || '-') + '</a>'
+                : '<span class="nx-text-sm">' + (p.providerType || '-') + ': ' + (p.providerId || '-') + '</span>';
             
             html += '<div class="nx-flex nx-items-center nx-gap-2 nx-p-2 nx-bg-elevated nx-rounded">' +
                 '<span class="nx-text-xs nx-text-secondary" style="min-width: 20px;">#' + (idx + 1) + '</span>' +
                 badge +
-                '<span class="nx-text-sm">' + (p.providerType || '-') + ': ' + (p.providerId || '-') + '</span>' +
+                providerLink +
                 '<span class="nx-badge ' + statusClass + ' nx-text-xs">' + (p.status || 'ACTIVE') + '</span>' +
                 '<span class="nx-text-xs nx-text-secondary">P' + (p.priority || 1) + '</span>' +
                 fallbackIcon +
@@ -371,6 +634,7 @@ function renderCapabilityBindings() {
         
         html += '</div>' +
             '<div class="nx-flex nx-gap-1 nx-ml-2">' +
+            skillLink +
             '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="showCapabilityDetail(\'' + group.capId + '\')" title="查看详情">' +
             '<i class="ri-information-line"></i></button>' +
             '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="unbindCapabilityGroup(\'' + group.capId + '\')" title="解绑所有">' +
@@ -604,19 +868,61 @@ async function saveParticipant() {
 }
 
 let currentEditingParticipantId = null;
+let currentEditingParticipantName = null;
+let currentEditingRole = null;
+
+const ROLE_CONFIG = {
+    'OWNER': { icon: 'ri-vip-crown-line', color: '#FFD700', label: '创建者' },
+    'MANAGER': { icon: 'ri-shield-star-line', color: '#2196F3', label: '管理者' },
+    'EMPLOYEE': { icon: 'ri-user-line', color: '#4CAF50', label: '员工' },
+    'LLM_ASSISTANT': { icon: 'ri-robot-line', color: '#9C27B0', label: 'LLM助手' },
+    'COORDINATOR': { icon: 'ri-git-merge-line', color: '#FF9800', label: '协调者' },
+    'OBSERVER': { icon: 'ri-eye-line', color: '#9E9E9E', label: '观察者' }
+};
+
+function getRoleDisplayName(role) {
+    return ROLE_CONFIG[role]?.label || role;
+}
 
 function showChangeRoleModal(participantId, currentRole) {
     currentEditingParticipantId = participantId;
+    currentEditingRole = currentRole;
     
-    const newRole = prompt('请输入新角色:', currentRole);
-    if (newRole && newRole !== currentRole) {
-        changeParticipantRole(participantId, newRole);
-    }
+    const participant = currentGroup.participants?.find(p => p.participantId === participantId);
+    currentEditingParticipantName = participant?.name || participant?.userName || participantId;
+    
+    document.getElementById('roleChangeParticipantName').textContent = currentEditingParticipantName;
+    document.getElementById('roleChangeCurrentRole').innerHTML = 
+        '<span class="nx-badge" style="background: ' + (ROLE_CONFIG[currentRole]?.color || '#666') + '20; color: ' + (ROLE_CONFIG[currentRole]?.color || '#666') + ';">' + 
+        '<i class="' + (ROLE_CONFIG[currentRole]?.icon || 'ri-user-line') + '"></i> ' + 
+        getRoleDisplayName(currentRole) + '</span>';
+    document.getElementById('newRoleSelect').value = currentRole;
+    
+    document.getElementById('roleChangeModal').classList.add('nx-modal--open');
 }
 
-async function changeParticipantRole(participantId, newRole) {
+function closeRoleChangeModal() {
+    document.getElementById('roleChangeModal').classList.remove('nx-modal--open');
+    currentEditingParticipantId = null;
+    currentEditingParticipantName = null;
+    currentEditingRole = null;
+}
+
+async function confirmRoleChange() {
+    const newRole = document.getElementById('newRoleSelect').value;
+    
+    if (!newRole) {
+        alert('请选择新角色');
+        return;
+    }
+    
+    if (newRole === currentEditingRole) {
+        closeRoleChangeModal();
+        return;
+    }
+    
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/participants/' + participantId + '/role', {
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/participants/' + currentEditingParticipantId + '/role', {
             method: 'PUT',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ newRole: newRole })
@@ -625,6 +931,7 @@ async function changeParticipantRole(participantId, newRole) {
         const result = await response.json();
         
         if (result.status === 'success') {
+            closeRoleChangeModal();
             loadSceneGroup(sceneGroupId);
         } else {
             alert('角色变更失败: ' + (result.message || '未知错误'));
@@ -957,7 +1264,7 @@ async function showCapabilityDetail(capId) {
     document.getElementById('detailCapName').textContent = group.capName || '-';
     document.getElementById('detailCapType').textContent = '-';
     document.getElementById('detailCapCategory').textContent = '-';
-    document.getElementById('detailCapDescription').textContent = '能力描述信息';
+    document.getElementById('detailCapDescription').textContent = '加载中...';
     
     let providerHtml = '<table class="nx-table"><thead><tr><th>#</th><th>角色</th><th>提供者类型</th><th>提供者ID</th><th>优先级</th><th>故障转移</th><th>状态</th></tr></thead><tbody>';
     group.providers.sort((a, b) => (a.priority || 1) - (b.priority || 1)).forEach((p, idx) => {
@@ -980,35 +1287,64 @@ async function showCapabilityDetail(capId) {
     document.getElementById('detailParameters').innerHTML = providerHtml;
     
     try {
-        const response = await fetch('/api/v1/capabilities/detail/' + capId);
+        const response = await fetch('/api/v1/scene/capabilities/' + capId);
         const result = await response.json();
         
         if (result.status === 'success' && result.data) {
             const cap = result.data;
-            document.getElementById('detailCapType').textContent = cap.typeName || '-';
-            document.getElementById('detailCapCategory').textContent = cap.categoryName || '-';
-            document.getElementById('detailCapDescription').textContent = cap.description || '-';
+            document.getElementById('detailCapType').textContent = cap.typeName || cap.type || '-';
+            document.getElementById('detailCapCategory').textContent = cap.categoryName || cap.category || '-';
+            document.getElementById('detailCapDescription').textContent = cap.description || '暂无描述';
+        } else {
+            document.getElementById('detailCapDescription').textContent = '暂无描述';
         }
     } catch (e) {
         console.error('Failed to load capability details:', e);
+        document.getElementById('detailCapDescription').textContent = '加载失败';
     }
     
     loadCapabilityLogs(capId);
     
-    document.querySelectorAll('[data-detail-tab]').forEach(tab => {
-        tab.addEventListener('click', function() {
-            document.querySelectorAll('[data-detail-tab]').forEach(t => t.classList.remove('nx-tabs__tab--active'));
-            this.classList.add('nx-tabs__tab--active');
-            
-            const tabId = this.getAttribute('data-detail-tab');
-            document.querySelectorAll('.detail-tab-content').forEach(content => {
-                content.style.display = 'none';
-            });
-            document.getElementById('detail-tab-' + tabId).style.display = 'block';
-        });
-    });
+    initDetailTabs();
     
     document.getElementById('capabilityDetailModal').classList.add('nx-modal--open');
+}
+
+function initDetailTabs() {
+    const tabs = document.querySelectorAll('[data-detail-tab]');
+    tabs.forEach(tab => {
+        tab.removeEventListener('click', handleDetailTabClick);
+        tab.addEventListener('click', handleDetailTabClick);
+    });
+    
+    tabs.forEach(t => t.classList.remove('nx-tabs__tab--active'));
+    tabs[0]?.classList.add('nx-tabs__tab--active');
+    
+    document.querySelectorAll('.detail-tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    const firstTabId = tabs[0]?.getAttribute('data-detail-tab');
+    if (firstTabId) {
+        const firstContent = document.getElementById('detail-tab-' + firstTabId);
+        if (firstContent) firstContent.style.display = 'block';
+    }
+}
+
+function handleDetailTabClick(event) {
+    const clickedTab = event.currentTarget;
+    const tabId = clickedTab.getAttribute('data-detail-tab');
+    
+    document.querySelectorAll('[data-detail-tab]').forEach(t => t.classList.remove('nx-tabs__tab--active'));
+    clickedTab.classList.add('nx-tabs__tab--active');
+    
+    document.querySelectorAll('.detail-tab-content').forEach(content => {
+        content.style.display = 'none';
+    });
+    
+    const targetContent = document.getElementById('detail-tab-' + tabId);
+    if (targetContent) {
+        targetContent.style.display = 'block';
+    }
 }
 
 function closeCapabilityDetailModal() {
@@ -1019,7 +1355,7 @@ async function loadCapabilityLogs(capId) {
     if (!sceneGroupId) return;
     
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/logs/recent?limit=20');
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/event-log?limit=20');
         const result = await response.json();
         
         if (result.status === 'success' && result.data) {
@@ -1062,23 +1398,72 @@ function refreshCapabilityLogs() {
     }
 }
 
+let availableKnowledgeBases = [];
+
 async function bindKnowledge() {
-    const kbId = prompt('请输入知识库ID:');
-    if (!kbId) return;
+    document.getElementById('knowledgeBindModal').classList.add('nx-modal--open');
     
-    const layer = prompt('请输入知识层 (GENERAL/PROFESSIONAL/SCENE):', 'SCENE');
-    if (!layer) return;
+    const knowledgeSelect = document.getElementById('knowledgeSelect');
+    knowledgeSelect.innerHTML = '<option value="">加载中...</option>';
+    
+    try {
+        const response = await fetch('/api/v1/knowledge-bases');
+        const result = await response.json();
+        
+        if (result.status === 'success' && result.data) {
+            availableKnowledgeBases = result.data;
+            
+            if (availableKnowledgeBases.length === 0) {
+                knowledgeSelect.innerHTML = '<option value="">暂无可用知识库</option>';
+                return;
+            }
+            
+            knowledgeSelect.innerHTML = '<option value="">请选择知识库</option>';
+            availableKnowledgeBases.forEach(kb => {
+                const bound = currentGroup.knowledgeBases?.some(b => b.kbId === kb.kbId);
+                if (!bound) {
+                    knowledgeSelect.innerHTML += '<option value="' + kb.kbId + '" data-name="' + kb.name + '">' + 
+                        kb.name + ' (' + kb.kbId + ')</option>';
+                }
+            });
+            
+            if (knowledgeSelect.options.length === 1) {
+                knowledgeSelect.innerHTML = '<option value="">所有知识库已绑定</option>';
+            }
+        } else {
+            knowledgeSelect.innerHTML = '<option value="">加载失败</option>';
+        }
+    } catch (error) {
+        console.error('Failed to load knowledge bases:', error);
+        knowledgeSelect.innerHTML = '<option value="">加载失败: ' + error.message + '</option>';
+    }
+}
+
+function closeKnowledgeBindModal() {
+    document.getElementById('knowledgeBindModal').classList.remove('nx-modal--open');
+}
+
+async function confirmKnowledgeBind() {
+    const kbId = document.getElementById('knowledgeSelect').value;
+    const layer = document.getElementById('knowledgeLayer').value;
+    const priority = parseInt(document.getElementById('knowledgePriority').value) || 0;
+    
+    if (!kbId) {
+        alert('请选择知识库');
+        return;
+    }
     
     try {
         const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/knowledge', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ kbId: kbId, layer: layer.toUpperCase() })
+            body: JSON.stringify({ kbId: kbId, layer: layer, priority: priority })
         });
         
         const result = await response.json();
         
         if (result.status === 'success') {
+            closeKnowledgeBindModal();
             loadKnowledgeBindings();
         } else {
             alert('绑定失败: ' + (result.message || '未知错误'));
@@ -1193,6 +1578,17 @@ async function loadLlmConfig() {
         if (result.status === 'success' && result.data) {
             const config = result.data;
             
+            const isSystemDefault = config.isSystemDefault === true;
+            
+            const statusIndicator = document.getElementById('llmConfigStatus');
+            if (statusIndicator) {
+                if (isSystemDefault) {
+                    statusIndicator.innerHTML = '<span class="nx-badge nx-badge--info"><i class="ri-settings-3-line"></i> 使用系统默认配置</span>';
+                } else {
+                    statusIndicator.innerHTML = '<span class="nx-badge nx-badge--success"><i class="ri-check-line"></i> 自定义配置</span>';
+                }
+            }
+            
             if (config.provider) document.getElementById('llmProvider').value = config.provider;
             if (config.model) document.getElementById('llmModel').value = config.model;
             if (config.decisionMode) document.getElementById('decisionMode').value = config.decisionMode;
@@ -1205,37 +1601,69 @@ async function loadLlmConfig() {
             if (config.dailyTokenLimit) document.getElementById('dailyTokenLimit').value = config.dailyTokenLimit;
             if (config.usedTokens !== undefined) document.getElementById('usedTokens').value = config.usedTokens;
             if (config.remainingTokens !== undefined) document.getElementById('remainingTokens').value = config.remainingTokens;
+            
+            loadLlmProviders(config.provider);
         }
     } catch (error) {
         console.error('Failed to load LLM config:', error);
     }
 }
 
-function onLlmProviderChange() {
-    const provider = document.getElementById('llmProvider').value;
+async function loadLlmProviders(currentProvider) {
+    try {
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/llm/providers');
+        const result = await response.json();
+        
+        const providerSelect = document.getElementById('llmProvider');
+        providerSelect.innerHTML = '<option value="">请选择提供者</option>';
+        
+        if (result.status === 'success' && result.data) {
+            result.data.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = p.name + (p.configured ? '' : ' (未配置)');
+                if (!p.configured) option.disabled = true;
+                if (p.id === currentProvider) option.selected = true;
+                providerSelect.appendChild(option);
+            });
+        }
+        
+        if (currentProvider) {
+            loadLlmModels(currentProvider);
+        }
+    } catch (error) {
+        console.error('Failed to load LLM providers:', error);
+    }
+}
+
+async function loadLlmModels(providerId) {
     const modelSelect = document.getElementById('llmModel');
-    
     modelSelect.innerHTML = '<option value="">加载中...</option>';
     
-    fetch('/api/v1/llm/providers/' + provider + '/models')
-        .then(response => response.json())
-        .then(result => {
-            if (result.status === 'success' && result.data) {
-                modelSelect.innerHTML = result.data.map(m => 
-                    '<option value="' + m.value + '">' + m.label + '</option>'
-                ).join('');
-            } else {
-                modelSelect.innerHTML = getDefaultModelsForProvider(provider).map(m => 
-                    '<option value="' + m.value + '">' + m.label + '</option>'
-                ).join('');
-            }
-        })
-        .catch(error => {
-            console.error('Failed to load models:', error);
-            modelSelect.innerHTML = getDefaultModelsForProvider(provider).map(m => 
+    try {
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/llm/providers/' + providerId + '/models');
+        const result = await response.json();
+        
+        if (result.status === 'success' && result.data) {
+            modelSelect.innerHTML = result.data.map(m => 
+                '<option value="' + m.id + '">' + m.name + '</option>'
+            ).join('');
+        } else {
+            modelSelect.innerHTML = getDefaultModelsForProvider(providerId).map(m => 
                 '<option value="' + m.value + '">' + m.label + '</option>'
             ).join('');
-        });
+        }
+    } catch (error) {
+        console.error('Failed to load models:', error);
+        modelSelect.innerHTML = getDefaultModelsForProvider(providerId).map(m => 
+            '<option value="' + m.value + '">' + m.label + '</option>'
+        ).join('');
+    }
+}
+
+function onLlmProviderChange() {
+    const provider = document.getElementById('llmProvider').value;
+    loadLlmModels(provider);
 }
 
 function getDefaultModelsForProvider(provider) {
@@ -1299,8 +1727,13 @@ async function testLlmConnection() {
     const provider = document.getElementById('llmProvider').value;
     const model = document.getElementById('llmModel').value;
     
+    if (!provider) {
+        alert('请先选择提供者');
+        return;
+    }
+    
     try {
-        const response = await fetch('/api/v1/llm/providers/' + provider + '/test', {
+        const response = await fetch('/api/v1/llm-providers/providers/' + provider + '/test', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ model: model })
@@ -1308,13 +1741,35 @@ async function testLlmConnection() {
         
         const result = await response.json();
         
-        if (result.status === 'success') {
-            alert('连接测试成功');
+        if (result.status === 'success' && result.data && result.data.success) {
+            alert('连接测试成功: ' + (result.data.message || 'OK'));
         } else {
-            alert('连接测试失败: ' + (result.message || '未知错误'));
+            alert('连接测试失败: ' + (result.data?.message || result.message || '未知错误'));
         }
     } catch (error) {
         console.error('Failed to test LLM connection:', error);
         alert('连接测试失败: ' + error.message);
+    }
+}
+
+async function resetLlmConfig() {
+    if (!confirm('确定要重置为系统默认配置吗？当前的自定义配置将被清除。')) return;
+    
+    try {
+        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/llm/reset', {
+            method: 'POST'
+        });
+        
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            loadLlmConfig();
+            alert('已重置为系统默认配置');
+        } else {
+            alert('重置失败: ' + (result.message || '未知错误'));
+        }
+    } catch (error) {
+        console.error('Failed to reset LLM config:', error);
+        alert('重置失败: ' + error.message);
     }
 }

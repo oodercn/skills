@@ -6,6 +6,9 @@
     var currentTab = 'definition';
     var bindings = [];
     var executionHistory = [];
+    var callLogs = [];
+    var dependencies = [];
+    var references = [];
 
     var TYPE_CONFIG = {
         'SCENE': { icon: 'ri-layout-grid-line', name: '场景能力', color: '#2563eb' },
@@ -34,6 +37,8 @@
                 this.loadCapability();
                 this.loadBindings();
                 this.loadHistory();
+                this.loadDependencies();
+                this.loadCallLogs();
             } else {
                 this.showError('缺少能力ID参数');
             }
@@ -103,6 +108,51 @@
             this.renderHistory(mockHistory);
         },
 
+        loadDependencies: function() {
+            var self = this;
+            dependencies = [];
+            references = [];
+            
+            ApiClient.get('/api/v1/capabilities/' + capabilityId + '/dependencies')
+                .then(function(result) {
+                    if (result && result.status === 'success' && result.data) {
+                        if (result.data.dependencies) dependencies = result.data.dependencies;
+                        if (result.data.references) references = result.data.references;
+                    }
+                })
+                .catch(function(e) {
+                    console.log('Dependencies API not available, using capability data');
+                })
+                .finally(function() {
+                    if (!dependencies || dependencies.length === 0) {
+                        dependencies = (capability && capability.dependencies) || [];
+                    }
+                    self.renderDependencies();
+                });
+        },
+
+        loadCallLogs: function() {
+            var self = this;
+            callLogs = [];
+            
+            ApiClient.get('/api/v1/capabilities/' + capabilityId + '/logs')
+                .then(function(result) {
+                    if (result && result.status === 'success' && result.data) {
+                    if (Array.isArray(result.data)) {
+                        callLogs = result.data;
+                    } else if (result.data.list) {
+                        callLogs = result.data.list;
+                    }
+                    }
+                })
+                .catch(function(e) {
+                    console.log('Logs API not available');
+                })
+                .finally(function() {
+                    self.renderCallLogs();
+                });
+        },
+
         showError: function(message) {
             var header = document.getElementById('capability-header');
             if (header) {
@@ -161,6 +211,34 @@
             
             if (skillEl) skillEl.textContent = capability.skillId || '-';
             if (versionEl) versionEl.textContent = capability.version || '1.0.0';
+            
+            this.renderBusinessScore();
+        },
+
+        renderBusinessScore: function() {
+            var score = capability.businessSemanticsScore;
+            var container = document.getElementById('score-container');
+            var scoreEl = document.getElementById('info-score');
+            
+            if (score !== undefined && score !== null && container && scoreEl) {
+                container.style.display = 'inline-flex';
+                
+                var level = score >= 8 ? 'high' : (score >= 3 ? 'medium' : 'low');
+                var levelConfig = {
+                    high: { color: '#10b981', label: '高业务价值', icon: 'ri-star-fill' },
+                    medium: { color: '#f59e0b', label: '中等价值', icon: 'ri-star-half-line' },
+                    low: { color: '#6b7280', label: '基础能力', icon: 'ri-star-line' }
+                };
+                var config = levelConfig[level];
+                
+                container.title = config.label + ' (评分: ' + score + '/10)';
+                scoreEl.textContent = score;
+                scoreEl.style.color = config.color;
+                scoreEl.style.fontWeight = '600';
+                
+                var icon = container.querySelector('i');
+                if (icon) icon.className = config.icon;
+            }
         },
 
         renderDefinition: function() {
@@ -481,6 +559,166 @@
             list.innerHTML = html;
         },
 
+        renderDependencies: function() {
+            this.renderDependencyGraph();
+            this.renderDependencyList();
+            this.renderReferenceList();
+        },
+
+        renderDependencyGraph: function() {
+            var graph = document.getElementById('dependency-graph');
+            if (!graph) return;
+            
+            var capName = capability.name || capability.capabilityId || '当前能力';
+            var type = capability.type || 'SERVICE';
+            var typeConfig = TYPE_CONFIG[type] || TYPE_CONFIG['SERVICE'];
+            
+            if (dependencies.length === 0 && references.length === 0) {
+                graph.innerHTML = '<div class="empty-state"><i class="ri-mind-map"></i><p>暂无依赖关系</p></div>';
+                return;
+            }
+            
+            var html = '<div class="dep-graph">';
+            
+            if (references.length > 0) {
+                html += '<div class="dep-group dep-group--refs">';
+                references.slice(0, 3).forEach(function(ref) {
+                    html += '<div class="dep-node dep-node--ref" onclick="navigateToCapability(\'' + ref.capabilityId + '\')">' +
+                        '<i class="ri-link"></i>' +
+                        '<span>' + this.truncateText(ref.name || ref.capabilityId, 12) + '</span>' +
+                    '</div>';
+                }, this);
+                if (references.length > 3) {
+                    html += '<div class="dep-more">+' + (references.length - 3) + '</div>';
+                }
+                html += '</div>';
+                html += '<div class="dep-arrow"><i class="ri-arrow-right-line"></i></div>';
+            }
+            
+            html += '<div class="dep-node dep-node--current">' +
+                '<i class="' + typeConfig.icon + '"></i>' +
+                '<span>' + this.truncateText(capName, 15) + '</span>' +
+            '</div>';
+            
+            if (dependencies.length > 0) {
+                html += '<div class="dep-arrow"><i class="ri-arrow-right-line"></i></div>';
+                html += '<div class="dep-group dep-group--deps">';
+                dependencies.slice(0, 3).forEach(function(dep) {
+                    html += '<div class="dep-node dep-node--dep" onclick="navigateToCapability(\'' + dep + '\')">' +
+                        '<i class="ri-flashlight-line"></i>' +
+                        '<span>' + this.truncateText(dep, 12) + '</span>' +
+                    '</div>';
+                }, this);
+                if (dependencies.length > 3) {
+                    html += '<div class="dep-more">+' + (dependencies.length - 3) + '</div>';
+                }
+                html += '</div>';
+            }
+            
+            html += '</div>';
+            html += '<div class="dep-legend">' +
+                '<span class="dep-legend-item"><span class="dep-legend-color" style="background:#8b5cf6"></span>被引用</span>' +
+                '<span class="dep-legend-item"><span class="dep-legend-color" style="background:#2563eb"></span>当前能力</span>' +
+                '<span class="dep-legend-item"><span class="dep-legend-color" style="background:#10b981"></span>依赖</span>' +
+            '</div>';
+            
+            graph.innerHTML = html;
+        },
+
+        renderDependencyList: function() {
+            var list = document.getElementById('dependency-list');
+            if (!list) return;
+            
+            if (dependencies.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="ri-link"></i><p>无依赖能力</p></div>';
+                return;
+            }
+            
+            var html = dependencies.map(function(dep) {
+                return '<div class="dep-item" onclick="navigateToCapability(\'' + dep + '\')">' +
+                    '<i class="ri-flashlight-line"></i>' +
+                    '<span class="dep-name">' + dep + '</span>' +
+                    '<i class="ri-arrow-right-s-line"></i>' +
+                '</div>';
+            }).join('');
+            
+            list.innerHTML = html;
+        },
+
+        renderReferenceList: function() {
+            var list = document.getElementById('reference-list');
+            if (!list) return;
+            
+            if (references.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="ri-team-line"></i><p>无被引用关系</p></div>';
+                return;
+            }
+            
+            var html = references.map(function(ref) {
+                return '<div class="ref-item" onclick="navigateToCapability(\'' + ref.capabilityId + '\')">' +
+                    '<i class="ri-link"></i>' +
+                    '<div class="ref-info">' +
+                        '<span class="ref-name">' + (ref.name || ref.capabilityId) + '</span>' +
+                        '<span class="ref-id">' + ref.capabilityId + '</span>' +
+                    '</div>' +
+                    '<i class="ri-arrow-right-s-line"></i>' +
+                '</div>';
+            }).join('');
+            
+            list.innerHTML = html;
+        },
+
+        renderCallLogs: function() {
+            var list = document.getElementById('log-list');
+            if (!list) return;
+            
+            var totalCalls = callLogs.length;
+            var successCalls = 0;
+            var errorCalls = 0;
+            var totalDuration = 0;
+            
+            callLogs.forEach(function(log) {
+                if (log.status === 'success' || log.level === 'INFO') {
+                    successCalls++;
+                } else {
+                    errorCalls++;
+                }
+                totalDuration += log.duration || 0;
+            });
+            
+            document.getElementById('log-total-calls').textContent = totalCalls;
+            document.getElementById('log-success-calls').textContent = successCalls;
+            document.getElementById('log-error-calls').textContent = errorCalls;
+            document.getElementById('log-avg-duration').textContent = 
+                totalCalls > 0 ? Math.round(totalDuration / totalCalls) + 'ms' : '0ms';
+            
+            if (callLogs.length === 0) {
+                list.innerHTML = '<div class="empty-state"><i class="ri-file-list-line"></i><p>暂无调用日志</p></div>';
+                return;
+            }
+            
+            var html = callLogs.slice(0, 50).map(function(log) {
+                var levelClass = log.level === 'ERROR' ? 'log-item--error' : 
+                                 (log.level === 'WARN' ? 'log-item--warn' : 'log-item--info');
+                var levelIcon = log.level === 'ERROR' ? 'ri-close-circle-line' : 
+                               (log.level === 'WARN' ? 'ri-alert-line' : 'ri-checkbox-circle-line');
+                
+                return '<div class="log-item ' + levelClass + '">' +
+                    '<div class="log-level"><i class="' + levelIcon + '"></i></div>' +
+                    '<div class="log-content">' +
+                        '<div class="log-message">' + (log.message || log.action || '-') + '</div>' +
+                        '<div class="log-meta">' +
+                            '<span>耗时: ' + (log.duration || 0) + 'ms</span>' +
+                            '<span>来源: ' + (log.source || '-') + '</span>' +
+                        '</div>' +
+                    '</div>' +
+                    '<div class="log-time">' + this.formatDate(log.timestamp) + '</div>' +
+                '</div>';
+            }, this).join('');
+            
+            list.innerHTML = html;
+        },
+
         switchTab: function(tabId) {
             currentTab = tabId;
             
@@ -631,6 +869,55 @@
                 if (icon) icon.classList.remove('section-toggle-icon--expanded');
             }
         }
+    };
+
+    global.refreshDependencies = function() {
+        CapabilityDetailPage.loadDependencies();
+        showToast('info', '刷新完成', '依赖关系已更新');
+    };
+
+    global.expandDependencyGraph = function() {
+        var container = document.getElementById('dependency-graph-container');
+        if (container) {
+            if (container.classList.contains('fullscreen')) {
+                container.classList.remove('fullscreen');
+            } else {
+                container.classList.add('fullscreen');
+            }
+        }
+    };
+
+    global.refreshLogs = function() {
+        CapabilityDetailPage.loadCallLogs();
+        showToast('info', '刷新完成', '调用日志已更新');
+    };
+
+    global.filterLogs = function() {
+        var level = document.getElementById('log-level-filter').value;
+        var items = document.querySelectorAll('.log-item');
+        items.forEach(function(item) {
+            if (!level || item.classList.contains('log-item--' + level.toLowerCase())) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+    };
+
+    global.exportLogs = function() {
+        if (callLogs.length === 0) {
+            showToast('warning', '导出失败', '暂无日志数据');
+            return;
+        }
+        var data = JSON.stringify(callLogs, null, 2);
+        var blob = new Blob([data], { type: 'application/json' });
+        var url = URL.createObjectURL(blob);
+        var a = document.createElement('a');
+        a.href = url;
+        a.download = 'capability-' + capabilityId + '-logs.json';
+        a.click();
+        URL.revokeObjectURL(url);
+        showToast('success', '导出成功', '日志文件已下载');
     };
 
     function showToast(type, title, message) {

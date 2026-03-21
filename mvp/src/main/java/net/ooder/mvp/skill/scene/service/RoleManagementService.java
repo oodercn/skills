@@ -76,7 +76,8 @@ public class RoleManagementService {
             createMenuItem("menu-user-2", "我的待办", "/console/pages/my-todos.html", "ri-task-line", 2, false),
             createMenuItem("menu-user-3", "我的场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false),
             createMenuItem("menu-user-4", "历史记录", "/console/pages/my-history.html", "ri-history-line", 4, false),
-            createMenuItem("menu-user-5", "密钥管理", "/console/pages/key-management.html", "ri-key-2-line", 5, false)
+            createMenuItem("menu-user-5", "密钥管理", "/console/pages/key-management.html", "ri-key-2-line", 5, false),
+            createMenuItem("menu-user-6", "入网审批", "/console/pages/network-approval.html", "ri-user-add-line", 6, false)
         );
         roleMenus.put("user", userMenus);
 

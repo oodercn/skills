@@ -9,6 +9,7 @@ public class CapabilityStatsDTO {
     private int failedInvocations;
     private double avgResponseTime;
     private long lastInvokeTime;
+    private int installedCapabilities;
 
     public CapabilityStatsDTO() {
     }
@@ -67,5 +68,13 @@ public class CapabilityStatsDTO {
 
     public void setLastInvokeTime(long lastInvokeTime) {
         this.lastInvokeTime = lastInvokeTime;
+    }
+
+    public int getInstalledCapabilities() {
+        return installedCapabilities;
+    }
+
+    public void setInstalledCapabilities(int installedCapabilities) {
+        this.installedCapabilities = installedCapabilities;
     }
 }

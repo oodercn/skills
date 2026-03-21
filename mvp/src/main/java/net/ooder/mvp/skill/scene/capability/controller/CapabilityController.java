@@ -258,7 +258,8 @@ public class CapabilityController {
         Map<String, Object> mockResult = new HashMap<>();
         mockResult.put("mock", true);
         mockResult.put("capabilityId", capabilityId);
-        mockResult.put("message", "This is a mock test result");
+        mockResult.put("error", "SceneEngineIntegration not available");
+        mockResult.put("message", "Please configure SE SDK to enable capability testing");
         mockResult.put("timestamp", System.currentTimeMillis());
         return mockResult;
     }
@@ -321,6 +322,54 @@ public class CapabilityController {
         );
         
         return ResultModel.success(result);
+    }
+    
+    @GetMapping("/{capabilityId}/dependencies")
+    public ResultModel<Map<String, Object>> getCapabilityDependencies(@PathVariable String capabilityId) {
+        log.info("Get dependencies for capability: {}", capabilityId);
+        
+        Capability capability = capabilityService.findById(capabilityId);
+        if (capability == null) {
+            return ResultModel.notFound("Capability not found: " + capabilityId);
+        }
+        
+        Map<String, Object> result = new HashMap<String, Object>();
+        result.put("capabilityId", capabilityId);
+        result.put("dependencies", capability.getDependencies() != null ? capability.getDependencies() : new ArrayList<String>());
+        result.put("references", new ArrayList<Object>());
+        
+        return ResultModel.success(result);
+    }
+    
+    @GetMapping("/{capabilityId}/logs")
+    public ResultModel<List<Map<String, Object>>> getCapabilityCallLogs(@PathVariable String capabilityId) {
+        log.info("Get call logs for capability: {}", capabilityId);
+        
+        Capability capability = capabilityService.findById(capabilityId);
+        if (capability == null) {
+            return ResultModel.notFound("Capability not found: " + capabilityId);
+        }
+        
+        List<Map<String, Object>> logs = new ArrayList<Map<String, Object>>();
+        
+        if (statsService != null) {
+            List<Object> recentLogs = statsService.getRecentLogs(50);
+            for (Object logObj : recentLogs) {
+                if (logObj instanceof Map) {
+                    Map<?, ?> m = (Map<?, ?>) logObj;
+                    String capName = String.valueOf(m.get("capabilityName"));
+                    if (capName != null && capName.contains(capabilityId)) {
+                        Map<String, Object> logMap = new HashMap<String, Object>();
+                        for (Map.Entry<?, ?> e : m.entrySet()) {
+                            logMap.put(String.valueOf(e.getKey()), e.getValue());
+                        }
+                        logs.add(logMap);
+                    }
+                }
+            }
+        }
+        
+        return ResultModel.success(logs);
     }
     
     @GetMapping("/skill-forms")

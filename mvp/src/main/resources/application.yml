@@ -22,8 +22,17 @@ ooder:
   skills:
     path: ../skills
     auto-sync: true
+    directories:
+      downloads: ./.ooder/downloads
+      installed: ./.ooder/installed
+      activated: ./.ooder/activated
+      dev: ./.ooder/dev
+      cache: ./.ooder/cache
   mock:
     enabled: false
+  discovery:
+    use-se-sdk: true
+    use-index-first: true
   jds:
     config:
       name: mvp
@@ -38,7 +47,29 @@ ooder:
       enabled: true
       auto-load: true
       plugin-directory: ./plugins
-    index-path: ../skill-index.yaml
+    index-dir: ../skill-index
+
+scene:
+  engine:
+    discovery:
+      enabled: true
+      gitee:
+        enabled: true
+        token: f0d11903a8e10e3ce09d51bc9552b664
+        default-owner: ooderCN
+        default-repo: skills
+        default-branch: master
+        skills-path: "skills"
+        cache-ttl-ms: 3600000
+      github:
+        enabled: false
+        token: ${GITHUB_TOKEN:}
+        default-owner: oodercn
+        default-repo: skills
+      cache:
+        enabled: true
+        ttl-ms: 3600000
+        dir: ./.ooder/cache/discovery
 
 management:
   endpoints:

@@ -39,7 +39,7 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
             return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
         }
         
-        if (capability.getType() != CapabilityType.SCENE) {
+        if (capability.getCapabilityType() != CapabilityType.SCENE) {
             return LifecycleResult.failure(capabilityId, "Only scene capabilities can be activated");
         }
         

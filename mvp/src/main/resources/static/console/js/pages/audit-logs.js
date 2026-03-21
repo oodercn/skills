@@ -6,8 +6,30 @@ var total = 0;
 async function init() {
     await DictCache.init();
     loadEventTypeOptions();
+    initFiltersFromUrl();
     loadLogs();
     loadStats();
+}
+
+function initFiltersFromUrl() {
+    var urlParams = new URLSearchParams(window.location.search);
+    var resourceId = urlParams.get('resourceId');
+    var userId = urlParams.get('userId');
+    var eventType = urlParams.get('eventType');
+    var result = urlParams.get('result');
+    
+    if (resourceId) {
+        document.getElementById('resourceFilter').value = resourceId;
+    }
+    if (userId) {
+        document.getElementById('userFilter').value = userId;
+    }
+    if (eventType) {
+        document.getElementById('eventTypeFilter').value = eventType;
+    }
+    if (result) {
+        document.getElementById('resultFilter').value = result;
+    }
 }
 
 async function loadEventTypeOptions() {
@@ -41,9 +63,9 @@ async function loadLogs() {
     try {
         var res = await ApiClient.get('/api/v1/audit/logs?' + params.toString());
         
-        if (res && res.code === 200) {
-            logs = res.data || [];
-            total = res.total || logs.length;
+        if (res && res.code === 200 && res.data) {
+            logs = res.data.list || [];
+            total = res.data.total || logs.length;
         } else {
             logs = [];
         }
@@ -60,7 +82,7 @@ async function loadStats() {
         var result = await ApiClient.get('/api/v1/audit/stats');
         
         var stats;
-        if (result && result.status === 'success') {
+        if (result && result.code === 200 && result.data) {
             stats = result.data || {};
         } else {
             stats = {};
@@ -70,13 +92,9 @@ async function loadStats() {
         document.getElementById('successCount').textContent = stats.successCount || 0;
         document.getElementById('failureCount').textContent = stats.failureCount || 0;
         document.getElementById('deniedCount').textContent = stats.deniedCount || 0;
-        
-        var today = new Date();
-        today.setHours(0, 0, 0, 0);
-        var todayStart = today.getTime();
-        
-        var todayCount = logs.filter(function(l) { return l.timestamp >= todayStart; }).length;
-        document.getElementById('todayCount').textContent = todayCount;
+        document.getElementById('todayCount').textContent = stats.todayCount || 0;
+        document.getElementById('weekCount').textContent = stats.weekCount || 0;
+        document.getElementById('monthCount').textContent = stats.monthCount || 0;
     } catch (e) {
         console.error('Load stats failed:', e);
     }

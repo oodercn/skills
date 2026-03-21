@@ -1,0 +1,288 @@
+apiVersion: scene.ooder.net/v1
+kind: SceneTemplate
+
+metadata:
+  id: recruitment-scene
+  name: 招聘管理场景
+  description: 人才招聘全流程管理，包括招聘看板、数据统计、候选人管理等
+  category: hr
+  icon: ri-user-add-line
+  version: 1.0.0
+  author: ooder-team
+  participantMode: multi-user
+
+spec:
+  skills:
+    - id: skill-recruitment-management
+      version: "1.0.0"
+      required: true
+      description: 招聘管理核心技能
+
+  dependencies:
+    required:
+      - skillId: skill-org
+        version: "1.0.0"
+        autoInstall: true
+        description: 组织管理基础能力
+    optional:
+      - skillId: skill-notification
+        version: "1.0.0"
+        autoInstall: false
+        description: 消息通知能力
+
+  capabilities:
+    - id: recruitment-dashboard
+      name: 招聘看板
+      description: 招聘状态可视化看板
+      category: hr
+      autoBind: true
+      dependencies: []
+    - id: recruitment-statistics
+      name: 数据统计
+      description: 招聘数据统计分析
+      category: hr
+      autoBind: true
+      dependencies: []
+
+  roles:
+    - name: MANAGER
+      description: 招聘经理，负责招聘流程管理和审批
+      required: true
+      minCount: 1
+      maxCount: 1
+      permissions: [manage, approve, view, config]
+    - name: HR
+      description: HR专员，执行招聘任务和候选人管理
+      required: true
+      minCount: 1
+      maxCount: 10
+      permissions: [execute, view, edit]
+    - name: INTERVIEWER
+      description: 面试官，参与面试评估
+      required: false
+      minCount: 0
+      maxCount: 50
+      permissions: [interview, view]
+
+  activationSteps:
+    MANAGER:
+      - stepId: confirm-participants
+        name: 确认参与者
+        description: 确认招聘团队角色分配，选择HR和面试官
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: select-push-targets
+        name: 选择推送目标
+        description: 选择要推送的下属员工
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: config-conditions
+        name: 配置驱动条件
+        description: 配置招聘流程触发规则和自动化条件
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: get-key
+        name: 获取KEY
+        description: 获取访问安全数据的密钥
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: confirm-activation
+        name: 确认激活
+        description: 确认激活招聘场景
+        required: true
+        skippable: false
+        autoExecute: false
+
+    HR:
+      - stepId: confirm-task
+        name: 确认任务
+        description: 您有一个新的招聘任务，确认激活吗？
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: config-private-capabilities
+        name: 配置私有能力
+        description: 选择要启用的私有能力
+        required: false
+        skippable: true
+        autoExecute: false
+        privateCapabilities:
+          - resume-parse
+          - interview-schedule
+      - stepId: get-key
+        name: 获取KEY
+        description: 获取访问安全数据的密钥
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: confirm-activation
+        name: 确认激活
+        description: 确认激活招聘场景
+        required: true
+        skippable: false
+        autoExecute: false
+
+    INTERVIEWER:
+      - stepId: confirm-task
+        name: 确认任务
+        description: 您被邀请参与面试评估
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: get-key
+        name: 获取KEY
+        description: 获取访问安全数据的密钥
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: confirm-activation
+        name: 确认激活
+        description: 确认参与面试
+        required: true
+        skippable: false
+        autoExecute: false
+
+  menus:
+    MANAGER:
+      - id: recruitment-overview
+        name: 招聘概览
+        icon: ri-dashboard-line
+        url: /console/pages/recruitment/dashboard.html
+        order: 1
+        visible: true
+      - id: recruitment-statistics
+        name: 数据统计
+        icon: ri-bar-chart-line
+        url: /console/pages/recruitment/statistics.html
+        order: 2
+        visible: true
+      - id: recruitment-candidates
+        name: 候选人管理
+        icon: ri-user-line
+        url: /console/pages/recruitment/candidates.html
+        order: 3
+        visible: true
+        children:
+          - id: candidate-list
+            name: 候选人列表
+            icon: ri-list-check
+            url: /console/pages/recruitment/candidate-list.html
+            order: 1
+            visible: true
+          - id: candidate-pool
+            name: 人才库
+            icon: ri-database-2-line
+            url: /console/pages/recruitment/candidate-pool.html
+            order: 2
+            visible: true
+      - id: recruitment-approval
+        name: 审批中心
+        icon: ri-checkbox-line
+        url: /console/pages/recruitment/approval.html
+        order: 4
+        visible: true
+      - id: recruitment-settings
+        name: 招聘设置
+        icon: ri-settings-3-line
+        url: /console/pages/recruitment/settings.html
+        order: 5
+        visible: true
+
+    HR:
+      - id: recruitment-overview
+        name: 招聘概览
+        icon: ri-dashboard-line
+        url: /console/pages/recruitment/dashboard.html
+        order: 1
+        visible: true
+      - id: recruitment-candidates
+        name: 候选人管理
+        icon: ri-user-line
+        url: /console/pages/recruitment/candidates.html
+        order: 2
+        visible: true
+        children:
+          - id: candidate-list
+            name: 候选人列表
+            icon: ri-list-check
+            url: /console/pages/recruitment/candidate-list.html
+            order: 1
+            visible: true
+          - id: candidate-pool
+            name: 人才库
+            icon: ri-database-2-line
+            url: /console/pages/recruitment/candidate-pool.html
+            order: 2
+            visible: true
+      - id: interview-arrangement
+        name: 面试安排
+        icon: ri-calendar-line
+        url: /console/pages/recruitment/interview.html
+        order: 3
+        visible: true
+
+    INTERVIEWER:
+      - id: my-interviews
+        name: 我的面试
+        icon: ri-calendar-check-line
+        url: /console/pages/recruitment/my-interviews.html
+        order: 1
+        visible: true
+      - id: candidate-evaluation
+        name: 候选人评估
+        icon: ri-file-list-3-line
+        url: /console/pages/recruitment/evaluation.html
+        order: 2
+        visible: true
+
+  uiSkills:
+    - id: recruitment-ui
+      name: 招聘管理界面
+      entryUrl: /console/pages/recruitment/
+      icon: ri-user-add-line
+      roles: [MANAGER, HR, INTERVIEWER]
+      order: 100
+
+  privateCapabilities:
+    - capId: resume-parse
+      name: 简历解析
+      description: AI自动解析简历内容，提取关键信息
+      optional: true
+      enabled: false
+      skillId: skill-resume-parse
+    - capId: interview-schedule
+      name: 面试安排
+      description: 自动安排面试时间，发送通知
+      optional: true
+      enabled: false
+      skillId: skill-schedule
+    - capId: offer-management
+      name: Offer管理
+      description: Offer生成、审批、发送流程管理
+      optional: true
+      enabled: false
+      skillId: skill-offer
+
+  scene:
+    type: INTERACTIVE
+    name: 招聘管理
+    description: 人才招聘全流程管理
+    config:
+      autoNotify: true
+      retentionDays: 365
+      maxCandidates: 10000
+
+  installOrder:
+    - skill-org
+    - skill-recruitment-management
+    - skill-notification
+
+  estimatedResources:
+    cpu: "500m"
+    memory: "512Mi"
+    storage: "1Gi"
+  estimatedDuration: "5m"

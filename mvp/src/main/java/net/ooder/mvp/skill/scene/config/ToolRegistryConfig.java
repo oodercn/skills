@@ -26,6 +26,7 @@ public class ToolRegistryConfig {
         registry.register(new FilterCapabilitiesTool());
         registry.register(new SelectCapabilityTool());
         registry.register(new InstallCapabilityTool());
+        registry.register(new NavigateToPageTool());
         
         log.info("[ToolRegistryConfig] Registered {} tools", registry.listAll().size());
         

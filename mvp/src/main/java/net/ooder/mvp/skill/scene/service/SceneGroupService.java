@@ -69,4 +69,6 @@ public interface SceneGroupService {
     Map<String, Object> getLlmConfig(String sceneGroupId);
     
     boolean updateLlmConfig(String sceneGroupId, Map<String, Object> config);
+    
+    List<SceneGroupEventLogDTO> getEventLog(String sceneGroupId, int limit);
 }

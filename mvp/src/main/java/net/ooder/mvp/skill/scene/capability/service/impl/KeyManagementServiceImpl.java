@@ -1,10 +1,14 @@
 package net.ooder.mvp.skill.scene.capability.service.impl;
 
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService;
+import net.ooder.skill.common.storage.JsonStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import javax.annotation.PostConstruct;
+import javax.annotation.PreDestroy;
 import java.security.SecureRandom;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -16,12 +20,74 @@ public class KeyManagementServiceImpl implements KeyManagementService {
 
     private static final String KEY_PREFIX = "sk-scene-";
     private static final long DEFAULT_EXPIRE_MS = 7 * 24 * 60 * 60 * 1000L;
+    private static final String KEYS_STORAGE_KEY = "key-management-keys";
+    private static final String USER_KEYS_STORAGE_KEY = "key-management-user-keys";
+    private static final String SCENE_KEYS_STORAGE_KEY = "key-management-scene-keys";
     
     private Map<String, KeyInfo> keyStore = new ConcurrentHashMap<>();
     private Map<String, List<String>> userKeys = new ConcurrentHashMap<>();
     private Map<String, List<String>> sceneKeys = new ConcurrentHashMap<>();
     
     private SecureRandom random = new SecureRandom();
+    
+    @Autowired(required = false)
+    private JsonStorageService jsonStorageService;
+    
+    @PostConstruct
+    public void init() {
+        loadFromStorage();
+    }
+    
+    @PreDestroy
+    public void shutdown() {
+        persistToStorage();
+    }
+    
+    private void loadFromStorage() {
+        if (jsonStorageService == null) {
+            log.info("[loadFromStorage] JsonStorageService not available, using memory-only mode");
+            return;
+        }
+        
+        try {
+            List<KeyInfo> storedKeys = jsonStorageService.loadList(KEYS_STORAGE_KEY, KeyInfo.class);
+            if (storedKeys != null && !storedKeys.isEmpty()) {
+                for (KeyInfo key : storedKeys) {
+                    keyStore.put(key.getKeyId(), key);
+                    
+                    String userId = key.getUserId();
+                    if (userId != null) {
+                        userKeys.computeIfAbsent(userId, k -> new ArrayList<>()).add(key.getKeyId());
+                    }
+                    
+                    String sceneGroupId = key.getSceneGroupId();
+                    if (sceneGroupId != null) {
+                        sceneKeys.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(key.getKeyId());
+                    }
+                }
+                log.info("[loadFromStorage] Loaded {} keys from storage", keyStore.size());
+            }
+        } catch (Exception e) {
+            log.error("[loadFromStorage] Failed to load keys: {}", e.getMessage());
+        }
+    }
+    
+    private void persistToStorage() {
+        if (jsonStorageService == null) {
+            return;
+        }
+        
+        try {
+            jsonStorageService.saveList(KEYS_STORAGE_KEY, new ArrayList<>(keyStore.values()));
+            log.info("[persistToStorage] Saved {} keys to storage", keyStore.size());
+        } catch (Exception e) {
+            log.error("[persistToStorage] Failed to persist keys: {}", e.getMessage());
+        }
+    }
+    
+    private void saveOnChange() {
+        persistToStorage();
+    }
 
     @Override
     public KeyInfo generateKey(KeyGenerateRequest request) {
@@ -48,6 +114,13 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         keyInfo.setPermissions(request.getPermissions());
         keyInfo.setDescription(request.getDescription());
         keyInfo.setAccessCount(0);
+        keyInfo.setKeyName(request.getKeyName());
+        keyInfo.setKeyType(request.getKeyType() != null ? request.getKeyType() : request.getScope());
+        keyInfo.setProvider(request.getProvider());
+        keyInfo.setAllowedUsers(request.getAllowedUsers());
+        keyInfo.setAllowedRoles(request.getAllowedRoles());
+        keyInfo.setAllowedScenes(request.getAllowedScenes());
+        keyInfo.setUpdatedAt(System.currentTimeMillis());
         
         keyStore.put(keyId, keyInfo);
         
@@ -55,6 +128,8 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         if (request.getSceneGroupId() != null) {
             sceneKeys.computeIfAbsent(request.getSceneGroupId(), k -> new ArrayList<>()).add(keyId);
         }
+        
+        saveOnChange();
         
         log.info("[generateKey] Key generated: {} for user: {}", keyId, request.getUserId());
         
@@ -68,6 +143,12 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         result.setCreateTime(keyInfo.getCreateTime());
         result.setExpireTime(keyInfo.getExpireTime());
         result.setDescription(keyInfo.getDescription());
+        result.setKeyName(keyInfo.getKeyName());
+        result.setKeyType(keyInfo.getKeyType());
+        result.setProvider(keyInfo.getProvider());
+        result.setAllowedUsers(keyInfo.getAllowedUsers());
+        result.setAllowedRoles(keyInfo.getAllowedRoles());
+        result.setAllowedScenes(keyInfo.getAllowedScenes());
         
         return result;
     }
@@ -81,6 +162,7 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         
         if (keyInfo.isExpired() && keyInfo.getStatus() == KeyInfo.KeyStatus.ACTIVE) {
             keyInfo.setStatus(KeyInfo.KeyStatus.EXPIRED);
+            saveOnChange();
             log.info("[getKey] Key expired: {}", keyId);
         }
         
@@ -118,6 +200,7 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         }
         
         keyInfo.setStatus(KeyInfo.KeyStatus.REVOKED);
+        saveOnChange();
         log.info("[revokeKey] Key revoked: {}", keyId);
         return true;
     }
@@ -137,6 +220,7 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         
         keyInfo.setExpireTime(System.currentTimeMillis() + DEFAULT_EXPIRE_MS);
         keyInfo.setStatus(KeyInfo.KeyStatus.ACTIVE);
+        saveOnChange();
         
         log.info("[refreshKey] Key refreshed: {}, new expire time: {}", keyId, keyInfo.getExpireTime());
         return keyInfo;
@@ -195,6 +279,7 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         
         keyInfo.setLastAccessTime(System.currentTimeMillis());
         keyInfo.setAccessCount(keyInfo.getAccessCount() + 1);
+        saveOnChange();
         
         Map<String, Object> permissions = keyInfo.getPermissions();
         if (permissions != null && !permissions.isEmpty()) {
@@ -269,6 +354,7 @@ public class KeyManagementServiceImpl implements KeyManagementService {
         }
         
         if (cleaned > 0) {
+            saveOnChange();
             log.info("[cleanupExpiredKeys] Cleaned {} expired keys", cleaned);
         }
     }

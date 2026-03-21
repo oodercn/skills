@@ -1,17 +1,19 @@
 package net.ooder.mvp.skill.scene.service;
 
-import lombok.extern.slf4j.Slf4j;
 import net.ooder.mvp.skill.scene.dto.menu.MenuItemDTO;
 import net.ooder.mvp.skill.scene.dto.menu.MenuConfigDTO;
 import net.ooder.mvp.skill.scene.dto.scene.SceneTemplateDTO;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
 @Service
-@Slf4j
 public class MenuAutoRegisterService {
+
+    private static final Logger log = LoggerFactory.getLogger(MenuAutoRegisterService.class);
 
     @Autowired
     private MenuRoleConfigService menuRoleConfigService;
@@ -19,13 +21,6 @@ public class MenuAutoRegisterService {
     @Autowired
     private SceneTemplateService sceneTemplateService;
 
-    /**
-     * 激活完成时自动注册菜单
-     * @param sceneGroupId 场景组ID
-     * @param templateId 模板ID
-     * @param userId 用户ID
-     * @param roleInScene 用户在场景中的角色
-     */
     public void registerMenusOnActivation(String sceneGroupId, String templateId, String userId, String roleInScene) {
         log.info("Auto registering menus for user: {}, sceneGroup: {}, template: {}, role: {}", 
             userId, sceneGroupId, templateId, roleInScene);
@@ -52,31 +47,15 @@ public class MenuAutoRegisterService {
         }
     }
 
-    /**
-     * 场景销毁时自动清理菜单
-     * @param sceneGroupId 场景组ID
-     * @param userId 用户ID
-     */
     public void removeMenusOnSceneDestroy(String sceneGroupId, String userId) {
         log.info("Removing menus for user: {}, sceneGroup: {}", userId, sceneGroupId);
         menuRoleConfigService.removeSceneMenus(userId, sceneGroupId);
     }
 
-    /**
-     * 获取用户的场景菜单
-     * @param userId 用户ID
-     * @return 菜单列表
-     */
     public List<MenuItemDTO> getUserSceneMenus(String userId) {
         return menuRoleConfigService.getUserSceneMenus(userId);
     }
 
-    /**
-     * 获取用户的完整菜单（包含角色菜单和场景菜单）
-     * @param userId 用户ID
-     * @param roleId 用户角色ID
-     * @return 菜单列表
-     */
     public List<MenuItemDTO> getFinalMenusForUser(String userId, String roleId) {
         return menuRoleConfigService.getFinalMenusForUserWithScene(userId, roleId);
     }

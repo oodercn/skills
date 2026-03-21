@@ -3,6 +3,7 @@ package net.ooder.mvp.skill.scene.capability.service;
 import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityType;
 import net.ooder.mvp.skill.scene.capability.driver.DriverCondition;
+import net.ooder.mvp.skill.scene.dto.discovery.InvokeResultDTO;
 
 import java.util.List;
 import java.util.Map;
@@ -15,7 +16,7 @@ public interface CapabilityDiscoveryService {
     
     List<DriverCondition> getDriverConditions(String capabilityId);
     
-    Object invokeCapability(String capabilityId, Map<String, Object> params);
+    InvokeResultDTO invokeCapability(String capabilityId, Map<String, Object> params);
     
     public static class DiscoveryRequest {
         private DiscoveryMethod method;

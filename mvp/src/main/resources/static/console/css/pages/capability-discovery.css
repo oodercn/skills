@@ -186,10 +186,9 @@
 
 .radar-visual {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 40px;
-    margin-bottom: 20px;
+    gap: 20px;
 }
 
 .radar-circle {

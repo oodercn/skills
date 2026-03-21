@@ -1,6 +1,7 @@
 package net.ooder.mvp.skill.scene.controller;
 
 import net.ooder.mvp.skill.scene.model.ResultModel;
+import net.ooder.scene.group.SceneGroupManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,8 +11,10 @@ import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
 
+import javax.sql.DataSource;
 import java.lang.reflect.Method;
 import java.lang.reflect.Parameter;
+import java.sql.Connection;
 import java.util.*;
 
 @RestController
@@ -22,6 +25,12 @@ public class ArchCheckController {
 
     @Autowired
     private ApplicationContext applicationContext;
+    
+    @Autowired(required = false)
+    private SceneGroupManager sceneGroupManager;
+    
+    @Autowired(required = false)
+    private DataSource dataSource;
 
     @GetMapping("/controllers")
     public ResultModel<List<Map<String, Object>>> checkControllers() {
@@ -81,6 +90,154 @@ public class ArchCheckController {
         
         log.info("[checkControllers] Checked {} controllers", results.size());
         return ResultModel.success(results);
+    }
+
+    @GetMapping("/system")
+    public ResultModel<Map<String, Object>> checkSystem() {
+        log.info("[checkSystem] Starting system check");
+        
+        Map<String, Object> results = new LinkedHashMap<>();
+        List<Map<String, Object>> checks = new ArrayList<>();
+        
+        checks.add(checkDatabase());
+        checks.add(checkSeSdk());
+        checks.add(checkSceneGroups());
+        checks.add(checkControllersCount());
+        
+        long passCount = checks.stream().filter(c -> "pass".equals(c.get("status"))).count();
+        long failCount = checks.stream().filter(c -> "fail".equals(c.get("status"))).count();
+        
+        results.put("checks", checks);
+        results.put("total", checks.size());
+        results.put("passed", passCount);
+        results.put("failed", failCount);
+        results.put("status", failCount == 0 ? "healthy" : "issues");
+        
+        return ResultModel.success(results);
+    }
+    
+    private Map<String, Object> checkDatabase() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("name", "数据库连接");
+        result.put("description", "检查数据库连接状态");
+        
+        if (dataSource == null) {
+            result.put("status", "fail");
+            result.put("message", "DataSource未配置");
+            return result;
+        }
+        
+        try (Connection conn = dataSource.getConnection()) {
+            boolean valid = conn.isValid(5);
+            if (valid) {
+                result.put("status", "pass");
+                result.put("message", "数据库连接正常");
+            } else {
+                result.put("status", "fail");
+                result.put("message", "数据库连接无效");
+            }
+        } catch (Exception e) {
+            result.put("status", "fail");
+            result.put("message", "数据库连接失败: " + e.getMessage());
+        }
+        
+        return result;
+    }
+    
+    private Map<String, Object> checkSeSdk() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("name", "SE SDK集成");
+        result.put("description", "检查Scene Engine SDK集成状态");
+        
+        if (sceneGroupManager != null) {
+            try {
+                List<?> groups = sceneGroupManager.getAllSceneGroups();
+                result.put("status", "pass");
+                result.put("message", "SE SDK正常，当前场景组数: " + (groups != null ? groups.size() : 0));
+                Map<String, Object> details = new LinkedHashMap<>();
+                details.put("sceneGroupManager", "available");
+                details.put("groupCount", groups != null ? groups.size() : 0);
+                result.put("details", details);
+            } catch (Exception e) {
+                result.put("status", "fail");
+                result.put("message", "SE SDK初始化异常: " + e.getMessage());
+            }
+        } else {
+            result.put("status", "fail");
+            result.put("message", "SceneGroupManager未注入");
+        }
+        
+        return result;
+    }
+    
+    private Map<String, Object> checkSceneGroups() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("name", "场景组状态");
+        result.put("description", "检查场景组运行状态");
+        
+        if (sceneGroupManager != null) {
+            try {
+                List<?> groups = sceneGroupManager.getAllSceneGroups();
+                int total = groups != null ? groups.size() : 0;
+                int activeCount = 0;
+                int suspendedCount = 0;
+                
+                result.put("status", "pass");
+                result.put("message", String.format("场景组总数: %d", total));
+                Map<String, Object> details = new LinkedHashMap<>();
+                details.put("total", total);
+                details.put("active", activeCount);
+                details.put("suspended", suspendedCount);
+                result.put("details", details);
+            } catch (Exception e) {
+                result.put("status", "fail");
+                result.put("message", "获取场景组失败: " + e.getMessage());
+            }
+        } else {
+            result.put("status", "fail");
+            result.put("message", "SceneGroupManager不可用");
+        }
+        
+        return result;
+    }
+    
+    private Map<String, Object> checkControllersCount() {
+        Map<String, Object> result = new LinkedHashMap<>();
+        result.put("name", "API端点");
+        result.put("description", "检查API端点注册情况");
+        
+        try {
+            RequestMappingHandlerMapping handlerMapping = (RequestMappingHandlerMapping) 
+                applicationContext.getBean("requestMappingHandlerMapping");
+            
+            Map<RequestMappingInfo, HandlerMethod> handlerMethods = handlerMapping.getHandlerMethods();
+            
+            Set<String> controllers = new HashSet<>();
+            int endpointCount = 0;
+            
+            for (Map.Entry<RequestMappingInfo, HandlerMethod> entry : handlerMethods.entrySet()) {
+                HandlerMethod handlerMethod = entry.getValue();
+                String controllerName = handlerMethod.getBeanType().getSimpleName();
+                
+                if (controllerName.contains("Controller") && 
+                    !controllerName.startsWith("org.springframework")) {
+                    controllers.add(controllerName);
+                    endpointCount++;
+                }
+            }
+            
+            result.put("status", "pass");
+            result.put("message", String.format("已注册 %d 个端点，%d 个Controller", endpointCount, controllers.size()));
+            Map<String, Object> details = new LinkedHashMap<>();
+            details.put("controllers", controllers.size());
+            details.put("endpoints", endpointCount);
+            result.put("details", details);
+        } catch (Exception e) {
+            result.put("status", "fail");
+            result.put("message", "获取端点信息失败: " + e.getMessage());
+        }
+        
+        return result;
     }
 
     private Map<String, Object> checkMethod(Method method) {

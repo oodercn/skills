@@ -8,112 +8,7 @@
     var logs = [];
     var typeFilter = 'all';
     var statusFilter = 'all';
-
-    var DISCOVERY_METHODS = [
-        {
-            id: 'LOCAL_FS',
-            name: '本地文件系统',
-            icon: 'ri-folder-line',
-            desc: '扫描本地已安装的能力包',
-            color: '#3b82f6',
-            requiresConfig: false
-        },
-        {
-            id: 'SKILL_CENTER',
-            name: '能力中心',
-            icon: 'ri-cloud-line',
-            desc: '从能力中心发现可用能力',
-            color: '#10b981',
-            requiresConfig: true,
-            configFields: [
-                { name: 'centerUrl', label: '能力中心地址', type: 'text', default: 'https://skill.ooder.cn/api' }
-            ]
-        },
-        {
-            id: 'GITHUB',
-            name: 'GitHub仓库',
-            icon: 'ri-github-fill',
-            desc: '从GitHub仓库发现能力',
-            color: '#6366f1',
-            requiresConfig: true,
-            configFields: [
-                { name: 'repoUrl', label: '仓库地址', type: 'text', placeholder: '如: https://github.com/user/repo' },
-                { name: 'branch', label: '分支', type: 'text', default: 'main' },
-                { name: 'token', label: '访问令牌(可选)', type: 'password' }
-            ]
-        },
-        {
-            id: 'GITEE',
-            name: 'Gitee仓库',
-            icon: 'ri-git-repository-line',
-            desc: '从Gitee仓库发现能力',
-            color: '#ef4444',
-            requiresConfig: true,
-            configFields: [
-                { name: 'repoUrl', label: '仓库地址', type: 'text', placeholder: '如: https://gitee.com/user/repo' },
-                { name: 'branch', label: '分支', type: 'text', default: 'master' },
-                { name: 'token', label: '访问令牌(可选)', type: 'password' }
-            ]
-        },
-        {
-            id: 'GIT_REPOSITORY',
-            name: 'Git仓库',
-            icon: 'ri-git-branch-line',
-            desc: '从任意Git仓库发现能力',
-            color: '#f59e0b',
-            requiresConfig: true,
-            configFields: [
-                { name: 'repoUrl', label: '仓库地址', type: 'text', placeholder: 'Git仓库URL' },
-                { name: 'branch', label: '分支', type: 'text', default: 'main' },
-                { name: 'username', label: '用户名(可选)', type: 'text' },
-                { name: 'password', label: '密码/令牌(可选)', type: 'password' }
-            ]
-        },
-        {
-            id: 'UDP_BROADCAST',
-            name: 'UDP广播',
-            icon: 'ri-broadcast-line',
-            desc: '通过UDP广播发现局域网能力',
-            color: '#8b5cf6',
-            requiresConfig: true,
-            configFields: [
-                { name: 'port', label: '广播端口', type: 'number', default: '8089' },
-                { name: 'timeout', label: '超时时间(秒)', type: 'number', default: '10' }
-            ]
-        },
-        {
-            id: 'MDNS_DNS_SD',
-            name: 'mDNS/DNS-SD',
-            icon: 'ri-wifi-line',
-            desc: '通过mDNS发现局域网能力',
-            color: '#06b6d4',
-            requiresConfig: true,
-            configFields: [
-                { name: 'serviceType', label: '服务类型', type: 'text', default: '_ooder-cap._tcp' },
-                { name: 'timeout', label: '超时时间(秒)', type: 'number', default: '15' }
-            ]
-        },
-        {
-            id: 'DHT_KADEMLIA',
-            name: 'DHT/Kademlia',
-            icon: 'ri-share-line',
-            desc: '通过DHT网络发现能力',
-            color: '#ec4899',
-            requiresConfig: true,
-            configFields: [
-                { name: 'bootstrapNodes', label: '引导节点', type: 'text', placeholder: '如: node1:8080,node2:8080' },
-                { name: 'timeout', label: '超时时间(秒)', type: 'number', default: '30' }
-            ]
-        },
-        {
-            id: 'AUTO',
-            name: '自动检测',
-            icon: 'ri-magic-line',
-            desc: '自动选择最佳发现方式',
-            color: '#64748b',
-            requiresConfig: false
-        }
-    ];
+    var DISCOVERY_METHODS = [];
 
     var CAPABILITY_TYPES = {
         'ATOMIC': { name: '原子能力', icon: 'ri-flashlight-line', desc: '单一功能，不可分解' },
@@ -138,7 +33,7 @@
         init: function() {
             window.onPageInit = function() {
                 console.log('能力中心页面初始化完成');
-                CapabilityManagement.renderDiscoveryMethods();
+                CapabilityManagement.loadDiscoveryMethods();
                 CapabilityManagement.loadInstalledCapabilities();
                 CapabilityManagement.initFilters();
                 CapabilityManagement.initLlmAssistant();
@@ -149,6 +44,22 @@
             if (typeof LlmAssistant !== 'undefined') {
                 LlmAssistant.init();
             }
+        },
+        
+        loadDiscoveryMethods: function() {
+            fetch('/api/v1/discovery/methods')
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    if (result.status === 'success' && result.data) {
+                        DISCOVERY_METHODS = result.data;
+                    }
+                    CapabilityManagement.renderDiscoveryMethods();
+                })
+                .catch(function(error) {
+                    console.error('加载发现方法失败:', error);
+                    DISCOVERY_METHODS = [];
+                    CapabilityManagement.renderDiscoveryMethods();
+                });
         },
 
         renderDiscoveryMethods: function() {

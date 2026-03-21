@@ -45,6 +45,8 @@ public class DictService {
         registerDictEnum(net.ooder.mvp.skill.scene.dto.scene.CapabilityBindingStatus.class);
         registerDictEnum(net.ooder.mvp.skill.scene.dto.scene.TemplateStatus.class);
         registerDictEnum(net.ooder.mvp.skill.scene.dto.scene.TemplateCategory.class);
+        registerDictEnum(net.ooder.mvp.skill.scene.dto.scene.KeyType.class);
+        registerDictEnum(net.ooder.mvp.skill.scene.dto.scene.KeyStatus.class);
         
         registerDictEnum(net.ooder.mvp.skill.scene.dto.audit.AuditEventType.class);
         registerDictEnum(net.ooder.mvp.skill.scene.dto.audit.AuditResultType.class);

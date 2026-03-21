@@ -541,95 +541,20 @@ public class SceneGroupController extends BaseController {
         }
     }
 
-
-    public ResultModel<List<Map<String, Object>>> getRecentLogs(
+    @GetMapping("/{sceneGroupId}/event-log")
+    public ResultModel<List<SceneGroupEventLogDTO>> getRecentLogs(
             @PathVariable String sceneGroupId,
             @RequestParam(defaultValue = "50") int limit) {
         long startTime = System.currentTimeMillis();
         logRequestStart("getRecentLogs", sceneGroupId);
 
         try {
-            List<Map<String, Object>> logs = new ArrayList<>();
-            
-            for (int i = 0; i < Math.min(limit, 10); i++) {
-                Map<String, Object> log = new HashMap<>();
-                log.put("timestamp", System.currentTimeMillis() - (i * 60000L));
-                log.put("status", i % 3 == 0 ? "SUCCESS" : i % 3 == 1 ? "INFO" : "WARN");
-                log.put("action", "scene." + (i % 2 == 0 ? "heartbeat" : "capability.invoke"));
-                log.put("message", "场景组 " + sceneGroupId + " 执行操作 #" + i);
-                log.put("sceneGroupId", sceneGroupId);
-                logs.add(log);
-            }
-            
+            List<SceneGroupEventLogDTO> logs = sceneGroupService.getEventLog(sceneGroupId, limit);
             logRequestEnd("getRecentLogs", logs.size(), System.currentTimeMillis() - startTime);
             return ResultModel.success(logs);
         } catch (Exception e) {
             logRequestError("getRecentLogs", e);
             return ResultModel.error(500, "获取日志失败: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{sceneGroupId}/knowledge")
-    public ResultModel<List<KnowledgeBindingDTO>> listKnowledgeBindings(@PathVariable String sceneGroupId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("listKnowledgeBindings", sceneGroupId);
-
-        try {
-            List<KnowledgeBindingDTO> result = sceneGroupService.listKnowledgeBindings(sceneGroupId);
-            logRequestEnd("listKnowledgeBindings", result != null ? result.size() : 0, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("listKnowledgeBindings", e);
-            return ResultModel.error(500, "获取知识库绑定列表失败: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/{sceneGroupId}/knowledge/config")
-    public ResultModel<Boolean> updateKnowledgeConfig(
-            @PathVariable String sceneGroupId,
-            @RequestBody Map<String, Object> config) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("updateKnowledgeConfig", sceneGroupId);
-
-        try {
-            boolean result = sceneGroupService.updateKnowledgeConfig(sceneGroupId, config);
-            logRequestEnd("updateKnowledgeConfig", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("updateKnowledgeConfig", e);
-            return ResultModel.error(500, "更新知识库配置失败: " + e.getMessage());
-        }
-    }
-
-    @GetMapping("/{sceneGroupId}/llm/config")
-    public ResultModel<Map<String, Object>> getLlmConfig(@PathVariable String sceneGroupId) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("getLlmConfig", sceneGroupId);
-
-        try {
-            Map<String, Object> config = sceneGroupService.getLlmConfig(sceneGroupId);
-            logRequestEnd("getLlmConfig", config, System.currentTimeMillis() - startTime);
-            return ResultModel.success(config);
-        } catch (Exception e) {
-            logRequestError("getLlmConfig", e);
-            return ResultModel.error(500, "获取LLM配置失败: " + e.getMessage());
-        }
-    }
-
-    @PutMapping("/{sceneGroupId}/llm/config")
-    public ResultModel<Boolean> updateLlmConfig(
-            @PathVariable String sceneGroupId,
-            @RequestBody Map<String, Object> config) {
-        long startTime = System.currentTimeMillis();
-        logRequestStart("updateLlmConfig", sceneGroupId);
-
-        try {
-            boolean result = sceneGroupService.updateLlmConfig(sceneGroupId, config);
-            logRequestEnd("updateLlmConfig", result, System.currentTimeMillis() - startTime);
-            return ResultModel.success(result);
-        } catch (Exception e) {
-            logRequestError("updateLlmConfig", e);
-            return ResultModel.error(500, "更新LLM配置失败: " + e.getMessage());
         }
     }
 }

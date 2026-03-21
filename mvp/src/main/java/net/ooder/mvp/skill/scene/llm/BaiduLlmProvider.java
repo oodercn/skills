@@ -85,9 +85,29 @@ public class BaiduLlmProvider implements LlmProvider {
             
             String response = sendRequest(QIANFAN_API_URL, requestBody);
             
-            result.put("content", response);
+            String content = extractNestedJsonValue(response, "choices", "message", "content");
+            if (content == null) {
+                content = extractJsonValue(response, "result");
+            }
+            
+            result.put("content", content != null ? content : response);
             result.put("model", model);
             result.put("provider", PROVIDER_TYPE);
+            
+            String usageJson = extractUsageJson(response);
+            if (usageJson != null) {
+                Map<String, Object> usage = parseUsage(usageJson);
+                result.put("usage", usage);
+                
+                Integer promptTokens = (Integer) usage.get("prompt_tokens");
+                Integer completionTokens = (Integer) usage.get("completion_tokens");
+                if (promptTokens != null) {
+                    result.put("inputTokens", promptTokens);
+                }
+                if (completionTokens != null) {
+                    result.put("outputTokens", completionTokens);
+                }
+            }
             
         } catch (Exception e) {
             log.error("Baidu LLM chat error", e);
@@ -245,15 +265,52 @@ public class BaiduLlmProvider implements LlmProvider {
         
         if (responseCode != 200) {
             log.error("Baidu API error: {} - {}", responseCode, responseBody);
-            return "Error (HTTP " + responseCode + "): " + responseBody;
+            return "{\"error\": true, \"message\": \"HTTP " + responseCode + ": " + escapeJson(responseBody) + "\"}";
         }
         
-        String content = extractNestedJsonValue(responseBody, "choices", "message", "content");
-        if (content == null) {
-            content = extractJsonValue(responseBody, "result");
+        return responseBody;
+    }
+    
+    private String extractUsageJson(String response) {
+        String searchKey = "\"usage\":";
+        int startIndex = response.indexOf(searchKey);
+        if (startIndex == -1) {
+            return null;
         }
         
-        return content != null ? content : responseBody;
+        startIndex += searchKey.length();
+        while (startIndex < response.length() && (response.charAt(startIndex) == ' ' || response.charAt(startIndex) == '\t')) {
+            startIndex++;
+        }
+        
+        if (startIndex >= response.length() || response.charAt(startIndex) != '{') {
+            return null;
+        }
+        
+        int braceCount = 0;
+        int endIndex = startIndex;
+        while (endIndex < response.length()) {
+            char c = response.charAt(endIndex);
+            if (c == '{') braceCount++;
+            else if (c == '}') braceCount--;
+            endIndex++;
+            if (braceCount == 0) break;
+        }
+        
+        return response.substring(startIndex, endIndex);
+    }
+    
+    private Map<String, Object> parseUsage(String usageJson) {
+        Map<String, Object> usage = new HashMap<String, Object>();
+        String promptTokens = extractJsonValue(usageJson, "prompt_tokens");
+        String completionTokens = extractJsonValue(usageJson, "completion_tokens");
+        String totalTokens = extractJsonValue(usageJson, "total_tokens");
+        
+        if (promptTokens != null) usage.put("prompt_tokens", Integer.parseInt(promptTokens));
+        if (completionTokens != null) usage.put("completion_tokens", Integer.parseInt(completionTokens));
+        if (totalTokens != null) usage.put("total_tokens", Integer.parseInt(totalTokens));
+        
+        return usage;
     }
     
     private String extractNestedJsonValue(String json, String... keys) {

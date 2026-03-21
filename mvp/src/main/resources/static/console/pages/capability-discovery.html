@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
     <link rel="stylesheet" href="/console/css/pages/capability-discovery.css">
+    <link rel="stylesheet" href="/console/css/components/llm-enhancement.css">
 </head>
 <body>
     <div class="nx-page">
@@ -164,6 +165,9 @@
                                 <div class="results-filter results-filter--business" id="businessCategoryFilter" style="margin-top: 8px;">
                                 </div>
                             </div>
+                            
+                            <div id="llm-status-container" style="margin: 16px;"></div>
+                            
                             <div class="results-body" id="resultsBody">
                                 <div class="empty-state">
                                     <i class="ri-radar-line"></i>
@@ -913,11 +917,17 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/components/llm-enhancement.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            LLMEnhancement.renderStatusIndicator('llm-status-container', { compact: true });
+        });
+    </script>
     <script src="/console/js/api-client.js"></script>
     <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/llm-assistant.js"></script>
-    <script src="/console/js/capability-service.js"></script>
+    <script src="/console/js/common/category-service.js"></script>
     <script src="/console/js/pages/capability-discovery.js?v=20260311"></script>
 </body>
 </html>

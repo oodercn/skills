@@ -64,7 +64,10 @@
         
         async loadMenu() {
             try {
-                const response = await fetch('/api/v1/auth/menu-config');
+                const roleType = this.currentUser?.roleType || 'collaborator';
+                const userId = this.currentUser?.userId || 'default-user';
+                
+                const response = await fetch(`/api/v1/auth/menu-config?role=${encodeURIComponent(roleType)}&userId=${encodeURIComponent(userId)}`);
                 const result = await response.json();
                 
                 if (result.status === 'success' && result.data) {

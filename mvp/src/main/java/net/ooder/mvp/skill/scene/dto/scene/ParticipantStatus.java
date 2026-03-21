@@ -10,8 +10,9 @@ public enum ParticipantStatus implements DictItem {
     JOINED("JOINED", "已加入", "参与者已加入场景", "ri-user-add-line", 2),
     ACTIVE("ACTIVE", "活跃", "参与者正常活跃", "ri-user-heart-line", 3),
     INACTIVE("INACTIVE", "非活跃", "参与者非活跃状态", "ri-user-unfollow-line", 4),
-    SUSPENDED("SUSPENDED", "已暂停", "参与者已暂停", "ri-pause-circle-line", 5),
-    REMOVED("REMOVED", "已移除", "参与者已移除", "ri-user-unfollow-line", 6);
+    LEFT("LEFT", "已离开", "参与者已离开场景", "ri-logout-box-line", 5),
+    SUSPENDED("SUSPENDED", "已暂停", "参与者已暂停", "ri-pause-circle-line", 6),
+    REMOVED("REMOVED", "已移除", "参与者已移除", "ri-user-unfollow-line", 7);
 
     private final String code;
     private final String name;

@@ -12,9 +12,13 @@ import net.ooder.mvp.skill.scene.capability.registry.CapabilityRegistry;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.skill.common.storage.JsonStorageService;
+import net.ooder.skills.api.SkillRegistry;
+import net.ooder.skills.api.InstalledSkill;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationEventPublisher;
 
 import javax.annotation.PostConstruct;
@@ -32,6 +36,12 @@ public class CapabilityServiceImpl implements CapabilityService {
     private final CapabilityStateService stateService;
     private ApplicationEventPublisher eventPublisher;
     private boolean initialized = false;
+    
+    @Autowired(required = false)
+    private SkillRegistry skillRegistry;
+    
+    @Value("${ooder.capability.use-se-sdk:true}")
+    private boolean useSeSdk;
 
     public CapabilityServiceImpl(JsonStorageService storageService, CapabilityStateService stateService) {
         this.storageService = storageService;
@@ -53,17 +63,48 @@ public class CapabilityServiceImpl implements CapabilityService {
     }
 
     private void loadFromStorage() {
+        if (useSeSdk && skillRegistry != null) {
+            try {
+                List<InstalledSkill> skills = skillRegistry.getInstalledSkills();
+                if (skills != null && !skills.isEmpty()) {
+                    for (InstalledSkill skill : skills) {
+                        Capability cap = convertInstalledSkillToCapability(skill);
+                        registry.register(cap);
+                    }
+                    log.info("[loadFromStorage] Loaded {} capabilities from SE SDK SkillRegistry", skills.size());
+                    return;
+                }
+            } catch (Exception e) {
+                log.warn("[loadFromStorage] Failed to load from SE SDK: {}, falling back to JSON", e.getMessage());
+            }
+        }
+        
         try {
             List<Capability> stored = storageService.loadList(STORAGE_KEY, Capability.class);
             if (stored != null) {
                 for (Capability cap : stored) {
                     registry.register(cap);
                 }
-                log.info("Loaded {} capabilities from storage", stored.size());
+                log.info("[loadFromStorage] Loaded {} capabilities from JSON storage", stored.size());
             }
         } catch (Exception e) {
-            log.warn("Failed to load capabilities from storage: {}", e.getMessage());
+            log.warn("[loadFromStorage] Failed to load capabilities from storage: {}", e.getMessage());
         }
+    }
+    
+    private Capability convertInstalledSkillToCapability(InstalledSkill skill) {
+        Capability cap = new Capability();
+        cap.setCapabilityId(skill.getSkillId());
+        cap.setName(skill.getName());
+        cap.setVersion(skill.getVersion());
+        cap.setSkillId(skill.getSkillId());
+        cap.setSceneType(skill.getSceneId());
+        cap.setStatus(CapabilityStatus.REGISTERED);
+        cap.setDependencies(skill.getDependencies());
+        cap.setInstalled(true);
+        cap.setCreateTime(skill.getInstallTime() > 0 ? skill.getInstallTime() : System.currentTimeMillis());
+        cap.setUpdateTime(System.currentTimeMillis());
+        return cap;
     }
 
     private void saveToStorage() {

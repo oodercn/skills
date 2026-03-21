@@ -18,7 +18,7 @@ public class KnowledgeBaseDTO {
     private IndexStatusDTO indexStatus;
     private long documentCount;
     private long createTime;
-    private long updateTime;
+    private long updatedAt;
     
     public String getKbId() { return kbId; }
     public void setKbId(String kbId) { this.kbId = kbId; }
@@ -46,8 +46,9 @@ public class KnowledgeBaseDTO {
     public void setDocumentCount(long documentCount) { this.documentCount = documentCount; }
     public long getCreateTime() { return createTime; }
     public void setCreateTime(long createTime) { this.createTime = createTime; }
-    public long getUpdateTime() { return updateTime; }
-    public void setUpdateTime(long updateTime) { this.updateTime = updateTime; }
+    public void setCreatedAt(long createdAt) { this.createTime = createdAt; }
+    public long getUpdatedAt() { return updatedAt; }
+    public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
     
     public static class KnowledgeLayerConfig {
         private String layer;

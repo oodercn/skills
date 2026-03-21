@@ -6,6 +6,7 @@ import net.ooder.scene.skill.install.InstallContext;
 import net.ooder.scene.skill.install.InstallResult;
 import net.ooder.scene.core.persistence.InstallationPersistence;
 import net.ooder.scene.skill.notification.NotificationService;
+import net.ooder.mvp.skill.scene.llm.prompt.PromptIndexingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +28,9 @@ public class SceneCapabilityInstallLifecycle implements CapabilityInstallLifecyc
 
     @Autowired(required = false)
     private net.ooder.mvp.skill.scene.capability.service.CapabilityService capabilityService;
+
+    @Autowired(required = false)
+    private PromptIndexingService promptIndexingService;
 
     @Override
     public void onPreInstall(Capability capability, InstallContext context) {
@@ -68,8 +72,9 @@ public class SceneCapabilityInstallLifecycle implements CapabilityInstallLifecyc
             updates.put("completedSteps", 5);
             updates.put("updateTime", System.currentTimeMillis());
             
-            installationPersistence.updateState(result.getInstallId(), updates);
-            log.info("[onPostInstall] Updated state to COMPLETED for install: {}", result.getInstallId());
+            String installId = capability != null ? capability.getId() : "unknown";
+            installationPersistence.updateState(installId, updates);
+            log.info("[onPostInstall] Updated state to COMPLETED for install: {}", installId);
         }
         
         if (capabilityService != null && capability != null) {
@@ -82,6 +87,17 @@ public class SceneCapabilityInstallLifecycle implements CapabilityInstallLifecyc
                 }
             } catch (Exception e) {
                 log.error("[onPostInstall] Failed to update capability status: {}", e.getMessage());
+            }
+        }
+        
+        if (promptIndexingService != null && capability != null && result != null && result.isSuccess()) {
+            try {
+                String skillId = capability.getId();
+                PromptIndexingService.IndexingResult indexingResult = promptIndexingService.indexPromptsForSkill(skillId);
+                log.info("[onPostInstall] Prompt indexing result for {}: indexed={}, failed={}", 
+                    skillId, indexingResult.getIndexedCount(), indexingResult.getFailedCount());
+            } catch (Exception e) {
+                log.error("[onPostInstall] Failed to index prompts: {}", e.getMessage());
             }
         }
     }

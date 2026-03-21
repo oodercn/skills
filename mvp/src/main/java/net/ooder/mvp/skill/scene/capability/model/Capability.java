@@ -14,7 +14,7 @@ public class Capability implements Serializable {
     private String capabilityId;
     private String name;
     private String description;
-    private CapabilityType type;
+    private CapabilityType capabilityType;
     private String version;
     private AccessLevel accessLevel;
     private String ownerId;
@@ -103,12 +103,12 @@ public class Capability implements Serializable {
         this.description = description;
     }
 
-    public CapabilityType getType() {
-        return type;
+    public CapabilityType getCapabilityType() {
+        return capabilityType;
     }
 
-    public void setType(CapabilityType type) {
-        this.type = type;
+    public void setCapabilityType(CapabilityType capabilityType) {
+        this.capabilityType = capabilityType;
     }
 
     public String getVersion() {
@@ -252,7 +252,7 @@ public class Capability implements Serializable {
     }
 
     public boolean isSceneCapability() {
-        return "SCENE".equals(skillForm) || type == CapabilityType.SCENE;
+        return "SCENE".equals(skillForm) || capabilityType == CapabilityType.SCENE;
     }
     
     public void setSceneCapability(boolean sceneCapability) {
@@ -296,7 +296,7 @@ public class Capability implements Serializable {
     }
 
     public boolean isDriverCapability() {
-        return type == CapabilityType.DRIVER;
+        return capabilityType == CapabilityType.DRIVER;
     }
 
     public boolean isEnabled() {
@@ -334,7 +334,7 @@ public class Capability implements Serializable {
         if (icon != null) {
             return icon;
         }
-        return type != null ? type.getIcon() : "ri-flashlight-line";
+        return capabilityType != null ? capabilityType.getIcon() : "ri-flashlight-line";
     }
 
     public void setIcon(String icon) {

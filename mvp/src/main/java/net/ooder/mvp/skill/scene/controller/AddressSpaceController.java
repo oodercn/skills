@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/config")
+@RequestMapping("/api/v1/address-space")
 public class AddressSpaceController {
 
     private static final List<Map<String, Object>> CATEGORIES = Arrays.asList(

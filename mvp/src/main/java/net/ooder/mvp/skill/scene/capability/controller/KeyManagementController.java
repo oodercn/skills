@@ -4,6 +4,7 @@ import net.ooder.mvp.skill.scene.capability.service.KeyManagementService;
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService.KeyInfo;
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService.KeyGenerateRequest;
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService.KeyAccessResult;
+import net.ooder.mvp.skill.scene.dto.key.KeyDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,7 @@ public class KeyManagementController {
     private KeyManagementService keyManagementService;
 
     @GetMapping
-    public ResponseEntity<List<Map<String, Object>>> listKeys(
+    public ResponseEntity<List<KeyDTO>> listKeys(
             @RequestParam(required = false) String type,
             @RequestParam(required = false) String status,
             @RequestParam(required = false) String userId,
@@ -37,25 +38,25 @@ public class KeyManagementController {
         } else if (sceneGroupId != null) {
             keys = keyManagementService.getKeysByScene(sceneGroupId);
         } else {
-            keys = keyManagementService.getKeysByUser("current-user");
+            keys = keyManagementService.getAllKeys();
         }
         
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<KeyDTO> result = new ArrayList<>();
         for (KeyInfo key : keys) {
-            if (type != null && !type.isEmpty() && !type.equals(key.getScope())) {
+            if (type != null && !type.isEmpty() && !type.equals(key.getKeyType()) && !type.equals(key.getScope())) {
                 continue;
             }
             if (status != null && !status.isEmpty() && !status.equals(key.getStatus().name())) {
                 continue;
             }
-            result.add(convertToMap(key));
+            result.add(KeyDTO.fromKeyInfo(key));
         }
         
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/{keyId}")
-    public ResponseEntity<Map<String, Object>> getKey(@PathVariable String keyId) {
+    public ResponseEntity<KeyDTO> getKey(@PathVariable String keyId) {
         log.info("[getKey] keyId={}", keyId);
         
         KeyInfo key = keyManagementService.getKey(keyId);
@@ -63,11 +64,11 @@ public class KeyManagementController {
             return ResponseEntity.notFound().build();
         }
         
-        return ResponseEntity.ok(convertToMap(key));
+        return ResponseEntity.ok(KeyDTO.fromKeyInfo(key));
     }
 
     @PostMapping
-    public ResponseEntity<Map<String, Object>> createKey(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<KeyDTO> createKey(@RequestBody Map<String, Object> request) {
         log.info("[createKey] request={}", request);
         
         KeyGenerateRequest generateRequest = new KeyGenerateRequest();
@@ -76,6 +77,30 @@ public class KeyManagementController {
         generateRequest.setInstallId((String) request.get("installId"));
         generateRequest.setScope((String) request.get("keyType"));
         generateRequest.setDescription((String) request.get("description"));
+        generateRequest.setKeyName((String) request.get("keyName"));
+        generateRequest.setKeyType((String) request.get("keyType"));
+        generateRequest.setProvider((String) request.get("provider"));
+        
+        if (request.containsKey("allowedUsers")) {
+            Object users = request.get("allowedUsers");
+            if (users instanceof List) {
+                generateRequest.setAllowedUsers((List<String>) users);
+            }
+        }
+        
+        if (request.containsKey("allowedRoles")) {
+            Object roles = request.get("allowedRoles");
+            if (roles instanceof List) {
+                generateRequest.setAllowedRoles((List<String>) roles);
+            }
+        }
+        
+        if (request.containsKey("allowedScenes")) {
+            Object scenes = request.get("allowedScenes");
+            if (scenes instanceof List) {
+                generateRequest.setAllowedScenes((List<String>) scenes);
+            }
+        }
         
         if (request.containsKey("expiresAt")) {
             Object expiresAt = request.get("expiresAt");
@@ -93,14 +118,14 @@ public class KeyManagementController {
         
         KeyInfo key = keyManagementService.generateKey(generateRequest);
         
-        Map<String, Object> result = convertToMap(key);
-        result.put("keyValue", key.getKeyValue());
+        KeyDTO result = KeyDTO.fromKeyInfo(key);
+        result.setKeyValue(key.getKeyValue());
         
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{keyId}/rotate")
-    public ResponseEntity<Map<String, Object>> rotateKey(
+    public ResponseEntity<KeyDTO> rotateKey(
             @PathVariable String keyId,
             @RequestBody(required = false) String newValue) {
         log.info("[rotateKey] keyId={}", keyId);
@@ -110,11 +135,11 @@ public class KeyManagementController {
             return ResponseEntity.notFound().build();
         }
         
-        return ResponseEntity.ok(convertToMap(key));
+        return ResponseEntity.ok(KeyDTO.fromKeyInfo(key));
     }
 
     @PostMapping("/{keyId}/revoke")
-    public ResponseEntity<Map<String, Object>> revokeKey(@PathVariable String keyId) {
+    public ResponseEntity<KeyDTO> revokeKey(@PathVariable String keyId) {
         log.info("[revokeKey] keyId={}", keyId);
         
         boolean success = keyManagementService.revokeKey(keyId);
@@ -123,26 +148,26 @@ public class KeyManagementController {
         }
         
         KeyInfo key = keyManagementService.getKey(keyId);
-        return ResponseEntity.ok(convertToMap(key));
+        return ResponseEntity.ok(KeyDTO.fromKeyInfo(key));
     }
 
     @PostMapping("/{keyId}/validate")
-    public ResponseEntity<Map<String, Object>> validateKey(
+    public ResponseEntity<KeyValidateResultDTO> validateKey(
             @PathVariable String keyId,
             @RequestParam(required = false) String scope) {
         log.info("[validateKey] keyId={}, scope={}", keyId, scope);
         
         boolean valid = keyManagementService.validateKey(keyId, scope);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("keyId", keyId);
-        result.put("valid", valid);
+        KeyValidateResultDTO result = new KeyValidateResultDTO();
+        result.setKeyId(keyId);
+        result.setValid(valid);
         
         return ResponseEntity.ok(result);
     }
 
     @PostMapping("/{keyId}/access")
-    public ResponseEntity<Map<String, Object>> accessResource(
+    public ResponseEntity<KeyAccessResultDTO> accessResource(
             @PathVariable String keyId,
             @RequestBody Map<String, Object> request) {
         
@@ -153,60 +178,65 @@ public class KeyManagementController {
         
         KeyAccessResult result = keyManagementService.accessResource(keyId, resource, action);
         
-        Map<String, Object> response = new HashMap<>();
-        response.put("allowed", result.isAllowed());
-        response.put("reason", result.getReason());
+        KeyAccessResultDTO response = new KeyAccessResultDTO();
+        response.setAllowed(result.isAllowed());
+        response.setReason(result.getReason());
         
         if (result.getKeyInfo() != null) {
-            response.put("keyInfo", convertToMap(result.getKeyInfo()));
+            response.setKeyInfo(KeyDTO.fromKeyInfo(result.getKeyInfo()));
         }
         
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/by-user/{userId}")
-    public ResponseEntity<List<Map<String, Object>>> getKeysByUser(@PathVariable String userId) {
+    public ResponseEntity<List<KeyDTO>> getKeysByUser(@PathVariable String userId) {
         log.info("[getKeysByUser] userId={}", userId);
         
         List<KeyInfo> keys = keyManagementService.getKeysByUser(userId);
         
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<KeyDTO> result = new ArrayList<>();
         for (KeyInfo key : keys) {
-            result.add(convertToMap(key));
+            result.add(KeyDTO.fromKeyInfo(key));
         }
         
         return ResponseEntity.ok(result);
     }
 
     @GetMapping("/by-scene/{sceneGroupId}")
-    public ResponseEntity<List<Map<String, Object>>> getKeysByScene(@PathVariable String sceneGroupId) {
+    public ResponseEntity<List<KeyDTO>> getKeysByScene(@PathVariable String sceneGroupId) {
         log.info("[getKeysByScene] sceneGroupId={}", sceneGroupId);
         
         List<KeyInfo> keys = keyManagementService.getKeysByScene(sceneGroupId);
         
-        List<Map<String, Object>> result = new ArrayList<>();
+        List<KeyDTO> result = new ArrayList<>();
         for (KeyInfo key : keys) {
-            result.add(convertToMap(key));
+            result.add(KeyDTO.fromKeyInfo(key));
         }
         
         return ResponseEntity.ok(result);
     }
-
-    private Map<String, Object> convertToMap(KeyInfo key) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("keyId", key.getKeyId());
-        map.put("keyName", key.getDescription() != null ? key.getDescription() : key.getKeyId());
-        map.put("keyType", key.getScope());
-        map.put("provider", key.getSceneGroupId());
-        map.put("status", key.getStatus().name());
-        map.put("createdAt", key.getCreateTime());
-        map.put("expiresAt", key.getExpireTime());
-        map.put("lastAccessAt", key.getLastAccessTime());
-        map.put("useCount", key.getAccessCount());
-        map.put("maxUseCount", key.getPermissions() != null ? key.getPermissions().get("maxUseCount") : -1);
-        map.put("userId", key.getUserId());
-        map.put("sceneGroupId", key.getSceneGroupId());
-        map.put("installId", key.getInstallId());
-        return map;
+    
+    public static class KeyValidateResultDTO {
+        private String keyId;
+        private boolean valid;
+        
+        public String getKeyId() { return keyId; }
+        public void setKeyId(String keyId) { this.keyId = keyId; }
+        public boolean isValid() { return valid; }
+        public void setValid(boolean valid) { this.valid = valid; }
+    }
+    
+    public static class KeyAccessResultDTO {
+        private boolean allowed;
+        private String reason;
+        private KeyDTO keyInfo;
+        
+        public boolean isAllowed() { return allowed; }
+        public void setAllowed(boolean allowed) { this.allowed = allowed; }
+        public String getReason() { return reason; }
+        public void setReason(String reason) { this.reason = reason; }
+        public KeyDTO getKeyInfo() { return keyInfo; }
+        public void setKeyInfo(KeyDTO keyInfo) { this.keyInfo = keyInfo; }
     }
 }

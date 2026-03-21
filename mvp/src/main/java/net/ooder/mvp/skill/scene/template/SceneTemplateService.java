@@ -258,11 +258,8 @@ public class SceneTemplateService {
                             }
                         }
                     } else {
-                        log.warn("[deployTemplate] SkillPackageManager not available, skipping: {}", skillId);
-                        skippedSkills.add(skillId);
-                        if (callback != null) {
-                            callback.onSkillComplete(skillId, true, "跳过（无PackageManager）");
-                        }
+                        log.error("[deployTemplate] SkillPackageManager not available - this is a production environment error!");
+                        throw new RuntimeException("SkillPackageManager 不可用，无法部署模板");
                     }
                 } catch (Exception e) {
                     log.error("[deployTemplate] Failed to install skill: {}", skillId, e);
@@ -411,6 +408,15 @@ public class SceneTemplateService {
     public InstallResult installTemplateDependencies(String templateId) {
         log.info("[installTemplateDependencies] Installing dependencies for template: {}", templateId);
         
+        if (skillPackageManager == null) {
+            log.error("[installTemplateDependencies] SkillPackageManager not available - this is a production environment error!");
+            InstallResult result = new InstallResult();
+            result.setTemplateId(templateId);
+            result.setSuccess(false);
+            result.setMessage("SkillPackageManager 不可用，无法安装依赖");
+            return result;
+        }
+        
         SceneTemplate template = getTemplate(templateId);
         if (template == null) {
             InstallResult result = new InstallResult();
@@ -431,23 +437,16 @@ public class SceneTemplateService {
         
         for (String skillId : installOrder) {
             try {
-                boolean installed = false;
-                if (skillPackageManager != null) {
-                    installed = skillPackageManager.isInstalled(skillId).get();
-                }
+                boolean installed = skillPackageManager.isInstalled(skillId).get();
                 
                 if (installed) {
                     log.info("[installTemplateDependencies] Skill already installed: {}", skillId);
                     result.getSkippedSkills().add(skillId);
                 } else {
                     log.info("[installTemplateDependencies] Installing skill: {}", skillId);
-                    if (skillPackageManager != null) {
-                        skillPackageManager.installWithDependencies(skillId, net.ooder.skills.api.InstallRequest.InstallMode.FULL_INSTALL).get();
-                        result.getInstalledSkills().add(skillId);
-                        log.info("[installTemplateDependencies] Successfully installed: {}", skillId);
-                    } else {
-                        result.getSkippedSkills().add(skillId);
-                    }
+                    skillPackageManager.installWithDependencies(skillId, net.ooder.skills.api.InstallRequest.InstallMode.FULL_INSTALL).get();
+                    result.getInstalledSkills().add(skillId);
+                    log.info("[installTemplateDependencies] Successfully installed: {}", skillId);
                 }
             } catch (Exception e) {
                 log.error("[installTemplateDependencies] Failed to install: {}", skillId, e);

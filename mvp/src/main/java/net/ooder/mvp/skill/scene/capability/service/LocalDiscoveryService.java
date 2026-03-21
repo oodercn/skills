@@ -2,6 +2,8 @@ package net.ooder.mvp.skill.scene.capability.service;
 
 import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.mvp.skill.scene.capability.model.SkillForm;
+import net.ooder.mvp.skill.scene.dto.discovery.CapabilityDetailDTO;
+import net.ooder.mvp.skill.scene.dto.discovery.DiscoveryResultDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +23,20 @@ public class LocalDiscoveryService {
     @Autowired
     private SkillCapabilitySyncService syncService;
 
-    public DiscoveryResult discover() {
+    public DiscoveryResultDTO discover() {
         log.info("[discover] Starting local discovery");
         
         List<Capability> allCaps = capabilityService.findAll();
         log.info("[discover] Found {} capabilities from storage", allCaps.size());
         
-        List<Map<String, Object>> capabilities = allCaps.stream()
+        List<CapabilityDetailDTO> capabilities = allCaps.stream()
             .filter(cap -> !isInternal(cap))
-            .map(this::convertToMap)
+            .map(this::convertToDTO)
             .collect(Collectors.toList());
         
         Map<String, Integer> stats = calculateStats(allCaps);
         
-        DiscoveryResult result = new DiscoveryResult();
+        DiscoveryResultDTO result = new DiscoveryResultDTO();
         result.setCapabilities(capabilities);
         result.setTotal(capabilities.size());
         result.setStats(stats);
@@ -64,12 +66,12 @@ public class LocalDiscoveryService {
         return result;
     }
 
-    public Map<String, Object> getCapabilityDetail(String capabilityId) {
+    public CapabilityDetailDTO getCapabilityDetail(String capabilityId) {
         Capability cap = capabilityService.findById(capabilityId);
         if (cap == null) {
             return null;
         }
-        return convertToMap(cap);
+        return convertToDTO(cap);
     }
 
     private boolean isInternal(Capability cap) {
@@ -77,39 +79,46 @@ public class LocalDiscoveryService {
         return "internal".equals(visibility);
     }
 
-    private Map<String, Object> convertToMap(Capability cap) {
-        Map<String, Object> map = new LinkedHashMap<>();
+    private CapabilityDetailDTO convertToDTO(Capability cap) {
+        CapabilityDetailDTO dto = new CapabilityDetailDTO();
         
-        map.put("id", cap.getCapabilityId());
-        map.put("name", cap.getName());
-        map.put("description", cap.getDescription());
-        map.put("version", cap.getVersion());
-        map.put("icon", cap.getIcon());
-        map.put("skillId", cap.getSkillId());
-        map.put("installed", cap.isInstalled());
-        map.put("visibility", cap.getVisibility());
+        dto.setId(cap.getCapabilityId());
+        dto.setName(cap.getName());
+        dto.setDescription(cap.getDescription());
+        dto.setVersion(cap.getVersion());
+        dto.setIcon(cap.getIcon());
+        dto.setSkillId(cap.getSkillId());
+        dto.setInstalled(cap.isInstalled());
+        dto.setVisibility(cap.getVisibility() != null ? cap.getVisibility().toLowerCase() : "public");
         
         SkillForm skillForm = cap.getSkillForm();
-        map.put("skillForm", skillForm != null ? skillForm.getCode() : "PROVIDER");
+        dto.setSkillForm(skillForm != null ? skillForm.getCode() : "PROVIDER");
         
-        map.put("sceneType", cap.getSceneType());
-        map.put("sceneCapability", cap.isSceneCapability());
-        map.put("hasSelfDrive", cap.isHasSelfDrive());
-        map.put("businessCategory", cap.getBusinessCategory());
-        map.put("businessSemanticsScore", cap.getBusinessSemanticsScore());
-        map.put("mainFirst", cap.isMainFirst());
-        map.put("category", cap.getCategory());
+        dto.setSceneType(cap.getSceneType());
+        dto.setSceneCapability(cap.isSceneCapability());
+        dto.setHasSelfDrive(cap.isHasSelfDrive());
+        dto.setBusinessCategory(cap.getBusinessCategory());
+        dto.setBusinessSemanticsScore(cap.getBusinessSemanticsScore());
+        dto.setMainFirst(cap.isMainFirst());
+        dto.setCategory(cap.getCategory());
         
         if (cap.getCapabilityCategory() != null) {
-            map.put("capabilityCategory", cap.getCapabilityCategory().getCode());
+            dto.setCapabilityCategory(cap.getCapabilityCategory().getCode());
         }
         
-        map.put("dependencies", cap.getDependencies());
-        map.put("tags", cap.getTags());
-        map.put("participants", cap.getParticipants());
-        map.put("type", cap.getType() != null ? cap.getType().name() : null);
+        dto.setDependencies(cap.getDependencies());
+        dto.setTags(cap.getTags());
         
-        return map;
+        if (cap.getParticipants() != null) {
+            List<String> participantIds = cap.getParticipants().stream()
+                .map(p -> p.getUserId())
+                .collect(Collectors.toList());
+            dto.setParticipants(participantIds);
+        }
+        
+        dto.setType(cap.getCapabilityType() != null ? cap.getCapabilityType().name() : null);
+        
+        return dto;
     }
 
     private Map<String, Integer> calculateStats(List<Capability> allCaps) {
@@ -143,25 +152,6 @@ public class LocalDiscoveryService {
         stats.put("total", allCaps.size());
         
         return stats;
-    }
-
-    public static class DiscoveryResult {
-        private List<Map<String, Object>> capabilities;
-        private int total;
-        private Map<String, Integer> stats;
-        private String source;
-        private long timestamp;
-
-        public List<Map<String, Object>> getCapabilities() { return capabilities; }
-        public void setCapabilities(List<Map<String, Object>> capabilities) { this.capabilities = capabilities; }
-        public int getTotal() { return total; }
-        public void setTotal(int total) { this.total = total; }
-        public Map<String, Integer> getStats() { return stats; }
-        public void setStats(Map<String, Integer> stats) { this.stats = stats; }
-        public String getSource() { return source; }
-        public void setSource(String source) { this.source = source; }
-        public long getTimestamp() { return timestamp; }
-        public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
     }
 
     public static class SyncResult {

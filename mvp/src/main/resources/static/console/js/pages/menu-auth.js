@@ -21,7 +21,7 @@
         loadRoles: function() {
             var self = this;
             
-            return fetch('/api/v1/menu/config')
+            return fetch('/api/v1/scene-menu/config')
                 .then(function(response) {
                     return response.json();
                 })
@@ -44,7 +44,7 @@
         loadLibrary: function() {
             var self = this;
             
-            return fetch('/api/v1/menu/library')
+            return fetch('/api/v1/scene-menu/library')
                 .then(function(response) {
                     return response.json();
                 })
@@ -62,7 +62,7 @@
         loadMenuTree: function(roleId) {
             var self = this;
             
-            return fetch('/api/v1/menu/roles/' + roleId + '/menu-tree')
+            return fetch('/api/v1/scene-menu/roles/' + roleId + '/menu-tree')
                 .then(function(response) {
                     return response.json();
                 })
@@ -298,7 +298,7 @@
             var self = this;
             if (!confirm('确定要删除此菜单吗？子菜单也会被一起删除。')) return;
             
-            fetch('/api/v1/menu/roles/' + this.selectedRoleId + '/menus/' + menuId + '/tree', {
+            fetch('/api/v1/scene-menu/roles/' + this.selectedRoleId + '/menus/' + menuId + '/tree', {
                 method: 'DELETE'
             })
             .then(function(response) {
@@ -342,10 +342,10 @@
             
             var fetchUrl, method;
             if (self.editingMenuId) {
-                fetchUrl = '/api/v1/menu/roles/' + self.selectedRoleId + '/menus/' + self.editingMenuId;
+                fetchUrl = '/api/v1/scene-menu/roles/' + self.selectedRoleId + '/menus/' + self.editingMenuId;
                 method = 'PUT';
             } else {
-                fetchUrl = '/api/v1/menu/roles/' + self.selectedRoleId + '/menus/' + (parentId || 'null') + '/children';
+                fetchUrl = '/api/v1/scene-menu/roles/' + self.selectedRoleId + '/menus/' + (parentId || 'null') + '/children';
                 method = 'POST';
             }
             
@@ -427,7 +427,7 @@
                 active: false
             };
             
-            fetch('/api/v1/menu/roles/' + self.selectedRoleId + '/menus/' + (parentId || 'null') + '/children', {
+            fetch('/api/v1/scene-menu/roles/' + self.selectedRoleId + '/menus/' + (parentId || 'null') + '/children', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(menu)
@@ -572,7 +572,7 @@
                 }
             }
             
-            fetch('/api/v1/menu/roles/' + this.selectedRoleId + '/menus/' + sourceId + '/move?newParentId=' + (newParentId || '') + '&newSort=' + newSort, {
+            fetch('/api/v1/scene-menu/roles/' + this.selectedRoleId + '/menus/' + sourceId + '/move?newParentId=' + (newParentId || '') + '&newSort=' + newSort, {
                 method: 'PUT'
             })
             .then(function(response) {

@@ -31,6 +31,12 @@ public interface KeyManagementService {
         private long expireTimeMs;
         private Map<String, Object> permissions;
         private String description;
+        private String keyName;
+        private String keyType;
+        private String provider;
+        private List<String> allowedUsers;
+        private List<String> allowedRoles;
+        private List<String> allowedScenes;
         
         public String getUserId() { return userId; }
         public void setUserId(String userId) { this.userId = userId; }
@@ -46,6 +52,18 @@ public interface KeyManagementService {
         public void setPermissions(Map<String, Object> permissions) { this.permissions = permissions; }
         public String getDescription() { return description; }
         public void setDescription(String description) { this.description = description; }
+        public String getKeyName() { return keyName; }
+        public void setKeyName(String keyName) { this.keyName = keyName; }
+        public String getKeyType() { return keyType; }
+        public void setKeyType(String keyType) { this.keyType = keyType; }
+        public String getProvider() { return provider; }
+        public void setProvider(String provider) { this.provider = provider; }
+        public List<String> getAllowedUsers() { return allowedUsers; }
+        public void setAllowedUsers(List<String> allowedUsers) { this.allowedUsers = allowedUsers; }
+        public List<String> getAllowedRoles() { return allowedRoles; }
+        public void setAllowedRoles(List<String> allowedRoles) { this.allowedRoles = allowedRoles; }
+        public List<String> getAllowedScenes() { return allowedScenes; }
+        public void setAllowedScenes(List<String> allowedScenes) { this.allowedScenes = allowedScenes; }
     }
     
     public static class KeyInfo {
@@ -62,16 +80,24 @@ public interface KeyManagementService {
         private int accessCount;
         private Map<String, Object> permissions;
         private String description;
+        private String keyName;
+        private String keyType;
+        private String provider;
+        private List<String> allowedUsers;
+        private List<String> allowedRoles;
+        private List<String> allowedScenes;
+        private long updatedAt;
         
         public enum KeyStatus {
             ACTIVE,
+            INACTIVE,
             EXPIRED,
             REVOKED,
             SUSPENDED
         }
         
         public boolean isExpired() {
-            return System.currentTimeMillis() > expireTime;
+            return expireTime > 0 && System.currentTimeMillis() > expireTime;
         }
         
         public boolean isActive() {
@@ -104,6 +130,20 @@ public interface KeyManagementService {
         public void setPermissions(Map<String, Object> permissions) { this.permissions = permissions; }
         public String getDescription() { return description; }
         public void setDescription(String description) { this.description = description; }
+        public String getKeyName() { return keyName; }
+        public void setKeyName(String keyName) { this.keyName = keyName; }
+        public String getKeyType() { return keyType; }
+        public void setKeyType(String keyType) { this.keyType = keyType; }
+        public String getProvider() { return provider; }
+        public void setProvider(String provider) { this.provider = provider; }
+        public List<String> getAllowedUsers() { return allowedUsers; }
+        public void setAllowedUsers(List<String> allowedUsers) { this.allowedUsers = allowedUsers; }
+        public List<String> getAllowedRoles() { return allowedRoles; }
+        public void setAllowedRoles(List<String> allowedRoles) { this.allowedRoles = allowedRoles; }
+        public List<String> getAllowedScenes() { return allowedScenes; }
+        public void setAllowedScenes(List<String> allowedScenes) { this.allowedScenes = allowedScenes; }
+        public long getUpdatedAt() { return updatedAt; }
+        public void setUpdatedAt(long updatedAt) { this.updatedAt = updatedAt; }
     }
     
     public static class KeyAccessResult {

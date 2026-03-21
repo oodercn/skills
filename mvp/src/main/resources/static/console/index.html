@@ -173,7 +173,7 @@
                                 <i class="ri-robot-2-line" style="font-size: 28px; margin-bottom: 8px; color: var(--ns-warning);"></i>
                                 <span style="font-size: 14px;">LLM配置</span>
                             </a>
-                            <a href="/console/pages/knowledge-base.html" class="quick-link">
+                            <a href="/console/pages/knowledge-center.html" class="quick-link">
                                 <i class="ri-book-2-line" style="font-size: 28px; margin-bottom: 8px; color: var(--ns-info);"></i>
                                 <span style="font-size: 14px;">知识库</span>
                             </a>
@@ -227,19 +227,27 @@
             } catch(e) {}
             
             try {
-                const scenes = await NX.api.get('/api/v1/scenes');
-                document.getElementById('stat-scenes').textContent = scenes.data ? scenes.data.length : 0;
+                const scenes = await NX.api.post('/api/v1/scenes/list', { pageNum: 1, pageSize: 100 });
+                document.getElementById('stat-scenes').textContent = scenes.data ? scenes.data.total : 0;
             } catch(e) {}
             
             try {
-                const users = await NX.api.get('/api/v1/users');
-                document.getElementById('stat-users').textContent = users.data ? users.data.length : 0;
+                const users = await NX.api.get('/api/v1/stats/users');
+                document.getElementById('stat-users').textContent = users.data || 0;
             } catch(e) {}
             
             try {
-                const response = await fetch('/api/v1/menu');
+                const response = await fetch('/api/v1/scene-menu/config');
                 const result = await response.json();
-                document.getElementById('stat-skills').textContent = result.data ? result.data.length : 0;
+                const menuData = result.data || {};
+                const roles = menuData.roles || [];
+                let totalMenus = 0;
+                roles.forEach(function(role) {
+                    if (role.menus) {
+                        totalMenus += role.menus.length;
+                    }
+                });
+                document.getElementById('stat-skills').textContent = totalMenus;
             } catch(e) {}
         }
     </script>

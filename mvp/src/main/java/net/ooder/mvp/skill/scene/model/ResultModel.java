@@ -12,13 +12,20 @@ public class ResultModel<T> {
     private String timestamp;
     private String requestId;
 
+    public ResultModel() {
+        this.code = CODE_SUCCESS;
+        this.status = "success";
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.requestId = generateRequestId();
+    }
+
     public ResultModel(int code, String message, T data, boolean success, String requestId) {
         this.code = code;
         this.status = success ? "success" : "error";
         this.message = message;
         this.data = data;
         this.requestId = requestId;
-        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss.SSS"));
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     public int getCode() {

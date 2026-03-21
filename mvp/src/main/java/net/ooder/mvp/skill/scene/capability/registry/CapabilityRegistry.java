@@ -25,8 +25,8 @@ public class CapabilityRegistry {
         String capId = capability.getCapabilityId();
         capabilities.put(capId, capability);
 
-        if (capability.getType() != null) {
-            String typeName = capability.getType().name();
+        if (capability.getCapabilityType() != null) {
+            String typeName = capability.getCapabilityType().name();
             if (!typeIndex.containsKey(typeName)) {
                 typeIndex.put(typeName, new ArrayList<String>());
             }
@@ -61,8 +61,8 @@ public class CapabilityRegistry {
     public void unregister(String capabilityId) {
         Capability capability = capabilities.remove(capabilityId);
         if (capability != null) {
-            if (capability.getType() != null) {
-                String typeName = capability.getType().name();
+            if (capability.getCapabilityType() != null) {
+                String typeName = capability.getCapabilityType().name();
                 List<String> typeList = typeIndex.get(typeName);
                 if (typeList != null) {
                     typeList.remove(capabilityId);

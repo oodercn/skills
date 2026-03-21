@@ -16,16 +16,30 @@
    * API 客户端配置
    */
   const config = {
-    // 基础 URL
     baseURL: '',
-    // 默认超时时间（毫秒）
     timeout: 30000,
-    // 默认请求头
     headers: {
       'Content-Type': 'application/json',
       'X-Requested-With': 'XMLHttpRequest'
     }
   };
+
+  function getCurrentUserId() {
+    if (typeof NexusMenu !== 'undefined' && NexusMenu.getCurrentUser) {
+      const user = NexusMenu.getCurrentUser();
+      if (user && user.userId) {
+        return user.userId;
+      }
+    }
+    const sessionUser = sessionStorage.getItem('currentUser');
+    if (sessionUser) {
+      try {
+        const user = JSON.parse(sessionUser);
+        return user.userId || 'current-user';
+      } catch (e) {}
+    }
+    return 'current-user';
+  }
 
   /**
    * API 客户端
@@ -134,6 +148,11 @@
 
       try {
         console.log(`[ApiClient] 请求: ${options.method} ${url} (timeout: ${timeout}ms)`);
+
+        const userId = getCurrentUserId();
+        if (userId && !options.headers['X-User-Id']) {
+          options.headers['X-User-Id'] = userId;
+        }
 
         const response = await fetch(url, {
           ...options,

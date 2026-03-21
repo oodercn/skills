@@ -142,7 +142,64 @@ public class DeepSeekLlmProvider implements LlmProvider {
             }
         }
         
+        String usageJson = extractUsageJson(response);
+        if (usageJson != null) {
+            Map<String, Object> usage = parseUsage(usageJson);
+            result.put("usage", usage);
+            
+            Integer promptTokens = (Integer) usage.get("prompt_tokens");
+            Integer completionTokens = (Integer) usage.get("completion_tokens");
+            if (promptTokens != null) {
+                result.put("inputTokens", promptTokens);
+            }
+            if (completionTokens != null) {
+                result.put("outputTokens", completionTokens);
+            }
+        }
+        
         return result;
+    }
+    
+    private String extractUsageJson(String response) {
+        String searchKey = "\"usage\":";
+        int startIndex = response.indexOf(searchKey);
+        if (startIndex == -1) {
+            return null;
+        }
+        
+        startIndex += searchKey.length();
+        while (startIndex < response.length() && (response.charAt(startIndex) == ' ' || response.charAt(startIndex) == '\t')) {
+            startIndex++;
+        }
+        
+        if (startIndex >= response.length() || response.charAt(startIndex) != '{') {
+            return null;
+        }
+        
+        int braceCount = 0;
+        int endIndex = startIndex;
+        while (endIndex < response.length()) {
+            char c = response.charAt(endIndex);
+            if (c == '{') braceCount++;
+            else if (c == '}') braceCount--;
+            endIndex++;
+            if (braceCount == 0) break;
+        }
+        
+        return response.substring(startIndex, endIndex);
+    }
+    
+    private Map<String, Object> parseUsage(String usageJson) {
+        Map<String, Object> usage = new HashMap<String, Object>();
+        String promptTokens = extractJsonValue(usageJson, "prompt_tokens");
+        String completionTokens = extractJsonValue(usageJson, "completion_tokens");
+        String totalTokens = extractJsonValue(usageJson, "total_tokens");
+        
+        if (promptTokens != null) usage.put("prompt_tokens", Integer.parseInt(promptTokens));
+        if (completionTokens != null) usage.put("completion_tokens", Integer.parseInt(completionTokens));
+        if (totalTokens != null) usage.put("total_tokens", Integer.parseInt(totalTokens));
+        
+        return usage;
     }
 
     private String extractToolCallsJson(String response) {

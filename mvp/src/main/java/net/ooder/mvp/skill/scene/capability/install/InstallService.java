@@ -32,6 +32,20 @@ public interface InstallService {
     
     RollbackResult getRollbackStatus(String installId);
     
+    CompletableFuture<InstallConfig> downloadAndInstall(String skillId, CreateInstallRequest request);
+    
+    CompletableFuture<InstallConfig> activateSkill(String installId);
+    
+    CompletableFuture<InstallConfig> deactivateSkill(String installId);
+    
+    CompletableFuture<InstallConfig> uninstallSkill(String installId);
+    
+    List<String> listDownloadedSkills();
+    
+    List<String> listInstalledSkills();
+    
+    List<String> listActivatedSkills();
+    
     public static class CreateInstallRequest {
         private String capabilityId;
         private String driverCondition;

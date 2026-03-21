@@ -91,6 +91,11 @@
                         <div class="info-bar" id="info-bar" role="region" aria-label="基本信息">
                             <span class="info-bar__item"><i class="ri-folder-line"></i> <span id="info-skill">-</span></span>
                             <span class="info-bar__item"><i class="ri-price-tag-3-line"></i> v<span id="info-version">1.0.0</span></span>
+                            <span class="info-bar__item info-bar__item--score" id="score-container" style="display:none;">
+                                <i class="ri-star-line"></i> 
+                                <span class="score-label">业务价值:</span>
+                                <span class="score-value" id="info-score">-</span>
+                            </span>
                         </div>
                         
                         <div class="tab-container" role="tablist" aria-label="详情标签页">
@@ -103,6 +108,14 @@
                                     <i class="ri-link tab-btn__icon" aria-hidden="true"></i>
                                     <span>绑定配置</span>
                                     <span class="tab-btn__badge" id="binding-count">0</span>
+                                </button>
+                                <button class="tab-btn" data-tab="dependencies" role="tab" aria-selected="false" aria-controls="dependencies-panel" id="dependencies-tab">
+                                    <i class="ri-mind-map tab-btn__icon" aria-hidden="true"></i>
+                                    <span>依赖关系</span>
+                                </button>
+                                <button class="tab-btn" data-tab="logs" role="tab" aria-selected="false" aria-controls="logs-panel" id="logs-tab">
+                                    <i class="ri-file-list-line tab-btn__icon" aria-hidden="true"></i>
+                                    <span>调用日志</span>
                                 </button>
                                 <button class="tab-btn" data-tab="statistics" role="tab" aria-selected="false" aria-controls="statistics-panel" id="statistics-tab">
                                     <i class="ri-bar-chart-line tab-btn__icon" aria-hidden="true"></i>
@@ -228,6 +241,108 @@
                                     <div class="section-body">
                                         <div class="driver-condition-list" id="driver-conditions">
                                             <div class="empty-state"><i class="ri-timer-line" aria-hidden="true"></i><p>无驱动条件</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-panel" id="dependencies-panel" role="tabpanel" aria-labelledby="dependencies-tab">
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title"><i class="ri-mind-map" aria-hidden="true"></i> 依赖关系图</h3>
+                                        <div class="section-actions">
+                                            <button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="refreshDependencies()">
+                                                <i class="ri-refresh-line"></i> 刷新
+                                            </button>
+                                            <button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="expandDependencyGraph()">
+                                                <i class="ri-fullscreen-line"></i> 全屏
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div id="dependency-graph-container" class="dependency-graph-container">
+                                            <div class="dependency-graph" id="dependency-graph">
+                                                <div class="empty-state">
+                                                    <i class="ri-mind-map" aria-hidden="true"></i>
+                                                    <p>暂无依赖关系</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title"><i class="ri-link" aria-hidden="true"></i> 依赖能力列表</h3>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="dependency-list" id="dependency-list">
+                                            <div class="empty-state"><i class="ri-link" aria-hidden="true"></i><p>无依赖能力</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title"><i class="ri-team-line" aria-hidden="true"></i> 被引用关系</h3>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="reference-list" id="reference-list">
+                                            <div class="empty-state"><i class="ri-team-line" aria-hidden="true"></i><p>无被引用关系</p></div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="tab-panel" id="logs-panel" role="tabpanel" aria-labelledby="logs-tab">
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title"><i class="ri-file-list-line" aria-hidden="true"></i> 调用日志</h3>
+                                        <div class="section-actions">
+                                            <select class="form-select form-select--sm" id="log-level-filter" onchange="filterLogs()">
+                                                <option value="">全部级别</option>
+                                                <option value="INFO">INFO</option>
+                                                <option value="WARN">WARN</option>
+                                                <option value="ERROR">ERROR</option>
+                                            </select>
+                                            <button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="refreshLogs()">
+                                                <i class="ri-refresh-line"></i> 刷新
+                                            </button>
+                                            <button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="exportLogs()">
+                                                <i class="ri-download-line"></i> 导出
+                                            </button>
+                                        </div>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="log-list" id="log-list">
+                                            <div class="empty-state"><i class="ri-file-list-line" aria-hidden="true"></i><p>暂无调用日志</p></div>
+                                        </div>
+                                        <div class="log-pagination" id="log-pagination"></div>
+                                    </div>
+                                </div>
+                                
+                                <div class="section-card">
+                                    <div class="section-header">
+                                        <h3 class="section-title"><i class="ri-bar-chart-line" aria-hidden="true"></i> 调用统计</h3>
+                                    </div>
+                                    <div class="section-body">
+                                        <div class="log-stats-row">
+                                            <div class="log-stat-item">
+                                                <span class="log-stat-value" id="log-total-calls">0</span>
+                                                <span class="log-stat-label">总调用次数</span>
+                                            </div>
+                                            <div class="log-stat-item">
+                                                <span class="log-stat-value log-stat-value--success" id="log-success-calls">0</span>
+                                                <span class="log-stat-label">成功</span>
+                                            </div>
+                                            <div class="log-stat-item">
+                                                <span class="log-stat-value log-stat-value--error" id="log-error-calls">0</span>
+                                                <span class="log-stat-label">失败</span>
+                                            </div>
+                                            <div class="log-stat-item">
+                                                <span class="log-stat-value" id="log-avg-duration">0ms</span>
+                                                <span class="log-stat-label">平均耗时</span>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>

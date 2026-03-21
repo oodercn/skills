@@ -7,6 +7,7 @@
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
     <link rel="stylesheet" href="/console/css/pages/knowledge-base.css">
+    <link rel="stylesheet" href="/console/css/pages/knowledge-pages.css">
 </head>
 <body>
     <div class="nx-page">
@@ -72,7 +73,7 @@
                         <div class="empty-state-title">选择知识库</div>
                         <p>从左侧列表选择知识库，或创建新知识库</p>
                     </div>
-                    <div id="kbDetail" style="display: none; flex-direction: column; height: 100%;">
+                    <div id="kbDetail" style="display: none; flex-direction: column; flex: 1; min-height: 0;">
                         <div class="kb-main-header">
                             <div class="kb-main-title">
                                 <i class="ri-book-3-line"></i>
@@ -107,7 +108,6 @@
                         </div>
                         
                         <div class="kb-content" id="kbContent">
-                            <!-- 概览 Tab -->
                             <div id="tab-overview">
                                 <div class="index-status">
                                     <div class="index-progress">
@@ -171,7 +171,6 @@
                                 </div>
                             </div>
                             
-                            <!-- 文档管理 Tab -->
                             <div id="tab-documents" style="display: none;">
                                 <div style="display: flex; justify-content: space-between; margin-bottom: 16px;">
                                     <div style="display: flex; gap: 8px;">
@@ -192,7 +191,6 @@
                                 <div class="doc-list" id="docList"></div>
                             </div>
                             
-                            <!-- 分层配置 Tab -->
                             <div id="tab-layer" style="display: none;">
                                 <div class="config-section">
                                     <div class="config-section-title"><i class="ri-stack-line"></i> 检索策略配置</div>
@@ -246,7 +244,6 @@
                                 </div>
                             </div>
                             
-                            <!-- 设置 Tab -->
                             <div id="tab-settings" style="display: none;">
                                 <div class="config-section">
                                     <div class="config-section-title"><i class="ri-cpu-line"></i> 嵌入模型配置</div>
@@ -293,7 +290,6 @@
         </main>
     </div>
     
-    <!-- 创建知识库模态框 -->
     <div class="modal" id="createKbModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -335,6 +331,156 @@
             <div class="modal-footer">
                 <button class="nx-btn nx-btn--secondary" onclick="closeModal('createKbModal')">取消</button>
                 <button class="nx-btn nx-btn--primary" onclick="createKb()">创建</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="editKbModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">编辑知识库</div>
+                <button class="modal-close" onclick="closeModal('editKbModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">知识库名称 *</label>
+                    <input type="text" class="form-input" id="editKbName" placeholder="输入知识库名称">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">描述</label>
+                    <textarea class="form-textarea" id="editKbDesc" placeholder="输入知识库描述"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">知识层</label>
+                    <select class="form-input" id="editKbLayer">
+                        <option value="GENERAL">通用知识层</option>
+                        <option value="PROFESSIONAL">专业模块层</option>
+                        <option value="SCENE">场景知识层</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">可见性</label>
+                    <select class="form-input" id="editKbVisibility">
+                        <option value="private">私有</option>
+                        <option value="team">团队</option>
+                        <option value="public">公开</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tag-input" id="editTagInput">
+                        <input type="text" placeholder="输入标签后按回车" onkeydown="handleEditTagInput(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('editKbModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="updateKb()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="addTextModal">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <div class="modal-title">添加文本内容</div>
+                <button class="modal-close" onclick="closeModal('addTextModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">文档标题 *</label>
+                    <input type="text" class="form-input" id="textDocTitle" placeholder="输入文档标题">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">文档内容 *</label>
+                    <textarea class="form-textarea" id="textDocContent" placeholder="输入文档内容" style="min-height: 200px;"></textarea>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tag-input" id="docTagInput">
+                        <input type="text" placeholder="输入标签后按回车" onkeydown="handleDocTagInput(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('addTextModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="addTextDocument()">添加</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="uploadModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">上传文件</div>
+                <button class="modal-close" onclick="closeModal('uploadModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">选择文件</label>
+                    <input type="file" class="form-input" id="uploadFileInput" accept=".txt,.pdf,.doc,.docx,.md,.html" style="padding: 8px;">
+                    <div style="font-size: 12px; color: var(--nx-text-secondary); margin-top: 4px;">支持: TXT, PDF, DOC, DOCX, MD, HTML</div>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">文档标题（可选）</label>
+                    <input type="text" class="form-input" id="uploadDocTitle" placeholder="默认使用文件名">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tag-input" id="uploadTagInput">
+                        <input type="text" placeholder="输入标签后按回车" onkeydown="handleUploadTagInput(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('uploadModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="uploadFile()">上传</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="urlImportModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">URL导入</div>
+                <button class="modal-close" onclick="closeModal('urlImportModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label class="form-label">URL地址 *</label>
+                    <input type="url" class="form-input" id="urlInput" placeholder="https://example.com/article">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">文档标题（可选）</label>
+                    <input type="text" class="form-input" id="urlDocTitle" placeholder="默认使用页面标题">
+                </div>
+                <div class="form-group">
+                    <label class="form-label">标签</label>
+                    <div class="tag-input" id="urlTagInput">
+                        <input type="text" placeholder="输入标签后按回车" onkeydown="handleUrlTagInput(event)">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('urlImportModal')">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="importFromUrl()">导入</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="viewDocModal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <div class="modal-title" id="viewDocTitle">文档详情</div>
+                <button class="modal-close" onclick="closeModal('viewDocModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="viewDocMeta" style="margin-bottom: 16px; padding: 12px; background: var(--nx-bg-secondary); border-radius: 8px; font-size: 14px;"></div>
+                <div style="margin-bottom: 8px; font-weight: 600;">内容预览</div>
+                <div id="viewDocContent" style="padding: 16px; background: var(--nx-bg-secondary); border-radius: 8px; max-height: 400px; overflow-y: auto; white-space: pre-wrap; font-size: 14px; line-height: 1.6;"></div>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="closeModal('viewDocModal')">关闭</button>
             </div>
         </div>
     </div>

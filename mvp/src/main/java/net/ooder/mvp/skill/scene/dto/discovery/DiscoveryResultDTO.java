@@ -1,88 +1,28 @@
 package net.ooder.mvp.skill.scene.dto.discovery;
 
 import java.util.List;
+import java.util.Map;
 
 public class DiscoveryResultDTO {
     
-    private String method;
+    private List<CapabilityDetailDTO> capabilities;
+    private int total;
+    private Map<String, Integer> stats;
+    private String source;
+    private long timestamp;
     
-    private String repoUrl;
+    public List<CapabilityDetailDTO> getCapabilities() { return capabilities; }
+    public void setCapabilities(List<CapabilityDetailDTO> capabilities) { this.capabilities = capabilities; }
     
-    private String branch;
+    public int getTotal() { return total; }
+    public void setTotal(int total) { this.total = total; }
     
-    private List<CapabilityDTO> capabilities;
+    public Map<String, Integer> getStats() { return stats; }
+    public void setStats(Map<String, Integer> stats) { this.stats = stats; }
     
-    private Long scanTime;
+    public String getSource() { return source; }
+    public void setSource(String source) { this.source = source; }
     
-    private List<RepositoryDTO> repositories;
-    
-    private String errorMessage;
-    
-    private boolean fromCache;
-
-    public DiscoveryResultDTO() {}
-
-    public String getMethod() {
-        return method;
-    }
-
-    public void setMethod(String method) {
-        this.method = method;
-    }
-
-    public String getRepoUrl() {
-        return repoUrl;
-    }
-
-    public void setRepoUrl(String repoUrl) {
-        this.repoUrl = repoUrl;
-    }
-
-    public String getBranch() {
-        return branch;
-    }
-
-    public void setBranch(String branch) {
-        this.branch = branch;
-    }
-
-    public List<CapabilityDTO> getCapabilities() {
-        return capabilities;
-    }
-
-    public void setCapabilities(List<CapabilityDTO> capabilities) {
-        this.capabilities = capabilities;
-    }
-
-    public Long getScanTime() {
-        return scanTime;
-    }
-
-    public void setScanTime(Long scanTime) {
-        this.scanTime = scanTime;
-    }
-
-    public List<RepositoryDTO> getRepositories() {
-        return repositories;
-    }
-
-    public void setRepositories(List<RepositoryDTO> repositories) {
-        this.repositories = repositories;
-    }
-
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-
-    public boolean isFromCache() {
-        return fromCache;
-    }
-
-    public void setFromCache(boolean fromCache) {
-        this.fromCache = fromCache;
-    }
+    public long getTimestamp() { return timestamp; }
+    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
 }

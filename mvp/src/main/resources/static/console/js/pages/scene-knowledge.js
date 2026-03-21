@@ -45,10 +45,10 @@
         },
 
         loadBoundKnowledgeBases: function() {
-            ApiClient.get('/api/v1/scene-groups/' + sceneGroupId)
+            ApiClient.get('/api/v1/scene-groups/' + sceneGroupId + '/knowledge')
                 .then(function(result) {
                     if (result.status === 'success' && result.data) {
-                        boundKnowledgeBases = result.data.knowledgeBases || [];
+                        boundKnowledgeBases = result.data || [];
                         SceneKnowledge.renderBoundList();
                     }
                 })
@@ -162,7 +162,7 @@
                 threshold: threshold
             };
 
-            ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/knowledge-bases', binding)
+            ApiClient.post('/api/v1/scene-groups/' + sceneGroupId + '/knowledge', binding)
                 .then(function(result) {
                     if (result.status === 'success') {
                         SceneKnowledge.closeBindModal();
@@ -190,9 +190,11 @@
         },
 
         unbindKnowledge: function(kbId) {
+            var kb = boundKnowledgeBases.find(function(k) { return k.kbId === kbId; });
+            if (!kb) return;
             if (!confirm('确定要解绑此知识库吗？')) return;
 
-            ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/knowledge-bases/' + kbId)
+            ApiClient.delete('/api/v1/scene-groups/' + sceneGroupId + '/knowledge/' + kbId + '?layer=' + (kb.layer || 'SCENE'))
                 .then(function(result) {
                     if (result.status === 'success') {
                         SceneKnowledge.loadBoundKnowledgeBases();

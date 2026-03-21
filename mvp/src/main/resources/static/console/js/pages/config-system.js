@@ -27,12 +27,17 @@ var ConfigSystem = {
         var self = this;
         fetch('/api/v1/config/system/capabilities')
             .then(function(response) { return response.json(); })
-            .then(function(data) {
-                self.capabilities = data;
+            .then(function(result) {
+                if (result.status === 'success' && result.data) {
+                    self.capabilities = result.data;
+                } else {
+                    self.capabilities = {};
+                }
                 self.renderCapabilities();
             })
             .catch(function(error) {
                 console.error('Failed to load capabilities:', error);
+                self.capabilities = {};
             });
     },
 

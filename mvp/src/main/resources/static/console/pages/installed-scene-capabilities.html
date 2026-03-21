@@ -6,273 +6,7 @@
     <title>已安装场景能力 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <style>
-        .capabilities-page { padding: 0; }
-        
-        .page-header {
-            background: var(--nx-bg-elevated);
-            border-bottom: 1px solid var(--nx-border);
-            padding: 24px;
-            margin-bottom: 24px;
-        }
-        
-        .header-content {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-        }
-        
-        .header-title {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .header-title i { font-size: 28px; color: var(--nx-primary); }
-        
-        .header-title h1 { margin: 0; font-size: 24px; }
-        
-        .header-subtitle {
-            color: var(--nx-text-secondary);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .stat-icon.primary { background: var(--nx-primary-light); color: var(--nx-primary); }
-        .stat-icon.success { background: var(--nx-success-light); color: var(--nx-success); }
-        .stat-icon.warning { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .stat-icon.info { background: var(--nx-info-light); color: var(--nx-info); }
-        
-        .stat-content h4 { margin: 0; font-size: 12px; color: var(--nx-text-secondary); font-weight: 500; }
-        .stat-value { margin: 4px 0 0 0; font-size: 28px; font-weight: 600; }
-        
-        .filter-bar {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 10px 12px 10px 36px;
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            background: var(--nx-bg);
-            color: var(--nx-text-primary);
-            font-size: 14px;
-        }
-        
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--nx-primary);
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--nx-text-secondary);
-        }
-        
-        .filter-tabs {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .filter-tab {
-            padding: 8px 16px;
-            border-radius: 8px;
-            border: 1px solid var(--nx-border);
-            background: var(--nx-bg);
-            color: var(--nx-text-secondary);
-            font-size: 13px;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .filter-tab:hover {
-            background: var(--nx-bg-hover);
-            color: var(--nx-text-primary);
-        }
-        
-        .filter-tab.active {
-            background: var(--nx-primary);
-            color: white;
-            border-color: var(--nx-primary);
-        }
-        
-        .category-section {
-            margin-bottom: 32px;
-        }
-        
-        .category-header {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 16px;
-            padding-bottom: 12px;
-            border-bottom: 1px solid var(--nx-border);
-        }
-        
-        .category-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-        }
-        
-        .category-title { font-size: 16px; font-weight: 600; margin: 0; }
-        .category-count { color: var(--nx-text-secondary); font-size: 13px; }
-        
-        .capabilities-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 16px;
-        }
-        
-        .capability-card {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 20px;
-            transition: all 0.2s;
-        }
-        
-        .capability-card:hover {
-            border-color: var(--nx-primary);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-        
-        .capability-header {
-            display: flex;
-            align-items: flex-start;
-            gap: 12px;
-            margin-bottom: 12px;
-        }
-        
-        .capability-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            flex-shrink: 0;
-        }
-        
-        .capability-info { flex: 1; min-width: 0; }
-        
-        .capability-name {
-            font-weight: 600;
-            font-size: 15px;
-            margin: 0 0 4px 0;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-        }
-        
-        .capability-id {
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-            font-family: 'SF Mono', Monaco, monospace;
-        }
-        
-        .capability-desc {
-            font-size: 13px;
-            color: var(--nx-text-secondary);
-            margin-bottom: 12px;
-            line-height: 1.5;
-            display: -webkit-box;
-            -webkit-line-clamp: 2;
-            -webkit-box-orient: vertical;
-            overflow: hidden;
-        }
-        
-        .capability-meta {
-            display: flex;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .meta-tag {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .meta-tag.type-service { background: var(--nx-primary-light); color: var(--nx-primary); }
-        .meta-tag.type-driver { background: var(--nx-success-light); color: var(--nx-success); }
-        .meta-tag.type-scene { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .meta-tag.type-orchestration { background: var(--nx-info-light); color: var(--nx-info); }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { margin: 0 0 8px 0; font-size: 18px; }
-        .empty-state p { margin: 0; font-size: 14px; }
-        
-        .loading-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .loading-state i { font-size: 32px; animation: spin 1s linear infinite; }
-        
-        @keyframes spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-    </style>
+    <link rel="stylesheet" href="/console/css/pages/scene-pages.css">
 </head>
 <body>
     <div class="nx-page">
@@ -332,24 +66,17 @@
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon success"><i class="ri-service-line"></i></div>
+                            <div class="stat-icon warning"><i class="ri-layout-grid-line"></i></div>
                             <div class="stat-content">
-                                <h4>服务能力</h4>
-                                <div class="stat-value" id="stat-service">-</div>
+                                <h4>场景技能</h4>
+                                <div class="stat-value" id="stat-scene">-</div>
                             </div>
                         </div>
                         <div class="stat-card">
-                            <div class="stat-icon warning"><i class="ri-flashlight-line"></i></div>
+                            <div class="stat-icon success"><i class="ri-cpu-line"></i></div>
                             <div class="stat-content">
-                                <h4>驱动能力</h4>
-                                <div class="stat-value" id="stat-driver">-</div>
-                            </div>
-                        </div>
-                        <div class="stat-card">
-                            <div class="stat-icon info"><i class="ri-flow-chart"></i></div>
-                            <div class="stat-content">
-                                <h4>编排能力</h4>
-                                <div class="stat-value" id="stat-orchestration">-</div>
+                                <h4>独立能力</h4>
+                                <div class="stat-value" id="stat-standalone">-</div>
                             </div>
                         </div>
                     </div>
@@ -361,10 +88,8 @@
                         </div>
                         <div class="filter-tabs" id="filter-tabs">
                             <button class="filter-tab active" data-category="all">全部</button>
-                            <button class="filter-tab" data-category="service">服务</button>
-                            <button class="filter-tab" data-category="driver">驱动</button>
-                            <button class="filter-tab" data-category="orchestration">编排</button>
-                            <button class="filter-tab" data-category="scene">场景</button>
+                            <button class="filter-tab" data-category="SCENE">场景技能</button>
+                            <button class="filter-tab" data-category="STANDALONE">独立能力</button>
                         </div>
                     </div>
                     
@@ -383,6 +108,7 @@
     <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
     <script src="/console/js/api.js"></script>
+    <script src="/console/js/common/category-service.js"></script>
     <script>
         (function() {
             'use strict';
@@ -390,14 +116,50 @@
             let allCapabilities = [];
             let currentCategory = 'all';
             let searchKeyword = '';
+            let CATEGORY_CONFIG = null;
             
-            const categoryConfig = {
-                'service': { icon: 'ri-service-line', color: 'primary', label: '服务能力' },
-                'driver': { icon: 'ri-flashlight-line', color: 'success', label: '驱动能力' },
-                'orchestration': { icon: 'ri-flow-chart', color: 'info', label: '编排能力' },
-                'scene': { icon: 'ri-layout-grid-line', color: 'warning', label: '场景能力' },
-                'unknown': { icon: 'ri-question-line', color: 'secondary', label: '其他' }
+            var SKILL_FORM_CONFIG = {
+                'SCENE': { icon: 'ri-layout-grid-line', color: 'warning', label: '场景技能' },
+                'STANDALONE': { icon: 'ri-cpu-line', color: 'primary', label: '独立能力' },
+                'default': { icon: 'ri-puzzle-line', color: 'secondary', label: '其他' }
             };
+            
+            function isInternalCapability(cap) {
+                if (cap.visibility === 'internal') {
+                    return true;
+                }
+                var skillForm = cap.skillForm || 'STANDALONE';
+                if (skillForm === 'INTERNAL') {
+                    return true;
+                }
+                return false;
+            }
+            
+            function getSkillForm(cap) {
+                return cap.skillForm || 'STANDALONE';
+            }
+            
+            async function loadCategoryConfig() {
+                if (typeof CategoryService !== 'undefined') {
+                    try {
+                        const categories = await CategoryService.loadCategories();
+                        CATEGORY_CONFIG = {};
+                        categories.forEach(function(cat) {
+                            CATEGORY_CONFIG[cat.code] = {
+                                icon: cat.icon,
+                                color: cat.color,
+                                label: cat.name
+                            };
+                        });
+                        CATEGORY_CONFIG['default'] = { icon: 'ri-folder-line', color: '#8c8c8c', label: '未分类' };
+                    } catch (e) {
+                        console.warn('Failed to load categories:', e);
+                        CATEGORY_CONFIG = { 'default': { icon: 'ri-folder-line', color: '#8c8c8c', label: '未分类' } };
+                    }
+                } else {
+                    CATEGORY_CONFIG = { 'default': { icon: 'ri-folder-line', color: '#8c8c8c', label: '未分类' } };
+                }
+            }
             
             async function loadCapabilities() {
                 try {
@@ -409,7 +171,18 @@
                     const result = await response.json();
                     
                     if (result.status === 'success' && result.data && result.data.capabilities) {
-                        allCapabilities = result.data.capabilities;
+                        var rawList = result.data.capabilities;
+                        var internalCount = 0;
+                        allCapabilities = rawList.filter(function(cap) {
+                            var isInternal = isInternalCapability(cap);
+                            if (isInternal) {
+                                internalCount++;
+                                return false;
+                            }
+                            var skillForm = getSkillForm(cap);
+                            return skillForm === 'SCENE' || skillForm === 'STANDALONE';
+                        });
+                        console.log('Loaded', allCapabilities.length, 'capabilities, filtered', internalCount, 'internal');
                         updateStats();
                         renderCapabilities();
                     } else {
@@ -422,49 +195,38 @@
             }
             
             function updateStats() {
-                const stats = {
-                    total: allCapabilities.length,
-                    service: 0,
-                    driver: 0,
-                    orchestration: 0,
-                    scene: 0
-                };
+                var total = allCapabilities.length;
+                var sceneCount = 0;
+                var standaloneCount = 0;
                 
-                allCapabilities.forEach(cap => {
-                    const type = (cap.type || cap.capabilityType || 'unknown').toLowerCase();
-                    if (type.includes('service')) stats.service++;
-                    else if (type.includes('driver')) stats.driver++;
-                    else if (type.includes('orchestration')) stats.orchestration++;
-                    else if (type.includes('scene')) stats.scene++;
+                allCapabilities.forEach(function(cap) {
+                    var skillForm = getSkillForm(cap);
+                    if (skillForm === 'SCENE') {
+                        sceneCount++;
+                    } else if (skillForm === 'STANDALONE') {
+                        standaloneCount++;
+                    }
                 });
                 
-                document.getElementById('stat-total').textContent = stats.total;
-                document.getElementById('stat-service').textContent = stats.service;
-                document.getElementById('stat-driver').textContent = stats.driver;
-                document.getElementById('stat-orchestration').textContent = stats.orchestration;
-            }
-            
-            function getCapabilityType(cap) {
-                const type = (cap.type || cap.capabilityType || 'unknown').toLowerCase();
-                if (type.includes('service')) return 'service';
-                if (type.includes('driver')) return 'driver';
-                if (type.includes('orchestration')) return 'orchestration';
-                if (type.includes('scene')) return 'scene';
-                return 'unknown';
+                document.getElementById('stat-total').textContent = total;
+                document.getElementById('stat-scene').textContent = sceneCount;
+                document.getElementById('stat-standalone').textContent = standaloneCount;
             }
             
             function filterCapabilities() {
-                return allCapabilities.filter(cap => {
-                    const type = getCapabilityType(cap);
-                    const categoryMatch = currentCategory === 'all' || type === currentCategory;
+                return allCapabilities.filter(function(cap) {
+                    var skillForm = getSkillForm(cap);
+                    var categoryMatch = currentCategory === 'all' || 
+                        (currentCategory === 'SCENE' && skillForm === 'SCENE') ||
+                        (currentCategory === 'STANDALONE' && skillForm === 'STANDALONE');
                     
                     if (!categoryMatch) return false;
                     
                     if (searchKeyword) {
-                        const keyword = searchKeyword.toLowerCase();
-                        const name = (cap.name || cap.capabilityName || '').toLowerCase();
-                        const id = (cap.id || cap.capabilityId || '').toLowerCase();
-                        const desc = (cap.description || cap.desc || '').toLowerCase();
+                        var keyword = searchKeyword.toLowerCase();
+                        var name = (cap.name || '').toLowerCase();
+                        var id = (cap.id || '').toLowerCase();
+                        var desc = (cap.description || '').toLowerCase();
                         return name.includes(keyword) || id.includes(keyword) || desc.includes(keyword);
                     }
                     
@@ -473,133 +235,138 @@
             }
             
             function groupByCategory(capabilities) {
-                const groups = {};
-                capabilities.forEach(cap => {
-                    const type = getCapabilityType(cap);
-                    if (!groups[type]) groups[type] = [];
-                    groups[type].push(cap);
+                var groups = {};
+                capabilities.forEach(function(cap) {
+                    var category = cap.category || cap.businessCategory || 'default';
+                    if (!groups[category]) {
+                        groups[category] = [];
+                    }
+                    groups[category].push(cap);
                 });
                 return groups;
             }
             
             function renderCapabilities() {
-                const filtered = filterCapabilities();
-                const container = document.getElementById('capability-container');
+                var filtered = filterCapabilities();
+                var container = document.getElementById('capability-container');
                 
                 if (filtered.length === 0) {
-                    container.innerHTML = `
-                        <div class="empty-state">
-                            <i class="ri-inbox-line"></i>
-                            <h3>暂无能力</h3>
-                            <p>没有找到匹配的能力，请尝试其他筛选条件</p>
-                        </div>
-                    `;
+                    container.innerHTML = '<div class="empty-state">' +
+                        '<i class="ri-inbox-line"></i>' +
+                        '<h3>暂无能力</h3>' +
+                        '<p>没有找到匹配的能力，请尝试其他筛选条件</p>' +
+                        '</div>';
                     return;
                 }
                 
-                const groups = groupByCategory(filtered);
-                let html = '';
+                var groups = groupByCategory(filtered);
+                var html = '';
                 
-                const categoryOrder = ['service', 'driver', 'orchestration', 'scene', 'unknown'];
+                var categoryOrder = Object.keys(groups).sort(function(a, b) {
+                    if (a === 'default') return 1;
+                    if (b === 'default') return -1;
+                    return a.localeCompare(b);
+                });
                 
-                categoryOrder.forEach(category => {
-                    const caps = groups[category];
+                categoryOrder.forEach(function(category) {
+                    var caps = groups[category];
                     if (!caps || caps.length === 0) return;
                     
-                    const config = categoryConfig[category];
-                    html += `
-                        <div class="category-section">
-                            <div class="category-header">
-                                <div class="category-icon stat-icon ${config.color}">
-                                    <i class="${config.icon}"></i>
-                                </div>
-                                <div>
-                                    <h3 class="category-title">${config.label}</h3>
-                                    <span class="category-count">${caps.length} 个能力</span>
-                                </div>
-                            </div>
-                            <div class="capabilities-grid">
-                                ${caps.map(cap => renderCapabilityCard(cap, category)).join('')}
-                            </div>
-                        </div>
-                    `;
+                    var catConfig = CATEGORY_CONFIG && CATEGORY_CONFIG[category] ? 
+                        CATEGORY_CONFIG[category] : 
+                        { icon: 'ri-folder-line', color: '#8c8c8c', label: category === 'default' ? '未分类' : category };
+                    
+                    html += '<div class="category-section">' +
+                        '<div class="category-header">' +
+                        '<div class="category-icon stat-icon" style="background: ' + catConfig.color + '20; color: ' + catConfig.color + ';">' +
+                        '<i class="' + catConfig.icon + '"></i></div>' +
+                        '<div><h3 class="category-title">' + catConfig.label + '</h3>' +
+                        '<span class="category-count">' + caps.length + ' 个能力</span></div>' +
+                        '</div>' +
+                        '<div class="capabilities-grid">';
+                    
+                    caps.forEach(function(cap) {
+                        html += renderCapabilityCard(cap);
+                    });
+                    
+                    html += '</div></div>';
                 });
                 
                 container.innerHTML = html;
             }
             
-            function renderCapabilityCard(cap, type) {
-                const config = categoryConfig[type];
-                const name = cap.name || cap.capabilityName || '未命名能力';
-                const id = cap.id || cap.capabilityId || '';
-                const desc = cap.description || cap.desc || '暂无描述';
-                const skillId = cap.skillId || '';
-                const version = cap.version || '';
+            function renderCapabilityCard(cap) {
+                var skillForm = getSkillForm(cap);
+                var formConfig = SKILL_FORM_CONFIG[skillForm] || SKILL_FORM_CONFIG['default'];
+                var name = cap.name || '未命名能力';
+                var id = cap.id || '';
+                var desc = cap.description || '暂无描述';
+                var skillId = cap.skillId || '';
+                var version = cap.version || '';
+                var configUrl = '/console/pages/skill-config-detail.html?id=' + encodeURIComponent(id);
                 
-                return `
-                    <div class="capability-card">
-                        <div class="capability-header">
-                            <div class="capability-icon stat-icon ${config.color}">
-                                <i class="${config.icon}"></i>
-                            </div>
-                            <div class="capability-info">
-                                <h4 class="capability-name" title="${name}">${name}</h4>
-                                <div class="capability-id">${id}</div>
-                            </div>
-                        </div>
-                        <p class="capability-desc">${desc}</p>
-                        <div class="capability-meta">
-                            <span class="meta-tag type-${type}">${config.label}</span>
-                            ${skillId ? `<span class="meta-tag" style="background: var(--nx-bg); color: var(--nx-text-secondary);">${skillId}</span>` : ''}
-                            ${version ? `<span class="meta-tag" style="background: var(--nx-bg); color: var(--nx-text-secondary);">v${version}</span>` : ''}
-                        </div>
-                    </div>
-                `;
+                return '<div class="capability-card">' +
+                    '<div class="capability-header">' +
+                    '<div class="capability-icon stat-icon ' + formConfig.color + '">' +
+                    '<i class="' + formConfig.icon + '"></i></div>' +
+                    '<div class="capability-info">' +
+                    '<h4 class="capability-name" title="' + name + '">' + name + '</h4>' +
+                    '<div class="capability-id">' + id + '</div>' +
+                    '</div></div>' +
+                    '<p class="capability-desc">' + desc + '</p>' +
+                    '<div class="capability-meta">' +
+                    '<span class="meta-tag type-' + skillForm + '">' + formConfig.label + '</span>' +
+                    (skillId ? '<span class="meta-tag" style="background: var(--nx-bg); color: var(--nx-text-secondary);">' + skillId + '</span>' : '') +
+                    (version ? '<span class="meta-tag" style="background: var(--nx-bg); color: var(--nx-text-secondary);">v' + version + '</span>' : '') +
+                    '</div>' +
+                    '<div class="capability-actions">' +
+                    '<a href="' + configUrl + '" class="action-link action-link--primary"><i class="ri-settings-3-line"></i> 查看配置详情</a>' +
+                    '<a href="capability-detail.html?id=' + encodeURIComponent(id) + '" class="action-link action-link--secondary"><i class="ri-eye-line"></i> 能力详情</a>' +
+                    '</div></div>';
             }
             
             function showEmpty() {
-                document.getElementById('capability-container').innerHTML = `
-                    <div class="empty-state">
-                        <i class="ri-inbox-line"></i>
-                        <h3>暂无已安装的能力</h3>
-                        <p>请先安装技能包以获取能力</p>
-                    </div>
-                `;
+                document.getElementById('capability-container').innerHTML = 
+                    '<div class="empty-state">' +
+                    '<i class="ri-inbox-line"></i>' +
+                    '<h3>暂无已安装的能力</h3>' +
+                    '<p>请先安装技能包以获取能力</p>' +
+                    '</div>';
             }
             
             function showError() {
-                document.getElementById('capability-container').innerHTML = `
-                    <div class="empty-state">
-                        <i class="ri-error-warning-line"></i>
-                        <h3>加载失败</h3>
-                        <p>无法加载能力列表，请稍后重试</p>
-                    </div>
-                `;
+                document.getElementById('capability-container').innerHTML = 
+                    '<div class="empty-state">' +
+                    '<i class="ri-error-warning-line"></i>' +
+                    '<h3>加载失败</h3>' +
+                    '<p>无法加载能力列表，请稍后重试</p>' +
+                    '</div>';
             }
             
             function initFilters() {
-                const tabs = document.querySelectorAll('.filter-tab');
-                tabs.forEach(tab => {
+                var tabs = document.querySelectorAll('.filter-tab');
+                tabs.forEach(function(tab) {
                     tab.addEventListener('click', function() {
-                        tabs.forEach(t => t.classList.remove('active'));
+                        tabs.forEach(function(t) { t.classList.remove('active'); });
                         this.classList.add('active');
                         currentCategory = this.dataset.category;
                         renderCapabilities();
-                    });
-                });
+                    }.bind(this));
+                }.bind(this));
                 
-                const searchInput = document.getElementById('search-input');
-                let debounceTimer;
+                var searchInput = document.getElementById('search-input');
+                var debounceTimer;
                 searchInput.addEventListener('input', function() {
                     clearTimeout(debounceTimer);
-                    debounceTimer = setTimeout(() => {
+                    debounceTimer = setTimeout(function() {
                         searchKeyword = this.value.trim();
                         renderCapabilities();
-                    }, 300);
-                });
+                    }.bind(this), 300);
+                }.bind(this));
             }
             
-            document.addEventListener('DOMContentLoaded', function() {
+            document.addEventListener('DOMContentLoaded', async function() {
+                await loadCategoryConfig();
                 initFilters();
                 loadCapabilities();
             });

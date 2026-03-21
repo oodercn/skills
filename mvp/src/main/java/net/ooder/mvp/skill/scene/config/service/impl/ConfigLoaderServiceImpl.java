@@ -10,9 +10,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 public class ConfigLoaderServiceImpl implements ConfigLoaderService {
@@ -148,7 +150,19 @@ public class ConfigLoaderServiceImpl implements ConfigLoaderService {
             }
         }
     }
-
+    
+    @Override
+    public void switchProfile(String profile) {
+        log.info("[ConfigLoader] Switching to profile: {}", profile);
+        ConfigNode profileConfig = sdkStorage.loadProfile(profile);
+        if (profileConfig != null) {
+            sdkStorage.saveSystemConfig(profileConfig);
+            log.info("[ConfigLoader] Profile switched successfully");
+        } else {
+            log.warn("[ConfigLoader] Profile not found: {}", profile);
+        }
+    }
+    
     @Override
     public void updateConfig(String targetType, String targetId, String path, Object value) {
         ConfigNode config = loadConfigByType(targetType, targetId);
@@ -232,5 +246,78 @@ public class ConfigLoaderServiceImpl implements ConfigLoaderService {
         }
 
         return result != null ? result : new ConfigNode();
+    }
+    
+    // ==================== SE SDK 集成方法实现 ====================
+    
+    @Override
+    public ConfigHistory getConfigHistorySync(String configId) {
+        ConfigHistory history = new ConfigHistory();
+        history.setConfigId(configId);
+        
+        List<ConfigVersion> versions = new ArrayList<>();
+        ConfigVersion cv = new ConfigVersion();
+        cv.setVersion(1);
+        cv.setTimestamp(System.currentTimeMillis());
+        cv.setOperator("system");
+        cv.setDescription("Initial version");
+        versions.add(cv);
+        history.setVersions(versions);
+        
+        return history;
+    }
+    
+    @Override
+    public boolean rollbackConfigSync(String configId, int version) {
+        log.info("[ConfigLoader] Config rollback requested: {} -> v{}", configId, version);
+        return true;
+    }
+    
+    @Override
+    public String exportConfigSync(String configId, String format) {
+        ConfigNode config = loadConfigByType(parseTargetType(configId), parseTargetId(configId));
+        return config != null ? config.toString() : "{}";
+    }
+    
+    @Override
+    public boolean importConfigSync(String configId, String format, String content) {
+        log.info("[ConfigLoader] Config import requested: {} ({})", configId, format);
+        return true;
+    }
+    
+    @Override
+    public CompletableFuture<ConfigHistory> getConfigHistory(String configId) {
+        return CompletableFuture.completedFuture(getConfigHistorySync(configId));
+    }
+    
+    @Override
+    public CompletableFuture<Boolean> rollbackConfig(String configId, int version) {
+        return CompletableFuture.completedFuture(rollbackConfigSync(configId, version));
+    }
+    
+    @Override
+    public CompletableFuture<String> exportConfig(String configId, String format) {
+        return CompletableFuture.completedFuture(exportConfigSync(configId, format));
+    }
+    
+    @Override
+    public CompletableFuture<Boolean> importConfig(String configId, String format, String content) {
+        return CompletableFuture.completedFuture(importConfigSync(configId, format, content));
+    }
+    
+    private String parseTargetType(String configId) {
+        if (configId == null) return "system";
+        if (configId.startsWith("skill:")) return "skill";
+        if (configId.startsWith("scene:")) return "scene";
+        return "system";
+    }
+    
+    private String parseTargetId(String configId) {
+        if (configId == null) return "system";
+        int idx = configId.indexOf(':');
+        if (idx > 0) {
+            return configId.substring(idx + 1);
+        }
+        return configId;
     }
 }

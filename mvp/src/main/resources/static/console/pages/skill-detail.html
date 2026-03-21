@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skill 详情 - Nexus Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/nx-page.css">
+    <link rel="stylesheet" href="/console/css/pages/skill-pages.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-server-line"></i> Nexus Console
+                </h1>
+            </div>
+            <ul class="nav-menu" id="nav-menu"></ul>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-flex nx-items-center nx-gap-3">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-sidebar-toggle aria-label="切换侧边栏">
+                        <i class="ri-menu-line"></i>
+                    </button>
+                    <a href="capability-management.html" class="nx-btn nx-btn--ghost nx-btn--icon">
+                        <i class="ri-arrow-left-line"></i>
+                    </a>
+                    <div class="nx-page__title">
+                        <h1 id="pageTitle">Skill 详情</h1>
+                    </div>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--ghost nx-btn--icon" data-nx-theme-toggle aria-label="切换主题">
+                        <i class="ri-sun-line"></i>
+                    </button>
+                    <div class="nx-relative">
+                        <div class="nx-page__user-menu" id="user-menu">
+                            <div class="nx-page__user-avatar" id="user-avatar">U</div>
+                            <span class="nx-page__user-name" id="user-name">加载中...</span>
+                            <i class="ri-arrow-down-s-line"></i>
+                        </div>
+                        <div class="nx-page__dropdown-menu" id="user-dropdown">
+                            <div class="nx-page__dropdown-item" onclick="window.location.href='my-profile.html'">
+                                <i class="ri-user-line"></i> 个人中心
+                            </div>
+                            <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
+                                <i class="ri-logout-box-line"></i> 退出登录
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <div id="loading-state" class="nx-text-center nx-py-12">
+                        <i class="ri-loader-4-line ri-spin" style="font-size: 32px;"></i>
+                        <p class="nx-mt-4">加载中...</p>
+                    </div>
+                    
+                    <div id="content-area" style="display: none;">
+                        <div class="detail-header">
+                            <div class="skill-avatar" id="skill-avatar">
+                                <i class="ri-puzzle-line"></i>
+                            </div>
+                            <div class="skill-meta">
+                                <h1 id="skill-name">-</h1>
+                                <div class="badges">
+                                    <span class="nx-badge nx-badge--secondary" id="skill-id">-</span>
+                                    <span class="nx-badge nx-badge--info" id="skill-version">-</span>
+                                    <span class="nx-badge" id="skill-status">-</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="info-grid">
+                            <div class="info-card">
+                                <h3><i class="ri-information-line"></i> 基本信息</h3>
+                                <div class="info-row">
+                                    <span class="info-label">Skill ID</span>
+                                    <span class="info-value" id="info-id">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">名称</span>
+                                    <span class="info-value" id="info-name">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">版本</span>
+                                    <span class="info-value" id="info-version">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">类型</span>
+                                    <span class="info-value" id="info-type">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">状态</span>
+                                    <span class="info-value" id="info-status">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">来源</span>
+                                    <span class="info-value" id="info-source">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-card">
+                                <h3><i class="ri-file-text-line"></i> 描述</h3>
+                                <div id="info-description" style="color: var(--nx-text-secondary); line-height: 1.6;">
+                                    暂无描述
+                                </div>
+                            </div>
+                            
+                            <div class="info-card">
+                                <h3><i class="ri-time-line"></i> 时间信息</h3>
+                                <div class="info-row">
+                                    <span class="info-label">安装时间</span>
+                                    <span class="info-value" id="info-install-time">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">更新时间</span>
+                                    <span class="info-value" id="info-update-time">-</span>
+                                </div>
+                                <div class="info-row">
+                                    <span class="info-label">所属场景</span>
+                                    <span class="info-value" id="info-scene">-</span>
+                                </div>
+                            </div>
+                            
+                            <div class="info-card">
+                                <h3><i class="ri-links-line"></i> 依赖</h3>
+                                <div id="dependencies-list">
+                                    <div class="empty-state" style="padding: 20px;">无依赖</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="nx-card nx-mt-6">
+                            <div class="nx-card__header">
+                                <h3><i class="ri-settings-3-line"></i> 配置</h3>
+                            </div>
+                            <div class="nx-card__body">
+                                <div id="config-area" class="config-block">暂无配置</div>
+                            </div>
+                        </div>
+                        
+                        <div class="nx-card nx-mt-4">
+                            <div class="nx-card__header">
+                                <h3><i class="ri-link"></i> 关联的场景组</h3>
+                            </div>
+                            <div class="nx-card__body" id="scene-groups-list">
+                                <div class="empty-state">暂无关联的场景组</div>
+                            </div>
+                        </div>
+                        
+                        <div class="nx-card nx-mt-4">
+                            <div class="nx-card__header">
+                                <h3><i class="ri-flashlight-line"></i> 能力绑定</h3>
+                            </div>
+                            <div class="nx-card__body" id="bindings-list">
+                                <div class="empty-state">暂无能力绑定</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script>
+        (function() {
+            'use strict';
+            
+            let skillId = null;
+            let skillData = null;
+            
+            function getSkillIdFromUrl() {
+                const params = new URLSearchParams(window.location.search);
+                return params.get('id');
+            }
+            
+            async function loadSkillDetail() {
+                skillId = getSkillIdFromUrl();
+                if (!skillId) {
+                    showError('缺少 Skill ID 参数');
+                    return;
+                }
+                
+                try {
+                    const response = await fetch('/api/v1/capabilities/' + skillId);
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        skillData = result.data;
+                        renderSkillDetail();
+                        loadBindings();
+                    } else {
+                        showError(result.message || 'Skill 不存在');
+                    }
+                } catch (e) {
+                    showError('加载失败: ' + e.message);
+                }
+            }
+            
+            function renderSkillDetail() {
+                document.getElementById('loading-state').style.display = 'none';
+                document.getElementById('content-area').style.display = 'block';
+                
+                const name = skillData.name || skillId;
+                const version = skillData.version || '-';
+                const status = skillData.status || 'UNKNOWN';
+                
+                document.getElementById('pageTitle').textContent = name + ' - Skill 详情';
+                document.getElementById('skill-name').textContent = name;
+                document.getElementById('skill-id').textContent = skillId;
+                document.getElementById('skill-version').textContent = 'v' + version;
+                
+                const statusClass = status === 'REGISTERED' || status === 'ACTIVE' 
+                    ? 'nx-badge--success' : status === 'INSTALLED' 
+                    ? 'nx-badge--info' : 'nx-badge--secondary';
+                document.getElementById('skill-status').textContent = status;
+                document.getElementById('skill-status').className = 'nx-badge ' + statusClass;
+                
+                document.getElementById('info-id').textContent = skillId;
+                document.getElementById('info-name').textContent = name;
+                document.getElementById('info-version').textContent = version;
+                document.getElementById('info-type').textContent = skillData.skillForm || skillData.type || '-';
+                document.getElementById('info-status').textContent = status;
+                document.getElementById('info-source').textContent = skillData.source || 'LOCAL';
+                document.getElementById('info-description').textContent = skillData.description || '暂无描述';
+                
+                if (skillData.createTime) {
+                    document.getElementById('info-install-time').textContent = formatTime(skillData.createTime);
+                }
+                if (skillData.updateTime) {
+                    document.getElementById('info-update-time').textContent = formatTime(skillData.updateTime);
+                }
+                document.getElementById('info-scene').textContent = skillData.sceneType || '-';
+                
+                if (skillData.dependencies && skillData.dependencies.length > 0) {
+                    document.getElementById('dependencies-list').innerHTML = skillData.dependencies.map(dep => {
+                        return '<div class="dependency-item">' +
+                            '<i class="ri-link"></i>' +
+                            '<span>' + (dep.name || dep) + '</span>' +
+                            (dep.version ? '<span class="nx-badge nx-badge--secondary">' + dep.version + '</span>' : '') +
+                        '</div>';
+                    }).join('');
+                }
+                
+                if (skillData.config) {
+                    document.getElementById('config-area').textContent = JSON.stringify(skillData.config, null, 2);
+                }
+            }
+            
+            async function loadBindings() {
+                try {
+                    const response = await fetch('/api/v1/capabilities/bindings');
+                    const result = await response.json();
+                    
+                    if (result.status === 'success' && result.data) {
+                        const bindings = result.data.filter(b => b.capId === skillId);
+                        renderBindings(bindings);
+                        
+                        const sceneGroups = [...new Set(bindings.map(b => b.sceneGroupId).filter(Boolean))];
+                        renderSceneGroups(sceneGroups);
+                    }
+                } catch (e) {
+                    console.error('Failed to load bindings:', e);
+                }
+            }
+            
+            function renderBindings(bindings) {
+                const container = document.getElementById('bindings-list');
+                
+                if (!bindings || bindings.length === 0) {
+                    container.innerHTML = '<div class="empty-state">暂无能力绑定</div>';
+                    return;
+                }
+                
+                container.innerHTML = bindings.map(b => {
+                    const agentLink = b.providerId ? '<a href="agent-detail.html?id=' + b.providerId + '" class="binding-link">' + b.providerId + '</a>' : '-';
+                    const sceneLink = b.sceneGroupId ? '<a href="scene-group-detail.html?id=' + b.sceneGroupId + '" class="scene-link"><i class="ri-group-line"></i> ' + b.sceneGroupId + '</a>' : '-';
+                    
+                    return '<div class="binding-item">' +
+                        '<div>' +
+                            '<div class="nx-font-medium">Provider: ' + (b.providerType || '-') + '</div>' +
+                            '<div class="nx-text-sm nx-text-secondary">Agent: ' + agentLink + '</div>' +
+                            '<div class="nx-text-sm nx-text-secondary">场景组: ' + sceneLink + '</div>' +
+                        '</div>' +
+                        '<span class="nx-badge ' + (b.status === 'ACTIVE' ? 'nx-badge--success' : 'nx-badge--secondary') + '">' + (b.status || 'UNKNOWN') + '</span>' +
+                    '</div>';
+                }).join('');
+            }
+            
+            function renderSceneGroups(sceneGroups) {
+                const container = document.getElementById('scene-groups-list');
+                
+                if (!sceneGroups || sceneGroups.length === 0) {
+                    container.innerHTML = '<div class="empty-state">暂无关联的场景组</div>';
+                    return;
+                }
+                
+                container.innerHTML = sceneGroups.map(sgId => {
+                    return '<div class="binding-item">' +
+                        '<a href="scene-group-detail.html?id=' + sgId + '" class="scene-link">' +
+                            '<i class="ri-group-line"></i> ' + sgId +
+                        '</a>' +
+                    '</div>';
+                }).join('');
+            }
+            
+            function formatTime(timestamp) {
+                if (!timestamp) return '-';
+                return new Date(timestamp).toLocaleString('zh-CN');
+            }
+            
+            function showError(message) {
+                document.getElementById('loading-state').innerHTML = 
+                    '<div class="empty-state">' +
+                        '<i class="ri-error-warning-line" style="font-size: 48px; color: var(--nx-danger);"></i>' +
+                        '<h3>' + message + '</h3>' +
+                        '<p><a href="capability-management.html">返回能力管理</a></p>' +
+                    '</div>';
+            }
+            
+            document.addEventListener('DOMContentLoaded', loadSkillDetail);
+        })();
+    </script>
+</body>
+</html>

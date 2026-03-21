@@ -4,26 +4,36 @@ import net.ooder.sdk.OoderSdk;
 import net.ooder.sdk.OoderSdkBuilder;
 import net.ooder.sdk.a2a.capability.CapabilityRegistry;
 import net.ooder.sdk.service.skill.SkillService;
-import net.ooder.sdk.discovery.git.GiteeDiscoverer;
-import net.ooder.sdk.discovery.git.GitHubDiscoverer;
-import net.ooder.sdk.discovery.git.GitDiscoveryConfig;
-import net.ooder.skills.api.SkillInstaller;
-import net.ooder.skills.api.SkillPackageManager;
-import net.ooder.skills.api.SkillRegistry;
-import net.ooder.skills.core.impl.SkillPackageManagerImpl;
+import net.ooder.skills.core.discovery.LocalDiscoverer;
 import net.ooder.skills.core.impl.SkillRegistryImpl;
 import net.ooder.skills.core.installer.SkillInstallerImpl;
-import net.ooder.skills.core.discovery.LocalDiscoverer;
+import net.ooder.skills.core.impl.SkillPackageManagerImpl;
 import net.ooder.skills.api.SkillDiscoverer;
+import net.ooder.skills.api.SkillRegistry;
+import net.ooder.skills.api.SkillInstaller;
+import net.ooder.skills.api.SkillPackageManager;
+import net.ooder.scene.core.security.AuditService;
+import net.ooder.scene.core.security.AuditLog;
+import net.ooder.scene.core.security.AuditLogQuery;
+import net.ooder.scene.core.security.OperationResult;
+import net.ooder.scene.core.security.AuditExportResult;
+import net.ooder.scene.core.security.UserOperationStats;
+import net.ooder.scene.core.security.ResourceAccessStats;
+import net.ooder.scene.discovery.UnifiedDiscoveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.annotation.PreDestroy;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class SdkConfiguration {
@@ -39,22 +49,22 @@ public class SdkConfiguration {
     @Value("${ooder.skills.path:./skills}")
     private String skillRootPath;
 
-    @Value("${ooder.gitee.token:}")
+    @Value("${scene.engine.discovery.gitee.token:}")
     private String giteeToken;
 
-    @Value("${ooder.gitee.owner:ooderCN}")
+    @Value("${scene.engine.discovery.gitee.default-owner:ooderCN}")
     private String giteeOwner;
 
-    @Value("${ooder.gitee.skills-repo:skills}")
+    @Value("${scene.engine.discovery.gitee.default-repo:skills}")
     private String giteeSkillsRepo;
 
-    @Value("${ooder.github.token:}")
+    @Value("${scene.engine.discovery.github.token:}")
     private String githubToken;
 
-    @Value("${ooder.github.owner:oodercn}")
+    @Value("${scene.engine.discovery.github.default-owner:oodercn}")
     private String githubOwner;
 
-    @Value("${ooder.github.skills-repo:skills}")
+    @Value("${scene.engine.discovery.github.default-repo:skills}")
     private String githubSkillsRepo;
 
     @Value("${ooder.llm.provider:mock}")
@@ -75,6 +85,9 @@ public class SdkConfiguration {
     @Value("${ooder.llm.aliyun-bailian.model:qwen-plus}")
     private String aliyunBailianModel;
 
+    @Autowired(required = false)
+    private GiteeDiscoveryProperties giteeDiscoveryProperties;
+
     private OoderSdk sdk;
 
     @Bean
@@ -94,6 +107,12 @@ public class SdkConfiguration {
                 .property("llm.baidu.secretKey", baiduSecretKey)
                 .property("llm.aliyun-bailian.apiKey", aliyunBailianApiKey)
                 .property("llm.aliyun-bailian.model", aliyunBailianModel)
+                .property("discovery.gitee.token", giteeToken)
+                .property("discovery.gitee.owner", giteeOwner)
+                .property("discovery.gitee.repo", giteeSkillsRepo)
+                .property("discovery.github.token", githubToken)
+                .property("discovery.github.owner", githubOwner)
+                .property("discovery.github.repo", githubSkillsRepo)
                 .build();
 
             log.info("[ooderSDK] OoderSDK initialized successfully");
@@ -105,12 +124,77 @@ public class SdkConfiguration {
     }
 
     @Bean
+    @ConditionalOnProperty(name = "scene.engine.discovery.enabled", havingValue = "true", matchIfMissing = true)
+    @org.springframework.boot.context.properties.ConfigurationProperties(prefix = "scene.engine.discovery")
+    public net.ooder.scene.discovery.config.DiscoveryProperties discoveryProperties() {
+        log.info("[discoveryProperties] Creating DiscoveryProperties with config binding");
+        net.ooder.scene.discovery.config.DiscoveryProperties props = new net.ooder.scene.discovery.config.DiscoveryProperties();
+        return props;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "scene.engine.discovery.enabled", havingValue = "true", matchIfMissing = true)
+    public net.ooder.scene.discovery.UnifiedDiscoveryService unifiedDiscoveryService() {
+        log.info("[unifiedDiscoveryService] Creating UnifiedDiscoveryService");
+        
+        String token = null;
+        String owner = "ooderCN";
+        String repo = "skills";
+        String branch = "main";
+        String skillsPath = "";
+        
+        if (giteeDiscoveryProperties != null) {
+            token = giteeDiscoveryProperties.getToken();
+            owner = giteeDiscoveryProperties.getDefaultOwner();
+            repo = giteeDiscoveryProperties.getDefaultRepo();
+            branch = giteeDiscoveryProperties.getDefaultBranch();
+            skillsPath = giteeDiscoveryProperties.getSkillsPath();
+            log.info("[unifiedDiscoveryService] GiteeDiscoveryProperties loaded: token={}, owner={}, repo={}", 
+                token != null ? (token.isEmpty() ? "empty" : "set(length=" + token.length() + ")") : "null", 
+                owner, repo);
+        } else {
+            log.warn("[unifiedDiscoveryService] GiteeDiscoveryProperties is null, falling back to @Value");
+            token = giteeToken;
+            owner = giteeOwner;
+            repo = giteeSkillsRepo;
+            log.info("[unifiedDiscoveryService] @Value fallback: giteeToken={}, giteeOwner={}, giteeSkillsRepo={}", 
+                token != null ? (token.isEmpty() ? "empty" : "set") : "null", 
+                owner, repo);
+        }
+        
+        try {
+            net.ooder.scene.discovery.impl.UnifiedDiscoveryServiceImpl service = 
+                new net.ooder.scene.discovery.impl.UnifiedDiscoveryServiceImpl();
+            
+            if (token != null && !token.isEmpty()) {
+                log.info("[unifiedDiscoveryService] Configuring Gitee with owner={}, repo={}, branch={}", owner, repo, branch);
+                service.configureGitee(token, owner, repo, branch, skillsPath);
+                log.info("[unifiedDiscoveryService] Gitee configured successfully");
+            } else {
+                log.warn("[unifiedDiscoveryService] Gitee token is not configured, skipping Gitee discovery setup");
+            }
+            
+            if (githubToken != null && !githubToken.isEmpty()) {
+                log.info("[unifiedDiscoveryService] Configuring GitHub with owner={}, repo={}", githubOwner, githubSkillsRepo);
+                service.configureGithub(githubToken, githubOwner, githubSkillsRepo);
+            }
+            
+            log.info("[unifiedDiscoveryService] UnifiedDiscoveryService created and configured successfully");
+            return service;
+        } catch (Exception e) {
+            log.error("[unifiedDiscoveryService] Failed to create UnifiedDiscoveryService: {}", e.getMessage());
+            return null;
+        }
+    }
+
+    @Bean
     @ConditionalOnMissingBean
     public SkillPackageManager skillPackageManager() {
-        log.info("[skillPackageManager] Creating SkillPackageManagerImpl with path: {}", skillRootPath);
-        SkillPackageManagerImpl manager = new SkillPackageManagerImpl();
-        manager.setSkillRootPath(skillRootPath);
-        return manager;
+        log.info("[skillPackageManager] Creating SkillPackageManagerImpl with skillRootPath: {}", skillRootPath);
+        net.ooder.skills.core.impl.SkillPackageManagerImpl impl = new net.ooder.skills.core.impl.SkillPackageManagerImpl();
+        impl.setSkillRootPath(skillRootPath);
+        log.info("[skillPackageManager] Gitee/GitHub discovery requires UnifiedDiscoveryService from SE SDK");
+        return impl;
     }
 
     @Bean
@@ -121,6 +205,7 @@ public class SdkConfiguration {
     }
 
     @Bean
+    @Primary
     @ConditionalOnMissingBean
     public SkillRegistry skillRegistry() {
         log.info("[skillRegistry] Creating SkillRegistryImpl");
@@ -130,9 +215,8 @@ public class SdkConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public SkillDiscoverer skillDiscoverer() {
-        log.info("[skillDiscoverer] Creating LocalDiscoverer with path: {}", skillRootPath);
-        LocalDiscoverer discoverer = new LocalDiscoverer();
-        discoverer.setSkillsDirectory(skillRootPath);
+        log.info("[skillDiscoverer] Creating LocalDiscoverer with skillsDirectory: {}", skillRootPath);
+        LocalDiscoverer discoverer = new LocalDiscoverer(skillRootPath);
         return discoverer;
     }
 
@@ -149,35 +233,26 @@ public class SdkConfiguration {
         log.info("[capabilityRegistry] Creating CapabilityRegistry");
         return new CapabilityRegistry();
     }
-
+    
     @Bean
-    @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public GitHubDiscoverer gitHubDiscoverer() {
-        log.info("[gitHubDiscoverer] Creating GitHubDiscoverer bean...");
-        try {
-            GitDiscoveryConfig config = GitDiscoveryConfig.forGitHub(githubToken, githubOwner, githubSkillsRepo);
-            GitHubDiscoverer discoverer = new GitHubDiscoverer(config);
-            log.info("[gitHubDiscoverer] GitHubDiscoverer bean created successfully with owner: {}", githubOwner);
-            return discoverer;
-        } catch (Exception e) {
-            log.error("[gitHubDiscoverer] Failed to create GitHubDiscoverer: {}", e.getMessage(), e);
-            return null;
-        }
+    @Primary
+    public net.ooder.scene.core.security.AuditService auditService() {
+        log.info("[auditService] Creating default InMemoryAuditService");
+        return new InMemoryAuditService();
     }
 
     @Bean
     @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
-    public GiteeDiscoverer giteeDiscoverer() {
-        log.info("[giteeDiscoverer] Creating GiteeDiscoverer bean...");
-        try {
-            GitDiscoveryConfig config = GitDiscoveryConfig.forGitee(giteeToken, giteeOwner, giteeSkillsRepo);
-            GiteeDiscoverer discoverer = new GiteeDiscoverer(config);
-            log.info("[giteeDiscoverer] GiteeDiscoverer bean created successfully");
-            return discoverer;
-        } catch (Exception e) {
-            log.error("[giteeDiscoverer] Failed to create GiteeDiscoverer: {}", e.getMessage(), e);
-            return null;
-        }
+    public SkillDiscoverer gitHubDiscoverer() {
+        log.info("[gitHubDiscoverer] Git discovery will be handled by SkillPackageManager");
+        return null;
+    }
+
+    @Bean
+    @ConditionalOnProperty(name = "ooder.sdk.enabled", havingValue = "true")
+    public SkillDiscoverer giteeDiscoverer() {
+        log.info("[giteeDiscoverer] Git discovery will be handled by SkillPackageManager");
+        return null;
     }
 
     @PreDestroy

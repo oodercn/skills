@@ -256,10 +256,11 @@ public class SceneEngineIntegration {
 
     private Object createMockResult(String capabilityId, Map<String, Object> params) {
         Map<String, Object> result = new HashMap<>();
-        result.put("success", true);
+        result.put("success", false);
         result.put("capabilityId", capabilityId);
         result.put("timestamp", System.currentTimeMillis());
-        result.put("message", "Mock result - SDK not available");
+        result.put("error", "SDK not available. Please configure SE SDK properly.");
+        result.put("message", "Mock mode - capability invocation requires SE SDK");
         return result;
     }
 

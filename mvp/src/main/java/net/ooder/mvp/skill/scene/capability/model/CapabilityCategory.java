@@ -90,6 +90,7 @@ public enum CapabilityCategory implements DictItem {
         CODE_MAPPING.put("VFS", "vfs");
         CODE_MAPPING.put("LLM", "llm");
         CODE_MAPPING.put("KNOWLEDGE", "knowledge");
+        CODE_MAPPING.put("BIZ", "biz");
         CODE_MAPPING.put("SYS", "sys");
         CODE_MAPPING.put("MSG", "msg");
         CODE_MAPPING.put("UI", "ui");
@@ -97,9 +98,18 @@ public enum CapabilityCategory implements DictItem {
         CODE_MAPPING.put("MEDIA", "media");
         CODE_MAPPING.put("UTIL", "util");
         CODE_MAPPING.put("NEXUS-UI", "nexus-ui");
+        CODE_MAPPING.put("NEXUS_UI", "nexus-ui");
+        
+        // 不规范命名 -> 标准分类
         CODE_MAPPING.put("SYSTEM", "sys");
         CODE_MAPPING.put("COMMUNICATION", "msg");
         CODE_MAPPING.put("COLLABORATION", "util");
+        CODE_MAPPING.put("MESSAGING", "msg");
+        CODE_MAPPING.put("STORAGE", "vfs");
+        CODE_MAPPING.put("AUTH", "org");
+        CODE_MAPPING.put("AUTHENTICATION", "org");
+        CODE_MAPPING.put("DATABASE", "vfs");
+        CODE_MAPPING.put("DB", "vfs");
         
         // 未定义分类 -> 标准分类
         CODE_MAPPING.put("business", "biz");
@@ -110,14 +120,32 @@ public enum CapabilityCategory implements DictItem {
         CODE_MAPPING.put("know", "knowledge");
         CODE_MAPPING.put("comm", "msg");
         CODE_MAPPING.put("mon", "sys");
+        CODE_MAPPING.put("monitor", "sys");
         CODE_MAPPING.put("search", "sys");
         CODE_MAPPING.put("sched", "sys");
         CODE_MAPPING.put("sec", "sys");
+        CODE_MAPPING.put("security", "sys");
         CODE_MAPPING.put("iot", "sys");
         CODE_MAPPING.put("net", "sys");
+        CODE_MAPPING.put("network", "sys");
         CODE_MAPPING.put("service", "util");
         CODE_MAPPING.put("scene", "util");
         CODE_MAPPING.put("nexus-ui", "nexus-ui");
+        CODE_MAPPING.put("notification", "msg");
+        CODE_MAPPING.put("notify", "msg");
+        CODE_MAPPING.put("task", "util");
+        CODE_MAPPING.put("workflow", "biz");
+        CODE_MAPPING.put("automation", "biz");
+        
+        // SE 2.3.1 新模型分类
+        CODE_MAPPING.put("TOOL", "util");
+        CODE_MAPPING.put("tool", "util");
+        CODE_MAPPING.put("WORKFLOW", "biz");
+        CODE_MAPPING.put("DATA", "vfs");
+        CODE_MAPPING.put("data", "vfs");
+        CODE_MAPPING.put("SERVICE", "util");
+        CODE_MAPPING.put("OTHER", "sys");
+        CODE_MAPPING.put("other", "sys");
     }
 
     public static CapabilityCategory fromCode(String code) {
@@ -160,5 +188,34 @@ public enum CapabilityCategory implements DictItem {
             }
         }
         return SYS;
+    }
+
+    public static CapabilityCategory fromSeSdkCategory(String seCategory) {
+        if (seCategory == null) return SYS;
+        
+        String code = seCategory.toUpperCase();
+        switch (code) {
+            case "KNOWLEDGE": return KNOWLEDGE;
+            case "LLM": return LLM;
+            case "TOOL": return UTIL;
+            case "WORKFLOW": return BIZ;
+            case "DATA": return VFS;
+            case "SERVICE": return UTIL;
+            case "UI": return UI;
+            case "OTHER": return SYS;
+            default: return fromCode(seCategory);
+        }
+    }
+
+    public String toSeSdkCategory() {
+        switch (this) {
+            case KNOWLEDGE: return "KNOWLEDGE";
+            case LLM: return "LLM";
+            case UTIL: return "TOOL";
+            case BIZ: return "WORKFLOW";
+            case VFS: return "DATA";
+            case UI: return "UI";
+            default: return "OTHER";
+        }
     }
 }

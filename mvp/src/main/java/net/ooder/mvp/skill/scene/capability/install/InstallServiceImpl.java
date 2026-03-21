@@ -1,5 +1,7 @@
 package net.ooder.mvp.skill.scene.capability.install;
 
+import net.ooder.mvp.skill.scene.audit.Auditable;
+import net.ooder.mvp.skill.scene.dto.audit.AuditEventType;
 import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityStatus;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
@@ -23,17 +25,26 @@ public class InstallServiceImpl implements InstallService {
     private Map<String, InstallConfig> installs = new ConcurrentHashMap<String, InstallConfig>();
     private Map<String, InstallProgress> progressMap = new ConcurrentHashMap<String, InstallProgress>();
 
-    @Autowired(required = false)
+    @Autowired
     private CapabilityService capabilityService;
 
-    @Autowired(required = false)
+    @Autowired
     private CapabilityStateService capabilityStateService;
 
-    @Autowired(required = false)
+    @Autowired
     private SceneNotificationService notificationService;
 
-    @Autowired(required = false)
+    @Autowired
     private TodoService todoService;
+
+    @Autowired
+    private SkillDirectoryMigrator directoryMigrator;
+
+    @Autowired
+    private SkillDownloadService downloadService;
+
+    @Autowired
+    private SkillDirectoryConfig directoryConfig;
 
     @Override
     public InstallConfig createInstall(CreateInstallRequest request) {
@@ -82,18 +93,13 @@ public class InstallServiceImpl implements InstallService {
     
     private void determineSceneTypeAndVisibility(InstallConfig config, String capabilityId) {
         if (capabilityService == null) {
-            config.setSkillForm("STANDALONE");
-            config.setVisibility("public");
-            return;
+            throw new IllegalStateException("CapabilityService 不可用，无法确定场景类型和可见性");
         }
         
         try {
             net.ooder.mvp.skill.scene.capability.model.Capability cap = capabilityService.findById(capabilityId);
             if (cap == null) {
-                config.setSkillForm("STANDALONE");
-                config.setVisibility("public");
-                log.warn("[determineSceneTypeAndVisibility] Capability not found: {}", capabilityId);
-                return;
+                throw new IllegalStateException("能力不存在: " + capabilityId + "，无法确定场景类型和可见性");
             }
             
             config.setSkillForm(cap.getSkillForm() != null ? cap.getSkillForm().getCode() : "PROVIDER");
@@ -103,10 +109,10 @@ public class InstallServiceImpl implements InstallService {
             log.info("[determineSceneTypeAndVisibility] Determined: skillForm={}, sceneType={}, visibility={}", 
                 config.getSkillForm(), config.getSceneType(), config.getVisibility());
                 
+        } catch (IllegalStateException e) {
+            throw e;
         } catch (Exception e) {
-            log.error("[determineSceneTypeAndVisibility] Failed to determine scene type: {}", e.getMessage());
-            config.setSkillForm("PROVIDER");
-            config.setVisibility("public");
+            throw new RuntimeException("确定场景类型失败: " + e.getMessage(), e);
         }
     }
     
@@ -206,6 +212,7 @@ public class InstallServiceImpl implements InstallService {
     }
 
     @Override
+    @Auditable(eventType = AuditEventType.CAPABILITY_INVOKE, action = "执行能力安装", resourceType = "install")
     public CompletableFuture<InstallConfig> executeInstall(String installId) {
         log.info("[executeInstall] Executing install: {}", installId);
         
@@ -232,8 +239,13 @@ public class InstallServiceImpl implements InstallService {
                 }
                 
                 if (capability == null) {
-                    log.warn("[executeInstall] Capability not found, using mock data");
-                    capability = createMockCapability(config.getCapabilityId());
+                    log.error("[executeInstall] Capability not found: {} - installation cannot proceed", config.getCapabilityId());
+                    config.setStatus(InstallConfig.InstallStatus.FAILED);
+                    if (progress != null) {
+                        progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                        progress.setMessage("能力不存在: " + config.getCapabilityId());
+                    }
+                    return config;
                 }
                 
                 List<String> dependencyIds = capability.getDependencies();
@@ -360,46 +372,45 @@ public class InstallServiceImpl implements InstallService {
         InstallConfig.DependencyInfo depInfo = new InstallConfig.DependencyInfo();
         depInfo.setCapabilityId(capabilityId);
         
+        if (capabilityService == null) {
+            throw new IllegalStateException("CapabilityService 不可用，无法安装依赖: " + capabilityId);
+        }
+        
         try {
-            if (capabilityService != null) {
-                net.ooder.mvp.skill.scene.capability.model.Capability dep = capabilityService.findById(capabilityId);
-                
-                if (dep != null) {
-                    depInfo.setName(dep.getName());
-                    
-                    boolean alreadyInstalled = capabilityStateService != null 
-                        ? capabilityStateService.isInstalled(capabilityId) 
-                        : dep.isInstalled();
-                    
-                    if (alreadyInstalled) {
-                        depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
-                        depInfo.setMessage("已安装");
-                        log.info("[installDependency] Dependency already installed: {}", capabilityId);
-                        return depInfo;
-                    }
-                    
-                    if (capabilityStateService != null) {
-                        capabilityStateService.setInstalled(capabilityId, true, "system", "dependency");
-                    } else {
-                        dep.setInstalled(true);
-                        capabilityService.update(dep);
-                    }
-                    
-                    depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
-                    depInfo.setMessage("安装成功");
-                    log.info("[installDependency] Dependency installed: {}", capabilityId);
-                } else {
-                    depInfo.setName(capabilityId);
-                    depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.SKIPPED);
-                    depInfo.setMessage("能力不存在，已跳过");
-                    log.warn("[installDependency] Dependency not found: {}", capabilityId);
-                }
-            } else {
+            net.ooder.mvp.skill.scene.capability.model.Capability dep = capabilityService.findById(capabilityId);
+            
+            if (dep == null) {
                 depInfo.setName(capabilityId);
-                depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
-                depInfo.setMessage("模拟安装成功");
-                log.info("[installDependency] Mock install for: {}", capabilityId);
+                depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.FAILED);
+                depInfo.setMessage("能力不存在: " + capabilityId);
+                log.error("[installDependency] Capability not found: {}", capabilityId);
+                return depInfo;
             }
+            
+            depInfo.setName(dep.getName());
+            
+            boolean alreadyInstalled = capabilityStateService != null 
+                ? capabilityStateService.isInstalled(capabilityId) 
+                : dep.isInstalled();
+            
+            if (alreadyInstalled) {
+                depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
+                depInfo.setMessage("已安装");
+                log.info("[installDependency] Dependency already installed: {}", capabilityId);
+                return depInfo;
+            }
+            
+            if (capabilityStateService != null) {
+                capabilityStateService.setInstalled(capabilityId, true, "system", "dependency");
+            } else {
+                dep.setInstalled(true);
+                capabilityService.update(dep);
+            }
+            
+            depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.INSTALLED);
+            depInfo.setMessage("安装成功");
+            log.info("[installDependency] Dependency installed: {}", capabilityId);
+            
         } catch (Exception e) {
             depInfo.setStatus(InstallConfig.DependencyInfo.DependencyStatus.FAILED);
             depInfo.setMessage("安装失败: " + e.getMessage());
@@ -407,14 +418,6 @@ public class InstallServiceImpl implements InstallService {
         }
         
         return depInfo;
-    }
-    
-    private net.ooder.mvp.skill.scene.capability.model.Capability createMockCapability(String capabilityId) {
-        net.ooder.mvp.skill.scene.capability.model.Capability cap = new net.ooder.mvp.skill.scene.capability.model.Capability();
-        cap.setCapabilityId(capabilityId);
-        cap.setName(capabilityId);
-        cap.setDependencies(Arrays.asList("kb-management", "kb-search"));
-        return cap;
     }
     
     private InstallConfig.InstallStatus determinePostInstallStatus(InstallConfig config) {
@@ -635,5 +638,270 @@ public class InstallServiceImpl implements InstallService {
             default:
                 return CapabilityStatus.ENABLED;
         }
+    }
+
+    @Override
+    public CompletableFuture<InstallConfig> downloadAndInstall(String skillId, CreateInstallRequest request) {
+        log.info("[downloadAndInstall] Downloading and installing skill: {}", skillId);
+        
+        return CompletableFuture.supplyAsync(() -> {
+            InstallConfig config = createInstall(request);
+            InstallProgress progress = progressMap.get(config.getInstallId());
+            
+            try {
+                config.setStatus(InstallConfig.InstallStatus.DOWNLOADING);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.DOWNLOADING);
+                    progress.setCurrentAction("正在下载技能包...");
+                    progress.setProgress(5);
+                }
+                
+                SkillDownloadService.DownloadResult downloadResult = downloadService.copyFromSource(skillId);
+                
+                if (!downloadResult.isSuccess()) {
+                    config.setStatus(InstallConfig.InstallStatus.FAILED);
+                    if (progress != null) {
+                        progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                        progress.setMessage(downloadResult.getMessage());
+                    }
+                    return config;
+                }
+                
+                config.setStatus(InstallConfig.InstallStatus.DOWNLOADED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.DOWNLOADED);
+                    progress.setCurrentAction("下载完成，准备安装...");
+                    progress.setProgress(20);
+                }
+                
+                SkillDirectoryMigrator.MigrationResult migrationResult = directoryMigrator.moveToInstalled(skillId);
+                
+                if (!migrationResult.isSuccess()) {
+                    config.setStatus(InstallConfig.InstallStatus.FAILED);
+                    if (progress != null) {
+                        progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                        progress.setMessage(migrationResult.getMessage());
+                    }
+                    return config;
+                }
+                
+                if (progress != null) {
+                    progress.setCurrentAction("安装依赖...");
+                    progress.setProgress(30);
+                }
+                
+                return executeInstall(config.getInstallId()).join();
+                
+            } catch (Exception e) {
+                log.error("[downloadAndInstall] Failed: {}", e.getMessage());
+                config.setStatus(InstallConfig.InstallStatus.FAILED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                    progress.setMessage("安装失败: " + e.getMessage());
+                }
+                return config;
+            }
+        });
+    }
+
+    @Override
+    public CompletableFuture<InstallConfig> activateSkill(String installId) {
+        log.info("[activateSkill] Activating skill: {}", installId);
+        
+        return CompletableFuture.supplyAsync(() -> {
+            InstallConfig config = installs.get(installId);
+            InstallProgress progress = progressMap.get(installId);
+            
+            if (config == null) {
+                log.error("[activateSkill] Install config not found: {}", installId);
+                return null;
+            }
+            
+            try {
+                String skillId = config.getCapabilityId();
+                
+                SkillDirectoryMigrator.MigrationResult result = directoryMigrator.moveToActivated(skillId);
+                
+                if (!result.isSuccess()) {
+                    config.setStatus(InstallConfig.InstallStatus.FAILED);
+                    if (progress != null) {
+                        progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                        progress.setMessage(result.getMessage());
+                    }
+                    return config;
+                }
+                
+                config.setStatus(InstallConfig.InstallStatus.ACTIVATED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.ACTIVATED);
+                    progress.setCurrentAction("激活完成");
+                    progress.setProgress(100);
+                    progress.setMessage("技能已激活");
+                }
+                
+                if (capabilityStateService != null) {
+                    capabilityStateService.setStatus(skillId, CapabilityStatus.ENABLED);
+                }
+                
+                log.info("[activateSkill] Skill activated: {}", skillId);
+                
+            } catch (Exception e) {
+                log.error("[activateSkill] Failed: {}", e.getMessage());
+                config.setStatus(InstallConfig.InstallStatus.FAILED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                    progress.setMessage("激活失败: " + e.getMessage());
+                }
+            }
+            
+            return config;
+        });
+    }
+
+    @Override
+    public CompletableFuture<InstallConfig> deactivateSkill(String installId) {
+        log.info("[deactivateSkill] Deactivating skill: {}", installId);
+        
+        return CompletableFuture.supplyAsync(() -> {
+            InstallConfig config = installs.get(installId);
+            InstallProgress progress = progressMap.get(installId);
+            
+            if (config == null) {
+                log.error("[deactivateSkill] Install config not found: {}", installId);
+                return null;
+            }
+            
+            try {
+                String skillId = config.getCapabilityId();
+                
+                config.setStatus(InstallConfig.InstallStatus.DEACTIVATING);
+                
+                SkillDirectoryMigrator.MigrationResult result = directoryMigrator.rollbackToInstalled(skillId);
+                
+                if (!result.isSuccess()) {
+                    config.setStatus(InstallConfig.InstallStatus.FAILED);
+                    if (progress != null) {
+                        progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                        progress.setMessage(result.getMessage());
+                    }
+                    return config;
+                }
+                
+                config.setStatus(InstallConfig.InstallStatus.INSTALLED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.INSTALLED);
+                    progress.setCurrentAction("已停用");
+                    progress.setMessage("技能已停用");
+                }
+                
+                if (capabilityStateService != null) {
+                    capabilityStateService.setStatus(skillId, CapabilityStatus.DISABLED);
+                }
+                
+                log.info("[deactivateSkill] Skill deactivated: {}", skillId);
+                
+            } catch (Exception e) {
+                log.error("[deactivateSkill] Failed: {}", e.getMessage());
+                config.setStatus(InstallConfig.InstallStatus.FAILED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                    progress.setMessage("停用失败: " + e.getMessage());
+                }
+            }
+            
+            return config;
+        });
+    }
+
+    @Override
+    public CompletableFuture<InstallConfig> uninstallSkill(String installId) {
+        log.info("[uninstallSkill] Uninstalling skill: {}", installId);
+        
+        return CompletableFuture.supplyAsync(() -> {
+            InstallConfig config = installs.get(installId);
+            InstallProgress progress = progressMap.get(installId);
+            
+            if (config == null) {
+                log.error("[uninstallSkill] Install config not found: {}", installId);
+                return null;
+            }
+            
+            try {
+                String skillId = config.getCapabilityId();
+                
+                config.setStatus(InstallConfig.InstallStatus.UNINSTALLING);
+                
+                SkillDirectoryConfig.SkillDirectoryType location = directoryMigrator.detectSkillLocation(skillId);
+                
+                if (location != null) {
+                    directoryMigrator.deleteSkillDirectory(skillId, location);
+                }
+                
+                config.setStatus(InstallConfig.InstallStatus.ARCHIVED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.ARCHIVED);
+                    progress.setCurrentAction("已卸载");
+                    progress.setMessage("技能已卸载");
+                }
+                
+                if (capabilityStateService != null) {
+                    capabilityStateService.setInstalled(skillId, false);
+                    capabilityStateService.setStatus(skillId, CapabilityStatus.ARCHIVED);
+                }
+                
+                if (capabilityService != null) {
+                    capabilityService.updateInstallStatus(skillId, false);
+                }
+                
+                log.info("[uninstallSkill] Skill uninstalled: {}", skillId);
+                
+            } catch (Exception e) {
+                log.error("[uninstallSkill] Failed: {}", e.getMessage());
+                config.setStatus(InstallConfig.InstallStatus.FAILED);
+                if (progress != null) {
+                    progress.setStatus(InstallConfig.InstallStatus.FAILED);
+                    progress.setMessage("卸载失败: " + e.getMessage());
+                }
+            }
+            
+            return config;
+        });
+    }
+
+    @Override
+    public List<String> listDownloadedSkills() {
+        return downloadService.listDownloadedSkills();
+    }
+
+    @Override
+    public List<String> listInstalledSkills() {
+        List<String> skills = new ArrayList<>();
+        try {
+            java.nio.file.Path installedDir = directoryConfig.getInstalledDir();
+            if (java.nio.file.Files.exists(installedDir)) {
+                java.nio.file.Files.list(installedDir)
+                    .filter(java.nio.file.Files::isDirectory)
+                    .forEach(dir -> skills.add(dir.getFileName().toString()));
+            }
+        } catch (Exception e) {
+            log.error("[listInstalledSkills] Failed: {}", e.getMessage());
+        }
+        return skills;
+    }
+
+    @Override
+    public List<String> listActivatedSkills() {
+        List<String> skills = new ArrayList<>();
+        try {
+            java.nio.file.Path activatedDir = directoryConfig.getActivatedDir();
+            if (java.nio.file.Files.exists(activatedDir)) {
+                java.nio.file.Files.list(activatedDir)
+                    .filter(java.nio.file.Files::isDirectory)
+                    .forEach(dir -> skills.add(dir.getFileName().toString()));
+            }
+        } catch (Exception e) {
+            log.error("[listActivatedSkills] Failed: {}", e.getMessage());
+        }
+        return skills;
     }
 }

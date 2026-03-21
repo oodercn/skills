@@ -8,48 +8,46 @@ var selectedBusinessCategory = null;
 var currentInstallCap = null;
 var currentInstallStep = 1;
 var installSteps = [1, 5, 7, 8];
+var selectedCapabilities = [];
+var batchMode = false;
 
-var DISCOVERY_METHODS = [
-    { id: 'LOCAL', name: '本地文件系统', icon: 'ri-folder-line', desc: '扫描本地已安装的能力包', color: '#3b82f6', requiresConfig: false },
-    { id: 'GITHUB', name: 'GitHub仓库', icon: 'ri-github-fill', desc: '从GitHub仓库发现能力', color: '#6366f1', requiresConfig: true,
-      configFields: [
-        { name: 'repoUrl', label: '仓库地址', type: 'text', default: 'https://github.com/ooderCN/skills' },
-        { name: 'branch', label: '分支', type: 'text', default: 'main' },
-        { name: 'token', label: '访问令牌', type: 'password' }
-      ]
-    },
-    { id: 'GITEE', name: 'Gitee仓库', icon: 'ri-git-repository-line', desc: '从Gitee仓库发现能力', color: '#c71d23', requiresConfig: true,
-      configFields: [
-        { name: 'repoUrl', label: '仓库地址', type: 'text', default: 'https://gitee.com/ooderCN/skills' },
-        { name: 'branch', label: '分支', type: 'text', default: 'main' },
-        { name: 'token', label: '访问令牌', type: 'password' }
-      ]
-    }
-];
+var DISCOVERY_METHODS = [];
 
-var BUSINESS_CATEGORIES = [
-    { code: 'org', name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', userFacing: false },
-    { code: 'vfs', name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', userFacing: false },
-    { code: 'llm', name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', userFacing: true },
-    { code: 'knowledge', name: '知识服务', icon: 'ri-book-line', color: '#10b981', userFacing: true },
-    { code: 'biz', name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', userFacing: true },
-    { code: 'sys', name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', userFacing: false },
-    { code: 'msg', name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', userFacing: false },
-    { code: 'ui', name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', userFacing: false },
-    { code: 'payment', name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', userFacing: false },
-    { code: 'media', name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', userFacing: false },
-    { code: 'util', name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', userFacing: true },
-    { code: 'nexus-ui', name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', userFacing: false }
-];
+var BUSINESS_CATEGORIES = [];
 
 var CapabilityDiscovery = {
     init: function() {
+        var self = this;
         window.onPageInit = function() {
             console.log('能力发现页面初始化完成');
-            CapabilityDiscovery.renderMethods();
-            CapabilityDiscovery.renderBusinessCategoryFilter();
-            CapabilityDiscovery.initFilters();
+            self.loadDiscoveryMethods().then(function() {
+                self.loadCategories().then(function() {
+                    CapabilityDiscovery.renderMethods();
+                    CapabilityDiscovery.renderBusinessCategoryFilter();
+                    CapabilityDiscovery.initFilters();
+                });
+            });
         };
+    },
+
+    loadDiscoveryMethods: function() {
+        return fetch('/api/v1/discovery/methods')
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.status === 'success' && result.data) {
+                    DISCOVERY_METHODS = result.data;
+                }
+            })
+            .catch(function(error) {
+                console.error('加载发现方法失败:', error);
+                DISCOVERY_METHODS = [];
+            });
+    },
+
+    loadCategories: function() {
+        return CategoryService.loadCategories().then(function(categories) {
+            BUSINESS_CATEGORIES = categories;
+        });
     },
 
     renderMethods: function() {
@@ -102,13 +100,12 @@ var CapabilityDiscovery = {
     renderDefaultCategories: function() {
         var container = document.getElementById('businessCategoryFilter');
         if (!container) return;
+        var userFacingCategories = CategoryService.getUserFacing();
         var html = '<span class="filter-label">业务领域:</span>';
         html += '<span class="filter-chip active" data-bc="" onclick="selectBusinessCategory(\'\')">全部</span>';
-        BUSINESS_CATEGORIES.forEach(function(bc) {
-            if (bc.userFacing) {
-                html += '<span class="filter-chip" data-bc="' + bc.code + '" onclick="selectBusinessCategory(\'' + bc.code + '\')">' +
-                    '<i class="' + bc.icon + '"></i> ' + bc.name + '</span>';
-            }
+        userFacingCategories.forEach(function(cat) {
+            html += '<span class="filter-chip" data-bc="' + cat.code + '" onclick="selectBusinessCategory(\'' + cat.code + '\')">' +
+                '<i class="' + cat.icon + '"></i> ' + cat.name + '</span>';
         });
         container.innerHTML = html;
     },
@@ -157,6 +154,7 @@ var CapabilityDiscovery = {
     },
 
     startScan: function() {
+        console.log('[startScan] Starting scan, currentMethod:', currentMethod);
         if (!currentMethod) {
             alert('请先选择发现途径');
             return;
@@ -166,14 +164,20 @@ var CapabilityDiscovery = {
         discoveredCapabilities = [];
         scanStats = { scanned: 0, found: 0, new: 0, installed: 0 };
         var sweep = document.getElementById('radarSweep');
-        sweep.classList.remove('idle');
-        document.getElementById('startBtn').disabled = true;
-        document.getElementById('radarStatusText').textContent = '扫描中...';
-        document.getElementById('badge-' + currentMethod).textContent = '扫描中';
-        document.getElementById('badge-' + currentMethod).className = 'method-badge running';
+        if (sweep) sweep.classList.remove('idle');
+        var startBtn = document.getElementById('startBtn');
+        if (startBtn) startBtn.disabled = true;
+        var statusText = document.getElementById('radarStatusText');
+        if (statusText) statusText.textContent = '扫描中...';
+        var badge = document.getElementById('badge-' + currentMethod);
+        if (badge) {
+            badge.textContent = '扫描中';
+            badge.className = 'method-badge running';
+        }
         CapabilityDiscovery.updateStats();
         CapabilityDiscovery.addLog('info', '开始扫描: ' + currentMethod);
         var method = DISCOVERY_METHODS.find(function(m) { return m.id === currentMethod; });
+        console.log('[startScan] Found method:', method);
         if (currentMethod === 'GITHUB') {
             CapabilityDiscovery.discoverFromGitService('/api/v1/discovery/github', method);
         } else if (currentMethod === 'GITEE') {
@@ -191,16 +195,31 @@ var CapabilityDiscovery = {
                 if (el) config[field.name] = el.value;
             });
         }
+        console.log('[discoverFromGitService] Starting discovery with config:', config);
+        console.log('[discoverFromGitService] API URL:', apiUrl);
         ApiClient.post(apiUrl, config, { timeout: 120000 })
             .then(function(result) {
+                console.log('[discoverFromGitService] API response:', result);
+                console.log('[discoverFromGitService] result.status:', result.status);
+                console.log('[discoverFromGitService] result.data:', result.data);
+                console.log('[discoverFromGitService] result.data type:', typeof result.data);
                 if (result.status === 'success' && result.data) {
-                    CapabilityDiscovery.processDiscoveryResult(result.data);
+                    console.log('[discoverFromGitService] Processing result.data, capabilities count:', result.data.capabilities ? result.data.capabilities.length : 0);
+                    console.log('[discoverFromGitService] Calling processDiscoveryResult...');
+                    try {
+                        CapabilityDiscovery.processDiscoveryResult(result.data);
+                        console.log('[discoverFromGitService] processDiscoveryResult completed');
+                    } catch (e) {
+                        console.error('[discoverFromGitService] processDiscoveryResult error:', e);
+                    }
                 } else {
+                    console.error('[discoverFromGitService] Scan failed:', result.message);
                     CapabilityDiscovery.addLog('error', '扫描失败: ' + (result.message || '未知错误'));
                     CapabilityDiscovery.showEmptyResult();
                 }
             })
             .catch(function(error) {
+                console.error('[discoverFromGitService] Error:', error);
                 CapabilityDiscovery.addLog('error', '扫描失败: ' + error.message);
                 CapabilityDiscovery.showEmptyResult();
             })
@@ -229,64 +248,85 @@ var CapabilityDiscovery = {
     },
 
     processDiscoveryResult: function(data) {
-        var caps = data.capabilities || [];
-        var newCount = 0;
-        var installedCount = 0;
-        discoveredCapabilities = [];
-        caps.forEach(function(cap) {
-            if (cap.skillForm === 'INTERNAL') {
-                return;
-            }
-            var isInstalled = cap.installed === true;
-            discoveredCapabilities.push({
-                capabilityId: cap.id,
-                id: cap.id,
-                name: cap.name,
-                type: cap.type,
-                description: cap.description,
-                version: cap.version,
-                source: currentMethod,
-                isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
-                sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
-                dependencies: cap.dependencies || [],
-                provider: cap.provider || null,
-                installed: isInstalled,
-                category: cap.category || 'NOT_SCENE_SKILL',
-                skillForm: cap.skillForm || 'PROVIDER',
-                sceneType: cap.sceneType || null,
-                skillCategory: cap.skillCategory || null,
-                businessCategory: cap.businessCategory || null,
-                hasSelfDrive: cap.hasSelfDrive || false,
-                businessSemanticsScore: cap.businessSemanticsScore || 5,
-                skillId: cap.skillId || null,
-                visibility: cap.visibility || 'public',
-                capabilityCategory: cap.capabilityCategory || null,
-                tags: cap.tags || [],
-                roles: cap.roles || [],
-                participants: cap.participants || []
+        console.log('[processDiscoveryResult] Processing data:', data);
+        try {
+            var caps = data.capabilities || [];
+            console.log('[processDiscoveryResult] capabilities array length:', caps.length);
+            console.log('[processDiscoveryResult] first 3 capabilities:', caps.slice(0, 3));
+            var newCount = 0;
+            var installedCount = 0;
+            discoveredCapabilities = [];
+            caps.forEach(function(cap) {
+                console.log('[processDiscoveryResult] Processing cap:', cap.id, 'skillForm:', cap.skillForm);
+                if (cap.skillForm === 'INTERNAL') {
+                    console.log('[processDiscoveryResult] Filtering out INTERNAL skill:', cap.id);
+                    return;
+                }
+                var isInstalled = cap.installed === true;
+                discoveredCapabilities.push({
+                    capabilityId: cap.id,
+                    id: cap.id,
+                    name: cap.name,
+                    type: cap.type,
+                    description: cap.description,
+                    version: cap.version,
+                    source: currentMethod,
+                    isSceneCapability: cap.isSceneCapability || cap.sceneCapability || false,
+                    sceneCapability: cap.sceneCapability || cap.isSceneCapability || false,
+                    dependencies: cap.dependencies || [],
+                    provider: cap.provider || null,
+                    installed: isInstalled,
+                    category: cap.category || 'NOT_SCENE_SKILL',
+                    skillForm: cap.skillForm || 'PROVIDER',
+                    sceneType: cap.sceneType || null,
+                    skillCategory: cap.skillCategory || null,
+                    businessCategory: cap.businessCategory || null,
+                    hasSelfDrive: cap.hasSelfDrive || false,
+                    businessSemanticsScore: cap.businessSemanticsScore || 5,
+                    skillId: cap.skillId || null,
+                    visibility: cap.visibility || 'public',
+                    capabilityCategory: cap.capabilityCategory || null,
+                    tags: cap.tags || [],
+                    roles: cap.roles || [],
+                    participants: cap.participants || []
+                });
+                if (isInstalled) { installedCount++; } else { newCount++; }
             });
-            if (isInstalled) { installedCount++; } else { newCount++; }
-        });
-        scanStats.found = discoveredCapabilities.length;
-        scanStats.new = newCount;
-        scanStats.installed = installedCount;
-        scanStats.scanned = data.total || caps.length;
-        CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个能力（已过滤内部服务）');
-        CapabilityDiscovery.renderResults();
-        CapabilityDiscovery.addRadarDots();
+            console.log('[processDiscoveryResult] Final discoveredCapabilities length:', discoveredCapabilities.length);
+            scanStats.found = discoveredCapabilities.length;
+            scanStats.new = newCount;
+            scanStats.installed = installedCount;
+            scanStats.scanned = data.total || caps.length;
+            CapabilityDiscovery.addLog('success', '发现 ' + discoveredCapabilities.length + ' 个能力（已过滤内部服务）');
+            console.log('[processDiscoveryResult] Calling renderResults...');
+            CapabilityDiscovery.renderResults();
+            console.log('[processDiscoveryResult] Calling addRadarDots...');
+            CapabilityDiscovery.addRadarDots();
+            console.log('[processDiscoveryResult] Completed successfully');
+        } catch (e) {
+            console.error('[processDiscoveryResult] Error:', e);
+            CapabilityDiscovery.addLog('error', '处理结果失败: ' + e.message);
+        }
     },
 
     finishScan: function() {
+        console.log('[finishScan] Starting finish scan');
         isScanning = false;
         var sweep = document.getElementById('radarSweep');
-        sweep.classList.add('idle');
-        document.getElementById('startBtn').disabled = false;
-        document.getElementById('radarStatusText').textContent = '扫描完成';
+        if (sweep) sweep.classList.add('idle');
+        var startBtn = document.getElementById('startBtn');
+        if (startBtn) startBtn.disabled = false;
+        var statusText = document.getElementById('radarStatusText');
+        if (statusText) statusText.textContent = '扫描完成';
         if (currentMethod) {
-            document.getElementById('badge-' + currentMethod).textContent = '完成';
-            document.getElementById('badge-' + currentMethod).className = 'method-badge success';
+            var badge = document.getElementById('badge-' + currentMethod);
+            if (badge) {
+                badge.textContent = '完成';
+                badge.className = 'method-badge success';
+            }
         }
         CapabilityDiscovery.updateStats();
+        console.log('[finishScan] Finish scan completed');
     },
 
     showEmptyResult: function() {
@@ -325,11 +365,57 @@ var CapabilityDiscovery = {
             var chip = e.target.closest('.filter-chip');
             if (!chip) return;
             if (chip.dataset.bc !== undefined) return;
+            if (chip.dataset.score !== undefined) return;
             filterContainer.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
             chip.classList.add('active');
             var filter = chip.dataset.filter;
             CapabilityDiscovery.applyFilter(filter);
         });
+        
+        var scoreFilterContainer = document.getElementById('scoreFilter');
+        if (scoreFilterContainer) {
+            scoreFilterContainer.addEventListener('click', function(e) {
+                var chip = e.target.closest('.filter-chip');
+                if (!chip || chip.dataset.score === undefined) return;
+                scoreFilterContainer.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+                CapabilityDiscovery.applyScoreFilter(chip.dataset.score);
+            });
+        }
+    },
+
+    applyScoreFilter: function(scoreRange) {
+        var container = document.getElementById('resultsBody');
+        if (!container) return;
+        var items = container.querySelectorAll('.result-item');
+        var visibleCount = 0;
+        
+        items.forEach(function(item) {
+            var score = parseInt(item.dataset.score) || 0;
+            var show = false;
+            
+            if (scoreRange === 'all') {
+                show = true;
+            } else if (scoreRange === 'high' && score >= 8) {
+                show = true;
+            } else if (scoreRange === 'medium' && score >= 3 && score < 8) {
+                show = true;
+            } else if (scoreRange === 'low' && score < 3) {
+                show = true;
+            }
+            
+            if (show && item.style.display !== 'none') {
+                visibleCount++;
+            }
+            
+            if (show) {
+                item.style.display = '';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('resultsCount').textContent = visibleCount;
     },
 
     selectBusinessCategory: function(bc) {
@@ -373,12 +459,18 @@ var CapabilityDiscovery = {
     },
 
     renderResults: function() {
+        console.log('[renderResults] Starting render, discoveredCapabilities length:', discoveredCapabilities.length);
         var container = document.getElementById('resultsBody');
-        if (!container) return;
+        if (!container) {
+            console.error('[renderResults] Container resultsBody not found');
+            return;
+        }
         var html = '';
         var counts = { scene: 0, provider: 0, driver: 0, new: 0, installed: 0 };
         var businessCounts = {};
+        var scoreCounts = { high: 0, medium: 0, low: 0 };
         discoveredCapabilities.forEach(function(cap) {
+            console.log('[renderResults] Processing cap:', cap.id, 'skillForm:', cap.skillForm);
             if (cap.skillForm === 'SCENE') { counts.scene++; }
             else if (cap.skillForm === 'PROVIDER') { counts.provider++; }
             else if (cap.skillForm === 'DRIVER') { counts.driver++; }
@@ -386,9 +478,15 @@ var CapabilityDiscovery = {
             if (cap.businessCategory) {
                 businessCounts[cap.businessCategory] = (businessCounts[cap.businessCategory] || 0) + 1;
             }
+            var score = cap.businessSemanticsScore || 5;
+            if (score >= 8) { scoreCounts.high++; }
+            else if (score >= 3) { scoreCounts.medium++; }
+            else { scoreCounts.low++; }
             var categoryInfo = CapabilityDiscovery.getCategoryInfo(cap.skillForm, cap.sceneType);
             var bcInfo = CapabilityDiscovery.getBusinessCategoryInfo(cap.businessCategory);
-            html += '<div class="result-item" data-skill-form="' + cap.skillForm + '" data-scene-type="' + (cap.sceneType || '') + '" data-business-category="' + (cap.businessCategory || '') + '" data-installed="' + cap.installed + '" data-skill-id="' + cap.id + '">' +
+            var scoreLevel = score >= 8 ? 'high' : (score >= 3 ? 'medium' : 'low');
+            var scoreColor = score >= 8 ? '#10b981' : (score >= 3 ? '#f59e0b' : '#6b7280');
+            html += '<div class="result-item" data-skill-form="' + cap.skillForm + '" data-scene-type="' + (cap.sceneType || '') + '" data-business-category="' + (cap.businessCategory || '') + '" data-installed="' + cap.installed + '" data-skill-id="' + cap.id + '" data-score="' + score + '" onclick="toggleCapabilitySelection(\'' + cap.id + '\', event)">' +
                 '<div class="result-header">' +
                 '<div class="result-icon"><i class="' + categoryInfo.icon + '"></i></div>' +
                 '<div class="result-info">' +
@@ -397,19 +495,31 @@ var CapabilityDiscovery = {
                 '<div class="result-badges">' +
                 '<span class="badge badge-' + categoryInfo.code.toLowerCase() + '">' + categoryInfo.name + '</span>' +
                 (cap.businessCategory ? '<span class="badge badge-bc" style="background: ' + bcInfo.color + '20; color: ' + bcInfo.color + ';">' + bcInfo.name + '</span>' : '') +
+                '<span class="badge badge-score" style="background: ' + scoreColor + '20; color: ' + scoreColor + ';" title="业务语义评分: ' + score + '/10"><i class="ri-star-line"></i> ' + score + '</span>' +
                 (cap.installed ? '<span class="badge badge-installed">已安装</span>' : '<span class="badge badge-new">新能力</span>') +
                 '</div></div>' +
                 '<div class="result-actions">' +
-                '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="viewCapability(\'' + cap.id + '\')" title="查看详情"><i class="ri-eye-line"></i></button>' +
+                '<button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="event.stopPropagation(); viewCapability(\'' + cap.id + '\')" title="查看详情"><i class="ri-eye-line"></i></button>' +
                 (cap.installed ? 
-                    '<button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="openCapability(\'' + cap.id + '\')" title="打开"><i class="ri-external-link-line"></i> 打开</button>' :
-                    '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="installCapability(\'' + cap.id + '\')" title="安装"><i class="ri-download-line"></i> 安装</button>') +
+                    '<button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="event.stopPropagation(); openCapability(\'' + cap.id + '\')" title="打开"><i class="ri-external-link-line"></i> 打开</button>' :
+                    '<button class="nx-btn nx-btn--primary nx-btn--sm" onclick="event.stopPropagation(); installCapability(\'' + cap.id + '\')" title="安装"><i class="ri-download-line"></i> 安装</button>') +
                 '</div></div>';
         });
+        console.log('[renderResults] Generated HTML length:', html.length);
         container.innerHTML = html;
         document.getElementById('resultsCount').textContent = discoveredCapabilities.length;
         CapabilityDiscovery.updateFilterCounts(counts, businessCounts);
+        CapabilityDiscovery.updateScoreFilterCounts(scoreCounts);
         CapabilityDiscovery.renderCharts(businessCounts, counts, discoveredCapabilities.length);
+        console.log('[renderResults] Render completed');
+    },
+
+    updateScoreFilterCounts: function(scoreCounts) {
+        var el;
+        el = document.getElementById('scoreCountAll'); if (el) el.textContent = discoveredCapabilities.length;
+        el = document.getElementById('scoreCountHigh'); if (el) el.textContent = scoreCounts.high;
+        el = document.getElementById('scoreCountMedium'); if (el) el.textContent = scoreCounts.medium;
+        el = document.getElementById('scoreCountLow'); if (el) el.textContent = scoreCounts.low;
     },
 
     updateFilterCounts: function(counts, businessCounts) {
@@ -429,18 +539,13 @@ var CapabilityDiscovery = {
         if (!chartSection || !businessChart || !skillFormChart) return;
         if (total === 0) { chartSection.style.display = 'none'; return; }
         chartSection.style.display = 'block';
-        var bcColors = {};
-        var bcNames = {};
-        BUSINESS_CATEGORIES.forEach(function(bc) {
-            bcColors[bc.code] = bc.color;
-            bcNames[bc.code] = bc.name;
-        });
         var bcHtml = '';
         for (var bc in businessCounts) {
             var count = businessCounts[bc];
             var percent = Math.round((count * 100.0) / total);
-            var color = bcColors[bc] || '#8c8c8c';
-            var name = bcNames[bc] || bc;
+            var bcInfo = CategoryService.getInfo(bc);
+            var color = bcInfo.color || '#8c8c8c';
+            var name = bcInfo.name || bc;
             bcHtml += '<div class="chart-pie-item" onclick="selectBusinessCategory(\'' + bc + '\')" style="cursor: pointer;">' +
                 '<div class="chart-pie-dot" style="background: ' + color + '"></div>' +
                 '<span class="chart-pie-label">' + name + '</span>' +
@@ -475,8 +580,7 @@ var CapabilityDiscovery = {
     },
 
     getBusinessCategoryInfo: function(bc) {
-        var found = BUSINESS_CATEGORIES.find(function(b) { return b.code === bc; });
-        return found || { name: bc || '未分类', icon: 'ri-folder-line', color: '#8c8c8c' };
+        return CategoryService.getInfo(bc);
     },
     
     showUserSelector: function(type, title, callback) {
@@ -1222,7 +1326,7 @@ var CapabilityDiscovery = {
         var log = { level: level, message: message, time: new Date() };
         logs.unshift(log);
         if (logs.length > 100) { logs.pop(); }
-        var container = document.getElementById('logContainer');
+        var container = document.getElementById('logsBody');
         if (!container) return;
         var item = document.createElement('div');
         item.className = 'log-item log-' + level;
@@ -1518,6 +1622,199 @@ global.selectUser = function(el) {
 
 global.searchUsers = function(keyword) {
     CapabilityDiscovery.loadUsers(keyword);
+};
+
+global.toggleBatchMode = function() {
+    batchMode = !batchMode;
+    selectedCapabilities = [];
+    
+    var batchBar = document.getElementById('batchBar');
+    var resultsBody = document.getElementById('resultsBody');
+    
+    if (batchMode) {
+        if (batchBar) batchBar.style.display = 'flex';
+        if (resultsBody) resultsBody.classList.add('batch-mode');
+    } else {
+        if (batchBar) batchBar.style.display = 'none';
+        if (resultsBody) resultsBody.classList.remove('batch-mode');
+        resultsBody.querySelectorAll('.result-item').forEach(function(item) {
+            item.classList.remove('selected');
+        });
+    }
+    
+    CapabilityDiscovery.updateBatchCount();
+};
+
+global.toggleCapabilitySelection = function(skillId, event) {
+    if (!batchMode) return;
+    
+    event.stopPropagation();
+    
+    var item = event.target.closest('.result-item');
+    var index = selectedCapabilities.indexOf(skillId);
+    
+    if (index > -1) {
+        selectedCapabilities.splice(index, 1);
+        if (item) item.classList.remove('selected');
+    } else {
+        selectedCapabilities.push(skillId);
+        if (item) item.classList.add('selected');
+    }
+    
+    CapabilityDiscovery.updateBatchCount();
+};
+
+global.selectAllCapabilities = function() {
+    var items = document.querySelectorAll('.result-item');
+    items.forEach(function(item) {
+        var skillId = item.dataset.skillId;
+        if (skillId && selectedCapabilities.indexOf(skillId) === -1) {
+            selectedCapabilities.push(skillId);
+            item.classList.add('selected');
+        }
+    });
+    CapabilityDiscovery.updateBatchCount();
+};
+
+global.deselectAllCapabilities = function() {
+    selectedCapabilities = [];
+    document.querySelectorAll('.result-item.selected').forEach(function(item) {
+        item.classList.remove('selected');
+    });
+    CapabilityDiscovery.updateBatchCount();
+};
+
+global.batchInstall = function() {
+    if (selectedCapabilities.length === 0) {
+        alert('请先选择要安装的能力');
+        return;
+    }
+    
+    var caps = selectedCapabilities.map(function(id) {
+        return discoveredCapabilities.find(function(c) { return c.id === id; });
+    }).filter(function(c) { return c && !c.installed; });
+    
+    if (caps.length === 0) {
+        alert('所选能力已全部安装');
+        return;
+    }
+    
+    if (!confirm('确定要批量安装 ' + caps.length + ' 个能力吗？')) {
+        return;
+    }
+    
+    CapabilityDiscovery.executeBatchInstall(caps);
+};
+
+CapabilityDiscovery.updateBatchCount = function() {
+    var countEl = document.getElementById('selectedCount');
+    if (countEl) {
+        countEl.textContent = selectedCapabilities.length;
+    }
+    
+    var installBtn = document.getElementById('batchInstallBtn');
+    if (installBtn) {
+        installBtn.disabled = selectedCapabilities.length === 0;
+    }
+};
+
+CapabilityDiscovery.executeBatchInstall = function(caps) {
+    var modal = document.getElementById('batchInstallModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'batchInstallModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = 
+            '<div class="modal-content" style="max-width: 600px;">' +
+            '<div class="modal-header">' +
+            '<h3><i class="ri-download-cloud-line"></i> 批量安装</h3>' +
+            '</div>' +
+            '<div class="modal-body">' +
+            '<div class="batch-progress">' +
+            '<div class="batch-progress-bar" id="batchProgressBar"></div>' +
+            '</div>' +
+            '<div class="batch-status" id="batchStatus">准备安装...</div>' +
+            '<div class="batch-list" id="batchList"></div>' +
+            '</div>' +
+            '<div class="modal-footer" style="display: none;" id="batchFooter">' +
+            '<button class="nx-btn nx-btn--primary" onclick="closeBatchInstall()">完成</button>' +
+            '</div>' +
+            '</div>';
+        document.body.appendChild(modal);
+    }
+    
+    modal.classList.add('show');
+    
+    var progressBar = document.getElementById('batchProgressBar');
+    var statusEl = document.getElementById('batchStatus');
+    var listEl = document.getElementById('batchList');
+    var footerEl = document.getElementById('batchFooter');
+    
+    listEl.innerHTML = caps.map(function(cap) {
+        return '<div class="batch-item" data-id="' + cap.id + '">' +
+            '<i class="ri-time-line batch-item-icon pending"></i>' +
+            '<span class="batch-item-name">' + cap.name + '</span>' +
+            '<span class="batch-item-status">等待中</span></div>';
+    }).join('');
+    
+    var completed = 0;
+    var total = caps.length;
+    
+    function installNext() {
+        if (completed >= total) {
+            progressBar.style.width = '100%';
+            progressBar.style.background = 'var(--nx-success)';
+            statusEl.textContent = '全部安装完成！成功: ' + total;
+            footerEl.style.display = 'flex';
+            return;
+        }
+        
+        var cap = caps[completed];
+        var progress = Math.round((completed / total) * 100);
+        progressBar.style.width = progress + '%';
+        statusEl.textContent = '正在安装: ' + cap.name + ' (' + (completed + 1) + '/' + total + ')';
+        
+        var itemEl = listEl.querySelector('[data-id="' + cap.id + '"]');
+        if (itemEl) {
+            itemEl.querySelector('.batch-item-icon').className = 'batch-item-icon ri-loader-4-line ri-spin';
+            itemEl.querySelector('.batch-item-status').textContent = '安装中...';
+        }
+        
+        ApiClient.post('/api/v1/discovery/install', {
+            capabilityId: cap.id,
+            name: cap.name,
+            skillForm: cap.skillForm
+        })
+        .then(function(result) {
+            if (itemEl) {
+                itemEl.querySelector('.batch-item-icon').className = 'batch-item-icon ri-checkbox-circle-line';
+                itemEl.querySelector('.batch-item-icon').style.color = 'var(--nx-success)';
+                itemEl.querySelector('.batch-item-status').textContent = '成功';
+            }
+        })
+        .catch(function(error) {
+            if (itemEl) {
+                itemEl.querySelector('.batch-item-icon').className = 'batch-item-icon ri-close-circle-line';
+                itemEl.querySelector('.batch-item-icon').style.color = 'var(--nx-danger)';
+                itemEl.querySelector('.batch-item-status').textContent = '失败';
+            }
+        })
+        .finally(function() {
+            completed++;
+            setTimeout(installNext, 500);
+        });
+    }
+    
+    installNext();
+};
+
+global.closeBatchInstall = function() {
+    var modal = document.getElementById('batchInstallModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+    global.toggleBatchMode();
+    CapabilityDiscovery.startScan();
 };
 
 CapabilityDiscovery.init();

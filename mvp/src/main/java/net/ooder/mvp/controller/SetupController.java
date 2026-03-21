@@ -247,13 +247,9 @@ public class SetupController {
     private File findSkillJar(String skillId) {
         String[] jarPaths = {
             "../skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
-            "../skills/_system/" + skillId + "/target/" + skillId + "-2.3.2.jar",
             "../skills/" + skillId + "/target/" + skillId + "-2.3.1.jar",
-            "../skills/" + skillId + "/target/" + skillId + "-2.3.2.jar",
             "skills/_system/" + skillId + "/target/" + skillId + "-2.3.1.jar",
-            "skills/_system/" + skillId + "/target/" + skillId + "-2.3.2.jar",
-            "skills/" + skillId + "/target/" + skillId + "-2.3.1.jar",
-            "skills/" + skillId + "/target/" + skillId + "-2.3.2.jar"
+            "skills/" + skillId + "/target/" + skillId + "-2.3.1.jar"
         };
         
         for (String jarPath : jarPaths) {
@@ -268,12 +264,6 @@ public class SetupController {
         if (mavenJar.exists()) {
             System.out.println("[SetupController] Found skill JAR in Maven repo: " + mavenJar.getAbsolutePath());
             return mavenJar;
-        }
-        
-        File mavenJar2 = new File(System.getProperty("user.home") + "/.m2/repository/net/ooder/" + skillId + "/2.3.2/" + skillId + "-2.3.2.jar");
-        if (mavenJar2.exists()) {
-            System.out.println("[SetupController] Found skill JAR in Maven repo: " + mavenJar2.getAbsolutePath());
-            return mavenJar2;
         }
         
         return null;

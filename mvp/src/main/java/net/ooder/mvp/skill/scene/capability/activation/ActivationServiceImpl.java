@@ -6,6 +6,8 @@ import net.ooder.mvp.skill.scene.template.SceneTemplate;
 import net.ooder.mvp.skill.scene.template.SceneTemplateService;
 import net.ooder.mvp.skill.scene.service.MenuAutoRegisterService;
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService;
+import net.ooder.mvp.skill.scene.capability.install.SkillDirectoryConfig;
+import net.ooder.mvp.skill.scene.capability.install.SkillDirectoryMigrator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +35,12 @@ public class ActivationServiceImpl implements ActivationService {
     
     @Autowired(required = false)
     private KeyManagementService keyManagementService;
+
+    @Autowired
+    private SkillDirectoryMigrator directoryMigrator;
+
+    @Autowired
+    private SkillDirectoryConfig directoryConfig;
 
     @Override
     public ActivationProcess getProcess(String installId) {
@@ -238,45 +246,44 @@ public class ActivationServiceImpl implements ActivationService {
             return result;
         }
         
-        if (keyManagementService != null) {
-            try {
-                KeyManagementService.KeyGenerateRequest request = new KeyManagementService.KeyGenerateRequest();
-                request.setUserId(process.getActivator());
-                request.setSceneGroupId(process.getSceneGroupId());
-                request.setInstallId(installId);
-                request.setScope("scene:" + process.getSceneGroupId());
-                request.setDescription("Scene activation key for " + process.getSceneGroupId());
-                
-                KeyManagementService.KeyInfo keyInfo = keyManagementService.generateKey(request);
-                
-                KeyResult result = new KeyResult();
-                result.setKeyId(keyInfo.getKeyId());
-                result.setKeyValue(keyInfo.getKeyValue());
-                result.setKeyStatus(keyInfo.getStatus().name());
-                result.setExpireTime(keyInfo.getExpireTime());
-                result.setMessage("Key generated successfully");
-                
-                process.setKeyId(result.getKeyId());
-                process.setKeyStatus(result.getKeyStatus());
-                
-                log.info("[getKey] Key generated via KeyManagementService: {}", result.getKeyId());
-                return result;
-                
-            } catch (Exception e) {
-                log.error("[getKey] Failed to generate key via KeyManagementService: {}", e.getMessage());
-            }
+        if (keyManagementService == null) {
+            log.error("[getKey] KeyManagementService not available - this is a production environment error!");
+            KeyResult result = new KeyResult();
+            result.setKeyStatus("ERROR");
+            result.setMessage("KeyManagementService 不可用，无法生成密钥");
+            return result;
         }
         
-        KeyResult result = new KeyResult();
-        result.setKeyId("key-" + installId);
-        result.setKeyStatus("ACTIVE");
-        result.setExpireTime(System.currentTimeMillis() + 86400000L);
-        result.setMessage("Key generated (fallback mode)");
-        
-        process.setKeyId(result.getKeyId());
-        process.setKeyStatus(result.getKeyStatus());
-        
-        return result;
+        try {
+            KeyManagementService.KeyGenerateRequest request = new KeyManagementService.KeyGenerateRequest();
+            request.setUserId(process.getActivator());
+            request.setSceneGroupId(process.getSceneGroupId());
+            request.setInstallId(installId);
+            request.setScope("scene:" + process.getSceneGroupId());
+            request.setDescription("Scene activation key for " + process.getSceneGroupId());
+            
+            KeyManagementService.KeyInfo keyInfo = keyManagementService.generateKey(request);
+            
+            KeyResult result = new KeyResult();
+            result.setKeyId(keyInfo.getKeyId());
+            result.setKeyValue(keyInfo.getKeyValue());
+            result.setKeyStatus(keyInfo.getStatus().name());
+            result.setExpireTime(keyInfo.getExpireTime());
+            result.setMessage("Key generated successfully");
+            
+            process.setKeyId(result.getKeyId());
+            process.setKeyStatus(result.getKeyStatus());
+            
+            log.info("[getKey] Key generated via KeyManagementService: {}", result.getKeyId());
+            return result;
+            
+        } catch (Exception e) {
+            log.error("[getKey] Failed to generate key via KeyManagementService: {}", e.getMessage());
+            KeyResult result = new KeyResult();
+            result.setKeyStatus("ERROR");
+            result.setMessage("生成密钥失败: " + e.getMessage());
+            return result;
+        }
     }
 
     @Override
@@ -286,6 +293,25 @@ public class ActivationServiceImpl implements ActivationService {
         ActivationProcess process = processes.get(installId);
         if (process == null) {
             return null;
+        }
+        
+        try {
+            String skillId = process.getInstallId();
+            if (skillId != null && skillId.startsWith("install-")) {
+                skillId = skillId.replace("install-", "");
+            }
+            
+            if (skillId != null) {
+                SkillDirectoryMigrator.MigrationResult migrationResult = directoryMigrator.moveToActivated(skillId);
+                
+                if (!migrationResult.isSuccess()) {
+                    log.warn("[confirmActivation] Failed to move to activated directory: {}", migrationResult.getMessage());
+                } else {
+                    log.info("[confirmActivation] Skill moved to activated directory: {}", skillId);
+                }
+            }
+        } catch (Exception e) {
+            log.error("[confirmActivation] Failed to migrate skill directory: {}", e.getMessage());
         }
         
         process.setStatus(ActivationProcess.ActivationStatus.COMPLETED);

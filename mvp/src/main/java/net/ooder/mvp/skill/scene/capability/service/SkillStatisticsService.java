@@ -5,7 +5,7 @@ import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.mvp.skill.scene.capability.model.SkillForm;
 import net.ooder.mvp.skill.scene.capability.model.Visibility;
-import net.ooder.mvp.skill.scene.discovery.SkillIndexLoader;
+import net.ooder.mvp.skill.scene.discovery.MvpSkillIndexLoader;
 import net.ooder.mvp.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.mvp.skill.scene.dto.discovery.SkillStatisticsDTO;
 import net.ooder.mvp.skill.scene.dto.discovery.SkillStatisticsDTO.CategoryStatistics;
@@ -21,7 +21,7 @@ import java.util.Map;
 public class SkillStatisticsService {
     
     @Autowired
-    private SkillIndexLoader skillIndexLoader;
+    private MvpSkillIndexLoader mvpSkillIndexLoader;
     
     private static final Map<String, String> CAPABILITY_TO_BUSINESS_MAP = new HashMap<>();
     static {
@@ -45,7 +45,7 @@ public class SkillStatisticsService {
     }
     
     public SkillStatisticsDTO getStatistics() {
-        List<CapabilityDTO> capabilities = skillIndexLoader.getSkillsFromEntryFiles("LOCAL");
+        List<CapabilityDTO> capabilities = mvpSkillIndexLoader.getSkillsFromEntryFiles("LOCAL");
         
         SkillStatisticsDTO dto = new SkillStatisticsDTO();
         dto.setTotal(capabilities.size());

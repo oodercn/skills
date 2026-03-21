@@ -1,11 +1,15 @@
 package net.ooder.mvp.skill.scene.controller;
 
+import net.ooder.mvp.skill.scene.dto.llm.LlmProviderConfigDTO;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 @RestController
 @RequestMapping("/api/v1/scene-groups/{sceneGroupId}/llm")
@@ -14,27 +18,62 @@ public class SceneLlmController {
 
     private static final Logger log = LoggerFactory.getLogger(SceneLlmController.class);
     
-    private Map<String, LlmConfig> llmConfigs = new HashMap<String, LlmConfig>();
+    @Value("${ooder.llm.provider:deepseek}")
+    private String defaultProvider;
     
-    public SceneLlmController() {
-        initMockData();
-    }
+    @Value("${ooder.llm.model:deepseek-chat}")
+    private String defaultModel;
     
-    private void initMockData() {
+    @Value("${ooder.llm.timeout:60000}")
+    private int defaultTimeout;
+    
+    @Value("${ooder.llm.max-iterations:5}")
+    private int defaultMaxIterations;
+    
+    @Value("${ooder.llm.daily-token-limit:100000}")
+    private int defaultDailyTokenLimit;
+    
+    @Autowired(required = false)
+    private LlmProviderController llmProviderController;
+    
+    private final Map<String, LlmConfig> llmConfigs = new ConcurrentHashMap<>();
+    
+    private LlmConfig getSystemDefaultConfig() {
         LlmConfig config = new LlmConfig();
-        config.setProvider("deepseek");
-        config.setModel("deepseek-chat");
+        
+        if (llmProviderController != null) {
+            try {
+                ResultModel<LlmProviderConfigDTO> defaultProviderResult = llmProviderController.getDefaultProvider();
+                if (defaultProviderResult != null && defaultProviderResult.getData() != null) {
+                    LlmProviderConfigDTO provider = defaultProviderResult.getData();
+                    config.setProvider(provider.getProviderId());
+                    config.setModel(provider.getDefaultModel());
+                    config.setMaxIterations(provider.getMaxIterations() > 0 ? provider.getMaxIterations() : defaultMaxIterations);
+                    config.setFunctionCalling(provider.isFunctionCallingEnabled());
+                    config.setLlmTimeout(provider.getTimeout() > 0 ? (int) provider.getTimeout() : defaultTimeout);
+                    log.info("[getSystemDefaultConfig] Using system provider: {}, model: {}", 
+                        provider.getProviderId(), provider.getDefaultModel());
+                    return config;
+                }
+            } catch (Exception e) {
+                log.warn("[getSystemDefaultConfig] Failed to get system default provider: {}", e.getMessage());
+            }
+        }
+        
+        config.setProvider(defaultProvider);
+        config.setModel(defaultModel);
         config.setDecisionMode("ONLINE_FIRST");
         config.setDecisionTimeout(30000);
         config.setDecisionCache(true);
         config.setCacheTtl(300000);
         config.setFunctionCalling(true);
-        config.setMaxIterations(5);
-        config.setLlmTimeout(60000);
-        config.setDailyTokenLimit(100000);
-        config.setUsedTokens(12500);
+        config.setMaxIterations(defaultMaxIterations);
+        config.setLlmTimeout(defaultTimeout);
+        config.setDailyTokenLimit(defaultDailyTokenLimit);
+        config.setUsedTokens(0);
         
-        llmConfigs.put("sg-1772887335550", config);
+        log.info("[getSystemDefaultConfig] Using fallback config: provider={}, model={}", defaultProvider, defaultModel);
+        return config;
     }
 
     @GetMapping("/config")
@@ -43,7 +82,11 @@ public class SceneLlmController {
         
         LlmConfig config = llmConfigs.get(sceneGroupId);
         if (config == null) {
-            config = new LlmConfig();
+            config = getSystemDefaultConfig();
+            config.setIsSystemDefault(true);
+            log.info("[getLlmConfig] Using system default config for new scene group: {}", sceneGroupId);
+        } else {
+            config.setIsSystemDefault(false);
         }
         
         return ResultModel.success(config);
@@ -55,7 +98,20 @@ public class SceneLlmController {
             @RequestBody LlmConfig config) {
         log.info("[updateLlmConfig] sceneGroupId: {}, provider: {}, model: {}", sceneGroupId, config.getProvider(), config.getModel());
         
+        config.setIsSystemDefault(false);
+        config.setUpdateTime(System.currentTimeMillis());
         llmConfigs.put(sceneGroupId, config);
+        
+        return ResultModel.success(config);
+    }
+    
+    @PostMapping("/reset")
+    public ResultModel<LlmConfig> resetToSystemDefault(@PathVariable String sceneGroupId) {
+        log.info("[resetToSystemDefault] sceneGroupId: {}", sceneGroupId);
+        
+        llmConfigs.remove(sceneGroupId);
+        LlmConfig config = getSystemDefaultConfig();
+        config.setIsSystemDefault(true);
         
         return ResultModel.success(config);
     }
@@ -72,9 +128,9 @@ public class SceneLlmController {
             stats.setUsedTokens(config.getUsedTokens());
             stats.setRemainingTokens(config.getDailyTokenLimit() - config.getUsedTokens());
         } else {
-            stats.setDailyTokenLimit(100000);
+            stats.setDailyTokenLimit(defaultDailyTokenLimit);
             stats.setUsedTokens(0);
-            stats.setRemainingTokens(100000);
+            stats.setRemainingTokens(defaultDailyTokenLimit);
         }
         
         return ResultModel.success(stats);
@@ -92,9 +148,86 @@ public class SceneLlmController {
         return ResultModel.success(true);
     }
     
+    @GetMapping("/providers")
+    public ResultModel<List<Map<String, Object>>> getAvailableProviders() {
+        log.info("[getAvailableProviders] request start");
+        
+        List<Map<String, Object>> providers = new ArrayList<>();
+        
+        if (llmProviderController != null) {
+            try {
+                ResultModel<List<LlmProviderConfigDTO>> result = llmProviderController.listProviders();
+                if (result != null && result.getData() != null) {
+                    for (LlmProviderConfigDTO p : result.getData()) {
+                        Map<String, Object> provider = new HashMap<>();
+                        provider.put("id", p.getProviderId());
+                        provider.put("name", p.getName());
+                        provider.put("type", p.getType());
+                        provider.put("enabled", p.isEnabled());
+                        provider.put("configured", p.isConfigured());
+                        provider.put("defaultModel", p.getDefaultModel());
+                        providers.add(provider);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("[getAvailableProviders] Failed to get providers: {}", e.getMessage());
+            }
+        }
+        
+        if (providers.isEmpty()) {
+            Map<String, Object> defaultProv = new HashMap<>();
+            defaultProv.put("id", defaultProvider);
+            defaultProv.put("name", defaultProvider);
+            defaultProv.put("type", defaultProvider);
+            defaultProv.put("enabled", true);
+            defaultProv.put("configured", true);
+            defaultProv.put("defaultModel", defaultModel);
+            providers.add(defaultProv);
+        }
+        
+        return ResultModel.success(providers);
+    }
+    
+    @GetMapping("/providers/{providerId}/models")
+    public ResultModel<List<Map<String, Object>>> getProviderModels(@PathVariable String providerId) {
+        log.info("[getProviderModels] providerId: {}", providerId);
+        
+        List<Map<String, Object>> models = new ArrayList<>();
+        
+        if (llmProviderController != null) {
+            try {
+                ResultModel<List<LlmProviderConfigDTO.ModelConfigDTO>> result = 
+                    llmProviderController.listModels(providerId);
+                if (result != null && result.getData() != null) {
+                    for (LlmProviderConfigDTO.ModelConfigDTO m : result.getData()) {
+                        Map<String, Object> model = new HashMap<>();
+                        model.put("id", m.getModelId());
+                        model.put("name", m.getDisplayName());
+                        model.put("maxTokens", m.getMaxTokens());
+                        model.put("supportsFunctionCalling", m.isSupportsFunctionCalling());
+                        models.add(model);
+                    }
+                }
+            } catch (Exception e) {
+                log.warn("[getProviderModels] Failed to get models: {}", e.getMessage());
+            }
+        }
+        
+        if (models.isEmpty()) {
+            Map<String, Object> defaultModelMap = new HashMap<>();
+            defaultModelMap.put("id", defaultModel);
+            defaultModelMap.put("name", defaultModel);
+            defaultModelMap.put("maxTokens", 64000);
+            defaultModelMap.put("supportsFunctionCalling", true);
+            models.add(defaultModelMap);
+        }
+        
+        return ResultModel.success(models);
+    }
+    
     public static class LlmConfig {
-        private String provider = "deepseek";
-        private String model = "deepseek-chat";
+        private String provider;
+        private String model;
         private String decisionMode = "ONLINE_FIRST";
         private int decisionTimeout = 30000;
         private boolean decisionCache = true;
@@ -104,6 +237,8 @@ public class SceneLlmController {
         private int llmTimeout = 60000;
         private int dailyTokenLimit = 100000;
         private int usedTokens = 0;
+        private boolean isSystemDefault = false;
+        private long updateTime;
         
         public String getProvider() { return provider; }
         public void setProvider(String provider) { this.provider = provider; }
@@ -127,6 +262,10 @@ public class SceneLlmController {
         public void setDailyTokenLimit(int dailyTokenLimit) { this.dailyTokenLimit = dailyTokenLimit; }
         public int getUsedTokens() { return usedTokens; }
         public void setUsedTokens(int usedTokens) { this.usedTokens = usedTokens; }
+        public boolean getIsSystemDefault() { return isSystemDefault; }
+        public void setIsSystemDefault(boolean isSystemDefault) { this.isSystemDefault = isSystemDefault; }
+        public long getUpdateTime() { return updateTime; }
+        public void setUpdateTime(long updateTime) { this.updateTime = updateTime; }
     }
     
     public static class LlmStats {

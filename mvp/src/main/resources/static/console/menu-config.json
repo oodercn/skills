@@ -5,14 +5,14 @@
             "name": "首页",
             "icon": "ri-home-line",
             "url": "/console/pages/scene-management.html",
-            "roles": ["personal", "enterprise", "admin", "collaborator"],
+            "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
             "status": "implemented"
         },
         {
             "id": "capability-center",
             "name": "能力中心",
             "icon": "ri-puzzle-line",
-            "roles": ["personal", "enterprise", "admin", "collaborator"],
+            "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -20,7 +20,7 @@
                     "name": "能力发现",
                     "icon": "ri-search-line",
                     "url": "/console/pages/capability-discovery.html",
-                    "roles": ["personal", "enterprise", "admin", "collaborator"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -28,7 +28,7 @@
                     "name": "我的能力",
                     "icon": "ri-user-star-line",
                     "url": "/console/pages/my-capabilities.html",
-                    "roles": ["personal", "enterprise", "admin", "collaborator"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -36,7 +36,48 @@
                     "name": "能力统计",
                     "icon": "ri-bar-chart-line",
                     "url": "/console/pages/capability-stats.html",
-                    "roles": ["enterprise", "admin"],
+                    "roles": ["enterprise", "admin", "leader"],
+                    "status": "implemented"
+                }
+            ]
+        },
+        {
+            "id": "knowledge-center",
+            "name": "知识中心",
+            "icon": "ri-book-3-line",
+            "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "knowledge-overview",
+                    "name": "知识概览",
+                    "icon": "ri-dashboard-line",
+                    "url": "/console/pages/knowledge-center.html",
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "knowledge-bases",
+                    "name": "知识库管理",
+                    "icon": "ri-database-2-line",
+                    "url": "/console/pages/knowledge-base.html",
+                    "roles": ["enterprise", "admin", "leader"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "llm-knowledge-config",
+                    "name": "LLM知识配置",
+                    "icon": "ri-robot-line",
+                    "url": "/console/pages/llm-knowledge-config.html",
+                    "roles": ["enterprise", "admin", "leader"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "knowledge-search",
+                    "name": "知识检索",
+                    "icon": "ri-search-line",
+                    "url": "/console/pages/knowledge-search.html",
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 }
             ]
@@ -45,8 +86,7 @@
             "id": "scene-management",
             "name": "场景管理",
             "icon": "ri-folder-line",
-            "url": "/console/pages/scene-group-management.html",
-            "roles": ["enterprise", "admin", "collaborator"],
+            "roles": ["enterprise", "admin", "collaborator", "leader", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -54,7 +94,7 @@
                     "name": "场景组列表",
                     "icon": "ri-list-check",
                     "url": "/console/pages/scene-group-management.html",
-                    "roles": ["enterprise", "admin", "collaborator"],
+                    "roles": ["enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -62,23 +102,7 @@
                     "name": "场景模板",
                     "icon": "ri-file-copy-line",
                     "url": "/console/pages/template-management.html",
-                    "roles": ["enterprise", "admin"],
-                    "status": "implemented"
-                },
-                {
-                    "id": "knowledge-bases",
-                    "name": "知识库",
-                    "icon": "ri-book-line",
-                    "url": "/console/pages/knowledge-base.html",
-                    "roles": ["enterprise", "admin"],
-                    "status": "implemented"
-                },
-                {
-                    "id": "execution-history",
-                    "name": "执行历史",
-                    "icon": "ri-history-line",
-                    "url": "/console/pages/my-history.html",
-                    "roles": ["enterprise", "admin", "collaborator"],
+                    "roles": ["enterprise", "admin", "leader", "installer"],
                     "status": "implemented"
                 }
             ]
@@ -87,7 +111,7 @@
             "id": "llm-service",
             "name": "LLM 服务",
             "icon": "ri-robot-line",
-            "roles": ["enterprise", "admin", "collaborator"],
+            "roles": ["enterprise", "admin", "collaborator", "leader", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -95,7 +119,7 @@
                     "name": "LLM 配置",
                     "icon": "ri-settings-3-line",
                     "url": "/console/pages/llm-config.html",
-                    "roles": ["enterprise", "admin", "collaborator"],
+                    "roles": ["enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -103,7 +127,7 @@
                     "name": "LLM 监控",
                     "icon": "ri-line-chart-line",
                     "url": "/console/pages/llm-monitor.html",
-                    "roles": ["enterprise", "admin"],
+                    "roles": ["enterprise", "admin", "leader"],
                     "status": "implemented"
                 }
             ]
@@ -112,8 +136,7 @@
             "id": "my-workspace",
             "name": "我的工作台",
             "icon": "ri-user-line",
-            "url": "/console/pages/my-todos.html",
-            "roles": ["personal", "enterprise", "admin", "collaborator"],
+            "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -121,7 +144,7 @@
                     "name": "我的待办",
                     "icon": "ri-task-line",
                     "url": "/console/pages/my-todos.html",
-                    "roles": ["personal", "enterprise", "admin", "collaborator"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -129,7 +152,7 @@
                     "name": "我的场景",
                     "icon": "ri-artboard-line",
                     "url": "/console/pages/my-scenes.html",
-                    "roles": ["personal", "enterprise", "admin", "collaborator"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -137,7 +160,15 @@
                     "name": "执行历史",
                     "icon": "ri-history-line",
                     "url": "/console/pages/my-history.html",
-                    "roles": ["personal", "enterprise", "admin", "collaborator"],
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "key-management",
+                    "name": "密钥管理",
+                    "icon": "ri-key-line",
+                    "url": "/console/pages/key-management.html",
+                    "roles": ["personal", "enterprise", "admin", "collaborator", "leader", "installer"],
                     "status": "implemented"
                 }
             ]
@@ -146,7 +177,7 @@
             "id": "system-management",
             "name": "系统管理",
             "icon": "ri-settings-4-line",
-            "roles": ["admin"],
+            "roles": ["admin", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -177,23 +208,64 @@
                     "id": "system-config",
                     "name": "系统配置",
                     "icon": "ri-tools-line",
-                    "url": "/console/pages/config-system.html",
-                    "roles": ["admin"],
-                    "status": "implemented"
+                    "roles": ["admin", "installer"],
+                    "status": "implemented",
+                    "children": [
+                        {
+                            "id": "db-config",
+                            "name": "数据库配置",
+                            "icon": "ri-database-2-line",
+                            "url": "/console/pages/db-config.html",
+                            "roles": ["admin", "installer"],
+                            "status": "implemented"
+                        },
+                        {
+                            "id": "org-config",
+                            "name": "组织管理配置",
+                            "icon": "ri-team-line",
+                            "url": "/console/pages/org-config.html",
+                            "roles": ["admin"],
+                            "status": "implemented"
+                        },
+                        {
+                            "id": "auth-config",
+                            "name": "认证配置",
+                            "icon": "ri-shield-line",
+                            "url": "/console/pages/auth-config.html",
+                            "roles": ["admin"],
+                            "status": "implemented"
+                        },
+                        {
+                            "id": "vfs-config",
+                            "name": "文件系统配置",
+                            "icon": "ri-folder-line",
+                            "url": "/console/pages/vfs-config.html",
+                            "roles": ["admin", "installer"],
+                            "status": "implemented"
+                        },
+                        {
+                            "id": "comm-config",
+                            "name": "消息通信配置",
+                            "icon": "ri-message-line",
+                            "url": "/console/pages/comm-config.html",
+                            "roles": ["admin", "installer"],
+                            "status": "implemented"
+                        },
+                        {
+                            "id": "security-config",
+                            "name": "安全配置",
+                            "icon": "ri-lock-line",
+                            "url": "/console/pages/security-config.html",
+                            "roles": ["admin"],
+                            "status": "implemented"
+                        }
+                    ]
                 },
                 {
                     "id": "audit-logs",
                     "name": "审计日志",
                     "icon": "ri-file-list-line",
                     "url": "/console/pages/audit-logs.html",
-                    "roles": ["admin"],
-                    "status": "implemented"
-                },
-                {
-                    "id": "key-management",
-                    "name": "密钥管理",
-                    "icon": "ri-key-line",
-                    "url": "/console/pages/key-management.html",
                     "roles": ["admin"],
                     "status": "implemented"
                 }

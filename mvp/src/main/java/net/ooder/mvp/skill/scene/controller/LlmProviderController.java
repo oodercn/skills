@@ -1,6 +1,7 @@
 package net.ooder.mvp.skill.scene.controller;
 
 import net.ooder.mvp.skill.scene.dto.llm.LlmProviderConfigDTO;
+import net.ooder.mvp.skill.scene.dto.llm.LlmProviderType;
 import net.ooder.mvp.skill.scene.llm.DeepSeekLlmProvider;
 import net.ooder.mvp.skill.scene.llm.BaiduLlmProvider;
 import net.ooder.mvp.skill.scene.llm.AliyunBailianLlmProvider;
@@ -14,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.*;
 
 @RestController
-@RequestMapping("/api/v1/llm")
+@RequestMapping("/api/v1/llm-providers")
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class LlmProviderController {
 
@@ -49,179 +50,74 @@ public class LlmProviderController {
     }
     
     private void initProviders() {
-        LlmProviderConfigDTO qianwen = new LlmProviderConfigDTO();
-        qianwen.setProviderId("qianwen");
-        qianwen.setName("阿里云百炼");
-        qianwen.setType("qianwen");
-        qianwen.setEnabled("qianwen".equals(defaultProvider) || defaultProvider == null || defaultProvider.isEmpty());
-        qianwen.setDefaultModel(defaultModel != null && !defaultModel.isEmpty() ? defaultModel : "qwen-plus");
-        qianwen.setTimeout(60000);
-        qianwen.setMaxRetries(3);
-        qianwen.setFunctionCallingEnabled(true);
-        qianwen.setMaxIterations(5);
-        qianwen.setCreateTime(System.currentTimeMillis() - 86400000L * 30);
-        qianwen.setUpdateTime(System.currentTimeMillis());
-        qianwen.setConfigured(qianwenApiKey != null && !qianwenApiKey.isEmpty());
-        
-        List<LlmProviderConfigDTO.ModelConfigDTO> qianwenModels = new ArrayList<LlmProviderConfigDTO.ModelConfigDTO>();
-        LlmProviderConfigDTO.ModelConfigDTO qwenPlus = new LlmProviderConfigDTO.ModelConfigDTO();
-        qwenPlus.setModelId("qwen-plus");
-        qwenPlus.setDisplayName("通义千问 Plus");
-        qwenPlus.setMaxTokens(128000);
-        qwenPlus.setTemperature(0.7);
-        qwenPlus.setSupportsFunctionCalling(true);
-        qwenPlus.setSupportsMultimodal(true);
-        qwenPlus.setSupportsEmbedding(true);
-        qwenPlus.setCostPer1kTokens(0.004);
-        qianwenModels.add(qwenPlus);
-        
-        LlmProviderConfigDTO.ModelConfigDTO qwenTurbo = new LlmProviderConfigDTO.ModelConfigDTO();
-        qwenTurbo.setModelId("qwen-turbo");
-        qwenTurbo.setDisplayName("通义千问 Turbo");
-        qwenTurbo.setMaxTokens(8000);
-        qwenTurbo.setTemperature(0.7);
-        qwenTurbo.setSupportsFunctionCalling(true);
-        qwenTurbo.setSupportsMultimodal(false);
-        qwenTurbo.setSupportsEmbedding(false);
-        qwenTurbo.setCostPer1kTokens(0.002);
-        qianwenModels.add(qwenTurbo);
-        
-        LlmProviderConfigDTO.ModelConfigDTO qwenMax = new LlmProviderConfigDTO.ModelConfigDTO();
-        qwenMax.setModelId("qwen-max");
-        qwenMax.setDisplayName("通义千问 Max");
-        qwenMax.setMaxTokens(32000);
-        qwenMax.setTemperature(0.7);
-        qwenMax.setSupportsFunctionCalling(true);
-        qwenMax.setSupportsMultimodal(true);
-        qwenMax.setSupportsEmbedding(true);
-        qwenMax.setCostPer1kTokens(0.02);
-        qianwenModels.add(qwenMax);
-        
-        qianwen.setModels(qianwenModels);
-        providers.put(qianwen.getProviderId(), qianwen);
-        
-        LlmProviderConfigDTO deepseek = new LlmProviderConfigDTO();
-        deepseek.setProviderId("deepseek");
-        deepseek.setName("DeepSeek");
-        deepseek.setType("deepseek");
-        deepseek.setEnabled("deepseek".equals(defaultProvider));
-        deepseek.setDefaultModel("deepseek-chat");
-        deepseek.setTimeout(60000);
-        deepseek.setMaxRetries(3);
-        deepseek.setFunctionCallingEnabled(true);
-        deepseek.setMaxIterations(5);
-        deepseek.setCreateTime(System.currentTimeMillis() - 86400000L * 30);
-        deepseek.setUpdateTime(System.currentTimeMillis() - 86400000L);
-        deepseek.setConfigured(deepseekApiKey != null && !deepseekApiKey.isEmpty());
-        
-        List<LlmProviderConfigDTO.ModelConfigDTO> deepseekModels = new ArrayList<LlmProviderConfigDTO.ModelConfigDTO>();
-        LlmProviderConfigDTO.ModelConfigDTO dsChat = new LlmProviderConfigDTO.ModelConfigDTO();
-        dsChat.setModelId("deepseek-chat");
-        dsChat.setDisplayName("DeepSeek Chat");
-        dsChat.setMaxTokens(64000);
-        dsChat.setTemperature(0.7);
-        dsChat.setSupportsFunctionCalling(true);
-        dsChat.setSupportsMultimodal(false);
-        dsChat.setSupportsEmbedding(false);
-        dsChat.setCostPer1kTokens(0.001);
-        deepseekModels.add(dsChat);
-        
-        LlmProviderConfigDTO.ModelConfigDTO dsCoder = new LlmProviderConfigDTO.ModelConfigDTO();
-        dsCoder.setModelId("deepseek-coder");
-        dsCoder.setDisplayName("DeepSeek Coder");
-        dsCoder.setMaxTokens(16000);
-        dsCoder.setTemperature(0.3);
-        dsCoder.setSupportsFunctionCalling(true);
-        dsCoder.setSupportsMultimodal(false);
-        dsCoder.setSupportsEmbedding(false);
-        dsCoder.setCostPer1kTokens(0.001);
-        deepseekModels.add(dsCoder);
-        
-        deepseek.setModels(deepseekModels);
-        providers.put(deepseek.getProviderId(), deepseek);
-        
-        LlmProviderConfigDTO baidu = new LlmProviderConfigDTO();
-        baidu.setProviderId("baidu");
-        baidu.setName("百度文心");
-        baidu.setType("baidu");
-        baidu.setEnabled("baidu".equals(defaultProvider));
-        baidu.setDefaultModel("ernie-bot-4");
-        baidu.setTimeout(60000);
-        baidu.setMaxRetries(3);
-        baidu.setFunctionCallingEnabled(true);
-        baidu.setMaxIterations(5);
-        baidu.setCreateTime(System.currentTimeMillis() - 86400000L * 20);
-        baidu.setUpdateTime(System.currentTimeMillis() - 86400000L * 2);
-        baidu.setConfigured(baiduApiKey != null && !baiduApiKey.isEmpty() && baiduSecretKey != null && !baiduSecretKey.isEmpty());
-        
-        List<LlmProviderConfigDTO.ModelConfigDTO> baiduModels = new ArrayList<LlmProviderConfigDTO.ModelConfigDTO>();
-        LlmProviderConfigDTO.ModelConfigDTO ernie4 = new LlmProviderConfigDTO.ModelConfigDTO();
-        ernie4.setModelId("ernie-bot-4");
-        ernie4.setDisplayName("ERNIE Bot 4.0");
-        ernie4.setMaxTokens(8000);
-        ernie4.setTemperature(0.7);
-        ernie4.setSupportsFunctionCalling(true);
-        ernie4.setSupportsMultimodal(false);
-        ernie4.setSupportsEmbedding(false);
-        ernie4.setCostPer1kTokens(0.12);
-        baiduModels.add(ernie4);
-        
-        LlmProviderConfigDTO.ModelConfigDTO ernieTurbo = new LlmProviderConfigDTO.ModelConfigDTO();
-        ernieTurbo.setModelId("ernie-bot-turbo");
-        ernieTurbo.setDisplayName("ERNIE Bot Turbo");
-        ernieTurbo.setMaxTokens(4000);
-        ernieTurbo.setTemperature(0.7);
-        ernieTurbo.setSupportsFunctionCalling(false);
-        ernieTurbo.setSupportsMultimodal(false);
-        ernieTurbo.setSupportsEmbedding(false);
-        ernieTurbo.setCostPer1kTokens(0.008);
-        baiduModels.add(ernieTurbo);
-        
-        baidu.setModels(baiduModels);
-        providers.put(baidu.getProviderId(), baidu);
-        
-        LlmProviderConfigDTO openai = new LlmProviderConfigDTO();
-        openai.setProviderId("openai");
-        openai.setName("OpenAI");
-        openai.setType("openai");
-        openai.setEnabled(false);
-        openai.setDefaultModel("gpt-4-turbo");
-        openai.setTimeout(60000);
-        openai.setMaxRetries(3);
-        openai.setFunctionCallingEnabled(true);
-        openai.setMaxIterations(5);
-        openai.setCreateTime(System.currentTimeMillis() - 86400000L * 10);
-        openai.setUpdateTime(System.currentTimeMillis() - 86400000L * 5);
-        openai.setConfigured(false);
-        
-        List<LlmProviderConfigDTO.ModelConfigDTO> openaiModels = new ArrayList<LlmProviderConfigDTO.ModelConfigDTO>();
-        LlmProviderConfigDTO.ModelConfigDTO gpt4 = new LlmProviderConfigDTO.ModelConfigDTO();
-        gpt4.setModelId("gpt-4-turbo");
-        gpt4.setDisplayName("GPT-4 Turbo");
-        gpt4.setMaxTokens(128000);
-        gpt4.setTemperature(0.7);
-        gpt4.setSupportsFunctionCalling(true);
-        gpt4.setSupportsMultimodal(true);
-        gpt4.setSupportsEmbedding(false);
-        gpt4.setCostPer1kTokens(0.01);
-        openaiModels.add(gpt4);
-        
-        LlmProviderConfigDTO.ModelConfigDTO gpt35 = new LlmProviderConfigDTO.ModelConfigDTO();
-        gpt35.setModelId("gpt-3.5-turbo");
-        gpt35.setDisplayName("GPT-3.5 Turbo");
-        gpt35.setMaxTokens(16000);
-        gpt35.setTemperature(0.7);
-        gpt35.setSupportsFunctionCalling(true);
-        gpt35.setSupportsMultimodal(false);
-        gpt35.setSupportsEmbedding(false);
-        gpt35.setCostPer1kTokens(0.0005);
-        openaiModels.add(gpt35);
-        
-        openai.setModels(openaiModels);
-        providers.put(openai.getProviderId(), openai);
+        for (LlmProviderType providerType : LlmProviderType.values()) {
+            LlmProviderConfigDTO config = createConfigFromType(providerType);
+            providers.put(config.getProviderId(), config);
+        }
         
         log.info("[initProviders] Initialized {} providers, default: {}, model: {}", 
                 providers.size(), defaultProvider, defaultModel);
+    }
+    
+    private LlmProviderConfigDTO createConfigFromType(LlmProviderType providerType) {
+        LlmProviderConfigDTO config = new LlmProviderConfigDTO();
+        config.setProviderId(providerType.getCode());
+        config.setName(providerType.getDisplayName());
+        config.setType(providerType.getCode());
+        config.setEnabled(providerType.getCode().equals(defaultProvider) || 
+                (defaultProvider == null || defaultProvider.isEmpty() && providerType == LlmProviderType.QIANWEN));
+        config.setTimeout(60000);
+        config.setMaxRetries(3);
+        config.setFunctionCallingEnabled(hasFunctionCallingModel(providerType));
+        config.setMaxIterations(5);
+        config.setCreateTime(System.currentTimeMillis() - 86400000L * 30);
+        config.setUpdateTime(System.currentTimeMillis());
+        config.setConfigured(isProviderConfigured(providerType.getCode()));
+        
+        List<LlmProviderConfigDTO.ModelConfigDTO> models = new ArrayList<LlmProviderConfigDTO.ModelConfigDTO>();
+        for (LlmProviderType.ModelInfo modelInfo : providerType.getModels()) {
+            LlmProviderConfigDTO.ModelConfigDTO modelConfig = new LlmProviderConfigDTO.ModelConfigDTO();
+            modelConfig.setModelId(modelInfo.getModelId());
+            modelConfig.setDisplayName(modelInfo.getDisplayName());
+            modelConfig.setMaxTokens(modelInfo.getMaxTokens());
+            modelConfig.setTemperature(modelInfo.getDefaultTemperature());
+            modelConfig.setSupportsFunctionCalling(modelInfo.isSupportsFunctionCalling());
+            modelConfig.setSupportsMultimodal(modelInfo.isSupportsMultimodal());
+            modelConfig.setSupportsEmbedding(modelInfo.isSupportsEmbedding());
+            modelConfig.setCostPer1kTokens(modelInfo.getCostPer1kTokens());
+            models.add(modelConfig);
+        }
+        config.setModels(models);
+        
+        if (!models.isEmpty()) {
+            config.setDefaultModel(defaultModel != null && !defaultModel.isEmpty() ? defaultModel : models.get(0).getModelId());
+        }
+        
+        return config;
+    }
+    
+    private boolean hasFunctionCallingModel(LlmProviderType providerType) {
+        for (LlmProviderType.ModelInfo modelInfo : providerType.getModels()) {
+            if (modelInfo.isSupportsFunctionCalling()) {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    private boolean isProviderConfigured(String providerCode) {
+        switch (providerCode) {
+            case "deepseek":
+                return deepseekApiKey != null && !deepseekApiKey.isEmpty();
+            case "baidu":
+                return baiduApiKey != null && !baiduApiKey.isEmpty() && 
+                       baiduSecretKey != null && !baiduSecretKey.isEmpty();
+            case "qianwen":
+            case "aliyun-bailian":
+                return qianwenApiKey != null && !qianwenApiKey.isEmpty();
+            default:
+                return false;
+        }
     }
 
     @GetMapping("/providers")
@@ -388,23 +284,28 @@ public class LlmProviderController {
         return null;
     }
     
-    private String getApiKeyFromConfig(LlmProviderConfigDTO config, String defaultKey) {
+    private String getApiKeyFromConfig(LlmProviderConfigDTO config, String providerCode) {
         Map<String, Object> providerConfig = config.getProviderConfig();
         if (providerConfig != null && providerConfig.containsKey("apiKey")) {
             return (String) providerConfig.get("apiKey");
         }
         
-        if ("deepseek".equals(defaultKey) && deepseekApiKey != null && !deepseekApiKey.isEmpty()) {
-            return deepseekApiKey;
+        String apiKey = getApiKeyByProviderCode(providerCode);
+        return apiKey;
+    }
+    
+    private String getApiKeyByProviderCode(String providerCode) {
+        switch (providerCode) {
+            case "deepseek":
+                return deepseekApiKey;
+            case "baidu":
+                return baiduApiKey;
+            case "qianwen":
+            case "aliyun-bailian":
+                return qianwenApiKey;
+            default:
+                return null;
         }
-        if ("baidu".equals(defaultKey) && baiduApiKey != null && !baiduApiKey.isEmpty()) {
-            return baiduApiKey;
-        }
-        if ("qianwen".equals(defaultKey) && qianwenApiKey != null && !qianwenApiKey.isEmpty()) {
-            return qianwenApiKey;
-        }
-        
-        return null;
     }
     
     private String getSecretKeyFromConfig(LlmProviderConfigDTO config) {

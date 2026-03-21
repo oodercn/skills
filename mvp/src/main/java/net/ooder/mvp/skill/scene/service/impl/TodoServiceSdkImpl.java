@@ -8,6 +8,7 @@ import net.ooder.skill.common.storage.JsonStorageService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
@@ -16,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 @Service
+@Primary
 public class TodoServiceSdkImpl implements TodoService {
 
     private static final Logger log = LoggerFactory.getLogger(TodoServiceSdkImpl.class);

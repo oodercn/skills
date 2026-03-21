@@ -29,10 +29,10 @@
                         </button>
                         <div>
                             <h2 class="page-title">
-                                <i class="ri-user-star-line"></i>
-                                我的能力
+                                <i class="ri-puzzle-line"></i>
+                                我的技能
                             </h2>
-                            <p class="page-subtitle">查看和管理已安装的能力</p>
+                            <p class="page-subtitle">查看和管理已注册的场景技能</p>
                         </div>
                     </div>
                     <div class="nx-flex nx-items-center nx-gap-3">
@@ -50,7 +50,7 @@
                                     <i class="ri-user-line"></i> 个人中心
                                 </div>
                                 <div class="nx-page__dropdown-item" onclick="window.location.href='my-capabilities.html'">
-                                    <i class="ri-puzzle-line"></i> 我的能力
+                                    <i class="ri-puzzle-line"></i> 我的技能
                                 </div>
                                 <div class="nx-page__dropdown-item nx-page__dropdown-item--danger" onclick="NX.userMenu.logout()">
                                     <i class="ri-logout-box-line"></i> 退出登录
@@ -68,19 +68,24 @@
                 
                 <div class="stats-row">
                     <div class="stat-card" data-category="all" onclick="filterByCategory('all')">
-                        <div class="stat-icon total"><i class="ri-flashlight-line"></i></div>
+                        <div class="stat-icon total"><i class="ri-puzzle-line"></i></div>
                         <div class="stat-value" id="statTotal">0</div>
-                        <div class="stat-label">总能力数</div>
+                        <div class="stat-label">总技能数</div>
                     </div>
-                    <div class="stat-card" onclick="filterByStatus('installed')">
-                        <div class="stat-icon installed"><i class="ri-download-cloud-line"></i></div>
+                    <div class="stat-card" onclick="filterByStatus('ACTIVATED')">
+                        <div class="stat-icon installed"><i class="ri-play-circle-line"></i></div>
+                        <div class="stat-value" id="statActivated">0</div>
+                        <div class="stat-label">已激活</div>
+                    </div>
+                    <div class="stat-card" onclick="filterByStatus('INSTALLED')">
+                        <div class="stat-icon installed"><i class="ri-install-line"></i></div>
                         <div class="stat-value" id="statInstalled">0</div>
                         <div class="stat-label">已安装</div>
                     </div>
-                    <div class="stat-card" onclick="filterByStatus('active')">
-                        <div class="stat-icon active"><i class="ri-play-circle-line"></i></div>
-                        <div class="stat-value" id="statActive">0</div>
-                        <div class="stat-label">运行中</div>
+                    <div class="stat-card" onclick="filterByStatus('DOWNLOADED')">
+                        <div class="stat-icon active"><i class="ri-download-line"></i></div>
+                        <div class="stat-value" id="statDownloaded">0</div>
+                        <div class="stat-label">已下载</div>
                     </div>
                 </div>
                 
@@ -88,37 +93,25 @@
                     <div class="toolbar-left">
                         <div class="search-box">
                             <i class="ri-search-line"></i>
-                            <input type="text" placeholder="搜索能力名称或ID..." id="searchInput" oninput="searchKeyword=this.value;filterCapabilities()">
+                            <input type="text" placeholder="搜索技能名称或ID..." id="searchInput" oninput="searchKeyword=this.value;filterCapabilities()">
                         </div>
                         <div class="filter-group">
                             <div class="filter-group-row">
                                 <span class="filter-label">分类:</span>
                             </div>
-                            <div class="filter-chips-row" id="categoryFilterChipsRow1">
+                            <div class="filter-chips-row" id="categoryFilterChips">
                                 <span class="filter-chip active" data-category="all" onclick="filterByCategory('all')">全部</span>
-                                <span class="filter-chip" data-category="org" onclick="filterByCategory('org')">组织服务</span>
-                                <span class="filter-chip" data-category="vfs" onclick="filterByCategory('vfs')">存储服务</span>
-                                <span class="filter-chip" data-category="llm" onclick="filterByCategory('llm')">LLM服务</span>
-                                <span class="filter-chip" data-category="knowledge" onclick="filterByCategory('knowledge')">知识服务</span>
-                                <span class="filter-chip" data-category="biz" onclick="filterByCategory('biz')">业务场景</span>
-                            </div>
-                            <div class="filter-chips-row" id="categoryFilterChipsRow2">
-                                <span class="filter-chip" data-category="sys" onclick="filterByCategory('sys')">系统管理</span>
-                                <span class="filter-chip" data-category="msg" onclick="filterByCategory('msg')">消息通讯</span>
-                                <span class="filter-chip" data-category="ui" onclick="filterByCategory('ui')">UI生成</span>
-                                <span class="filter-chip" data-category="payment" onclick="filterByCategory('payment')">支付服务</span>
-                                <span class="filter-chip" data-category="media" onclick="filterByCategory('media')">媒体发布</span>
-                                <span class="filter-chip" data-category="util" onclick="filterByCategory('util')">工具服务</span>
-                                <span class="filter-chip" data-category="nexus-ui" onclick="filterByCategory('nexus-ui')">Nexus界面</span>
                             </div>
                         </div>
                         <div class="filter-group">
                             <span class="filter-label">状态:</span>
                             <div class="filter-chips" id="statusFilterChips">
                                 <span class="filter-chip active" data-status="all" onclick="filterByStatus('all')">全部</span>
-                                <span class="filter-chip" data-status="ENABLED" onclick="filterByStatus('ENABLED')">已启用</span>
-                                <span class="filter-chip" data-status="DISABLED" onclick="filterByStatus('DISABLED')">已停用</span>
-                                <span class="filter-chip" data-status="ERROR" onclick="filterByStatus('ERROR')">异常</span>
+                                <span class="filter-chip" data-status="ACTIVATED" onclick="filterByStatus('ACTIVATED')">已激活</span>
+                                <span class="filter-chip" data-status="INSTALLED" onclick="filterByStatus('INSTALLED')">已安装</span>
+                                <span class="filter-chip" data-status="DOWNLOADED" onclick="filterByStatus('DOWNLOADED')">已下载</span>
+                                <span class="filter-chip" data-status="DEV" onclick="filterByStatus('DEV')">开发中</span>
+                                <span class="filter-chip" data-status="DISABLED" onclick="filterByStatus('DISABLED')">已禁用</span>
                             </div>
                         </div>
                         <div class="filter-group">
@@ -128,7 +121,6 @@
                                 <span class="filter-chip" data-type="SERVICE" onclick="filterByType('SERVICE')">服务</span>
                                 <span class="filter-chip" data-type="AI" onclick="filterByType('AI')">AI</span>
                                 <span class="filter-chip" data-type="DATA" onclick="filterByType('DATA')">数据</span>
-                                <span class="filter-chip" data-type="CONNECTOR" onclick="filterByType('CONNECTOR')">连接器</span>
                             </div>
                         </div>
                     </div>
@@ -143,13 +135,13 @@
                     <table>
                         <thead>
                             <tr>
-                                <th>能力</th>
+                                <th>技能</th>
                                 <th>归属类型</th>
-                                <th>能力类型</th>
+                                <th>分类</th>
                                 <th>状态</th>
                                 <th>版本</th>
-                                <th>支持场景</th>
-                                <th>最后调用</th>
+                                <th>包含能力</th>
+                                <th>更新时间</th>
                                 <th>操作</th>
                             </tr>
                         </thead>
@@ -166,7 +158,7 @@
     
     <div class="detail-panel" id="detailPanel">
         <div class="detail-header">
-            <span class="detail-title" id="detailTitle">能力详情</span>
+            <span class="detail-title" id="detailTitle">技能详情</span>
             <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="closeDetailPanel()">
                 <i class="ri-close-line"></i>
             </button>
@@ -176,6 +168,7 @@
     </div>
     
     <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/common/category-service.js"></script>
     <script src="/console/js/capability-config.js"></script>
     <script src="/console/js/api-client.js"></script>
     <script src="/console/js/menu.js"></script>

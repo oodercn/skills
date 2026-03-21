@@ -6,6 +6,7 @@ import net.ooder.mvp.skill.scene.capability.service.CapabilityDiscoveryService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.mvp.skill.scene.capability.model.Capability;
+import net.ooder.mvp.skill.scene.dto.discovery.InvokeResultDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +36,7 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         
         if (request.getType() != null) {
             allCapabilities = allCapabilities.stream()
-                .filter(c -> c.getType() == request.getType())
+                .filter(c -> c.getCapabilityType() == request.getType())
                 .collect(Collectors.toList());
         }
         
@@ -85,10 +86,10 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
             
             CapabilityItem item = convertToItem(cap);
             
-            if (cap.getType() == CapabilityType.SCENE) {
+            if (cap.getCapabilityType() == CapabilityType.SCENE) {
                 sceneCapabilities.add(item);
-            } else if (cap.getType() != CapabilityType.SCENE_GROUP && 
-                       cap.getType() != CapabilityType.CAPABILITY_CHAIN) {
+            } else if (cap.getCapabilityType() != CapabilityType.SCENE_GROUP && 
+                       cap.getCapabilityType() != CapabilityType.CAPABILITY_CHAIN) {
                 collaborationCapabilities.add(item);
             }
         }
@@ -114,7 +115,7 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         detail.setCapabilityId(capability.getCapabilityId());
         detail.setName(capability.getName());
         detail.setDescription(capability.getDescription());
-        detail.setType(capability.getType());
+        detail.setType(capability.getCapabilityType());
         detail.setIcon(capability.getIcon());
         detail.setVersion(capability.getVersion());
         detail.setInstalled(capabilityStateService != null 
@@ -172,7 +173,7 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
     }
 
     @Override
-    public Object invokeCapability(String capabilityId, Map<String, Object> params) {
+    public InvokeResultDTO invokeCapability(String capabilityId, Map<String, Object> params) {
         log.info("[invokeCapability] Invoking capability: {} with params: {}", capabilityId, params);
         
         Capability capability = capabilityService.findById(capabilityId);
@@ -180,13 +181,13 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
             throw new RuntimeException("Capability not found: " + capabilityId);
         }
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("capabilityId", capabilityId);
-        result.put("name", capability.getName());
-        result.put("invokedAt", System.currentTimeMillis());
-        result.put("params", params);
-        result.put("status", "invoked");
-        result.put("message", "Capability invoked successfully");
+        InvokeResultDTO result = new InvokeResultDTO();
+        result.setCapabilityId(capabilityId);
+        result.setName(capability.getName());
+        result.setInvokedAt(System.currentTimeMillis());
+        result.setParams(params);
+        result.setStatus("invoked");
+        result.setMessage("Capability invoked successfully");
         
         return result;
     }
@@ -196,7 +197,7 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         item.setCapabilityId(cap.getCapabilityId());
         item.setName(cap.getName());
         item.setDescription(cap.getDescription());
-        item.setType(cap.getType());
+        item.setType(cap.getCapabilityType());
         item.setIcon(cap.getIcon());
         item.setVersion(cap.getVersion());
         item.setInstalled(capabilityStateService != null 
@@ -210,7 +211,7 @@ public class CapabilityDiscoveryServiceImpl implements CapabilityDiscoveryServic
         item.setVisibility(cap.getVisibility());
         item.setParticipants(convertParticipants(cap));
         
-        if (cap.getType() == CapabilityType.SCENE) {
+        if (cap.getCapabilityType() == CapabilityType.SCENE) {
             List<DriverConditionInfo> conditions = getDriverConditions(cap.getCapabilityId())
                 .stream()
                 .map(dc -> {

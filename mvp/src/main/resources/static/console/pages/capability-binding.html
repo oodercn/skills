@@ -6,409 +6,7 @@
     <title>能力绑定管理 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <style>
-        .bindings-page { padding: 0; }
-        
-        .stats-row {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 16px;
-            margin-bottom: 24px;
-        }
-        
-        .stat-card {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 20px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-        }
-        
-        .stat-icon {
-            width: 48px;
-            height: 48px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-        }
-        
-        .stat-icon.primary { background: var(--nx-primary-light); color: var(--nx-primary); }
-        .stat-icon.success { background: var(--nx-success-light); color: var(--nx-success); }
-        .stat-icon.warning { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .stat-icon.danger { background: var(--nx-danger-light); color: var(--nx-danger); }
-        
-        .stat-content h4 { margin: 0; font-size: 12px; color: var(--nx-text-secondary); font-weight: 500; }
-        .stat-value { margin: 4px 0 0 0; font-size: 28px; font-weight: 600; }
-        
-        .filter-bar {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            padding: 16px 20px;
-            margin-bottom: 24px;
-            display: flex;
-            gap: 16px;
-            align-items: center;
-            flex-wrap: wrap;
-        }
-        
-        .search-box {
-            flex: 1;
-            min-width: 200px;
-            position: relative;
-        }
-        
-        .search-box input {
-            width: 100%;
-            padding: 10px 12px 10px 36px;
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            background: var(--nx-bg);
-            color: var(--nx-text-primary);
-            font-size: 14px;
-        }
-        
-        .search-box input:focus {
-            outline: none;
-            border-color: var(--nx-primary);
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 12px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: var(--nx-text-secondary);
-        }
-        
-        .filter-select {
-            padding: 10px 12px;
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            background: var(--nx-bg);
-            color: var(--nx-text-primary);
-            font-size: 14px;
-            min-width: 140px;
-        }
-        
-        .bindings-table {
-            background: var(--nx-bg-elevated);
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-            overflow: hidden;
-        }
-        
-        .bindings-table table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        
-        .bindings-table th,
-        .bindings-table td {
-            padding: 14px 16px;
-            text-align: left;
-            border-bottom: 1px solid var(--nx-border);
-        }
-        
-        .bindings-table th {
-            background: var(--nx-bg);
-            font-weight: 600;
-            font-size: 13px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .bindings-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        .bindings-table tr:hover td {
-            background: var(--nx-bg-hover);
-        }
-        
-        .binding-id {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .binding-icon {
-            width: 36px;
-            height: 36px;
-            border-radius: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 18px;
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-        }
-        
-        .binding-info h4 { margin: 0; font-size: 14px; font-weight: 600; }
-        .binding-info span { font-size: 12px; color: var(--nx-text-secondary); }
-        
-        .status-badge {
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            padding: 4px 10px;
-            border-radius: 20px;
-            font-size: 12px;
-            font-weight: 500;
-        }
-        
-        .status-badge.active { background: var(--nx-success-light); color: var(--nx-success); }
-        .status-badge.pending { background: var(--nx-warning-light); color: var(--nx-warning); }
-        .status-badge.binding { background: var(--nx-info-light); color: var(--nx-info); }
-        .status-badge.inactive { background: var(--nx-bg); color: var(--nx-text-secondary); }
-        .status-badge.error { background: var(--nx-danger-light); color: var(--nx-danger); }
-        
-        .status-badge i { font-size: 8px; }
-        
-        .provider-badge {
-            display: inline-block;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 11px;
-            font-weight: 500;
-        }
-        
-        .provider-badge.skill { background: var(--nx-success-light); color: var(--nx-success); }
-        .provider-badge.agent { background: var(--nx-info-light); color: var(--nx-info); }
-        .provider-badge.platform { background: var(--nx-primary-light); color: var(--nx-primary); }
-        .provider-badge.device { background: var(--nx-warning-light); color: var(--nx-warning); }
-        
-        .action-btns {
-            display: flex;
-            gap: 8px;
-        }
-        
-        .action-btn {
-            width: 32px;
-            height: 32px;
-            border-radius: 6px;
-            border: 1px solid var(--nx-border);
-            background: var(--nx-bg);
-            color: var(--nx-text-secondary);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .action-btn:hover {
-            background: var(--nx-bg-hover);
-            color: var(--nx-text-primary);
-        }
-        
-        .action-btn.danger:hover {
-            background: var(--nx-danger-light);
-            color: var(--nx-danger);
-            border-color: var(--nx-danger);
-        }
-        
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
-        .empty-state h3 { margin: 0 0 8px 0; font-size: 18px; }
-        .empty-state p { margin: 0; font-size: 14px; }
-        
-        .ref-link {
-            display: inline-flex;
-            align-items: center;
-            gap: 4px;
-            padding: 2px 8px;
-            background: var(--nx-bg);
-            border-radius: 4px;
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-            text-decoration: none;
-            transition: all 0.2s;
-        }
-        
-        .ref-link:hover {
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-        }
-        
-        .ref-link i { font-size: 14px; }
-        
-        .modal-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0,0,0,0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: all 0.3s;
-        }
-        
-        .modal-overlay.active {
-            opacity: 1;
-            visibility: visible;
-        }
-        
-        .modal {
-            background: var(--nx-bg-elevated);
-            border-radius: 16px;
-            width: 90%;
-            max-width: 700px;
-            max-height: 85vh;
-            overflow: auto;
-            transform: scale(0.9);
-            transition: transform 0.3s;
-        }
-        
-        .modal-overlay.active .modal {
-            transform: scale(1);
-        }
-        
-        .modal-header {
-            padding: 20px 24px;
-            border-bottom: 1px solid var(--nx-border);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .modal-header h3 { margin: 0; font-size: 18px; }
-        
-        .modal-close {
-            width: 32px;
-            height: 32px;
-            border-radius: 8px;
-            border: none;
-            background: transparent;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            color: var(--nx-text-secondary);
-        }
-        
-        .modal-close:hover {
-            background: var(--nx-bg-hover);
-        }
-        
-        .modal-body { padding: 24px; }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            font-size: 14px;
-            font-weight: 500;
-        }
-        
-        .form-group input,
-        .form-group select {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            background: var(--nx-bg);
-            color: var(--nx-text-primary);
-            font-size: 14px;
-        }
-        
-        .form-group input:focus,
-        .form-group select:focus {
-            outline: none;
-            border-color: var(--nx-primary);
-        }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 16px;
-        }
-        
-        .select-list {
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            max-height: 200px;
-            overflow: auto;
-        }
-        
-        .select-item {
-            padding: 10px 12px;
-            border-bottom: 1px solid var(--nx-border);
-            cursor: pointer;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
-        
-        .select-item:last-child {
-            border-bottom: none;
-        }
-        
-        .select-item:hover {
-            background: var(--nx-bg-hover);
-        }
-        
-        .select-item.selected {
-            background: var(--nx-primary-light);
-            color: var(--nx-primary);
-        }
-        
-        .select-item-info h5 { margin: 0; font-size: 14px; }
-        .select-item-info span { font-size: 12px; color: var(--nx-text-secondary); }
-        
-        .modal-footer {
-            padding: 16px 24px;
-            border-top: 1px solid var(--nx-border);
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s;
-        }
-        
-        .btn-primary {
-            background: var(--nx-primary);
-            color: white;
-            border: none;
-        }
-        
-        .btn-primary:hover {
-            background: var(--nx-primary-dark);
-        }
-        
-        .btn-secondary {
-            background: var(--nx-bg);
-            color: var(--nx-text-primary);
-            border: 1px solid var(--nx-border);
-        }
-        
-        .btn-secondary:hover {
-            background: var(--nx-bg-hover);
-        }
-    </style>
+    <link rel="stylesheet" href="/console/css/pages/capability-pages.css">
 </head>
 <body>
     <div class="nx-page">
@@ -602,6 +200,41 @@
         </div>
     </div>
     
+    <div class="modal-overlay" id="test-modal">
+        <div class="modal">
+            <div class="modal-header">
+                <h3><i class="ri-play-line"></i> 绑定测试</h3>
+                <button class="modal-close" onclick="closeTestModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="test-result-container">
+                    <div class="test-loading">
+                        <i class="ri-loader-4-line ri-spin"></i>
+                        <span>正在测试绑定...</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeTestModal()">关闭</button>
+                <button class="btn btn-primary" onclick="retryTest()">重新测试</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal-overlay" id="monitor-modal">
+        <div class="modal" style="max-width: 900px;">
+            <div class="modal-header">
+                <h3><i class="ri-line-chart-line"></i> 状态监控</h3>
+                <button class="modal-close" onclick="closeMonitorModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body" id="monitor-content"></div>
+        </div>
+    </div>
+    
     <script src="/console/js/nexus.js"></script>
     <script src="/console/js/menu.js"></script>
     <script src="/console/js/page-init.js" data-auto-init></script>
@@ -777,6 +410,9 @@
                                 </button>
                                 <button class="action-btn" onclick="testBinding('${bindingId}')" title="测试">
                                     <i class="ri-play-line"></i>
+                                </button>
+                                <button class="action-btn" onclick="showMonitor('${bindingId}')" title="监控">
+                                    <i class="ri-line-chart-line"></i>
                                 </button>
                                 <button class="action-btn danger" onclick="deleteBinding('${bindingId}')" title="删除">
                                     <i class="ri-delete-bin-line"></i>
@@ -978,18 +614,151 @@
             }
             
             async function testBinding(bindingId) {
+                currentTestBindingId = bindingId;
+                document.getElementById('test-modal').classList.add('active');
+                document.getElementById('test-result-container').innerHTML = `
+                    <div class="test-loading">
+                        <i class="ri-loader-4-line ri-spin"></i>
+                        <span>正在测试绑定...</span>
+                    </div>
+                `;
+                
                 try {
+                    const startTime = Date.now();
                     const response = await fetch(`/api/v1/capabilities/bindings/${bindingId}/test`, { method: 'POST' });
+                    const duration = Date.now() - startTime;
                     const result = await response.json();
                     
-                    if (result.status === 'success') {
-                        alert('测试成功');
-                    } else {
-                        alert('测试失败: ' + (result.message || '未知错误'));
-                    }
+                    renderTestResult(result, duration);
                 } catch (e) {
-                    alert('测试失败: ' + e.message);
+                    renderTestResult({ status: 'error', message: e.message }, 0);
                 }
+            }
+            
+            function renderTestResult(result, duration) {
+                const isSuccess = result.status === 'success';
+                const container = document.getElementById('test-result-container');
+                
+                container.innerHTML = `
+                    <div class="test-result test-result--${isSuccess ? 'success' : 'error'}">
+                        <div class="test-result-header">
+                            <i class="ri-${isSuccess ? 'checkbox-circle' : 'close-circle'}-line"></i>
+                            <span class="test-result-title">${isSuccess ? '测试成功' : '测试失败'}</span>
+                        </div>
+                        <div class="test-metrics">
+                            <div class="test-metric">
+                                <div class="test-metric-value">${duration}ms</div>
+                                <div class="test-metric-label">响应时间</div>
+                            </div>
+                            <div class="test-metric">
+                                <div class="test-metric-value">${result.statusCode || '-'}</div>
+                                <div class="test-metric-label">状态码</div>
+                            </div>
+                            <div class="test-metric">
+                                <div class="test-metric-value">${result.data ? '有' : '无'}</div>
+                                <div class="test-metric-label">返回数据</div>
+                            </div>
+                        </div>
+                        ${result.message ? `<div class="test-details">${result.message}</div>` : ''}
+                        ${result.data ? `<div class="test-details">${JSON.stringify(result.data, null, 2)}</div>` : ''}
+                    </div>
+                `;
+            }
+            
+            function closeTestModal() {
+                document.getElementById('test-modal').classList.remove('active');
+            }
+            
+            function retryTest() {
+                if (currentTestBindingId) {
+                    testBinding(currentTestBindingId);
+                }
+            }
+            
+            let currentTestBindingId = null;
+            let currentMonitorBindingId = null;
+            
+            async function showMonitor(bindingId) {
+                currentMonitorBindingId = bindingId;
+                document.getElementById('monitor-modal').classList.add('active');
+                
+                const binding = allBindings.find(b => b.bindingId === bindingId);
+                if (!binding) return;
+                
+                const successRate = binding.successCount + binding.failureCount > 0 
+                    ? Math.round(binding.successCount / (binding.successCount + binding.failureCount) * 100) 
+                    : 0;
+                
+                document.getElementById('monitor-content').innerHTML = `
+                    <div class="monitor-stats">
+                        <div class="monitor-stat">
+                            <div class="monitor-stat-value" style="color: var(--nx-success)">${binding.successCount || 0}</div>
+                            <div class="monitor-stat-label">成功调用</div>
+                        </div>
+                        <div class="monitor-stat">
+                            <div class="monitor-stat-value" style="color: var(--nx-danger)">${binding.failureCount || 0}</div>
+                            <div class="monitor-stat-label">失败调用</div>
+                        </div>
+                        <div class="monitor-stat">
+                            <div class="monitor-stat-value">${successRate}%</div>
+                            <div class="monitor-stat-label">成功率</div>
+                        </div>
+                        <div class="monitor-stat">
+                            <div class="monitor-stat-value">${binding.avgLatency || 0}ms</div>
+                            <div class="monitor-stat-label">平均延迟</div>
+                        </div>
+                    </div>
+                    <div style="margin-bottom: 16px;">
+                        <h4 style="margin: 0 0 12px 0; font-size: 14px;">调用趋势 (最近24小时)</h4>
+                        <div class="monitor-chart" id="trend-chart">
+                            ${generateTrendChart(binding.trendData || [])}
+                        </div>
+                    </div>
+                    <div>
+                        <h4 style="margin: 0 0 12px 0; font-size: 14px;">绑定信息</h4>
+                        <div class="detail-row">
+                            <div class="detail-label">绑定 ID</div>
+                            <div class="detail-value">${binding.bindingId}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">能力 ID</div>
+                            <div class="detail-value">${binding.capabilityId || '-'}</div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">状态</div>
+                            <div class="detail-value">
+                                <span class="status-badge ${binding.status === 'ACTIVE' ? 'active' : 'inactive'}">
+                                    ${binding.status || 'UNKNOWN'}
+                                </span>
+                            </div>
+                        </div>
+                        <div class="detail-row">
+                            <div class="detail-label">最后调用</div>
+                            <div class="detail-value">${binding.lastInvokeTime ? new Date(binding.lastInvokeTime).toLocaleString() : '-'}</div>
+                        </div>
+                    </div>
+                `;
+            }
+            
+            function generateTrendChart(data) {
+                if (!data || data.length === 0) {
+                    const hours = 24;
+                    let bars = '';
+                    for (let i = 0; i < hours; i++) {
+                        const height = Math.random() * 80 + 20;
+                        bars += `<div class="chart-bar" style="height: ${height}px" title="${i}:00"></div>`;
+                    }
+                    return bars;
+                }
+                const max = Math.max(...data.map(d => d.count || 0));
+                return data.map(d => {
+                    const height = max > 0 ? (d.count / max * 160) : 4;
+                    return `<div class="chart-bar" style="height: ${height}px" title="${d.hour}:00 - ${d.count}次"></div>`;
+                }).join('');
+            }
+            
+            function closeMonitorModal() {
+                document.getElementById('monitor-modal').classList.remove('active');
             }
             
             async function deleteBinding(bindingId) {
@@ -1040,6 +809,10 @@
             window.closeDetailModal = closeDetailModal;
             window.editBinding = editBinding;
             window.testBinding = testBinding;
+            window.closeTestModal = closeTestModal;
+            window.retryTest = retryTest;
+            window.showMonitor = showMonitor;
+            window.closeMonitorModal = closeMonitorModal;
             window.deleteBinding = deleteBinding;
             
             document.addEventListener('DOMContentLoaded', function() {

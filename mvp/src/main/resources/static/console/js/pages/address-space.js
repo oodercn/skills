@@ -1,43 +1,30 @@
 var AddressSpace = {
-    categories: [
-        { code: 'org', name: '组织服务', range: '0x00-0x07', base: 0x00, color: '#8b5cf6', icon: 'ri-team-line', userFacing: false },
-        { code: 'vfs', name: '存储服务', range: '0x08-0x0F', base: 0x08, color: '#f5970b', icon: 'ri-database-2-line', userFacing: false },
-        { code: 'llm', name: 'LLM服务', range: '0x10-0x17', base: 0x10, color: '#9334ff', icon: 'ri-brain-line', userFacing: true },
-        { code: 'knowledge', name: '知识服务', range: '0x18-0x1F', base: 0x18, color: '#10b981', icon: 'ri-book-line', userFacing: true },
-        { code: 'biz', name: '业务场景', range: '0x20-0x27', base: 0x20, color: '#f97316', icon: 'ri-briefcase-line', userFacing: true },
-        { code: 'sys', name: '系统管理', range: '0x28-0x2F', base: 0x28, color: '#6366f1', icon: 'ri-settings-3-line', userFacing: false },
-        { code: 'msg', name: '消息通讯', range: '0x30-0x37', base: 0x30, color: '#f97b72', icon: 'ri-message-3-line', userFacing: false },
-        { code: 'ui', name: 'UI生成', range: '0x38-0x3F', base: 0x38, color: '#ec4899', icon: 'ri-palette-line', userFacing: false },
-        { code: 'payment', name: '支付服务', range: '0x40-0x47', base: 0x40, color: '#8b5cf6', icon: 'ri-bank-card-line', userFacing: false },
-        { code: 'media', name: '媒体发布', range: '0x48-0x4F', base: 0x48, color: '#f5970b', icon: 'ri-edit-line', userFacing: false },
-        { code: 'util', name: '工具服务', range: '0x50-0x57', base: 0x50, color: '#4f46e5', icon: 'ri-tools-line', userFacing: true },
-        { code: 'nexus-ui', name: 'Nexus界面', range: '0x58-0x5F', base: 0x58, color: '#6366f1', icon: 'ri-layout-line', userFacing: false }
-    ],
-    
+    categories: [],
     addresses: [],
     statusData: {},
     
     init: function() {
-        this.loadAddresses();
-        this.loadStatus();
+        var self = this;
+        CategoryService.loadCategories().then(function(categories) {
+            self.categories = categories.map(function(cat, index) {
+                var base = index * 8;
+                return {
+                    code: cat.code,
+                    name: cat.name,
+                    range: '0x' + base.toString(16).toUpperCase().padStart(2, '0') + '-0x' + (base + 7).toString(16).toUpperCase().padStart(2, '0'),
+                    base: base,
+                    color: cat.color,
+                    icon: cat.icon,
+                    userFacing: cat.userFacing
+                };
+            });
+            self.loadAddresses();
+            self.loadStatus();
+        });
     },
     
     getCategoryColor: function(categoryId) {
-        var colors = {
-            'org': '#8b5cf6',
-            'vfs': '#f5970b',
-            'llm': '#9334ff',
-            'knowledge': '#10b981',
-            'biz': '#f97316',
-            'sys': '#6366f1',
-            'msg': '#f97b72',
-            'ui': '#ec4899',
-            'payment': '#8b5cf6',
-            'media': '#f5970b',
-            'util': '#4f46e5',
-            'nexus-ui': '#6366f1'
-        };
-        return colors[categoryId] || '#6b7280';
+        return CategoryService.getColor(categoryId);
     },
     
     loadAddresses: function() {

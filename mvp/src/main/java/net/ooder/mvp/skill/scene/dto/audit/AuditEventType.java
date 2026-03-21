@@ -32,6 +32,13 @@ public enum AuditEventType implements DictItem {
     USER_LOGOUT("USER_LOGOUT", "用户登出", "用户登出系统操作", "ri-logout-box-line", 61),
     
     CONFIG_CHANGE("CONFIG_CHANGE", "配置变更", "系统配置变更操作", "ri-settings-3-line", 70),
+    CONFIG_DB("CONFIG_DB", "数据库配置", "数据库连接配置变更", "ri-database-2-line", 71),
+    CONFIG_LLM("CONFIG_LLM", "LLM配置", "大语言模型配置变更", "ri-robot-line", 72),
+    CONFIG_ORG("CONFIG_ORG", "组织配置", "组织管理配置变更", "ri-team-line", 73),
+    CONFIG_AUTH("CONFIG_AUTH", "认证配置", "认证授权配置变更", "ri-shield-line", 74),
+    CONFIG_VFS("CONFIG_VFS", "存储配置", "文件系统配置变更", "ri-folder-line", 75),
+    CONFIG_COMM("CONFIG_COMM", "通信配置", "消息通知配置变更", "ri-message-line", 76),
+    CONFIG_KNOWLEDGE("CONFIG_KNOWLEDGE", "知识库配置", "知识库配置变更", "ri-book-line", 77),
     
     SECURITY_EVENT("SECURITY_EVENT", "安全事件", "安全相关事件", "ri-shield-line", 80),
     

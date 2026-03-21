@@ -1,0 +1,139 @@
+.skill-page {
+    padding: 0;
+}
+
+.skill-toolbar {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+}
+
+.skill-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 24px;
+}
+
+.skill-info {
+    display: flex;
+    gap: 16px;
+    align-items: flex-start;
+}
+
+.skill-icon {
+    width: 64px;
+    height: 64px;
+    border-radius: 12px;
+    background: var(--nx-primary-light);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 32px;
+    color: var(--nx-primary);
+}
+
+.skill-details h2 {
+    margin: 0 0 4px 0;
+    font-size: 20px;
+}
+
+.skill-meta {
+    display: flex;
+    gap: 16px;
+    font-size: 13px;
+    color: var(--nx-text-secondary);
+}
+
+.skill-status {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.skill-status.active {
+    background: var(--nx-success-light);
+    color: var(--nx-success);
+}
+
+.skill-status.inactive {
+    background: var(--nx-bg);
+    color: var(--nx-text-secondary);
+}
+
+.skill-status.developing {
+    background: var(--nx-warning-light);
+    color: var(--nx-warning);
+}
+
+.skill-card {
+    background: var(--nx-bg-elevated);
+    border: 1px solid var(--nx-border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+
+.skill-card-header {
+    padding: 16px 20px;
+    border-bottom: 1px solid var(--nx-border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.skill-card-title {
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.skill-card-body {
+    padding: 20px;
+}
+
+.skill-param-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.skill-param-table th,
+.skill-param-table td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid var(--nx-border);
+}
+
+.skill-param-table th {
+    width: 150px;
+    font-weight: 500;
+    color: var(--nx-text-secondary);
+    background: var(--nx-bg);
+}
+
+.skill-param-name {
+    font-family: monospace;
+    color: var(--nx-primary);
+}
+
+.skill-param-type {
+    padding: 2px 8px;
+    background: var(--nx-bg);
+    border-radius: 4px;
+    font-size: 11px;
+}
+
+.skill-code-block {
+    background: var(--nx-bg);
+    border-radius: 8px;
+    padding: 16px;
+    font-family: monospace;
+    font-size: 13px;
+    overflow-x: auto;
+}

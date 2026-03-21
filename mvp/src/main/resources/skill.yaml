@@ -70,6 +70,19 @@ spec:
       description: 提供能力注册、发现、验证
       category: service
   
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    systemPromptFile: "prompts/system-prompt.md"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    rolePrompts:
+      discovery-assistant: "你是一个能力发现助手，帮助用户发现和安装能力。"
+      install-assistant: "你是一个安装向导助手，帮助用户完成能力安装配置。"
+  
   profiles:
     - name: micro
       description: 微型部署

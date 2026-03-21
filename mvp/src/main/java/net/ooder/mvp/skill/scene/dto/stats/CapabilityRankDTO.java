@@ -11,6 +11,8 @@ public class CapabilityRankDTO {
     private int successCount;
     private double avgResponseTime;
     private double successRate;
+    private String category;
+    private String status;
 
     public CapabilityRankDTO() {
     }
@@ -69,5 +71,21 @@ public class CapabilityRankDTO {
 
     public void setSuccessRate(double successRate) {
         this.successRate = successRate;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

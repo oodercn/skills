@@ -6,47 +6,20 @@ var DriverConfig = {
     currentDriver: null,
 
     init: function() {
-        this.loadCategories();
-        this.loadDrivers();
-        this.loadConfigs();
-    },
-
-    loadCategories: function() {
         var self = this;
-        ApiClient.get('/api/v1/config/categories')
-            .then(function(result) {
-                if (result.status === 'success' && result.data) {
-                    self.categories = result.data;
-                    self.renderTabs();
-                }
-            })
-            .catch(function(error) {
-                console.error('[loadCategories] Error:', error);
-                self.loadMockCategories();
+        CategoryService.loadCategories().then(function(categories) {
+            self.categories = categories.map(function(cat) {
+                return {
+                    code: cat.code,
+                    name: cat.name,
+                    icon: cat.icon,
+                    color: cat.color
+                };
             });
-    },
-
-    loadMockCategories: function() {
-        this.categories = [
-            { code: 'llm', name: '大语言模型', icon: 'ri-robot-line', color: '#2f54eb' },
-            { code: 'db', name: '数据库', icon: 'ri-database-2-line', color: '#52c41a' },
-            { code: 'vfs', name: '文件存储', icon: 'ri-folder-line', color: '#fa8c16' },
-            { code: 'org', name: '组织服务', icon: 'ri-team-line', color: '#722ed1' },
-            { code: 'know', name: '知识库', icon: 'ri-book-2-line', color: '#faad14' },
-            { code: 'comm', name: '通讯服务', icon: 'ri-message-3-line', color: '#1890ff' },
-            { code: 'auth', name: '认证服务', icon: 'ri-shield-keyhole-line', color: '#eb2f96' },
-            { code: 'mon', name: '监控服务', icon: 'ri-line-chart-line', color: '#595959' },
-            { code: 'payment', name: '支付服务', icon: 'ri-bank-card-line', color: '#f5222d' },
-            { code: 'media', name: '媒体服务', icon: 'ri-video-line', color: '#eb2f96' },
-            { code: 'search', name: '搜索服务', icon: 'ri-search-line', color: '#722ed1' },
-            { code: 'sched', name: '调度服务', icon: 'ri-time-line', color: '#fa8c16' },
-            { code: 'sec', name: '安全服务', icon: 'ri-lock-line', color: '#f5222d' },
-            { code: 'iot', name: '物联网', icon: 'ri-cpu-line', color: '#52c41a' },
-            { code: 'net', name: '网络服务', icon: 'ri-global-line', color: '#13c2c2' },
-            { code: 'sys', name: '系统核心', icon: 'ri-settings-3-line', color: '#1890ff' },
-            { code: 'util', name: '工具服务', icon: 'ri-tools-line', color: '#8c8c8c' }
-        ];
-        this.renderTabs();
+            self.loadDrivers();
+            self.loadConfigs();
+            self.renderTabs();
+        });
     },
 
     loadDrivers: function() {

@@ -6,264 +6,7 @@
     <title>创建能力 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
-    <style>
-        .create-page { padding: 20px; max-width: 900px; margin: 0 auto; }
-        
-        .page-header {
-            margin-bottom: 24px;
-        }
-        
-        .page-title {
-            font-size: 24px;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        
-        .page-title i { color: var(--nx-primary); }
-        
-        .page-subtitle {
-            color: var(--nx-text-secondary);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-        
-        .create-tabs {
-            display: flex;
-            gap: 8px;
-            margin-bottom: 24px;
-            background: var(--nx-bg-elevated);
-            padding: 8px;
-            border-radius: 12px;
-            border: 1px solid var(--nx-border);
-        }
-        
-        .create-tab {
-            flex: 1;
-            padding: 16px;
-            border-radius: 8px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.2s;
-            border: 2px solid transparent;
-        }
-        
-        .create-tab:hover { background: var(--nx-bg-hover); }
-        .create-tab.active { background: var(--nx-primary-light); border-color: var(--nx-primary); }
-        
-        .tab-icon {
-            font-size: 32px;
-            margin-bottom: 8px;
-            color: var(--nx-text-secondary);
-        }
-        
-        .create-tab.active .tab-icon { color: var(--nx-primary); }
-        
-        .tab-name { font-weight: 500; font-size: 15px; }
-        .tab-desc { font-size: 12px; color: var(--nx-text-secondary); margin-top: 4px; }
-        
-        .create-form {
-            background: var(--nx-bg-elevated);
-            border: 1px solid var(--nx-border);
-            border-radius: 12px;
-            padding: 24px;
-        }
-        
-        .form-section {
-            margin-bottom: 24px;
-        }
-        
-        .form-section:last-child { margin-bottom: 0; }
-        
-        .section-title {
-            font-weight: 600;
-            margin-bottom: 16px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            padding-bottom: 8px;
-            border-bottom: 1px solid var(--nx-border);
-        }
-        
-        .section-title i { color: var(--nx-primary); }
-        
-        .form-row {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 16px;
-            margin-bottom: 16px;
-        }
-        
-        .form-row.single { grid-template-columns: 1fr; }
-        
-        .form-group { margin-bottom: 0; }
-        
-        .form-label {
-            display: block;
-            font-size: 13px;
-            font-weight: 500;
-            margin-bottom: 6px;
-        }
-        
-        .form-label .required { color: var(--nx-danger); }
-        
-        .form-input, .form-select, .form-textarea {
-            width: 100%;
-            padding: 10px 12px;
-            border: 1px solid var(--nx-border);
-            border-radius: 6px;
-            background: var(--nx-bg);
-            font-size: 14px;
-        }
-        
-        .form-textarea { min-height: 100px; resize: vertical; }
-        
-        .form-input:focus, .form-select:focus, .form-textarea:focus {
-            outline: none;
-            border-color: var(--nx-primary);
-        }
-        
-        .form-hint {
-            font-size: 12px;
-            color: var(--nx-text-secondary);
-            margin-top: 4px;
-        }
-        
-        .llm-section {
-            display: none;
-        }
-        
-        .llm-section.show { display: block; }
-        
-        .llm-prompt-box {
-            background: var(--nx-bg);
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        
-        .llm-prompt-box textarea {
-            border: none;
-            background: transparent;
-            width: 100%;
-            min-height: 150px;
-            resize: vertical;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-        
-        .llm-prompt-box textarea:focus { outline: none; }
-        
-        .llm-actions {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid var(--nx-border);
-        }
-        
-        .llm-provider-select {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .llm-provider-select select {
-            padding: 6px 12px;
-            border: 1px solid var(--nx-border);
-            border-radius: 6px;
-            background: var(--nx-bg-elevated);
-        }
-        
-        .generated-preview {
-            background: var(--nx-bg);
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            padding: 16px;
-            margin-top: 16px;
-            display: none;
-        }
-        
-        .generated-preview.show { display: block; }
-        
-        .preview-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        
-        .preview-title { font-weight: 600; }
-        
-        .preview-code {
-            background: #1e1e1e;
-            color: #d4d4d4;
-            padding: 16px;
-            border-radius: 6px;
-            font-family: monospace;
-            font-size: 13px;
-            overflow-x: auto;
-            white-space: pre-wrap;
-        }
-        
-        .param-list {
-            border: 1px solid var(--nx-border);
-            border-radius: 8px;
-            overflow: hidden;
-        }
-        
-        .param-item {
-            display: grid;
-            grid-template-columns: 1fr 1fr 100px 40px;
-            gap: 8px;
-            padding: 12px;
-            border-bottom: 1px solid var(--nx-border);
-            align-items: center;
-        }
-        
-        .param-item:last-child { border-bottom: none; }
-        
-        .param-item input {
-            padding: 8px;
-            border: 1px solid var(--nx-border);
-            border-radius: 4px;
-            background: var(--nx-bg);
-        }
-        
-        .param-item select {
-            padding: 8px;
-            border: 1px solid var(--nx-border);
-            border-radius: 4px;
-            background: var(--nx-bg);
-        }
-        
-        .add-param-btn {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 12px;
-            background: var(--nx-bg);
-            border: 1px dashed var(--nx-border);
-            border-radius: 8px;
-            cursor: pointer;
-            margin-top: 8px;
-            color: var(--nx-primary);
-        }
-        
-        .add-param-btn:hover { background: var(--nx-bg-hover); }
-        
-        .form-actions {
-            display: flex;
-            justify-content: flex-end;
-            gap: 12px;
-            margin-top: 24px;
-            padding-top: 24px;
-            border-top: 1px solid var(--nx-border);
-        }
-    </style>
+    <link rel="stylesheet" href="/console/css/pages/capability-pages.css">
 </head>
 <body>
     <div class="nx-page">
@@ -370,6 +113,37 @@
                                     <option value="SECURITY">安全能力 - 认证、加密</option>
                                     <option value="MONITORING">监控能力 - 日志、指标</option>
                                     <option value="CUSTOM">自定义能力 - 用户自定义</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">业务分类 <span class="required">*</span></label>
+                                <select class="form-select" id="capabilityCategory">
+                                    <option value="">选择业务分类</option>
+                                    <option value="LLM">LLM服务 - 大语言模型、对话、上下文管理</option>
+                                    <option value="KNOWLEDGE">知识服务 - 知识库、RAG、向量存储</option>
+                                    <option value="BIZ">业务场景 - 业务场景能力、智能助手</option>
+                                    <option value="UTIL">工具服务 - 通用工具、辅助服务</option>
+                                    <option value="ORG">组织服务 - 企业组织架构、用户认证</option>
+                                    <option value="VFS">存储服务 - 文件存储、对象存储</option>
+                                    <option value="SYS">系统管理 - 系统监控、网络管理</option>
+                                    <option value="MSG">消息通讯 - 消息队列、通讯协议</option>
+                                    <option value="UI">UI生成 - 界面生成、设计转代码</option>
+                                    <option value="PAYMENT">支付服务 - 支付渠道、退款管理</option>
+                                    <option value="MEDIA">媒体发布 - 自媒体文章发布</option>
+                                    <option value="NEXUS_UI">Nexus界面 - 管理界面、仪表盘</option>
+                                </select>
+                                <div class="form-hint">选择能力所属的业务领域分类</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">技能形态</label>
+                                <select class="form-select" id="skillForm">
+                                    <option value="STANDALONE">独立技能 - 原子型技能，直接提供服务</option>
+                                    <option value="SCENE">场景技能 - 容器型技能，可包含子技能</option>
+                                    <option value="PROVIDER">能力服务 - 提供基础能力的技能</option>
+                                    <option value="DRIVER">驱动适配 - 驱动场景运行的技能</option>
+                                    <option value="INTERNAL">内部服务 - 系统内部使用的技能</option>
                                 </select>
                             </div>
                             <div class="form-group">

@@ -14,8 +14,12 @@
             systemPrompt: '',
             temperature: 0.7,
             maxTokens: 2048,
-            streamEnabled: true
+            streamEnabled: true,
+            timeout: 60000
         },
+        
+        abortController: null,
+        streamTimeoutId: null,
 
         init: function() {
             if (document.getElementById('llm-assistant-container')) {
@@ -104,6 +108,9 @@
                                 placeholder="输入问题，按 Enter 发送..."\
                                 rows="1"\
                             ></textarea>\
+                            <button class="llm-btn llm-btn--secondary" id="llm-cancel-btn" style="display: none;" title="取消">\
+                                <i class="ri-stop-circle-line"></i>\
+                            </button>\
                             <button class="llm-btn llm-btn--primary" id="llm-send-btn" disabled>\
                                 <i class="ri-send-plane-fill"></i>\
                             </button>\
@@ -141,6 +148,10 @@
                                     <input type="checkbox" id="llm-stream-enabled" checked>\
                                     <span>启用流式输出</span>\
                                 </label>\
+                            </div>\
+                            <div class="llm-form-group">\
+                                <label>请求超时 (秒)</label>\
+                                <input type="number" id="llm-timeout" value="60" min="10" max="300">\
                             </div>\
                         </div>\
                         <div class="llm-modal-footer">\
@@ -592,6 +603,10 @@
                 self.sendMessage();
             });
 
+            document.getElementById('llm-cancel-btn').addEventListener('click', function() {
+                self.cancelStream();
+            });
+
             document.getElementById('llm-provider-select').addEventListener('change', function() {
                 self.currentProvider = this.value;
                 self.updateModelSelect();
@@ -647,11 +662,14 @@
                 });
                 var data = await response.json();
                 
-                if (data.requestStatus === 200 && data.data) {
-                    self.providers = data.data.providers || [];
-                    self.modelsByProvider = data.data.modelsByProvider || {};
-                    self.currentProvider = data.data.currentProvider || 'mock';
-                    self.currentModel = data.data.currentModel || 'default';
+                var resultData = data.data || data;
+                var isSuccess = (data.code === 200 || data.requestStatus === 200 || data.status === 'success');
+                
+                if (isSuccess && resultData) {
+                    self.providers = resultData.providers || [];
+                    self.modelsByProvider = resultData.modelsByProvider || {};
+                    self.currentProvider = resultData.currentProvider || 'qianwen';
+                    self.currentModel = resultData.currentModel || 'qwen-plus';
                     
                     var providerSelect = document.getElementById('llm-provider-select');
                     providerSelect.innerHTML = '';
@@ -659,9 +677,14 @@
                     var providerNames = {
                         'openai': 'OpenAI',
                         'qianwen': '通义千问',
+                        'aliyun-bailian': '阿里云百炼',
                         'deepseek': 'DeepSeek',
                         'ollama': 'Ollama',
                         'volcengine': '火山引擎',
+                        'siliconflow': 'SiliconFlow',
+                        'google': 'Google Gemini',
+                        'zhipu': '智谱AI',
+                        'azure': 'Azure OpenAI',
                         'mock': '模拟器'
                     };
                     
@@ -712,6 +735,7 @@
                 document.getElementById('llm-temp-value').textContent = this.settings.temperature;
                 document.getElementById('llm-max-tokens').value = this.settings.maxTokens;
                 document.getElementById('llm-stream-enabled').checked = this.settings.streamEnabled;
+                document.getElementById('llm-timeout').value = (this.settings.timeout || 60000) / 1000;
             }
         },
 
@@ -720,6 +744,7 @@
             this.settings.temperature = parseFloat(document.getElementById('llm-temperature').value);
             this.settings.maxTokens = parseInt(document.getElementById('llm-max-tokens').value);
             this.settings.streamEnabled = document.getElementById('llm-stream-enabled').checked;
+            this.settings.timeout = parseInt(document.getElementById('llm-timeout').value) * 1000;
             
             localStorage.setItem('llm-assistant-settings', JSON.stringify(this.settings));
             this.hideSettings();
@@ -730,13 +755,15 @@
                 systemPrompt: '',
                 temperature: 0.7,
                 maxTokens: 2048,
-                streamEnabled: true
+                streamEnabled: true,
+                timeout: 60000
             };
             document.getElementById('llm-system-prompt').value = '';
             document.getElementById('llm-temperature').value = 0.7;
             document.getElementById('llm-temp-value').textContent = '0.7';
             document.getElementById('llm-max-tokens').value = 2048;
             document.getElementById('llm-stream-enabled').checked = true;
+            document.getElementById('llm-timeout').value = 60;
         },
 
         showSettings: function() {
@@ -817,8 +844,21 @@
         },
 
         sendSyncMessage: async function(message) {
+            var self = this;
+            
+            if (this.abortController) {
+                this.abortController.abort();
+            }
+            this.abortController = new AbortController();
+            
             try {
                 this.updateStatus('sending');
+                
+                var timeoutId = setTimeout(function() {
+                    if (self.abortController) {
+                        self.abortController.abort();
+                    }
+                }, self.settings.timeout);
                 
                 var response = await fetch('/api/v1/llm/chat', {
                     method: 'POST',
@@ -829,8 +869,11 @@
                         provider: this.currentProvider,
                         temperature: this.settings.temperature,
                         maxTokens: this.settings.maxTokens
-                    })
+                    }),
+                    signal: this.abortController.signal
                 });
+                
+                clearTimeout(timeoutId);
                 
                 var data = await response.json();
                 
@@ -852,8 +895,15 @@
                 this.updateStatus('ready');
             } catch (error) {
                 console.error('Chat error:', error);
-                this.addMessage('assistant', '抱歉，网络错误，请重试', true);
-                this.updateStatus('error');
+                if (error.name === 'AbortError') {
+                    this.addMessage('assistant', '请求超时，请重试', true);
+                    this.updateStatus('timeout');
+                } else {
+                    this.addMessage('assistant', '抱歉，网络错误，请重试', true);
+                    this.updateStatus('error');
+                }
+            } finally {
+                this.abortController = null;
             }
         },
 
@@ -891,16 +941,29 @@
 
         sendStreamMessage: async function(message) {
             var self = this;
+            
+            if (this.abortController) {
+                this.abortController.abort();
+            }
+            
             this.isStreaming = true;
             this.updateStatus('streaming');
+            this.abortController = new AbortController();
 
             var messageDiv = this.createMessageElement('assistant', '');
             var contentDiv = messageDiv.querySelector('.llm-message-content');
             document.getElementById('llm-messages').appendChild(messageDiv);
 
             var fullResponse = '';
+            var lastReceiveTime = Date.now();
 
             try {
+                var timeoutId = setTimeout(function() {
+                    if (self.abortController) {
+                        self.abortController.abort();
+                    }
+                }, self.settings.timeout);
+
                 var response = await fetch('/api/v1/llm/chat/stream', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -910,7 +973,8 @@
                         provider: this.currentProvider,
                         temperature: this.settings.temperature,
                         maxTokens: this.settings.maxTokens
-                    })
+                    }),
+                    signal: this.abortController.signal
                 });
 
                 if (!response.ok) {
@@ -926,9 +990,30 @@
 
                 var buffer = '';
                 var currentEvent = 'message';
+                var idleTimeout = 30000;
+                
+                var idleCheckId = setInterval(function() {
+                    if (Date.now() - lastReceiveTime > idleTimeout) {
+                        clearInterval(idleCheckId);
+                        if (self.isStreaming) {
+                            self.abortController.abort();
+                            contentDiv.innerHTML = '抱歉，响应超时，请重试';
+                            self.updateStatus('timeout');
+                            self.isStreaming = false;
+                            self.updateSendButton();
+                        }
+                    }
+                }, 5000);
+
                 while (true) {
                     var result = await reader.read();
-                    if (result.done) break;
+                    if (result.done) {
+                        clearInterval(idleCheckId);
+                        clearTimeout(timeoutId);
+                        break;
+                    }
+
+                    lastReceiveTime = Date.now();
 
                     buffer += decoder.decode(result.value, { stream: true });
                     var lines = buffer.split('\n');
@@ -941,6 +1026,8 @@
                         } else if (line.startsWith('data:')) {
                             var data = line.substring(5).trim();
                             if (data === '[DONE]') {
+                                clearInterval(idleCheckId);
+                                clearTimeout(timeoutId);
                                 break;
                             }
                             if (data) {
@@ -969,12 +1056,37 @@
                 this.updateStatus('ready');
             } catch (error) {
                 console.error('Stream error:', error);
-                contentDiv.innerHTML = '抱歉，流式输出发生错误: ' + (error.message || '未知错误');
-                this.updateStatus('error');
+                clearInterval(idleCheckId);
+                clearTimeout(timeoutId);
+                
+                if (error.name === 'AbortError') {
+                    if (!fullResponse) {
+                        contentDiv.innerHTML = '请求已取消或超时，请重试';
+                    }
+                    this.updateStatus('cancelled');
+                } else {
+                    contentDiv.innerHTML = '抱歉，流式输出发生错误: ' + (error.message || '未知错误');
+                    this.updateStatus('error');
+                }
             } finally {
                 this.isStreaming = false;
+                this.abortController = null;
                 this.updateSendButton();
             }
+        },
+
+        cancelStream: function() {
+            if (this.abortController) {
+                this.abortController.abort();
+                this.abortController = null;
+            }
+            if (this.streamTimeoutId) {
+                clearTimeout(this.streamTimeoutId);
+                this.streamTimeoutId = null;
+            }
+            this.isStreaming = false;
+            this.updateStatus('ready');
+            this.updateSendButton();
         },
 
         addMessage: function(role, content, isError) {
@@ -1030,8 +1142,14 @@
 
         updateSendButton: function() {
             var input = document.getElementById('llm-input');
-            var btn = document.getElementById('llm-send-btn');
-            btn.disabled = !input.value.trim() || this.isStreaming;
+            var sendBtn = document.getElementById('llm-send-btn');
+            var cancelBtn = document.getElementById('llm-cancel-btn');
+            
+            sendBtn.disabled = !input.value.trim() || this.isStreaming;
+            
+            if (cancelBtn) {
+                cancelBtn.style.display = this.isStreaming ? 'inline-flex' : 'none';
+            }
         },
 
         updateStatus: function(status) {
@@ -1041,7 +1159,9 @@
                 'ready': '就绪',
                 'sending': '发送中...',
                 'streaming': '输出中...',
-                'error': '错误'
+                'error': '错误',
+                'timeout': '超时',
+                'cancelled': '已取消'
             };
             statusEl.textContent = statusText[status] || status;
         },

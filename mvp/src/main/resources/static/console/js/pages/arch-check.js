@@ -1,96 +1,29 @@
 let checkResults = [];
 
 async function initPage() {
-    await loadCheckResult();
+    await loadSystemCheck();
 }
 
-async function loadCheckResult() {
+async function loadSystemCheck() {
     const container = document.getElementById('check-result');
-    
-    checkResults = [
-        { name: 'API端点检查', status: 'checking', description: '检查所有API端点是否可访问' },
-        { name: '数据库连接', status: 'checking', description: '检查数据存储服务连接状态' },
-        { name: '场景能力注册', status: 'checking', description: '检查场景能力是否正确注册' },
-        { name: '模板配置', status: 'checking', description: '检查模板配置是否完整' },
-        { name: '用户权限', status: 'checking', description: '检查用户权限配置' }
-    ];
-    
-    renderCheckList();
-    
-    for (let i = 0; i < checkResults.length; i++) {
-        await runCheck(i);
-    }
-}
-
-async function runCheck(index) {
-    const check = checkResults[index];
+    container.innerHTML = '<div class="nx-flex nx-items-center nx-justify-center nx-p-8"><i class="ri-loader-4-line ri-spin"></i><span>加载中...</span></div>';
     
     try {
-        let success = false;
-        let message = '';
+        const res = await fetch('/api/v1/arch-check/system');
+        const result = await res.json();
         
-        switch (index) {
-            case 0:
-                const apiRes = await fetch('/api/v1/capabilities');
-                const apiResult = await apiRes.json();
-                success = apiResult.status === 'success';
-                message = success ? '所有API端点正常' : '部分API端点异常';
-                break;
-                
-            case 1:
-                const dbRes = await fetch('/api/v1/org/users');
-                const dbResult = await dbRes.json();
-                success = dbResult.status === 'success';
-                message = success ? '数据存储服务正常' : '数据存储服务异常';
-                break;
-                
-            case 2:
-                const capRes = await fetch('/api/v1/capabilities');
-                const capResult = await capRes.json();
-                const caps = capResult.data?.list || capResult.data || [];
-                success = caps.length > 0;
-                message = success ? `已注册 ${caps.length} 个场景能力` : '未发现已注册的场景能力';
-                break;
-                
-            case 3:
-                const tplRes = await fetch('/api/v1/templates');
-                const tplResult = await tplRes.json();
-                const templates = tplResult.data || [];
-                success = templates.length > 0;
-                message = success ? `已配置 ${templates.length} 个模板` : '未发现模板配置';
-                break;
-                
-            case 4:
-                const userRes = await fetch('/api/v1/org/roles');
-                const userResult = await userRes.json();
-                const roles = userResult.data || [];
-                success = roles.length > 0;
-                message = success ? `已配置 ${roles.length} 个角色` : '未发现角色配置';
-                break;
+        if (result.status === 'success' && result.data) {
+            renderSystemCheck(result.data);
+        } else {
+            container.innerHTML = '<p class="nx-text-danger">加载失败</p>';
         }
-        
-        check.status = success ? 'success' : 'error';
-        check.message = message;
     } catch (e) {
-        check.status = 'error';
-        check.message = '检查失败: ' + e.message;
+        container.innerHTML = '<p class="nx-text-danger">加载失败: ' + e.message + '</p>';
     }
-    
-    renderCheckList();
 }
 
-function renderCheckList() {
+function renderSystemCheck(data) {
     const container = document.getElementById('check-result');
-    
-    let successCount = 0;
-    let errorCount = 0;
-    let checkingCount = 0;
-    
-    checkResults.forEach(r => {
-        if (r.status === 'success') successCount++;
-        else if (r.status === 'error') errorCount++;
-        else if (r.status === 'checking') checkingCount++;
-    });
     
     let html = `
         <div class="nx-grid nx-grid-cols-3 nx-mb-4">
@@ -98,21 +31,21 @@ function renderCheckList() {
                 <div class="nx-stat-card__icon" style="background: var(--nx-success-light); color: var(--nx-success);"><i class="ri-checkbox-circle-line"></i></div>
                 <div class="nx-stat-card__content">
                     <h4>通过</h4>
-                    <p class="nx-stat-card__value" style="color: var(--nx-success);">${successCount}</p>
+                    <p class="nx-stat-card__value" style="color: var(--nx-success);">${data.passed}</p>
                 </div>
             </div>
             <div class="nx-stat-card">
                 <div class="nx-stat-card__icon" style="background: var(--nx-danger-light); color: var(--nx-danger);"><i class="ri-error-warning-line"></i></div>
                 <div class="nx-stat-card__content">
                     <h4>失败</h4>
-                    <p class="nx-stat-card__value" style="color: var(--nx-danger);">${errorCount}</p>
+                    <p class="nx-stat-card__value" style="color: var(--nx-danger);">${data.failed}</p>
                 </div>
             </div>
             <div class="nx-stat-card">
-                <div class="nx-stat-card__icon" style="background: var(--nx-warning-light); color: var(--nx-warning);"><i class="ri-loader-4-line"></i></div>
+                <div class="nx-stat-card__icon" style="background: var(--nx-primary-light); color: var(--nx-primary);"><i class="ri-shield-check-line"></i></div>
                 <div class="nx-stat-card__content">
-                    <h4>检查中</h4>
-                    <p class="nx-stat-card__value">${checkingCount}</p>
+                    <h4>总检查项</h4>
+                    <p class="nx-stat-card__value">${data.total}</p>
                 </div>
             </div>
         </div>
@@ -130,18 +63,18 @@ function renderCheckList() {
                 <tbody>
     `;
     
-    checkResults.forEach(check => {
-        const statusIcon = check.status === 'success' ? 
+    data.checks.forEach(check => {
+        const statusIcon = check.status === 'pass' ? 
             '<i class="ri-checkbox-circle-line" style="color: var(--nx-success);"></i>' :
-            check.status === 'error' ? 
+            check.status === 'fail' ? 
             '<i class="ri-error-warning-line" style="color: var(--nx-danger);"></i>' :
             '<i class="ri-loader-4-line ri-spin" style="color: var(--nx-warning);"></i>';
         
-        const statusBadge = check.status === 'success' ?
+        const statusBadge = check.status === 'pass' ?
             '<span class="nx-badge nx-badge--success">通过</span>' :
-            check.status === 'error' ?
+            check.status === 'fail' ?
             '<span class="nx-badge nx-badge--danger">失败</span>' :
-            '<span class="nx-badge nx-badge--warning">检查中</span>';
+            '<span class="nx-badge nx-badge--warning">警告</span>';
         
         html += `
             <tr>
@@ -155,21 +88,21 @@ function renderCheckList() {
     
     html += '</tbody></table></div>';
     
-    if (successCount === checkResults.length) {
+    if (data.status === 'healthy') {
         html += `
             <div class="nx-mt-4 nx-p-4 nx-bg-success-light nx-rounded-lg">
                 <div class="nx-flex nx-items-center nx-gap-2">
                     <i class="ri-checkbox-circle-line" style="color: var(--nx-success); font-size: 20px;"></i>
-                    <span class="nx-font-medium" style="color: var(--nx-success);">架构检查全部通过，系统运行正常</span>
+                    <span class="nx-font-medium" style="color: var(--nx-success);">${data.passed}/${data.total} 项检查全部通过，系统运行正常</span>
                 </div>
             </div>
         `;
-    } else if (errorCount > 0 && checkingCount === 0) {
+    } else if (data.failed > 0) {
         html += `
             <div class="nx-mt-4 nx-p-4 nx-bg-danger-light nx-rounded-lg">
                 <div class="nx-flex nx-items-center nx-gap-2">
                     <i class="ri-error-warning-line" style="color: var(--nx-danger); font-size: 20px;"></i>
-                    <span class="nx-font-medium" style="color: var(--nx-danger);">发现 ${errorCount} 项检查未通过，请检查相关配置</span>
+                    <span class="nx-font-medium" style="color: var(--nx-danger);">${data.failed} 项检查未通过，请检查相关配置</span>
                 </div>
             </div>
         `;
@@ -178,8 +111,8 @@ function renderCheckList() {
     container.innerHTML = html;
 }
 
-function runAllChecks() {
-    loadCheckResult();
+async function runAllChecks() {
+    await loadSystemCheck();
 }
 
 document.addEventListener('DOMContentLoaded', initPage);

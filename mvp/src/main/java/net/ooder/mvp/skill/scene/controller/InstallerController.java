@@ -1,5 +1,7 @@
 package net.ooder.mvp.skill.scene.controller;
 
+import net.ooder.mvp.skill.scene.dto.installer.InstallerStatusDTO;
+import net.ooder.mvp.skill.scene.dto.installer.InstallerStatusRequestDTO;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,8 +11,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Properties;
 
 @RestController
@@ -23,7 +23,7 @@ public class InstallerController {
     private static final String STATUS_FILE = "status.properties";
     
     @PostMapping("/status")
-    public ResultModel<Map<String, Object>> saveStatus(@RequestBody Map<String, Object> request) {
+    public ResultModel<InstallerStatusDTO> saveStatus(@RequestBody InstallerStatusRequestDTO request) {
         log.info("[saveStatus] request: {}", request);
         
         try {
@@ -41,9 +41,9 @@ public class InstallerController {
                 }
             }
             
-            String loop = (String) request.get("loop");
-            String status = (String) request.get("status");
-            String completedAt = (String) request.get("completedAt");
+            String loop = request.getLoop();
+            String status = request.getStatus();
+            String completedAt = request.getCompletedAt();
             
             if (loop != null) {
                 props.setProperty(loop + ".status", status != null ? status : "unknown");
@@ -56,10 +56,10 @@ public class InstallerController {
                 props.store(os, "Installer Status");
             }
             
-            Map<String, Object> result = new HashMap<>();
-            result.put("loop", loop);
-            result.put("status", status);
-            result.put("saved", true);
+            InstallerStatusDTO result = new InstallerStatusDTO();
+            result.setLoop(loop);
+            result.setStatus(status);
+            result.setSaved(true);
             
             return ResultModel.success(result);
             
@@ -70,15 +70,15 @@ public class InstallerController {
     }
     
     @GetMapping("/status")
-    public ResultModel<Map<String, Object>> getStatus() {
+    public ResultModel<InstallerStatusDTO> getStatus() {
         log.info("[getStatus] request");
         
         try {
             Path filePath = Paths.get(STATUS_DIR, STATUS_FILE);
             
             if (!Files.exists(filePath)) {
-                Map<String, Object> empty = new HashMap<>();
-                empty.put("initialized", false);
+                InstallerStatusDTO empty = new InstallerStatusDTO();
+                empty.setInitialized(false);
                 return ResultModel.success(empty);
             }
             
@@ -87,12 +87,8 @@ public class InstallerController {
                 props.load(is);
             }
             
-            Map<String, Object> result = new HashMap<>();
-            result.put("initialized", true);
-            
-            for (String key : props.stringPropertyNames()) {
-                result.put(key, props.getProperty(key));
-            }
+            InstallerStatusDTO result = new InstallerStatusDTO();
+            result.setInitialized(true);
             
             return ResultModel.success(result);
             
@@ -103,16 +99,16 @@ public class InstallerController {
     }
     
     @GetMapping("/status/{loop}")
-    public ResultModel<Map<String, Object>> getLoopStatus(@PathVariable String loop) {
+    public ResultModel<InstallerStatusDTO> getLoopStatus(@PathVariable String loop) {
         log.info("[getLoopStatus] loop: {}", loop);
         
         try {
             Path filePath = Paths.get(STATUS_DIR, STATUS_FILE);
             
             if (!Files.exists(filePath)) {
-                Map<String, Object> empty = new HashMap<>();
-                empty.put("loop", loop);
-                empty.put("status", "not_started");
+                InstallerStatusDTO empty = new InstallerStatusDTO();
+                empty.setLoop(loop);
+                empty.setStatus("not_started");
                 return ResultModel.success(empty);
             }
             
@@ -121,10 +117,10 @@ public class InstallerController {
                 props.load(is);
             }
             
-            Map<String, Object> result = new HashMap<>();
-            result.put("loop", loop);
-            result.put("status", props.getProperty(loop + ".status", "not_started"));
-            result.put("completedAt", props.getProperty(loop + ".completedAt"));
+            InstallerStatusDTO result = new InstallerStatusDTO();
+            result.setLoop(loop);
+            result.setStatus(props.getProperty(loop + ".status", "not_started"));
+            result.setCompletedAt(props.getProperty(loop + ".completedAt"));
             
             return ResultModel.success(result);
             

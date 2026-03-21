@@ -15,6 +15,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.function.Consumer;
 
 public class AliyunBailianLlmProvider implements LlmProvider {
 
@@ -73,6 +74,171 @@ public class AliyunBailianLlmProvider implements LlmProvider {
     @Override
     public boolean supportsFunctionCalling() {
         return true;
+    }
+
+    public void chatStream(String model, List<Map<String, Object>> messages, Map<String, Object> options, Consumer<String> onChunk, Consumer<Map<String, Object>> onComplete, Consumer<Exception> onError) {
+        log.info("AliyunBailian LLM chatStream called with model: {}", model);
+        
+        try {
+            Map<String, Object> requestBody = new HashMap<String, Object>();
+            requestBody.put("model", model != null ? model : DEFAULT_MODEL);
+            requestBody.put("messages", messages);
+            requestBody.put("stream", true);
+            
+            if (options != null) {
+                if (options.containsKey("temperature")) {
+                    requestBody.put("temperature", options.get("temperature"));
+                }
+                if (options.containsKey("max_tokens")) {
+                    requestBody.put("max_tokens", options.get("max_tokens"));
+                }
+                if (options.containsKey("top_p")) {
+                    requestBody.put("top_p", options.get("top_p"));
+                }
+                
+                @SuppressWarnings("unchecked")
+                List<Map<String, Object>> tools = (List<Map<String, Object>>) options.get("tools");
+                if (tools != null && !tools.isEmpty()) {
+                    requestBody.put("tools", tools);
+                    Object toolChoice = options.get("tool_choice");
+                    if (toolChoice != null) {
+                        requestBody.put("tool_choice", toolChoice);
+                    } else {
+                        requestBody.put("tool_choice", "auto");
+                    }
+                }
+            }
+            
+            sendStreamRequest(API_URL, requestBody, onChunk, onComplete, onError);
+            
+        } catch (Exception e) {
+            log.error("AliyunBailian LLM chatStream error", e);
+            if (onError != null) {
+                onError.accept(e);
+            }
+        }
+    }
+
+    private void sendStreamRequest(String apiUrl, Map<String, Object> requestBody, Consumer<String> onChunk, Consumer<Map<String, Object>> onComplete, Consumer<Exception> onError) {
+        try {
+            URL url = new URL(apiUrl);
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setRequestMethod("POST");
+            conn.setRequestProperty("Content-Type", "application/json");
+            conn.setRequestProperty("Authorization", "Bearer " + apiKey);
+            conn.setRequestProperty("Accept", "text/event-stream");
+            conn.setRequestProperty("X-DashScope-SSE", "enable");
+            
+            conn.setConnectTimeout(60000);
+            conn.setReadTimeout(120000);
+            conn.setDoOutput(true);
+            
+            String jsonBody = mapToJson(requestBody);
+            log.debug("Stream request body: {}", jsonBody);
+            
+            try (OutputStream os = conn.getOutputStream()) {
+                byte[] input = jsonBody.getBytes(StandardCharsets.UTF_8);
+                os.write(input, 0, input.length);
+            }
+            
+            int responseCode = conn.getResponseCode();
+            log.info("AliyunBailian Stream API response code: {}", responseCode);
+            
+            if (responseCode != 200) {
+                InputStream errorStream = conn.getErrorStream();
+                String errorMessage = "HTTP " + responseCode;
+                if (errorStream != null) {
+                    BufferedReader errorReader = new BufferedReader(new InputStreamReader(errorStream, StandardCharsets.UTF_8));
+                    StringBuilder errorResponse = new StringBuilder();
+                    String line;
+                    while ((line = errorReader.readLine()) != null) {
+                        errorResponse.append(line);
+                    }
+                    errorReader.close();
+                    errorMessage = errorResponse.toString();
+                    log.error("AliyunBailian Stream API error: {} - {}", responseCode, errorMessage);
+                }
+                if (onError != null) {
+                    onError.accept(new Exception(errorMessage));
+                }
+                return;
+            }
+            
+            StringBuilder fullContent = new StringBuilder();
+            Map<String, Object> usage = new HashMap<String, Object>();
+            
+            try (InputStream is = conn.getInputStream();
+                 BufferedReader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
+                
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    if (line.isEmpty() || line.startsWith(":")) {
+                        continue;
+                    }
+                    
+                    if (line.startsWith("data:")) {
+                        String data = line.substring(5).trim();
+                        
+                        if (data.equals("[DONE]")) {
+                            break;
+                        }
+                        
+                        try {
+                            String content = extractStreamContent(data);
+                            if (content != null && !content.isEmpty()) {
+                                fullContent.append(content);
+                                if (onChunk != null) {
+                                    onChunk.accept(content);
+                                }
+                            }
+                            
+                            Map<String, Object> chunkUsage = extractStreamUsage(data);
+                            if (chunkUsage != null && !chunkUsage.isEmpty()) {
+                                usage.putAll(chunkUsage);
+                            }
+                        } catch (Exception e) {
+                            log.debug("Failed to parse stream chunk: {}", data);
+                        }
+                    }
+                }
+            }
+            
+            Map<String, Object> result = new HashMap<String, Object>();
+            result.put("content", fullContent.toString());
+            result.put("model", requestBody.get("model"));
+            result.put("provider", PROVIDER_TYPE);
+            if (!usage.isEmpty()) {
+                result.put("usage", usage);
+                Integer promptTokens = (Integer) usage.get("prompt_tokens");
+                Integer completionTokens = (Integer) usage.get("completion_tokens");
+                if (promptTokens != null) result.put("inputTokens", promptTokens);
+                if (completionTokens != null) result.put("outputTokens", completionTokens);
+            }
+            
+            if (onComplete != null) {
+                onComplete.accept(result);
+            }
+            
+        } catch (Exception e) {
+            log.error("AliyunBailian Stream request error", e);
+            if (onError != null) {
+                onError.accept(e);
+            }
+        }
+    }
+
+    private String extractStreamContent(String jsonData) {
+        String content = extractNestedJsonValue(jsonData, "choices", "delta", "content");
+        return content;
+    }
+
+    private Map<String, Object> extractStreamUsage(String jsonData) {
+        Map<String, Object> usage = new HashMap<String, Object>();
+        String usageJson = extractUsageJson(jsonData);
+        if (usageJson != null) {
+            return parseUsage(usageJson);
+        }
+        return usage;
     }
 
     @Override
@@ -147,7 +313,17 @@ public class AliyunBailianLlmProvider implements LlmProvider {
         
         String usageJson = extractUsageJson(response);
         if (usageJson != null) {
-            result.put("usage", parseUsage(usageJson));
+            Map<String, Object> usage = parseUsage(usageJson);
+            result.put("usage", usage);
+            
+            Integer promptTokens = (Integer) usage.get("prompt_tokens");
+            Integer completionTokens = (Integer) usage.get("completion_tokens");
+            if (promptTokens != null) {
+                result.put("inputTokens", promptTokens);
+            }
+            if (completionTokens != null) {
+                result.put("outputTokens", completionTokens);
+            }
         }
         
         return result;

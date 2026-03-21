@@ -43,6 +43,34 @@ public class ConfigNode {
         }
         return null;
     }
+    
+    public Object getNestedValue(String path) {
+        String[] parts = path.split("\\.");
+        Map<String, Object> current = data;
+        
+        for (int i = 0; i < parts.length - 1; i++) {
+            Object value = current.get(parts[i]);
+            if (value instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<String, Object> next = (Map<String, Object>) value;
+                current = next;
+            } else {
+                return null;
+            }
+        }
+        
+        return current.get(parts[parts.length - 1]);
+    }
+    
+    public String getNestedString(String path) {
+        Object value = getNestedValue(path);
+        return value != null ? value.toString() : null;
+    }
+    
+    public String getNestedString(String path, String defaultValue) {
+        String value = getNestedString(path);
+        return value != null ? value : defaultValue;
+    }
 
     public void put(String key, Object value) {
         data.put(key, value);

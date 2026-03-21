@@ -171,7 +171,7 @@ public class SkillCapabilitySyncService {
                 return;
             }
 
-            syncSkillCapabilities(skillId, capabilities, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill, skillCategory);
+            syncSkillCapabilities(skillId, capabilities, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill, skillCategory, skillName, description, spec);
             syncedCount++;
 
         } catch (Exception e) {
@@ -180,8 +180,51 @@ public class SkillCapabilitySyncService {
         }
     }
 
-    private void syncSkillCapabilities(String skillId, List<Map<String, Object>> capabilities, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill, String skillCategory) {
+    private void syncSkillCapabilities(String skillId, List<Map<String, Object>> capabilities, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill, String skillCategory, String skillName, String description, Map<String, Object> spec) {
         List<Capability> caps = new ArrayList<>();
+        
+        String skillForm = null;
+        String sceneType = null;
+        String visibility = "public";
+        if (spec != null) {
+            Object skillFormObj = spec.get("skillForm");
+            if (skillFormObj != null) {
+                skillForm = String.valueOf(skillFormObj);
+            }
+            Map<String, Object> scene = (Map<String, Object>) spec.get("scene");
+            if (scene != null) {
+                sceneType = (String) scene.get("type");
+                visibility = scene.get("visibility") != null ? (String) scene.get("visibility") : "public";
+            }
+        }
+        
+        boolean isSceneSkill = "SCENE".equals(skillForm) || "scene-skill".equals(skillType);
+        
+        log.info("[syncSkillCapabilities] skillId={}, skillForm={}, skillType={}, isSceneSkill={}", skillId, skillForm, skillType, isSceneSkill);
+        
+        boolean hasMainCapability = capabilities.stream()
+            .anyMatch(cap -> skillId.equals(cap.get("id")));
+        
+        log.info("[syncSkillCapabilities] hasMainCapability={}, capabilities count={}", hasMainCapability, capabilities.size());
+        
+        if (isSceneSkill && !hasMainCapability) {
+            log.info("[syncSkillCapabilities] Auto-creating main capability for SCENE skill: {}", skillId);
+            Map<String, Object> mainCap = new HashMap<>();
+            mainCap.put("id", skillId);
+            mainCap.put("name", skillName != null ? skillName : skillId);
+            mainCap.put("description", description != null ? description : "");
+            mainCap.put("category", skillCategory != null ? skillCategory : "biz");
+            mainCap.put("type", "SCENE");
+            mainCap.put("skillForm", "SCENE");
+            mainCap.put("sceneType", sceneType != null ? sceneType : "INTERACTIVE");
+            mainCap.put("visibility", visibility);
+            mainCap.put("mainFirst", true);
+            mainCap.put("isSceneCapability", true);
+            
+            List<Map<String, Object>> modifiableCapabilities = new ArrayList<>(capabilities);
+            modifiableCapabilities.add(0, mainCap);
+            capabilities = modifiableCapabilities;
+        }
 
         for (Map<String, Object> capData : capabilities) {
             Capability cap = createCapabilityFromYaml(skillId, capData, version, skillType, specMainFirst, specHasSelfDrive, specBusinessScore, specSceneSkill, skillCategory);
@@ -213,7 +256,7 @@ public class SkillCapabilitySyncService {
         cap.setSkillId(skillId);
         
         CapabilityType capType = determineCapabilityType(capData, skillType);
-        cap.setType(capType);
+        cap.setCapabilityType(capType);
         
         Object mainFirstObj = capData.get("mainFirst");
         boolean capMainFirst = mainFirstObj != null ? Boolean.TRUE.equals(mainFirstObj) : Boolean.TRUE.equals(specMainFirst);
@@ -264,7 +307,7 @@ public class SkillCapabilitySyncService {
         List<String> capabilityIds = (List<String>) capData.get("capabilities");
         if (capabilityIds != null && !capabilityIds.isEmpty()) {
             cap.setCapabilities(capabilityIds);
-        } else if (cap.getType() == CapabilityType.SCENE) {
+        } else if (cap.getCapabilityType() == CapabilityType.SCENE) {
             cap.setCapabilities(Arrays.asList(capId));
         }
         
@@ -367,7 +410,20 @@ public class SkillCapabilitySyncService {
 
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> parseExamples(Map<String, Object> capData) {
-        return (List<Map<String, Object>>) capData.get("examples");
+        List<Map<String, Object>> rawExamples = (List<Map<String, Object>>) capData.get("examples");
+        if (rawExamples == null || rawExamples.isEmpty()) {
+            return null;
+        }
+        
+        List<Map<String, Object>> examples = new ArrayList<>();
+        for (Map<String, Object> element : rawExamples) {
+            Map<String, Object> ex = new HashMap<>();
+            ex.put("name", (String) element.get("name"));
+            ex.put("description", (String) element.get("description"));
+            ex.put("type", (String) element.get("type"));
+            examples.add(ex);
+        }
+        return examples;
     }
 
     private CapabilityType determineCapabilityType(Map<String, Object> capData, String skillType) {
@@ -412,8 +468,8 @@ public class SkillCapabilitySyncService {
         existing.setDescription(newCap.getDescription());
         existing.setVersion(newVersion);
         existing.setSkillId(newCap.getSkillId());
-        if (newCap.getType() != null) {
-            existing.setType(newCap.getType());
+        if (newCap.getCapabilityType() != null) {
+            existing.setCapabilityType(newCap.getCapabilityType());
         }
         if (newCap.getSceneType() != null) {
             existing.setSceneType(newCap.getSceneType());
@@ -423,6 +479,9 @@ public class SkillCapabilitySyncService {
         }
         if (newCap.getVisibility() != null) {
             existing.setVisibility(newCap.getVisibility());
+        }
+        if (newCap.getCapabilityCategory() != null) {
+            existing.setCapabilityCategory(newCap.getCapabilityCategory());
         }
         existing.setMainFirst(newCap.isMainFirst());
         existing.setSceneCapability(newCap.isSceneCapability());

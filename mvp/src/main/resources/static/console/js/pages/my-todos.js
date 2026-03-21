@@ -67,11 +67,7 @@ async function refreshAll() {
     }
 }
 
-function loadMockTodos() {
-    todos = [];
-    renderTodos();
-    updateStats();
-}
+
 
 function switchTab(tab) {
     currentTab = tab;

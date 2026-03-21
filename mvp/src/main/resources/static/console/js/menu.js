@@ -59,7 +59,7 @@
 
         async loadSession() {
             try {
-                const response = await fetch('/api/v1/auth/session');
+                const response = await fetch('/api/v1/scene-auth/session');
                 const result = await response.json();
                 if (result.status === 'success' && result.data) {
                     this.currentUser = result.data;
@@ -79,12 +79,15 @@
         },
 
         async loadMenuConfig() {
-            const response = await fetch('/api/v1/auth/menu-config');
+            const roleType = this.currentUser?.roleType || 'collaborator';
+            const userId = this.currentUser?.userId || 'default-user';
+            
+            const response = await fetch(`/api/v1/scene-auth/menu-config?role=${encodeURIComponent(roleType)}&userId=${encodeURIComponent(userId)}`);
             const result = await response.json();
             
             if (result.status === 'success' && result.data) {
                 this.menuConfig = result.data;
-                console.log('[NexusMenu] 菜单配置加载成功:', this.menuConfig.length, '项');
+                console.log('[NexusMenu] 菜单配置加载成功:', this.menuConfig.length, '项, 角色:', roleType);
             } else {
                 throw new Error('菜单配置加载失败');
             }

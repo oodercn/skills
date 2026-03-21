@@ -77,8 +77,8 @@ public class CapabilityClassificationService {
             return SkillForm.SCENE;
         }
         
-        if (cap.getType() != null) {
-            String type = cap.getType().name();
+        if (cap.getCapabilityType() != null) {
+            String type = cap.getCapabilityType().name();
             if ("SCENE".equals(type) || "scene-skill".equalsIgnoreCase(type)) {
                 return SkillForm.SCENE;
             }

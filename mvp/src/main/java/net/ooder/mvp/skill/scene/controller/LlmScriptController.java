@@ -1,5 +1,9 @@
 package net.ooder.mvp.skill.scene.controller;
 
+import net.ooder.mvp.skill.scene.dto.llmscript.ActionExecuteRequestDTO;
+import net.ooder.mvp.skill.scene.dto.llmscript.ActionExecuteResultDTO;
+import net.ooder.mvp.skill.scene.dto.llmscript.ScriptExecuteRequestDTO;
+import net.ooder.mvp.skill.scene.dto.llmscript.ScriptGenerateRequestDTO;
 import net.ooder.mvp.skill.scene.llm.ModuleApiRegistry;
 import net.ooder.mvp.skill.scene.llm.SceneActionExecutor;
 import net.ooder.mvp.skill.scene.llm.SceneActionExecutor.ActionRequest;
@@ -19,7 +23,7 @@ import java.util.Map;
 import java.util.Set;
 
 @RestController
-@RequestMapping("/api/v1/llm")
+@RequestMapping("/api/v1/llm-script")
 public class LlmScriptController {
 
     private static final Logger log = LoggerFactory.getLogger(LlmScriptController.class);
@@ -35,208 +39,200 @@ public class LlmScriptController {
     }
 
     @PostMapping("/execute")
-    public ResponseEntity<Map<String, Object>> executeAction(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<ActionExecuteResultDTO> executeAction(@RequestBody ActionExecuteRequestDTO request) {
         log.info("[LlmScriptController] Received execute request: {}", request);
 
         ActionRequest actionRequest = new ActionRequest();
-        actionRequest.setAction((String) request.get("action"));
-        actionRequest.setModule((String) request.get("module"));
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> params = (Map<String, Object>) request.get("params");
-        if (params != null) {
-            actionRequest.setParams(params);
+        actionRequest.setAction(request.getAction());
+        actionRequest.setModule(request.getModule());
+        if (request.getParams() != null) {
+            actionRequest.setParams(request.getParams());
         }
-        
-        Boolean requireConfirm = (Boolean) request.get("requireConfirm");
-        if (requireConfirm != null) {
-            actionRequest.setRequireConfirm(requireConfirm);
+        if (request.getRequireConfirm() != null) {
+            actionRequest.setRequireConfirm(request.getRequireConfirm());
         }
-        
-        Boolean syncContext = (Boolean) request.get("syncContext");
-        if (syncContext != null) {
-            actionRequest.setSyncContext(syncContext);
+        if (request.getSyncContext() != null) {
+            actionRequest.setSyncContext(request.getSyncContext());
         }
 
         ActionResult result = actionExecutor.execute(actionRequest);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
-        response.put("needConfirm", result.isNeedConfirm());
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(result.isSuccess());
+        response.setNeedConfirm(result.isNeedConfirm());
         
         if (result.isNeedConfirm()) {
-            response.put("confirmMessage", result.getConfirmMessage());
+            response.setConfirmMessage(result.getConfirmMessage());
             Map<String, Object> pendingAction = new HashMap<>();
             pendingAction.put("action", actionRequest.getAction());
             pendingAction.put("module", actionRequest.getModule());
             pendingAction.put("params", actionRequest.getParams());
-            response.put("pendingAction", pendingAction);
+            response.setPendingAction(pendingAction);
         } else if (result.isSuccess()) {
-            response.put("result", result.getResult());
+            response.setResult(result.getResult());
         } else {
-            response.put("error", result.getError());
+            response.setError(result.getError());
         }
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/execute-script")
-    public ResponseEntity<Map<String, Object>> executeScript(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<ActionExecuteResultDTO> executeScript(@RequestBody ScriptExecuteRequestDTO request) {
         log.info("[LlmScriptController] Received script execution request");
 
         ScriptRequest scriptRequest = new ScriptRequest();
-        scriptRequest.setScript((String) request.get("script"));
-        scriptRequest.setScriptType((String) request.getOrDefault("scriptType", "mvel"));
-        scriptRequest.setModule((String) request.get("module"));
-        
-        Boolean requireConfirm = (Boolean) request.get("requireConfirm");
-        if (requireConfirm != null) {
-            scriptRequest.setRequireConfirm(requireConfirm);
+        scriptRequest.setScript(request.getScript());
+        scriptRequest.setScriptType(request.getScriptType() != null ? request.getScriptType() : "mvel");
+        scriptRequest.setModule(request.getModule());
+        if (request.getRequireConfirm() != null) {
+            scriptRequest.setRequireConfirm(request.getRequireConfirm());
         }
-        
-        Boolean syncContext = (Boolean) request.get("syncContext");
-        if (syncContext != null) {
-            scriptRequest.setSyncContext(syncContext);
+        if (request.getSyncContext() != null) {
+            scriptRequest.setSyncContext(request.getSyncContext());
         }
 
         ScriptResult result = actionExecutor.executeScript(scriptRequest);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
-        response.put("needConfirm", result.isNeedConfirm());
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(result.isSuccess());
+        response.setNeedConfirm(result.isNeedConfirm());
         
         if (result.isNeedConfirm()) {
-            response.put("confirmMessage", result.getConfirmMessage());
+            response.setConfirmMessage(result.getConfirmMessage());
             Map<String, Object> pendingScript = new HashMap<>();
             pendingScript.put("script", scriptRequest.getScript());
             pendingScript.put("scriptType", scriptRequest.getScriptType());
             pendingScript.put("module", scriptRequest.getModule());
-            response.put("pendingScript", pendingScript);
+            response.setPendingAction(pendingScript);
         } else if (result.isSuccess()) {
-            response.put("result", result.getResult());
+            response.setResult(result.getResult());
         } else {
-            response.put("error", result.getError());
+            response.setError(result.getError());
         }
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/generate-script")
-    public ResponseEntity<Map<String, Object>> generateScript(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<ActionExecuteResultDTO> generateScript(@RequestBody ScriptGenerateRequestDTO request) {
         log.info("[LlmScriptController] Received script generation request");
 
-        String intent = (String) request.get("intent");
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> context = (Map<String, Object>) request.get("context");
+        String intent = request.getIntent();
+        Map<String, Object> context = request.getContext();
         if (context == null) {
             context = new HashMap<>();
         }
 
         ScriptGenerationResultDto result = actionExecutor.generateScriptForIntent(intent, context);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(result.isSuccess());
         
         if (result.isSuccess()) {
-            response.put("script", result.getScript());
-            response.put("scriptType", result.getScriptType());
-            response.put("module", result.getModule());
-            response.put("explanation", result.getExplanation());
+            Map<String, Object> scriptResult = new HashMap<>();
+            scriptResult.put("script", result.getScript());
+            scriptResult.put("scriptType", result.getScriptType());
+            scriptResult.put("module", result.getModule());
+            scriptResult.put("explanation", result.getExplanation());
+            response.setResult(scriptResult);
         } else {
-            response.put("error", result.getError());
+            response.setError(result.getError());
         }
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/confirm")
-    public ResponseEntity<Map<String, Object>> confirmAction(@RequestBody Map<String, Object> request) {
+    public ResponseEntity<ActionExecuteResultDTO> confirmAction(@RequestBody ActionExecuteRequestDTO request) {
         log.info("[LlmScriptController] Received confirm request");
 
-        String action = (String) request.get("action");
-        String module = (String) request.get("module");
-        
-        @SuppressWarnings("unchecked")
-        Map<String, Object> params = (Map<String, Object>) request.get("params");
-
+        String module = request.getModule();
         moduleApiRegistry.setCurrentModule(module);
 
         ActionRequest actionRequest = new ActionRequest();
-        actionRequest.setAction(action);
+        actionRequest.setAction(request.getAction());
         actionRequest.setModule(module);
-        if (params != null) {
-            actionRequest.setParams(params);
+        if (request.getParams() != null) {
+            actionRequest.setParams(request.getParams());
         }
         actionRequest.setRequireConfirm(false);
         actionRequest.setSyncContext(true);
 
         ActionResult result = actionExecutor.execute(actionRequest);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", result.isSuccess());
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(result.isSuccess());
         
         if (result.isSuccess()) {
-            response.put("result", result.getResult());
+            response.setResult(result.getResult());
         } else {
-            response.put("error", result.getError());
+            response.setError(result.getError());
         }
 
         return ResponseEntity.ok(response);
     }
 
     @PostMapping("/module/set")
-    public ResponseEntity<Map<String, Object>> setCurrentModule(@RequestBody Map<String, String> request) {
+    public ResponseEntity<ActionExecuteResultDTO> setCurrentModule(@RequestBody Map<String, String> request) {
         String module = request.get("module");
         
         if (module == null || module.isEmpty()) {
-            Map<String, Object> errorResponse = new HashMap<>();
-            errorResponse.put("success", false);
-            errorResponse.put("error", "Module name is required");
+            ActionExecuteResultDTO errorResponse = new ActionExecuteResultDTO();
+            errorResponse.setSuccess(false);
+            errorResponse.setError("Module name is required");
             return ResponseEntity.badRequest().body(errorResponse);
         }
 
         moduleApiRegistry.setCurrentModule(module);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("currentModule", module);
-        response.put("availableApis", moduleApiRegistry.getAvailableApis(module));
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(true);
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentModule", module);
+        result.put("availableApis", moduleApiRegistry.getAvailableApis(module));
+        response.setResult(result);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/module/current")
-    public ResponseEntity<Map<String, Object>> getCurrentModule() {
+    public ResponseEntity<ActionExecuteResultDTO> getCurrentModule() {
         String currentModule = moduleApiRegistry.getCurrentModule();
         Set<String> availableApis = moduleApiRegistry.getCurrentAvailableApis();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("currentModule", currentModule);
-        response.put("availableApis", availableApis);
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(true);
+        Map<String, Object> result = new HashMap<>();
+        result.put("currentModule", currentModule);
+        result.put("availableApis", availableApis);
+        response.setResult(result);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/module/{module}/apis")
-    public ResponseEntity<Map<String, Object>> getModuleApis(@PathVariable String module) {
+    public ResponseEntity<ActionExecuteResultDTO> getModuleApis(@PathVariable String module) {
         Set<String> apis = moduleApiRegistry.getAvailableApis(module);
         Map<String, Object> moduleInfo = moduleApiRegistry.getModuleInfo(module);
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("module", module);
-        response.put("apis", apis);
-        response.put("info", moduleInfo);
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(true);
+        Map<String, Object> result = new HashMap<>();
+        result.put("module", module);
+        result.put("apis", apis);
+        result.put("info", moduleInfo);
+        response.setResult(result);
         return ResponseEntity.ok(response);
     }
 
     @GetMapping("/modules")
-    public ResponseEntity<Map<String, Object>> getAllModules() {
+    public ResponseEntity<ActionExecuteResultDTO> getAllModules() {
         List<Map<String, Object>> modules = moduleApiRegistry.getAllModulesInfo();
 
-        Map<String, Object> response = new HashMap<>();
-        response.put("success", true);
-        response.put("modules", modules);
+        ActionExecuteResultDTO response = new ActionExecuteResultDTO();
+        response.setSuccess(true);
+        Map<String, Object> result = new HashMap<>();
+        result.put("modules", modules);
+        response.setResult(result);
         return ResponseEntity.ok(response);
     }
 }

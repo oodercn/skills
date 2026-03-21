@@ -4,25 +4,46 @@
     var allCapabilities = [];
     var filteredCapabilities = [];
     var searchKeyword = '';
+    var CATEGORY_CONFIG = null;
 
-    var CATEGORY_ICONS = {
-        'collaboration': 'ri-team-line',
-        'communication': 'ri-message-3-line',
-        'management': 'ri-settings-3-line',
-        'ai': 'ri-brain-line',
-        'storage': 'ri-database-2-line',
-        'monitoring': 'ri-pulse-line',
-        'org': 'ri-organization-chart',
-        'business': 'ri-briefcase-line',
-        'default': 'ri-flashlight-line'
+    var SKILL_FORM_CONFIG = {
+        'SCENE': { icon: 'ri-layout-grid-line', color: 'warning', label: '场景应用' },
+        'PROVIDER': { icon: 'ri-service-line', color: 'primary', label: '能力服务' },
+        'DRIVER': { icon: 'ri-steering-line', color: 'success', label: '驱动适配' },
+        'default': { icon: 'ri-puzzle-line', color: 'secondary', label: '其他' }
     };
 
     var InstalledSceneCapabilities = {
         init: function() {
+            var self = this;
             window.onPageInit = function() {
                 console.log('[InstalledSceneCapabilities] 页面初始化完成');
-                InstalledSceneCapabilities.loadCapabilities();
+                self.loadCategoryConfig().then(function() {
+                    InstalledSceneCapabilities.loadCapabilities();
+                });
             };
+        },
+
+        loadCategoryConfig: function() {
+            if (typeof CategoryService === 'undefined') {
+                console.warn('[InstalledSceneCapabilities] CategoryService 未加载，使用默认配置');
+                CATEGORY_CONFIG = {
+                    'default': { icon: 'ri-folder-line', color: '#8c8c8c', label: '其他' }
+                };
+                return Promise.resolve();
+            }
+            
+            return CategoryService.loadCategories().then(function(categories) {
+                CATEGORY_CONFIG = {};
+                categories.forEach(function(cat) {
+                    CATEGORY_CONFIG[cat.code] = {
+                        icon: cat.icon,
+                        color: cat.color,
+                        label: cat.name
+                    };
+                });
+                CATEGORY_CONFIG['default'] = { icon: 'ri-folder-line', color: '#8c8c8c', label: '其他' };
+            });
         },
 
         loadCapabilities: function() {
@@ -86,18 +107,21 @@
 
             var html = '';
             filteredCapabilities.forEach(function(cap) {
-                var icon = CATEGORY_ICONS[cap.category] || CATEGORY_ICONS['default'];
-                var iconClass = cap.category || 'default';
+                var skillForm = cap.skillForm || 'PROVIDER';
+                var formConfig = SKILL_FORM_CONFIG[skillForm] || SKILL_FORM_CONFIG['default'];
+                
+                var category = cap.category || cap.capabilityCategory || 'default';
+                var catConfig = CATEGORY_CONFIG[category] || CATEGORY_CONFIG['default'];
 
                 html += '<div class="capability-item" data-id="' + cap.id + '">' +
-                    '<div class="capability-icon ' + iconClass + '"><i class="' + icon + '"></i></div>' +
+                    '<div class="capability-icon" style="color: ' + catConfig.color + '"><i class="' + catConfig.icon + '"></i></div>' +
                     '<div class="capability-info">' +
                     '<div class="capability-name">' + (cap.name || cap.id) + '</div>' +
                     '<div class="capability-desc">' + (cap.description || '暂无描述') + '</div>' +
                     '<div class="capability-meta">' +
                     '<span><i class="ri-information-line"></i> v' + (cap.version || '1.0.0') + '</span>' +
-                    '<span><i class="ri-folder-line"></i> ' + (cap.category || '其他') + '</span>' +
-                    '<span><i class="ri-checkbox-circle-line"></i> ' + (cap.sceneCapability ? '场景能力' : '技能能力') + '</span>' +
+                    '<span><i class="ri-folder-line"></i> ' + catConfig.label + '</span>' +
+                    '<span><i class="' + formConfig.icon + '"></i> ' + formConfig.label + '</span>' +
                     '</div>' +
                     '</div>' +
                     '<div class="capability-actions">' +

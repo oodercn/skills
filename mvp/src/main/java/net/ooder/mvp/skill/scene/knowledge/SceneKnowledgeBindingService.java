@@ -2,16 +2,16 @@ package net.ooder.mvp.skill.scene.knowledge;
 
 import net.ooder.scene.skill.knowledge.KnowledgeBaseService;
 import net.ooder.scene.skill.knowledge.KnowledgeBase;
-import net.ooder.scene.skill.knowledge.KnowledgeBaseCreateRequest;
 import net.ooder.scene.skill.knowledge.KnowledgeSearchRequest;
 import net.ooder.scene.skill.knowledge.KnowledgeSearchResult;
-import net.ooder.scene.skill.vector.SearchResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 @Service
 public class SceneKnowledgeBindingService {
@@ -21,8 +21,8 @@ public class SceneKnowledgeBindingService {
     @Autowired(required = false)
     private KnowledgeBaseService knowledgeBaseService;
 
-    private Map<String, List<KnowledgeBinding>> sceneBindings = new HashMap<>();
-    private Map<String, KnowledgeLayerConfig> layerConfigs = new HashMap<>();
+    private final Map<String, List<KnowledgeBinding>> sceneBindings = new ConcurrentHashMap<>();
+    private final Map<String, KnowledgeLayerConfig> layerConfigs = new ConcurrentHashMap<>();
 
     public static class KnowledgeBinding {
         private String kbId;
@@ -79,9 +79,13 @@ public class SceneKnowledgeBindingService {
         binding.setEnabled(true);
         
         if (knowledgeBaseService != null) {
-            KnowledgeBase kb = knowledgeBaseService.get(kbId);
-            if (kb != null) {
-                binding.setKbName(kb.getName());
+            try {
+                KnowledgeBase kb = knowledgeBaseService.get(kbId);
+                if (kb != null) {
+                    binding.setKbName(kb.getName());
+                }
+            } catch (Exception e) {
+                log.warn("[bindToScene] Failed to get kb name: {}", e.getMessage());
             }
         }
         
@@ -102,18 +106,13 @@ public class SceneKnowledgeBindingService {
     }
 
     public List<KnowledgeBinding> getBindings(String sceneGroupId) {
-        return sceneBindings.getOrDefault(sceneGroupId, new ArrayList<>());
+        return new ArrayList<>(sceneBindings.getOrDefault(sceneGroupId, new ArrayList<>()));
     }
 
     public List<Map<String, Object>> searchKnowledge(String sceneGroupId, String query, int topK) {
         log.info("[searchKnowledge] Searching in scene {} for: {}", sceneGroupId, query);
         
         List<Map<String, Object>> results = new ArrayList<>();
-        
-        if (knowledgeBaseService == null) {
-            log.warn("[searchKnowledge] KnowledgeBaseService not available");
-            return results;
-        }
         
         List<KnowledgeBinding> bindings = getBindings(sceneGroupId);
         if (bindings.isEmpty()) {
@@ -126,6 +125,11 @@ public class SceneKnowledgeBindingService {
         
         for (KnowledgeBinding binding : bindings) {
             if (!binding.isEnabled()) {
+                continue;
+            }
+            
+            if (knowledgeBaseService == null) {
+                log.warn("[searchKnowledge] KnowledgeBaseService not available");
                 continue;
             }
             
@@ -175,7 +179,9 @@ public class SceneKnowledgeBindingService {
         List<Map<String, Object>> allResults = searchKnowledge(sceneGroupId, query, topK * 2);
         
         if (layers != null && !layers.isEmpty()) {
-            allResults.removeIf(r -> !layers.contains(r.get("layer")));
+            allResults = allResults.stream()
+                .filter(r -> layers.contains(r.get("layer")))
+                .collect(Collectors.toList());
         }
         
         if (allResults.size() > topK) {
@@ -191,6 +197,22 @@ public class SceneKnowledgeBindingService {
     }
 
     public KnowledgeLayerConfig getLayerConfig(String sceneGroupId) {
-        return layerConfigs.getOrDefault(sceneGroupId, new KnowledgeLayerConfig());
+        KnowledgeLayerConfig config = layerConfigs.get(sceneGroupId);
+        if (config == null) {
+            config = new KnowledgeLayerConfig();
+            log.info("[getLayerConfig] Using default layer config for new scene group: {}", sceneGroupId);
+        }
+        return config;
+    }
+    
+    public void initDefaultBindingsForScene(String sceneGroupId) {
+        if (!sceneBindings.containsKey(sceneGroupId)) {
+            sceneBindings.put(sceneGroupId, new ArrayList<>());
+            log.info("[initDefaultBindingsForScene] Initialized empty bindings for scene: {}", sceneGroupId);
+        }
+        if (!layerConfigs.containsKey(sceneGroupId)) {
+            layerConfigs.put(sceneGroupId, new KnowledgeLayerConfig());
+            log.info("[initDefaultBindingsForScene] Initialized default config for scene: {}", sceneGroupId);
+        }
     }
 }

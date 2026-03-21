@@ -24,6 +24,21 @@ public class LlmCallLogDTO {
     private long createTime;
     private Map<String, Object> metadata;
     
+    private String companyId;
+    private String companyName;
+    private String departmentId;
+    private String departmentName;
+    private String userName;
+    private String sceneName;
+    private String capabilityName;
+    private String moduleId;
+    private String moduleName;
+    private String moduleType;
+    private String businessType;
+    private String clientIp;
+    private String sessionId;
+    private String requestId;
+    
     public String getLogId() { return logId; }
     public void setLogId(String logId) { this.logId = logId; }
     public String getProviderId() { return providerId; }
@@ -62,4 +77,33 @@ public class LlmCallLogDTO {
     public void setCreateTime(long createTime) { this.createTime = createTime; }
     public Map<String, Object> getMetadata() { return metadata; }
     public void setMetadata(Map<String, Object> metadata) { this.metadata = metadata; }
+    
+    public String getCompanyId() { return companyId; }
+    public void setCompanyId(String companyId) { this.companyId = companyId; }
+    public String getCompanyName() { return companyName; }
+    public void setCompanyName(String companyName) { this.companyName = companyName; }
+    public String getDepartmentId() { return departmentId; }
+    public void setDepartmentId(String departmentId) { this.departmentId = departmentId; }
+    public String getDepartmentName() { return departmentName; }
+    public void setDepartmentName(String departmentName) { this.departmentName = departmentName; }
+    public String getUserName() { return userName; }
+    public void setUserName(String userName) { this.userName = userName; }
+    public String getSceneName() { return sceneName; }
+    public void setSceneName(String sceneName) { this.sceneName = sceneName; }
+    public String getCapabilityName() { return capabilityName; }
+    public void setCapabilityName(String capabilityName) { this.capabilityName = capabilityName; }
+    public String getModuleId() { return moduleId; }
+    public void setModuleId(String moduleId) { this.moduleId = moduleId; }
+    public String getModuleName() { return moduleName; }
+    public void setModuleName(String moduleName) { this.moduleName = moduleName; }
+    public String getModuleType() { return moduleType; }
+    public void setModuleType(String moduleType) { this.moduleType = moduleType; }
+    public String getBusinessType() { return businessType; }
+    public void setBusinessType(String businessType) { this.businessType = businessType; }
+    public String getClientIp() { return clientIp; }
+    public void setClientIp(String clientIp) { this.clientIp = clientIp; }
+    public String getSessionId() { return sessionId; }
+    public void setSessionId(String sessionId) { this.sessionId = sessionId; }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 }

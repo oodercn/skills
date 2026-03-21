@@ -242,22 +242,56 @@
         }
     ];
 
-    var CATEGORY_CONFIG = {
-        'org': { name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', desc: '企业组织架构、用户认证相关服务', userFacing: false },
-        'vfs': { name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', desc: '文件存储、对象存储相关服务', userFacing: false },
-        'llm': { name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', desc: '大语言模型服务、对话、配置、上下文管理', userFacing: true },
-        'knowledge': { name: '知识服务', icon: 'ri-book-line', color: '#10b981', desc: '知识库、RAG、向量存储、文档处理', userFacing: true },
-        'biz': { name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', desc: '业务场景能力、智能助手、自动化流程', userFacing: true },
-        'sys': { name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', desc: '系统监控、网络管理、安全审计', userFacing: false },
-        'msg': { name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', desc: '消息队列、通讯协议服务', userFacing: false },
-        'ui': { name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', desc: '界面生成、设计转代码服务', userFacing: false },
-        'payment': { name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', desc: '支付渠道、退款管理、交易处理', userFacing: false },
-        'media': { name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', desc: '自媒体文章发布、内容管理、数据分析', userFacing: false },
-        'util': { name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', desc: '通用工具、辅助服务、业务工具', userFacing: true },
-        'nexus-ui': { name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', desc: 'Nexus管理界面、仪表盘、监控页面', userFacing: false }
-    };
+    var CATEGORY_CONFIG = {};
     
-    var USER_FACING_CATEGORIES = ['llm', 'knowledge', 'biz', 'util'];
+    var USER_FACING_CATEGORIES = [];
+
+    function initCategoryConfig() {
+        if (typeof CategoryService === 'undefined') {
+            console.warn('CategoryService 未加载，使用默认分类配置');
+            var defaultCategories = [
+                { code: 'org', name: '组织服务', icon: 'ri-team-line', color: '#8b5cf6', userFacing: true },
+                { code: 'vfs', name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', userFacing: true },
+                { code: 'llm', name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', userFacing: true },
+                { code: 'knowledge', name: '知识服务', icon: 'ri-book-line', color: '#10b981', userFacing: true },
+                { code: 'biz', name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', userFacing: true },
+                { code: 'sys', name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', userFacing: false },
+                { code: 'msg', name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', userFacing: true },
+                { code: 'ui', name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', userFacing: true },
+                { code: 'payment', name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', userFacing: true },
+                { code: 'media', name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', userFacing: true },
+                { code: 'util', name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', userFacing: true },
+                { code: 'nexus-ui', name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', userFacing: false }
+            ];
+            defaultCategories.forEach(function(cat) {
+                CATEGORY_CONFIG[cat.code] = {
+                    name: cat.name,
+                    icon: cat.icon,
+                    color: cat.color,
+                    desc: '',
+                    userFacing: cat.userFacing
+                };
+                if (cat.userFacing) {
+                    USER_FACING_CATEGORIES.push(cat.code);
+                }
+            });
+            return Promise.resolve();
+        }
+        return CategoryService.loadCategories().then(function(categories) {
+            categories.forEach(function(cat) {
+                CATEGORY_CONFIG[cat.code] = {
+                    name: cat.name,
+                    icon: cat.icon,
+                    color: cat.color,
+                    desc: cat.desc || '',
+                    userFacing: cat.userFacing
+                };
+                if (cat.userFacing) {
+                    USER_FACING_CATEGORIES.push(cat.code);
+                }
+            });
+        });
+    }
     
     var BIZ_SUBCATEGORIES = [
         { id: 'hr', name: '人力资源', icon: 'ri-user-add-line', desc: '招聘、入职、培训、绩效管理' },
@@ -472,7 +506,9 @@
     }
 
     function getCategoryConfig(address) {
-        return CATEGORY_CONFIG[address] || CATEGORY_CONFIG['util'];
+        var config = CATEGORY_CONFIG[address];
+        if (config) return config;
+        return CategoryService.getInfo(address);
     }
 
     function getProfileSteps(profile) {
@@ -506,6 +542,8 @@
             return cap.address;
         });
     }
+
+    initCategoryConfig();
 
     global.OoderCapability = {
         CAPABILITIES: CAPABILITIES,
