@@ -17,6 +17,7 @@ metadata:
     - smtp
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: independent

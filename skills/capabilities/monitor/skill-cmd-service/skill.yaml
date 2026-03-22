@@ -17,6 +17,7 @@ metadata:
     - process
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: platform

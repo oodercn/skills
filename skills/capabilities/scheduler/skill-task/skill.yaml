@@ -17,6 +17,7 @@ metadata:
     - execution
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: platform

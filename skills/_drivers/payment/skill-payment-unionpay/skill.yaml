@@ -17,6 +17,7 @@ metadata:
     - upac
 
 spec:
+  skillForm: PROVIDER
   type: driver-skill
   
   ownership: independent

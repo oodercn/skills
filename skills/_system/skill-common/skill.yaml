@@ -18,6 +18,7 @@ metadata:
     - storage
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: platform

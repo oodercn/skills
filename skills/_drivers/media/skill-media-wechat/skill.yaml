@@ -17,6 +17,7 @@ metadata:
     - mp
 
 spec:
+  skillForm: PROVIDER
   type: driver-skill
   
   ownership: independent

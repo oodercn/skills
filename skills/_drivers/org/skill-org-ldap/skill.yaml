@@ -18,6 +18,7 @@ metadata:
     - directory
 
 spec:
+  skillForm: PROVIDER
   type: enterprise-skill
   
   ownership: platform

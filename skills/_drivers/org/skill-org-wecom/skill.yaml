@@ -18,6 +18,7 @@ metadata:
     - organization
 
 spec:
+  skillForm: PROVIDER
   type: enterprise-skill
   
   ownership: platform

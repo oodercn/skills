@@ -21,6 +21,7 @@ metadata:
     - fallback
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: platform

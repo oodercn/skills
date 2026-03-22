@@ -17,6 +17,7 @@ metadata:
     - pdf
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: independent

@@ -18,6 +18,7 @@ metadata:
     - authentication
 
 spec:
+  skillForm: PROVIDER
   type: enterprise-skill
   
   ownership: platform

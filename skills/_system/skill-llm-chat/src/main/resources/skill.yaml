@@ -11,6 +11,7 @@ metadata:
   type: service-skill
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: platform

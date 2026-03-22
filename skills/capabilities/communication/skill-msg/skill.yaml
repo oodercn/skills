@@ -17,6 +17,7 @@ metadata:
     - mq
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: independent

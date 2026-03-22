@@ -18,6 +18,7 @@ metadata:
     - monitor
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: platform

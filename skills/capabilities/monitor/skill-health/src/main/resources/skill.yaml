@@ -19,6 +19,7 @@ metadata:
     - report
 
 spec:
+  skillForm: PROVIDER
   type: system-service
   
   ownership: platform

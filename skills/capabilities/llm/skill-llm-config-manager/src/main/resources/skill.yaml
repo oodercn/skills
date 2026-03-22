@@ -15,6 +15,7 @@ metadata:
     - security
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   runtime:

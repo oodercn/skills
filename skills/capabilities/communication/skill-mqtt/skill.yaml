@@ -18,6 +18,7 @@ metadata:
     - lightweight
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: independent

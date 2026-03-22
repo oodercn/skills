@@ -17,6 +17,7 @@ metadata:
     - websocket
 
 spec:
+  skillForm: PROVIDER
   type: provider-skill
   
   ownership: independent

@@ -19,6 +19,7 @@ metadata:
     - device
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: platform

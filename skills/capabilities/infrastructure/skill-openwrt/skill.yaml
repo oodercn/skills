@@ -18,6 +18,7 @@ metadata:
     - driver
 
 spec:
+  skillForm: STANDALONE
   type: tool-skill
   
   ownership: tool

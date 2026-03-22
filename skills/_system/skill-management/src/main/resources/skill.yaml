@@ -16,6 +16,7 @@ metadata:
     - marketplace
 
 spec:
+  skillForm: PROVIDER
   type: service-skill
   
   ownership: platform
