@@ -1,228 +1,68 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-vfs-base
   name: VFS基础服务
-  version: 1.0.0
-  description: VFS基础服务 - 提供文件操作基础接口，支持多种存储后端
-  author: ooder Team
-  type: provider-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - vfs
-    - storage
-    - file
-    - filesystem
+  version: "2.3.1"
+  category: vfs
+  subCategory: base
+  description: VFS基础服务，提供文件系统抽象接口
+  author: Ooder Team
+  icon: ri-folder-line
 
 spec:
-  type: provider-skill
-  
-  ownership: independent
-  
-  capability:
-    address: 0x20
-    category: vfs
-    code: VFS_BASE
-    operations: [read, write, delete, list, copy, move]
-  
-  providerType: storage
-  
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-  
-  llmConfig:
-    required: false
-    defaultProvider: "deepseek"
-    defaultModel: "deepseek-chat"
-    capabilities:
-      - chat
-      - streaming
-      - function-calling
-    modelSelection:
-      allowUserOverride: true
-      availableProviders:
-        - deepseek
-        - openai
-        - qianwen
-        - volcengine
-        - ollama
-    functionCalling:
-      enabled: true
-      tools:
-        - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
-          parameters:
-            type: object
-            properties:
-              capability:
-                type: string
-                description: "能力名称"
-              detail:
-                type: string
-                enum: [brief, detailed, examples]
-                default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
-          parameters:
-            type: object
-            properties:
-              expression:
-                type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
-          parameters:
-            type: object
-            properties:
-              formType:
-                type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
-          parameters:
-            type: object
-            properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-  
-  supportedSceneTypes:
-    - document-management
-    - knowledge-base
-    - media-management
-    - backup-service
-    
-  dynamicSceneTypes: true
-  
-  autoStart:
-    enabled: true
-    delay: 2s
-    
-  autoJoin:
-    enabled: true
-    matchSceneTypes: true
-    maxSceneGroups: 20
-  
-  dependencies: []
-  
-  providedInterfaces:
-    - id: vfs-storage
-      version: "1.0"
-      description: "VFS存储接口"
-    - id: file-operations
-      version: "1.0"
-      description: "文件操作接口"
+  skillForm: PROVIDER
   
   capabilities:
-    - id: file-read
+    - id: vfs-read
       name: 文件读取
       description: 读取文件内容
       category: service
-    - id: file-write
+      autoBind: true
+      
+    - id: vfs-write
       name: 文件写入
       description: 写入文件内容
       category: service
-    - id: file-delete
+      autoBind: true
+      
+    - id: vfs-delete
       name: 文件删除
       description: 删除文件
       category: service
-    - id: file-list
+      autoBind: true
+      
+    - id: vfs-list
       name: 文件列表
       description: 列出目录内容
       category: service
-    - id: file-copy
-      name: 文件复制
-      description: 复制文件
-      category: service
-    - id: file-move
-      name: 文件移动
-      description: 移动文件
-      category: service
-    - id: metadata
+      autoBind: true
+      
+    - id: vfs-metadata
       name: 元数据管理
       description: 文件元数据操作
       category: service
+      autoBind: false
+      
+  dependencies: []
   
-  endpoints:
-    - path: /api/vfs/files
-      method: GET
-      description: 列出文件
-      capability: file-list
-    - path: /api/vfs/files/{path}
-      method: GET
-      description: 读取文件
-      capability: file-read
-    - path: /api/vfs/files/{path}
-      method: PUT
-      description: 写入文件
-      capability: file-write
-    - path: /api/vfs/files/{path}
-      method: DELETE
-      description: 删除文件
-      capability: file-delete
-    - path: /api/vfs/files/{path}/copy
-      method: POST
-      description: 复制文件
-      capability: file-copy
-    - path: /api/vfs/files/{path}/move
-      method: POST
-      description: 移动文件
-      capability: file-move
-    - path: /api/vfs/files/{path}/metadata
-      method: GET
-      description: 获取元数据
-      capability: metadata
-  
-  config:
-    optional:
-      - name: DEFAULT_STORAGE
-        type: string
-        default: "local"
-        description: 默认存储类型
-      - name: MAX_FILE_SIZE
-        type: integer
-        default: 104857600
-        description: 最大文件大小(字节)
-      - name: ALLOWED_EXTENSIONS
-        type: string
-        default: "*"
-        description: 允许的文件扩展名
-      - name: ROOT_PATH
+  configSchema:
+    type: object
+    properties:
+      basePath:
         type: string
         default: "./data/vfs"
-        description: 根路径
-  
-  resources:
-    cpu: "100m"
-    memory: "128Mi"
-    storage: "1Gi"
-  
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: true
+        title: 基础路径
+      maxFileSize:
+        type: integer
+        default: 104857600
+        title: 最大文件大小(字节)
+      allowedExtensions:
+        type: array
+        default: []
+        title: 允许的文件扩展名
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "64Mi"
