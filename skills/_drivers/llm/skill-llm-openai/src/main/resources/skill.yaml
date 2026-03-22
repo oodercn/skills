@@ -1,262 +1,63 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-llm-openai
   name: OpenAI LLM Provider
-  version: 2.3
-  description: OpenAI LLM Provider - 支持GPT-4、GPT-4o、GPT-3.5-turbo等模型，提供对话、补全、嵌入、Function Calling能力
-  author: ooder Team
-  type: provider-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - llm
-    - openai
-    - gpt-4
-    - chatgpt
-    - embedding
+  version: "2.3.1"
+  category: llm
+  subCategory: provider
+  description: OpenAI LLM Provider，支持GPT-4、GPT-4o、GPT-3.5-turbo等模型
+  author: Ooder Team
+  icon: ri-robot-line
 
 spec:
-  type: provider-skill
-  
-  ownership: independent
-  
-  capability:
-    address: 0x29
-    category: LLM
-    code: LLM_OPENAI
-    operations: [chat, completion, embedding, streaming, function-calling]
-  
-  providerType: llm
-  
-  supportedSceneTypes:
-    - llm-chat
-    - knowledge-qa
-    - document-assistant
-    - onboarding-assistant
-    
-  dynamicSceneTypes: true
-  
-  autoStart:
-    enabled: false
-    
-  autoJoin:
-    enabled: true
-    matchSceneTypes: true
-    maxSceneGroups: 20
-  
-  dependencies:
-    - id: llm-sdk
-      version: ">=2.3"
-      required: true
-      description: "LLM SDK"
-  
-  providedInterfaces:
-    - id: llm-provider
-      version: "1.0"
-      description: "LLM Provider接口"
-  
-  supportedModels:
-    - id: gpt-4
-      name: GPT-4
-      type: chat
-      maxTokens: 8192
-      supportsFunctionCalling: true
-      supportsStreaming: true
-    - id: gpt-4-turbo
-      name: GPT-4 Turbo
-      type: chat
-      maxTokens: 128000
-      supportsFunctionCalling: true
-      supportsStreaming: true
-    - id: gpt-4o
-      name: GPT-4o
-      type: chat
-      maxTokens: 128000
-      supportsFunctionCalling: true
-      supportsStreaming: true
-      supportsVision: true
-    - id: gpt-3.5-turbo
-      name: GPT-3.5 Turbo
-      type: chat
-      maxTokens: 16385
-      supportsFunctionCalling: true
-      supportsStreaming: true
-    - id: text-embedding-3-small
-      name: Text Embedding 3 Small
-      type: embedding
-      dimension: 1536
-    - id: text-embedding-3-large
-      name: Text Embedding 3 Large
-      type: embedding
-      dimension: 3072
+  skillForm: PROVIDER
   
   capabilities:
     - id: chat-completion
       name: 对话补全
-      description: 支持多轮对话补全
+      description: GPT模型对话补全
       category: ai
-    - id: text-completion
-      name: 文本补全
-      description: 文本生成补全
-      category: ai
+      autoBind: true
     - id: embedding
-      name: 向量嵌入
-      description: 文本向量嵌入
+      name: 文本嵌入
+      description: Text Embedding模型
       category: ai
+      autoBind: false
     - id: function-calling
       name: 函数调用
       description: 支持Function Calling
       category: ai
+      autoBind: false
     - id: streaming
       name: 流式输出
       description: 支持SSE流式输出
       category: ai
-  
-  endpoints:
-    - path: /api/llm/chat
-      method: POST
-      description: 对话补全
-      capability: chat-completion
-    - path: /api/llm/chat/stream
-      method: POST
-      description: 流式对话
-      capability: streaming
-    - path: /api/llm/embed
-      method: POST
-      description: 向量嵌入
-      capability: embedding
-  
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-    
-
-  llmConfig:
-    required: false
-    defaultProvider: "deepseek"
-    defaultModel: "deepseek-chat"
-    capabilities:
-      - chat
-      - streaming
-      - function-calling
-    modelSelection:
-      allowUserOverride: true
-      availableProviders:
-        - deepseek
-        - openai
-        - qianwen
-        - volcengine
-        - ollama
-    functionCalling:
-      enabled: true
-      tools:
-        - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
-          parameters:
-            type: object
-            properties:
-              capability:
-                type: string
-                description: "能力名称"
-              detail:
-                type: string
-                enum: [brief, detailed, examples]
-                default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
-          parameters:
-            type: object
-            properties:
-              expression:
-                type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
-          parameters:
-            type: object
-            properties:
-              formType:
-                type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
-          parameters:
-            type: object
-            properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-
-  config:
-    required:
-      - name: OPENAI_API_KEY
+      autoBind: false
+      
+  dependencies:
+    - skillId: llm-sdk
+      version: ">=2.3.1"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      apiKey:
         type: string
-        description: OpenAI API Key
+        title: API Key
+        required: true
         secret: true
-    optional:
-      - name: OPENAI_BASE_URL
+      baseUrl:
         type: string
         default: "https://api.openai.com/v1"
-        description: API基础URL
-      - name: DEFAULT_MODEL
+        title: API基础URL
+      model:
         type: string
         default: "gpt-4o"
-        description: 默认模型
-      - name: TIMEOUT
-        type: integer
-        default: 60000
-        description: 请求超时(毫秒)
-      - name: MAX_RETRIES
-        type: integer
-        default: 3
-        description: 最大重试次数
-  
-  resources:
+        title: 默认模型
+        
+  estimatedResources:
     cpu: "50m"
     memory: "128Mi"
-    storage: "10Mi"
-  
-  offline:
-    enabled: false
-
-  knowledge:
-    documents:
-      - id: overview
-        name: 功能概述
-        path: README.md
-        type: guide
-        language: zh
-        priority: high
-    ragConfig:
-      enabled: true
-      indexName: "skill-llm-openai-knowledge"
-      embeddingModel: text-embedding-3-small
-      chunkSize: 1000
-      chunkOverlap: 200
-      searchStrategy: hybrid
-      topK: 5
-      threshold: 0.7

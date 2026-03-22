@@ -1,251 +1,45 @@
 apiVersion: skill.ooder.net/v1
-kind: Skill
+kind: SkillPackage
 
 metadata:
   id: skill-llm-ollama
   name: Ollama LLM Provider
-  version: 2.3
-  description: Ollama LLM Provider - 支持本地部署的LLM模型(llama3、mistral、qwen2.5等)，提供离线对话、补全能力
-  author: ooder Team
-  type: provider-skill
-  license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - llm
-    - ollama
-    - local
-    - offline
-    - llama
+  version: "2.3.1"
+  category: llm
+  subCategory: provider
+  description: Ollama本地LLM Provider，支持运行本地开源大模型
+  author: Ooder Team
+  icon: ri-robot-line
 
 spec:
-  type: provider-skill
-  
-  ownership: independent
-  
-  capability:
-    address: 0x28
-    category: LLM
-    code: LLM_OLLAMA
-    operations: [chat, completion, embedding, streaming]
-  
-  providerType: llm
-  
-  supportedSceneTypes:
-    - llm-chat
-    - knowledge-qa
-    - document-assistant
-    - offline-assistant
-    
-  dynamicSceneTypes: true
-  
-  autoStart:
-    enabled: false
-    
-  autoJoin:
-    enabled: true
-    matchSceneTypes: true
-    maxSceneGroups: 20
-  
-  dependencies:
-    - id: llm-sdk
-      version: ">=2.3"
-      required: true
-      description: "LLM SDK"
-  
-  providedInterfaces:
-    - id: llm-provider
-      version: "1.0"
-      description: "LLM Provider接口"
-  
-  supportedModels:
-    - id: llama3
-      name: Llama 3
-      type: chat
-      maxTokens: 8192
-      supportsStreaming: true
-    - id: llama3.1
-      name: Llama 3.1
-      type: chat
-      maxTokens: 128000
-      supportsStreaming: true
-    - id: mistral
-      name: Mistral
-      type: chat
-      maxTokens: 32768
-      supportsStreaming: true
-    - id: qwen2.5
-      name: Qwen 2.5
-      type: chat
-      maxTokens: 32768
-      supportsStreaming: true
-    - id: nomic-embed-text
-      name: Nomic Embed Text
-      type: embedding
-      dimension: 768
+  skillForm: PROVIDER
   
   capabilities:
     - id: chat-completion
       name: 对话补全
-      description: 支持多轮对话补全
+      description: 本地模型对话补全
       category: ai
-    - id: text-completion
-      name: 文本补全
-      description: 文本生成补全
-      category: ai
+      autoBind: true
     - id: embedding
-      name: 向量嵌入
-      description: 本地向量嵌入
+      name: 文本嵌入
+      description: 本地Embedding模型
       category: ai
-    - id: streaming
-      name: 流式输出
-      description: 支持流式输出
-      category: ai
-    - id: offline
-      name: 离线运行
-      description: 完全离线运行，无需网络
-      category: infra
-  
-  endpoints:
-    - path: /api/llm/chat
-      method: POST
-      description: 对话补全
-      capability: chat-completion
-    - path: /api/llm/chat/stream
-      method: POST
-      description: 流式对话
-      capability: streaming
-    - path: /api/llm/embed
-      method: POST
-      description: 向量嵌入
-      capability: embedding
-  
-  runtime:
-    language: java
-    javaVersion: "8"
-    framework: spring-boot
-    
-
-  llmConfig:
-    required: false
-    defaultProvider: "deepseek"
-    defaultModel: "deepseek-chat"
-    capabilities:
-      - chat
-      - streaming
-      - function-calling
-    modelSelection:
-      allowUserOverride: true
-      availableProviders:
-        - deepseek
-        - openai
-        - qianwen
-        - volcengine
-        - ollama
-    functionCalling:
-      enabled: true
-      tools:
-        - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
-          parameters:
-            type: object
-            properties:
-              capability:
-                type: string
-                description: "能力名称"
-              detail:
-                type: string
-                enum: [brief, detailed, examples]
-                default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
-          parameters:
-            type: object
-            properties:
-              expression:
-                type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
-          parameters:
-            type: object
-            properties:
-              formType:
-                type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
-          parameters:
-            type: object
-            properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-
-  config:
-    required:
-      - name: OLLAMA_BASE_URL
+      autoBind: false
+      
+  dependencies: []
+      
+  configSchema:
+    type: object
+    properties:
+      baseUrl:
         type: string
-        description: Ollama服务地址
         default: "http://localhost:11434"
-    optional:
-      - name: DEFAULT_MODEL
+        title: Ollama服务地址
+      model:
         type: string
         default: "llama3"
-        description: 默认模型
-      - name: TIMEOUT
-        type: integer
-        default: 120000
-        description: 请求超时(毫秒)
-      - name: KEEP_ALIVE
-        type: string
-        default: "5m"
-        description: 模型保持加载时间
-  
-  resources:
-    cpu: "100m"
-    memory: "256Mi"
-    storage: "10Mi"
-  
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: false
-
-  knowledge:
-    documents:
-      - id: overview
-        name: 功能概述
-        path: README.md
-        type: guide
-        language: zh
-        priority: high
-    ragConfig:
-      enabled: true
-      indexName: "skill-llm-ollama-knowledge"
-      embeddingModel: text-embedding-3-small
-      chunkSize: 1000
-      chunkOverlap: 200
-      searchStrategy: hybrid
-      topK: 5
-      threshold: 0.7
+        title: 默认模型
+        
+  estimatedResources:
+    cpu: "500m"
+    memory: "1Gi"
