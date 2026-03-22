@@ -22,9 +22,170 @@ metadata:
 
 spec:
   skillForm: SCENE
-  type: scene-skill
-  category: tbs
   
+  scene:
+    type: TRIGGER
+    visibility: public
+    participantMode: multi-role
+    name: 项目知识沉淀
+    description: 项目知识自动沉淀和整理
+    
+  roles:
+    - id: PROJECT_MANAGER
+      name: 项目经理
+      description: 项目负责人，管理项目知识库
+      required: true
+      minCount: 1
+      maxCount: 1
+      permissions:
+        - project:manage
+        - docs:import
+        - docs:delete
+        - graph:view
+    - id: TEAM_MEMBER
+      name: 团队成员
+      description: 项目团队成员
+      required: false
+      minCount: 0
+      maxCount: 50
+      permissions:
+        - docs:view
+        - docs:upload
+        - docs:edit
+    - id: STAKEHOLDER
+      name: 干系人
+      description: 项目干系人，只读访问
+      required: false
+      minCount: 0
+      maxCount: 100
+      permissions:
+        - docs:view
+        - graph:view
+        
+  activationSteps:
+    PROJECT_MANAGER:
+      - stepId: link-project
+        step: 1
+        action: link-project
+        title: 关联项目
+        description: 选择要沉淀知识的项目
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-classification
+        step: 2
+        action: configure-classification
+        title: 配置分类规则
+        description: 设置文档分类规则
+        type: CONFIG_CONDITIONS
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: invite-team
+        step: 3
+        action: invite-team
+        title: 邀请团队成员
+        description: 添加项目团队成员
+        type: CONFIRM_PARTICIPANTS
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+    TEAM_MEMBER:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入项目知识库
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+    STAKEHOLDER:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 获取项目知识库访问权限
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    PROJECT_MANAGER:
+      - id: overview
+        name: 项目概览
+        icon: ri-dashboard-line
+        path: /project-knowledge/overview
+        order: 1
+        visible: true
+      - id: import
+        name: 导入文档
+        icon: ri-upload-line
+        path: /project-knowledge/import
+        order: 2
+        visible: true
+      - id: documents
+        name: 文档管理
+        icon: ri-folder-line
+        path: /project-knowledge/documents
+        order: 3
+        visible: true
+      - id: knowledge-graph
+        name: 知识图谱
+        icon: ri-mind-map
+        path: /project-knowledge/graph
+        order: 4
+        visible: true
+      - id: similar-projects
+        name: 相似项目
+        icon: ri-links-line
+        path: /project-knowledge/similar
+        order: 5
+        visible: true
+    TEAM_MEMBER:
+      - id: my-documents
+        name: 我的文档
+        icon: ri-folder-line
+        path: /project-knowledge/my-documents
+        order: 1
+        visible: true
+      - id: upload
+        name: 上传文档
+        icon: ri-upload-line
+        path: /project-knowledge/upload
+        order: 2
+        visible: true
+      - id: knowledge-graph
+        name: 知识图谱
+        icon: ri-mind-map
+        path: /project-knowledge/graph
+        order: 3
+        visible: true
+    STAKEHOLDER:
+      - id: documents
+        name: 项目文档
+        icon: ri-folder-line
+        path: /project-knowledge/documents
+        order: 1
+        visible: true
+      - id: knowledge-graph
+        name: 知识图谱
+        icon: ri-mind-map
+        path: /project-knowledge/graph
+        order: 2
+        visible: true
+        
   classification:
     category: tbs
     categoryName: 触发业务场景

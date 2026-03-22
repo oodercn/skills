@@ -21,8 +21,181 @@ metadata:
 
 spec:
   skillForm: SCENE
-  type: scene-skill
   
+  scene:
+    type: TRIGGER
+    visibility: public
+    participantMode: multi-role
+    name: 房源管理
+    description: 房产中介房源信息采集与管理
+    
+  roles:
+    - id: BROKER
+      name: 房产经纪人
+      description: 房产经纪人，负责房源录入和管理
+      required: true
+      minCount: 1
+      maxCount: 100
+      permissions:
+        - property:create
+        - property:edit.own
+        - property:view
+        - property:search
+    - id: MANAGER
+      name: 门店经理
+      description: 门店经理，负责审核和管理房源
+      required: false
+      minCount: 0
+      maxCount: 10
+      permissions:
+        - property:manage
+        - property:approve
+        - property:view-all
+        - property:export
+    - id: ADMIN
+      name: 系统管理员
+      description: 系统管理员，负责系统配置
+      required: true
+      minCount: 1
+      maxCount: 5
+      permissions:
+        - system:manage
+        - user:manage
+        - property:view-all
+        
+  activationSteps:
+    BROKER:
+      - stepId: register-account
+        step: 1
+        action: register-account
+        title: 注册账号
+        description: 创建经纪人账号
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-profile
+        step: 2
+        action: configure-profile
+        title: 配置个人信息
+        description: 设置联系方式和负责区域
+        type: CONFIG_PRIVATE_CAPABILITIES
+        required: false
+        skippable: true
+        autoExecute: false
+    MANAGER:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入门店管理
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+    ADMIN:
+      - stepId: configure-map
+        step: 1
+        action: configure-map
+        title: 配置地图服务
+        description: 设置地图服务商API
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-storage
+        step: 2
+        action: configure-storage
+        title: 配置存储
+        description: 设置图片存储位置
+        type: CONFIG_CONDITIONS
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: invite-brokers
+        step: 3
+        action: invite-brokers
+        title: 邀请经纪人
+        description: 添加经纪人账号
+        type: CONFIRM_PARTICIPANTS
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    BROKER:
+      - id: property-list
+        name: 房源列表
+        icon: ri-home-4-line
+        path: /real-estate/properties
+        order: 1
+        visible: true
+      - id: add-property
+        name: 新增房源
+        icon: ri-add-line
+        path: /real-estate/add
+        order: 2
+        visible: true
+      - id: my-properties
+        name: 我的房源
+        icon: ri-user-line
+        path: /real-estate/my
+        order: 3
+        visible: true
+    MANAGER:
+      - id: dashboard
+        name: 门店概览
+        icon: ri-dashboard-line
+        path: /real-estate/dashboard
+        order: 1
+        visible: true
+      - id: all-properties
+        name: 全部房源
+        icon: ri-home-4-line
+        path: /real-estate/all
+        order: 2
+        visible: true
+      - id: pending-approval
+        name: 待审核
+        icon: ri-checkbox-line
+        path: /real-estate/pending
+        order: 3
+        visible: true
+      - id: reports
+        name: 统计报表
+        icon: ri-bar-chart-line
+        path: /real-estate/reports
+        order: 4
+        visible: true
+    ADMIN:
+      - id: system-config
+        name: 系统配置
+        icon: ri-settings-line
+        path: /real-estate/config
+        order: 1
+        visible: true
+      - id: user-management
+        name: 用户管理
+        icon: ri-user-settings-line
+        path: /real-estate/users
+        order: 2
+        visible: true
+      - id: data-export
+        name: 数据导出
+        icon: ri-download-line
+        path: /real-estate/export
+        order: 3
+        visible: true
+        
   dependencies:
     - id: skill-form-builder
       version: ">=1.0.0"

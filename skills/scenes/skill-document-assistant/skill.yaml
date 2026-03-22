@@ -22,9 +22,83 @@ metadata:
 
 spec:
   skillForm: SCENE
-  type: scene-skill
-  # category 已废弃，请在 skill-index 中定义
   
+  scene:
+    type: AUTO
+    visibility: public
+    participantMode: single-user
+    name: 文档助手
+    description: 企业文档智能问答
+    
+  roles:
+    - id: USER
+      name: 用户
+      description: 使用文档助手进行问答的用户
+      required: true
+      minCount: 1
+      maxCount: 10000
+      permissions:
+        - document:query
+        - document:upload
+        - kb:manage.own
+        
+  activationSteps:
+    USER:
+      - stepId: configure-llm
+        step: 1
+        action: configure-llm
+        title: 配置LLM
+        description: 配置问答使用的LLM服务
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: create-kb
+        step: 2
+        action: create-kb
+        title: 创建知识库
+        description: 创建第一个知识库
+        type: VERIFY_CONFIG
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: confirm-activation
+        step: 3
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    USER:
+      - id: query
+        name: 文档问答
+        icon: ri-question-line
+        path: /document-assistant/query
+        order: 1
+        visible: true
+      - id: upload
+        name: 上传文档
+        icon: ri-upload-line
+        path: /document-assistant/upload
+        order: 2
+        visible: true
+      - id: knowledge-bases
+        name: 知识库管理
+        icon: ri-database-2-line
+        path: /document-assistant/kb
+        order: 3
+        visible: true
+      - id: history
+        name: 对话历史
+        icon: ri-history-line
+        path: /document-assistant/history
+        order: 4
+        visible: true
+        
   classification:
     # category 已废弃
     categoryName: 自驱业务场景

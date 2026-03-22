@@ -22,9 +22,174 @@ metadata:
 
 spec:
   skillForm: SCENE
-  type: scene-skill
-  # category 已废弃，请在 skill-index 中定义
   
+  scene:
+    type: AUTO
+    visibility: public
+    participantMode: multi-role
+    name: 新人培训
+    description: 新员工入职培训助手
+    
+  roles:
+    - id: NEW_EMPLOYEE
+      name: 新员工
+      description: 刚入职需要培训的员工
+      required: true
+      minCount: 1
+      maxCount: 1000
+      permissions:
+        - learning:view
+        - learning:complete
+        - question:ask
+        - progress:view.own
+    - id: MENTOR
+      name: 导师
+      description: 负责指导新员工的导师
+      required: false
+      minCount: 0
+      maxCount: 50
+      permissions:
+        - progress:view.assigned
+        - report:view.assigned
+        - feedback:provide
+    - id: HR
+      name: HR管理员
+      description: HR培训管理员
+      required: true
+      minCount: 1
+      maxCount: 10
+      permissions:
+        - learning:manage
+        - report:view.all
+        - path:configure
+        
+  activationSteps:
+    NEW_EMPLOYEE:
+      - stepId: complete-profile
+        step: 1
+        action: complete-profile
+        title: 完善个人信息
+        description: 填写岗位和部门信息
+        type: CONFIG_PRIVATE_CAPABILITIES
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: start-learning
+        step: 2
+        action: start-learning
+        title: 开始学习
+        description: 查看学习路径并开始学习
+        type: ENABLE_FEATURES
+        required: true
+        skippable: false
+        autoExecute: false
+    MENTOR:
+      - stepId: accept-assignment
+        step: 1
+        action: accept-assignment
+        title: 接受指派
+        description: 确认成为导师
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+    HR:
+      - stepId: configure-kb
+        step: 1
+        action: configure-kb
+        title: 配置知识库
+        description: 设置培训知识库
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-paths
+        step: 2
+        action: configure-paths
+        title: 配置学习路径
+        description: 为不同岗位配置学习路径
+        type: CONFIG_CONDITIONS
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: assign-mentors
+        step: 3
+        action: assign-mentors
+        title: 分配导师
+        description: 为新员工分配导师
+        type: CONFIRM_PARTICIPANTS
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    NEW_EMPLOYEE:
+      - id: learning-path
+        name: 学习路径
+        icon: ri-route-line
+        path: /onboarding/learning-path
+        order: 1
+        visible: true
+      - id: my-progress
+        name: 学习进度
+        icon: ri-bar-chart-line
+        path: /onboarding/progress
+        order: 2
+        visible: true
+      - id: ask-question
+        name: 培训问答
+        icon: ri-question-line
+        path: /onboarding/qa
+        order: 3
+        visible: true
+    MENTOR:
+      - id: my-mentees
+        name: 我的学员
+        icon: ri-user-line
+        path: /onboarding/mentees
+        order: 1
+        visible: true
+      - id: mentee-progress
+        name: 学员进度
+        icon: ri-bar-chart-line
+        path: /onboarding/mentee-progress
+        order: 2
+        visible: true
+    HR:
+      - id: dashboard
+        name: 培训概览
+        icon: ri-dashboard-line
+        path: /onboarding/dashboard
+        order: 1
+        visible: true
+      - id: employees
+        name: 新员工管理
+        icon: ri-user-add-line
+        path: /onboarding/employees
+        order: 2
+        visible: true
+      - id: paths
+        name: 学习路径配置
+        icon: ri-route-line
+        path: /onboarding/paths
+        order: 3
+        visible: true
+      - id: reports
+        name: 培训报告
+        icon: ri-file-chart-line
+        path: /onboarding/reports
+        order: 4
+        visible: true
+        
   classification:
     # category 已废弃
     categoryName: 自驱业务场景

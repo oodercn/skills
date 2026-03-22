@@ -21,9 +21,151 @@ metadata:
 
 spec:
   skillForm: SCENE
-  type: scene-skill
-  # category 已废弃，请在 skill-index 中定义
   
+  scene:
+    type: AUTO
+    visibility: public
+    participantMode: multi-role
+    name: 知识共享
+    description: 知识库权限管理和分享
+    
+  roles:
+    - id: OWNER
+      name: 知识库所有者
+      description: 知识库创建者，拥有完全控制权限
+      required: true
+      minCount: 1
+      maxCount: 1
+      permissions:
+        - kb:manage
+        - kb:share
+        - kb:delete
+        - permission:manage
+    - id: COLLABORATOR
+      name: 协作者
+      description: 参与知识库协作的用户
+      required: false
+      minCount: 0
+      maxCount: 100
+      permissions:
+        - kb:read
+        - kb:write
+        - kb:comment
+    - id: VIEWER
+      name: 查看者
+      description: 只有查看权限的用户
+      required: false
+      minCount: 0
+      maxCount: 1000
+      permissions:
+        - kb:read
+        
+  activationSteps:
+    OWNER:
+      - stepId: configure-kb
+        step: 1
+        action: configure-kb
+        title: 配置知识库
+        description: 选择要共享的知识库
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: set-permissions
+        step: 2
+        action: set-permissions
+        title: 设置权限
+        description: 配置知识库访问权限
+        type: CONFIG_CONDITIONS
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: invite-collaborators
+        step: 3
+        action: invite-collaborators
+        title: 邀请协作者
+        description: 添加知识库协作者
+        type: CONFIRM_PARTICIPANTS
+        required: false
+        skippable: true
+        autoExecute: false
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+    COLLABORATOR:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入知识库协作
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+    VIEWER:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 获取知识库访问权限
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    OWNER:
+      - id: overview
+        name: 共享概览
+        icon: ri-dashboard-line
+        path: /knowledge-share/overview
+        order: 1
+        visible: true
+      - id: permissions
+        name: 权限管理
+        icon: ri-shield-keyhole-line
+        path: /knowledge-share/permissions
+        order: 2
+        visible: true
+      - id: shares
+        name: 分享管理
+        icon: ri-share-line
+        path: /knowledge-share/shares
+        order: 3
+        visible: true
+      - id: collaboration
+        name: 协作设置
+        icon: ri-team-line
+        path: /knowledge-share/collaboration
+        order: 4
+        visible: true
+    COLLABORATOR:
+      - id: my-kbs
+        name: 我的协作
+        icon: ri-folder-line
+        path: /knowledge-share/my-kbs
+        order: 1
+        visible: true
+      - id: shared-with-me
+        name: 共享给我
+        icon: ri-share-forward-line
+        path: /knowledge-share/shared-with-me
+        order: 2
+        visible: true
+    VIEWER:
+      - id: shared-with-me
+        name: 共享给我
+        icon: ri-share-forward-line
+        path: /knowledge-share/shared-with-me
+        order: 1
+        visible: true
+        
   classification:
     # category 已废弃
     categoryName: 自驱系统场景

@@ -71,6 +71,9 @@ spec:
     - id: hr-manager
       name: HR管理员
       description: 管理招聘流程和职位
+      required: true
+      minCount: 1
+      maxCount: 5
       permissions:
         - manage-jobs
         - view-all-resumes
@@ -80,6 +83,9 @@ spec:
     - id: hiring-manager
       name: 招聘经理
       description: 管理本部门招聘
+      required: false
+      minCount: 0
+      maxCount: 50
       permissions:
         - view-department-jobs
         - view-department-resumes
@@ -88,12 +94,18 @@ spec:
     - id: interviewer
       name: 面试官
       description: 参与面试评估
+      required: false
+      minCount: 0
+      maxCount: 100
       permissions:
         - view-assigned-resumes
         - submit-feedback
     - id: candidate
       name: 候选人
       description: 查看职位和提交简历
+      required: false
+      minCount: 0
+      maxCount: 10000
       permissions:
         - view-public-jobs
         - submit-resume
@@ -101,44 +113,65 @@ spec:
         
   activationSteps:
     hr-manager:
-      - step: 1
+      - stepId: configure-departments
+        step: 1
         action: configure-departments
         title: 配置部门
         description: 设置招聘部门和团队
         required: true
-      - step: 2
+        skippable: false
+        autoExecute: false
+      - stepId: configure-workflow
+        step: 2
         action: configure-workflow
         title: 配置审批流程
         description: 设置录用审批流程
         required: true
-      - step: 3
+        skippable: false
+        autoExecute: false
+      - stepId: configure-notification
+        step: 3
         action: configure-notification
         title: 配置通知
         description: 设置面试提醒方式
         required: false
-      - step: 4
+        skippable: true
+        autoExecute: false
+      - stepId: invite-team
+        step: 4
         action: invite-team
         title: 邀请团队成员
         description: 添加招聘经理和面试官
         required: false
+        skippable: true
+        autoExecute: false
     hiring-manager:
-      - step: 1
+      - stepId: accept-invitation
+        step: 1
         action: accept-invitation
         title: 接受邀请
         description: 加入招聘团队
         required: true
+        skippable: false
+        autoExecute: false
     interviewer:
-      - step: 1
+      - stepId: accept-invitation
+        step: 1
         action: accept-invitation
         title: 接受邀请
         description: 加入面试团队
         required: true
+        skippable: false
+        autoExecute: false
     candidate:
-      - step: 1
+      - stepId: register
+        step: 1
         action: register
         title: 注册账号
         description: 创建候选人账号
         required: true
+        skippable: false
+        autoExecute: false
         
   menus:
     hr-manager:
