@@ -350,7 +350,7 @@ public class LlmStatsServiceImpl implements LlmStatsService {
         stats.setFailedCalls(logs.stream().filter(l -> "error".equals(l.getStatus())).count());
         stats.setTotalTokens(logs.stream().mapToLong(LlmCallLogDTO::getTotalTokens).sum());
         stats.setTotalCost(logs.stream().mapToDouble(LlmCallLogDTO::getCost).sum());
-        stats.setAvgLatency(logs.stream().mapToLong(LlmCallLogDTO::getLatency).average().orElse(0));
+        stats.setAvgLatency((long) logs.stream().mapToLong(LlmCallLogDTO::getLatency).average().orElse(0));
         stats.setSuccessRate(logs.size() > 0 
             ? (double) logs.stream().filter(l -> "success".equals(l.getStatus())).count() / logs.size() * 100 : 0);
         

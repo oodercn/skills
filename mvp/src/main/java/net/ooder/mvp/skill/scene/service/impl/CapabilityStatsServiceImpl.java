@@ -70,7 +70,8 @@ public class CapabilityStatsServiceImpl implements CapabilityStatsService {
         }
         
         stats.setTotalCapabilities(totalCapabilities);
-        stats.setActiveCapabilities(installedCapabilities > 0 ? installedCapabilities : activeCapabilities);
+        stats.setActiveCapabilities(activeCapabilities);
+        stats.setInstalledCapabilities(installedCapabilities);
         stats.setTotalInvocations(0);
         stats.setSuccessInvocations(0);
         stats.setFailedInvocations(0);

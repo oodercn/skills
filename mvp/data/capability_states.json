@@ -1,0 +1,26 @@
+[
+	{
+		"capabilityId":"skill-management",
+		"installSource":"registry",
+		"installTime":1773788661118,
+		"installed":true,
+		"status":"REGISTERED",
+		"updateTime":1774135953416
+	},
+	{
+		"capabilityId":"skill-llm",
+		"installSource":"registry",
+		"installTime":1773788648307,
+		"installed":true,
+		"status":"REGISTERED",
+		"updateTime":1774135953416
+	},
+	{
+		"capabilityId":"skill-capability",
+		"installSource":"registry",
+		"installTime":1773788646080,
+		"installed":true,
+		"status":"REGISTERED",
+		"updateTime":1774135953417
+	}
+]

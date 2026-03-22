@@ -355,6 +355,10 @@ ul, ol {
   flex: 1;
   padding: var(--nx-space-6);
   overflow: auto;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  height: 0;
 }
 
 /* 菜单折叠样式 */

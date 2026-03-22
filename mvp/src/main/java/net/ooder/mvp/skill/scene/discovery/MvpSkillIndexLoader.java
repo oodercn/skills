@@ -30,6 +30,18 @@ public class MvpSkillIndexLoader {
     
     @Value("${ooder.mock.enabled:false}")
     private boolean mockEnabled;
+    
+    @Value("${ooder.skills.directories.downloads:./.ooder/downloads}")
+    private String downloadsDir;
+    
+    @Value("${ooder.skills.directories.installed:./.ooder/installed}")
+    private String installedDir;
+    
+    @Value("${ooder.skills.directories.activated:./.ooder/activated}")
+    private String activatedDir;
+    
+    @Value("${ooder.skills.directories.dev:./.ooder/dev}")
+    private String devDir;
 
     @Autowired(required = false)
     private SkillPackageManager skillPackageManager;
@@ -622,6 +634,111 @@ public class MvpSkillIndexLoader {
         all.addAll(getSkillsFromIndex(source));
         all.addAll(getScenesFromIndex(source));
         return all;
+    }
+    
+    public List<CapabilityDTO> getWorkspaceCapabilities(String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        capabilities.addAll(scanDirectoryForSkills(downloadsDir, "downloaded", source));
+        capabilities.addAll(scanDirectoryForSkills(installedDir, "installed", source));
+        capabilities.addAll(scanDirectoryForSkills(activatedDir, "activated", source));
+        capabilities.addAll(scanDirectoryForSkills(devDir, "developing", source));
+        
+        return capabilities;
+    }
+    
+    private List<CapabilityDTO> scanDirectoryForSkills(String dirPath, String status, String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        File dir = new File(dirPath);
+        if (!dir.exists() || !dir.isDirectory()) {
+            log.debug("[scanDirectoryForSkills] Directory not found: {}", dirPath);
+            return capabilities;
+        }
+        
+        File[] skillDirs = dir.listFiles(File::isDirectory);
+        if (skillDirs == null) return capabilities;
+        
+        Yaml yaml = new Yaml();
+        
+        for (File skillDir : skillDirs) {
+            try {
+                File skillYaml = new File(skillDir, "src/main/resources/skill.yaml");
+                if (!skillYaml.exists()) {
+                    skillYaml = new File(skillDir, "skill.yaml");
+                }
+                if (!skillYaml.exists()) {
+                    skillYaml = new File(skillDir, "skill.yml");
+                }
+                
+                if (skillYaml.exists()) {
+                    try (InputStream is = new FileInputStream(skillYaml)) {
+                        Map<String, Object> skillData = yaml.load(is);
+                        if (skillData != null) {
+                            CapabilityDTO cap = convertSkillYamlToDTO(skillData, skillDir.getName(), status, source);
+                            if (cap != null) {
+                                capabilities.add(cap);
+                            }
+                        }
+                    }
+                } else {
+                    CapabilityDTO cap = new CapabilityDTO();
+                    cap.setId(skillDir.getName());
+                    cap.setSkillId(skillDir.getName());
+                    cap.setName(skillDir.getName());
+                    cap.setStatus(status);
+                    cap.setInstalled("installed".equals(status) || "activated".equals(status));
+                    cap.setSource(source);
+                    capabilities.add(cap);
+                }
+            } catch (Exception e) {
+                log.warn("[scanDirectoryForSkills] Failed to read skill from {}: {}", skillDir.getName(), e.getMessage());
+            }
+        }
+        
+        log.info("[scanDirectoryForSkills] Found {} skills in {} with status {}", capabilities.size(), dirPath, status);
+        return capabilities;
+    }
+    
+    @SuppressWarnings("unchecked")
+    private CapabilityDTO convertSkillYamlToDTO(Map<String, Object> skillData, String dirName, String status, String source) {
+        if (skillData == null) return null;
+        
+        CapabilityDTO cap = new CapabilityDTO();
+        
+        Map<String, Object> metadata = (Map<String, Object>) skillData.get("metadata");
+        Map<String, Object> spec = (Map<String, Object>) skillData.get("spec");
+        
+        String skillId = null;
+        String name = null;
+        String description = null;
+        String version = null;
+        
+        if (metadata != null) {
+            skillId = (String) metadata.get("id");
+            name = (String) metadata.get("name");
+            version = (String) metadata.get("version");
+        }
+        
+        if (spec != null) {
+            if (name == null) name = (String) spec.get("name");
+            description = (String) spec.get("description");
+            if (version == null) version = (String) spec.get("version");
+        }
+        
+        if (skillId == null) skillId = dirName;
+        if (name == null) name = dirName;
+        
+        cap.setId(skillId);
+        cap.setSkillId(skillId);
+        cap.setName(name);
+        cap.setDescription(description);
+        cap.setVersion(version);
+        cap.setStatus(status);
+        cap.setInstalled("installed".equals(status) || "activated".equals(status));
+        cap.setSource(source);
+        
+        return cap;
     }
     
     public Map<String, Object> getSkillInfo(String skillId) {

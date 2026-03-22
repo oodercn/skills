@@ -16,6 +16,7 @@ import net.ooder.mvp.skill.scene.capability.model.SceneType;
 import net.ooder.mvp.skill.scene.capability.model.SkillForm;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityCategory;
 import net.ooder.mvp.skill.scene.service.CapabilityStatsService;
+import net.ooder.mvp.skill.scene.dto.stats.LogEntryDTO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -353,18 +354,17 @@ public class CapabilityController {
         List<Map<String, Object>> logs = new ArrayList<Map<String, Object>>();
         
         if (statsService != null) {
-            List<Object> recentLogs = statsService.getRecentLogs(50);
-            for (Object logObj : recentLogs) {
-                if (logObj instanceof Map) {
-                    Map<?, ?> m = (Map<?, ?>) logObj;
-                    String capName = String.valueOf(m.get("capabilityName"));
-                    if (capName != null && capName.contains(capabilityId)) {
-                        Map<String, Object> logMap = new HashMap<String, Object>();
-                        for (Map.Entry<?, ?> e : m.entrySet()) {
-                            logMap.put(String.valueOf(e.getKey()), e.getValue());
-                        }
-                        logs.add(logMap);
-                    }
+            List<LogEntryDTO> recentLogs = statsService.getRecentLogs(50);
+            for (LogEntryDTO logEntry : recentLogs) {
+                if (logEntry.getCapabilityId() != null && logEntry.getCapabilityId().contains(capabilityId)) {
+                    Map<String, Object> logMap = new HashMap<String, Object>();
+                    logMap.put("timestamp", logEntry.getTimestamp());
+                    logMap.put("capabilityId", logEntry.getCapabilityId());
+                    logMap.put("capabilityName", logEntry.getCapabilityName());
+                    logMap.put("level", logEntry.getLevel());
+                    logMap.put("message", logEntry.getMessage());
+                    logMap.put("duration", logEntry.getDuration());
+                    logs.add(logMap);
                 }
             }
         }
@@ -488,29 +488,27 @@ public class CapabilityController {
         log.info("Get capability logs - pageNum: {}, pageSize: {}, capabilityId: {}, level: {}", 
             pageNum, pageSize, capabilityId, level);
         
-        List<Object> logs = statsService.getRecentLogs(pageSize * 10);
+        List<LogEntryDTO> logs = statsService.getRecentLogs(pageSize * 10);
         
         List<Map<String, Object>> filteredLogs = new ArrayList<Map<String, Object>>();
-        for (Object logObj : logs) {
+        for (LogEntryDTO logEntry : logs) {
             Map<String, Object> logMap = new HashMap<String, Object>();
-            if (logObj instanceof Map) {
-                Map<?, ?> m = (Map<?, ?>) logObj;
-                for (Map.Entry<?, ?> e : m.entrySet()) {
-                    logMap.put(String.valueOf(e.getKey()), e.getValue());
-                }
-            } else {
-                logMap.put("data", logObj);
-            }
+            logMap.put("timestamp", logEntry.getTimestamp());
+            logMap.put("capabilityId", logEntry.getCapabilityId());
+            logMap.put("capabilityName", logEntry.getCapabilityName());
+            logMap.put("level", logEntry.getLevel());
+            logMap.put("message", logEntry.getMessage());
+            logMap.put("duration", logEntry.getDuration());
             
             if (capabilityId != null && !capabilityId.isEmpty()) {
-                String capName = String.valueOf(logMap.get("capabilityName"));
+                String capName = logEntry.getCapabilityName();
                 if (capName == null || !capName.contains(capabilityId)) {
                     continue;
                 }
             }
             
             if (level != null && !level.isEmpty()) {
-                String logLevel = String.valueOf(logMap.get("level"));
+                String logLevel = logEntry.getLevel();
                 if (logLevel == null || !logLevel.equalsIgnoreCase(level)) {
                     continue;
                 }

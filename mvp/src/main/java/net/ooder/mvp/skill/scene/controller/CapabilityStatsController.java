@@ -2,6 +2,7 @@ package net.ooder.mvp.skill.scene.controller;
 
 import net.ooder.mvp.skill.scene.dto.stats.CapabilityStatsDTO;
 import net.ooder.mvp.skill.scene.dto.stats.CapabilityRankDTO;
+import net.ooder.mvp.skill.scene.dto.stats.LogEntryDTO;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import net.ooder.mvp.skill.scene.service.CapabilityStatsService;
 
@@ -51,9 +52,9 @@ public class CapabilityStatsController {
     }
 
     @GetMapping("/logs")
-    public ResultModel<List<Object>> getLogs(
+    public ResultModel<List<LogEntryDTO>> getLogs(
             @RequestParam(defaultValue = "20") int limit) {
-        List<Object> logs = statsService.getRecentLogs(limit);
+        List<LogEntryDTO> logs = statsService.getRecentLogs(limit);
         return ResultModel.success(logs);
     }
 }

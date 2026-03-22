@@ -72,10 +72,32 @@ public class DiscoveryController {
 
     @PostMapping("/local")
     public ResultModel<LocalDiscoveryResultDTO> discoverLocal(@RequestBody(required = false) Map<String, Object> request) {
-        log.info("[discoverLocal] Starting local discovery, useSeSdk: {}", useSeSdk);
+        log.info("[discoverLocal] Starting local discovery");
         
         LocalDiscoveryResultDTO result = new LocalDiscoveryResultDTO();
         List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        if (mvpSkillIndexLoader != null) {
+            log.info("[discoverLocal] Scanning workspace directories for skills");
+            List<CapabilityDTO> workspaceCaps = mvpSkillIndexLoader.getWorkspaceCapabilities("WORKSPACE");
+            if (workspaceCaps != null && !workspaceCaps.isEmpty()) {
+                capabilities.addAll(workspaceCaps);
+                log.info("[discoverLocal] Found {} skills in workspace directories", workspaceCaps.size());
+                
+                result.setCapabilities(capabilities);
+                result.setTotal(capabilities.size());
+                result.setSource("workspace");
+                result.setTimestamp(System.currentTimeMillis());
+                return ResultModel.success(result);
+            }
+            
+            log.info("[discoverLocal] No skills found in workspace directories, returning empty list");
+            result.setCapabilities(capabilities);
+            result.setTotal(0);
+            result.setSource("workspace-empty");
+            result.setTimestamp(System.currentTimeMillis());
+            return ResultModel.success(result);
+        }
         
         if (useSeSdk && skillDiscoverer != null) {
             log.info("[discoverLocal] Using SE SDK SkillDiscoverer");
@@ -155,7 +177,7 @@ public class DiscoveryController {
         }
         
         if (mvpSkillIndexLoader != null) {
-            log.info("[discoverLocal] Using MvpSkillIndexLoader");
+            log.info("[discoverLocal] Using MvpSkillIndexLoader as fallback");
             List<CapabilityDTO> caps = mvpSkillIndexLoader.getAllCapabilities("LOCAL");
             if (caps != null && !caps.isEmpty()) {
                 capabilities.addAll(caps);

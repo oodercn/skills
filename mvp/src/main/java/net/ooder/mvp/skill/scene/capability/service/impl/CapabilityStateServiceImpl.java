@@ -11,6 +11,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PostConstruct;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileReader;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -37,6 +41,64 @@ public class CapabilityStateServiceImpl implements CapabilityStateService {
     @PostConstruct
     public void init() {
         reload();
+        syncFromRegistryProperties();
+    }
+    
+    private void syncFromRegistryProperties() {
+        String[] registryPaths = {
+            "./data/installed-skills/registry.properties",
+            "./.ooder/installed/registry.properties",
+            "./.ooder/registry.properties"
+        };
+        
+        for (String registryPath : registryPaths) {
+            File registryFile = new File(registryPath);
+            if (registryFile.exists()) {
+                try {
+                    Properties props = new Properties();
+                    try (FileInputStream fis = new FileInputStream(registryFile)) {
+                        props.load(fis);
+                    }
+                    
+                    int syncedCount = 0;
+                    for (String key : props.stringPropertyNames()) {
+                        if (key.endsWith(".id")) {
+                            String skillId = props.getProperty(key);
+                            if (skillId != null && !skillId.isEmpty()) {
+                                if (!isInstalled(skillId)) {
+                                    CapabilityState state = stateCache.computeIfAbsent(skillId, CapabilityState::new);
+                                    state.setInstalled(true);
+                                    state.setStatus(CapabilityStatus.REGISTERED);
+                                    
+                                    String installedAt = props.getProperty(skillId + ".installedAt");
+                                    if (installedAt != null && !installedAt.isEmpty()) {
+                                        try {
+                                            state.setInstallTime(Long.parseLong(installedAt));
+                                        } catch (NumberFormatException e) {
+                                            state.setInstallTime(System.currentTimeMillis());
+                                        }
+                                    } else {
+                                        state.setInstallTime(System.currentTimeMillis());
+                                    }
+                                    state.setInstallSource("registry");
+                                    syncedCount++;
+                                    log.debug("[syncFromRegistryProperties] Synced installed state for: {}", skillId);
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (syncedCount > 0) {
+                        persistAllStates();
+                        log.info("[syncFromRegistryProperties] Synced {} installed skills from {}", syncedCount, registryPath);
+                    }
+                    return;
+                } catch (Exception e) {
+                    log.warn("[syncFromRegistryProperties] Failed to sync from {}: {}", registryPath, e.getMessage());
+                }
+            }
+        }
+        log.info("[syncFromRegistryProperties] No registry file found to sync");
     }
 
     @Override

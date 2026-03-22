@@ -2,6 +2,7 @@ package net.ooder.mvp.skill.scene.controller;
 
 import net.ooder.mvp.skill.scene.knowledge.EmbeddingService;
 import net.ooder.mvp.skill.scene.knowledge.EmbeddingService.EmbeddingModel;
+import net.ooder.mvp.skill.scene.dto.knowledge.EmbeddingConfigResponseDTO;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -28,22 +29,25 @@ public class EmbeddingConfigController {
     }
     
     @GetMapping("/config")
-    public ResultModel<Map<String, Object>> getConfig() {
+    public ResultModel<EmbeddingConfigResponseDTO> getConfig() {
         log.info("[getConfig] request start");
-        Map<String, Object> config = new HashMap<>();
-        config.put("currentModel", embeddingService.getCurrentModel());
+        
+        EmbeddingConfigResponseDTO config = new EmbeddingConfigResponseDTO();
+        config.setCurrentModel(embeddingService.getCurrentModel());
+        
         EmbeddingModel model = embeddingService.getModel(embeddingService.getCurrentModel());
         if (model != null) {
-            config.put("dimensions", model.getDimensions());
-            config.put("provider", model.getProvider());
+            config.setDimensions(model.getDimensions());
+            config.setProvider(model.getProvider());
         }
-        config.put("defaultChunkSize", 500);
-        config.put("defaultChunkOverlap", 50);
+        config.setDefaultChunkSize(500);
+        config.setDefaultChunkOverlap(50);
+        
         return ResultModel.success(config);
     }
     
     @PutMapping("/config")
-    public ResultModel<Map<String, Object>> updateConfig(@RequestBody Map<String, Object> request) {
+    public ResultModel<EmbeddingConfigResponseDTO> updateConfig(@RequestBody Map<String, Object> request) {
         log.info("[updateConfig] request: {}", request);
         
         if (request.containsKey("currentModel")) {
@@ -55,7 +59,7 @@ public class EmbeddingConfigController {
     }
     
     @PostMapping("/test")
-    public ResultModel<Map<String, Object>> testEmbedding(@RequestBody Map<String, Object> request) {
+    public ResultModel<EmbeddingTestResultDTO> testEmbedding(@RequestBody Map<String, Object> request) {
         String modelId = (String) request.getOrDefault("modelId", embeddingService.getCurrentModel());
         String text = (String) request.get("text");
         
@@ -67,18 +71,24 @@ public class EmbeddingConfigController {
         
         Map<String, Object> result = embeddingService.testEmbedding(modelId, text);
         
+        EmbeddingTestResultDTO response = new EmbeddingTestResultDTO();
+        response.setSuccess(Boolean.TRUE.equals(result.get("success")));
+        response.setModelId(modelId);
+        response.setTextLength(text.length());
+        
         if (Boolean.TRUE.equals(result.get("success"))) {
             int dimensions = (Integer) result.get("dimensions");
+            response.setDimensions(dimensions);
+            
             List<Double> mockVector = new ArrayList<>();
             Random random = new Random();
             for (int i = 0; i < Math.min(10, dimensions); i++) {
                 mockVector.add(random.nextDouble() * 2 - 1);
             }
-            result.put("sampleVector", mockVector);
-            result.put("textLength", text.length());
+            response.setSampleVector(mockVector);
         }
         
-        return ResultModel.success(result);
+        return ResultModel.success(response);
     }
     
     @GetMapping("/models/{modelId}")
@@ -112,5 +122,24 @@ public class EmbeddingConfigController {
         log.info("[configureModel] modelId: {}, configured: {}", modelId, configured);
         embeddingService.configureModel(modelId, configured);
         return ResultModel.success(true);
+    }
+    
+    public static class EmbeddingTestResultDTO {
+        private Boolean success;
+        private String modelId;
+        private Integer dimensions;
+        private Integer textLength;
+        private List<Double> sampleVector;
+        
+        public Boolean getSuccess() { return success; }
+        public void setSuccess(Boolean success) { this.success = success; }
+        public String getModelId() { return modelId; }
+        public void setModelId(String modelId) { this.modelId = modelId; }
+        public Integer getDimensions() { return dimensions; }
+        public void setDimensions(Integer dimensions) { this.dimensions = dimensions; }
+        public Integer getTextLength() { return textLength; }
+        public void setTextLength(Integer textLength) { this.textLength = textLength; }
+        public List<Double> getSampleVector() { return sampleVector; }
+        public void setSampleVector(List<Double> sampleVector) { this.sampleVector = sampleVector; }
     }
 }

@@ -56,18 +56,19 @@
                 </div>
             </header>
             
-            <div class="kb-grid">
-                <div class="kb-list">
-                    <div class="kb-list-header">
-                        <h3><i class="ri-book-3-line"></i> 知识库列表</h3>
-                        <div class="kb-search">
-                            <input type="text" placeholder="搜索知识库..." id="kbSearch" oninput="filterKbList()">
+            <div class="nx-page__main">
+                <div class="kb-grid">
+                    <div class="kb-list">
+                        <div class="kb-list-header">
+                            <h3><i class="ri-book-3-line"></i> 知识库列表</h3>
+                            <div class="kb-search">
+                                <input type="text" placeholder="搜索知识库..." id="kbSearch" oninput="filterKbList()">
+                            </div>
                         </div>
+                        <div class="kb-list-body" id="kbList"></div>
                     </div>
-                    <div class="kb-list-body" id="kbList"></div>
-                </div>
-                
-                <div class="kb-main" id="kbMain">
+                    
+                    <div class="kb-main" id="kbMain">
                     <div class="empty-state" id="emptyState">
                         <i class="ri-book-3-line"></i>
                         <div class="empty-state-title">选择知识库</div>

@@ -80,7 +80,13 @@ public class LlmMonitorController {
         }
         
         if (stats.isEmpty()) {
-            stats = llmCallLogService.getStats(providerId);
+            LlmStatsSummaryDTO localStats = llmCallLogService.getStats(providerId);
+            stats.put("totalCalls", localStats.getTotalCalls());
+            stats.put("totalTokens", localStats.getTotalTokens());
+            stats.put("totalCost", localStats.getTotalCost());
+            stats.put("avgLatency", localStats.getAvgLatency());
+            stats.put("successRate", localStats.getSuccessRate());
+            stats.put("errorCount", localStats.getErrorCount());
             stats.put("source", "local");
         }
         
@@ -178,10 +184,10 @@ public class LlmMonitorController {
     }
     
     @GetMapping("/provider-stats")
-    public ResultModel<List<Map<String, Object>>> getProviderStats() {
+    public ResultModel<List<ProviderStatsDTO>> getProviderStats() {
         log.info("[getProviderStats] request start");
         
-        List<Map<String, Object>> result = llmCallLogService.getProviderStats();
+        List<ProviderStatsDTO> result = llmCallLogService.getProviderStats();
         
         return ResultModel.success(result);
     }
@@ -341,14 +347,14 @@ public class LlmMonitorController {
     }
     
     @GetMapping("/overall-stats")
-    public ResultModel<Map<String, Object>> getOverallStats(
+    public ResultModel<OverallStatsDTO> getOverallStats(
             @RequestParam(required = false) String companyId,
             @RequestParam(required = false) Long startTime,
             @RequestParam(required = false) Long endTime) {
         log.info("[getOverallStats] companyId: {}", companyId);
         
         StatsTimeRange range = buildTimeRange(startTime, endTime);
-        Map<String, Object> stats = llmStatsService.getOverallStats(companyId, range);
+        OverallStatsDTO stats = llmStatsService.getOverallStats(companyId, range);
         
         return ResultModel.success(stats);
     }

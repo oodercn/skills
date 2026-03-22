@@ -1,7 +1,7 @@
 {
 	"user-leader-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"leader@example.com",
 		"name":"主导者",
@@ -12,7 +12,7 @@
 	},
 	"user-hr-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-hr",
 		"email":"liu.hr@example.com",
 		"name":"刘HR",
@@ -23,7 +23,7 @@
 	},
 	"user-installer-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-it",
 		"email":"installer@example.com",
 		"name":"安装者",
@@ -34,7 +34,7 @@
 	},
 	"user-employee-003":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"zhao.employee@example.com",
 		"name":"赵员工",
@@ -45,7 +45,7 @@
 	},
 	"user-employee-002":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"wang.employee@example.com",
 		"name":"王员工",
@@ -56,7 +56,7 @@
 	},
 	"user-employee-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"li.employee@example.com",
 		"name":"李员工",
@@ -67,7 +67,7 @@
 	},
 	"user-admin-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-it",
 		"email":"admin@example.com",
 		"name":"系统管理员",
@@ -78,7 +78,7 @@
 	},
 	"user-manager-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"zhang.manager@example.com",
 		"name":"张经理",
@@ -89,7 +89,7 @@
 	},
 	"user-collaborator-001":{
 		"active":true,
-		"createTime":1774088002803,
+		"createTime":1774138373676,
 		"departmentId":"dept-rd",
 		"email":"collaborator@example.com",
 		"name":"协作者",
