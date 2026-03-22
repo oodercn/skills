@@ -1,81 +1,238 @@
-id: skill-recording-qa
-name: 录音质检系统
-description: 录音上传、人工审核、质检分析的完整解决方案
-category: business
-version: 1.0.0
-author: ooder
-dependencies: []
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
 
-# 技能配置
-config:
-  # 录音文件存储路径
-  storage:
-    path: ./recordings
-    maxFileSize: 100MB
-    allowedFormats:
-      - mp3
-      - wav
-      - m4a
-      - ogg
-  
-  # 质检评分标准
-  scoring:
-    items:
-      - id: greeting
-        name: 开场白
-        weight: 10
-        maxScore: 10
-      - id: communication
-        name: 沟通技巧
-        weight: 30
-        maxScore: 30
-      - id: professionalism
-        name: 专业度
-        weight: 25
-        maxScore: 25
-      - id: problemSolving
-        name: 问题解决
-        weight: 25
-        maxScore: 25
-      - id: closing
-        name: 结束语
-        weight: 10
-        maxScore: 10
+metadata:
+  id: skill-recording-qa
+  name: 录音质检系统
+  version: "2.3.1"
+  category: biz
+  subCategory: qa
+  description: 录音上传、人工审核、质检分析的完整解决方案
+  author: Ooder Team
+  icon: ri-mic-line
 
-# 菜单配置
-menu:
-  - id: recording-upload
-    name: 录音上传
-    icon: ri-upload-cloud-line
-    url: /console/skills/skill-recording-qa/ui/pages/upload.html
-    order: 1
+spec:
+  capabilities:
+    - id: recording-upload
+      name: 录音上传
+      description: 上传录音文件进行质检
+      category: service
+      autoBind: true
+      
+    - id: manual-review
+      name: 人工审核
+      description: 人工审核录音并评分
+      category: service
+      autoBind: true
+      
+    - id: qa-analysis
+      name: 质检分析
+      description: 录音质检分析和报告生成
+      category: ai
+      autoBind: false
+      
+    - id: statistics-report
+      name: 统计报表
+      description: 质检统计报表生成
+      category: service
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-vfs-base
+      version: ">=2.3.1"
+      required: true
+      description: 文件存储服务（录音存储）
+    - skillId: skill-llm-chat
+      version: ">=2.3.1"
+      required: false
+      description: LLM服务（智能质检分析）
+      
+  skillForm: SCENE
   
-  - id: recording-review
-    name: 人工审核
-    icon: ri-file-search-line
-    url: /console/skills/skill-recording-qa/ui/pages/review.html
-    order: 2
-  
-  - id: recording-statistics
-    name: 质检统计
-    icon: ri-bar-chart-line
-    url: /console/skills/skill-recording-qa/ui/pages/statistics.html
-    order: 3
-
-# 权限配置
-permissions:
-  - id: recording.upload
-    name: 上传录音
-    description: 允许上传录音文件
-  
-  - id: recording.review
-    name: 审核录音
-    description: 允许审核录音并评分
-  
-  - id: recording.view.all
-    name: 查看所有录音
-    description: 允许查看所有录音记录
-  
-  - id: recording.statistics
-    name: 查看统计报表
-    description: 允许查看质检统计报表
+  scene:
+    type: INTERACTIVE
+    visibility: public
+    name: 录音质检
+    description: 录音上传、审核、质检分析
+    
+  roles:
+    - id: qa-manager
+      name: 质检管理员
+      description: 质检管理员，负责质检标准配置和报告查看
+      required: true
+      minCount: 1
+      maxCount: 5
+      permissions:
+        - manage-scoring
+        - view-all
+        - export-reports
+        - configure
+    - id: reviewer
+      name: 审核员
+      description: 审核员，负责录音审核和评分
+      required: true
+      minCount: 1
+      maxCount: 50
+      permissions:
+        - review
+        - score
+        - view-assigned
+    - id: agent
+      name: 客服人员
+      description: 客服人员，上传录音供审核
+      required: false
+      minCount: 0
+      maxCount: 1000
+      permissions:
+        - upload
+        - view-own
+        
+  activationSteps:
+    qa-manager:
+      - stepId: configure-scoring
+        step: 1
+        action: configure-scoring
+        title: 配置评分标准
+        description: 设置质检评分项目和权重
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: configure-storage
+        step: 2
+        action: configure-storage
+        title: 配置存储
+        description: 设置录音文件存储位置
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: invite-reviewers
+        step: 3
+        action: invite-reviewers
+        title: 邀请审核员
+        description: 添加审核员账号
+        required: false
+        skippable: true
+        autoExecute: false
+    reviewer:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入质检团队
+        required: true
+        skippable: false
+        autoExecute: false
+    agent:
+      - stepId: register
+        step: 1
+        action: register
+        title: 注册账号
+        description: 创建客服账号
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    qa-manager:
+      - id: dashboard
+        name: 质检概览
+        icon: ri-dashboard-line
+        path: /recording-qa/dashboard
+        order: 1
+        visible: true
+      - id: scoring-config
+        name: 评分配置
+        icon: ri-settings-3-line
+        path: /recording-qa/scoring-config
+        order: 2
+        visible: true
+      - id: all-recordings
+        name: 全部录音
+        icon: ri-folder-music-line
+        path: /recording-qa/all-recordings
+        order: 3
+        visible: true
+      - id: reports
+        name: 统计报表
+        icon: ri-bar-chart-line
+        path: /recording-qa/reports
+        order: 4
+        visible: true
+    reviewer:
+      - id: pending-review
+        name: 待审核
+        icon: ri-inbox-line
+        path: /recording-qa/pending-review
+        order: 1
+        visible: true
+      - id: reviewed
+        name: 已审核
+        icon: ri-check-line
+        path: /recording-qa/reviewed
+        order: 2
+        visible: true
+    agent:
+      - id: upload
+        name: 上传录音
+        icon: ri-upload-cloud-line
+        path: /recording-qa/upload
+        order: 1
+        visible: true
+      - id: my-recordings
+        name: 我的录音
+        icon: ri-music-line
+        path: /recording-qa/my-recordings
+        order: 2
+        visible: true
+        
+  configSchema:
+    type: object
+    properties:
+      storageType:
+        type: string
+        enum: [local, database, oss]
+        default: database
+        title: 存储类型
+      maxFileSize:
+        type: integer
+        default: 104857600
+        title: 最大文件大小(字节)
+      allowedFormats:
+        type: array
+        default: [mp3, wav, m4a, ogg]
+        title: 允许的音频格式
+      scoringItems:
+        type: array
+        title: 评分项目
+        default:
+          - id: greeting
+            name: 开场白
+            weight: 10
+          - id: communication
+            name: 沟通技巧
+            weight: 30
+          - id: professionalism
+            name: 专业度
+            weight: 25
+          - id: problemSolving
+            name: 问题解决
+            weight: 25
+          - id: closing
+            name: 结束语
+            weight: 10
+      enableAutoQA:
+        type: boolean
+        default: false
+        title: 启用自动质检
+        
+  installOrder:
+    - skill-vfs-base
+    - skill-llm-chat
+    - skill-recording-qa
+    
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "500Mi"
+    
+  estimatedDuration: "3-5分钟"
