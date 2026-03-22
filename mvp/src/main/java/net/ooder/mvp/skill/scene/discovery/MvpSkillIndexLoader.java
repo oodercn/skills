@@ -222,6 +222,7 @@ public class MvpSkillIndexLoader {
                 skillId = (String) skill.get("id");
             }
             cap.setId(skillId);
+            cap.setSkillId(skillId);
             cap.setName((String) skill.get("name"));
             cap.setDescription((String) skill.get("description"));
             cap.setVersion((String) skill.get("version"));
@@ -554,6 +555,7 @@ public class MvpSkillIndexLoader {
                 sceneId = (String) scene.get("id");
             }
             cap.setId(sceneId);
+            cap.setSkillId(sceneId);
             cap.setName((String) scene.get("name"));
             cap.setDescription((String) scene.get("description"));
             cap.setVersion((String) scene.get("version"));
