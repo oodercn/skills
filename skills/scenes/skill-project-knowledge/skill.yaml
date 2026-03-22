@@ -21,6 +21,7 @@ metadata:
   # sceneType: tbs
 
 spec:
+  skillForm: SCENE
   type: scene-skill
   category: tbs
   

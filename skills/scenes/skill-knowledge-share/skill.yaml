@@ -20,6 +20,7 @@ metadata:
   sceneCategory: ass
 
 spec:
+  skillForm: SCENE
   type: scene-skill
   # category 已废弃，请在 skill-index 中定义
   
