@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-notify</artifactId>
-    <version>2.3.1</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <name>skill-notify</name>

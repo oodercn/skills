@@ -7,22 +7,22 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-common-all</artifactId>
-        <version>2.3.1</version>
+        <version>3.0.0</version>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-vfs-oss</artifactId>
-    <version>2.3.1</version>
+    <version>3.0.0</version>
     <name>Skill VFS OSS - Aliyun OSS Storage Implementation</name>
     <description>Aliyun OSS object storage implementation for OoderAgent VFS</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <java.version>21</java.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <ooder.version>2.3</ooder.version>
-        <spring-boot.version>2.7.0</spring-boot.version>
+        <ooder.version>3.0.0</ooder.version>
+        <spring-boot.version>3.2.5</spring-boot.version>
     </properties>
 
     <dependencies>

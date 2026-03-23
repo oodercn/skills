@@ -7,13 +7,13 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>2.3.1</version>
+        <version>3.0.0</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-share</artifactId>
-    <version>2.3.1</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <name>skill-share</name>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>llm-sdk</artifactId>
-            <version>2.3.1</version>
+            <version>3.0.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -40,7 +40,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-ai</artifactId>
-            <version>2.3.1</version>
+            <version>3.0.0</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

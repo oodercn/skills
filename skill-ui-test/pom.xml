@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-ui-test</artifactId>
-    <version>1.0.0</version>
+    <version>3.0.0</version>
     <packaging>jar</packaging>
 
     <name>Skill UI Test</name>
@@ -15,14 +15,14 @@
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.0</version>
+        <version>3.2.5</version>
         <relativePath/>
     </parent>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -60,32 +60,26 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-api</artifactId>
-            <version>2.3.1</version>
-            <scope>system</scope>
-            <systemPath>D:\maven\.m2\repository\net\ooder\agent-sdk-api\2.3.1\agent-sdk-api-2.3.1.jar</systemPath>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-core</artifactId>
-            <version>2.3.1</version>
-            <scope>system</scope>
-            <systemPath>D:\maven\.m2\repository\net\ooder\agent-sdk-core\2.3.1\agent-sdk-core-2.3.1.jar</systemPath>
+            <version>3.0.0</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skills-framework</artifactId>
-            <version>2.3.1</version>
-            <scope>system</scope>
-            <systemPath>D:\maven\.m2\repository\net\ooder\skills-framework\2.3.1\skills-framework-2.3.1.jar</systemPath>
+            <version>3.0.0</version>
         </dependency>
     </dependencies>
 
@@ -98,10 +92,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.8.1</version>
+                <version>3.11.0</version>
                 <configuration>
-                    <source>1.8</source>
-                    <target>1.8</target>
+                    <source>21</source>
+                    <target>21</target>
                     <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>

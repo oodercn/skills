@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>ooder-skills</artifactId>
-    <version>2.3.1</version>
+    <version>3.0.0</version>
     <packaging>pom</packaging>
 
     <name>ooder-skills</name>
@@ -39,12 +39,12 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <spring-boot.version>2.7.0</spring-boot.version>
-        <agent-sdk.version>2.3.1</agent-sdk.version>
-        <scene-engine.version>2.3.1</scene-engine.version>
-        <llm-sdk.version>2.3.1</llm-sdk.version>
+        <maven.compiler.source>21</maven.compiler.source>
+        <maven.compiler.target>21</maven.compiler.target>
+        <spring-boot.version>3.2.5</spring-boot.version>
+        <agent-sdk.version>3.0.0</agent-sdk.version>
+        <scene-engine.version>3.0.0</scene-engine.version>
+        <llm-sdk.version>3.0.0</llm-sdk.version>
     </properties>
 
     <modules>
@@ -235,7 +235,7 @@
             <dependency>
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
-                <version>1.18.24</version>
+                <version>1.18.30</version>
             </dependency>
             <dependency>
                 <groupId>net.ooder</groupId>
@@ -271,7 +271,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.24</version>
+            <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -294,16 +294,16 @@
                 <plugin>
                     <groupId>org.apache.maven.plugins</groupId>
                     <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.8.1</version>
+                    <version>3.11.0</version>
                     <configuration>
-                        <source>1.8</source>
-                        <target>1.8</target>
+                        <source>21</source>
+                        <target>21</target>
                         <encoding>UTF-8</encoding>
                         <annotationProcessorPaths>
                             <path>
                                 <groupId>org.projectlombok</groupId>
                                 <artifactId>lombok</artifactId>
-                                <version>1.18.24</version>
+                                <version>1.18.30</version>
                             </path>
                         </annotationProcessorPaths>
                     </configuration>
