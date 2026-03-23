@@ -248,6 +248,16 @@
                 <version>${scene-engine.version}</version>
             </dependency>
             <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-org-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-hotplug-starter</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            <dependency>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-starter-mail</artifactId>
                 <version>${spring-boot.version}</version>
