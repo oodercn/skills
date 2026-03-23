@@ -8,6 +8,7 @@ import net.ooder.mvp.skill.scene.capability.model.SceneType;
 import net.ooder.mvp.skill.scene.capability.model.SkillForm;
 import net.ooder.mvp.skill.scene.capability.model.Visibility;
 import net.ooder.mvp.skill.scene.capability.service.BusinessSemanticsScorer.BusinessSemanticsScore;
+import net.ooder.mvp.skill.scene.capability.service.impl.CapabilityServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -68,12 +69,22 @@ public class SkillCapabilitySyncService {
             return createResult(syncedSkills, errorSkills);
         }
 
+        // 启动批量模式，避免每次更新都保存文件
+        if (capabilityService instanceof CapabilityServiceImpl) {
+            ((CapabilityServiceImpl) capabilityService).startBatchMode();
+        }
+
         try {
             Files.walk(skillsDir)
                 .filter(this::isSkillYaml)
                 .forEach(this::processSkillYaml);
         } catch (Exception e) {
             log.error("[syncAllSkills] Error walking skills directory: {}", e.getMessage());
+        } finally {
+            // 结束批量模式，一次性保存所有变更
+            if (capabilityService instanceof CapabilityServiceImpl) {
+                ((CapabilityServiceImpl) capabilityService).endBatchMode();
+            }
         }
 
         log.info("[syncAllSkills] Sync completed: synced={}, skipped={}, errors={}", 
@@ -237,12 +248,39 @@ public class SkillCapabilitySyncService {
                 capabilityService.register(newCap);
                 log.info("[syncSkillCapabilities] Registered new capability: {} from skill: {}", 
                         newCap.getCapabilityId(), skillId);
-            } else {
+            } else if (needsUpdate(newCap, existing, version)) {
                 updateCapabilityFromSkill(newCap, existing, version);
                 log.debug("[syncSkillCapabilities] Updated capability: {} from skill: {}", 
                         newCap.getCapabilityId(), skillId);
+            } else {
+                log.debug("[syncSkillCapabilities] No changes, skipping: {} from skill: {}", 
+                        newCap.getCapabilityId(), skillId);
             }
         }
+    }
+
+    private boolean needsUpdate(Capability newCap, Capability existing, String newVersion) {
+        if (newVersion != null && !newVersion.equals(existing.getVersion())) {
+            log.debug("[needsUpdate] {} version changed: {} -> {}", newCap.getCapabilityId(), existing.getVersion(), newVersion);
+            return true;
+        }
+        if (!Objects.equals(newCap.getName(), existing.getName())) {
+            log.debug("[needsUpdate] {} name changed: {} -> {}", newCap.getCapabilityId(), existing.getName(), newCap.getName());
+            return true;
+        }
+        if (!Objects.equals(newCap.getDescription(), existing.getDescription())) {
+            log.debug("[needsUpdate] {} description changed", newCap.getCapabilityId());
+            return true;
+        }
+        if (newCap.getCapabilityType() != existing.getCapabilityType()) {
+            log.debug("[needsUpdate] {} type changed: {} -> {}", newCap.getCapabilityId(), existing.getCapabilityType(), newCap.getCapabilityType());
+            return true;
+        }
+        if (!Objects.equals(newCap.getParameters(), existing.getParameters())) {
+            log.debug("[needsUpdate] {} parameters changed", newCap.getCapabilityId());
+            return true;
+        }
+        return false;
     }
 
     private Capability createCapabilityFromYaml(String skillId, Map<String, Object> capData, String version, String skillType, Boolean specMainFirst, Boolean specHasSelfDrive, Integer specBusinessScore, Boolean specSceneSkill, String skillCategory) {

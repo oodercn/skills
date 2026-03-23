@@ -1,6 +1,6 @@
 {
 	"dept-rd":{
-		"createTime":1774305274611,
+		"createTime":1774309606681,
 		"departmentId":"dept-rd",
 		"description":"负责产品研发和技术创新",
 		"managerId":"user-manager-001",
@@ -13,10 +13,10 @@
 			"user-collaborator-001"
 		],
 		"name":"研发部",
-		"updateTime":1774305274611
+		"updateTime":1774309606681
 	},
 	"dept-hr":{
-		"createTime":1774305274611,
+		"createTime":1774309606681,
 		"departmentId":"dept-hr",
 		"description":"负责人才招聘和员工管理",
 		"managerId":"user-hr-001",
@@ -24,10 +24,10 @@
 			"user-hr-001"
 		],
 		"name":"人力资源部",
-		"updateTime":1774305274611
+		"updateTime":1774309606681
 	},
 	"dept-it":{
-		"createTime":1774305274611,
+		"createTime":1774309606681,
 		"departmentId":"dept-it",
 		"description":"负责系统运维和技术支持",
 		"managerId":"user-admin-001",
@@ -36,6 +36,6 @@
 			"user-installer-001"
 		],
 		"name":"信息技术部",
-		"updateTime":1774305274611
+		"updateTime":1774309606681
 	}
 }

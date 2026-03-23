@@ -36,6 +36,7 @@ public class CapabilityServiceImpl implements CapabilityService {
     private final CapabilityStateService stateService;
     private ApplicationEventPublisher eventPublisher;
     private boolean initialized = false;
+    private boolean batchMode = false;
     
     @Autowired(required = false)
     private SkillRegistry skillRegistry;
@@ -108,11 +109,26 @@ public class CapabilityServiceImpl implements CapabilityService {
     }
 
     private void saveToStorage() {
+        if (batchMode) {
+            log.debug("[saveToStorage] Batch mode enabled, skipping save");
+            return;
+        }
         try {
             storageService.saveList(STORAGE_KEY, registry.findAll());
         } catch (Exception e) {
             log.error("Failed to save capabilities to storage: {}", e.getMessage());
         }
+    }
+    
+    public void startBatchMode() {
+        this.batchMode = true;
+        log.debug("[startBatchMode] Batch mode started");
+    }
+    
+    public void endBatchMode() {
+        this.batchMode = false;
+        saveToStorage();
+        log.debug("[endBatchMode] Batch mode ended, saved {} capabilities", registry.size());
     }
 
     private void initDefaultCapabilities() {
