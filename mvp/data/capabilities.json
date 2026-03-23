@@ -92,8 +92,8 @@
 		],
 		"config":{
 			"skillId":"skill-protocol",
-			"createTime":1774306413629,
-			"updateTime":1774306413629,
+			"createTime":1774307697435,
+			"updateTime":1774307697435,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -118,7 +118,7 @@
 		"metadata":{
 			"skillId":"skill-protocol",
 			"createTime":1773961018993,
-			"updateTime":1774306413630,
+			"updateTime":1774307697436,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -152,7 +152,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413630,
+		"updateTime":1774307697436,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -171,8 +171,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1774306413283,
-			"updateTime":1774306413283,
+			"createTime":1774307696642,
+			"updateTime":1774307696642,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -197,7 +197,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1773961018469,
-			"updateTime":1774306413303,
+			"updateTime":1774307696685,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -231,166 +231,8 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413303,
+		"updateTime":1774307696685,
 		"version":"0.7.3",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[
-			
-		],
-		"capabilityCategory":"UTIL",
-		"capabilityId":"daily-report-review",
-		"capabilityType":"SERVICE",
-		"category":"util",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"daily-report",
-			"createTime":1774306411547,
-			"updateTime":1774306411547,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"createTime":1774220851344,
-		"dependencies":[
-			
-		],
-		"description":"管理员审核日报",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-server-line",
-		"independent":false,
-		"installed":false,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"daily-report",
-			"createTime":1774220851344,
-			"updateTime":1774306411560,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"name":"日报审核",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[
-			
-		],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"daily-report",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[
-			
-		],
-		"tags":[
-			
-		],
-		"updateTime":1774306411560,
-		"version":"2.3.1",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[
-			
-		],
-		"capabilityCategory":"UTIL",
-		"capabilityId":"archive-to-kb",
-		"capabilityType":"SERVICE",
-		"category":"util",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"skill-meeting-minutes",
-			"createTime":1774306411971,
-			"updateTime":1774306411971,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"createTime":1773961017572,
-		"dependencies":[
-			
-		],
-		"description":"将会议纪要归档到项目知识库",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-flashlight-line",
-		"independent":false,
-		"installed":false,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-meeting-minutes",
-			"createTime":1773961017572,
-			"updateTime":1774306411990,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"name":"归档到知识库",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[
-			
-		],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"skill-meeting-minutes",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[
-			
-		],
-		"tags":[
-			
-		],
-		"updateTime":1774306411990,
-		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -408,8 +250,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1774306411842,
-			"updateTime":1774306411842,
+			"createTime":1774307695953,
+			"updateTime":1774307695953,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -434,7 +276,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1773961017499,
-			"updateTime":1774306411883,
+			"updateTime":1774307695974,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -468,7 +310,165 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411883,
+		"updateTime":1774307695974,
+		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[
+			
+		],
+		"capabilityCategory":"UTIL",
+		"capabilityId":"archive-to-kb",
+		"capabilityType":"SERVICE",
+		"category":"util",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"skill-meeting-minutes",
+			"createTime":1774307696020,
+			"updateTime":1774307696020,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1773961017572,
+		"dependencies":[
+			
+		],
+		"description":"将会议纪要归档到项目知识库",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-flashlight-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-meeting-minutes",
+			"createTime":1773961017572,
+			"updateTime":1774307696037,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"name":"归档到知识库",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[
+			
+		],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-meeting-minutes",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[
+			
+		],
+		"tags":[
+			
+		],
+		"updateTime":1774307696037,
+		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[
+			
+		],
+		"capabilityCategory":"UTIL",
+		"capabilityId":"daily-report-review",
+		"capabilityType":"SERVICE",
+		"category":"util",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"daily-report",
+			"createTime":1774307695686,
+			"updateTime":1774307695686,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1774220851344,
+		"dependencies":[
+			
+		],
+		"description":"管理员审核日报",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"daily-report",
+			"createTime":1774220851344,
+			"updateTime":1774307695699,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"name":"日报审核",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[
+			
+		],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"daily-report",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[
+			
+		],
+		"tags":[
+			
+		],
+		"updateTime":1774307695699,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -487,8 +487,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-weibo",
-			"createTime":1774306413068,
-			"updateTime":1774306413068,
+			"createTime":1774307696461,
+			"updateTime":1774307696461,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -513,7 +513,7 @@
 		"metadata":{
 			"skillId":"skill-media-weibo",
 			"createTime":1773961018347,
-			"updateTime":1774306413069,
+			"updateTime":1774307696462,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -547,7 +547,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413069,
+		"updateTime":1774307696462,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -555,28 +555,27 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[
-			"skill-recruitment-management"
+			
 		],
-		"capabilityCategory":"BIZ",
-		"capabilityId":"skill-recruitment-management",
-		"capabilityType":"SCENE",
-		"category":"biz",
+		"capabilityCategory":"UTIL",
+		"capabilityId":"scene-management",
+		"capabilityType":"SERVICE",
+		"category":"util",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
-			"skillId":"skill-recruitment-management",
-			"createTime":1774306412692,
-			"sceneType":"TRIGGER",
-			"updateTime":1774306412692,
+			"skillId":"skill-collaboration",
+			"createTime":1774307695854,
+			"updateTime":1774307695854,
 			"version":"2.3.1",
-			"skillForm":"SCENE"
+			"skillForm":"PROVIDER"
 		},
-		"createTime":1774088004961,
+		"createTime":1774086762502,
 		"dependencies":[
-			"skill-recruitment-management"
+			
 		],
-		"description":"企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批",
+		"description":"创建、配置、管理协作场景",
 		"developerVisible":false,
 		"driverCapability":false,
 		"driverConditions":[
@@ -585,20 +584,19 @@
 		"dynamicSceneTypes":false,
 		"enabled":true,
 		"hasSelfDrive":false,
-		"icon":"ri-layout-grid-line",
+		"icon":"ri-server-line",
 		"independent":false,
-		"installed":true,
+		"installed":false,
 		"internalVisible":false,
-		"mainFirst":true,
+		"mainFirst":false,
 		"metadata":{
-			"skillId":"skill-recruitment-management",
-			"createTime":1774088004961,
-			"sceneType":"TRIGGER",
-			"updateTime":1774306412698,
+			"skillId":"skill-collaboration",
+			"createTime":1774086762502,
+			"updateTime":1774307695860,
 			"version":"2.3.1",
-			"skillForm":"SCENE"
+			"skillForm":"PROVIDER"
 		},
-		"name":"招聘管理系统",
+		"name":"场景管理",
 		"optionalAddresses":[
 			
 		],
@@ -617,11 +615,88 @@
 		"requiredAddresses":[
 			
 		],
-		"sceneCapability":true,
+		"sceneCapability":false,
 		"sceneInternal":false,
-		"sceneType":"TRIGGER",
-		"sceneTypeEnum":"TRIGGER",
-		"skillForm":"SCENE",
+		"skillForm":"PROVIDER",
+		"skillId":"skill-collaboration",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[
+			
+		],
+		"tags":[
+			
+		],
+		"updateTime":1774307695860,
+		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[
+			
+		],
+		"capabilityCategory":"UTIL",
+		"capabilityId":"resume-management",
+		"capabilityType":"SERVICE",
+		"category":"util",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"skill-recruitment-management",
+			"createTime":1774307696206,
+			"updateTime":1774307696206,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1773961017696,
+		"dependencies":[
+			
+		],
+		"description":"收集、筛选、管理候选人简历",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-links-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-recruitment-management",
+			"createTime":1773961017696,
+			"updateTime":1774307696220,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"name":"简历管理",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[
+			
+		],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
 		"skillId":"skill-recruitment-management",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[
@@ -630,8 +705,87 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412698,
+		"updateTime":1774307696220,
 		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[
+			
+		],
+		"capabilityCategory":"SYS",
+		"capabilityId":"wifi-management",
+		"capabilityType":"SERVICE",
+		"category":"sys",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"skill-openwrt",
+			"createTime":1774307695329,
+			"updateTime":1774307695329,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1773961017019,
+		"dependencies":[
+			
+		],
+		"description":"管理WiFi设置",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"skill-openwrt",
+			"createTime":1773961017019,
+			"updateTime":1774307695367,
+			"version":"0.7.3",
+			"skillForm":"PROVIDER"
+		},
+		"name":"WiFi Management",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[
+			
+		],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"skill-openwrt",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[
+			
+		],
+		"tags":[
+			
+		],
+		"updateTime":1774307695367,
+		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -649,9 +803,9 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1774306412161,
+			"createTime":1774307696085,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412161,
+			"updateTime":1774307696085,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -677,7 +831,7 @@
 			"skillId":"skill-project-knowledge",
 			"createTime":1774088004843,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412200,
+			"updateTime":1774307696086,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -713,7 +867,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412200,
+		"updateTime":1774307696086,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -721,27 +875,28 @@
 	{
 		"accessLevel":"SCENE",
 		"capabilities":[
-			
+			"skill-recruitment-management"
 		],
-		"capabilityCategory":"SYS",
-		"capabilityId":"wifi-management",
-		"capabilityType":"SERVICE",
-		"category":"sys",
+		"capabilityCategory":"BIZ",
+		"capabilityId":"skill-recruitment-management",
+		"capabilityType":"SCENE",
+		"category":"biz",
 		"collaborativeCapabilities":[
 			
 		],
 		"config":{
-			"skillId":"skill-openwrt",
-			"createTime":1774306411070,
-			"updateTime":1774306411070,
-			"version":"0.7.3",
-			"skillForm":"PROVIDER"
+			"skillId":"skill-recruitment-management",
+			"createTime":1774307696205,
+			"sceneType":"TRIGGER",
+			"updateTime":1774307696205,
+			"version":"2.3.1",
+			"skillForm":"SCENE"
 		},
-		"createTime":1773961017019,
+		"createTime":1774088004961,
 		"dependencies":[
-			
+			"skill-recruitment-management"
 		],
-		"description":"管理WiFi设置",
+		"description":"企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批",
 		"developerVisible":false,
 		"driverCapability":false,
 		"driverConditions":[
@@ -750,19 +905,20 @@
 		"dynamicSceneTypes":false,
 		"enabled":true,
 		"hasSelfDrive":false,
-		"icon":"ri-server-line",
+		"icon":"ri-layout-grid-line",
 		"independent":false,
-		"installed":false,
+		"installed":true,
 		"internalVisible":false,
-		"mainFirst":false,
+		"mainFirst":true,
 		"metadata":{
-			"skillId":"skill-openwrt",
-			"createTime":1773961017019,
-			"updateTime":1774306411122,
-			"version":"0.7.3",
-			"skillForm":"PROVIDER"
+			"skillId":"skill-recruitment-management",
+			"createTime":1774088004961,
+			"sceneType":"TRIGGER",
+			"updateTime":1774307696207,
+			"version":"2.3.1",
+			"skillForm":"SCENE"
 		},
-		"name":"WiFi Management",
+		"name":"招聘管理系统",
 		"optionalAddresses":[
 			
 		],
@@ -781,88 +937,11 @@
 		"requiredAddresses":[
 			
 		],
-		"sceneCapability":false,
+		"sceneCapability":true,
 		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"skill-openwrt",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[
-			
-		],
-		"tags":[
-			
-		],
-		"updateTime":1774306411122,
-		"version":"0.7.3",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[
-			
-		],
-		"capabilityCategory":"UTIL",
-		"capabilityId":"resume-management",
-		"capabilityType":"SERVICE",
-		"category":"util",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"skill-recruitment-management",
-			"createTime":1774306412696,
-			"updateTime":1774306412696,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"createTime":1773961017696,
-		"dependencies":[
-			
-		],
-		"description":"收集、筛选、管理候选人简历",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-links-line",
-		"independent":false,
-		"installed":false,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-recruitment-management",
-			"createTime":1773961017696,
-			"updateTime":1774306412723,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"name":"简历管理",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[
-			
-		],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
+		"sceneType":"TRIGGER",
+		"sceneTypeEnum":"TRIGGER",
+		"skillForm":"SCENE",
 		"skillId":"skill-recruitment-management",
 		"status":"REGISTERED",
 		"supportedSceneTypes":[
@@ -871,86 +950,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412723,
-		"version":"2.3.1",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[
-			
-		],
-		"capabilityCategory":"UTIL",
-		"capabilityId":"scene-management",
-		"capabilityType":"SERVICE",
-		"category":"util",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"skill-collaboration",
-			"createTime":1774306411663,
-			"updateTime":1774306411663,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"createTime":1774086762502,
-		"dependencies":[
-			
-		],
-		"description":"创建、配置、管理协作场景",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-server-line",
-		"independent":false,
-		"installed":false,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"skill-collaboration",
-			"createTime":1774086762502,
-			"updateTime":1774306411668,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"name":"场景管理",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[
-			
-		],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"skill-collaboration",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[
-			
-		],
-		"tags":[
-			
-		],
-		"updateTime":1774306411668,
+		"updateTime":1774307696207,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -969,8 +969,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410748,
-			"updateTime":1774306410748,
+			"createTime":1774307695066,
+			"updateTime":1774307695066,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -995,7 +995,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016600,
-			"updateTime":1774306410770,
+			"updateTime":1774307695075,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1029,7 +1029,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410770,
+		"updateTime":1774307695075,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1048,8 +1048,8 @@
 		],
 		"config":{
 			"skillId":"skill-notification",
-			"createTime":1774306410905,
-			"updateTime":1774306410905,
+			"createTime":1774307695235,
+			"updateTime":1774307695235,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1074,7 +1074,7 @@
 		"metadata":{
 			"skillId":"skill-notification",
 			"createTime":1773961016922,
-			"updateTime":1774306410961,
+			"updateTime":1774307695269,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -1108,87 +1108,8 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410961,
+		"updateTime":1774307695269,
 		"version":"1.0.0",
-		"visibility":"public",
-		"visibilityEnum":"PUBLIC"
-	},
-	{
-		"accessLevel":"SCENE",
-		"capabilities":[
-			
-		],
-		"capabilityCategory":"UTIL",
-		"capabilityId":"daily-report-reminder",
-		"capabilityType":"SERVICE",
-		"category":"util",
-		"collaborativeCapabilities":[
-			
-		],
-		"config":{
-			"skillId":"daily-report",
-			"createTime":1774306411548,
-			"updateTime":1774306411548,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"createTime":1774220851345,
-		"dependencies":[
-			
-		],
-		"description":"日报提交提醒",
-		"developerVisible":false,
-		"driverCapability":false,
-		"driverConditions":[
-			
-		],
-		"dynamicSceneTypes":false,
-		"enabled":true,
-		"hasSelfDrive":false,
-		"icon":"ri-server-line",
-		"independent":false,
-		"installed":false,
-		"internalVisible":false,
-		"mainFirst":false,
-		"metadata":{
-			"skillId":"daily-report",
-			"createTime":1774220851345,
-			"updateTime":1774306411572,
-			"version":"2.3.1",
-			"skillForm":"PROVIDER"
-		},
-		"name":"提醒通知",
-		"optionalAddresses":[
-			
-		],
-		"optionalCapabilities":[
-			
-		],
-		"ownership":"PLATFORM",
-		"parameters":[
-			
-		],
-		"participants":[
-			
-		],
-		"platform":true,
-		"publicVisible":true,
-		"requiredAddresses":[
-			
-		],
-		"sceneCapability":false,
-		"sceneInternal":false,
-		"skillForm":"PROVIDER",
-		"skillId":"daily-report",
-		"status":"REGISTERED",
-		"supportedSceneTypes":[
-			
-		],
-		"tags":[
-			
-		],
-		"updateTime":1774306411572,
-		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
 	},
@@ -1276,6 +1197,85 @@
 			
 		],
 		"capabilityCategory":"UTIL",
+		"capabilityId":"daily-report-reminder",
+		"capabilityType":"SERVICE",
+		"category":"util",
+		"collaborativeCapabilities":[
+			
+		],
+		"config":{
+			"skillId":"daily-report",
+			"createTime":1774307695687,
+			"updateTime":1774307695687,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"createTime":1774220851345,
+		"dependencies":[
+			
+		],
+		"description":"日报提交提醒",
+		"developerVisible":false,
+		"driverCapability":false,
+		"driverConditions":[
+			
+		],
+		"dynamicSceneTypes":false,
+		"enabled":true,
+		"hasSelfDrive":false,
+		"icon":"ri-server-line",
+		"independent":false,
+		"installed":false,
+		"internalVisible":false,
+		"mainFirst":false,
+		"metadata":{
+			"skillId":"daily-report",
+			"createTime":1774220851345,
+			"updateTime":1774307695714,
+			"version":"2.3.1",
+			"skillForm":"PROVIDER"
+		},
+		"name":"提醒通知",
+		"optionalAddresses":[
+			
+		],
+		"optionalCapabilities":[
+			
+		],
+		"ownership":"PLATFORM",
+		"parameters":[
+			
+		],
+		"participants":[
+			
+		],
+		"platform":true,
+		"publicVisible":true,
+		"requiredAddresses":[
+			
+		],
+		"sceneCapability":false,
+		"sceneInternal":false,
+		"skillForm":"PROVIDER",
+		"skillId":"daily-report",
+		"status":"REGISTERED",
+		"supportedSceneTypes":[
+			
+		],
+		"tags":[
+			
+		],
+		"updateTime":1774307695714,
+		"version":"2.3.1",
+		"visibility":"public",
+		"visibilityEnum":"PUBLIC"
+	},
+	{
+		"accessLevel":"SCENE",
+		"capabilities":[
+			
+		],
+		"capabilityCategory":"UTIL",
 		"capabilityId":"approval-process",
 		"capabilityType":"SERVICE",
 		"category":"util",
@@ -1284,8 +1284,8 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411585,
-			"updateTime":1774306411585,
+			"createTime":1774307695733,
+			"updateTime":1774307695733,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1310,7 +1310,7 @@
 		"metadata":{
 			"skillId":"skill-approval-form",
 			"createTime":1773961017368,
-			"updateTime":1774306411601,
+			"updateTime":1774307695755,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1344,7 +1344,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411601,
+		"updateTime":1774307695755,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1363,8 +1363,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-local",
-			"createTime":1774306413479,
-			"updateTime":1774306413479,
+			"createTime":1774307696981,
+			"updateTime":1774307696981,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1389,7 +1389,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-local",
 			"createTime":1774220852793,
-			"updateTime":1774306413484,
+			"updateTime":1774307696992,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1423,7 +1423,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413484,
+		"updateTime":1774307696992,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1442,8 +1442,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-local",
-			"createTime":1774306413480,
-			"updateTime":1774306413480,
+			"createTime":1774307696981,
+			"updateTime":1774307696981,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1468,7 +1468,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-local",
 			"createTime":1774220852794,
-			"updateTime":1774306413495,
+			"updateTime":1774307697010,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -1502,7 +1502,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413495,
+		"updateTime":1774307697010,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1521,8 +1521,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1774306413283,
-			"updateTime":1774306413283,
+			"createTime":1774307696642,
+			"updateTime":1774307696642,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1547,7 +1547,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1773961018440,
-			"updateTime":1774306413296,
+			"updateTime":1774307696673,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1581,7 +1581,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413296,
+		"updateTime":1774307696673,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1678,8 +1678,8 @@
 		],
 		"config":{
 			"skillId":"skill-im",
-			"createTime":1774306410695,
-			"updateTime":1774306410695,
+			"createTime":1774307695006,
+			"updateTime":1774307695006,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1704,7 +1704,7 @@
 		"metadata":{
 			"skillId":"skill-im",
 			"createTime":1773961016117,
-			"updateTime":1774306410719,
+			"updateTime":1774307695030,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1738,7 +1738,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410719,
+		"updateTime":1774307695030,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1757,8 +1757,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410749,
-			"updateTime":1774306410749,
+			"createTime":1774307695066,
+			"updateTime":1774307695066,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1783,7 +1783,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016621,
-			"updateTime":1774306410777,
+			"updateTime":1774307695094,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1817,7 +1817,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410777,
+		"updateTime":1774307695094,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1914,8 +1914,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-zhihu",
-			"createTime":1774306413157,
-			"updateTime":1774306413157,
+			"createTime":1774307696521,
+			"updateTime":1774307696521,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1940,7 +1940,7 @@
 		"metadata":{
 			"skillId":"skill-media-zhihu",
 			"createTime":1773961017962,
-			"updateTime":1774306413158,
+			"updateTime":1774307696522,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -1974,7 +1974,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413158,
+		"updateTime":1774307696522,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -1993,8 +1993,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1774306411903,
-			"updateTime":1774306411903,
+			"createTime":1774307695985,
+			"updateTime":1774307695985,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2019,7 +2019,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1773961017548,
-			"updateTime":1774306411918,
+			"updateTime":1774307695992,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -2053,7 +2053,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411918,
+		"updateTime":1774307695992,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2072,8 +2072,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-wechat",
-			"createTime":1774306412999,
-			"updateTime":1774306412999,
+			"createTime":1774307696426,
+			"updateTime":1774307696426,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2098,7 +2098,7 @@
 		"metadata":{
 			"skillId":"skill-media-wechat",
 			"createTime":1773961017973,
-			"updateTime":1774306413042,
+			"updateTime":1774307696446,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2132,7 +2132,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413042,
+		"updateTime":1774307696446,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2151,8 +2151,8 @@
 		],
 		"config":{
 			"skillId":"skill-search",
-			"createTime":1774306411524,
-			"updateTime":1774306411524,
+			"createTime":1774307695658,
+			"updateTime":1774307695658,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2177,7 +2177,7 @@
 		"metadata":{
 			"skillId":"skill-search",
 			"createTime":1773961017345,
-			"updateTime":1774306411525,
+			"updateTime":1774307695658,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2211,7 +2211,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411525,
+		"updateTime":1774307695658,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2230,8 +2230,8 @@
 		],
 		"config":{
 			"skillId":"skill-recruitment-management",
-			"createTime":1774306412696,
-			"updateTime":1774306412696,
+			"createTime":1774307696206,
+			"updateTime":1774307696206,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2256,7 +2256,7 @@
 		"metadata":{
 			"skillId":"skill-recruitment-management",
 			"createTime":1774086763578,
-			"updateTime":1774306412735,
+			"updateTime":1774307696227,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2290,7 +2290,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412735,
+		"updateTime":1774307696227,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2309,8 +2309,8 @@
 		],
 		"config":{
 			"skillId":"skill-task",
-			"createTime":1774306411506,
-			"updateTime":1774306411506,
+			"createTime":1774307695635,
+			"updateTime":1774307695635,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2335,7 +2335,7 @@
 		"metadata":{
 			"skillId":"skill-task",
 			"createTime":1773961017094,
-			"updateTime":1774306411510,
+			"updateTime":1774307695641,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2369,7 +2369,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411510,
+		"updateTime":1774307695641,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2388,8 +2388,8 @@
 		],
 		"config":{
 			"skillId":"skill-notify",
-			"createTime":1774306410986,
-			"updateTime":1774306410986,
+			"createTime":1774307695285,
+			"updateTime":1774307695285,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2414,7 +2414,7 @@
 		"metadata":{
 			"skillId":"skill-notify",
 			"createTime":1773961016969,
-			"updateTime":1774306410987,
+			"updateTime":1774307695285,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2448,7 +2448,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410987,
+		"updateTime":1774307695285,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2467,8 +2467,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410749,
-			"updateTime":1774306410749,
+			"createTime":1774307695067,
+			"updateTime":1774307695067,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2493,7 +2493,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016635,
-			"updateTime":1774306410787,
+			"updateTime":1774307695102,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2527,7 +2527,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410787,
+		"updateTime":1774307695102,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2546,8 +2546,8 @@
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1774306411321,
-			"updateTime":1774306411321,
+			"createTime":1774307695481,
+			"updateTime":1774307695481,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2572,7 +2572,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1773961017205,
-			"updateTime":1774306411327,
+			"updateTime":1774307695483,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2606,7 +2606,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411327,
+		"updateTime":1774307695483,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2625,8 +2625,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-xiaohongshu",
-			"createTime":1774306413123,
-			"updateTime":1774306413123,
+			"createTime":1774307696492,
+			"updateTime":1774307696492,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2651,7 +2651,7 @@
 		"metadata":{
 			"skillId":"skill-media-xiaohongshu",
 			"createTime":1773961018375,
-			"updateTime":1774306413140,
+			"updateTime":1774307696507,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2685,7 +2685,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413140,
+		"updateTime":1774307696507,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2704,8 +2704,8 @@
 		],
 		"config":{
 			"skillId":"skill-business",
-			"createTime":1774306411627,
-			"updateTime":1774306411627,
+			"createTime":1774307695808,
+			"updateTime":1774307695808,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2730,7 +2730,7 @@
 		"metadata":{
 			"skillId":"skill-business",
 			"createTime":1774086762425,
-			"updateTime":1774306411650,
+			"updateTime":1774307695843,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2764,7 +2764,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411650,
+		"updateTime":1774307695843,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2783,8 +2783,8 @@
 		],
 		"config":{
 			"skillId":"skill-collaboration",
-			"createTime":1774306411663,
-			"updateTime":1774306411663,
+			"createTime":1774307695855,
+			"updateTime":1774307695855,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2809,7 +2809,7 @@
 		"metadata":{
 			"skillId":"skill-collaboration",
 			"createTime":1774086762506,
-			"updateTime":1774306411681,
+			"updateTime":1774307695870,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2843,7 +2843,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411681,
+		"updateTime":1774307695870,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2862,8 +2862,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-database",
-			"createTime":1774306413445,
-			"updateTime":1774306413445,
+			"createTime":1774307696940,
+			"updateTime":1774307696940,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2888,7 +2888,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-database",
 			"createTime":1774220852828,
-			"updateTime":1774306413453,
+			"updateTime":1774307696951,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -2922,7 +2922,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413453,
+		"updateTime":1774307696951,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -2941,8 +2941,8 @@
 		],
 		"config":{
 			"skillId":"skill-market",
-			"createTime":1774306412778,
-			"updateTime":1774306412778,
+			"createTime":1774307696258,
+			"updateTime":1774307696258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -2967,7 +2967,7 @@
 		"metadata":{
 			"skillId":"skill-market",
 			"createTime":1773961017750,
-			"updateTime":1774306412797,
+			"updateTime":1774307696270,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3001,7 +3001,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412797,
+		"updateTime":1774307696270,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3020,9 +3020,9 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1774306411714,
+			"createTime":1774307695888,
 			"sceneType":"AUTO",
-			"updateTime":1774306411714,
+			"updateTime":1774307695888,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3048,7 +3048,7 @@
 			"skillId":"skill-document-assistant",
 			"createTime":1774088004350,
 			"sceneType":"AUTO",
-			"updateTime":1774306411716,
+			"updateTime":1774307695888,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3084,7 +3084,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411716,
+		"updateTime":1774307695888,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3103,9 +3103,9 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1774306411903,
+			"createTime":1774307695985,
 			"sceneType":"AUTO",
-			"updateTime":1774306411903,
+			"updateTime":1774307695985,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3131,7 +3131,7 @@
 			"skillId":"skill-knowledge-share",
 			"createTime":1774088004726,
 			"sceneType":"AUTO",
-			"updateTime":1774306411904,
+			"updateTime":1774307695985,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -3167,7 +3167,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411904,
+		"updateTime":1774307695985,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3186,8 +3186,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1774306411715,
-			"updateTime":1774306411715,
+			"createTime":1774307695888,
+			"updateTime":1774307695888,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3212,7 +3212,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1773961017467,
-			"updateTime":1774306411733,
+			"updateTime":1774307695901,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -3246,7 +3246,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411733,
+		"updateTime":1774307695901,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3265,8 +3265,8 @@
 		],
 		"config":{
 			"skillId":"skill-task",
-			"createTime":1774306411506,
-			"updateTime":1774306411506,
+			"createTime":1774307695635,
+			"updateTime":1774307695635,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3291,7 +3291,7 @@
 		"metadata":{
 			"skillId":"skill-task",
 			"createTime":1773961017139,
-			"updateTime":1774306411516,
+			"updateTime":1774307695647,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3325,7 +3325,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411516,
+		"updateTime":1774307695647,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3344,8 +3344,8 @@
 		],
 		"config":{
 			"skillId":"skill-payment-wechat",
-			"createTime":1774306413385,
-			"updateTime":1774306413385,
+			"createTime":1774307696838,
+			"updateTime":1774307696838,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3370,7 +3370,7 @@
 		"metadata":{
 			"skillId":"skill-payment-wechat",
 			"createTime":1773961018693,
-			"updateTime":1774306413390,
+			"updateTime":1774307696848,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3404,7 +3404,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413390,
+		"updateTime":1774307696848,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3423,8 +3423,8 @@
 		],
 		"config":{
 			"skillId":"skill-email",
-			"createTime":1774306410416,
-			"updateTime":1774306410416,
+			"createTime":1774307694825,
+			"updateTime":1774307694825,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3449,7 +3449,7 @@
 		"metadata":{
 			"skillId":"skill-email",
 			"createTime":1773961015531,
-			"updateTime":1774306410578,
+			"updateTime":1774307694882,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3483,7 +3483,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410578,
+		"updateTime":1774307694882,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3502,8 +3502,8 @@
 		],
 		"config":{
 			"skillId":"skill-notify",
-			"createTime":1774306410986,
-			"updateTime":1774306410986,
+			"createTime":1774307695285,
+			"updateTime":1774307695285,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3528,7 +3528,7 @@
 		"metadata":{
 			"skillId":"skill-notify",
 			"createTime":1773961016970,
-			"updateTime":1774306411004,
+			"updateTime":1774307695294,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -3562,7 +3562,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411004,
+		"updateTime":1774307695294,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3581,8 +3581,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411763,
-			"updateTime":1774306411763,
+			"createTime":1774307695917,
+			"updateTime":1774307695917,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3607,7 +3607,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851523,
-			"updateTime":1774306411774,
+			"updateTime":1774307695923,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3641,7 +3641,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411774,
+		"updateTime":1774307695923,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3739,8 +3739,8 @@
 		],
 		"config":{
 			"skillId":"skill-recording-qa",
-			"createTime":1774306412443,
-			"updateTime":1774306412443,
+			"createTime":1774307696167,
+			"updateTime":1774307696167,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3765,7 +3765,7 @@
 		"metadata":{
 			"skillId":"skill-recording-qa",
 			"createTime":1774148464910,
-			"updateTime":1774306412622,
+			"updateTime":1774307696185,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3799,7 +3799,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412622,
+		"updateTime":1774307696185,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3896,8 +3896,8 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411585,
-			"updateTime":1774306411585,
+			"createTime":1774307695733,
+			"updateTime":1774307695733,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3922,7 +3922,7 @@
 		"metadata":{
 			"skillId":"skill-approval-form",
 			"createTime":1773961017368,
-			"updateTime":1774306411596,
+			"updateTime":1774307695749,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -3956,7 +3956,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411596,
+		"updateTime":1774307695749,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -3975,8 +3975,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1774306411715,
-			"updateTime":1774306411715,
+			"createTime":1774307695888,
+			"updateTime":1774307695888,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4001,7 +4001,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1773961017467,
-			"updateTime":1774306411724,
+			"updateTime":1774307695893,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4035,7 +4035,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411724,
+		"updateTime":1774307695893,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4054,8 +4054,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1774306411904,
-			"updateTime":1774306411904,
+			"createTime":1774307695985,
+			"updateTime":1774307695985,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4080,7 +4080,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1773961017548,
-			"updateTime":1774306411932,
+			"updateTime":1774307695999,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4114,7 +4114,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411932,
+		"updateTime":1774307695999,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4133,8 +4133,8 @@
 		],
 		"config":{
 			"skillId":"skill-market",
-			"createTime":1774306412778,
-			"updateTime":1774306412778,
+			"createTime":1774307696257,
+			"updateTime":1774307696257,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4159,7 +4159,7 @@
 		"metadata":{
 			"skillId":"skill-market",
 			"createTime":1773961017345,
-			"updateTime":1774306412787,
+			"updateTime":1774307696265,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4193,7 +4193,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412787,
+		"updateTime":1774307696265,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4212,8 +4212,8 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411585,
-			"updateTime":1774306411585,
+			"createTime":1774307695734,
+			"updateTime":1774307695734,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4238,7 +4238,7 @@
 		"metadata":{
 			"skillId":"skill-approval-form",
 			"createTime":1773961017369,
-			"updateTime":1774306411611,
+			"updateTime":1774307695763,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4272,7 +4272,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411611,
+		"updateTime":1774307695763,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4291,9 +4291,9 @@
 		],
 		"config":{
 			"skillId":"daily-report",
-			"createTime":1774306411547,
+			"createTime":1774307695685,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411547,
+			"updateTime":1774307695685,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -4319,7 +4319,7 @@
 			"skillId":"daily-report",
 			"createTime":1774220851343,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411548,
+			"updateTime":1774307695687,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -4355,7 +4355,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411548,
+		"updateTime":1774307695687,
 		"version":"2.3.1",
 		"visibility":"internal",
 		"visibilityEnum":"INTERNAL"
@@ -4374,8 +4374,8 @@
 		],
 		"config":{
 			"skillId":"daily-report",
-			"createTime":1774306411547,
-			"updateTime":1774306411547,
+			"createTime":1774307695686,
+			"updateTime":1774307695686,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4400,7 +4400,7 @@
 		"metadata":{
 			"skillId":"daily-report",
 			"createTime":1774220851344,
-			"updateTime":1774306411564,
+			"updateTime":1774307695706,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4434,7 +4434,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411564,
+		"updateTime":1774307695706,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4531,8 +4531,8 @@
 		],
 		"config":{
 			"skillId":"skill-group",
-			"createTime":1774306410629,
-			"updateTime":1774306410629,
+			"createTime":1774307694909,
+			"updateTime":1774307694909,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4557,7 +4557,7 @@
 		"metadata":{
 			"skillId":"skill-group",
 			"createTime":1773961015642,
-			"updateTime":1774306410652,
+			"updateTime":1774307694959,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4591,7 +4591,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410652,
+		"updateTime":1774307694959,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4610,8 +4610,8 @@
 		],
 		"config":{
 			"skillId":"skill-notification",
-			"createTime":1774306410897,
-			"updateTime":1774306410897,
+			"createTime":1774307695229,
+			"updateTime":1774307695229,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4636,7 +4636,7 @@
 		"metadata":{
 			"skillId":"skill-notification",
 			"createTime":1773961016901,
-			"updateTime":1774306410906,
+			"updateTime":1774307695235,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -4670,7 +4670,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410906,
+		"updateTime":1774307695235,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4689,8 +4689,8 @@
 		],
 		"config":{
 			"skillId":"skill-share",
-			"createTime":1774306412847,
-			"updateTime":1774306412847,
+			"createTime":1774307696322,
+			"updateTime":1774307696322,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4715,7 +4715,7 @@
 		"metadata":{
 			"skillId":"skill-share",
 			"createTime":1773961017815,
-			"updateTime":1774306412849,
+			"updateTime":1774307696322,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4749,7 +4749,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412849,
+		"updateTime":1774307696322,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4768,8 +4768,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1774306413283,
-			"updateTime":1774306413283,
+			"createTime":1774307696642,
+			"updateTime":1774307696642,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4794,7 +4794,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1773961018468,
-			"updateTime":1774306413289,
+			"updateTime":1774307696661,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4828,7 +4828,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413289,
+		"updateTime":1774307696661,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4847,8 +4847,8 @@
 		],
 		"config":{
 			"skillId":"skill-recruitment-management",
-			"createTime":1774306412698,
-			"updateTime":1774306412698,
+			"createTime":1774307696207,
+			"updateTime":1774307696207,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4873,7 +4873,7 @@
 		"metadata":{
 			"skillId":"skill-recruitment-management",
 			"createTime":1774086763579,
-			"updateTime":1774306412757,
+			"updateTime":1774307696239,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -4907,7 +4907,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412757,
+		"updateTime":1774307696239,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -4926,8 +4926,8 @@
 		],
 		"config":{
 			"skillId":"skill-remote-terminal",
-			"createTime":1774306411401,
-			"updateTime":1774306411401,
+			"createTime":1774307695514,
+			"updateTime":1774307695514,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4952,7 +4952,7 @@
 		"metadata":{
 			"skillId":"skill-remote-terminal",
 			"createTime":1773961017232,
-			"updateTime":1774306411401,
+			"updateTime":1774307695514,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -4986,7 +4986,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411401,
+		"updateTime":1774307695514,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5005,8 +5005,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1774306412200,
-			"updateTime":1774306412200,
+			"createTime":1774307696086,
+			"updateTime":1774307696086,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5031,7 +5031,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1773961017626,
-			"updateTime":1774306412318,
+			"updateTime":1774307696106,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5065,7 +5065,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412318,
+		"updateTime":1774307696106,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5084,8 +5084,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1774306413283,
-			"updateTime":1774306413283,
+			"createTime":1774307696641,
+			"updateTime":1774307696641,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5110,7 +5110,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1773961018440,
-			"updateTime":1774306413283,
+			"updateTime":1774307696643,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5144,7 +5144,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413283,
+		"updateTime":1774307696643,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5163,8 +5163,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412336,
-			"updateTime":1774306412336,
+			"createTime":1774307696117,
+			"updateTime":1774307696117,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5189,7 +5189,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017651,
-			"updateTime":1774306412406,
+			"updateTime":1774307696139,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -5223,7 +5223,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412406,
+		"updateTime":1774307696139,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5242,8 +5242,8 @@
 		],
 		"config":{
 			"skillId":"skill-im",
-			"createTime":1774306410695,
-			"updateTime":1774306410695,
+			"createTime":1774307695006,
+			"updateTime":1774307695006,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5268,7 +5268,7 @@
 		"metadata":{
 			"skillId":"skill-im",
 			"createTime":1773961015530,
-			"updateTime":1774306410708,
+			"updateTime":1774307695019,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5302,7 +5302,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410708,
+		"updateTime":1774307695019,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5321,8 +5321,8 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411585,
-			"updateTime":1774306411585,
+			"createTime":1774307695736,
+			"updateTime":1774307695736,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -5347,7 +5347,7 @@
 		"metadata":{
 			"skillId":"skill-approval-form",
 			"createTime":1773961017369,
-			"updateTime":1774306411615,
+			"updateTime":1774307695781,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -5381,7 +5381,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411615,
+		"updateTime":1774307695781,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5478,8 +5478,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-xiaohongshu",
-			"createTime":1774306413122,
-			"updateTime":1774306413122,
+			"createTime":1774307696491,
+			"updateTime":1774307696491,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5504,7 +5504,7 @@
 		"metadata":{
 			"skillId":"skill-media-xiaohongshu",
 			"createTime":1773961018374,
-			"updateTime":1774306413123,
+			"updateTime":1774307696493,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5538,7 +5538,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413123,
+		"updateTime":1774307696493,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5557,8 +5557,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-weibo",
-			"createTime":1774306413069,
-			"updateTime":1774306413069,
+			"createTime":1774307696462,
+			"updateTime":1774307696462,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5583,7 +5583,7 @@
 		"metadata":{
 			"skillId":"skill-media-weibo",
 			"createTime":1773961018348,
-			"updateTime":1774306413096,
+			"updateTime":1774307696476,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5617,7 +5617,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413096,
+		"updateTime":1774307696476,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5716,8 +5716,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-local",
-			"createTime":1774306413480,
-			"updateTime":1774306413480,
+			"createTime":1774307696981,
+			"updateTime":1774307696981,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -5742,7 +5742,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-local",
 			"createTime":1774220852793,
-			"updateTime":1774306413490,
+			"updateTime":1774307697004,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -5776,7 +5776,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413490,
+		"updateTime":1774307697004,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5795,8 +5795,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-xiaohongshu",
-			"createTime":1774306413122,
-			"updateTime":1774306413122,
+			"createTime":1774307696492,
+			"updateTime":1774307696492,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5821,7 +5821,7 @@
 		"metadata":{
 			"skillId":"skill-media-xiaohongshu",
 			"createTime":1773961018375,
-			"updateTime":1774306413132,
+			"updateTime":1774307696498,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -5855,7 +5855,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413132,
+		"updateTime":1774307696498,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5874,9 +5874,9 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412335,
+			"createTime":1774307696116,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412335,
+			"updateTime":1774307696116,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -5902,7 +5902,7 @@
 			"skillId":"skill-real-estate-form",
 			"createTime":1774088004883,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412349,
+			"updateTime":1774307696118,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -5938,7 +5938,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412349,
+		"updateTime":1774307696118,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6035,8 +6035,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410749,
-			"updateTime":1774306410749,
+			"createTime":1774307695068,
+			"updateTime":1774307695068,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6061,7 +6061,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016649,
-			"updateTime":1774306410793,
+			"updateTime":1774307695115,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6095,7 +6095,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410793,
+		"updateTime":1774307695115,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6114,8 +6114,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412336,
-			"updateTime":1774306412336,
+			"createTime":1774307696116,
+			"updateTime":1774307696116,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6140,7 +6140,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017650,
-			"updateTime":1774306412387,
+			"updateTime":1774307696128,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6174,7 +6174,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412387,
+		"updateTime":1774307696128,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6193,8 +6193,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-zhihu",
-			"createTime":1774306413157,
-			"updateTime":1774306413157,
+			"createTime":1774307696521,
+			"updateTime":1774307696521,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6219,7 +6219,7 @@
 		"metadata":{
 			"skillId":"skill-media-zhihu",
 			"createTime":1773961018403,
-			"updateTime":1774306413164,
+			"updateTime":1774307696528,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6253,7 +6253,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413164,
+		"updateTime":1774307696528,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6272,8 +6272,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1774306413563,
-			"updateTime":1774306413563,
+			"createTime":1774307697313,
+			"updateTime":1774307697313,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6298,7 +6298,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1774220852918,
-			"updateTime":1774306413575,
+			"updateTime":1774307697330,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6332,7 +6332,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413575,
+		"updateTime":1774307697330,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6351,8 +6351,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412336,
-			"updateTime":1774306412336,
+			"createTime":1774307696116,
+			"updateTime":1774307696116,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6377,7 +6377,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017650,
-			"updateTime":1774306412397,
+			"updateTime":1774307696134,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6411,7 +6411,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412397,
+		"updateTime":1774307696134,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6430,8 +6430,8 @@
 		],
 		"config":{
 			"skillId":"skill-business",
-			"createTime":1774306411627,
-			"updateTime":1774306411627,
+			"createTime":1774307695808,
+			"updateTime":1774307695808,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6456,7 +6456,7 @@
 		"metadata":{
 			"skillId":"skill-business",
 			"createTime":1774086762424,
-			"updateTime":1774306411639,
+			"updateTime":1774307695826,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6490,7 +6490,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411639,
+		"updateTime":1774307695826,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6509,8 +6509,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1774306412011,
-			"updateTime":1774306412011,
+			"createTime":1774307696051,
+			"updateTime":1774307696051,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6535,7 +6535,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1773961017599,
-			"updateTime":1774306412038,
+			"updateTime":1774307696072,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6569,7 +6569,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412038,
+		"updateTime":1774307696072,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6588,8 +6588,8 @@
 		],
 		"config":{
 			"skillId":"skill-recording-qa",
-			"createTime":1774306412442,
-			"updateTime":1774306412442,
+			"createTime":1774307696166,
+			"updateTime":1774307696166,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6614,7 +6614,7 @@
 		"metadata":{
 			"skillId":"skill-recording-qa",
 			"createTime":1774148464909,
-			"updateTime":1774306412563,
+			"updateTime":1774307696175,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6648,7 +6648,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412563,
+		"updateTime":1774307696175,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6667,8 +6667,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-share",
-			"createTime":1774306411904,
-			"updateTime":1774306411904,
+			"createTime":1774307695985,
+			"updateTime":1774307695985,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6693,7 +6693,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-share",
 			"createTime":1773961017549,
-			"updateTime":1774306411949,
+			"updateTime":1774307696005,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6727,7 +6727,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411949,
+		"updateTime":1774307696005,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6746,8 +6746,8 @@
 		],
 		"config":{
 			"skillId":"skill-document-assistant",
-			"createTime":1774306411716,
-			"updateTime":1774306411716,
+			"createTime":1774307695888,
+			"updateTime":1774307695888,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6772,7 +6772,7 @@
 		"metadata":{
 			"skillId":"skill-document-assistant",
 			"createTime":1773961017468,
-			"updateTime":1774306411743,
+			"updateTime":1774307695906,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -6806,7 +6806,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411743,
+		"updateTime":1774307695906,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6825,8 +6825,8 @@
 		],
 		"config":{
 			"skillId":"skill-common",
-			"createTime":1774306413591,
-			"updateTime":1774306413591,
+			"createTime":1774307697385,
+			"updateTime":1774307697385,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6851,7 +6851,7 @@
 		"metadata":{
 			"skillId":"skill-common",
 			"createTime":1773961018942,
-			"updateTime":1774306413602,
+			"updateTime":1774307697403,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -6885,7 +6885,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413602,
+		"updateTime":1774307697403,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6904,8 +6904,8 @@
 		],
 		"config":{
 			"skillId":"skill-msg",
-			"createTime":1774306410837,
-			"updateTime":1774306410837,
+			"createTime":1774307695160,
+			"updateTime":1774307695160,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6930,7 +6930,7 @@
 		"metadata":{
 			"skillId":"skill-msg",
 			"createTime":1773961016841,
-			"updateTime":1774306410858,
+			"updateTime":1774307695193,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -6964,7 +6964,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410858,
+		"updateTime":1774307695193,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -6983,8 +6983,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412337,
-			"updateTime":1774306412337,
+			"createTime":1774307696117,
+			"updateTime":1774307696117,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7009,7 +7009,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017651,
-			"updateTime":1774306412421,
+			"updateTime":1774307696149,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7043,7 +7043,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412421,
+		"updateTime":1774307696149,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7062,8 +7062,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1774306411070,
-			"updateTime":1774306411070,
+			"createTime":1774307695329,
+			"updateTime":1774307695329,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7088,7 +7088,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1773961017020,
-			"updateTime":1774306411134,
+			"updateTime":1774307695380,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7122,7 +7122,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411134,
+		"updateTime":1774307695380,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7141,8 +7141,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411763,
-			"updateTime":1774306411763,
+			"createTime":1774307695918,
+			"updateTime":1774307695918,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7167,7 +7167,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851524,
-			"updateTime":1774306411811,
+			"updateTime":1774307695938,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7201,7 +7201,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411811,
+		"updateTime":1774307695938,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7220,8 +7220,8 @@
 		],
 		"config":{
 			"skillId":"skill-common",
-			"createTime":1774306413590,
-			"updateTime":1774306413590,
+			"createTime":1774307697384,
+			"updateTime":1774307697384,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7246,7 +7246,7 @@
 		"metadata":{
 			"skillId":"skill-common",
 			"createTime":1773961018941,
-			"updateTime":1774306413591,
+			"updateTime":1774307697385,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7280,7 +7280,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413591,
+		"updateTime":1774307697385,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7299,8 +7299,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-baidu",
-			"createTime":1774306412884,
-			"updateTime":1774306412884,
+			"createTime":1774307696349,
+			"updateTime":1774307696349,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7325,7 +7325,7 @@
 		"metadata":{
 			"skillId":"skill-llm-baidu",
 			"createTime":1773961017844,
-			"updateTime":1774306412895,
+			"updateTime":1774307696355,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7359,7 +7359,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412895,
+		"updateTime":1774307696355,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7457,8 +7457,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1774306413563,
-			"updateTime":1774306413563,
+			"createTime":1774307697312,
+			"updateTime":1774307697312,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7483,7 +7483,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1774220852917,
-			"updateTime":1774306413569,
+			"updateTime":1774307697323,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7517,7 +7517,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413569,
+		"updateTime":1774307697323,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7536,8 +7536,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1774306412187,
-			"updateTime":1774306412187,
+			"createTime":1774307696086,
+			"updateTime":1774307696086,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7562,7 +7562,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1773961017625,
-			"updateTime":1774306412309,
+			"updateTime":1774307696101,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7596,7 +7596,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412309,
+		"updateTime":1774307696101,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7694,8 +7694,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-weibo",
-			"createTime":1774306413068,
-			"updateTime":1774306413068,
+			"createTime":1774307696461,
+			"updateTime":1774307696461,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7720,7 +7720,7 @@
 		"metadata":{
 			"skillId":"skill-media-weibo",
 			"createTime":1773961018348,
-			"updateTime":1774306413081,
+			"updateTime":1774307696468,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7754,7 +7754,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413081,
+		"updateTime":1774307696468,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7773,8 +7773,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1774306411066,
-			"updateTime":1774306411066,
+			"createTime":1774307695327,
+			"updateTime":1774307695327,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7799,7 +7799,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1773961017013,
-			"updateTime":1774306411070,
+			"updateTime":1774307695329,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -7833,7 +7833,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411070,
+		"updateTime":1774307695329,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7852,8 +7852,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1774306412162,
-			"updateTime":1774306412162,
+			"createTime":1774307696085,
+			"updateTime":1774307696085,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7878,7 +7878,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1773961017625,
-			"updateTime":1774306412236,
+			"updateTime":1774307696090,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -7912,7 +7912,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412236,
+		"updateTime":1774307696090,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -7931,8 +7931,8 @@
 		],
 		"config":{
 			"skillId":"skill-recruitment-management",
-			"createTime":1774306412697,
-			"updateTime":1774306412697,
+			"createTime":1774307696207,
+			"updateTime":1774307696207,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7957,7 +7957,7 @@
 		"metadata":{
 			"skillId":"skill-recruitment-management",
 			"createTime":1774086763578,
-			"updateTime":1774306412747,
+			"updateTime":1774307696234,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -7991,7 +7991,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412747,
+		"updateTime":1774307696234,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8010,8 +8010,8 @@
 		],
 		"config":{
 			"skillId":"skill-task",
-			"createTime":1774306411505,
-			"updateTime":1774306411505,
+			"createTime":1774307695635,
+			"updateTime":1774307695635,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8036,7 +8036,7 @@
 		"metadata":{
 			"skillId":"skill-task",
 			"createTime":1773961015634,
-			"updateTime":1774306411506,
+			"updateTime":1774307695635,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8070,7 +8070,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411506,
+		"updateTime":1774307695635,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8089,8 +8089,8 @@
 		],
 		"config":{
 			"skillId":"skill-business",
-			"createTime":1774306411626,
-			"updateTime":1774306411626,
+			"createTime":1774307695808,
+			"updateTime":1774307695808,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8115,7 +8115,7 @@
 		"metadata":{
 			"skillId":"skill-business",
 			"createTime":1774086762424,
-			"updateTime":1774306411633,
+			"updateTime":1774307695820,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8149,7 +8149,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411633,
+		"updateTime":1774307695820,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8168,8 +8168,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1774306412010,
-			"updateTime":1774306412010,
+			"createTime":1774307696050,
+			"updateTime":1774307696050,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -8194,7 +8194,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1773961017597,
-			"updateTime":1774306412017,
+			"updateTime":1774307696056,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -8228,7 +8228,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412017,
+		"updateTime":1774307696056,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8247,8 +8247,8 @@
 		],
 		"config":{
 			"skillId":"skill-recording-qa",
-			"createTime":1774306412443,
-			"updateTime":1774306412443,
+			"createTime":1774307696166,
+			"updateTime":1774307696166,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8273,7 +8273,7 @@
 		"metadata":{
 			"skillId":"skill-recording-qa",
 			"createTime":1774148464910,
-			"updateTime":1774306412591,
+			"updateTime":1774307696181,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8307,7 +8307,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412591,
+		"updateTime":1774307696181,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8404,8 +8404,8 @@
 		],
 		"config":{
 			"skillId":"skill-report",
-			"createTime":1774306412816,
-			"updateTime":1774306412816,
+			"createTime":1774307696288,
+			"updateTime":1774307696288,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8430,7 +8430,7 @@
 		"metadata":{
 			"skillId":"skill-report",
 			"createTime":1773961017789,
-			"updateTime":1774306412817,
+			"updateTime":1774307696289,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8464,7 +8464,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412817,
+		"updateTime":1774307696289,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8483,8 +8483,8 @@
 		],
 		"config":{
 			"skillId":"skill-report",
-			"createTime":1774306412817,
-			"updateTime":1774306412817,
+			"createTime":1774307696289,
+			"updateTime":1774307696289,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8509,7 +8509,7 @@
 		"metadata":{
 			"skillId":"skill-report",
 			"createTime":1773961017789,
-			"updateTime":1774306412826,
+			"updateTime":1774307696297,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8543,7 +8543,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412826,
+		"updateTime":1774307696297,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8562,9 +8562,9 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411584,
+			"createTime":1774307695732,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411584,
+			"updateTime":1774307695732,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -8590,7 +8590,7 @@
 			"skillId":"skill-approval-form",
 			"createTime":1774088003860,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411585,
+			"updateTime":1774307695736,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -8626,7 +8626,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411585,
+		"updateTime":1774307695736,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8645,8 +8645,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1774306411842,
-			"updateTime":1774306411842,
+			"createTime":1774307695953,
+			"updateTime":1774307695953,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8671,7 +8671,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1773961017499,
-			"updateTime":1774306411869,
+			"updateTime":1774307695969,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8705,7 +8705,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411869,
+		"updateTime":1774307695969,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8724,8 +8724,8 @@
 		],
 		"config":{
 			"skillId":"skill-protocol",
-			"createTime":1774306413630,
-			"updateTime":1774306413630,
+			"createTime":1774307697436,
+			"updateTime":1774307697436,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8750,7 +8750,7 @@
 		"metadata":{
 			"skillId":"skill-protocol",
 			"createTime":1774220853411,
-			"updateTime":1774306413645,
+			"updateTime":1774307697457,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8784,7 +8784,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413645,
+		"updateTime":1774307697457,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8803,8 +8803,8 @@
 		],
 		"config":{
 			"skillId":"skill-im",
-			"createTime":1774306410696,
-			"updateTime":1774306410696,
+			"createTime":1774307695007,
+			"updateTime":1774307695007,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8829,7 +8829,7 @@
 		"metadata":{
 			"skillId":"skill-im",
 			"createTime":1773961016150,
-			"updateTime":1774306410730,
+			"updateTime":1774307695042,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8863,7 +8863,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410730,
+		"updateTime":1774307695042,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8882,8 +8882,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410748,
-			"updateTime":1774306410748,
+			"createTime":1774307695065,
+			"updateTime":1774307695065,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8908,7 +8908,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016588,
-			"updateTime":1774306410750,
+			"updateTime":1774307695068,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -8942,7 +8942,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410750,
+		"updateTime":1774307695068,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8961,8 +8961,8 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1774306411970,
-			"updateTime":1774306411970,
+			"createTime":1774307696020,
+			"updateTime":1774307696020,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -8987,7 +8987,7 @@
 		"metadata":{
 			"skillId":"skill-meeting-minutes",
 			"createTime":1773961017571,
-			"updateTime":1774306411977,
+			"updateTime":1774307696026,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -9021,7 +9021,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411977,
+		"updateTime":1774307696026,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9040,8 +9040,8 @@
 		],
 		"config":{
 			"skillId":"skill-org-wecom",
-			"createTime":1774306413283,
-			"updateTime":1774306413283,
+			"createTime":1774307696643,
+			"updateTime":1774307696643,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9066,7 +9066,7 @@
 		"metadata":{
 			"skillId":"skill-org-wecom",
 			"createTime":1773961018469,
-			"updateTime":1774306413310,
+			"updateTime":1774307696699,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9100,7 +9100,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413310,
+		"updateTime":1774307696699,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9119,8 +9119,8 @@
 		],
 		"config":{
 			"skillId":"skill-recording-qa",
-			"createTime":1774306412443,
-			"updateTime":1774306412443,
+			"createTime":1774307696167,
+			"updateTime":1774307696167,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -9145,7 +9145,7 @@
 		"metadata":{
 			"skillId":"skill-recording-qa",
 			"createTime":1774148464910,
-			"updateTime":1774306412639,
+			"updateTime":1774307696194,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -9179,7 +9179,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412639,
+		"updateTime":1774307696194,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9198,8 +9198,8 @@
 		],
 		"config":{
 			"skillId":"skill-payment-wechat",
-			"createTime":1774306413385,
-			"updateTime":1774306413385,
+			"createTime":1774307696839,
+			"updateTime":1774307696839,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9224,7 +9224,7 @@
 		"metadata":{
 			"skillId":"skill-payment-wechat",
 			"createTime":1773961018693,
-			"updateTime":1774306413401,
+			"updateTime":1774307696866,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9258,7 +9258,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413401,
+		"updateTime":1774307696866,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9277,8 +9277,8 @@
 		],
 		"config":{
 			"skillId":"skill-res-service",
-			"createTime":1774306411445,
-			"updateTime":1774306411445,
+			"createTime":1774307695547,
+			"updateTime":1774307695547,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9303,7 +9303,7 @@
 		"metadata":{
 			"skillId":"skill-res-service",
 			"createTime":1773961017258,
-			"updateTime":1774306411447,
+			"updateTime":1774307695549,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9337,7 +9337,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411447,
+		"updateTime":1774307695549,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9356,8 +9356,8 @@
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1774306411327,
-			"updateTime":1774306411327,
+			"createTime":1774307695483,
+			"updateTime":1774307695483,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9382,7 +9382,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1773961017207,
-			"updateTime":1774306411372,
+			"updateTime":1774307695498,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9416,7 +9416,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411372,
+		"updateTime":1774307695498,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9435,8 +9435,8 @@
 		],
 		"config":{
 			"skillId":"skill-payment-wechat",
-			"createTime":1774306413385,
-			"updateTime":1774306413385,
+			"createTime":1774307696838,
+			"updateTime":1774307696838,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9461,7 +9461,7 @@
 		"metadata":{
 			"skillId":"skill-payment-wechat",
 			"createTime":1773961018693,
-			"updateTime":1774306413385,
+			"updateTime":1774307696839,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9495,7 +9495,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413385,
+		"updateTime":1774307696839,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9514,8 +9514,8 @@
 		],
 		"config":{
 			"skillId":"skill-notification",
-			"createTime":1774306410898,
-			"updateTime":1774306410898,
+			"createTime":1774307695232,
+			"updateTime":1774307695232,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -9540,7 +9540,7 @@
 		"metadata":{
 			"skillId":"skill-notification",
 			"createTime":1773961016909,
-			"updateTime":1774306410924,
+			"updateTime":1774307695250,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -9574,7 +9574,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410924,
+		"updateTime":1774307695250,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9593,8 +9593,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-zhihu",
-			"createTime":1774306413158,
-			"updateTime":1774306413158,
+			"createTime":1774307696522,
+			"updateTime":1774307696522,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9619,7 +9619,7 @@
 		"metadata":{
 			"skillId":"skill-media-zhihu",
 			"createTime":1773961018404,
-			"updateTime":1774306413187,
+			"updateTime":1774307696541,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9653,7 +9653,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413187,
+		"updateTime":1774307696541,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9672,8 +9672,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1774306411069,
-			"updateTime":1774306411069,
+			"createTime":1774307695328,
+			"updateTime":1774307695328,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9698,7 +9698,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1773961017015,
-			"updateTime":1774306411084,
+			"updateTime":1774307695339,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9732,7 +9732,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411084,
+		"updateTime":1774307695339,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9829,8 +9829,8 @@
 		],
 		"config":{
 			"skillId":"skill-res-service",
-			"createTime":1774306411446,
-			"updateTime":1774306411446,
+			"createTime":1774307695548,
+			"updateTime":1774307695548,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9855,7 +9855,7 @@
 		"metadata":{
 			"skillId":"skill-res-service",
 			"createTime":1773961017258,
-			"updateTime":1774306411462,
+			"updateTime":1774307695564,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9889,7 +9889,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411462,
+		"updateTime":1774307695564,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -9908,8 +9908,8 @@
 		],
 		"config":{
 			"skillId":"skill-remote-terminal",
-			"createTime":1774306411401,
-			"updateTime":1774306411401,
+			"createTime":1774307695514,
+			"updateTime":1774307695514,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9934,7 +9934,7 @@
 		"metadata":{
 			"skillId":"skill-remote-terminal",
 			"createTime":1773961017233,
-			"updateTime":1774306411426,
+			"updateTime":1774307695529,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -9968,7 +9968,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411426,
+		"updateTime":1774307695529,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10065,9 +10065,9 @@
 		],
 		"config":{
 			"skillId":"skill-collaboration",
-			"createTime":1774306411662,
+			"createTime":1774307695853,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411662,
+			"updateTime":1774307695853,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -10093,7 +10093,7 @@
 			"skillId":"skill-collaboration",
 			"createTime":1774088004256,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411664,
+			"updateTime":1774307695855,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -10129,7 +10129,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411664,
+		"updateTime":1774307695855,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10148,8 +10148,8 @@
 		],
 		"config":{
 			"skillId":"skill-protocol",
-			"createTime":1774306413630,
-			"updateTime":1774306413630,
+			"createTime":1774307697436,
+			"updateTime":1774307697436,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10174,7 +10174,7 @@
 		"metadata":{
 			"skillId":"skill-protocol",
 			"createTime":1774220853412,
-			"updateTime":1774306413651,
+			"updateTime":1774307697464,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10208,7 +10208,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413651,
+		"updateTime":1774307697464,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10227,8 +10227,8 @@
 		],
 		"config":{
 			"skillId":"skill-project-knowledge",
-			"createTime":1774306412170,
-			"updateTime":1774306412170,
+			"createTime":1774307696085,
+			"updateTime":1774307696085,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -10253,7 +10253,7 @@
 		"metadata":{
 			"skillId":"skill-project-knowledge",
 			"createTime":1773961017625,
-			"updateTime":1774306412263,
+			"updateTime":1774307696096,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -10287,7 +10287,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412263,
+		"updateTime":1774307696096,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10306,8 +10306,8 @@
 		],
 		"config":{
 			"skillId":"skill-mqtt",
-			"createTime":1774306410750,
-			"updateTime":1774306410750,
+			"createTime":1774307695068,
+			"updateTime":1774307695068,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -10332,7 +10332,7 @@
 		"metadata":{
 			"skillId":"skill-mqtt",
 			"createTime":1773961016679,
-			"updateTime":1774306410799,
+			"updateTime":1774307695125,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -10366,7 +10366,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410799,
+		"updateTime":1774307695125,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10385,8 +10385,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411764,
-			"updateTime":1774306411764,
+			"createTime":1774307695918,
+			"updateTime":1774307695918,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10411,7 +10411,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851524,
-			"updateTime":1774306411823,
+			"updateTime":1774307695944,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10445,7 +10445,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411823,
+		"updateTime":1774307695944,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10464,8 +10464,8 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1774306411971,
-			"updateTime":1774306411971,
+			"createTime":1774307696020,
+			"updateTime":1774307696020,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10490,7 +10490,7 @@
 		"metadata":{
 			"skillId":"skill-meeting-minutes",
 			"createTime":1773961017572,
-			"updateTime":1774306411985,
+			"updateTime":1774307696032,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10524,7 +10524,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411985,
+		"updateTime":1774307696032,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10543,8 +10543,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412349,
-			"updateTime":1774306412349,
+			"createTime":1774307696118,
+			"updateTime":1774307696118,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -10569,7 +10569,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017652,
-			"updateTime":1774306412428,
+			"updateTime":1774307696155,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -10603,7 +10603,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412428,
+		"updateTime":1774307696155,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10622,8 +10622,8 @@
 		],
 		"config":{
 			"skillId":"skill-collaboration",
-			"createTime":1774306411663,
-			"updateTime":1774306411663,
+			"createTime":1774307695855,
+			"updateTime":1774307695855,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10648,7 +10648,7 @@
 		"metadata":{
 			"skillId":"skill-collaboration",
 			"createTime":1774086762504,
-			"updateTime":1774306411675,
+			"updateTime":1774307695864,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10682,7 +10682,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411675,
+		"updateTime":1774307695864,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10701,8 +10701,8 @@
 		],
 		"config":{
 			"skillId":"skill-im",
-			"createTime":1774306410695,
-			"updateTime":1774306410695,
+			"createTime":1774307695005,
+			"updateTime":1774307695005,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -10727,7 +10727,7 @@
 		"metadata":{
 			"skillId":"skill-im",
 			"createTime":1773961015530,
-			"updateTime":1774306410696,
+			"updateTime":1774307695007,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -10761,7 +10761,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410696,
+		"updateTime":1774307695007,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10780,9 +10780,9 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1774306411841,
+			"createTime":1774307695953,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411841,
+			"updateTime":1774307695953,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -10808,7 +10808,7 @@
 			"skillId":"skill-knowledge-qa",
 			"createTime":1774088004457,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411842,
+			"updateTime":1774307695954,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -10844,7 +10844,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411842,
+		"updateTime":1774307695954,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10863,8 +10863,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1774306413563,
-			"updateTime":1774306413563,
+			"createTime":1774307697312,
+			"updateTime":1774307697312,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10889,7 +10889,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1773961018834,
-			"updateTime":1774306413563,
+			"updateTime":1774307697313,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -10923,7 +10923,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413563,
+		"updateTime":1774307697313,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -10942,8 +10942,8 @@
 		],
 		"config":{
 			"skillId":"skill-res-service",
-			"createTime":1774306411446,
-			"updateTime":1774306411446,
+			"createTime":1774307695548,
+			"updateTime":1774307695548,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -10968,7 +10968,7 @@
 		"metadata":{
 			"skillId":"skill-res-service",
 			"createTime":1773961017258,
-			"updateTime":1774306411455,
+			"updateTime":1774307695556,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11002,7 +11002,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411455,
+		"updateTime":1774307695556,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11021,8 +11021,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-wechat",
-			"createTime":1774306412997,
-			"updateTime":1774306412997,
+			"createTime":1774307696426,
+			"updateTime":1774307696426,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11047,7 +11047,7 @@
 		"metadata":{
 			"skillId":"skill-media-wechat",
 			"createTime":1773961017963,
-			"updateTime":1774306413018,
+			"updateTime":1774307696433,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11081,7 +11081,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413018,
+		"updateTime":1774307696433,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11100,8 +11100,8 @@
 		],
 		"config":{
 			"skillId":"skill-recruitment-management",
-			"createTime":1774306412695,
-			"updateTime":1774306412695,
+			"createTime":1774307696206,
+			"updateTime":1774307696206,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11126,7 +11126,7 @@
 		"metadata":{
 			"skillId":"skill-recruitment-management",
 			"createTime":1774086763576,
-			"updateTime":1774306412710,
+			"updateTime":1774307696212,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11160,7 +11160,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412710,
+		"updateTime":1774307696212,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11179,8 +11179,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412337,
-			"updateTime":1774306412337,
+			"createTime":1774307696117,
+			"updateTime":1774307696117,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -11205,7 +11205,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017651,
-			"updateTime":1774306412413,
+			"updateTime":1774307696144,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -11239,7 +11239,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412413,
+		"updateTime":1774307696144,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11258,8 +11258,8 @@
 		],
 		"config":{
 			"skillId":"skill-protocol",
-			"createTime":1774306413629,
-			"updateTime":1774306413629,
+			"createTime":1774307697435,
+			"updateTime":1774307697435,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11284,7 +11284,7 @@
 		"metadata":{
 			"skillId":"skill-protocol",
 			"createTime":1773961018995,
-			"updateTime":1774306413636,
+			"updateTime":1774307697443,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11318,7 +11318,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413636,
+		"updateTime":1774307697443,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11337,8 +11337,8 @@
 		],
 		"config":{
 			"skillId":"skill-approval-form",
-			"createTime":1774306411584,
-			"updateTime":1774306411584,
+			"createTime":1774307695732,
+			"updateTime":1774307695732,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11363,7 +11363,7 @@
 		"metadata":{
 			"skillId":"skill-approval-form",
 			"createTime":1773961017368,
-			"updateTime":1774306411589,
+			"updateTime":1774307695742,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11397,7 +11397,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411589,
+		"updateTime":1774307695742,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11416,8 +11416,8 @@
 		],
 		"config":{
 			"skillId":"skill-market",
-			"createTime":1774306412780,
-			"updateTime":1774306412780,
+			"createTime":1774307696258,
+			"updateTime":1774307696258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11442,7 +11442,7 @@
 		"metadata":{
 			"skillId":"skill-market",
 			"createTime":1773961017750,
-			"updateTime":1774306412803,
+			"updateTime":1774307696276,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11476,7 +11476,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412803,
+		"updateTime":1774307696276,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11495,8 +11495,8 @@
 		],
 		"config":{
 			"skillId":"skill-real-estate-form",
-			"createTime":1774306412335,
-			"updateTime":1774306412335,
+			"createTime":1774307696116,
+			"updateTime":1774307696116,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -11521,7 +11521,7 @@
 		"metadata":{
 			"skillId":"skill-real-estate-form",
 			"createTime":1773961017649,
-			"updateTime":1774306412370,
+			"updateTime":1774307696123,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -11555,7 +11555,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412370,
+		"updateTime":1774307696123,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11574,8 +11574,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-wechat",
-			"createTime":1774306412997,
-			"updateTime":1774306412997,
+			"createTime":1774307696426,
+			"updateTime":1774307696426,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11600,7 +11600,7 @@
 		"metadata":{
 			"skillId":"skill-media-wechat",
 			"createTime":1773961017970,
-			"updateTime":1774306413031,
+			"updateTime":1774307696438,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11634,7 +11634,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413031,
+		"updateTime":1774307696438,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11653,8 +11653,8 @@
 		],
 		"config":{
 			"skillId":"skill-common",
-			"createTime":1774306413591,
-			"updateTime":1774306413591,
+			"createTime":1774307697385,
+			"updateTime":1774307697385,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11679,7 +11679,7 @@
 		"metadata":{
 			"skillId":"skill-common",
 			"createTime":1773961018943,
-			"updateTime":1774306413609,
+			"updateTime":1774307697410,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11713,7 +11713,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413609,
+		"updateTime":1774307697410,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11732,8 +11732,8 @@
 		],
 		"config":{
 			"skillId":"skill-search",
-			"createTime":1774306411525,
-			"updateTime":1774306411525,
+			"createTime":1774307695658,
+			"updateTime":1774307695658,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11758,7 +11758,7 @@
 		"metadata":{
 			"skillId":"skill-search",
 			"createTime":1773961015640,
-			"updateTime":1774306411535,
+			"updateTime":1774307695672,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11792,7 +11792,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411535,
+		"updateTime":1774307695672,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11811,8 +11811,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-s3",
-			"createTime":1774306413563,
-			"updateTime":1774306413563,
+			"createTime":1774307697313,
+			"updateTime":1774307697313,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11837,7 +11837,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-s3",
 			"createTime":1774220852794,
-			"updateTime":1774306413582,
+			"updateTime":1774307697357,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -11871,7 +11871,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413582,
+		"updateTime":1774307697357,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11890,9 +11890,9 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1774306412010,
+			"createTime":1774307696049,
 			"sceneType":"AUTO",
-			"updateTime":1774306412010,
+			"updateTime":1774307696049,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -11918,7 +11918,7 @@
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1774088004794,
 			"sceneType":"AUTO",
-			"updateTime":1774306412011,
+			"updateTime":1774307696051,
 			"version":"1.0.0",
 			"skillForm":"SCENE"
 		},
@@ -11954,7 +11954,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412011,
+		"updateTime":1774307696051,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -11973,8 +11973,8 @@
 		],
 		"config":{
 			"skillId":"skill-res-service",
-			"createTime":1774306411447,
-			"updateTime":1774306411447,
+			"createTime":1774307695549,
+			"updateTime":1774307695549,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -11999,7 +11999,7 @@
 		"metadata":{
 			"skillId":"skill-res-service",
 			"createTime":1773961017259,
-			"updateTime":1774306411467,
+			"updateTime":1774307695573,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -12033,7 +12033,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411467,
+		"updateTime":1774307695573,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12131,8 +12131,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-local",
-			"createTime":1774306413480,
-			"updateTime":1774306413480,
+			"createTime":1774307696981,
+			"updateTime":1774307696981,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12157,7 +12157,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-local",
 			"createTime":1774220852794,
-			"updateTime":1774306413502,
+			"updateTime":1774307697018,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12191,7 +12191,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413502,
+		"updateTime":1774307697018,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12210,8 +12210,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-database",
-			"createTime":1774306413446,
-			"updateTime":1774306413446,
+			"createTime":1774307696940,
+			"updateTime":1774307696940,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12236,7 +12236,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-database",
 			"createTime":1774220852828,
-			"updateTime":1774306413458,
+			"updateTime":1774307696957,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12270,7 +12270,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413458,
+		"updateTime":1774307696957,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12289,8 +12289,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411763,
-			"updateTime":1774306411763,
+			"createTime":1774307695917,
+			"updateTime":1774307695917,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12315,7 +12315,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851524,
-			"updateTime":1774306411787,
+			"updateTime":1774307695928,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12349,7 +12349,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411787,
+		"updateTime":1774307695928,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12368,8 +12368,8 @@
 		],
 		"config":{
 			"skillId":"skill-vfs-database",
-			"createTime":1774306413447,
-			"updateTime":1774306413447,
+			"createTime":1774307696940,
+			"updateTime":1774307696940,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12394,7 +12394,7 @@
 		"metadata":{
 			"skillId":"skill-vfs-database",
 			"createTime":1774220852828,
-			"updateTime":1774306413465,
+			"updateTime":1774307696963,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12428,7 +12428,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413465,
+		"updateTime":1774307696963,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12447,8 +12447,8 @@
 		],
 		"config":{
 			"skillId":"skill-notification",
-			"createTime":1774306410903,
-			"updateTime":1774306410903,
+			"createTime":1774307695235,
+			"updateTime":1774307695235,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -12473,7 +12473,7 @@
 		"metadata":{
 			"skillId":"skill-notification",
 			"createTime":1773961016910,
-			"updateTime":1774306410949,
+			"updateTime":1774307695260,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -12507,7 +12507,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410949,
+		"updateTime":1774307695260,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12526,8 +12526,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1774306411841,
-			"updateTime":1774306411841,
+			"createTime":1774307695953,
+			"updateTime":1774307695953,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12552,7 +12552,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1773961017498,
-			"updateTime":1774306411852,
+			"updateTime":1774307695958,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12586,7 +12586,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411852,
+		"updateTime":1774307695958,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12605,8 +12605,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411763,
-			"updateTime":1774306411763,
+			"createTime":1774307695917,
+			"updateTime":1774307695917,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12631,7 +12631,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851524,
-			"updateTime":1774306411798,
+			"updateTime":1774307695934,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12665,7 +12665,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411798,
+		"updateTime":1774307695934,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12684,9 +12684,9 @@
 		],
 		"config":{
 			"skillId":"skill-business",
-			"createTime":1774306411626,
+			"createTime":1774307695807,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411626,
+			"updateTime":1774307695807,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -12712,7 +12712,7 @@
 			"skillId":"skill-business",
 			"createTime":1774088004070,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411627,
+			"updateTime":1774307695808,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -12748,7 +12748,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411627,
+		"updateTime":1774307695808,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12767,9 +12767,9 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-management",
-			"createTime":1774306411762,
+			"createTime":1774307695916,
 			"sceneType":"HYBRID",
-			"updateTime":1774306411762,
+			"updateTime":1774307695916,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -12795,7 +12795,7 @@
 			"skillId":"skill-knowledge-management",
 			"createTime":1774220851523,
 			"sceneType":"HYBRID",
-			"updateTime":1774306411764,
+			"updateTime":1774307695918,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -12831,7 +12831,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411764,
+		"updateTime":1774307695918,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -12928,8 +12928,8 @@
 		],
 		"config":{
 			"skillId":"skill-business",
-			"createTime":1774306411627,
-			"updateTime":1774306411627,
+			"createTime":1774307695808,
+			"updateTime":1774307695808,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12954,7 +12954,7 @@
 		"metadata":{
 			"skillId":"skill-business",
 			"createTime":1774086762424,
-			"updateTime":1774306411644,
+			"updateTime":1774307695835,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -12988,7 +12988,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411644,
+		"updateTime":1774307695835,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13242,8 +13242,8 @@
 		],
 		"config":{
 			"skillId":"skill-msg",
-			"createTime":1774306410836,
-			"updateTime":1774306410836,
+			"createTime":1774307695160,
+			"updateTime":1774307695160,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13268,7 +13268,7 @@
 		"metadata":{
 			"skillId":"skill-msg",
 			"createTime":1773961016838,
-			"updateTime":1774306410844,
+			"updateTime":1774307695176,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13302,7 +13302,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410844,
+		"updateTime":1774307695176,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13321,8 +13321,8 @@
 		],
 		"config":{
 			"skillId":"skill-common",
-			"createTime":1774306413591,
-			"updateTime":1774306413591,
+			"createTime":1774307697385,
+			"updateTime":1774307697385,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -13347,7 +13347,7 @@
 		"metadata":{
 			"skillId":"skill-common",
 			"createTime":1773961018942,
-			"updateTime":1774306413598,
+			"updateTime":1774307697394,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -13381,7 +13381,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413598,
+		"updateTime":1774307697394,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13400,8 +13400,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-baidu",
-			"createTime":1774306412884,
-			"updateTime":1774306412884,
+			"createTime":1774307696350,
+			"updateTime":1774307696350,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -13426,7 +13426,7 @@
 		"metadata":{
 			"skillId":"skill-llm-baidu",
 			"createTime":1773961017845,
-			"updateTime":1774306412907,
+			"updateTime":1774307696361,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -13460,7 +13460,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412907,
+		"updateTime":1774307696361,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13479,9 +13479,9 @@
 		],
 		"config":{
 			"skillId":"skill-recording-qa",
-			"createTime":1774306412442,
+			"createTime":1774307696165,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412442,
+			"updateTime":1774307696165,
 			"skillForm":"SCENE",
 			"version":"2.3.1"
 		},
@@ -13507,7 +13507,7 @@
 			"skillId":"skill-recording-qa",
 			"createTime":1774147545273,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306412443,
+			"updateTime":1774307696167,
 			"skillForm":"SCENE",
 			"version":"2.3.1"
 		},
@@ -13543,7 +13543,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412443,
+		"updateTime":1774307696167,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13562,8 +13562,8 @@
 		],
 		"config":{
 			"skillId":"skill-group",
-			"createTime":1774306410630,
-			"updateTime":1774306410630,
+			"createTime":1774307694910,
+			"updateTime":1774307694910,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13588,7 +13588,7 @@
 		"metadata":{
 			"skillId":"skill-group",
 			"createTime":1773961015642,
-			"updateTime":1774306410664,
+			"updateTime":1774307694971,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13622,7 +13622,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306410664,
+		"updateTime":1774307694971,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13641,8 +13641,8 @@
 		],
 		"config":{
 			"skillId":"skill-cmd-service",
-			"createTime":1774306411202,
-			"updateTime":1774306411202,
+			"createTime":1774307695408,
+			"updateTime":1774307695408,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13667,7 +13667,7 @@
 		"metadata":{
 			"skillId":"skill-cmd-service",
 			"createTime":1773961017096,
-			"updateTime":1774306411217,
+			"updateTime":1774307695424,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13701,7 +13701,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411217,
+		"updateTime":1774307695424,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13720,8 +13720,8 @@
 		],
 		"config":{
 			"skillId":"skill-share",
-			"createTime":1774306412849,
-			"updateTime":1774306412849,
+			"createTime":1774307696322,
+			"updateTime":1774307696322,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13746,7 +13746,7 @@
 		"metadata":{
 			"skillId":"skill-share",
 			"createTime":1773961017816,
-			"updateTime":1774306412865,
+			"updateTime":1774307696335,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13780,7 +13780,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412865,
+		"updateTime":1774307696335,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13799,8 +13799,8 @@
 		],
 		"config":{
 			"skillId":"skill-openwrt",
-			"createTime":1774306411069,
-			"updateTime":1774306411069,
+			"createTime":1774307695328,
+			"updateTime":1774307695328,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13825,7 +13825,7 @@
 		"metadata":{
 			"skillId":"skill-openwrt",
 			"createTime":1773961017017,
-			"updateTime":1774306411108,
+			"updateTime":1774307695356,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13859,7 +13859,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411108,
+		"updateTime":1774307695356,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13878,8 +13878,8 @@
 		],
 		"config":{
 			"skillId":"skill-share",
-			"createTime":1774306412848,
-			"updateTime":1774306412848,
+			"createTime":1774307696322,
+			"updateTime":1774307696322,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13904,7 +13904,7 @@
 		"metadata":{
 			"skillId":"skill-share",
 			"createTime":1773961017292,
-			"updateTime":1774306412855,
+			"updateTime":1774307696328,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -13938,7 +13938,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412855,
+		"updateTime":1774307696328,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13957,8 +13957,8 @@
 		],
 		"config":{
 			"skillId":"skill-llm-baidu",
-			"createTime":1774306412883,
-			"updateTime":1774306412883,
+			"createTime":1774307696349,
+			"updateTime":1774307696349,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -13983,7 +13983,7 @@
 		"metadata":{
 			"skillId":"skill-llm-baidu",
 			"createTime":1773961017844,
-			"updateTime":1774306412884,
+			"updateTime":1774307696350,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14017,7 +14017,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412884,
+		"updateTime":1774307696350,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14036,8 +14036,8 @@
 		],
 		"config":{
 			"skillId":"skill-media-zhihu",
-			"createTime":1774306413157,
-			"updateTime":1774306413157,
+			"createTime":1774307696521,
+			"updateTime":1774307696521,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14062,7 +14062,7 @@
 		"metadata":{
 			"skillId":"skill-media-zhihu",
 			"createTime":1773961018404,
-			"updateTime":1774306413174,
+			"updateTime":1774307696535,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14096,7 +14096,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413174,
+		"updateTime":1774307696535,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14115,8 +14115,8 @@
 		],
 		"config":{
 			"skillId":"skill-report",
-			"createTime":1774306412817,
-			"updateTime":1774306412817,
+			"createTime":1774307696289,
+			"updateTime":1774307696289,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14141,7 +14141,7 @@
 		"metadata":{
 			"skillId":"skill-report",
 			"createTime":1773961016970,
-			"updateTime":1774306412833,
+			"updateTime":1774307696309,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14175,7 +14175,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412833,
+		"updateTime":1774307696309,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14194,9 +14194,9 @@
 		],
 		"config":{
 			"skillId":"skill-meeting-minutes",
-			"createTime":1774306411970,
+			"createTime":1774307696019,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411970,
+			"updateTime":1774307696019,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -14222,7 +14222,7 @@
 			"skillId":"skill-meeting-minutes",
 			"createTime":1774088004759,
 			"sceneType":"TRIGGER",
-			"updateTime":1774306411971,
+			"updateTime":1774307696020,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -14258,7 +14258,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411971,
+		"updateTime":1774307696020,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14277,8 +14277,8 @@
 		],
 		"config":{
 			"skillId":"skill-protocol",
-			"createTime":1774306413629,
-			"updateTime":1774306413629,
+			"createTime":1774307697436,
+			"updateTime":1774307697436,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14303,7 +14303,7 @@
 		"metadata":{
 			"skillId":"skill-protocol",
 			"createTime":1773961018995,
-			"updateTime":1774306413640,
+			"updateTime":1774307697450,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14337,7 +14337,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413640,
+		"updateTime":1774307697450,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14356,8 +14356,8 @@
 		],
 		"config":{
 			"skillId":"daily-report",
-			"createTime":1774306411547,
-			"updateTime":1774306411547,
+			"createTime":1774307695686,
+			"updateTime":1774307695686,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14382,7 +14382,7 @@
 		"metadata":{
 			"skillId":"daily-report",
 			"createTime":1774220851344,
-			"updateTime":1774306411554,
+			"updateTime":1774307695691,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14416,7 +14416,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411554,
+		"updateTime":1774307695691,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14435,8 +14435,8 @@
 		],
 		"config":{
 			"skillId":"skill-network",
-			"createTime":1774306411324,
-			"updateTime":1774306411324,
+			"createTime":1774307695483,
+			"updateTime":1774307695483,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14461,7 +14461,7 @@
 		"metadata":{
 			"skillId":"skill-network",
 			"createTime":1773961017206,
-			"updateTime":1774306411345,
+			"updateTime":1774307695490,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14495,7 +14495,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411345,
+		"updateTime":1774307695490,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14514,8 +14514,8 @@
 		],
 		"config":{
 			"skillId":"skill-market",
-			"createTime":1774306412778,
-			"updateTime":1774306412778,
+			"createTime":1774307696257,
+			"updateTime":1774307696257,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14540,7 +14540,7 @@
 		"metadata":{
 			"skillId":"skill-market",
 			"createTime":1773961016836,
-			"updateTime":1774306412780,
+			"updateTime":1774307696258,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14574,7 +14574,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412780,
+		"updateTime":1774307696258,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14593,8 +14593,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1774306412011,
-			"updateTime":1774306412011,
+			"createTime":1774307696051,
+			"updateTime":1774307696051,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -14619,7 +14619,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1773961017599,
-			"updateTime":1774306412030,
+			"updateTime":1774307696066,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -14653,7 +14653,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412030,
+		"updateTime":1774307696066,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14672,8 +14672,8 @@
 		],
 		"config":{
 			"skillId":"skill-knowledge-qa",
-			"createTime":1774306411841,
-			"updateTime":1774306411841,
+			"createTime":1774307695953,
+			"updateTime":1774307695953,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14698,7 +14698,7 @@
 		"metadata":{
 			"skillId":"skill-knowledge-qa",
 			"createTime":1773961017498,
-			"updateTime":1774306411861,
+			"updateTime":1774307695963,
 			"version":"2.3.1",
 			"skillForm":"PROVIDER"
 		},
@@ -14732,7 +14732,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306411861,
+		"updateTime":1774307695963,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14751,8 +14751,8 @@
 		],
 		"config":{
 			"skillId":"skill-payment-wechat",
-			"createTime":1774306413385,
-			"updateTime":1774306413385,
+			"createTime":1774307696838,
+			"updateTime":1774307696838,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14777,7 +14777,7 @@
 		"metadata":{
 			"skillId":"skill-payment-wechat",
 			"createTime":1773961018693,
-			"updateTime":1774306413397,
+			"updateTime":1774307696858,
 			"version":"0.7.3",
 			"skillForm":"PROVIDER"
 		},
@@ -14811,7 +14811,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306413397,
+		"updateTime":1774307696858,
 		"version":"0.7.3",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -14987,8 +14987,8 @@
 		],
 		"config":{
 			"skillId":"skill-onboarding-assistant",
-			"createTime":1774306412010,
-			"updateTime":1774306412010,
+			"createTime":1774307696050,
+			"updateTime":1774307696050,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -15013,7 +15013,7 @@
 		"metadata":{
 			"skillId":"skill-onboarding-assistant",
 			"createTime":1773961017598,
-			"updateTime":1774306412025,
+			"updateTime":1774307696061,
 			"version":"1.0.0",
 			"skillForm":"PROVIDER"
 		},
@@ -15047,7 +15047,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774306412025,
+		"updateTime":1774307696061,
 		"version":"1.0.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"

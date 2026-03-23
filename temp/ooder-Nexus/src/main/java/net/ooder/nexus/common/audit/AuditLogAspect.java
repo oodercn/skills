@@ -1,4 +1,4 @@
-package net.ooder.nexus.common.audit;
+﻿package net.ooder.nexus.common.audit;
 
 import net.ooder.nexus.domain.skill.model.SkillResourceLog;
 import net.ooder.nexus.service.skill.SkillAuthService;
@@ -14,7 +14,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
@@ -78,19 +78,19 @@ public class AuditLogAspect {
             
             String detail = description;
             if (exception != null) {
-                detail = description + " - 错误: " + exception.getMessage();
+                detail = description + " - 閿欒: " + exception.getMessage();
             }
             
             if (skillId != null || userId != null) {
                 try {
                     skillAuthService.logResourceAccess(
                             skillId != null ? skillId : "system",
-                            skillName != null ? skillName : "系统",
+                            skillName != null ? skillName : "绯荤粺",
                             userId != null ? userId : "anonymous",
                             action.isEmpty() ? "execute" : action,
                             resourceType.isEmpty() ? "api" : resourceType,
                             resourceId != null ? resourceId : "unknown",
-                            resourceName != null ? resourceName : "未知资源",
+                            resourceName != null ? resourceName : "鏈煡璧勬簮",
                             sceneId,
                             sceneName,
                             groupId,

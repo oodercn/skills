@@ -1,4 +1,4 @@
-package net.ooder.skill.scene.controller;
+﻿package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.dto.audit.AuditLogDTO;
 import net.ooder.skill.scene.dto.audit.AuditStatsDTO;
@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
 
@@ -46,7 +46,7 @@ public class AuditController extends BaseController {
             return ResultModel.success(pageResult);
         } catch (Exception e) {
             logRequestError("listLogs", e);
-            return ResultModel.error(500, "获取审计日志失败: " + e.getMessage());
+            return ResultModel.error(500, "鑾峰彇瀹¤鏃ュ織澶辫触: " + e.getMessage());
         }
     }
 
@@ -59,13 +59,13 @@ public class AuditController extends BaseController {
             AuditLogDTO log = auditService.getLogById(recordId);
             if (log == null) {
                 logRequestEnd("getLogById", "Not found", System.currentTimeMillis() - start);
-                return ResultModel.notFound("审计日志不存在");
+                return ResultModel.notFound("瀹¤鏃ュ織涓嶅瓨鍦?);
             }
             logRequestEnd("getLogById", log.getRecordId(), System.currentTimeMillis() - start);
             return ResultModel.success(log);
         } catch (Exception e) {
             logRequestError("getLogById", e);
-            return ResultModel.error(500, "获取审计日志失败: " + e.getMessage());
+            return ResultModel.error(500, "鑾峰彇瀹¤鏃ュ織澶辫触: " + e.getMessage());
         }
     }
 
@@ -80,7 +80,7 @@ public class AuditController extends BaseController {
             return ResultModel.success(stats);
         } catch (Exception e) {
             logRequestError("getStats", e);
-            return ResultModel.error(500, "获取审计统计失败: " + e.getMessage());
+            return ResultModel.error(500, "鑾峰彇瀹¤缁熻澶辫触: " + e.getMessage());
         }
     }
 
@@ -95,7 +95,7 @@ public class AuditController extends BaseController {
             return ResultModel.success(true);
         } catch (Exception e) {
             logRequestError("createLog", e);
-            return ResultModel.error(500, "创建审计日志失败: " + e.getMessage());
+            return ResultModel.error(500, "鍒涘缓瀹¤鏃ュ織澶辫触: " + e.getMessage());
         }
     }
 
@@ -117,7 +117,7 @@ public class AuditController extends BaseController {
         
         PrintWriter writer = response.getWriter();
         writer.write("\uFEFF");
-        writer.println("记录ID,事件类型,结果,时间,用户ID,Agent ID,资源类型,资源ID,操作,详情,IP地址");
+        writer.println("璁板綍ID,浜嬩欢绫诲瀷,缁撴灉,鏃堕棿,鐢ㄦ埛ID,Agent ID,璧勬簮绫诲瀷,璧勬簮ID,鎿嶄綔,璇︽儏,IP鍦板潃");
         
         PageResult<AuditLogDTO> pageResult = auditService.listLogs(
             eventType, result, userId, resourceId, startTime, endTime, 1, 10000);

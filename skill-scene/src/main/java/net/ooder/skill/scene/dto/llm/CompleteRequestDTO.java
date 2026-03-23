@@ -1,11 +1,11 @@
-package net.ooder.skill.scene.dto.llm;
+﻿package net.ooder.skill.scene.dto.llm;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public class CompleteRequestDTO {
     
-    @NotBlank(message = "提示词不能为空")
+    @NotBlank(message = "鎻愮ず璇嶄笉鑳戒负绌?)
     private String prompt;
     
     private String model;

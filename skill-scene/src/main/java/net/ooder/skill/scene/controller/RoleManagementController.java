@@ -1,4 +1,4 @@
-package net.ooder.skill.scene.controller;
+﻿package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.org.base.UserInfo;
 import net.ooder.skill.scene.dto.CreateUserRequest;
@@ -14,7 +14,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.List;
 import java.util.Map;
 
@@ -182,11 +182,11 @@ public class RoleManagementController {
         log.info("[initTestData] Initializing test data...");
 
         UserInfo testLeader = roleManagementService.createUser(
-            "测试主导者", "test-leader@ooder.local", "manager", "root");
+            "娴嬭瘯涓诲鑰?, "test-leader@ooder.local", "manager", "root");
         roleManagementService.setUserPassword(testLeader.getUserId(), "test123");
 
         UserInfo testCollaborator = roleManagementService.createUser(
-            "测试协作者", "test-collaborator@ooder.local", "employee", "root");
+            "娴嬭瘯鍗忎綔鑰?, "test-collaborator@ooder.local", "employee", "root");
         roleManagementService.setUserPassword(testCollaborator.getUserId(), "test123");
 
         roleManagementService.bindUserToRole(testLeader.getUserId(), "leader");

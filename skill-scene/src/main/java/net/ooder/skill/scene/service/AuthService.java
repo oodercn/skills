@@ -1,4 +1,4 @@
-package net.ooder.skill.scene.service;
+﻿package net.ooder.skill.scene.service;
 
 import net.ooder.skill.org.base.OrgSkill;
 import net.ooder.skill.org.base.UserInfo;
@@ -10,8 +10,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -52,24 +52,24 @@ public class AuthService {
 
     private void initRoleConfigs() {
         roleConfigs.put("installer", new RoleConfig(
-            "installer", "系统安装者", "安装基础技能包，初始化系统环境", "ri-install-line",
+            "installer", "绯荤粺瀹夎鑰?, "瀹夎鍩虹鎶€鑳藉寘锛屽垵濮嬪寲绯荤粺鐜", "ri-install-line",
             "installer", Arrays.asList("skill:install", "skill:view", "system:init")
         ));
 
         roleConfigs.put("admin", new RoleConfig(
-            "admin", "系统管理员", "发现场景技能，配置分发，推送给参与者", "ri-admin-line",
+            "admin", "绯荤粺绠＄悊鍛?, "鍙戠幇鍦烘櫙鎶€鑳斤紝閰嶇疆鍒嗗彂锛屾帹閫佺粰鍙備笌鑰?, "ri-admin-line",
             "admin", Arrays.asList("capability:discover", "capability:install", "capability:distribute",
                 "scene:create", "scene:manage", "user:assign", "capability:view", "scene:view")
         ));
 
         roleConfigs.put("leader", new RoleConfig(
-            "leader", "主导者", "激活场景，获取KEY，执行入网动作", "ri-user-star-line",
+            "leader", "涓诲鑰?, "婵€娲诲満鏅紝鑾峰彇KEY锛屾墽琛屽叆缃戝姩浣?, "ri-user-star-line",
             "leader", Arrays.asList("scene:activate", "scene:manage", "scene:view",
                 "key:generate", "participant:manage", "task:assign")
         ));
 
         roleConfigs.put("collaborator", new RoleConfig(
-            "collaborator", "协作者", "参与业务流转，执行分配的任务", "ri-team-line",
+            "collaborator", "鍗忎綔鑰?, "鍙備笌涓氬姟娴佽浆锛屾墽琛屽垎閰嶇殑浠诲姟", "ri-team-line",
             "collaborator", Arrays.asList("task:view", "task:execute", "task:submit", "scene:view", "todo:view")
         ));
 

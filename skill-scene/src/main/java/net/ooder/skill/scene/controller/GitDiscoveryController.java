@@ -1,6 +1,6 @@
-package net.ooder.skill.scene.controller;
+﻿package net.ooder.skill.scene.controller;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import net.ooder.skill.scene.discovery.SkillIndexLoader;
 import net.ooder.skill.scene.dto.discovery.*;
 import net.ooder.skill.scene.model.ResultModel;
@@ -281,24 +281,24 @@ public class GitDiscoveryController {
         
         results.add(createSkillRepo(
             "ooderCN/skill-daily-report",
-            "日志汇报技能",
-            "提供日志提醒、提交、汇总、分析能力，支持定时提醒、表单提交、数据汇总、AI分析等功能",
+            "鏃ュ織姹囨姤鎶€鑳?,
+            "鎻愪緵鏃ュ織鎻愰啋銆佹彁浜ゃ€佹眹鎬汇€佸垎鏋愯兘鍔涳紝鏀寔瀹氭椂鎻愰啋銆佽〃鍗曟彁浜ゃ€佹暟鎹眹鎬汇€丄I鍒嗘瀽绛夊姛鑳?,
             "https://github.com/ooderCN/skill-daily-report",
             128, 45, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-notification",
-            "通知技能",
-            "邮件、短信、站内信通知能力，支持模板消息、批量发送、定时发送",
+            "閫氱煡鎶€鑳?,
+            "閭欢銆佺煭淇°€佺珯鍐呬俊閫氱煡鑳藉姏锛屾敮鎸佹ā鏉挎秷鎭€佹壒閲忓彂閫併€佸畾鏃跺彂閫?,
             "https://github.com/ooderCN/skill-notification",
             256, 89, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-meeting",
-            "会议管理技能",
-            "会议预约、提醒、纪要能力，支持会议室预定、参会人员管理、会议记录生成",
+            "浼氳绠＄悊鎶€鑳?,
+            "浼氳棰勭害銆佹彁閱掋€佺邯瑕佽兘鍔涳紝鏀寔浼氳瀹ら瀹氥€佸弬浼氫汉鍛樼鐞嗐€佷細璁褰曠敓鎴?,
             "https://github.com/ooderCN/skill-meeting",
             96, 32, "v2.3"
         ));
@@ -648,40 +648,40 @@ public class GitDiscoveryController {
         
         results.add(createSkillRepo(
             "ooderCN/skill-daily-report",
-            "日志汇报技能",
-            "提供日志提醒、提交、汇总、分析能力，支持定时提醒、表单提交、数据汇总、AI分析等功能",
+            "鏃ュ織姹囨姤鎶€鑳?,
+            "鎻愪緵鏃ュ織鎻愰啋銆佹彁浜ゃ€佹眹鎬汇€佸垎鏋愯兘鍔涳紝鏀寔瀹氭椂鎻愰啋銆佽〃鍗曟彁浜ゃ€佹暟鎹眹鎬汇€丄I鍒嗘瀽绛夊姛鑳?,
             "https://gitee.com/ooderCN/skill-daily-report",
             128, 45, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-meeting",
-            "会议管理技能",
-            "会议预约、提醒、纪要能力，支持会议室预定、参会人员管理、会议记录生成",
+            "浼氳绠＄悊鎶€鑳?,
+            "浼氳棰勭害銆佹彁閱掋€佺邯瑕佽兘鍔涳紝鏀寔浼氳瀹ら瀹氥€佸弬浼氫汉鍛樼鐞嗐€佷細璁褰曠敓鎴?,
             "https://gitee.com/ooderCN/skill-meeting",
             96, 32, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-network",
-            "网络管理技能",
-            "网络管理服务，支持网络配置、状态监控、故障诊断",
+            "缃戠粶绠＄悊鎶€鑳?,
+            "缃戠粶绠＄悊鏈嶅姟锛屾敮鎸佺綉缁滈厤缃€佺姸鎬佺洃鎺с€佹晠闅滆瘖鏂?,
             "https://gitee.com/ooderCN/skill-network",
             64, 23, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-security",
-            "安全管理技能",
-            "安全管理服务，支持权限控制、审计日志、安全扫描",
+            "瀹夊叏绠＄悊鎶€鑳?,
+            "瀹夊叏绠＄悊鏈嶅姟锛屾敮鎸佹潈闄愭帶鍒躲€佸璁℃棩蹇椼€佸畨鍏ㄦ壂鎻?,
             "https://gitee.com/ooderCN/skill-security",
             85, 28, "v2.3"
         ));
         
         results.add(createSkillRepo(
             "ooderCN/skill-im",
-            "即时通讯技能",
-            "即时通讯服务，支持消息发送、群组管理、消息推送",
+            "鍗虫椂閫氳鎶€鑳?,
+            "鍗虫椂閫氳鏈嶅姟锛屾敮鎸佹秷鎭彂閫併€佺兢缁勭鐞嗐€佹秷鎭帹閫?,
             "https://gitee.com/ooderCN/skill-im",
             156, 67, "v2.3"
         ));
@@ -693,28 +693,28 @@ public class GitDiscoveryController {
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
-            "daily-log-scene", "日志汇报场景", "SCENE",
-            "完整的日志汇报场景能力，包含提醒、提交、汇总、分析等闭环流程", "2.3", "GITHUB"
+            "daily-log-scene", "鏃ュ織姹囨姤鍦烘櫙", "SCENE",
+            "瀹屾暣鐨勬棩蹇楁眹鎶ュ満鏅兘鍔涳紝鍖呭惈鎻愰啋銆佹彁浜ゃ€佹眹鎬汇€佸垎鏋愮瓑闂幆娴佺▼", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
-            "report-remind", "日志提醒", "COMMUNICATION",
-            "定时提醒员工提交工作日志", "2.3", "GITHUB"
+            "report-remind", "鏃ュ織鎻愰啋", "COMMUNICATION",
+            "瀹氭椂鎻愰啋鍛樺伐鎻愪氦宸ヤ綔鏃ュ織", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
-            "report-submit", "日志提交", "SERVICE",
-            "员工提交工作日志的表单能力", "2.3", "GITHUB"
+            "report-submit", "鏃ュ織鎻愪氦", "SERVICE",
+            "鍛樺伐鎻愪氦宸ヤ綔鏃ュ織鐨勮〃鍗曡兘鍔?, "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
-            "report-aggregate", "日志汇总", "SERVICE",
-            "汇总所有员工提交的日志", "2.3", "GITHUB"
+            "report-aggregate", "鏃ュ織姹囨€?, "SERVICE",
+            "姹囨€绘墍鏈夊憳宸ユ彁浜ょ殑鏃ュ織", "2.3", "GITHUB"
         ));
         
         capabilities.add(createCapability(
-            "report-analyze", "日志分析", "AI",
-            "使用AI分析日志内容，提取关键信息", "2.3", "GITHUB"
+            "report-analyze", "鏃ュ織鍒嗘瀽", "AI",
+            "浣跨敤AI鍒嗘瀽鏃ュ織鍐呭锛屾彁鍙栧叧閿俊鎭?, "2.3", "GITHUB"
         ));
         
         return capabilities;
@@ -724,28 +724,28 @@ public class GitDiscoveryController {
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
-            "daily-log-scene", "日志汇报场景", "SCENE",
-            "完整的日志汇报场景能力，包含提醒、提交、汇总、分析等闭环流程", "2.3", "GITEE"
+            "daily-log-scene", "鏃ュ織姹囨姤鍦烘櫙", "SCENE",
+            "瀹屾暣鐨勬棩蹇楁眹鎶ュ満鏅兘鍔涳紝鍖呭惈鎻愰啋銆佹彁浜ゃ€佹眹鎬汇€佸垎鏋愮瓑闂幆娴佺▼", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
-            "report-remind", "日志提醒", "COMMUNICATION",
-            "定时提醒员工提交工作日志", "2.3", "GITEE"
+            "report-remind", "鏃ュ織鎻愰啋", "COMMUNICATION",
+            "瀹氭椂鎻愰啋鍛樺伐鎻愪氦宸ヤ綔鏃ュ織", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
-            "report-submit", "日志提交", "SERVICE",
-            "员工提交工作日志的表单能力", "2.3", "GITEE"
+            "report-submit", "鏃ュ織鎻愪氦", "SERVICE",
+            "鍛樺伐鎻愪氦宸ヤ綔鏃ュ織鐨勮〃鍗曡兘鍔?, "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
-            "report-aggregate", "日志汇总", "SERVICE",
-            "汇总所有员工提交的日志", "2.3", "GITEE"
+            "report-aggregate", "鏃ュ織姹囨€?, "SERVICE",
+            "姹囨€绘墍鏈夊憳宸ユ彁浜ょ殑鏃ュ織", "2.3", "GITEE"
         ));
         
         capabilities.add(createCapability(
-            "notification-email", "邮件通知", "COMMUNICATION",
-            "发送邮件通知", "2.3", "GITEE"
+            "notification-email", "閭欢閫氱煡", "COMMUNICATION",
+            "鍙戦€侀偖浠堕€氱煡", "2.3", "GITEE"
         ));
         
         return capabilities;
@@ -755,13 +755,13 @@ public class GitDiscoveryController {
         List<CapabilityDTO> capabilities = new ArrayList<>();
         
         capabilities.add(createCapability(
-            "data-backup", "数据备份", "STORAGE",
-            "自动备份场景数据到云端或本地存储", "2.3", "GIT_REPOSITORY"
+            "data-backup", "鏁版嵁澶囦唤", "STORAGE",
+            "鑷姩澶囦唤鍦烘櫙鏁版嵁鍒颁簯绔垨鏈湴瀛樺偍", "2.3", "GIT_REPOSITORY"
         ));
         
         capabilities.add(createCapability(
-            "system-monitor", "系统监控", "MONITORING",
-            "监控系统运行状态，包括CPU、内存、网络等", "2.3", "GIT_REPOSITORY"
+            "system-monitor", "绯荤粺鐩戞帶", "MONITORING",
+            "鐩戞帶绯荤粺杩愯鐘舵€侊紝鍖呮嫭CPU銆佸唴瀛樸€佺綉缁滅瓑", "2.3", "GIT_REPOSITORY"
         ));
         
         return capabilities;
@@ -801,15 +801,15 @@ public class GitDiscoveryController {
         
         if ("skill-daily-report".equals(skillId))
 {
-            capabilities.add(createCapability("report-remind", "日志提醒", "COMMUNICATION", "定时提醒", "2.3", "INSTALLED"));
-            capabilities.add(createCapability("report-submit", "日志提交", "SERVICE", "提交日志", "2.3", "INSTALLED"));
-            capabilities.add(createCapability("report-aggregate", "日志汇总", "SERVICE", "汇总日志", "2.3", "INSTALLED"));
-            capabilities.add(createCapability("report-analyze", "日志分析", "AI", "分析日志", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-remind", "鏃ュ織鎻愰啋", "COMMUNICATION", "瀹氭椂鎻愰啋", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-submit", "鏃ュ織鎻愪氦", "SERVICE", "鎻愪氦鏃ュ織", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-aggregate", "鏃ュ織姹囨€?, "SERVICE", "姹囨€绘棩蹇?, "2.3", "INSTALLED"));
+            capabilities.add(createCapability("report-analyze", "鏃ュ織鍒嗘瀽", "AI", "鍒嗘瀽鏃ュ織", "2.3", "INSTALLED"));
         }
  else if ("skill-notification".equals(skillId))
         {
-            capabilities.add(createCapability("notification-email", "邮件通知", "COMMUNICATION", "发送邮件", "2.3", "INSTALLED"));
-            capabilities.add(createCapability("notification-sms", "短信通知", "COMMUNICATION", "发送短信", "2.3", "INSTALLED"));
+            capabilities.add(createCapability("notification-email", "閭欢閫氱煡", "COMMUNICATION", "鍙戦€侀偖浠?, "2.3", "INSTALLED"));
+            capabilities.add(createCapability("notification-sms", "鐭俊閫氱煡", "COMMUNICATION", "鍙戦€佺煭淇?, "2.3", "INSTALLED"));
         }
         
         return capabilities;
@@ -883,21 +883,21 @@ public class GitDiscoveryController {
         List<Map<String, Object>> roles = new ArrayList<>();
         
         if ("daily-log-scene".equals(capabilityId) || capabilityId.contains("log") || capabilityId.contains("report")) {
-            roles.add(createRole("LEADER", "领导", "管理者角色，配置场景参数、查看团队日志", "ri-user-star-line", 
+            roles.add(createRole("LEADER", "棰嗗", "绠＄悊鑰呰鑹诧紝閰嶇疆鍦烘櫙鍙傛暟銆佹煡鐪嬪洟闃熸棩蹇?, "ri-user-star-line", 
                 Arrays.asList("CONFIG", "VIEW_ALL", "MANAGE")));
-            roles.add(createRole("EMPLOYEE", "员工", "参与者角色，填写日志、查看个人记录", "ri-user-line", 
+            roles.add(createRole("EMPLOYEE", "鍛樺伐", "鍙備笌鑰呰鑹诧紝濉啓鏃ュ織銆佹煡鐪嬩釜浜鸿褰?, "ri-user-line", 
                 Arrays.asList("WRITE", "VIEW_SELF")));
-            roles.add(createRole("HR", "HR", "观察者角色，查看团队日志、统计分析", "ri-team-line", 
+            roles.add(createRole("HR", "HR", "瑙傚療鑰呰鑹诧紝鏌ョ湅鍥㈤槦鏃ュ織銆佺粺璁″垎鏋?, "ri-team-line", 
                 Arrays.asList("VIEW_ALL", "ANALYZE", "EXPORT")));
         } else if (capabilityId.contains("meeting")) {
-            roles.add(createRole("ORGANIZER", "组织者", "创建和管理会议", "ri-user-star-line", 
+            roles.add(createRole("ORGANIZER", "缁勭粐鑰?, "鍒涘缓鍜岀鐞嗕細璁?, "ri-user-star-line", 
                 Arrays.asList("CREATE", "MANAGE", "CANCEL")));
-            roles.add(createRole("PARTICIPANT", "参与者", "参加会议", "ri-user-line", 
+            roles.add(createRole("PARTICIPANT", "鍙備笌鑰?, "鍙傚姞浼氳", "ri-user-line", 
                 Arrays.asList("JOIN", "VIEW")));
         } else {
-            roles.add(createRole("MANAGER", "管理者", "拥有完整管理权限", "ri-user-star-line", 
+            roles.add(createRole("MANAGER", "绠＄悊鑰?, "鎷ユ湁瀹屾暣绠＄悊鏉冮檺", "ri-user-star-line", 
                 Arrays.asList("READ", "WRITE", "CONFIG", "DELETE")));
-            roles.add(createRole("USER", "普通用户", "基础使用权限", "ri-user-line", 
+            roles.add(createRole("USER", "鏅€氱敤鎴?, "鍩虹浣跨敤鏉冮檺", "ri-user-line", 
                 Arrays.asList("READ", "WRITE")));
         }
         

@@ -1,11 +1,11 @@
-package net.ooder.skill.scene.dto.capability;
+﻿package net.ooder.skill.scene.dto.capability;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 public class InvokeCapabilityRequestDTO {
     
-    @NotBlank(message = "能力ID不能为空")
+    @NotBlank(message = "鑳藉姏ID涓嶈兘涓虹┖")
     private String capabilityId;
     
     private Map<String, Object> params;

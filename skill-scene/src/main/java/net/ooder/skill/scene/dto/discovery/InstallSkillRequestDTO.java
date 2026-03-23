@@ -1,12 +1,12 @@
-package net.ooder.skill.scene.dto.discovery;
+﻿package net.ooder.skill.scene.dto.discovery;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
 public class InstallSkillRequestDTO {
     
-    @NotBlank(message = "skillId不能为空")
+    @NotBlank(message = "skillId涓嶈兘涓虹┖")
     private String skillId;
     
     private String name;

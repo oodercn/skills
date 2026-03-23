@@ -1,12 +1,12 @@
-package net.ooder.skill.scene.dto.dailyreport;
+﻿package net.ooder.skill.scene.dto.dailyreport;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
 public class AnalyzeRequestDTO {
     
-    @NotBlank(message = "场景组ID不能为空")
+    @NotBlank(message = "鍦烘櫙缁処D涓嶈兘涓虹┖")
     private String sceneGroupId;
     
     private List<Map<String, Object>> reports;

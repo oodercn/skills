@@ -29,12 +29,7 @@ public class MvcConfig implements WebMvcConfigurer {
                     "/actuator/**",
                     "/error",
                     "/favicon.svg",
-                    "/console/css/**",
-                    "/console/js/**",
-                    "/console/images/**",
-                    "/console/fonts/**",
-                    "/console/skills/**",
-                    "/console/pages/**",
+                    "/console/**",
                     "/css/**",
                     "/js/**",
                     "/images/**"
@@ -96,5 +91,6 @@ public class MvcConfig implements WebMvcConfigurer {
     @Override
     public void addViewControllers(org.springframework.web.servlet.config.annotation.ViewControllerRegistry registry) {
         registry.addRedirectViewController("/console", "/console/index.html");
+        registry.addRedirectViewController("/console/", "/console/index.html");
     }
 }

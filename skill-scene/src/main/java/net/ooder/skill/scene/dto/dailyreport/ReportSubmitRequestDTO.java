@@ -1,17 +1,17 @@
-package net.ooder.skill.scene.dto.dailyreport;
+﻿package net.ooder.skill.scene.dto.dailyreport;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 
 public class ReportSubmitRequestDTO {
     
-    @NotBlank(message = "场景组ID不能为空")
+    @NotBlank(message = "鍦烘櫙缁処D涓嶈兘涓虹┖")
     private String sceneGroupId;
     
-    @NotBlank(message = "用户ID不能为空")
+    @NotBlank(message = "鐢ㄦ埛ID涓嶈兘涓虹┖")
     private String userId;
     
-    @NotBlank(message = "报告内容不能为空")
+    @NotBlank(message = "鎶ュ憡鍐呭涓嶈兘涓虹┖")
     private String content;
     
     private List<String> attachments;

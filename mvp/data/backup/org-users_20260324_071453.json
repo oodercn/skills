@@ -53,49 +53,5 @@
 		"title":"工程师",
 		"updateTime":1774307693570,
 		"userId":"user-employee-002"
-	},
-	"user-employee-001":{
-		"active":true,
-		"createTime":1774307693570,
-		"departmentId":"dept-rd",
-		"email":"li.employee@example.com",
-		"name":"李员工",
-		"role":"employee",
-		"title":"高级工程师",
-		"updateTime":1774307693570,
-		"userId":"user-employee-001"
-	},
-	"user-admin-001":{
-		"active":true,
-		"createTime":1774307693570,
-		"departmentId":"dept-it",
-		"email":"admin@example.com",
-		"name":"系统管理员",
-		"role":"admin",
-		"title":"系统管理员",
-		"updateTime":1774307693570,
-		"userId":"user-admin-001"
-	},
-	"user-manager-001":{
-		"active":true,
-		"createTime":1774307693570,
-		"departmentId":"dept-rd",
-		"email":"zhang.manager@example.com",
-		"name":"张经理",
-		"role":"manager",
-		"title":"研发经理",
-		"updateTime":1774307693570,
-		"userId":"user-manager-001"
-	},
-	"user-collaborator-001":{
-		"active":true,
-		"createTime":1774307693570,
-		"departmentId":"dept-rd",
-		"email":"collaborator@example.com",
-		"name":"协作者",
-		"role":"collaborator",
-		"title":"项目协作",
-		"updateTime":1774307693570,
-		"userId":"user-collaborator-001"
 	}
 }

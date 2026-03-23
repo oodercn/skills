@@ -1,15 +1,15 @@
-package net.ooder.skill.scene.dto.llm;
+﻿package net.ooder.skill.scene.dto.llm;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class TranslateRequestDTO {
     
-    @NotBlank(message = "文本不能为空")
+    @NotBlank(message = "鏂囨湰涓嶈兘涓虹┖")
     private String text;
     
     private String sourceLang;
     
-    @NotBlank(message = "目标语言不能为空")
+    @NotBlank(message = "鐩爣璇█涓嶈兘涓虹┖")
     private String targetLang;
     
     private String model;

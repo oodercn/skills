@@ -1,6 +1,6 @@
-package net.ooder.nexus.domain.admin.model;
+﻿package net.ooder.nexus.domain.admin.model;
 
-import javax.persistence.*;
+import jakarta.persistence.*;
 import java.io.Serializable;
 import java.util.Map;
 import java.util.HashMap;

@@ -1,4 +1,4 @@
-package net.ooder.skill.dailyreport.controller;
+﻿package net.ooder.skill.dailyreport.controller;
 
 import net.ooder.skill.dailyreport.dto.ApiResponse;
 import net.ooder.skill.dailyreport.dto.PageResult;
@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpServletResponse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class DailyReportController {
     public ApiResponse<DailyReport> getReport(@PathVariable String id) {
         DailyReport report = dailyReportService.getReport(id);
         if (report == null) {
-            return new ApiResponse<>("error", "日报不存在");
+            return new ApiResponse<>("error", "鏃ユ姤涓嶅瓨鍦?);
         }
         return new ApiResponse<>(report);
     }
@@ -42,7 +42,7 @@ public class DailyReportController {
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate date) {
         DailyReport report = dailyReportService.getReportByDate(userId, date);
         if (report == null) {
-            return new ApiResponse<>("error", "该日期没有日报");
+            return new ApiResponse<>("error", "璇ユ棩鏈熸病鏈夋棩鎶?);
         }
         return new ApiResponse<>(report);
     }
@@ -75,7 +75,7 @@ public class DailyReportController {
             @RequestBody ReportCreateRequest request) {
         DailyReport report = dailyReportService.updateReport(id, request);
         if (report == null) {
-            return new ApiResponse<>("error", "日报不存在");
+            return new ApiResponse<>("error", "鏃ユ姤涓嶅瓨鍦?);
         }
         return new ApiResponse<>(report);
     }
@@ -90,7 +90,7 @@ public class DailyReportController {
     public ApiResponse<DailyReport> submitReport(@PathVariable String id) {
         DailyReport report = dailyReportService.submitReport(id);
         if (report == null) {
-            return new ApiResponse<>("error", "日报不存在");
+            return new ApiResponse<>("error", "鏃ユ姤涓嶅瓨鍦?);
         }
         return new ApiResponse<>(report);
     }
@@ -101,7 +101,7 @@ public class DailyReportController {
             @RequestBody ReviewRequest request) {
         DailyReport report = dailyReportService.reviewReport(id, request);
         if (report == null) {
-            return new ApiResponse<>("error", "日报不存在");
+            return new ApiResponse<>("error", "鏃ユ姤涓嶅瓨鍦?);
         }
         return new ApiResponse<>(report);
     }
@@ -138,7 +138,7 @@ public class DailyReportController {
             response.setHeader("Content-Disposition", "attachment; filename=reports." + format);
             response.getOutputStream().write(data);
         } catch (Exception e) {
-            throw new RuntimeException("导出失败", e);
+            throw new RuntimeException("瀵煎嚭澶辫触", e);
         }
     }
 }

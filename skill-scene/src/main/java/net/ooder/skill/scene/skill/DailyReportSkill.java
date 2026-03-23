@@ -1,4 +1,4 @@
-package net.ooder.skill.scene.skill;
+﻿package net.ooder.skill.scene.skill;
 
 import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.dailyreport.*;
@@ -6,7 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.*;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -25,29 +25,29 @@ public class DailyReportSkill {
         
         CapabilityDTO remindCap = new CapabilityDTO();
         remindCap.setCapId("report-remind");
-        remindCap.setName("日志提醒");
-        remindCap.setDescription("定时提醒员工提交日志");
+        remindCap.setName("鏃ュ織鎻愰啋");
+        remindCap.setDescription("瀹氭椂鎻愰啋鍛樺伐鎻愪氦鏃ュ織");
         remindCap.setCategory("notification");
         capabilities.add(remindCap);
         
         CapabilityDTO submitCap = new CapabilityDTO();
         submitCap.setCapId("report-submit");
-        submitCap.setName("日志提交");
-        submitCap.setDescription("员工提交工作日志");
+        submitCap.setName("鏃ュ織鎻愪氦");
+        submitCap.setDescription("鍛樺伐鎻愪氦宸ヤ綔鏃ュ織");
         submitCap.setCategory("data-input");
         capabilities.add(submitCap);
         
         CapabilityDTO aggregateCap = new CapabilityDTO();
         aggregateCap.setCapId("report-aggregate");
-        aggregateCap.setName("日志汇总");
-        aggregateCap.setDescription("汇总所有员工日志");
+        aggregateCap.setName("鏃ュ織姹囨€?);
+        aggregateCap.setDescription("姹囨€绘墍鏈夊憳宸ユ棩蹇?);
         aggregateCap.setCategory("data-processing");
         capabilities.add(aggregateCap);
         
         CapabilityDTO analyzeCap = new CapabilityDTO();
         analyzeCap.setCapId("report-analyze");
-        analyzeCap.setName("日志分析");
-        analyzeCap.setDescription("AI分析日志内容");
+        analyzeCap.setName("鏃ュ織鍒嗘瀽");
+        analyzeCap.setDescription("AI鍒嗘瀽鏃ュ織鍐呭");
         analyzeCap.setCategory("intelligence");
         capabilities.add(analyzeCap);
         
@@ -61,7 +61,7 @@ public class DailyReportSkill {
         
         String sceneGroupId = request.getSceneGroupId();
         List<String> targetUsers = request.getTargetUsers();
-        String message = request.getMessage() != null ? request.getMessage() : "请及时提交今日工作日志";
+        String message = request.getMessage() != null ? request.getMessage() : "璇峰強鏃舵彁浜や粖鏃ュ伐浣滄棩蹇?;
         
         Reminder reminder = new Reminder();
         reminder.setReminderId("remind-" + System.currentTimeMillis());
@@ -73,7 +73,7 @@ public class DailyReportSkill {
         
         reminders.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(reminder);
         
-        DailyReportResponseDTO response = DailyReportResponseDTO.success("提醒已发送");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("鎻愰啋宸插彂閫?);
         response.setReminderId(reminder.getReminderId());
         response.setSentCount(targetUsers != null ? targetUsers.size() : 0);
         
@@ -96,7 +96,7 @@ public class DailyReportSkill {
         
         reports.computeIfAbsent(request.getSceneGroupId(), k -> new ArrayList<>()).add(report);
         
-        DailyReportResponseDTO response = DailyReportResponseDTO.success("日志提交成功");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("鏃ュ織鎻愪氦鎴愬姛");
         response.setReportId(report.getReportId());
         
         return response;
@@ -125,7 +125,7 @@ public class DailyReportSkill {
             userReportCount.merge(userId, 1, Integer::sum);
         }
         
-        DailyReportResponseDTO response = DailyReportResponseDTO.success("汇总完成");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("姹囨€诲畬鎴?);
         response.setTotalReports(filteredReports.size());
         response.setUserReportCount(userReportCount);
         response.setReports(filteredReports);
@@ -145,17 +145,17 @@ public class DailyReportSkill {
         analysis.put("analyzeTime", System.currentTimeMillis());
         
         if ("summary".equals(analyzeType)) {
-            analysis.put("summary", "今日团队整体工作进展顺利，共完成" + 
-                    (request.getReports() != null ? request.getReports().size() : 0) + "项任务。");
-            analysis.put("highlights", Arrays.asList("项目进度正常", "团队协作良好", "无重大问题"));
-            analysis.put("suggestions", Arrays.asList("继续保持良好的工作节奏", "关注项目关键节点"));
+            analysis.put("summary", "浠婃棩鍥㈤槦鏁翠綋宸ヤ綔杩涘睍椤哄埄锛屽叡瀹屾垚" + 
+                    (request.getReports() != null ? request.getReports().size() : 0) + "椤逛换鍔°€?);
+            analysis.put("highlights", Arrays.asList("椤圭洰杩涘害姝ｅ父", "鍥㈤槦鍗忎綔鑹ソ", "鏃犻噸澶ч棶棰?));
+            analysis.put("suggestions", Arrays.asList("缁х画淇濇寔鑹ソ鐨勫伐浣滆妭濂?, "鍏虫敞椤圭洰鍏抽敭鑺傜偣"));
         } else if ("sentiment".equals(analyzeType)) {
             analysis.put("sentiment", "positive");
             analysis.put("confidence", 0.85);
-            analysis.put("keywords", Arrays.asList("完成", "进展", "顺利", "协作"));
+            analysis.put("keywords", Arrays.asList("瀹屾垚", "杩涘睍", "椤哄埄", "鍗忎綔"));
         }
         
-        DailyReportResponseDTO response = DailyReportResponseDTO.success("分析完成");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("鍒嗘瀽瀹屾垚");
         response.setAnalysis(analysis);
         
         return response;
@@ -165,7 +165,7 @@ public class DailyReportSkill {
     public DailyReportResponseDTO getReports(@PathVariable String sceneGroupId) {
         List<Report> sceneReports = reports.getOrDefault(sceneGroupId, new ArrayList<>());
         
-        DailyReportResponseDTO response = DailyReportResponseDTO.success("查询成功");
+        DailyReportResponseDTO response = DailyReportResponseDTO.success("鏌ヨ鎴愬姛");
         response.setReports(sceneReports);
         response.setTotal(sceneReports.size());
         

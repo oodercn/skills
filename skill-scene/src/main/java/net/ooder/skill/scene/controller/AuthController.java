@@ -1,4 +1,4 @@
-package net.ooder.skill.scene.controller;
+﻿package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.dto.LoginRequest;
 import net.ooder.skill.scene.dto.menu.MenuItemDTO;
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -41,7 +41,7 @@ public class AuthController {
         if (session != null) {
             return ResultModel.success(session);
         }
-        return ResultModel.error(401, "用户名或密码错误");
+        return ResultModel.error(401, "鐢ㄦ埛鍚嶆垨瀵嗙爜閿欒");
     }
 
     @PostMapping("/logout")
@@ -57,7 +57,7 @@ public class AuthController {
         if (user != null) {
             return ResultModel.success(user);
         }
-        return ResultModel.error(401, "未登录或会话已过期");
+        return ResultModel.error(401, "鏈櫥褰曟垨浼氳瘽宸茶繃鏈?);
     }
 
     @GetMapping("/current-user")
@@ -102,7 +102,7 @@ public class AuthController {
         UserSessionDTO user = authService.getCurrentUser(request);
         
         if (user == null) {
-            return ResultModel.error(401, "未登录");
+            return ResultModel.error(401, "鏈櫥褰?);
         }
 
         String roleType = user.getRoleType();

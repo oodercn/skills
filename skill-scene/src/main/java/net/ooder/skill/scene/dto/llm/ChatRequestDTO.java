@@ -1,12 +1,12 @@
-package net.ooder.skill.scene.dto.llm;
+﻿package net.ooder.skill.scene.dto.llm;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.List;
 import java.util.Map;
 
 public class ChatRequestDTO {
     
-    @NotBlank(message = "消息不能为空")
+    @NotBlank(message = "娑堟伅涓嶈兘涓虹┖")
     private String message;
     
     private String conversationId;
