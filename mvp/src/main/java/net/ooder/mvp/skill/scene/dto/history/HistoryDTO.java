@@ -1,5 +1,7 @@
 package net.ooder.mvp.skill.scene.dto.history;
 
+import java.util.List;
+
 public class HistoryDTO {
     
     private String executionId;
@@ -13,6 +15,21 @@ public class HistoryDTO {
     private Long endTime;
     private String triggerType;
     private String errorMessage;
+    private List<LogEntry> logs;
+    private Object result;
+
+    public static class LogEntry {
+        private Long timestamp;
+        private String level;
+        private String message;
+        
+        public Long getTimestamp() { return timestamp; }
+        public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
+        public String getLevel() { return level; }
+        public void setLevel(String level) { this.level = level; }
+        public String getMessage() { return message; }
+        public void setMessage(String message) { this.message = message; }
+    }
 
     public HistoryDTO() {
     }
@@ -103,5 +120,21 @@ public class HistoryDTO {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public List<LogEntry> getLogs() {
+        return logs;
+    }
+
+    public void setLogs(List<LogEntry> logs) {
+        this.logs = logs;
+    }
+
+    public Object getResult() {
+        return result;
+    }
+
+    public void setResult(Object result) {
+        this.result = result;
     }
 }

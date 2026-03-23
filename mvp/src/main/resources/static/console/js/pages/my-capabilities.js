@@ -58,16 +58,33 @@
         'iot': 'sys',
         'net': 'sys',
         'service': 'util',
-        'scene': 'util',
+        'scene': 'biz',
         'tool': 'util',
         'workflow': 'biz',
         'data': 'vfs',
         'other': 'util',
+        'form': 'biz',
+        'template': 'biz',
+        'record': 'biz',
+        'dashboard': 'biz',
+        'notification': 'msg',
+        'recruitment': 'biz',
+        'approval': 'biz',
+        'hr': 'biz',
         'TOOL': 'util',
         'WORKFLOW': 'biz',
         'DATA': 'vfs',
         'SERVICE': 'util',
-        'OTHER': 'util'
+        'OTHER': 'util',
+        'FORM': 'biz',
+        'TEMPLATE': 'biz',
+        'RECORD': 'biz',
+        'DASHBOARD': 'biz',
+        'NOTIFICATION': 'msg',
+        'RECRUITMENT': 'biz',
+        'APPROVAL': 'biz',
+        'HR': 'biz',
+        'SCENE': 'biz'
     };
 
     function normalizeCategory(category) {
@@ -207,9 +224,11 @@
                 if (!skillMap[skillId]) {
                     var rawCategory = cap.category || cap.capabilityCategory || cap.businessCategory || 'util';
                     var normalizedCategory = normalizeCategory(rawCategory);
+                    var capabilityId = cap.capabilityId || cap.id || skillId;
                     
                     skillMap[skillId] = {
                         skillId: skillId,
+                        capabilityId: capabilityId,
                         name: cap.name || skillId,
                         description: cap.description || '',
                         category: normalizedCategory,
@@ -573,6 +592,22 @@
             html += '<div class="detail-row"><span class="detail-row-label">更新时间</span><span class="detail-row-value">' + (skill.updateTime ? MyCapabilities.formatTime(skill.updateTime) : '-') + '</span></div>';
             html += '</div>';
 
+            html += '<div class="detail-section" style="margin-top: 20px;">';
+            html += '<div class="detail-section-title"><i class="ri-settings-3-line"></i> 操作</div>';
+            html += '<div style="display: flex; gap: 12px; flex-wrap: wrap;">';
+            var isSceneSkill = skill.skillForm === 'SCENE' || skill.skillForm === 'scene-skill' || 
+                               skill.capabilityType === 'SCENE' || skill.sceneType != null;
+            if (skill.installed && !skill.enabled && isSceneSkill) {
+                html += '<button class="nx-btn nx-btn--primary" onclick="MyCapabilities.activateSkill(\'' + skill.capabilityId + '\')">' +
+                    '<i class="ri-play-circle-line"></i> 激活</button>';
+            } else if (skill.installed && skill.enabled && isSceneSkill) {
+                html += '<button class="nx-btn nx-btn--secondary" onclick="MyCapabilities.deactivateSkill(\'' + skill.capabilityId + '\')">' +
+                    '<i class="ri-stop-circle-line"></i> 停用</button>';
+            }
+            html += '<button class="nx-btn nx-btn--secondary" onclick="MyCapabilities.viewDetails(\'' + skill.capabilityId + '\')">' +
+                '<i class="ri-external-link-line"></i> 查看详情</button>';
+            html += '</div></div>';
+
             detailBody.innerHTML = html;
             detailPanel.classList.add('open');
             overlay.classList.add('open');
@@ -588,6 +623,54 @@
                 hour: '2-digit',
                 minute: '2-digit'
             });
+        },
+        
+        activateSkill: function(capabilityId) {
+            if (!confirm('确定要激活能力 "' + capabilityId + '" 吗？')) return;
+            
+            fetch('/api/v1/scene-capabilities/' + capabilityId + '/activate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.status === 'success' || (data.data && data.data.success)) {
+                    alert('激活成功');
+                    closeDetailPanel();
+                    MyCapabilities.loadCapabilities();
+                } else {
+                    alert('激活失败: ' + (data.message || '未知错误'));
+                }
+            })
+            .catch(function(err) {
+                alert('激活失败: ' + err.message);
+            });
+        },
+        
+        deactivateSkill: function(capabilityId) {
+            if (!confirm('确定要停用能力 "' + capabilityId + '" 吗？')) return;
+            
+            fetch('/api/v1/scene-capabilities/' + capabilityId + '/deactivate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            })
+            .then(function(response) { return response.json(); })
+            .then(function(data) {
+                if (data.status === 'success' || (data.data && data.data.success)) {
+                    alert('停用成功');
+                    closeDetailPanel();
+                    MyCapabilities.loadCapabilities();
+                } else {
+                    alert('停用失败: ' + (data.message || '未知错误'));
+                }
+            })
+            .catch(function(err) {
+                alert('停用失败: ' + err.message);
+            });
+        },
+        
+        viewDetails: function(capabilityId) {
+            window.open('/console/pages/skill-detail.html?id=' + capabilityId, '_blank');
         }
     };
 
@@ -670,6 +753,8 @@
         document.getElementById('detailPanel').classList.remove('open');
         document.getElementById('overlay').classList.remove('open');
     };
+    
+    global.MyCapabilities = MyCapabilities;
 
     if (document.readyState === 'loading') {
         document.addEventListener('DOMContentLoaded', function() {

@@ -570,7 +570,7 @@
     global.registerCapability = function() {
         var capabilityId = document.getElementById('regCapabilityId').value;
         var name = document.getElementById('regCapabilityName').value;
-        var type = document.getElementById('regCapabilityType').value;
+        var type = document.getElementById('regType').value;
         var desc = document.getElementById('regCapabilityDesc').value;
 
         if (!capabilityId || !name) {

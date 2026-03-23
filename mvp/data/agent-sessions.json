@@ -1,0 +1,58 @@
+[
+	{
+		"agentId": "agent-llm-001",
+		"sessionToken": "tok-agent-llm-001-a1b2c3d4e5f6",
+		"agentName": "LLM Assistant",
+		"agentType": "LLM",
+		"status": "ONLINE",
+		"loginTime": 1774100000000,
+		"lastHeartbeat": 1774161000000,
+		"expireTime": 1774186400000,
+		"sceneGroupId": "sg-1773890302603",
+		"role": "LLM_ASSISTANT",
+		"ipAddress": "127.0.0.1",
+		"port": 8080
+	},
+	{
+		"agentId": "agent-coordinator-001",
+		"sessionToken": "tok-agent-coordinator-001-g7h8i9j0k1",
+		"agentName": "Coordinator Agent",
+		"agentType": "WORKER",
+		"status": "BUSY",
+		"loginTime": 1774110000000,
+		"lastHeartbeat": 1774160500000,
+		"expireTime": 1774186400000,
+		"sceneGroupId": "sg-1773890302603",
+		"role": "COORDINATOR",
+		"ipAddress": "127.0.0.1",
+		"port": 8081
+	},
+	{
+		"agentId": "agent-data-001",
+		"sessionToken": "tok-agent-data-001-l2m3n4o5p6",
+		"agentName": "Data Processing Agent",
+		"agentType": "WORKER",
+		"status": "IDLE",
+		"loginTime": 1774120000000,
+		"lastHeartbeat": 1774160000000,
+		"expireTime": 1774186400000,
+		"sceneGroupId": "sg-1773890302603",
+		"role": "EMPLOYEE",
+		"ipAddress": "127.0.0.1",
+		"port": 8082
+	},
+	{
+		"agentId": "super-agent-001",
+		"sessionToken": "tok-super-agent-001-q7r8s9t0u1",
+		"agentName": "Super Agent",
+		"agentType": "SUPER_AGENT",
+		"status": "ONLINE",
+		"loginTime": 1774090000000,
+		"lastHeartbeat": 1774162000000,
+		"expireTime": 1774186400000,
+		"sceneGroupId": "sg-1773890302603",
+		"role": "OWNER",
+		"ipAddress": "127.0.0.1",
+		"port": 8083
+	}
+]

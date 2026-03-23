@@ -165,6 +165,104 @@ public class SkillDownloadService {
         return result;
     }
 
+    public DownloadResult cloneFromGit(String repoUrl, String skillId, String branch) {
+        log.info("[cloneFromGit] Cloning skill from git: {} skillId={} branch={}", repoUrl, skillId, branch);
+        
+        DownloadResult result = new DownloadResult();
+        
+        if (branch == null || branch.isEmpty()) {
+            branch = "master";
+        }
+        
+        try {
+            Path tempDir = Files.createTempDirectory("skill-clone-");
+            Path cloneDir = tempDir.resolve("repo");
+            
+            ProcessBuilder pb = new ProcessBuilder(
+                "git", "clone",
+                "--depth", "1",
+                "--branch", branch,
+                repoUrl,
+                cloneDir.toString()
+            );
+            pb.redirectErrorStream(true);
+            
+            log.info("[cloneFromGit] Executing: git clone --depth 1 --branch {} {}", branch, repoUrl);
+            Process process = pb.start();
+            
+            StringBuilder output = new StringBuilder();
+            try (BufferedReader reader = new BufferedReader(new InputStreamReader(process.getInputStream()))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    output.append(line).append("\n");
+                    log.debug("[cloneFromGit] git: {}", line);
+                }
+            }
+            
+            int exitCode = process.waitFor();
+            
+            if (exitCode != 0) {
+                log.error("[cloneFromGit] Git clone failed with exit code {}: {}", exitCode, output);
+                result.setSuccess(false);
+                result.setMessage("Git clone 失败: " + output.toString());
+                deleteDirectory(tempDir);
+                return result;
+            }
+            
+            log.info("[cloneFromGit] Git clone successful, searching for skill: {}", skillId);
+            
+            Path skillSourcePath = findSkillInClonedRepo(cloneDir, skillId);
+            
+            if (skillSourcePath == null) {
+                log.error("[cloneFromGit] Skill not found in cloned repo: {}", skillId);
+                result.setSuccess(false);
+                result.setMessage("在克隆的仓库中未找到技能: " + skillId);
+                deleteDirectory(tempDir);
+                return result;
+            }
+            
+            Path targetPath = directoryConfig.getSkillDownloadPath(skillId);
+            
+            if (Files.exists(targetPath)) {
+                deleteDirectory(targetPath);
+            }
+            
+            copyDirectory(skillSourcePath, targetPath);
+            
+            Map<String, Object> metadata = loadSkillMetadata(targetPath);
+            
+            result.setSuccess(true);
+            result.setSkillId(skillId);
+            result.setSkillPath(targetPath);
+            result.setSkillMetadata(metadata);
+            result.setMessage("从 Git 仓库克隆成功");
+            
+            log.info("[cloneFromGit] Skill cloned successfully: {} -> {}", skillSourcePath, targetPath);
+            
+            deleteDirectory(tempDir);
+            
+        } catch (Exception e) {
+            log.error("[cloneFromGit] Failed to clone skill: {}", e.getMessage());
+            result.setSuccess(false);
+            result.setMessage("Git clone 失败: " + e.getMessage());
+        }
+        
+        return result;
+    }
+    
+    private Path findSkillInClonedRepo(Path cloneDir, String skillId) throws IOException {
+        return Files.walk(cloneDir)
+            .filter(Files::isDirectory)
+            .filter(dir -> dir.getFileName().toString().equals(skillId))
+            .filter(dir -> {
+                Path skillYaml = dir.resolve("skill.yaml");
+                Path skillManifest = dir.resolve("skill-manifest.yaml");
+                return Files.exists(skillYaml) || Files.exists(skillManifest);
+            })
+            .findFirst()
+            .orElse(null);
+    }
+
     private Path findSkillInSource(String skillId) throws IOException {
         Path sourceDir = directoryConfig.getSourceDir();
         

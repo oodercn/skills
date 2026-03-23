@@ -9,6 +9,12 @@ import net.ooder.mvp.skill.scene.capability.model.Visibility;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.mvp.skill.scene.capability.service.SceneSkillLifecycleService;
+import net.ooder.mvp.skill.scene.dto.scene.SceneGroupConfigDTO;
+import net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO;
+import net.ooder.mvp.skill.scene.service.SceneGroupService;
+import net.ooder.mvp.skill.scene.service.MenuAutoRegisterService;
+import net.ooder.mvp.skill.scene.template.SceneTemplate;
+import net.ooder.mvp.skill.scene.template.SceneTemplateService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +35,15 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
     
     @Autowired
     private CapabilityStateService capabilityStateService;
+    
+    @Autowired(required = false)
+    private SceneGroupService sceneGroupService;
+    
+    @Autowired(required = false)
+    private MenuAutoRegisterService menuAutoRegisterService;
+    
+    @Autowired(required = false)
+    private SceneTemplateService sceneTemplateService;
 
     @Override
     public LifecycleResult activate(String capabilityId, String userId) {
@@ -54,6 +69,16 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         CapabilityStatus currentStatus = getStatus(capabilityId);
         CapabilityStatus targetStatus = determineActivateStatus(sceneType, isInternal);
         
+        if (currentStatus == targetStatus) {
+            log.info("[activate] Capability {} already in target status: {}", capabilityId, targetStatus);
+            LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
+            result.setSceneType(sceneType);
+            result.setSkillForm(skillForm);
+            result.setMessage("Already activated");
+            result.setNextSteps(getNextSteps(targetStatus, sceneType));
+            return result;
+        }
+        
         if (!canTransition(currentStatus, targetStatus, sceneType)) {
             return LifecycleResult.failure(capabilityId, 
                 "Cannot activate from status: " + currentStatus + " to: " + targetStatus);
@@ -62,13 +87,126 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         capabilityStateService.setStatus(capabilityId, targetStatus);
         capabilityStateService.setInstalled(capabilityId, true, userId, "activate");
         
+        String sceneGroupId = autoCreateSceneGroup(capability, userId);
+        
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, targetStatus);
         result.setSceneType(sceneType);
         result.setSkillForm(skillForm);
-        result.setMessage("Activated successfully");
+        result.setSceneGroupId(sceneGroupId);
+        result.setMessage("Activated successfully" + (sceneGroupId != null ? ", SceneGroup: " + sceneGroupId : ""));
         result.setNextSteps(getNextSteps(targetStatus, sceneType));
         
         return result;
+    }
+    
+    private String autoCreateSceneGroup(Capability capability, String userId) {
+        if (sceneGroupService == null) {
+            log.warn("[autoCreateSceneGroup] SceneGroupService not available");
+            return null;
+        }
+        
+        String existingSceneGroupId = capabilityStateService.getSceneGroupId(capability.getCapabilityId());
+        if (existingSceneGroupId != null) {
+            SceneGroupDTO existingGroup = sceneGroupService.get(existingSceneGroupId);
+            if (existingGroup != null) {
+                log.info("[autoCreateSceneGroup] Reusing existing SceneGroup: {} for capability: {}", 
+                    existingSceneGroupId, capability.getCapabilityId());
+                
+                if (menuAutoRegisterService != null) {
+                    try {
+                        String templateId = findTemplateForSkill(capability.getCapabilityId());
+                        if (templateId != null) {
+                            menuAutoRegisterService.registerMenusOnActivation(
+                                existingSceneGroupId,
+                                templateId,
+                                userId != null ? userId : "system",
+                                "MANAGER"
+                            );
+                            log.info("[autoCreateSceneGroup] Menus re-registered for SceneGroup: {}", 
+                                existingSceneGroupId);
+                        }
+                    } catch (Exception e) {
+                        log.warn("[autoCreateSceneGroup] Failed to re-register menus: {}", e.getMessage());
+                    }
+                }
+                
+                return existingSceneGroupId;
+            }
+        }
+        
+        String templateId = findTemplateForSkill(capability.getCapabilityId());
+        if (templateId == null) {
+            log.info("[autoCreateSceneGroup] No template found for skill: {}", capability.getCapabilityId());
+            return null;
+        }
+        
+        try {
+            SceneGroupConfigDTO config = new SceneGroupConfigDTO();
+            config.setName(capability.getName() + " 场景组");
+            config.setCreatorId(userId != null ? userId : "system");
+            config.setCreatorType(SceneGroupConfigDTO.CreatorType.USER);
+            config.setMinMembers(1);
+            config.setMaxMembers(100);
+            
+            SceneGroupDTO sceneGroup = sceneGroupService.create(templateId, config);
+            if (sceneGroup != null) {
+                log.info("[autoCreateSceneGroup] Created SceneGroup: {} for skill: {}", 
+                    sceneGroup.getSceneGroupId(), capability.getCapabilityId());
+                
+                capabilityStateService.setSceneGroupId(capability.getCapabilityId(), sceneGroup.getSceneGroupId());
+                
+                if (menuAutoRegisterService != null) {
+                    try {
+                        menuAutoRegisterService.registerMenusOnActivation(
+                            sceneGroup.getSceneGroupId(),
+                            templateId,
+                            userId != null ? userId : "system",
+                            "MANAGER"
+                        );
+                        log.info("[autoCreateSceneGroup] Menus registered for SceneGroup: {}", 
+                            sceneGroup.getSceneGroupId());
+                    } catch (Exception e) {
+                        log.warn("[autoCreateSceneGroup] Failed to register menus: {}", e.getMessage());
+                    }
+                }
+                
+                return sceneGroup.getSceneGroupId();
+            }
+        } catch (Exception e) {
+            log.error("[autoCreateSceneGroup] Failed to create SceneGroup: {}", e.getMessage());
+        }
+        
+        return null;
+    }
+    
+    private String findTemplateForSkill(String skillId) {
+        if (sceneTemplateService == null) {
+            return null;
+        }
+        
+        try {
+            List<SceneTemplate> templates = sceneTemplateService.listTemplates();
+            if (templates != null) {
+                for (SceneTemplate template : templates) {
+                    if (template.getMetadata() != null) {
+                        String templateId = template.getMetadata().getId();
+                        if (template.getSpec() != null && template.getSpec().getSkills() != null) {
+                            for (SceneTemplate.SkillRef skillRef : template.getSpec().getSkills()) {
+                                if (skillId.equals(skillRef.getId())) {
+                                    log.info("[findTemplateForSkill] Found template {} for skill {}", 
+                                        templateId, skillId);
+                                    return templateId;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.warn("[findTemplateForSkill] Failed to find template: {}", e.getMessage());
+        }
+        
+        return null;
     }
 
     @Override
@@ -95,6 +233,41 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.PAUSED);
         result.setSceneType(sceneType);
         result.setMessage("Paused successfully");
+        
+        return result;
+    }
+
+    @Override
+    public LifecycleResult deactivate(String capabilityId, String userId) {
+        log.info("[deactivate] Deactivating capability: {} by user: {}", capabilityId, userId);
+        
+        Capability capability = capabilityService.findById(capabilityId);
+        if (capability == null) {
+            return LifecycleResult.failure(capabilityId, "Capability not found: " + capabilityId);
+        }
+        
+        CapabilityStatus currentStatus = getStatus(capabilityId);
+        
+        if (currentStatus == CapabilityStatus.REGISTERED || currentStatus == CapabilityStatus.DRAFT) {
+            return LifecycleResult.failure(capabilityId, "Capability is not activated: " + currentStatus);
+        }
+        
+        String sceneGroupId = capabilityStateService.getSceneGroupId(capabilityId);
+        
+        if (sceneGroupId != null && menuAutoRegisterService != null) {
+            try {
+                menuAutoRegisterService.removeMenusOnSceneDestroy(sceneGroupId, userId);
+                log.info("[deactivate] Removed menus for SceneGroup: {}", sceneGroupId);
+            } catch (Exception e) {
+                log.warn("[deactivate] Failed to remove menus: {}", e.getMessage());
+            }
+        }
+        
+        capabilityStateService.setStatus(capabilityId, CapabilityStatus.REGISTERED);
+        
+        LifecycleResult result = LifecycleResult.success(capabilityId, currentStatus, CapabilityStatus.REGISTERED);
+        result.setSceneGroupId(sceneGroupId);
+        result.setMessage("Deactivated successfully");
         
         return result;
     }
@@ -261,6 +434,11 @@ public class SceneSkillLifecycleServiceImpl implements SceneSkillLifecycleServic
         }
         
         switch (from) {
+            case REGISTERED:
+                return to == CapabilityStatus.DRAFT 
+                    || to == CapabilityStatus.PENDING 
+                    || to == CapabilityStatus.SCHEDULED 
+                    || to == CapabilityStatus.INITIALIZING;
             case DRAFT:
                 return to == CapabilityStatus.PENDING 
                     || to == CapabilityStatus.SCHEDULED 

@@ -10,7 +10,7 @@ public class SceneGroupDTO {
     private String description;
     private SceneGroupStatus status;
     private String creatorId;
-    private ParticipantType creatorType;
+    private SceneGroupConfigDTO.CreatorType creatorType;
     private SceneGroupConfigDTO config;
     private int memberCount;
     private String primaryAgentId;
@@ -33,8 +33,8 @@ public class SceneGroupDTO {
     public void setStatus(SceneGroupStatus status) { this.status = status; }
     public String getCreatorId() { return creatorId; }
     public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
-    public ParticipantType getCreatorType() { return creatorType; }
-    public void setCreatorType(ParticipantType creatorType) { this.creatorType = creatorType; }
+    public SceneGroupConfigDTO.CreatorType getCreatorType() { return creatorType; }
+    public void setCreatorType(SceneGroupConfigDTO.CreatorType creatorType) { this.creatorType = creatorType; }
     public SceneGroupConfigDTO getConfig() { return config; }
     public void setConfig(SceneGroupConfigDTO config) { this.config = config; }
     public int getMemberCount() { return memberCount; }

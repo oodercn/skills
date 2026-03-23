@@ -1,0 +1,322 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-knowledge-management
+  name: 知识管理场景
+  version: "2.3.1"
+  category: knowledge
+  subCategory: management
+  description: 企业知识管理场景，支持知识创建、分类、检索、共享、权限管理
+  author: Ooder Team
+  icon: ri-book-2-line
+
+spec:
+  capabilities:
+    - id: knowledge-create
+      name: 知识创建
+      description: 创建和编辑知识文档
+      category: service
+      autoBind: true
+      
+    - id: knowledge-classify
+      name: 知识分类
+      description: 知识分类和标签管理
+      category: service
+      autoBind: true
+      
+    - id: knowledge-search
+      name: 知识检索
+      description: 全文检索和智能搜索
+      category: ai
+      autoBind: true
+      
+    - id: knowledge-share
+      name: 知识共享
+      description: 知识分享和协作
+      category: service
+      autoBind: false
+      
+    - id: knowledge-analytics
+      name: 知识分析
+      description: 知识使用统计和分析
+      category: ai
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-search
+      version: ">=2.3.1"
+      required: true
+      description: 搜索服务
+    - skillId: skill-vfs-base
+      version: ">=2.3.1"
+      required: true
+      description: 文件存储服务
+    - skillId: skill-notify
+      version: ">=2.3.1"
+      required: false
+      description: 通知服务
+      
+  skillForm: SCENE
+  
+  scene:
+    type: HYBRID
+    visibility: public
+    participantMode: multi-role
+    name: 知识管理
+    description: 企业知识库管理
+    
+  roles:
+    - id: ADMIN
+      name: 知识管理员
+      description: 知识库管理员，负责知识管理和权限配置
+      required: true
+      minCount: 1
+      maxCount: 5
+      permissions:
+        - knowledge:manage
+        - knowledge:delete
+        - knowledge:approve
+        - permission:manage
+        - category:manage
+        - analytics:view
+        
+    - id: CONTRIBUTOR
+      name: 知识贡献者
+      description: 知识内容创作者
+      required: true
+      minCount: 1
+      maxCount: 500
+      permissions:
+        - knowledge:create
+        - knowledge:edit.own
+        - knowledge:submit
+        - knowledge:view
+        
+    - id: READER
+      name: 知识读者
+      description: 知识浏览权限用户
+      required: false
+      minCount: 0
+      maxCount: 10000
+      permissions:
+        - knowledge:view
+        - knowledge:search
+        - knowledge:bookmark
+        
+  activationSteps:
+    ADMIN:
+      - stepId: configure-categories
+        step: 1
+        action: configure-categories
+        title: 配置知识分类
+        description: 设置知识库分类体系
+        type: CONFIG_SKILL
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: configure-permissions
+        step: 2
+        action: configure-permissions
+        title: 配置权限
+        description: 设置知识访问权限
+        type: CONFIG_CONDITIONS
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: invite-contributors
+        step: 3
+        action: invite-contributors
+        title: 邀请贡献者
+        description: 添加知识贡献者
+        type: CONFIRM_PARTICIPANTS
+        required: false
+        skippable: true
+        autoExecute: false
+        
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+    CONTRIBUTOR:
+      - stepId: accept-invitation
+        step: 1
+        action: accept-invitation
+        title: 接受邀请
+        description: 加入知识库
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: configure-profile
+        step: 2
+        action: configure-profile
+        title: 配置个人资料
+        description: 设置专业知识领域
+        type: CONFIG_PRIVATE_CAPABILITIES
+        required: false
+        skippable: true
+        autoExecute: false
+        
+      - stepId: confirm-activation
+        step: 3
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+    READER:
+      - stepId: confirm-join
+        step: 1
+        action: confirm-join
+        title: 确认加入
+        description: 加入知识库
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    ADMIN:
+      - id: knowledge-dashboard
+        name: 知识概览
+        icon: ri-dashboard-line
+        path: /knowledge/dashboard
+        order: 1
+        visible: true
+        
+      - id: knowledge-categories
+        name: 分类管理
+        icon: ri-folder-line
+        path: /knowledge/categories
+        order: 2
+        visible: true
+        
+      - id: knowledge-review
+        name: 内容审核
+        icon: ri-checkbox-circle-line
+        path: /knowledge/review
+        order: 3
+        visible: true
+        
+      - id: knowledge-permissions
+        name: 权限管理
+        icon: ri-shield-keyhole-line
+        path: /knowledge/permissions
+        order: 4
+        visible: true
+        
+      - id: knowledge-analytics
+        name: 统计分析
+        icon: ri-bar-chart-line
+        path: /knowledge/analytics
+        order: 5
+        visible: true
+        
+    CONTRIBUTOR:
+      - id: knowledge-create
+        name: 创建知识
+        icon: ri-add-line
+        path: /knowledge/create
+        order: 1
+        visible: true
+        
+      - id: knowledge-my
+        name: 我的贡献
+        icon: ri-user-line
+        path: /knowledge/my
+        order: 2
+        visible: true
+        
+      - id: knowledge-drafts
+        name: 草稿箱
+        icon: ri-draft-line
+        path: /knowledge/drafts
+        order: 3
+        visible: true
+        
+    READER:
+      - id: knowledge-search
+        name: 知识搜索
+        icon: ri-search-line
+        path: /knowledge/search
+        order: 1
+        visible: true
+        
+      - id: knowledge-browse
+        name: 知识浏览
+        icon: ri-book-open-line
+        path: /knowledge/browse
+        order: 2
+        visible: true
+        
+      - id: knowledge-bookmarks
+        name: 我的收藏
+        icon: ri-bookmark-line
+        path: /knowledge/bookmarks
+        order: 3
+        visible: true
+        
+  privateCapabilities:
+    - capId: personal-recommendation
+      name: 个性化推荐
+      description: 基于阅读历史的智能推荐
+      configSchema:
+        type: object
+        properties:
+          enableRecommendation:
+            type: boolean
+            description: 启用推荐
+          recommendationCategories:
+            type: array
+            description: 推荐分类
+            
+  configSchema:
+    type: object
+    properties:
+      enableAutoApprove:
+        type: boolean
+        default: false
+        title: 自动审核通过
+      maxFileSize:
+        type: integer
+        default: 50
+        title: 最大文件大小(MB)
+      allowedFileTypes:
+        type: array
+        default: [pdf, doc, docx, md, txt]
+        title: 允许的文件类型
+      enableVersionControl:
+        type: boolean
+        default: true
+        title: 启用版本控制
+      searchEngine:
+        type: string
+        enum: [elasticsearch, database]
+        default: elasticsearch
+        title: 搜索引擎
+        
+  installOrder:
+    - skill-search
+    - skill-vfs-base
+    - skill-notify
+    - skill-knowledge-management
+    
+  estimatedResources:
+    cpu: "200m"
+    memory: "512Mi"
+    storage: "1Gi"
+    
+  estimatedDuration: "5-8分钟"

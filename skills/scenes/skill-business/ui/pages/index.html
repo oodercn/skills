@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>业务场景服务</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/business.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ri-briefcase-line"></i>
+                <span>业务场景</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">管理</div>
+                    <a href="#" class="nav-item active" data-page="overview">
+                        <i class="ri-dashboard-line"></i>
+                        <span>业务概览</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="scenarios">
+                        <i class="ri-layout-line"></i>
+                        <span>场景管理</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="workflows">
+                        <i class="ri-flow-chart"></i>
+                        <span>工作流管理</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="monitoring">
+                        <i class="ri-line-chart-line"></i>
+                        <span>流程监控</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <i class="ri-settings-line"></i>
+                        <span>场景设置</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">操作</div>
+                    <a href="#" class="nav-item" data-page="my-tasks">
+                        <i class="ri-task-line"></i>
+                        <span>我的任务</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="my-workflows">
+                        <i class="ri-git-branch-line"></i>
+                        <span>我的流程</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">查看</div>
+                    <a href="#" class="nav-item" data-page="view-scenarios">
+                        <i class="ri-eye-line"></i>
+                        <span>场景列表</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="view-workflows">
+                        <i class="ri-flow-chart"></i>
+                        <span>流程查看</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <h1 id="page-title">业务概览</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="create-scenario-btn">
+                        <i class="ri-add-line"></i>
+                        创建场景
+                    </button>
+                </div>
+            </header>
+            
+            <div id="page-content">
+                <div class="overview-page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #3b82f6;">
+                                <i class="ri-layout-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-scenarios">8</div>
+                                <div class="stat-label">业务场景</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #22c55e;">
+                                <i class="ri-flow-chart"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-workflows">24</div>
+                                <div class="stat-label">工作流</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #f59e0b;">
+                                <i class="ri-play-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-active">12</div>
+                                <div class="stat-label">运行中</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #8b5cf6;">
+                                <i class="ri-checkbox-circle-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-completed">156</div>
+                                <div class="stat-label">已完成</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>活跃场景</h3>
+                                <a href="#" class="link-more">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="scenario-list" id="active-scenarios">
+                                    <div class="scenario-item">
+                                        <div class="scenario-icon" style="background: #dbeafe; color: #2563eb;">
+                                            <i class="ri-shopping-cart-line"></i>
+                                        </div>
+                                        <div class="scenario-info">
+                                            <div class="scenario-name">订单处理流程</div>
+                                            <div class="scenario-meta">
+                                                <span>5个工作流</span>
+                                                <span>运行中: 3</span>
+                                            </div>
+                                        </div>
+                                        <div class="scenario-status">
+                                            <span class="status-dot active"></span>
+                                            活跃
+                                        </div>
+                                    </div>
+                                    <div class="scenario-item">
+                                        <div class="scenario-icon" style="background: #dcfce7; color: #16a34a;">
+                                            <i class="ri-user-add-line"></i>
+                                        </div>
+                                        <div class="scenario-info">
+                                            <div class="scenario-name">客户入驻流程</div>
+                                            <div class="scenario-meta">
+                                                <span>3个工作流</span>
+                                                <span>运行中: 2</span>
+                                            </div>
+                                        </div>
+                                        <div class="scenario-status">
+                                            <span class="status-dot active"></span>
+                                            活跃
+                                        </div>
+                                    </div>
+                                    <div class="scenario-item">
+                                        <div class="scenario-icon" style="background: #fef3c7; color: #d97706;">
+                                            <i class="ri-file-list-3-line"></i>
+                                        </div>
+                                        <div class="scenario-info">
+                                            <div class="scenario-name">合同审批流程</div>
+                                            <div class="scenario-meta">
+                                                <span>4个工作流</span>
+                                                <span>运行中: 5</span>
+                                            </div>
+                                        </div>
+                                        <div class="scenario-status">
+                                            <span class="status-dot active"></span>
+                                            活跃
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>最近工作流</h3>
+                                <a href="#" class="link-more">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="workflow-list" id="recent-workflows">
+                                    <div class="workflow-item">
+                                        <div class="workflow-info">
+                                            <div class="workflow-name">订单 #12345 处理</div>
+                                            <div class="workflow-meta">
+                                                <span>订单处理流程</span>
+                                                <span>2026-03-23 14:30</span>
+                                            </div>
+                                        </div>
+                                        <div class="workflow-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 60%;"></div>
+                                            </div>
+                                            <span class="progress-text">60%</span>
+                                        </div>
+                                    </div>
+                                    <div class="workflow-item">
+                                        <div class="workflow-info">
+                                            <div class="workflow-name">客户 ABC 入驻</div>
+                                            <div class="workflow-meta">
+                                                <span>客户入驻流程</span>
+                                                <span>2026-03-23 13:00</span>
+                                            </div>
+                                        </div>
+                                        <div class="workflow-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill" style="width: 80%;"></div>
+                                            </div>
+                                            <span class="progress-text">80%</span>
+                                        </div>
+                                    </div>
+                                    <div class="workflow-item">
+                                        <div class="workflow-info">
+                                            <div class="workflow-name">合同审批 #C20260323</div>
+                                            <div class="workflow-meta">
+                                                <span>合同审批流程</span>
+                                                <span>2026-03-23 10:00</span>
+                                            </div>
+                                        </div>
+                                        <div class="workflow-progress">
+                                            <div class="progress-bar">
+                                                <div class="progress-fill complete" style="width: 100%;"></div>
+                                            </div>
+                                            <span class="progress-text">完成</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="create-scenario-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>创建业务场景</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-scenario-form">
+                    <div class="form-group">
+                        <label>场景名称</label>
+                        <input type="text" name="name" required placeholder="请输入场景名称">
+                    </div>
+                    <div class="form-group">
+                        <label>场景描述</label>
+                        <textarea name="description" rows="3" placeholder="描述该业务场景的用途"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>场景类型</label>
+                        <select name="type">
+                            <option value="order">订单处理</option>
+                            <option value="approval">审批流程</option>
+                            <option value="customer">客户管理</option>
+                            <option value="custom">自定义</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>触发方式</label>
+                        <div class="checkbox-group">
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="triggers" value="manual" checked>
+                                手动触发
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="triggers" value="api">
+                                API触发
+                            </label>
+                            <label class="checkbox-label">
+                                <input type="checkbox" name="triggers" value="schedule">
+                                定时触发
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" id="cancel-create">取消</button>
+                <button class="btn btn-primary" type="button" id="submit-create">
+                    <i class="ri-check-line"></i>
+                    创建场景
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/business.js"></script>
+</body>
+</html>

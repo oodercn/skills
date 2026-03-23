@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>招聘管理系统</title>
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="../css/recruitment-management.css">
+</head>
+<body>
+    <div class="nx-page">
+        <aside class="nx-page__sidebar">
+            <div class="nx-p-4 nx-mb-4">
+                <h1 class="nx-text-lg nx-font-bold">
+                    <i class="ri-briefcase-line"></i> 招聘管理
+                </h1>
+            </div>
+            
+            <!-- 招聘流程导航菜单 -->
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">招聘流程</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item active" onclick="RecruitmentManagement.switchTab('jobs')">
+                        <i class="ri-briefcase-line" style="color: #3b82f6;"></i>
+                        <span>职位管理</span>
+                        <span class="sidebar-menu__badge" id="menu-job-count">0</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.switchTab('resumes')">
+                        <i class="ri-file-list-line" style="color: #22c55e;"></i>
+                        <span>简历管理</span>
+                        <span class="sidebar-menu__badge" id="menu-resume-count">0</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.switchTab('interviews')">
+                        <i class="ri-calendar-check-line" style="color: #f59e0b;"></i>
+                        <span>面试管理</span>
+                        <span class="sidebar-menu__badge" id="menu-interview-count">0</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.switchTab('offers')">
+                        <i class="ri-user-add-line" style="color: #8b5cf6;"></i>
+                        <span>录用审批</span>
+                        <span class="sidebar-menu__badge" id="menu-offer-count">0</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">数据分析</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.switchTab('dashboard')">
+                        <i class="ri-dashboard-line" style="color: #06b6d4;"></i>
+                        <span>数据看板</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.exportReport()">
+                        <i class="ri-download-line" style="color: #ec4899;"></i>
+                        <span>导出报表</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <div class="sidebar-section">
+                <div class="sidebar-section__title">快捷操作</div>
+                <ul class="sidebar-menu">
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.openJobModal()">
+                        <i class="ri-add-circle-line" style="color: #3b82f6;"></i>
+                        <span>发布职位</span>
+                    </li>
+                    <li class="sidebar-menu__item" onclick="RecruitmentManagement.openResumeParser()">
+                        <i class="ri-upload-cloud-line" style="color: #22c55e;"></i>
+                        <span>简历解析</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <ul class="nav-menu" id="nav-menu" style="display: none;"></ul>
+            
+            <!-- 主题切换按钮 -->
+            <div class="sidebar-footer">
+                <button class="theme-toggle-btn" id="theme-toggle" onclick="RecruitmentManagement.toggleTheme()">
+                    <i class="ri-sun-line" id="theme-icon"></i>
+                    <span id="theme-text">切换主题</span>
+                </button>
+            </div>
+        </aside>
+        
+        <main class="nx-page__content">
+            <header class="nx-page__header">
+                <div class="nx-page__title">
+                    <i class="ri-briefcase-line"></i>
+                    <span>招聘管理系统</span>
+                </div>
+                <div class="nx-page__actions">
+                    <button class="nx-btn nx-btn--primary" onclick="RecruitmentManagement.openJobModal()">
+                        <i class="ri-add-line"></i> 发布职位
+                    </button>
+                </div>
+            </header>
+            
+            <div class="nx-page__main">
+                <div class="nx-container">
+                    <!-- 统计卡片 -->
+                    <div class="stats-row">
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(59, 130, 246, 0.1); color: #3b82f6;">
+                                <i class="ri-briefcase-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-active-jobs">0</div>
+                                <div class="stat-card__label">在招职位</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(34, 197, 94, 0.1); color: #22c55e;">
+                                <i class="ri-file-list-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-new-resumes">0</div>
+                                <div class="stat-card__label">新简历</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(245, 158, 11, 0.1); color: #f59e0b;">
+                                <i class="ri-calendar-check-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-interviews">0</div>
+                                <div class="stat-card__label">待面试</div>
+                            </div>
+                        </div>
+                        <div class="nx-card stat-card">
+                            <div class="stat-card__icon" style="background: rgba(139, 92, 246, 0.1); color: #8b5cf6;">
+                                <i class="ri-user-add-line"></i>
+                            </div>
+                            <div class="stat-card__content">
+                                <div class="stat-card__value" id="stat-offers">0</div>
+                                <div class="stat-card__label">录用审批</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 标签页导航 -->
+                    <div class="nx-card nx-mb-4">
+                        <div class="nx-card__body">
+                            <div class="tab-nav">
+                                <button class="tab-btn active" data-tab="jobs" onclick="RecruitmentManagement.switchTab('jobs')">
+                                    <i class="ri-briefcase-line"></i> 职位管理
+                                </button>
+                                <button class="tab-btn" data-tab="resumes" onclick="RecruitmentManagement.switchTab('resumes')">
+                                    <i class="ri-file-list-line"></i> 简历管理
+                                </button>
+                                <button class="tab-btn" data-tab="interviews" onclick="RecruitmentManagement.switchTab('interviews')">
+                                    <i class="ri-calendar-check-line"></i> 面试管理
+                                </button>
+                                <button class="tab-btn" data-tab="offers" onclick="RecruitmentManagement.switchTab('offers')">
+                                    <i class="ri-user-add-line"></i> 录用审批
+                                </button>
+                                <button class="tab-btn" data-tab="dashboard" onclick="RecruitmentManagement.switchTab('dashboard')">
+                                    <i class="ri-dashboard-line"></i> 数据看板
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 职位管理 -->
+                    <div class="tab-content active" id="tab-jobs">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">职位列表</h3>
+                                <div class="filter-group">
+                                    <select class="nx-select" id="job-filter-department" onchange="RecruitmentManagement.filterJobs()">
+                                        <option value="">全部部门</option>
+                                        <option value="技术部">技术部</option>
+                                        <option value="产品部">产品部</option>
+                                        <option value="运营部">运营部</option>
+                                        <option value="市场部">市场部</option>
+                                        <option value="人事部">人事部</option>
+                                    </select>
+                                    <select class="nx-select" id="job-filter-status" onchange="RecruitmentManagement.filterJobs()">
+                                        <option value="">全部状态</option>
+                                        <option value="active">招聘中</option>
+                                        <option value="paused">已暂停</option>
+                                        <option value="closed">已关闭</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>职位名称</th>
+                                            <th>部门</th>
+                                            <th>薪资范围</th>
+                                            <th>工作地点</th>
+                                            <th>简历数</th>
+                                            <th>状态</th>
+                                            <th>发布时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="job-table-body">
+                                        <tr>
+                                            <td colspan="8" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 简历管理 -->
+                    <div class="tab-content" id="tab-resumes">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">简历列表</h3>
+                                <div class="filter-group">
+                                    <select class="nx-select" id="resume-filter-job" onchange="RecruitmentManagement.filterResumes()">
+                                        <option value="">全部职位</option>
+                                    </select>
+                                    <select class="nx-select" id="resume-filter-status" onchange="RecruitmentManagement.filterResumes()">
+                                        <option value="">全部状态</option>
+                                        <option value="new">新投递</option>
+                                        <option value="screening">筛选中</option>
+                                        <option value="interview">面试中</option>
+                                        <option value="offer">录用中</option>
+                                        <option value="rejected">已淘汰</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>候选人</th>
+                                            <th>应聘职位</th>
+                                            <th>联系方式</th>
+                                            <th>工作经验</th>
+                                            <th>匹配度</th>
+                                            <th>状态</th>
+                                            <th>投递时间</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="resume-table-body">
+                                        <tr>
+                                            <td colspan="8" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 面试管理 -->
+                    <div class="tab-content" id="tab-interviews">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">面试安排</h3>
+                                <button class="nx-btn nx-btn--primary" onclick="RecruitmentManagement.openInterviewModal()">
+                                    <i class="ri-add-line"></i> 安排面试
+                                </button>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>候选人</th>
+                                            <th>面试职位</th>
+                                            <th>面试时间</th>
+                                            <th>面试官</th>
+                                            <th>面试类型</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="interview-table-body">
+                                        <tr>
+                                            <td colspan="7" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 录用审批 -->
+                    <div class="tab-content" id="tab-offers">
+                        <div class="nx-card">
+                            <div class="nx-card__header">
+                                <h3 class="nx-card__title">录用审批</h3>
+                                <div class="filter-group">
+                                    <select class="nx-select" id="offer-filter-status" onchange="RecruitmentManagement.filterOffers()">
+                                        <option value="">全部状态</option>
+                                        <option value="pending">待审批</option>
+                                        <option value="approved">已通过</option>
+                                        <option value="rejected">已拒绝</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="nx-card__body">
+                                <table class="nx-table">
+                                    <thead>
+                                        <tr>
+                                            <th>候选人</th>
+                                            <th>录用职位</th>
+                                            <th>期望薪资</th>
+                                            <th>入职时间</th>
+                                            <th>申请人</th>
+                                            <th>状态</th>
+                                            <th>操作</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="offer-table-body">
+                                        <tr>
+                                            <td colspan="7" class="nx-text-center nx-text-secondary">
+                                                <i class="ri-loader-4-line ri-spin"></i> 加载中...
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 数据看板 -->
+                    <div class="tab-content" id="tab-dashboard">
+                        <!-- 顶部快捷统计 -->
+                        <div class="quick-stats-row">
+                            <div class="nx-card quick-stat-card">
+                                <div class="quick-stat__icon" style="background: linear-gradient(135deg, #3b82f6, #1d4ed8);">
+                                    <i class="ri-user-received-line"></i>
+                                </div>
+                                <div class="quick-stat__info">
+                                    <div class="quick-stat__value" id="stat-today-resumes">0</div>
+                                    <div class="quick-stat__label">今日投递</div>
+                                </div>
+                            </div>
+                            <div class="nx-card quick-stat-card">
+                                <div class="quick-stat__icon" style="background: linear-gradient(135deg, #f59e0b, #d97706);">
+                                    <i class="ri-calendar-event-line"></i>
+                                </div>
+                                <div class="quick-stat__info">
+                                    <div class="quick-stat__value" id="stat-today-interviews">0</div>
+                                    <div class="quick-stat__label">今日面试</div>
+                                </div>
+                            </div>
+                            <div class="nx-card quick-stat-card">
+                                <div class="quick-stat__icon" style="background: linear-gradient(135deg, #22c55e, #16a34a);">
+                                    <i class="ri-user-follow-line"></i>
+                                </div>
+                                <div class="quick-stat__info">
+                                    <div class="quick-stat__value" id="stat-week-hired">0</div>
+                                    <div class="quick-stat__label">本周入职</div>
+                                </div>
+                            </div>
+                            <div class="nx-card quick-stat-card">
+                                <div class="quick-stat__icon" style="background: linear-gradient(135deg, #8b5cf6, #7c3aed);">
+                                    <i class="ri-time-line"></i>
+                                </div>
+                                <div class="quick-stat__info">
+                                    <div class="quick-stat__value" id="stat-avg-process">0</div>
+                                    <div class="quick-stat__label">平均处理(天)</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="dashboard-grid">
+                            <!-- 招聘漏斗 -->
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-filter-3-line" style="color: #3b82f6;"></i>
+                                        招聘漏斗
+                                    </h3>
+                                    <span class="nx-text-secondary" style="font-size: 12px;">转化率分析</span>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="funnel-chart" id="funnel-chart">
+                                        <div class="funnel-item">
+                                            <div class="funnel-bar" style="width: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa);">
+                                                <span class="funnel-label"><i class="ri-mail-line"></i> 简历投递</span>
+                                                <span class="funnel-value" id="funnel-resumes">0</span>
+                                            </div>
+                                            <span class="funnel-rate">100%</span>
+                                        </div>
+                                        <div class="funnel-item">
+                                            <div class="funnel-bar" style="width: 85%; background: linear-gradient(90deg, #06b6d4, #22d3ee);">
+                                                <span class="funnel-label"><i class="ri-eye-line"></i> 简历筛选</span>
+                                                <span class="funnel-value" id="funnel-screening">0</span>
+                                            </div>
+                                            <span class="funnel-rate" id="rate-screening">85%</span>
+                                        </div>
+                                        <div class="funnel-item">
+                                            <div class="funnel-bar" style="width: 60%; background: linear-gradient(90deg, #f59e0b, #fbbf24);">
+                                                <span class="funnel-label"><i class="ri-calendar-check-line"></i> 面试</span>
+                                                <span class="funnel-value" id="funnel-interviews">0</span>
+                                            </div>
+                                            <span class="funnel-rate" id="rate-interview">60%</span>
+                                        </div>
+                                        <div class="funnel-item">
+                                            <div class="funnel-bar" style="width: 40%; background: linear-gradient(90deg, #8b5cf6, #a78bfa);">
+                                                <span class="funnel-label"><i class="ri-file-list-3-line"></i> 录用</span>
+                                                <span class="funnel-value" id="funnel-offers">0</span>
+                                            </div>
+                                            <span class="funnel-rate" id="rate-offer">40%</span>
+                                        </div>
+                                        <div class="funnel-item">
+                                            <div class="funnel-bar" style="width: 30%; background: linear-gradient(90deg, #22c55e, #4ade80);">
+                                                <span class="funnel-label"><i class="ri-user-follow-line"></i> 入职</span>
+                                                <span class="funnel-value" id="funnel-hired">0</span>
+                                            </div>
+                                            <span class="funnel-rate" id="rate-hired">30%</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 部门招聘统计 -->
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-building-line" style="color: #22c55e;"></i>
+                                        部门招聘统计
+                                    </h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="dept-stats" id="dept-stats">
+                                        <!-- 动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 招聘渠道分析 -->
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-share-circle-line" style="color: #f59e0b;"></i>
+                                        简历来源渠道
+                                    </h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="source-chart" id="source-chart">
+                                        <!-- 动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 面试官工作量 -->
+                            <div class="nx-card dashboard-card">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-user-star-line" style="color: #8b5cf6;"></i>
+                                        面试官工作量
+                                    </h3>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="interviewer-stats" id="interviewer-stats">
+                                        <!-- 动态生成 -->
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- 近期动态 -->
+                            <div class="nx-card dashboard-card wide">
+                                <div class="nx-card__header">
+                                    <h3 class="nx-card__title">
+                                        <i class="ri-notification-3-line" style="color: #ec4899;"></i>
+                                        近期动态
+                                    </h3>
+                                    <div class="activity-filter">
+                                        <button class="activity-filter__btn active" data-filter="all" onclick="RecruitmentManagement.filterActivity('all')">全部</button>
+                                        <button class="activity-filter__btn" data-filter="resume" onclick="RecruitmentManagement.filterActivity('resume')">简历</button>
+                                        <button class="activity-filter__btn" data-filter="interview" onclick="RecruitmentManagement.filterActivity('interview')">面试</button>
+                                        <button class="activity-filter__btn" data-filter="offer" onclick="RecruitmentManagement.filterActivity('offer')">录用</button>
+                                    </div>
+                                </div>
+                                <div class="nx-card__body">
+                                    <div class="activity-timeline" id="activity-timeline">
+                                        <!-- 动态生成时间线 -->
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- 职位模态框 -->
+    <div class="modal" id="job-modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-briefcase-line"></i>
+                    <span id="job-modal-title">发布职位</span>
+                </h3>
+                <button class="modal-close" onclick="RecruitmentManagement.closeJobModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="job-form">
+                    <input type="hidden" id="job-id">
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">职位名称 <span class="nx-text-danger">*</span></label>
+                            <input type="text" class="nx-input" id="job-title" placeholder="请输入职位名称">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">所属部门 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="job-department">
+                                <option value="">请选择</option>
+                                <option value="技术部">技术部</option>
+                                <option value="产品部">产品部</option>
+                                <option value="运营部">运营部</option>
+                                <option value="市场部">市场部</option>
+                                <option value="人事部">人事部</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">薪资范围</label>
+                            <div class="nx-input-group">
+                                <input type="number" class="nx-input" id="job-salary-min" placeholder="最低">
+                                <span class="nx-input-suffix">-</span>
+                                <input type="number" class="nx-input" id="job-salary-max" placeholder="最高">
+                                <span class="nx-input-suffix">K</span>
+                            </div>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">工作地点</label>
+                            <input type="text" class="nx-input" id="job-location" placeholder="如：北京、上海">
+                        </div>
+                    </div>
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">工作经验</label>
+                            <select class="nx-select" id="job-experience">
+                                <option value="">不限</option>
+                                <option value="应届生">应届生</option>
+                                <option value="1-3年">1-3年</option>
+                                <option value="3-5年">3-5年</option>
+                                <option value="5-10年">5-10年</option>
+                                <option value="10年以上">10年以上</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">学历要求</label>
+                            <select class="nx-select" id="job-education">
+                                <option value="">不限</option>
+                                <option value="大专">大专</option>
+                                <option value="本科">本科</option>
+                                <option value="硕士">硕士</option>
+                                <option value="博士">博士</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">职位描述 <span class="nx-text-danger">*</span></label>
+                        <textarea class="nx-textarea" id="job-description" rows="4" placeholder="请输入职位描述、岗位职责、任职要求等" style="width: 100%;"></textarea>
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">职位状态</label>
+                        <div class="nx-radio-group">
+                            <label class="nx-radio">
+                                <input type="radio" name="job-status" value="active" checked>
+                                <span>招聘中</span>
+                            </label>
+                            <label class="nx-radio">
+                                <input type="radio" name="job-status" value="paused">
+                                <span>已暂停</span>
+                            </label>
+                            <label class="nx-radio">
+                                <input type="radio" name="job-status" value="closed">
+                                <span>已关闭</span>
+                            </label>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="RecruitmentManagement.closeJobModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="RecruitmentManagement.saveJob()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 面试安排模态框 -->
+    <div class="modal" id="interview-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-calendar-check-line"></i>
+                    <span id="interview-modal-title">安排面试</span>
+                </h3>
+                <button class="modal-close" onclick="RecruitmentManagement.closeInterviewModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="interview-form">
+                    <input type="hidden" id="interview-id">
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">候选人 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="interview-resume">
+                                <option value="">请选择候选人</option>
+                            </select>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">面试职位 <span class="nx-text-danger">*</span></label>
+                            <select class="nx-select" id="interview-job">
+                                <option value="">请选择职位</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">面试时间 <span class="nx-text-danger">*</span></label>
+                            <input type="datetime-local" class="nx-input" id="interview-time">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">面试类型</label>
+                            <select class="nx-select" id="interview-type">
+                                <option value="phone">电话面试</option>
+                                <option value="video">视频面试</option>
+                                <option value="onsite">现场面试</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">面试官</label>
+                        <input type="text" class="nx-input" id="interviewers" placeholder="多个面试官用逗号分隔">
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">面试地点/链接</label>
+                        <input type="text" class="nx-input" id="interview-location" placeholder="现场面试填地址，视频面试填链接">
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">备注</label>
+                        <textarea class="nx-textarea" id="interview-notes" rows="3" placeholder="面试注意事项或其他备注" style="width: 100%;"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="RecruitmentManagement.closeInterviewModal()">取消</button>
+                <button class="nx-btn nx-btn--primary" onclick="RecruitmentManagement.saveInterview()">保存</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- 录用审批模态框 -->
+    <div class="modal" id="offer-modal">
+        <div class="modal-content" style="max-width: 700px;">
+            <div class="modal-header">
+                <h3>
+                    <i class="ri-user-add-line"></i>
+                    <span>录用审批</span>
+                </h3>
+                <button class="modal-close" onclick="RecruitmentManagement.closeOfferModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="offer-form">
+                    <input type="hidden" id="offer-id">
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">候选人</label>
+                            <input type="text" class="nx-input" id="offer-candidate" readonly>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">录用职位</label>
+                            <input type="text" class="nx-input" id="offer-job" readonly>
+                        </div>
+                    </div>
+                    <div class="nx-form-row">
+                        <div class="nx-form-group">
+                            <label class="nx-label">期望薪资（K）</label>
+                            <input type="number" class="nx-input" id="offer-salary">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-label">入职时间</label>
+                            <input type="date" class="nx-input" id="offer-start-date">
+                        </div>
+                    </div>
+                    <div class="nx-form-group">
+                        <label class="nx-label">审批意见</label>
+                        <textarea class="nx-textarea" id="offer-comment" rows="3" placeholder="请输入审批意见" style="width: 100%;"></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="nx-btn nx-btn--secondary" onclick="RecruitmentManagement.closeOfferModal()">取消</button>
+                <button class="nx-btn nx-btn--danger" onclick="RecruitmentManagement.rejectOffer()">拒绝</button>
+                <button class="nx-btn nx-btn--primary" onclick="RecruitmentManagement.approveOffer()">通过</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- AI招聘助手浮动面板 -->
+    <div class="llm-floating-trigger" id="llm-trigger" onclick="RecruitmentAIAssistant.toggle()">
+        <i class="ri-robot-2-line"></i>
+        <span class="llm-trigger-badge" id="llm-badge" style="display: none;">0</span>
+    </div>
+    
+    <div class="llm-floating-panel" id="llm-panel">
+        <div class="llm-floating-header">
+            <div class="llm-floating-title">
+                <i class="ri-robot-2-line"></i>
+                <span>AI招聘助手</span>
+            </div>
+            <div class="llm-floating-actions">
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.toggleSettings()" title="设置">
+                    <i class="ri-settings-3-line"></i>
+                </button>
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.minimize()" title="最小化">
+                    <i class="ri-subtract-line"></i>
+                </button>
+                <button class="llm-floating-btn" onclick="RecruitmentAIAssistant.close()" title="关闭">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+        </div>
+        <div class="llm-floating-body" id="llm-body">
+            <!-- 模型选择栏 -->
+            <div class="llm-model-bar">
+                <div class="llm-model-select">
+                    <i class="ri-brain-line"></i>
+                    <select id="llm-provider" onchange="RecruitmentAIAssistant.changeProvider()">
+                        <option value="deepseek" selected>DeepSeek</option>
+                        <option value="openai">OpenAI</option>
+                        <option value="qianwen">通义千问</option>
+                        <option value="baidu">百度文心</option>
+                    </select>
+                </div>
+                <div class="llm-model-select">
+                    <select id="llm-model" onchange="RecruitmentAIAssistant.changeModel()">
+                        <option value="default">默认模型</option>
+                    </select>
+                </div>
+            </div>
+            <div class="llm-context-bar">
+                <div class="llm-context-info">
+                    <i class="ri-briefcase-line"></i>
+                    <span id="llm-context-text">已获取招聘上下文</span>
+                </div>
+                <button class="llm-context-refresh" onclick="RecruitmentAIAssistant.refreshContext()" title="刷新上下文">
+                    <i class="ri-refresh-line"></i>
+                </button>
+            </div>
+            <div class="llm-messages" id="llm-messages">
+                <div class="llm-message llm-message--system">
+                    <div class="llm-message-avatar">
+                        <i class="ri-robot-2-line"></i>
+                    </div>
+                    <div class="llm-message-content">
+                        <p>你好！我是AI招聘助手，可以帮助你：</p>
+                        <ul>
+                            <li>分析简历匹配度</li>
+                            <li>生成面试问题</li>
+                            <li>评估候选人</li>
+                            <li>提供招聘建议</li>
+                        </ul>
+                        <p>请告诉我你需要什么帮助？</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="llm-floating-footer">
+            <div class="llm-input-area">
+                <textarea class="llm-input" id="llm-input" placeholder="输入你的问题..." rows="1"></textarea>
+                <button class="llm-send-btn" onclick="RecruitmentAIAssistant.sendMessage()" id="llm-send-btn">
+                    <i class="ri-send-plane-fill"></i>
+                </button>
+            </div>
+            <div class="llm-quick-actions">
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('分析当前简历质量')">
+                    <i class="ri-file-list-line"></i> 分析简历
+                </button>
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('生成Java工程师面试题')">
+                    <i class="ri-questionnaire-line"></i> 面试题
+                </button>
+                <button class="llm-quick-btn" onclick="RecruitmentAIAssistant.quickAsk('招聘进度如何？')">
+                    <i class="ri-bar-chart-line"></i> 招聘进度
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/menu-loader.js"></script>
+    <script src="/console/js/nexus-menu.js"></script>
+    <script src="/console/js/page-init.js" data-auto-init></script>
+    <script src="/console/js/api.js"></script>
+    <script src="../js/recruitment-ai-assistant.js"></script>
+    <script src="../js/recruitment-management.js"></script>
+</body>
+</html>

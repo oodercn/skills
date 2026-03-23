@@ -23,12 +23,19 @@ public class CapabilityDTO extends FullDTO {
     private List<String> tags;
     private List<String> capabilities;
     private List<String> dependencies;
+    private List<String> supportedSceneTypes;
     private List<Map<String, Object>> driverConditions;
     private List<Map<String, Object>> participants;
+    private List<Map<String, Object>> parameters;
+    private Map<String, Object> returns;
+    private Map<String, Object> metadata;
+    private Map<String, Object> mainFirstConfig;
+    private String driverType;
     private boolean sceneCapability;
     private boolean hasSelfDrive;
     private boolean mainFirst;
     private Boolean installed;
+    private Boolean enabled;
     
     public CapabilityDTO() {
         super();
@@ -221,6 +228,66 @@ public class CapabilityDTO extends FullDTO {
     
     public boolean isInstalled() { 
         return installed != null && installed; 
+    }
+    
+    public Boolean getEnabled() { 
+        return enabled; 
+    }
+    
+    public void setEnabled(Boolean enabled) { 
+        this.enabled = enabled; 
+    }
+    
+    public boolean isEnabled() { 
+        return enabled != null && enabled; 
+    }
+    
+    public List<String> getSupportedSceneTypes() { 
+        return supportedSceneTypes; 
+    }
+    
+    public void setSupportedSceneTypes(List<String> supportedSceneTypes) { 
+        this.supportedSceneTypes = supportedSceneTypes; 
+    }
+    
+    public List<Map<String, Object>> getParameters() { 
+        return parameters; 
+    }
+    
+    public void setParameters(List<Map<String, Object>> parameters) { 
+        this.parameters = parameters; 
+    }
+    
+    public Map<String, Object> getReturns() { 
+        return returns; 
+    }
+    
+    public void setReturns(Map<String, Object> returns) { 
+        this.returns = returns; 
+    }
+    
+    public Map<String, Object> getMetadata() { 
+        return metadata; 
+    }
+    
+    public void setMetadata(Map<String, Object> metadata) { 
+        this.metadata = metadata; 
+    }
+    
+    public Map<String, Object> getMainFirstConfig() { 
+        return mainFirstConfig; 
+    }
+    
+    public void setMainFirstConfig(Map<String, Object> mainFirstConfig) { 
+        this.mainFirstConfig = mainFirstConfig; 
+    }
+    
+    public String getDriverType() { 
+        return driverType; 
+    }
+    
+    public void setDriverType(String driverType) { 
+        this.driverType = driverType; 
     }
     
     @Deprecated

@@ -226,6 +226,21 @@ public class CapabilityStateServiceImpl implements CapabilityStateService {
             log.warn("[reload] Failed to load capability states, starting with empty cache: {}", e.getMessage());
         }
     }
+
+    @Override
+    public String getSceneGroupId(String capabilityId) {
+        CapabilityState state = stateCache.get(capabilityId);
+        return state != null ? state.getSceneGroupId() : null;
+    }
+
+    @Override
+    public void setSceneGroupId(String capabilityId, String sceneGroupId) {
+        CapabilityState state = stateCache.computeIfAbsent(capabilityId, CapabilityState::new);
+        state.setSceneGroupId(sceneGroupId);
+        state.setUpdateTime(System.currentTimeMillis());
+        persistState(state);
+        log.info("[setSceneGroupId] Capability {} sceneGroupId={}", capabilityId, sceneGroupId);
+    }
     
     private void persistState(CapabilityState state) {
         if (state.getCapabilityId() != null) {

@@ -1,0 +1,92 @@
+[
+	{
+		"messageId": "msg-demo-001",
+		"fromAgent": "agent-llm-001",
+		"toAgent": "agent-data-001",
+		"sceneGroupId": "sg-1773890302603",
+		"type": "TASK_DELEGATE",
+		"title": "数据处理任务",
+		"content": "请处理附件中的日志数据文件",
+		"payload": {
+			"taskId": "task-001",
+			"dataUrl": "/data/logs/2024-03.csv",
+			"deadline": 1774246400000
+		},
+		"priority": 5,
+		"createTime": 1774160000000,
+		"expireTime": 1774246400000,
+		"status": "PENDING"
+	},
+	{
+		"messageId": "msg-demo-002",
+		"fromAgent": "agent-data-001",
+		"toAgent": "agent-llm-001",
+		"sceneGroupId": "sg-1773890302603",
+		"type": "TASK_RESULT",
+		"title": "数据处理完成",
+		"content": "日志数据处理已完成，共处理 1000 条记录",
+		"payload": {
+			"taskId": "task-001",
+			"processedCount": 1000,
+			"outputUrl": "/data/output/result.json"
+		},
+		"priority": 5,
+		"createTime": 1774161000000,
+		"expireTime": 1774246400000,
+		"status": "DELIVERED"
+	},
+	{
+		"messageId": "msg-demo-003",
+		"fromAgent": "agent-coordinator-001",
+		"toAgent": "agent-llm-001",
+		"sceneGroupId": "sg-1773890302603",
+		"type": "COLLAB_REQUEST",
+		"title": "协作请求: 周报生成",
+		"content": "需要 LLM 协助生成团队周报",
+		"payload": {
+			"collabId": "collab-001",
+			"requiredSkills": ["text-generation", "summarization"],
+			"estimatedTime": 30
+		},
+		"priority": 7,
+		"createTime": 1774162000000,
+		"expireTime": 1774246400000,
+		"status": "PENDING"
+	},
+	{
+		"messageId": "msg-demo-004",
+		"fromAgent": "agent-llm-001",
+		"toAgent": "agent-coordinator-001",
+		"sceneGroupId": "sg-1773890302603",
+		"type": "DATA_SHARE",
+		"title": "共享: 分析报告",
+		"content": "本周数据分析报告已生成",
+		"payload": {
+			"reportId": "report-001",
+			"reportUrl": "/reports/weekly-2024-03.pdf",
+			"summary": "本周共完成 50 个任务，效率提升 15%"
+		},
+		"priority": 3,
+		"createTime": 1774163000000,
+		"expireTime": 1774246400000,
+		"status": "READ"
+	},
+	{
+		"messageId": "msg-demo-005",
+		"fromAgent": "super-agent-001",
+		"toAgent": "agent-llm-001",
+		"sceneGroupId": "sg-1773890302603",
+		"type": "STATUS_UPDATE",
+		"title": "场景状态更新",
+		"content": "场景组 sg-1773890302603 已激活",
+		"payload": {
+			"oldStatus": "CREATING",
+			"newStatus": "ACTIVE",
+			"memberCount": 5
+		},
+		"priority": 5,
+		"createTime": 1774164000000,
+		"expireTime": 1774246400000,
+		"status": "PROCESSED"
+	}
+]

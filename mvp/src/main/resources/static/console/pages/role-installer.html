@@ -54,6 +54,12 @@
             </section>
 
             <section class="action-section">
+                <div style="display: flex; align-items: center; gap: 20px; margin-bottom: 16px;">
+                    <label class="nx-checkbox" style="display: flex; align-items: center; gap: 8px; cursor: pointer;">
+                        <input type="checkbox" id="autoActivate" onchange="toggleAutoActivate(this.checked)" style="width: 18px; height: 18px;">
+                        <span>安装后自动激活技能</span>
+                    </label>
+                </div>
                 <button class="nx-btn nx-btn--primary nx-btn--lg" onclick="startInstall()">
                     <i class="ri-play-line"></i> 开始安装
                 </button>

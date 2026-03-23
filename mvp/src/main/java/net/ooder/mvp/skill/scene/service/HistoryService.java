@@ -9,6 +9,8 @@ public interface HistoryService {
     PageResult<HistoryDTO> listMyHistory(String userId, Integer days, String category, 
             String status, String keyword, int pageNum, int pageSize);
     
+    HistoryDTO getExecutionDetail(String executionId, String userId);
+    
     HistoryStatisticsDTO getStatistics(String userId, Integer days);
     
     boolean rerunScene(String userId, String sceneGroupId);

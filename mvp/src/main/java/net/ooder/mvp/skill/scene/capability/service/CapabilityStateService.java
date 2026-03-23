@@ -38,4 +38,8 @@ public interface CapabilityStateService {
     void saveAll();
     
     void reload();
+    
+    String getSceneGroupId(String capabilityId);
+    
+    void setSceneGroupId(String capabilityId, String sceneGroupId);
 }

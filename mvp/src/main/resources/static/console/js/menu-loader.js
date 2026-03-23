@@ -79,20 +79,62 @@ if (window.MenuLoader) {
          */
         async loadMenuConfig() {
             try {
-                // 从根路径加载菜单配置，确保从任何页面访问都正确
-                // 添加时间戳参数防止缓存
                 const timestamp = new Date().getTime();
-                const response = await fetch(`/console/menu-config.json?v=${timestamp}`);
-                if (!response.ok) {
-                    throw new Error('菜单配置加载失败');
+                
+                const staticResponse = await fetch(`/console/menu-config.json?v=${timestamp}`);
+                if (!staticResponse.ok) {
+                    throw new Error('静态菜单配置加载失败');
                 }
-                this.menuConfig = await response.json();
+                const staticConfig = await staticResponse.json();
+                
+                let dynamicMenus = [];
+                try {
+                    const role = this.currentRole || 'collaborator';
+                    const userId = localStorage.getItem('userId') || 'default-user';
+                    const dynamicResponse = await fetch(`/api/v1/scene-auth/menu-config?role=${role}&userId=${userId}`);
+                    
+                    if (dynamicResponse.ok) {
+                        const dynamicResult = await dynamicResponse.json();
+                        if (dynamicResult.status === 'success' && dynamicResult.data) {
+                            dynamicMenus = dynamicResult.data;
+                            console.log('[MenuLoader] 动态菜单加载成功:', dynamicMenus.length, '项');
+                        }
+                    }
+                } catch (dynamicError) {
+                    console.warn('[MenuLoader] 动态菜单加载失败，使用静态菜单:', dynamicError.message);
+                }
+                
+                if (dynamicMenus.length > 0) {
+                    this.menuConfig = this.mergeMenuConfigs(staticConfig, dynamicMenus);
+                    console.log('[MenuLoader] 菜单配置合并成功，动态菜单已添加');
+                } else {
+                    this.menuConfig = staticConfig;
+                }
+                
                 console.log('[MenuLoader] 菜单配置加载成功:', this.menuConfig);
                 return this.menuConfig;
             } catch (error) {
                 console.error('加载菜单配置错误:', error);
                 throw error;
             }
+        }
+        
+        mergeMenuConfigs(staticConfig, dynamicMenus) {
+            if (!staticConfig) staticConfig = { menu: [] };
+            if (!staticConfig.menu) staticConfig.menu = [];
+            
+            const existingIds = new Set(staticConfig.menu.map(m => m.id));
+            
+            for (const dynamicMenu of dynamicMenus) {
+                if (!existingIds.has(dynamicMenu.id)) {
+                    dynamicMenu.status = 'implemented';
+                    dynamicMenu.roles = dynamicMenu.roles || [this.currentRole];
+                    staticConfig.menu.push(dynamicMenu);
+                    existingIds.add(dynamicMenu.id);
+                }
+            }
+            
+            return staticConfig;
         }
 
         /**

@@ -16,6 +16,17 @@ app:
   storage:
     path: ./data
 
+org-web:
+  storage-path: org
+  auto-init: true
+
+agent:
+  session:
+    timeout: 86400
+  message:
+    expire: 86400
+    max-queue: 1000
+
 ooder:
   sdk:
     enabled: true

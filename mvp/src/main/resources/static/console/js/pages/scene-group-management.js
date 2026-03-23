@@ -9,7 +9,7 @@ async function initPage() {
 
 async function loadTemplates() {
     try {
-        const response = await fetch('/api/v1/scene-templates?pageNum=1&pageSize=100');
+        const response = await fetch('/api/v1/templates?pageNum=1&pageSize=100');
         const result = await response.json();
         
         if (result.status === 'success' && result.data) {
@@ -175,11 +175,16 @@ async function saveSceneGroup() {
         return;
     }
     
+    const currentUser = NX.userMenu.getCurrentUser ? NX.userMenu.getCurrentUser() : null;
+    const userId = currentUser ? currentUser.userId : 'default-user';
+    
     const config = {
         name: name,
         description: document.getElementById('group-description').value,
         minMembers: parseInt(document.getElementById('min-members').value) || 1,
-        maxMembers: parseInt(document.getElementById('max-members').value) || 100
+        maxMembers: parseInt(document.getElementById('max-members').value) || 100,
+        creatorId: userId,
+        creatorType: 'USER'
     };
     
     try {

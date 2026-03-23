@@ -187,7 +187,7 @@ function renderMockLogs() {
 function loadMockSceneGroup() {
     console.warn('[loadMockSceneGroup] No mock data - redirecting to list');
     alert('场景组不存在或已被删除');
-    window.location.href = '/console/pages/scene-groups.html';
+    window.location.href = '/console/pages/scene-group-management.html';
 }
 
 function renderSceneGroup() {

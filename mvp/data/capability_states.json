@@ -1,11 +1,28 @@
 [
 	{
-		"capabilityId":"skill-management",
-		"installSource":"registry",
-		"installTime":1773788661118,
+		"capabilityId":"skill-recording-qa",
+		"installSource":"activate",
+		"installTime":1774170979035,
 		"installed":true,
 		"status":"REGISTERED",
-		"updateTime":1774135953416
+		"updateTime":1774182059556
+	},
+	{
+		"capabilityId":"skill-management",
+		"installSource":"activate",
+		"installTime":1774160349632,
+		"installed":true,
+		"status":"PENDING",
+		"updateTime":1774160349632
+	},
+	{
+		"capabilityId":"skill-recruitment-management",
+		"installSource":"activate",
+		"installTime":1774182070726,
+		"installed":true,
+		"sceneGroupId":"sg-1774182070728",
+		"status":"PENDING",
+		"updateTime":1774182070730
 	},
 	{
 		"capabilityId":"skill-llm",
@@ -22,5 +39,13 @@
 		"installed":true,
 		"status":"REGISTERED",
 		"updateTime":1774135953417
+	},
+	{
+		"capabilityId":"skill-approval-form",
+		"installSource":"activate",
+		"installTime":1774144831229,
+		"installed":true,
+		"status":"PENDING",
+		"updateTime":1774144831229
 	}
 ]

@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>会议纪要整理</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/meeting-minutes.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ri-file-text-line"></i>
+                <span>会议纪要</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">组织者</div>
+                    <a href="#" class="nav-item active" data-page="overview">
+                        <i class="ri-dashboard-line"></i>
+                        <span>会议概览</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="create">
+                        <i class="ri-add-line"></i>
+                        <span>创建会议</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="minutes">
+                        <i class="ri-file-text-line"></i>
+                        <span>会议纪要</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="actions">
+                        <i class="ri-task-line"></i>
+                        <span>行动项管理</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="templates">
+                        <i class="ri-file-copy-line"></i>
+                        <span>纪要模板</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">参会人</div>
+                    <a href="#" class="nav-item" data-page="my-meetings">
+                        <i class="ri-calendar-line"></i>
+                        <span>我的会议</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="my-minutes">
+                        <i class="ri-file-text-line"></i>
+                        <span>会议纪要</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">行动项负责人</div>
+                    <a href="#" class="nav-item" data-page="my-actions">
+                        <i class="ri-task-line"></i>
+                        <span>我的行动项</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <h1 id="page-title">会议概览</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="create-meeting-btn">
+                        <i class="ri-add-line"></i>
+                        创建会议
+                    </button>
+                </div>
+            </header>
+            
+            <div id="page-content">
+                <div class="overview-page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #3b82f6;">
+                                <i class="ri-calendar-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-meetings">12</div>
+                                <div class="stat-label">本周会议</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #22c55e;">
+                                <i class="ri-file-text-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-minutes">8</div>
+                                <div class="stat-label">已生成纪要</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #f59e0b;">
+                                <i class="ri-task-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-actions">15</div>
+                                <div class="stat-label">待处理行动项</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #8b5cf6;">
+                                <i class="ri-archive-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-archived">5</div>
+                                <div class="stat-label">已归档</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>最近会议</h3>
+                                <a href="#" class="link-more">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="meeting-list" id="recent-meetings">
+                                    <div class="meeting-item">
+                                        <div class="meeting-info">
+                                            <div class="meeting-title">产品需求评审会</div>
+                                            <div class="meeting-meta">
+                                                <span><i class="ri-time-line"></i> 2026-03-23 14:00</span>
+                                                <span><i class="ri-user-line"></i> 8人参会</span>
+                                            </div>
+                                        </div>
+                                        <div class="meeting-status">
+                                            <span class="badge badge-success">已生成纪要</span>
+                                        </div>
+                                    </div>
+                                    <div class="meeting-item">
+                                        <div class="meeting-info">
+                                            <div class="meeting-title">技术方案讨论</div>
+                                            <div class="meeting-meta">
+                                                <span><i class="ri-time-line"></i> 2026-03-22 10:00</span>
+                                                <span><i class="ri-user-line"></i> 5人参会</span>
+                                            </div>
+                                        </div>
+                                        <div class="meeting-status">
+                                            <span class="badge badge-warning">待整理</span>
+                                        </div>
+                                    </div>
+                                    <div class="meeting-item">
+                                        <div class="meeting-info">
+                                            <div class="meeting-title">周例会</div>
+                                            <div class="meeting-meta">
+                                                <span><i class="ri-time-line"></i> 2026-03-21 09:00</span>
+                                                <span><i class="ri-user-line"></i> 12人参会</span>
+                                            </div>
+                                        </div>
+                                        <div class="meeting-status">
+                                            <span class="badge badge-success">已生成纪要</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>待处理行动项</h3>
+                                <a href="#" class="link-more">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="action-list" id="pending-actions">
+                                    <div class="action-item">
+                                        <input type="checkbox" class="action-checkbox">
+                                        <div class="action-content">
+                                            <div class="action-title">完成产品PRD文档</div>
+                                            <div class="action-meta">
+                                                <span class="assignee">张三</span>
+                                                <span class="deadline">截止: 2026-03-25</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="action-item">
+                                        <input type="checkbox" class="action-checkbox">
+                                        <div class="action-content">
+                                            <div class="action-title">技术方案评审</div>
+                                            <div class="action-meta">
+                                                <span class="assignee">李四</span>
+                                                <span class="deadline">截止: 2026-03-26</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="action-item">
+                                        <input type="checkbox" class="action-checkbox">
+                                        <div class="action-content">
+                                            <div class="action-title">接口文档更新</div>
+                                            <div class="action-meta">
+                                                <span class="assignee">王五</span>
+                                                <span class="deadline">截止: 2026-03-27</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="create-meeting-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>创建会议</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="create-meeting-form">
+                    <div class="form-group">
+                        <label>会议主题</label>
+                        <input type="text" name="title" required placeholder="请输入会议主题">
+                    </div>
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>会议时间</label>
+                            <input type="datetime-local" name="time" required>
+                        </div>
+                        <div class="form-group">
+                            <label>会议时长</label>
+                            <select name="duration">
+                                <option value="30">30分钟</option>
+                                <option value="60" selected>1小时</option>
+                                <option value="90">1.5小时</option>
+                                <option value="120">2小时</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>参会人员</label>
+                        <input type="text" name="attendees" placeholder="输入参会人员，用逗号分隔">
+                    </div>
+                    <div class="form-group">
+                        <label>会议内容</label>
+                        <textarea name="content" rows="8" placeholder="粘贴会议记录或上传会议录音转写文本..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>上传附件</label>
+                        <div class="file-upload">
+                            <input type="file" id="meeting-file" multiple>
+                            <div class="file-upload-hint">
+                                <i class="ri-upload-cloud-line"></i>
+                                <span>点击或拖拽文件到此处上传</span>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" id="cancel-create">取消</button>
+                <button class="btn btn-primary" type="button" id="submit-create">
+                    <i class="ri-magic-line"></i>
+                    创建并生成纪要
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="minutes-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>会议纪要</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="minutes-container">
+                    <div class="minutes-header">
+                        <h3 id="minutes-title">产品需求评审会</h3>
+                        <div class="minutes-meta">
+                            <span><i class="ri-time-line"></i> 2026-03-23 14:00-15:00</span>
+                            <span><i class="ri-user-line"></i> 参会人: 张三, 李四, 王五</span>
+                        </div>
+                    </div>
+                    <div class="minutes-section">
+                        <h4>会议摘要</h4>
+                        <p id="minutes-summary">本次会议主要讨论了新版本的产品需求，确定了核心功能模块和优先级排序。</p>
+                    </div>
+                    <div class="minutes-section">
+                        <h4>关键决策</h4>
+                        <ul id="minutes-decisions">
+                            <li>确定V2.0版本核心功能为用户中心重构</li>
+                            <li>支付模块延后到V2.1版本</li>
+                            <li>UI改版同步进行</li>
+                        </ul>
+                    </div>
+                    <div class="minutes-section">
+                        <h4>行动项</h4>
+                        <table class="action-table" id="minutes-actions">
+                            <thead>
+                                <tr>
+                                    <th>任务</th>
+                                    <th>负责人</th>
+                                    <th>截止时间</th>
+                                    <th>状态</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>完成产品PRD文档</td>
+                                    <td>张三</td>
+                                    <td>2026-03-25</td>
+                                    <td><span class="badge badge-warning">进行中</span></td>
+                                </tr>
+                                <tr>
+                                    <td>技术方案设计</td>
+                                    <td>李四</td>
+                                    <td>2026-03-28</td>
+                                    <td><span class="badge badge-info">待开始</span></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button">
+                    <i class="ri-edit-line"></i>
+                    编辑
+                </button>
+                <button class="btn btn-secondary" type="button">
+                    <i class="ri-download-line"></i>
+                    导出
+                </button>
+                <button class="btn btn-primary" type="button">
+                    <i class="ri-archive-line"></i>
+                    归档到知识库
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/meeting-minutes.js"></script>
+</body>
+</html>

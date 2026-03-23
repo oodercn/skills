@@ -15,7 +15,7 @@ function initLlmAssistant() {
 
 async function refreshTemplates() {
     try {
-        const result = await ApiClient.get('/api/v1/scene-templates?pageNum=' + currentPage + '&pageSize=' + pageSize);
+        const result = await ApiClient.get('/api/v1/templates?pageNum=' + currentPage + '&pageSize=' + pageSize);
         
         if (result.status === 'success' && result.data) {
             templates = result.data.list || [];
@@ -117,7 +117,7 @@ async function saveTemplate() {
     };
     
     try {
-        const result = await ApiClient.post('/api/v1/scene-templates', template);
+        const result = await ApiClient.post('/api/v1/templates', template);
         
         if (result.status === 'success') {
             closeModal();
@@ -143,7 +143,7 @@ async function deleteTemplate(templateId) {
     if (!confirm('确定要删除此模板吗？')) return;
     
     try {
-        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId);
+        const result = await ApiClient.delete('/api/v1/templates/' + templateId);
         
         if (result.status === 'success') {
             refreshTemplates();
@@ -159,7 +159,7 @@ async function deleteTemplate(templateId) {
 async function filterByCategory() {
     const category = document.getElementById('categoryFilter').value;
     if (category) {
-        const result = await ApiClient.get('/api/v1/scene-templates?pageNum=1&pageSize=10&category=' + category);
+        const result = await ApiClient.get('/api/v1/templates?pageNum=1&pageSize=10&category=' + category);
         if (result.status === 'success' && result.data) {
             templates = result.data.list || [];
             renderTemplateTable();

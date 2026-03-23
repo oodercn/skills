@@ -5,6 +5,10 @@ import net.ooder.mvp.skill.scene.template.PrivateCapabilityConfig;
 import net.ooder.mvp.skill.scene.template.SceneTemplate;
 import net.ooder.mvp.skill.scene.template.SceneTemplateService;
 import net.ooder.mvp.skill.scene.service.MenuAutoRegisterService;
+import net.ooder.mvp.skill.scene.service.SceneGroupService;
+import net.ooder.mvp.skill.scene.dto.scene.SceneGroupDTO;
+import net.ooder.mvp.skill.scene.dto.scene.SceneGroupConfigDTO;
+import net.ooder.mvp.skill.scene.dto.scene.ParticipantType;
 import net.ooder.mvp.skill.scene.capability.service.KeyManagementService;
 import net.ooder.mvp.skill.scene.capability.install.SkillDirectoryConfig;
 import net.ooder.mvp.skill.scene.capability.install.SkillDirectoryMigrator;
@@ -32,6 +36,9 @@ public class ActivationServiceImpl implements ActivationService {
 
     @Autowired
     private MenuAutoRegisterService menuAutoRegisterService;
+    
+    @Autowired(required = false)
+    private SceneGroupService sceneGroupService;
     
     @Autowired(required = false)
     private KeyManagementService keyManagementService;
@@ -317,22 +324,64 @@ public class ActivationServiceImpl implements ActivationService {
         process.setStatus(ActivationProcess.ActivationStatus.COMPLETED);
         process.setUpdateTime(System.currentTimeMillis());
 
-        if (process.getTemplateId() != null && process.getSceneGroupId() != null) {
-            try {
-                menuAutoRegisterService.registerMenusOnActivation(
-                    process.getSceneGroupId(),
-                    process.getTemplateId(),
-                    process.getActivator(),
-                    process.getRoleName()
-                );
-                process.setMenuRegistered(true);
-                log.info("[confirmActivation] Menus registered for user: {}", process.getActivator());
-            } catch (Exception e) {
-                log.error("[confirmActivation] Failed to register menus: {}", e.getMessage());
+        if (process.getTemplateId() != null) {
+            String sceneGroupId = process.getSceneGroupId();
+            
+            if (sceneGroupId == null && sceneGroupService != null) {
+                try {
+                    log.info("[confirmActivation] Auto-creating SceneGroup for template: {}", process.getTemplateId());
+                    
+                    SceneGroupConfigDTO config = new SceneGroupConfigDTO();
+                    config.setName(getTemplateName(process.getTemplateId()));
+                    config.setCreatorId(process.getActivator());
+                    config.setCreatorType(SceneGroupConfigDTO.CreatorType.USER);
+                    config.setMinMembers(1);
+                    config.setMaxMembers(100);
+                    
+                    SceneGroupDTO sceneGroup = sceneGroupService.create(process.getTemplateId(), config);
+                    sceneGroupId = sceneGroup.getSceneGroupId();
+                    process.setSceneGroupId(sceneGroupId);
+                    
+                    log.info("[confirmActivation] SceneGroup auto-created: {}", sceneGroupId);
+                } catch (Exception e) {
+                    log.error("[confirmActivation] Failed to auto-create SceneGroup: {}", e.getMessage());
+                }
+            }
+            
+            if (sceneGroupId != null) {
+                try {
+                    menuAutoRegisterService.registerMenusOnActivation(
+                        sceneGroupId,
+                        process.getTemplateId(),
+                        process.getActivator(),
+                        process.getRoleName() != null ? process.getRoleName() : "MANAGER"
+                    );
+                    process.setMenuRegistered(true);
+                    log.info("[confirmActivation] Menus registered for user: {}, sceneGroup: {}", 
+                        process.getActivator(), sceneGroupId);
+                } catch (Exception e) {
+                    log.error("[confirmActivation] Failed to register menus: {}", e.getMessage());
+                }
+            } else {
+                log.warn("[confirmActivation] Cannot register menus - no SceneGroup available. " +
+                    "sceneGroupService={}", sceneGroupService != null ? "available" : "not available");
             }
         }
         
         return process;
+    }
+    
+    private String getTemplateName(String templateId) {
+        try {
+            SceneTemplate template = sceneTemplateService.getTemplate(templateId);
+            if (template != null && template.getMetadata() != null) {
+                String name = template.getMetadata().getName();
+                return name != null ? name : templateId;
+            }
+        } catch (Exception e) {
+            log.warn("[getTemplateName] Failed to get template name: {}", e.getMessage());
+        }
+        return templateId;
     }
 
     @Override

@@ -12,13 +12,6 @@ import net.ooder.skills.api.SkillDiscoverer;
 import net.ooder.skills.api.SkillRegistry;
 import net.ooder.skills.api.SkillInstaller;
 import net.ooder.skills.api.SkillPackageManager;
-import net.ooder.scene.core.security.AuditService;
-import net.ooder.scene.core.security.AuditLog;
-import net.ooder.scene.core.security.AuditLogQuery;
-import net.ooder.scene.core.security.OperationResult;
-import net.ooder.scene.core.security.AuditExportResult;
-import net.ooder.scene.core.security.UserOperationStats;
-import net.ooder.scene.core.security.ResourceAccessStats;
 import net.ooder.scene.discovery.UnifiedDiscoveryService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,9 +24,6 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.annotation.PreDestroy;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
 
 @Configuration
 public class SdkConfiguration {
@@ -232,13 +222,6 @@ public class SdkConfiguration {
     public CapabilityRegistry capabilityRegistry() {
         log.info("[capabilityRegistry] Creating CapabilityRegistry");
         return new CapabilityRegistry();
-    }
-    
-    @Bean
-    @Primary
-    public net.ooder.scene.core.security.AuditService auditService() {
-        log.info("[auditService] Creating default InMemoryAuditService");
-        return new InMemoryAuditService();
     }
 
     @Bean

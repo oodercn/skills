@@ -1,0 +1,20 @@
+{
+	"dept-rd":{
+		"createTime":1774170791026,
+		"departmentId":"dept-rd",
+		"description":"负责产品研发和技术创新",
+		"managerId":"user-admin-001",
+		"memberIds":["user-admin-001","user-default-001"],
+		"name":"研发部",
+		"updateTime":0
+	},
+	"dept-it":{
+		"createTime":1774170791026,
+		"departmentId":"dept-it",
+		"description":"负责系统运维和技术支持",
+		"managerId":"user-admin-001",
+		"memberIds":["user-admin-001"],
+		"name":"信息技术部",
+		"updateTime":0
+	}
+}

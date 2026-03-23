@@ -52,6 +52,21 @@ public class SceneSkillLifecycleController {
         }
     }
 
+    @PostMapping("/{id}/deactivate")
+    public ResultModel<LifecycleResult> deactivate(
+            @PathVariable("id") String capabilityId,
+            @RequestHeader(value = "X-User-Id", required = false) String userId) {
+        log.info("[deactivate] Deactivating scene capability: {}", capabilityId);
+        
+        LifecycleResult result = lifecycleService.deactivate(capabilityId, userId);
+        
+        if (result.isSuccess()) {
+            return ResultModel.success(result);
+        } else {
+            return ResultModel.error(result.getMessage());
+        }
+    }
+
     @PostMapping("/{id}/resume")
     public ResultModel<LifecycleResult> resume(
             @PathVariable("id") String capabilityId,

@@ -365,6 +365,16 @@ public class MenuRoleConfigService {
         item.setSort(menu.getIntValue("sort"));
         item.setActive(menu.getBooleanValue("active"));
         item.setLevel(menu.getIntValue("level"));
+        
+        JSONArray children = menu.getJSONArray("children");
+        if (children != null && !children.isEmpty()) {
+            List<MenuItemDTO> childList = new ArrayList<>();
+            for (int i = 0; i < children.size(); i++) {
+                childList.add(convertToMenuItem(children.getJSONObject(i)));
+            }
+            item.setChildren(childList);
+        }
+        
         return item;
     }
     
@@ -395,6 +405,15 @@ public class MenuRoleConfigService {
         json.put("sort", item.getSort());
         json.put("active", item.isActive());
         json.put("level", item.getLevel());
+        
+        if (item.getChildren() != null && !item.getChildren().isEmpty()) {
+            JSONArray childrenArray = new JSONArray();
+            for (MenuItemDTO child : item.getChildren()) {
+                childrenArray.add(convertFromMenuItem(child));
+            }
+            json.put("children", childrenArray);
+        }
+        
         return json;
     }
     

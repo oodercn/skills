@@ -198,7 +198,7 @@ public class DailyReportTestDataInitializer {
         config.setName("研发部日志汇报组");
         config.setDescription("研发部团队的日常日志汇报场景组");
         config.setCreatorId("current-user");
-        config.setCreatorType(ParticipantType.USER);
+        config.setCreatorType(SceneGroupConfigDTO.CreatorType.USER);
         config.setMinMembers(2);
         config.setMaxMembers(20);
         

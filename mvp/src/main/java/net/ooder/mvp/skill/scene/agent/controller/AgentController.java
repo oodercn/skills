@@ -1,6 +1,10 @@
 package net.ooder.mvp.skill.scene.agent.controller;
 
+import net.ooder.mvp.skill.scene.agent.dto.AgentAlertConfigDTO;
+import net.ooder.mvp.skill.scene.agent.dto.AgentBatchOperationDTO;
 import net.ooder.mvp.skill.scene.agent.dto.AgentDTO;
+import net.ooder.mvp.skill.scene.agent.dto.AgentMetricsDTO;
+import net.ooder.mvp.skill.scene.agent.dto.AgentTopologyDTO;
 import net.ooder.mvp.skill.scene.agent.service.AgentService;
 import net.ooder.mvp.skill.scene.dto.PageResult;
 import net.ooder.mvp.skill.scene.model.ResultModel;
@@ -13,6 +17,7 @@ import java.util.Map;
 
 @RestController("sceneAgentController")
 @RequestMapping("/api/agent")
+@CrossOrigin(origins = "*", allowedHeaders = "*")
 public class AgentController {
 
     @Autowired
@@ -59,6 +64,12 @@ public class AgentController {
         return ResultModel.success(agents);
     }
 
+    @GetMapping("/cluster/{clusterId}")
+    public ResultModel<List<AgentDTO>> listByCluster(@PathVariable String clusterId) {
+        List<AgentDTO> agents = agentService.listByCluster(clusterId);
+        return ResultModel.success(agents);
+    }
+
     @PostMapping("/{agentId}/heartbeat")
     public ResultModel<Boolean> sendHeartbeat(@PathVariable String agentId) {
         boolean success = agentService.sendHeartbeat(agentId);
@@ -90,32 +101,169 @@ public class AgentController {
 
     @GetMapping("/stats")
     public ResultModel<Map<String, Object>> getStats() {
-        PageResult<AgentDTO> allAgents = agentService.listAgents(1, 1000);
-        
-        int total = (int) allAgents.getTotal();
-        int online = 0;
-        int busy = 0;
-        int offline = 0;
-        
-        if (allAgents.getList() != null) {
-            for (AgentDTO agent : allAgents.getList()) {
-                String status = agent.getStatus();
-                if ("online".equalsIgnoreCase(status) || "running".equalsIgnoreCase(status)) {
-                    online++;
-                } else if ("busy".equalsIgnoreCase(status)) {
-                    busy++;
-                } else {
-                    offline++;
-                }
-            }
-        }
-        
-        Map<String, Object> stats = new HashMap<>();
-        stats.put("total", total);
-        stats.put("online", online);
-        stats.put("busy", busy);
-        stats.put("offline", offline);
-        
+        Map<String, Object> stats = agentService.getOverallStats();
         return ResultModel.success(stats);
+    }
+
+    @GetMapping("/cluster/{clusterId}/stats")
+    public ResultModel<Map<String, Object>> getClusterStats(@PathVariable String clusterId) {
+        Map<String, Object> stats = agentService.getClusterStats(clusterId);
+        return ResultModel.success(stats);
+    }
+
+    @PostMapping("/register")
+    public ResultModel<AgentDTO> registerAgent(@RequestBody AgentDTO agent) {
+        AgentDTO registered = agentService.registerAgent(agent);
+        return ResultModel.success(registered);
+    }
+
+    @DeleteMapping("/{agentId}")
+    public ResultModel<Boolean> unregisterAgent(@PathVariable String agentId) {
+        boolean success = agentService.unregisterAgent(agentId);
+        if (success) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error("Failed to unregister agent: " + agentId);
+    }
+
+    @PutMapping("/{agentId}/config")
+    public ResultModel<Boolean> updateAgentConfig(
+            @PathVariable String agentId,
+            @RequestBody Map<String, Object> config) {
+        boolean success = agentService.updateAgentConfig(agentId, config);
+        if (success) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error("Failed to update config for agent: " + agentId);
+    }
+
+    @GetMapping("/topology")
+    public ResultModel<AgentTopologyDTO> getTopology() {
+        AgentTopologyDTO topology = agentService.getTopology();
+        return ResultModel.success(topology);
+    }
+
+    @GetMapping("/topology/cluster/{clusterId}")
+    public ResultModel<AgentTopologyDTO> getTopologyByCluster(@PathVariable String clusterId) {
+        AgentTopologyDTO topology = agentService.getTopologyByCluster(clusterId);
+        return ResultModel.success(topology);
+    }
+
+    @GetMapping("/{agentId}/metrics")
+    public ResultModel<AgentMetricsDTO> getAgentMetrics(@PathVariable String agentId) {
+        AgentMetricsDTO metrics = agentService.getAgentMetrics(agentId);
+        if (metrics != null) {
+            return ResultModel.success(metrics);
+        }
+        return ResultModel.error("Agent not found: " + agentId);
+    }
+
+    @GetMapping("/metrics/all")
+    public ResultModel<List<AgentMetricsDTO>> getAllMetrics() {
+        List<AgentMetricsDTO> metrics = agentService.getAllMetrics();
+        return ResultModel.success(metrics);
+    }
+
+    @PostMapping("/{agentId}/metrics")
+    public ResultModel<Boolean> updateAgentMetrics(
+            @PathVariable String agentId,
+            @RequestBody Map<String, Object> metrics) {
+        agentService.updateAgentMetrics(agentId, metrics);
+        return ResultModel.success(true);
+    }
+
+    @GetMapping("/{agentId}/health")
+    public ResultModel<Map<String, Object>> healthCheck(@PathVariable String agentId) {
+        Map<String, Object> result = agentService.healthCheck(agentId);
+        return ResultModel.success(result);
+    }
+
+    @PostMapping("/batch")
+    public ResultModel<AgentBatchOperationDTO> executeBatchOperation(
+            @RequestBody AgentBatchOperationDTO operation) {
+        AgentBatchOperationDTO result = agentService.executeBatchOperation(operation);
+        return ResultModel.success(result);
+    }
+
+    @GetMapping("/batch/{operationId}")
+    public ResultModel<AgentBatchOperationDTO> getBatchOperationStatus(
+            @PathVariable String operationId) {
+        AgentBatchOperationDTO operation = agentService.getBatchOperationStatus(operationId);
+        if (operation != null) {
+            return ResultModel.success(operation);
+        }
+        return ResultModel.error("Operation not found: " + operationId);
+    }
+
+    @GetMapping("/capability/{capability}")
+    public ResultModel<List<AgentDTO>> listByCapability(@PathVariable String capability) {
+        List<AgentDTO> agents = agentService.listByCapability(capability);
+        return ResultModel.success(agents);
+    }
+
+    @GetMapping("/tag")
+    public ResultModel<List<AgentDTO>> listByTag(
+            @RequestParam String tagKey,
+            @RequestParam String tagValue) {
+        List<AgentDTO> agents = agentService.listByTag(tagKey, tagValue);
+        return ResultModel.success(agents);
+    }
+
+    @GetMapping("/alerts")
+    public ResultModel<List<AgentAlertConfigDTO>> listAlertConfigs() {
+        List<AgentAlertConfigDTO> configs = agentService.listAlertConfigs();
+        return ResultModel.success(configs);
+    }
+
+    @GetMapping("/{agentId}/alerts")
+    public ResultModel<List<AgentAlertConfigDTO>> getAlertConfigsByAgent(
+            @PathVariable String agentId) {
+        List<AgentAlertConfigDTO> configs = agentService.getAlertConfigsByAgent(agentId);
+        return ResultModel.success(configs);
+    }
+
+    @PostMapping("/alerts")
+    public ResultModel<AgentAlertConfigDTO> createAlertConfig(
+            @RequestBody AgentAlertConfigDTO config) {
+        AgentAlertConfigDTO created = agentService.createAlertConfig(config);
+        return ResultModel.success(created);
+    }
+
+    @PutMapping("/alerts/{id}")
+    public ResultModel<AgentAlertConfigDTO> updateAlertConfig(
+            @PathVariable Long id,
+            @RequestBody AgentAlertConfigDTO config) {
+        AgentAlertConfigDTO updated = agentService.updateAlertConfig(id, config);
+        if (updated != null) {
+            return ResultModel.success(updated);
+        }
+        return ResultModel.error("Alert config not found: " + id);
+    }
+
+    @DeleteMapping("/alerts/{id}")
+    public ResultModel<Boolean> deleteAlertConfig(@PathVariable Long id) {
+        boolean success = agentService.deleteAlertConfig(id);
+        if (success) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error("Failed to delete alert config: " + id);
+    }
+
+    @PostMapping("/alerts/{id}/enable")
+    public ResultModel<Boolean> enableAlertConfig(@PathVariable Long id) {
+        boolean success = agentService.enableAlertConfig(id);
+        if (success) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error("Failed to enable alert config: " + id);
+    }
+
+    @PostMapping("/alerts/{id}/disable")
+    public ResultModel<Boolean> disableAlertConfig(@PathVariable Long id) {
+        boolean success = agentService.disableAlertConfig(id);
+        if (success) {
+            return ResultModel.success(true);
+        }
+        return ResultModel.error("Failed to disable alert config: " + id);
     }
 }

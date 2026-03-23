@@ -3,6 +3,7 @@ package net.ooder.mvp.skill.scene.controller;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import net.ooder.mvp.skill.scene.capability.service.LocalDiscoveryService;
 import net.ooder.mvp.skill.scene.capability.service.LocalDiscoveryService.SyncResult;
+import net.ooder.mvp.skill.scene.capability.install.SkillDownloadService;
 import net.ooder.mvp.skill.scene.dto.discovery.DiscoveryResultDTO;
 import net.ooder.mvp.skill.scene.discovery.MvpSkillIndexLoader;
 import net.ooder.mvp.skill.scene.dto.discovery.CapabilityDTO;
@@ -29,12 +30,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.ApplicationContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 @RestController
 @RequestMapping("/api/v1/discovery")
@@ -60,6 +66,9 @@ public class DiscoveryController {
     
     @Autowired(required = false)
     private net.ooder.scene.discovery.UnifiedDiscoveryService unifiedDiscoveryService;
+    
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Value("${ooder.mock.enabled:false}")
     private boolean mockEnabled;
@@ -527,10 +536,46 @@ public class DiscoveryController {
             }
             
             String downloadUrl = null;
+            String repoUrl = null;
             if (mvpSkillIndexLoader != null) {
                 downloadUrl = mvpSkillIndexLoader.getDownloadUrl(skillId);
+                repoUrl = mvpSkillIndexLoader.getRepoUrl(skillId);
                 if (downloadUrl != null) {
-                    log.info("[installSkill] Installing from URL: {}", downloadUrl);
+                    log.info("[installSkill] Download URL found: {}", downloadUrl);
+                }
+                if (repoUrl != null) {
+                    log.info("[installSkill] Repo URL found: {}", repoUrl);
+                }
+            }
+            
+            boolean shouldTryGitClone = false;
+            
+            if (downloadUrl != null && !downloadUrl.isEmpty()) {
+                log.info("[installSkill] Attempting to download from URL: {}", downloadUrl);
+            } else {
+                log.info("[installSkill] No direct download URL, will try git clone");
+                shouldTryGitClone = true;
+            }
+            
+            if (shouldTryGitClone && repoUrl != null && !repoUrl.isEmpty()) {
+                log.info("[installSkill] Trying git clone from: {}", repoUrl);
+                try {
+                    SkillDownloadService downloadService = getBean(SkillDownloadService.class);
+                    if (downloadService != null) {
+                        SkillDownloadService.DownloadResult cloneResult = downloadService.cloneFromGit(repoUrl, skillId, "master");
+                        if (cloneResult.isSuccess()) {
+                            log.info("[installSkill] Git clone successful for: {}", skillId);
+                            registerSkillInRegistry(skillId);
+                            result.setStatus("installed");
+                            result.setMessage("通过 Git clone 安装成功");
+                            result.setInstallTime(System.currentTimeMillis());
+                            return ResultModel.success(result);
+                        } else {
+                            log.warn("[installSkill] Git clone failed: {}", cloneResult.getMessage());
+                        }
+                    }
+                } catch (Exception e) {
+                    log.warn("[installSkill] Git clone attempt failed: {}", e.getMessage());
                 }
             }
             
@@ -547,6 +592,8 @@ public class DiscoveryController {
                 if (installResult.getInstalledDependencies() != null) {
                     result.setInstalledDependencies(installResult.getInstalledDependencies());
                 }
+                
+                registerSkillInRegistry(skillId);
             } else {
                 String error = installResult != null ? installResult.getError() : "未知错误";
                 log.error("[installSkill] Failed to install {}: {}", skillId, error);
@@ -788,5 +835,75 @@ public class DiscoveryController {
         }
         
         return fields;
+    }
+    
+    private void registerSkillInRegistry(String skillId) {
+        try {
+            File registryDir = new File("data/installed-skills");
+            if (!registryDir.exists()) {
+                registryDir.mkdirs();
+            }
+            
+            File registryFile = new File("data/installed-skills/registry.properties");
+            Properties props = new Properties();
+            
+            if (registryFile.exists()) {
+                try (FileInputStream fis = new FileInputStream(registryFile)) {
+                    props.load(fis);
+                }
+            }
+            
+            String skillPath = findSkillInstallPath(skillId);
+            if (skillPath == null) {
+                log.warn("[registerSkillInRegistry] Could not find install path for: {}", skillId);
+                skillPath = "./.ooder/installed/" + skillId;
+            }
+            
+            props.setProperty(skillId + ".id", skillId);
+            props.setProperty(skillId + ".path", skillPath);
+            props.setProperty(skillId + ".installedAt", String.valueOf(System.currentTimeMillis()));
+            
+            try (FileOutputStream fos = new FileOutputStream(registryFile)) {
+                props.store(fos, "Installed Skills Registry");
+            }
+            
+            log.info("[registerSkillInRegistry] Registered skill in registry: {} -> {}", skillId, skillPath);
+            
+            if (mvpSkillIndexLoader != null) {
+                mvpSkillIndexLoader.markAsInstalled(skillId);
+            }
+        } catch (Exception e) {
+            log.error("[registerSkillInRegistry] Failed to register skill: {}", e.getMessage());
+        }
+    }
+    
+    private String findSkillInstallPath(String skillId) {
+        String[] possiblePaths = {
+            "./.ooder/downloads/" + skillId,
+            "./.ooder/installed/" + skillId,
+            "./.ooder/activated/" + skillId,
+            "../skills/_system/" + skillId,
+            "../skills/" + skillId
+        };
+        
+        for (String path : possiblePaths) {
+            File dir = new File(path);
+            if (dir.exists() && dir.isDirectory()) {
+                log.info("[findSkillInstallPath] Found skill {} at: {}", skillId, dir.getAbsolutePath());
+                return dir.getAbsolutePath();
+            }
+        }
+        
+        log.warn("[findSkillInstallPath] Skill {} not found in any known directory", skillId);
+        return null;
+    }
+    
+    private <T> T getBean(Class<T> clazz) {
+        try {
+            return applicationContext != null ? applicationContext.getBean(clazz) : null;
+        } catch (Exception e) {
+            log.warn("[getBean] Failed to get bean for {}: {}", clazz.getSimpleName(), e.getMessage());
+            return null;
+        }
     }
 }

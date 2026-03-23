@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>日报管理</title>
+    <link href="https://cdn.jsdelivr.net/npm/remixicon@3.5.0/fonts/remixicon.css" rel="stylesheet">
+    <link rel="stylesheet" href="../css/daily-report.css">
+</head>
+<body>
+    <div class="app-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <i class="ri-file-text-line"></i>
+                <span>日报管理</span>
+            </div>
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">管理员</div>
+                    <a href="#" class="nav-item active" data-page="dashboard">
+                        <i class="ri-dashboard-line"></i>
+                        <span>日报管理</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="summary">
+                        <i class="ri-file-list-line"></i>
+                        <span>日报汇总</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="settings">
+                        <i class="ri-settings-line"></i>
+                        <span>场景设置</span>
+                    </a>
+                </div>
+                <div class="nav-section">
+                    <div class="nav-section-title">员工</div>
+                    <a href="#" class="nav-item" data-page="submit">
+                        <i class="ri-edit-line"></i>
+                        <span>提交日报</span>
+                    </a>
+                    <a href="#" class="nav-item" data-page="history">
+                        <i class="ri-history-line"></i>
+                        <span>我的日报</span>
+                    </a>
+                </div>
+            </nav>
+        </aside>
+        
+        <main class="main-content">
+            <header class="page-header">
+                <h1 id="page-title">日报管理</h1>
+                <div class="header-actions">
+                    <button class="btn btn-primary" id="export-btn">
+                        <i class="ri-download-line"></i>
+                        导出报表
+                    </button>
+                </div>
+            </header>
+            
+            <div id="page-content">
+                <div class="dashboard-page">
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #3b82f6;">
+                                <i class="ri-file-text-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-total">45</div>
+                                <div class="stat-label">今日提交</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #22c55e;">
+                                <i class="ri-checkbox-circle-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-reviewed">38</div>
+                                <div class="stat-label">已审核</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #f59e0b;">
+                                <i class="ri-time-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-pending">7</div>
+                                <div class="stat-label">待审核</div>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: #ef4444;">
+                                <i class="ri-user-unfollow-line"></i>
+                            </div>
+                            <div class="stat-info">
+                                <div class="stat-value" id="stat-unsubmit">5</div>
+                                <div class="stat-label">未提交</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="content-grid">
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>待审核日报</h3>
+                                <a href="#" class="link-more">查看全部</a>
+                            </div>
+                            <div class="card-body">
+                                <div class="report-list" id="pending-reports">
+                                    <div class="report-item" onclick="viewReport('RPT-001')">
+                                        <div class="report-info">
+                                            <div class="report-author">
+                                                <span class="avatar">张</span>
+                                                <span class="name">张三</span>
+                                            </div>
+                                            <div class="report-meta">
+                                                <span>技术研发部</span>
+                                                <span>2026-03-23</span>
+                                            </div>
+                                        </div>
+                                        <div class="report-status">
+                                            <span class="badge badge-warning">待审核</span>
+                                        </div>
+                                    </div>
+                                    <div class="report-item" onclick="viewReport('RPT-002')">
+                                        <div class="report-info">
+                                            <div class="report-author">
+                                                <span class="avatar">李</span>
+                                                <span class="name">李四</span>
+                                            </div>
+                                            <div class="report-meta">
+                                                <span>产品设计部</span>
+                                                <span>2026-03-23</span>
+                                            </div>
+                                        </div>
+                                        <div class="report-status">
+                                            <span class="badge badge-warning">待审核</span>
+                                        </div>
+                                    </div>
+                                    <div class="report-item" onclick="viewReport('RPT-003')">
+                                        <div class="report-info">
+                                            <div class="report-author">
+                                                <span class="avatar">王</span>
+                                                <span class="name">王五</span>
+                                            </div>
+                                            <div class="report-meta">
+                                                <span>市场运营部</span>
+                                                <span>2026-03-23</span>
+                                            </div>
+                                        </div>
+                                        <div class="report-status">
+                                            <span class="badge badge-warning">待审核</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="card">
+                            <div class="card-header">
+                                <h3>提交排行</h3>
+                            </div>
+                            <div class="card-body">
+                                <div class="ranking-list" id="ranking-list">
+                                    <div class="ranking-item">
+                                        <span class="rank rank-1">1</span>
+                                        <span class="name">技术研发部</span>
+                                        <span class="count">100%</span>
+                                    </div>
+                                    <div class="ranking-item">
+                                        <span class="rank rank-2">2</span>
+                                        <span class="name">产品设计部</span>
+                                        <span class="count">95%</span>
+                                    </div>
+                                    <div class="ranking-item">
+                                        <span class="rank rank-3">3</span>
+                                        <span class="name">市场运营部</span>
+                                        <span class="count">90%</span>
+                                    </div>
+                                    <div class="ranking-item">
+                                        <span class="rank">4</span>
+                                        <span class="name">人力资源部</span>
+                                        <span class="count">85%</span>
+                                    </div>
+                                    <div class="ranking-item">
+                                        <span class="rank">5</span>
+                                        <span class="name">财务部</span>
+                                        <span class="count">80%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <div class="modal" id="submit-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>提交日报</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <form id="submit-form">
+                    <div class="form-group">
+                        <label>日期</label>
+                        <input type="date" name="reportDate" required>
+                    </div>
+                    <div class="form-group">
+                        <label>今日工作</label>
+                        <div class="work-items" id="work-items">
+                            <div class="work-item">
+                                <input type="text" name="workContent" placeholder="工作内容">
+                                <select name="workStatus">
+                                    <option value="completed">已完成</option>
+                                    <option value="in_progress">进行中</option>
+                                    <option value="pending">待处理</option>
+                                </select>
+                                <input type="number" name="workPercent" placeholder="%" min="0" max="100" value="100">
+                            </div>
+                        </div>
+                        <button type="button" class="btn btn-secondary btn-sm" onclick="addWorkItem()">
+                            <i class="ri-add-line"></i> 添加工作项
+                        </button>
+                    </div>
+                    <div class="form-group">
+                        <label>遇到的问题</label>
+                        <textarea name="problems" rows="3" placeholder="记录工作中遇到的问题..."></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>明日计划</label>
+                        <textarea name="plans" rows="3" placeholder="明日工作计划..."></textarea>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('submit-modal')">取消</button>
+                <button class="btn btn-primary" type="button" onclick="submitReport()">
+                    <i class="ri-send-line"></i>
+                    提交日报
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="modal" id="view-modal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2>日报详情</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="report-detail">
+                    <div class="report-header">
+                        <div class="author-info">
+                            <span class="avatar large">张</span>
+                            <div class="author-detail">
+                                <div class="author-name">张三</div>
+                                <div class="author-dept">技术研发部</div>
+                            </div>
+                        </div>
+                        <div class="report-date">2026年3月23日</div>
+                    </div>
+                    <div class="report-section">
+                        <h4><i class="ri-checkbox-circle-line"></i> 今日工作</h4>
+                        <div class="work-list">
+                            <div class="work-item-view">
+                                <div class="work-status completed"></div>
+                                <div class="work-content">完成用户中心API开发</div>
+                                <div class="work-percent">100%</div>
+                            </div>
+                            <div class="work-item-view">
+                                <div class="work-status in-progress"></div>
+                                <div class="work-content">编写单元测试</div>
+                                <div class="work-percent">60%</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="report-section">
+                        <h4><i class="ri-error-warning-line"></i> 遇到的问题</h4>
+                        <p>数据库连接池配置需要优化，已联系运维处理</p>
+                    </div>
+                    <div class="report-section">
+                        <h4><i class="ri-calendar-line"></i> 明日计划</h4>
+                        <p>继续完成单元测试，开始集成测试</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" onclick="closeModal('view-modal')">关闭</button>
+                <button class="btn btn-success" type="button" onclick="reviewReport('approve')">
+                    <i class="ri-checkbox-circle-line"></i>
+                    通过
+                </button>
+                <button class="btn btn-danger" type="button" onclick="reviewReport('reject')">
+                    <i class="ri-close-circle-line"></i>
+                    驳回
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script src="../js/daily-report.js"></script>
+</body>
+</html>

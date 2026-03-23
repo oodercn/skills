@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>人工审核 - 录音质检系统</title>
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="../css/recording-qa.css">
+</head>
+<body>
+    <div class="nexus-layout">
+        <!-- 侧边栏 -->
+        <aside class="nexus-sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <i class="ri-mic-line"></i>
+                    <span>录音质检</span>
+                </div>
+            </div>
+            <nav class="sidebar-nav">
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="upload.html" class="nav-link">
+                            <i class="ri-upload-cloud-line"></i>
+                            <span>录音上传</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="review.html" class="nav-link active">
+                            <i class="ri-file-search-line"></i>
+                            <span>人工审核</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="statistics.html" class="nav-link">
+                            <i class="ri-bar-chart-line"></i>
+                            <span>质检统计</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+        </aside>
+
+        <!-- 主内容区 -->
+        <main class="nexus-main">
+            <!-- 顶部导航 -->
+            <header class="nexus-header">
+                <button class="menu-toggle" id="menu-toggle">
+                    <i class="ri-menu-line"></i>
+                </button>
+                <h1 class="page-title">人工审核</h1>
+                <div class="header-actions">
+                    <div class="user-info">
+                        <i class="ri-user-line"></i>
+                        <span>审核员</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- 页面内容 -->
+            <div class="nexus-content">
+                <!-- 筛选栏 -->
+                <div class="filter-bar">
+                    <div class="filter-group">
+                        <label>审核状态</label>
+                        <select class="form-select" id="filter-status">
+                            <option value="">全部</option>
+                            <option value="pending" selected>待审核</option>
+                            <option value="completed">已审核</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>部门</label>
+                        <select class="form-select" id="filter-department">
+                            <option value="">全部部门</option>
+                            <option value="客服一部">客服一部</option>
+                            <option value="客服二部">客服二部</option>
+                            <option value="客服三部">客服三部</option>
+                            <option value="技术支持部">技术支持部</option>
+                        </select>
+                    </div>
+                    <div class="filter-group">
+                        <label>搜索</label>
+                        <input type="text" class="form-input" id="filter-keyword" placeholder="客服姓名/电话">
+                    </div>
+                    <button class="btn btn-primary" onclick="RecordingQA.loadRecordings()">
+                        <i class="ri-search-line"></i>
+                        <span>查询</span>
+                    </button>
+                </div>
+
+                <!-- 录音列表 -->
+                <div class="list-section">
+                    <div class="table-container">
+                        <table class="data-table" id="recording-list">
+                            <thead>
+                                <tr>
+                                    <th>录音ID</th>
+                                    <th>文件名</th>
+                                    <th>客服</th>
+                                    <th>部门</th>
+                                    <th>通话类型</th>
+                                    <th>时长</th>
+                                    <th>状态</th>
+                                    <th>评分</th>
+                                    <th>上传时间</th>
+                                    <th>操作</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- 动态加载 -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- 分页 -->
+                    <div class="pagination" id="pagination">
+                        <!-- 动态加载 -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 审核弹窗 -->
+    <div class="modal" id="review-modal">
+        <div class="modal-overlay" onclick="RecordingQA.closeReviewModal()"></div>
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h3>录音质检</h3>
+                <button class="modal-close" onclick="RecordingQA.closeReviewModal()">
+                    <i class="ri-close-line"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="review-layout">
+                    <!-- 左侧：录音信息 -->
+                    <div class="review-left">
+                        <div class="audio-player-section">
+                            <h4>录音播放</h4>
+                            <audio id="audio-player" controls style="width: 100%;">
+                                <source src="" type="audio/mpeg">
+                                您的浏览器不支持音频播放
+                            </audio>
+                            <div class="audio-controls">
+                                <button class="btn btn-sm" onclick="RecordingQA.skipAudio(-10)">
+                                    <i class="ri-rewind-line"></i> -10s
+                                </button>
+                                <button class="btn btn-sm" onclick="RecordingQA.togglePlay()">
+                                    <i class="ri-play-line" id="play-icon"></i>
+                                    <span id="play-text">播放</span>
+                                </button>
+                                <button class="btn btn-sm" onclick="RecordingQA.skipAudio(10)">
+                                    <i class="ri-speed-line"></i> +10s
+                                </button>
+                            </div>
+                        </div>
+                        <div class="recording-info">
+                            <h4>通话信息</h4>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <label>客服姓名</label>
+                                    <span id="review-agent-name">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>客服工号</label>
+                                    <span id="review-agent-id">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>所属部门</label>
+                                    <span id="review-department">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>通话类型</label>
+                                    <span id="review-call-type">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>客户电话</label>
+                                    <span id="review-customer-phone">-</span>
+                                </div>
+                                <div class="info-item">
+                                    <label>录音时长</label>
+                                    <span id="review-duration">-</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- 右侧：评分表单 -->
+                    <div class="review-right">
+                        <h4>质检评分</h4>
+                        <form id="review-form">
+                            <input type="hidden" id="review-recording-id">
+                            <div class="scoring-items" id="scoring-items">
+                                <!-- 动态加载评分项 -->
+                            </div>
+                            <div class="score-summary">
+                                <div class="total-score">
+                                    <label>总分</label>
+                                    <span id="total-score">0</span>
+                                    <span class="score-max">/100</span>
+                                </div>
+                            </div>
+                            <div class="review-result">
+                                <label>审核结果</label>
+                                <div class="result-options">
+                                    <label class="radio-label">
+                                        <input type="radio" name="review-result" value="pass" checked>
+                                        <span class="radio-text pass">通过</span>
+                                    </label>
+                                    <label class="radio-label">
+                                        <input type="radio" name="review-result" value="fail">
+                                        <span class="radio-text fail">不通过</span>
+                                    </label>
+                                </div>
+                            </div>
+                            <div class="review-comment">
+                                <label>审核评语</label>
+                                <textarea class="form-textarea" id="review-comment" rows="4" placeholder="请输入审核评语..."></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary">
+                                    <i class="ri-check-line"></i>
+                                    <span>提交审核</span>
+                                </button>
+                                <button type="button" class="btn btn-secondary" onclick="RecordingQA.closeReviewModal()">
+                                    <i class="ri-close-line"></i>
+                                    <span>取消</span>
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="/console/js/nexus.js"></script>
+    <script src="/console/js/api.js"></script>
+    <script src="../js/recording-qa.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            RecordingQA.initReview();
+        });
+    </script>
+</body>
+</html>

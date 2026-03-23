@@ -152,13 +152,42 @@ public class HistoryServiceImpl implements HistoryService {
             (long) filtered.stream().mapToLong(HistoryDTO::getDuration).average().orElse(0);
         
         return new HistoryStatisticsDTO(
-            total,
+ total,
             (int) filtered.stream().mapToInt(HistoryDTO::getParticipantCount).sum(),
             total > 0 ? (int) (successCount * 100 / total) : 0,
             (int) (avgDuration / 1000)
         );
     }
-
+    
+    @Override
+    public HistoryDTO getExecutionDetail(String executionId, String userId) {
+        log.info("[getExecutionDetail] executionId={}, userId={}", executionId, userId);
+        
+        List<HistoryDTO> allHistory = loadHistoryFromSE(userId);
+        
+        for (HistoryDTO history : allHistory) {
+            if (executionId.equals(history.getExecutionId())) {
+                return history;
+            }
+        }
+        
+        if (executionId.startsWith("exec-")) {
+            String sceneGroupId = executionId.substring(5);
+            if (sceneGroupManager != null) {
+                try {
+                    SceneGroup group = sceneGroupManager.getSceneGroup(sceneGroupId);
+                    if (group != null) {
+                        return convertSceneGroupToHistory(group, userId);
+                    }
+                } catch (Exception e) {
+                    log.warn("[getExecutionDetail] Failed to get SceneGroup: {}", e.getMessage());
+                }
+            }
+        }
+        
+        return historyStore.get(executionId);
+    }
+    
     @Override
     public boolean rerunScene(String userId, String sceneGroupId) {
         log.info("[rerunScene] userId={}, sceneGroupId={}", userId, sceneGroupId);

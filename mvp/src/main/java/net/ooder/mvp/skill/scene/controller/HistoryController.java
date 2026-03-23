@@ -40,6 +40,16 @@ public class HistoryController {
         return ResultModel.success(result);
     }
 
+    @GetMapping("/{executionId}")
+    public ResultModel<HistoryDTO> getExecutionDetail(@PathVariable String executionId) {
+        String currentUserId = "current-user";
+        HistoryDTO result = historyService.getExecutionDetail(executionId, currentUserId);
+        if (result == null) {
+            return ResultModel.error(404, "执行记录不存在");
+        }
+        return ResultModel.success(result);
+    }
+
     @GetMapping("/statistics")
     public ResultModel<HistoryStatisticsDTO> getStatistics(
             @RequestParam(required = false) Integer days) {

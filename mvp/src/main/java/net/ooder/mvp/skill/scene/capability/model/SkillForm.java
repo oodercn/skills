@@ -53,6 +53,7 @@ public enum SkillForm implements DictItem {
                 return form;
             }
         }
+        if (code.toUpperCase().contains("SCENE")) return SCENE;
         if ("SCENE".equalsIgnoreCase(code)) return SCENE;
         if ("STANDALONE".equalsIgnoreCase(code)) return STANDALONE;
         return STANDALONE;

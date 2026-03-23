@@ -1,256 +1,156 @@
-/**
- * 执行管理页面脚本
- */
+let executionId = null;
+let executionData = null;
 
-// 初始化页面
-function init() {
-    updateTimestamp();
-    loadExecutionHistory();
-    setInterval(updateTimestamp, 60000); // 每分钟更新时间戳
-}
-
-// 更新时间戳
-function updateTimestamp() {
-    const now = new Date();
-    const timestamp = document.getElementById('timestamp');
-    if (timestamp) {
-        timestamp.textContent = now.toLocaleString('zh-CN');
-    }
-}
-
-// 执行管理相关函数
-
-// 加载执行历史
-async function loadExecutionHistory() {
-    try {
-        // 由于后端API没有直接提供执行历史的接口，我们需要从其他接口获取数据
-        // 这里我们暂时使用模拟数据
-        const executions = [
-            {
-                executionId: 'exec-12345',
-                skillId: 'text-uppercase',
-                timestamp: new Date().toLocaleString('zh-CN'),
-                status: 'SUCCESS',
-                executionTime: '0.5s'
-            },
-            {
-                executionId: 'exec-12344',
-                skillId: 'code-generation',
-                timestamp: new Date().toLocaleString('zh-CN'),
-                status: 'SUCCESS',
-                executionTime: '3.2s'
-            },
-            {
-                executionId: 'exec-12343',
-                skillId: 'local-deployment',
-                timestamp: new Date().toLocaleString('zh-CN'),
-                status: 'FAILED',
-                executionTime: '1.8s'
-            }
-        ];
-        renderExecutionHistory(executions);
-    } catch (error) {
-        console.error('加载执行历史错误:', error);
-        alert('加载执行历史失败: ' + error.message);
-    }
-}
-
-// 渲染执行历史
-function renderExecutionHistory(executions) {
-    const tbody = document.querySelector('table tbody');
-    tbody.innerHTML = '';
-    
-    executions.forEach(execution => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-            <td>${execution.executionId}</td>
-            <td>${execution.skillId}</td>
-            <td>${execution.timestamp}</td>
-            <td>${execution.status === 'SUCCESS' ? '成功' : '失败'}</td>
-            <td>${execution.executionTime}</td>
-            <td>
-                <button class="btn btn-secondary" onclick="showExecutionDetail('${execution.executionId}')">详情</button>
-            </td>
-        `;
-        tbody.appendChild(tr);
-    });
-}
-
-// 显示执行详情
-async function showExecutionDetail(executionId) {
-    try {
-        const response = await fetch(`${utils.API_BASE_URL}/execution/result/${executionId}`);
-        if (!response.ok) {
-            throw new Error('获取执行详情失败');
-        }
-        const result = await response.json();
-        alert(`执行详情:\n执行ID: ${executionId}\n状态: ${result.status === 'SUCCESS' ? '成功' : '失败'}\n结果: ${result.output || result.errorMessage}\n执行时间: ${result.executionTime || '未知'}`);
-    } catch (error) {
-        console.error('获取执行详情错误:', error);
-        alert('获取执行详情失败: ' + error.message);
-    }
-}
-
-// 获取执行状态
-async function getExecutionStatus(executionId) {
-    try {
-        const response = await fetch(`${utils.API_BASE_URL}/execution/status/${executionId}`);
-        if (!response.ok) {
-            throw new Error('获取执行状态失败');
-        }
-        const status = await response.text();
-        alert(`执行状态 ${status}`);
-    } catch (error) {
-        console.error('获取执行状态错误:', error);
-        alert('获取执行状态失败: ' + error.message);
-    }
-}
-
-// 清理执行结果
-async function clearExecutionResult(executionId) {
-    if (!confirm('确定要清理执行结果 ' + executionId + ' 吗?')) {
+document.addEventListener('DOMContentLoaded', async function() {
+    executionId = getUrlParam('id');
+    if (!executionId) {
+        alert('未指定执行ID');
+        goBack();
         return;
     }
     
-    try {
-        const response = await fetch(`${utils.API_BASE_URL}/execution/result/${executionId}`, {
-            method: 'DELETE'
-        });
-        if (!response.ok) {
-            throw new Error('清理执行结果失败');
-        }
-        const result = await response.json();
-        if (result) {
-            alert('执行结果清理成功!');
-            loadExecutionHistory();
-        } else {
-            alert('执行结果清理失败!');
-        }
-    } catch (error) {
-        console.error('清理执行结果错误:', error);
-        alert('清理执行结果失败: ' + error.message);
-    }
+    await loadExecutionDetail();
+});
+
+function getUrlParam(name) {
+    const params = new URLSearchParams(window.location.search);
+    return params.get(name);
 }
 
-// 标签页切换函数
-function switchTab(tabId) {
-    // 隐藏所有标签页内容
-    document.querySelectorAll('.tab-content').forEach(tab => {
-        tab.classList.add('hidden');
-    });
-    
-    // 显示选中的标签页内容
-    document.getElementById(`${tabId}-tab`).classList.remove('hidden');
-    
-    // 更新标签页按钮状态
-    document.querySelectorAll('.btn-secondary').forEach(btn => {
-        btn.style.backgroundColor = '#1a1a1a';
-        btn.style.color = 'var(--ooder-secondary)';
-    });
-    
-    // 高亮当前标签页按钮
-    event.target.style.backgroundColor = 'var(--ooder-primary)';
-    event.target.style.color = 'white';
-    
-    // 根据标签页ID加载相应的数据
-    if (tabId === 'execute-history') {
-        loadExecutionHistory();
-    } else if (tabId === 'execute-run') {
-        loadSkillsForExecution();
-    }
-}
-
-// 加载技能列表供执行选择
-async function loadSkillsForExecution() {
+async function loadExecutionDetail() {
     try {
-        // 使用统一封装的 SkillSelector 组件
-        if (utils && utils.SkillSelector) {
-            utils.SkillSelector({
-                selectId: 'skill-select',
-                emptyText: '选择技能',
-                pageName: 'ExecutionPage',
-                onLoad: (skills) => {
-                    console.log('[ExecutionPage] 技能选择器加载完成，共', skills.length, '个技能');
-                },
-                onError: (error) => {
-                    console.error('[ExecutionPage] 技能选择器加载失败:', error);
-                }
-            });
-        } else {
-            // 回退到旧方式
-            console.warn('[ExecutionPage] SkillSelector 组件未加载，使用旧方式加载');
-            const response = await fetch(`${utils.API_BASE_URL}/skills`);
-            if (!response.ok) {
-                throw new Error('加载技能列表失败');
-            }
-            const result = await response.json();
-            
-            let skills = [];
-            if (result.success && result.data) {
-                skills = result.data.items || result.data || [];
-            } else if (Array.isArray(result)) {
-                skills = result;
-            }
-            
-            const skillSelect = document.getElementById('skill-select');
-            skillSelect.innerHTML = '<option value="">选择技能</option>';
-            
-            skills.forEach(skill => {
-                const option = document.createElement('option');
-                option.value = skill.id;
-                option.textContent = skill.name;
-                skillSelect.appendChild(option);
-            });
-        }
-        
-        // 添加技能选择事件监听器
-        const skillSelect = document.getElementById('skill-select');
-        skillSelect.addEventListener('change', function() {
-            const skillId = this.value;
-            if (skillId) {
-                loadSkillParameters(skillId);
-            } else {
-                document.getElementById('execution-parameters').innerHTML = '';
-            }
-        });
-    } catch (error) {
-        console.error('加载技能列表错误:', error);
-        alert('加载技能列表失败: ' + error.message);
-    }
-}
-
-// 加载技能参数
-async function loadSkillParameters(skillId) {
-    try {
-        const response = await fetch(`${utils.API_BASE_URL}/skills/${skillId}`);
-        if (!response.ok) {
-            throw new Error('获取技能详情失败');
-        }
+        const response = await fetch('/api/v1/my/history/' + executionId);
         const result = await response.json();
         
-        // 解析 API 响应结构
-        let skill = null;
-        if (result.success && result.data) {
-            skill = result.data;
+        if (result.status === 'success' && result.data) {
+            executionData = result.data;
+            renderExecutionDetail();
         } else {
-            skill = result;
+            document.getElementById('executionLogs').innerHTML = '<p class="nx-text-danger">加载失败: ' + (result.message || '未知错误') + '</p>';
         }
-        
-        const parametersContainer = document.getElementById('execution-parameters');
-        parametersContainer.innerHTML = `
-            <h4>执行参数</h4>
-            <div style="margin-top: 8px;">
-                <p>技能: ${skill.name || '-'}</p>
-                <p>分类: ${skill.category || '未分类'}</p>
-                <p>描述: ${skill.description || '无描述'}</p>
-            </div>
-        `;
     } catch (error) {
-        console.error('获取技能详情错误:', error);
+        console.error('Failed to load execution detail:', error);
+        document.getElementById('executionLogs').innerHTML = '<p class="nx-text-danger">加载失败: ' + error.message + '</p>';
     }
 }
 
-// 页面加载完成后初始化
-window.onload = function() {
-    init();
-};
+function renderExecutionDetail() {
+    if (!executionData) return;
+    
+    document.getElementById('pageTitle').textContent = executionData.sceneName || '执行详情';
+    document.getElementById('executionId').textContent = executionData.executionId || '-';
+    document.getElementById('sceneName').textContent = executionData.sceneName || '-';
+    
+    const statusBadge = getStatusBadge(executionData.status);
+    document.getElementById('executionStatus').innerHTML = statusBadge;
+    
+    document.getElementById('startTime').textContent = formatTime(executionData.startTime);
+    document.getElementById('endTime').textContent = formatTime(executionData.endTime);
+    
+    if (executionData.startTime && executionData.endTime) {
+        const duration = executionData.endTime - executionData.startTime;
+        document.getElementById('duration').textContent = formatDuration(duration);
+    } else {
+        document.getElementById('duration').textContent = '-';
+    }
+    
+    renderLogs(executionData.logs);
+    renderResult(executionData.result);
+}
+
+function getStatusBadge(status) {
+    const badges = {
+        'SUCCESS': '<span class="nx-badge nx-badge--success">成功</span>',
+        'FAILED': '<span class="nx-badge nx-badge--danger">失败</span>',
+        'RUNNING': '<span class="nx-badge nx-badge--info">执行中</span>',
+        'PENDING': '<span class="nx-badge nx-badge--warning">等待中</span>',
+        'CANCELLED': '<span class="nx-badge nx-badge--secondary">已取消</span>'
+    };
+    return badges[status] || '<span class="nx-badge nx-badge--secondary">' + status + '</span>';
+}
+
+function formatTime(timestamp) {
+    if (!timestamp) return '-';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('zh-CN') + ' ' + date.toLocaleTimeString('zh-CN');
+}
+
+function formatDuration(ms) {
+    if (!ms || ms < 0) return '-';
+    const seconds = Math.floor(ms / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const hours = Math.floor(minutes / 60);
+    
+    if (hours > 0) {
+        return hours + '小时' + (minutes % 60) + '分钟';
+    } else if (minutes > 0) {
+        return minutes + '分钟' + (seconds % 60) + '秒';
+    } else {
+        return seconds + '秒';
+    }
+}
+
+function renderLogs(logs) {
+    const container = document.getElementById('executionLogs');
+    
+    if (!logs || logs.length === 0) {
+        container.innerHTML = '<p class="nx-text-secondary">暂无日志</p>';
+        return;
+    }
+    
+    let html = '';
+    logs.forEach(log => {
+        const time = formatTime(log.timestamp || log.time);
+        const level = log.level || 'INFO';
+        const levelClass = level === 'ERROR' ? 'nx-text-danger' : level === 'WARN' ? 'nx-text-warning' : 'nx-text-secondary';
+        const message = log.message || log.msg || log;
+        
+        html += '<div class="nx-mb-2"><span class="nx-text-xs ' + levelClass + '">[' + time + '] [' + level + ']</span> <span>' + message + '</span></div>';
+    });
+    
+    container.innerHTML = html;
+}
+
+function renderResult(result) {
+    const container = document.getElementById('executionResult');
+    
+    if (!result) {
+        container.innerHTML = '<p class="nx-text-secondary">暂无结果</p>';
+        return;
+    }
+    
+    if (typeof result === 'string') {
+        container.innerHTML = '<pre class="nx-bg-gray-50 nx-p-4 nx-rounded nx-overflow-x-auto">' + result + '</pre>';
+    } else {
+        container.innerHTML = '<pre class="nx-bg-gray-50 nx-p-4 nx-rounded nx-overflow-x-auto">' + JSON.stringify(result, null, 2) + '</pre>';
+    }
+}
+
+function goBack() {
+    if (document.referrer) {
+        window.history.back();
+    } else {
+        window.location.href = '/console/pages/my-history.html';
+    }
+}
+
+async function rerunExecution() {
+    if (!confirm('确定要重新执行此场景吗？')) return;
+    
+    try {
+        const response = await fetch('/api/v1/my/history/' + executionId + '/rerun', {
+            method: 'POST'
+        });
+        const result = await response.json();
+        
+        if (result.status === 'success') {
+            alert('场景已开始执行');
+            window.location.href = '/console/pages/my-scenes.html';
+        } else {
+            alert('执行失败: ' + result.message);
+        }
+    } catch (error) {
+        console.error('Failed to rerun:', error);
+        alert('执行失败: ' + error.message);
+    }
+}

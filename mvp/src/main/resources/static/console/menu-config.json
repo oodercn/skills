@@ -174,6 +174,55 @@
             ]
         },
         {
+            "id": "agent-management",
+            "name": "Agent管理",
+            "icon": "ri-robot-line",
+            "roles": ["admin", "enterprise", "leader"],
+            "status": "implemented",
+            "children": [
+                {
+                    "id": "agent-list",
+                    "name": "Agent列表",
+                    "icon": "ri-list-check",
+                    "url": "/console/pages/agent-list.html",
+                    "roles": ["admin", "enterprise", "leader"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "agent-register",
+                    "name": "Agent注册",
+                    "icon": "ri-add-circle-line",
+                    "url": "/console/pages/agent-register.html",
+                    "roles": ["admin"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "agent-topology",
+                    "name": "拓扑视图",
+                    "icon": "ri-node-tree",
+                    "url": "/console/pages/agent-topology.html",
+                    "roles": ["admin", "enterprise", "leader"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "agent-monitor",
+                    "name": "实时监控",
+                    "icon": "ri-line-chart-line",
+                    "url": "/console/pages/agent-monitor.html",
+                    "roles": ["admin", "enterprise", "leader"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "agent-alert",
+                    "name": "告警配置",
+                    "icon": "ri-alarm-warning-line",
+                    "url": "/console/pages/agent-alert.html",
+                    "roles": ["admin"],
+                    "status": "implemented"
+                }
+            ]
+        },
+        {
             "id": "system-management",
             "name": "系统管理",
             "icon": "ri-settings-4-line",

@@ -45,6 +45,12 @@ public class MvpSkillIndexLoader {
 
     @Autowired(required = false)
     private SkillPackageManager skillPackageManager;
+    
+    @Autowired(required = false)
+    private net.ooder.mvp.skill.scene.capability.service.CapabilityService capabilityService;
+    
+    @Autowired(required = false)
+    private net.ooder.mvp.skill.scene.capability.service.CapabilityStateService capabilityStateService;
 
     private List<Map<String, Object>> skills = new ArrayList<>();
     private List<Map<String, Object>> scenes = new ArrayList<>();
@@ -638,13 +644,228 @@ public class MvpSkillIndexLoader {
     
     public List<CapabilityDTO> getWorkspaceCapabilities(String source) {
         List<CapabilityDTO> capabilities = new ArrayList<>();
+        Map<String, CapabilityDTO> skillMap = new LinkedHashMap<>();
         
-        capabilities.addAll(scanDirectoryForSkills(downloadsDir, "downloaded", source));
-        capabilities.addAll(scanDirectoryForSkills(installedDir, "installed", source));
-        capabilities.addAll(scanDirectoryForSkills(activatedDir, "activated", source));
-        capabilities.addAll(scanDirectoryForSkills(devDir, "developing", source));
+        List<CapabilityDTO> registrySkills = scanRegistryInstalledSkills(source);
+        for (CapabilityDTO cap : registrySkills) {
+            if (cap.getSkillId() != null) {
+                skillMap.put(cap.getSkillId(), cap);
+            }
+        }
+        
+        List<CapabilityDTO> downloaded = scanDirectoryForSkills(downloadsDir, "downloaded", source);
+        for (CapabilityDTO cap : downloaded) {
+            if (cap.getSkillId() != null && !skillMap.containsKey(cap.getSkillId())) {
+                skillMap.put(cap.getSkillId(), cap);
+            }
+        }
+        
+        List<CapabilityDTO> installed = scanDirectoryForSkills(installedDir, "installed", source);
+        for (CapabilityDTO cap : installed) {
+            if (cap.getSkillId() != null && !skillMap.containsKey(cap.getSkillId())) {
+                skillMap.put(cap.getSkillId(), cap);
+            }
+        }
+        
+        List<CapabilityDTO> activated = scanDirectoryForSkills(activatedDir, "activated", source);
+        for (CapabilityDTO cap : activated) {
+            if (cap.getSkillId() != null && !skillMap.containsKey(cap.getSkillId())) {
+                skillMap.put(cap.getSkillId(), cap);
+            }
+        }
+        
+        List<CapabilityDTO> dev = scanDirectoryForSkills(devDir, "developing", source);
+        for (CapabilityDTO cap : dev) {
+            if (cap.getSkillId() != null && !skillMap.containsKey(cap.getSkillId())) {
+                skillMap.put(cap.getSkillId(), cap);
+            }
+        }
+        
+        capabilities.addAll(skillMap.values());
+        
+        log.info("[getWorkspaceCapabilities] Total {} unique skills found", capabilities.size());
+        
+        syncToCapabilityRegistry(capabilities);
+        
+        updateCapabilityStates(capabilities);
         
         return capabilities;
+    }
+    
+    private void updateCapabilityStates(List<CapabilityDTO> capabilities) {
+        if (capabilityStateService == null) {
+            log.debug("[updateCapabilityStates] CapabilityStateService not available, skipping state update");
+            return;
+        }
+        
+        for (CapabilityDTO cap : capabilities) {
+            try {
+                net.ooder.mvp.skill.scene.capability.model.CapabilityStatus status = 
+                    capabilityStateService.getStatus(cap.getSkillId());
+                if (status != null) {
+                    cap.setStatus(status.getCode().toLowerCase());
+                    cap.setEnabled(status == net.ooder.mvp.skill.scene.capability.model.CapabilityStatus.RUNNING 
+                        || status == net.ooder.mvp.skill.scene.capability.model.CapabilityStatus.SCHEDULED
+                        || status == net.ooder.mvp.skill.scene.capability.model.CapabilityStatus.PENDING
+                        || status == net.ooder.mvp.skill.scene.capability.model.CapabilityStatus.WAITING);
+                    log.debug("[updateCapabilityStates] Updated {} status={}, enabled={}", 
+                        cap.getSkillId(), status.getCode(), cap.getEnabled());
+                }
+            } catch (Exception e) {
+                log.debug("[updateCapabilityStates] Failed to get status for {}: {}", cap.getSkillId(), e.getMessage());
+            }
+        }
+    }
+    
+    private void syncToCapabilityRegistry(List<CapabilityDTO> capabilities) {
+        if (capabilityService == null) {
+            log.debug("[syncToCapabilityRegistry] CapabilityService not available, skipping sync");
+            return;
+        }
+        
+        for (CapabilityDTO dto : capabilities) {
+            try {
+                net.ooder.mvp.skill.scene.capability.model.Capability existing = capabilityService.findById(dto.getSkillId());
+                if (existing == null) {
+                    net.ooder.mvp.skill.scene.capability.model.Capability cap = new net.ooder.mvp.skill.scene.capability.model.Capability();
+                    cap.setCapabilityId(dto.getSkillId());
+                    cap.setName(dto.getName());
+                    cap.setDescription(dto.getDescription());
+                    cap.setVersion(dto.getVersion());
+                    cap.setSkillId(dto.getSkillId());
+                    cap.setInstalled(dto.isInstalled());
+                    cap.setCreateTime(System.currentTimeMillis());
+                    cap.setUpdateTime(System.currentTimeMillis());
+                    
+                    if (dto.getCategory() != null) {
+                        cap.setSceneType(dto.getCategory());
+                    }
+                    
+                    if (dto.getSkillForm() != null) {
+                        cap.setSkillForm(dto.getSkillForm());
+                        if ("SCENE".equals(dto.getSkillForm())) {
+                            cap.setCapabilityType(net.ooder.mvp.skill.scene.capability.model.CapabilityType.SCENE);
+                        }
+                    }
+                    
+                    capabilityService.register(cap);
+                    log.info("[syncToCapabilityRegistry] Registered capability: {} with skillForm={}", dto.getSkillId(), dto.getSkillForm());
+                } else {
+                    if (dto.getSkillForm() != null && existing.getSkillForm() == null) {
+                        existing.setSkillForm(dto.getSkillForm());
+                        if ("SCENE".equals(dto.getSkillForm())) {
+                            existing.setCapabilityType(net.ooder.mvp.skill.scene.capability.model.CapabilityType.SCENE);
+                        }
+                    }
+                    existing.setUpdateTime(System.currentTimeMillis());
+                    capabilityService.register(existing);
+                    log.debug("[syncToCapabilityRegistry] Updated capability: {} with skillForm={}", dto.getSkillId(), dto.getSkillForm());
+                }
+            } catch (Exception e) {
+                log.warn("[syncToCapabilityRegistry] Failed to sync capability {}: {}", dto.getSkillId(), e.getMessage());
+            }
+        }
+    }
+    
+    private List<CapabilityDTO> scanRegistryInstalledSkills(String source) {
+        List<CapabilityDTO> capabilities = new ArrayList<>();
+        
+        String[] registryPaths = {
+            "./data/installed-skills/registry.properties",
+            "./.ooder/installed/registry.properties",
+            "./.ooder/registry.properties"
+        };
+        
+        for (String registryPath : registryPaths) {
+            File registryFile = new File(registryPath);
+            log.info("[scanRegistryInstalledSkills] Checking registry file: {} exists={}", registryPath, registryFile.exists());
+            if (registryFile.exists()) {
+                try (java.io.BufferedReader reader = new java.io.BufferedReader(new java.io.FileReader(registryFile))) {
+                    Map<String, String> properties = new HashMap<>();
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        if (line.startsWith("#") || line.trim().isEmpty()) continue;
+                        int eqIdx = line.indexOf('=');
+                        if (eqIdx > 0) {
+                            String key = line.substring(0, eqIdx);
+                            String value = line.substring(eqIdx + 1);
+                            properties.put(key, value);
+                            log.debug("[scanRegistryInstalledSkills] Loaded property: {} = {}", key, value);
+                        }
+                    }
+                    
+                    log.info("[scanRegistryInstalledSkills] Loaded {} properties from {}", properties.size(), registryPath);
+                    
+                    for (String key : properties.keySet()) {
+                        if (key.endsWith(".id")) {
+                            String skillId = properties.get(key);
+                            String pathKey = skillId + ".path";
+                            String skillPath = properties.get(pathKey);
+                            
+                            log.info("[scanRegistryInstalledSkills] Found skillId={}, pathKey={}, skillPath={}", skillId, pathKey, skillPath);
+                            
+                            if (skillPath != null && !skillPath.isEmpty()) {
+                                String normalizedPath = skillPath.replace("\\\\", "\\").replace("\\:", ":");
+                                File skillDir = new File(normalizedPath);
+                                log.info("[scanRegistryInstalledSkills] Checking skill directory: {} (normalized: {}) exists={}", skillPath, normalizedPath, skillDir.exists());
+                                if (skillDir.exists() && skillDir.isDirectory()) {
+                                    CapabilityDTO cap = scanSingleSkillDirectory(skillDir, "installed", source);
+                                    if (cap != null) {
+                                        capabilities.add(cap);
+                                        log.info("[scanRegistryInstalledSkills] Found installed skill: {} at {}", skillId, normalizedPath);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (!capabilities.isEmpty()) {
+                        log.info("[scanRegistryInstalledSkills] Found {} installed skills from {}", capabilities.size(), registryPath);
+                    }
+                    break;
+                } catch (Exception e) {
+                    log.warn("[scanRegistryInstalledSkills] Failed to read registry from {}: {}", registryPath, e.getMessage());
+                }
+            }
+        }
+        
+        return capabilities;
+    }
+    
+    private CapabilityDTO scanSingleSkillDirectory(File skillDir, String status, String source) {
+        Yaml yaml = new Yaml();
+        
+        try {
+            File skillYaml = new File(skillDir, "src/main/resources/skill.yaml");
+            if (!skillYaml.exists()) {
+                skillYaml = new File(skillDir, "skill.yaml");
+            }
+            if (!skillYaml.exists()) {
+                skillYaml = new File(skillDir, "skill.yml");
+            }
+            
+            if (skillYaml.exists()) {
+                try (InputStream is = new FileInputStream(skillYaml)) {
+                    Map<String, Object> skillData = yaml.load(is);
+                    if (skillData != null) {
+                        return convertSkillYamlToDTO(skillData, skillDir.getName(), status, source);
+                    }
+                }
+            } else {
+                CapabilityDTO cap = new CapabilityDTO();
+                cap.setId(skillDir.getName());
+                cap.setSkillId(skillDir.getName());
+                cap.setName(skillDir.getName());
+                cap.setStatus(status);
+                cap.setInstalled("installed".equals(status) || "activated".equals(status));
+                cap.setSource(source);
+                return cap;
+            }
+        } catch (Exception e) {
+            log.warn("[scanSingleSkillDirectory] Failed to read skill from {}: {}", skillDir.getName(), e.getMessage());
+        }
+        
+        return null;
     }
     
     private List<CapabilityDTO> scanDirectoryForSkills(String dirPath, String status, String source) {
@@ -713,6 +934,7 @@ public class MvpSkillIndexLoader {
         String name = null;
         String description = null;
         String version = null;
+        String category = null;
         
         if (metadata != null) {
             skillId = (String) metadata.get("id");
@@ -720,22 +942,83 @@ public class MvpSkillIndexLoader {
             version = (String) metadata.get("version");
         }
         
+        String topLevelCategory = (String) skillData.get("category");
+        if (topLevelCategory != null) {
+            category = topLevelCategory;
+        }
+        
+        String topLevelName = (String) skillData.get("name");
+        if (topLevelName != null && name == null) {
+            name = topLevelName;
+        }
+        
+        String topLevelDesc = (String) skillData.get("description");
+        if (topLevelDesc != null && description == null) {
+            description = topLevelDesc;
+        }
+        
+        String topLevelVersion = (String) skillData.get("version");
+        if (topLevelVersion != null && version == null) {
+            version = topLevelVersion;
+        }
+        
         if (spec != null) {
             if (name == null) name = (String) spec.get("name");
             description = (String) spec.get("description");
             if (version == null) version = (String) spec.get("version");
+            
+            String type = (String) spec.get("type");
+            if (type != null) {
+                category = type.replace("-skill", "").replace("scene-", "business");
+                
+                if ("scene".equals(type) || "scene-skill".equals(type)) {
+                    cap.setSkillForm("SCENE");
+                    cap.setCapabilityType("SCENE");
+                } else {
+                    cap.setSkillForm("PROVIDER");
+                    cap.setCapabilityType("PROVIDER");
+                }
+            }
+            
+            List<Map<String, Object>> capabilities = (List<Map<String, Object>>) spec.get("capabilities");
+            if (capabilities != null && !capabilities.isEmpty()) {
+                String capCategory = (String) capabilities.get(0).get("category");
+                if (capCategory != null) {
+                    category = capCategory;
+                }
+            }
+            
+            List<Map<String, Object>> scenes = (List<Map<String, Object>>) spec.get("scenes");
+            if (scenes != null && !scenes.isEmpty()) {
+                cap.setCapabilityType("SCENE");
+                cap.setSkillForm("SCENE");
+            }
+        }
+        
+        if (cap.getSkillForm() == null || cap.getSkillForm().isEmpty()) {
+            List<Map<String, Object>> menu = (List<Map<String, Object>>) skillData.get("menu");
+            if (menu != null && !menu.isEmpty()) {
+                cap.setSkillForm("SCENE");
+                cap.setCapabilityType("SCENE");
+            } else {
+                cap.setSkillForm("PROVIDER");
+                cap.setCapabilityType("PROVIDER");
+            }
         }
         
         if (skillId == null) skillId = dirName;
         if (name == null) name = dirName;
+        if (category == null) category = "util";
         
         cap.setId(skillId);
         cap.setSkillId(skillId);
         cap.setName(name);
         cap.setDescription(description);
         cap.setVersion(version);
+        cap.setCategory(category);
         cap.setStatus(status);
         cap.setInstalled("installed".equals(status) || "activated".equals(status));
+        cap.setEnabled("activated".equals(status));
         cap.setSource(source);
         
         return cap;
@@ -764,6 +1047,21 @@ public class MvpSkillIndexLoader {
             return giteeUrl != null ? giteeUrl : githubUrl;
         }
         return null;
+    }
+    
+    public String getRepoUrl(String skillId) {
+        Map<String, Object> skill = getSkillInfo(skillId);
+        if (skill != null) {
+            String giteeRepo = (String) skill.get("giteeRepo");
+            String githubRepo = (String) skill.get("githubRepo");
+            if (giteeRepo != null && !giteeRepo.isEmpty()) {
+                return "https://gitee.com/" + giteeRepo + ".git";
+            }
+            if (githubRepo != null && !githubRepo.isEmpty()) {
+                return "https://github.com/" + githubRepo + ".git";
+            }
+        }
+        return "https://gitee.com/ooderCN/skills.git";
     }
     
     /**

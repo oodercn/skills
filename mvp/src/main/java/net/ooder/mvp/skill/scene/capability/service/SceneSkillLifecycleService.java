@@ -13,6 +13,8 @@ public interface SceneSkillLifecycleService {
     
     LifecycleResult pause(String capabilityId, String userId);
     
+    LifecycleResult deactivate(String capabilityId, String userId);
+    
     LifecycleResult resume(String capabilityId, String userId);
     
     LifecycleResult trigger(String capabilityId, TriggerRequest request);
@@ -43,6 +45,7 @@ public interface SceneSkillLifecycleService {
         private CapabilityStatus currentStatus;
         private SceneType sceneType;
         private SkillForm skillForm;
+        private String sceneGroupId;
         private String message;
         private List<String> nextSteps;
         private long timestamp;
@@ -59,6 +62,8 @@ public interface SceneSkillLifecycleService {
         public void setSceneType(SceneType sceneType) { this.sceneType = sceneType; }
         public SkillForm getSkillForm() { return skillForm; }
         public void setSkillForm(SkillForm skillForm) { this.skillForm = skillForm; }
+        public String getSceneGroupId() { return sceneGroupId; }
+        public void setSceneGroupId(String sceneGroupId) { this.sceneGroupId = sceneGroupId; }
         public String getMessage() { return message; }
         public void setMessage(String message) { this.message = message; }
         public List<String> getNextSteps() { return nextSteps; }

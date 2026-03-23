@@ -11,14 +11,24 @@
         { code: 'vfs', name: '存储服务', icon: 'ri-database-2-line', color: '#f5970b', userFacing: false },
         { code: 'llm', name: 'LLM服务', icon: 'ri-brain-line', color: '#9334ff', userFacing: true },
         { code: 'knowledge', name: '知识服务', icon: 'ri-book-line', color: '#10b981', userFacing: true },
-        { code: 'biz', name: '业务场景', icon: 'ri-briefcase-line', color: '#f97316', userFacing: true },
+        { code: 'biz', name: '业务应用', icon: 'ri-briefcase-line', color: '#f97316', userFacing: true },
         { code: 'sys', name: '系统管理', icon: 'ri-settings-3-line', color: '#6366f1', userFacing: false },
         { code: 'msg', name: '消息通讯', icon: 'ri-message-3-line', color: '#f97b72', userFacing: false },
         { code: 'ui', name: 'UI生成', icon: 'ri-palette-line', color: '#ec4899', userFacing: false },
         { code: 'payment', name: '支付服务', icon: 'ri-bank-card-line', color: '#8b5cf6', userFacing: false },
         { code: 'media', name: '媒体发布', icon: 'ri-edit-line', color: '#f5970b', userFacing: false },
         { code: 'util', name: '工具服务', icon: 'ri-tools-line', color: '#4f46e5', userFacing: true },
-        { code: 'nexus-ui', name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', userFacing: false }
+        { code: 'nexus-ui', name: 'Nexus界面', icon: 'ri-layout-line', color: '#6366f1', userFacing: false },
+        { code: 'form', name: '表单服务', icon: 'ri-file-list-3-line', color: '#10b981', userFacing: true },
+        { code: 'template', name: '模板服务', icon: 'ri-file-copy-line', color: '#8b5cf6', userFacing: true },
+        { code: 'workflow', name: '工作流', icon: 'ri-flow-chart', color: '#f97316', userFacing: true },
+        { code: 'record', name: '记录服务', icon: 'ri-history-line', color: '#6366f1', userFacing: true },
+        { code: 'dashboard', name: '仪表盘', icon: 'ri-dashboard-line', color: '#ec4899', userFacing: true },
+        { code: 'notification', name: '通知服务', icon: 'ri-notification-line', color: '#f97b72', userFacing: true },
+        { code: 'recruitment', name: '招聘服务', icon: 'ri-user-add-line', color: '#10b981', userFacing: true },
+        { code: 'approval', name: '审批服务', icon: 'ri-checkbox-circle-line', color: '#8b5cf6', userFacing: true },
+        { code: 'hr', name: '人力资源', icon: 'ri-team-line', color: '#f97316', userFacing: true },
+        { code: 'management', name: '管理服务', icon: 'ri-settings-4-line', color: '#6366f1', userFacing: true }
     ];
 
     var CategoryService = {

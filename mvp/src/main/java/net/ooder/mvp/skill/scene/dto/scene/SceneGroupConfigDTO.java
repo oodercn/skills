@@ -3,10 +3,15 @@ package net.ooder.mvp.skill.scene.dto.scene;
 import java.util.Map;
 
 public class SceneGroupConfigDTO {
+    
+    public enum CreatorType {
+        USER, AGENT, SYSTEM
+    }
+    
     private String name;
     private String description;
     private String creatorId;
-    private ParticipantType creatorType;
+    private CreatorType creatorType;
     private Integer minMembers;
     private Integer maxMembers;
     private String securityPolicy;
@@ -23,8 +28,8 @@ public class SceneGroupConfigDTO {
     public void setDescription(String description) { this.description = description; }
     public String getCreatorId() { return creatorId; }
     public void setCreatorId(String creatorId) { this.creatorId = creatorId; }
-    public ParticipantType getCreatorType() { return creatorType; }
-    public void setCreatorType(ParticipantType creatorType) { this.creatorType = creatorType; }
+    public CreatorType getCreatorType() { return creatorType; }
+    public void setCreatorType(CreatorType creatorType) { this.creatorType = creatorType; }
     public Integer getMinMembers() { return minMembers; }
     public void setMinMembers(Integer minMembers) { this.minMembers = minMembers; }
     public Integer getMaxMembers() { return maxMembers; }

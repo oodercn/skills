@@ -6,6 +6,7 @@ import java.util.List;
 public class InstallResultDTO {
     
     private String skillId;
+    private String capabilityId;
     private String status;
     private String message;
     private Long installTime;
@@ -29,6 +30,15 @@ public class InstallResultDTO {
 
     public void setSkillId(String skillId) {
         this.skillId = skillId;
+        this.capabilityId = skillId;
+    }
+
+    public String getCapabilityId() {
+        return capabilityId;
+    }
+
+    public void setCapabilityId(String capabilityId) {
+        this.capabilityId = capabilityId;
     }
 
     public String getStatus() {

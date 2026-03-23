@@ -125,7 +125,7 @@ function getDefaultRoles() {
 
 async function loadTemplate(id) {
     try {
-        const result = await ApiClient.get('/api/v1/scene-templates/' + id);
+        const result = await ApiClient.get('/api/v1/templates/' + id);
         
         if (result.status === 'success' && result.data) {
             currentTemplate = result.data;
@@ -464,7 +464,7 @@ async function saveCapability() {
     }
     
     try {
-        const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/capabilities', capability);
+        const result = await ApiClient.post('/api/v1/templates/' + templateId + '/capabilities', capability);
         
         if (result.status === 'success') {
             if (!currentTemplate.capabilities) currentTemplate.capabilities = [];
@@ -505,7 +505,7 @@ async function deleteCapability(capId) {
     if (!confirm('确定要删除此能力吗？')) return;
     
     try {
-        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/capabilities/' + capId);
+        const result = await ApiClient.delete('/api/v1/templates/' + templateId + '/capabilities/' + capId);
         
         if (result.status === 'success') {
             currentTemplate.capabilities = currentTemplate.capabilities?.filter(c => c.capId !== capId);
@@ -593,7 +593,7 @@ async function saveRole() {
     }
     
     try {
-        const result = await ApiClient.post('/api/v1/scene-templates/' + templateId + '/roles', role);
+        const result = await ApiClient.post('/api/v1/templates/' + templateId + '/roles', role);
         
         if (result.status === 'success') {
             if (!currentTemplate.roles) currentTemplate.roles = [];
@@ -642,7 +642,7 @@ async function deleteRole(roleName) {
     if (!confirm('确定要删除此角色吗？')) return;
     
     try {
-        const result = await ApiClient.delete('/api/v1/scene-templates/' + templateId + '/roles/' + encodeURIComponent(roleName));
+        const result = await ApiClient.delete('/api/v1/templates/' + templateId + '/roles/' + encodeURIComponent(roleName));
         
         if (result.status === 'success') {
             currentTemplate.roles = currentTemplate.roles?.filter(r => r.name !== roleName);
@@ -676,7 +676,7 @@ async function saveTemplate() {
     }
     
     try {
-        const result = await ApiClient.put('/api/v1/scene-templates/' + currentTemplate.templateId, currentTemplate);
+        const result = await ApiClient.put('/api/v1/templates/' + currentTemplate.templateId, currentTemplate);
         
         if (result.status === 'success') {
             alert('保存成功');

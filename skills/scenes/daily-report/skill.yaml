@@ -1,0 +1,246 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: daily-report
+  name: 日报场景
+  version: "2.3.1"
+  category: biz
+  subCategory: report
+  description: 员工日报提交与管理场景，支持日报创建、提交、审核、统计等功能
+  author: Ooder Team
+  icon: ri-file-text-line
+
+spec:
+  capabilities:
+    - id: daily-report-submit
+      name: 日报提交
+      description: 员工提交日报
+      category: service
+      autoBind: true
+      
+    - id: daily-report-review
+      name: 日报审核
+      description: 管理员审核日报
+      category: service
+      autoBind: true
+      
+    - id: daily-report-statistics
+      name: 日报统计
+      description: 日报数据统计分析
+      category: ai
+      autoBind: false
+      
+    - id: daily-report-reminder
+      name: 提醒通知
+      description: 日报提交提醒
+      category: service
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-msg
+      version: ">=2.3.1"
+      required: true
+      description: 消息服务
+    - skillId: skill-notify
+      version: ">=2.3.1"
+      required: true
+      description: 通知服务
+      
+  skillForm: SCENE
+  
+  scene:
+    type: TRIGGER
+    visibility: internal
+    participantMode: multi-role
+    name: 日报管理
+    description: 员工日报提交与管理
+    
+  roles:
+    - id: MANAGER
+      name: 管理员
+      description: 场景管理员，负责日报管理和审核
+      required: true
+      minCount: 1
+      maxCount: 1
+      permissions:
+        - scene:manage
+        - report:view
+        - report:export
+        - report:review
+        - report:statistics
+        
+    - id: EMPLOYEE
+      name: 员工
+      description: 普通员工，提交日报
+      required: true
+      minCount: 1
+      maxCount: 100
+      permissions:
+        - report:submit
+        - report:view.own
+        - report:edit.own
+        
+  activationSteps:
+    MANAGER:
+      - stepId: confirm-participants
+        step: 1
+        action: confirm-participants
+        title: 确认参与者
+        description: 选择参与日报的员工
+        type: CONFIRM_PARTICIPANTS
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: select-push-targets
+        step: 2
+        action: select-push-targets
+        title: 选择推送目标
+        description: 选择接收日报提醒的人员
+        type: SELECT_PUSH_TARGETS
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: config-conditions
+        step: 3
+        action: config-conditions
+        title: 配置提醒条件
+        description: 设置日报提交提醒的时间和条件
+        type: CONFIG_CONDITIONS
+        required: false
+        skippable: true
+        autoExecute: false
+        
+      - stepId: confirm-activation
+        step: 4
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+    EMPLOYEE:
+      - stepId: confirm-join
+        step: 1
+        action: confirm-join
+        title: 确认加入
+        description: 确认加入日报场景
+        type: CONFIRM_JOIN
+        required: true
+        skippable: false
+        autoExecute: false
+        
+      - stepId: config-private-capabilities
+        step: 2
+        action: config-private-capabilities
+        title: 配置私有能力
+        description: 配置个人提醒等私有能力
+        type: CONFIG_PRIVATE_CAPABILITIES
+        required: false
+        skippable: true
+        autoExecute: false
+        privateCapabilities:
+          - personal-reminder
+          
+      - stepId: confirm-activation
+        step: 3
+        action: confirm-activation
+        title: 确认激活
+        description: 确认场景激活
+        type: CONFIRM_ACTIVATION
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    MANAGER:
+      - id: daily-report-dashboard
+        name: 日报管理
+        icon: ri-dashboard-line
+        path: /daily-report/manager
+        order: 1
+        visible: true
+        
+      - id: daily-report-summary
+        name: 日报汇总
+        icon: ri-file-list-line
+        path: /daily-report/summary
+        order: 2
+        visible: true
+        
+      - id: daily-report-settings
+        name: 场景设置
+        icon: ri-settings-line
+        path: /daily-report/settings
+        order: 3
+        visible: true
+        
+    EMPLOYEE:
+      - id: daily-report-submit
+        name: 提交日报
+        icon: ri-edit-line
+        path: /daily-report/submit
+        order: 1
+        visible: true
+        
+      - id: daily-report-history
+        name: 我的日报
+        icon: ri-history-line
+        path: /daily-report/history
+        order: 2
+        visible: true
+        
+  privateCapabilities:
+    - capId: personal-reminder
+      name: 个人提醒
+      description: 自定义提醒时间和方式
+      configSchema:
+        type: object
+        properties:
+          reminderTime:
+            type: string
+            description: 提醒时间
+          reminderMethod:
+            type: string
+            enum: [email, sms, app]
+            description: 提醒方式
+            
+  configSchema:
+    type: object
+    properties:
+      submitDeadline:
+        type: string
+        default: "18:00"
+        title: 提交截止时间
+      enableWeekend:
+        type: boolean
+        default: false
+        title: 启用周末提交
+      autoRemind:
+        type: boolean
+        default: true
+        title: 自动提醒
+      remindAdvance:
+        type: integer
+        default: 30
+        title: 提醒提前时间(分钟)
+      notifyChannels:
+        type: array
+        default: [email, app]
+        title: 通知渠道
+        
+  installOrder:
+    - skill-msg
+    - skill-notify
+    - daily-report
+    
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "50Mi"
+    
+  estimatedDuration: "2-3分钟"

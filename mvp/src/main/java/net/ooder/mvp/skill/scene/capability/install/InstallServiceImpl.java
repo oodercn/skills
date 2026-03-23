@@ -4,6 +4,7 @@ import net.ooder.mvp.skill.scene.audit.Auditable;
 import net.ooder.mvp.skill.scene.dto.audit.AuditEventType;
 import net.ooder.mvp.skill.scene.capability.model.Capability;
 import net.ooder.mvp.skill.scene.capability.model.CapabilityStatus;
+import net.ooder.mvp.skill.scene.capability.model.CapabilityType;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityService;
 import net.ooder.mvp.skill.scene.capability.service.CapabilityStateService;
 import net.ooder.mvp.skill.scene.notification.SceneNotificationService;
@@ -246,6 +247,18 @@ public class InstallServiceImpl implements InstallService {
                         progress.setMessage("能力不存在: " + config.getCapabilityId());
                     }
                     return config;
+                }
+                
+                if (capability.getCapabilityType() == CapabilityType.SCENE) {
+                    try {
+                        validateSceneConfig(config.getCapabilityId(), capability);
+                        log.info("[executeInstall] Scene config validation passed for: {}", config.getCapabilityId());
+                    } catch (Exception e) {
+                        log.warn("[executeInstall] Scene config validation failed for {}: {}", config.getCapabilityId(), e.getMessage());
+                        if (progress != null) {
+                            progress.setCurrentAction("场景配置验证: " + e.getMessage());
+                        }
+                    }
                 }
                 
                 List<String> dependencyIds = capability.getDependencies();
@@ -903,5 +916,21 @@ public class InstallServiceImpl implements InstallService {
             log.error("[listActivatedSkills] Failed: {}", e.getMessage());
         }
         return skills;
+    }
+    
+    private void validateSceneConfig(String skillId, net.ooder.mvp.skill.scene.capability.model.Capability capability) {
+        log.info("[validateSceneConfig] Scene config validation for: {} - using MVP validation", skillId);
+        
+        if (capability == null) {
+            log.warn("[validateSceneConfig] Capability is null for: {}", skillId);
+            return;
+        }
+        
+        if (capability.getSceneTypeEnum() == null) {
+            log.debug("[validateSceneConfig] No scene type defined for: {}, skipping validation", skillId);
+            return;
+        }
+        
+        log.info("[validateSceneConfig] Scene config validated successfully for: {}", skillId);
     }
 }

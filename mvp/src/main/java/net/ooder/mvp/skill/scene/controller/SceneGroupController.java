@@ -3,10 +3,17 @@ package net.ooder.mvp.skill.scene.controller;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import net.ooder.mvp.skill.scene.dto.PageResult;
 import net.ooder.mvp.skill.scene.dto.scene.*;
+import net.ooder.mvp.skill.scene.dto.UserSessionDTO;
 import net.ooder.mvp.skill.scene.service.SceneGroupService;
+import net.ooder.mvp.skill.scene.service.TodoService;
+import net.ooder.mvp.skill.scene.service.MenuAutoRegisterService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
@@ -17,11 +24,19 @@ import java.util.ArrayList;
 @CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.GET, RequestMethod.POST, RequestMethod.PUT, RequestMethod.DELETE, RequestMethod.OPTIONS})
 public class SceneGroupController extends BaseController {
 
+    private static final Logger log = LoggerFactory.getLogger(SceneGroupController.class);
+
     private final SceneGroupService sceneGroupService;
+    private final MenuAutoRegisterService menuAutoRegisterService;
+    
+    @Autowired(required = false)
+    private TodoService todoService;
 
     @Autowired
-    public SceneGroupController(SceneGroupService sceneGroupService) {
+    public SceneGroupController(SceneGroupService sceneGroupService, 
+                                 MenuAutoRegisterService menuAutoRegisterService) {
         this.sceneGroupService = sceneGroupService;
+        this.menuAutoRegisterService = menuAutoRegisterService;
     }
 
     @PostMapping
@@ -115,18 +130,53 @@ public class SceneGroupController extends BaseController {
     }
 
     @PostMapping("/{sceneGroupId}/activate")
-    public ResultModel<Boolean> activate(@PathVariable String sceneGroupId) {
+    public ResultModel<Boolean> activate(@PathVariable String sceneGroupId, 
+                                          HttpServletRequest request,
+                                          HttpSession session) {
         long startTime = System.currentTimeMillis();
         logRequestStart("activate", sceneGroupId);
 
         try {
+            SceneGroupDTO group = sceneGroupService.get(sceneGroupId);
+            if (group == null) {
+                logRequestEnd("activate", "Not found", System.currentTimeMillis() - startTime);
+                return ResultModel.notFound("场景组不存在");
+            }
+            
             boolean result = sceneGroupService.activate(sceneGroupId);
+            
+            if (result) {
+                String userId = getCurrentUserId(session);
+                String templateId = group.getTemplateId();
+                String roleInScene = "MANAGER";
+                
+                try {
+                    menuAutoRegisterService.registerMenusOnActivation(
+                        sceneGroupId, 
+                        templateId, 
+                        userId, 
+                        roleInScene
+                    );
+                    log.info("[activate] Menus registered for user: {}, sceneGroup: {}", userId, sceneGroupId);
+                } catch (Exception e) {
+                    log.warn("[activate] Failed to register menus: {}", e.getMessage());
+                }
+            }
+            
             logRequestEnd("activate", result, System.currentTimeMillis() - startTime);
             return ResultModel.success(result);
         } catch (Exception e) {
             logRequestError("activate", e);
             return ResultModel.error(500, "激活场景组失败: " + e.getMessage());
         }
+    }
+    
+    private String getCurrentUserId(HttpSession session) {
+        UserSessionDTO user = (UserSessionDTO) session.getAttribute("user");
+        if (user != null) {
+            return user.getUserId();
+        }
+        return "default-user";
     }
 
     @PostMapping("/{sceneGroupId}/deactivate")
@@ -156,6 +206,124 @@ public class SceneGroupController extends BaseController {
         } catch (Exception e) {
             logRequestError("join", e);
             return ResultModel.error(500, "加入场景失败: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/{sceneGroupId}/invite")
+    public ResultModel<Boolean> inviteMember(
+            @PathVariable String sceneGroupId,
+            @RequestBody InviteMemberRequest request,
+            HttpSession session) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("inviteMember", sceneGroupId);
+
+        try {
+            SceneGroupDTO group = sceneGroupService.get(sceneGroupId);
+            if (group == null) {
+                logRequestEnd("inviteMember", "Not found", System.currentTimeMillis() - startTime);
+                return ResultModel.notFound("场景组不存在");
+            }
+            
+            String fromUserId = getCurrentUserId(session);
+            String toUserId = request.getUserId();
+            String role = request.getRole() != null ? request.getRole() : "MEMBER";
+            
+            if (todoService != null) {
+                boolean created = todoService.createInvitationTodo(
+                    sceneGroupId, 
+                    fromUserId, 
+                    toUserId, 
+                    role
+                );
+                log.info("[inviteMember] Created invitation todo: {} -> {}, sceneGroup: {}", 
+                    fromUserId, toUserId, sceneGroupId);
+            }
+            
+            logRequestEnd("inviteMember", true, System.currentTimeMillis() - startTime);
+            return ResultModel.success(true);
+        } catch (Exception e) {
+            logRequestError("inviteMember", e);
+            return ResultModel.error(500, "邀请成员失败: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/{sceneGroupId}/delegate")
+    public ResultModel<Boolean> delegateTask(
+            @PathVariable String sceneGroupId,
+            @RequestBody DelegateTaskRequest request,
+            HttpSession session) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("delegateTask", sceneGroupId);
+
+        try {
+            SceneGroupDTO group = sceneGroupService.get(sceneGroupId);
+            if (group == null) {
+                logRequestEnd("delegateTask", "Not found", System.currentTimeMillis() - startTime);
+                return ResultModel.notFound("场景组不存在");
+            }
+            
+            String fromUserId = getCurrentUserId(session);
+            String toUserId = request.getUserId();
+            String title = request.getTitle();
+            Long deadline = request.getDeadline();
+            
+            if (todoService != null) {
+                boolean created = todoService.createDelegationTodo(
+                    sceneGroupId, 
+                    fromUserId, 
+                    toUserId, 
+                    title, 
+                    deadline
+                );
+                log.info("[delegateTask] Created delegation todo: {} -> {}, sceneGroup: {}", 
+                    fromUserId, toUserId, sceneGroupId);
+            }
+            
+            logRequestEnd("delegateTask", true, System.currentTimeMillis() - startTime);
+            return ResultModel.success(true);
+        } catch (Exception e) {
+            logRequestError("delegateTask", e);
+            return ResultModel.error(500, "委派任务失败: " + e.getMessage());
+        }
+    }
+    
+    @PostMapping("/{sceneGroupId}/approval")
+    public ResultModel<Boolean> requestApproval(
+            @PathVariable String sceneGroupId,
+            @RequestBody ApprovalRequest request,
+            HttpSession session) {
+        long startTime = System.currentTimeMillis();
+        logRequestStart("requestApproval", sceneGroupId);
+
+        try {
+            SceneGroupDTO group = sceneGroupService.get(sceneGroupId);
+            if (group == null) {
+                logRequestEnd("requestApproval", "Not found", System.currentTimeMillis() - startTime);
+                return ResultModel.notFound("场景组不存在");
+            }
+            
+            String fromUserId = getCurrentUserId(session);
+            String toUserId = request.getUserId();
+            String title = request.getTitle();
+            String description = request.getDescription();
+            
+            if (todoService != null) {
+                boolean created = todoService.createApprovalTodo(
+                    sceneGroupId, 
+                    fromUserId, 
+                    toUserId, 
+                    title, 
+                    description
+                );
+                log.info("[requestApproval] Created approval todo: {} -> {}, sceneGroup: {}", 
+                    fromUserId, toUserId, sceneGroupId);
+            }
+            
+            logRequestEnd("requestApproval", true, System.currentTimeMillis() - startTime);
+            return ResultModel.success(true);
+        } catch (Exception e) {
+            logRequestError("requestApproval", e);
+            return ResultModel.error(500, "请求审批失败: " + e.getMessage());
         }
     }
 
@@ -423,6 +591,42 @@ public class SceneGroupController extends BaseController {
 
         public String getNewRole() { return newRole; }
         public void setNewRole(String newRole) { this.newRole = newRole; }
+    }
+    
+    public static class InviteMemberRequest {
+        private String userId;
+        private String role;
+        
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
+        public String getRole() { return role; }
+        public void setRole(String role) { this.role = role; }
+    }
+    
+    public static class DelegateTaskRequest {
+        private String userId;
+        private String title;
+        private Long deadline;
+        
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public Long getDeadline() { return deadline; }
+        public void setDeadline(Long deadline) { this.deadline = deadline; }
+    }
+    
+    public static class ApprovalRequest {
+        private String userId;
+        private String title;
+        private String description;
+        
+        public String getUserId() { return userId; }
+        public void setUserId(String userId) { this.userId = userId; }
+        public String getTitle() { return title; }
+        public void setTitle(String title) { this.title = title; }
+        public String getDescription() { return description; }
+        public void setDescription(String description) { this.description = description; }
     }
 
     @PostMapping("/{sceneGroupId}/knowledge-bases")

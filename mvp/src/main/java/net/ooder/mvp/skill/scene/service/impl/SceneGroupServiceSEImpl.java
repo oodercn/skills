@@ -64,12 +64,45 @@ public class SceneGroupServiceSEImpl implements SceneGroupService {
 
         log.info("Created scene group {} via SE", sceneGroupId);
         
+        addDefaultParticipants(sceneGroup, creatorId, templateId);
+        
         if (eventLogService != null) {
             eventLogService.logCreateEvent(sceneGroupId, creatorId, creatorId, 
                 config != null ? config.getName() : sceneGroupId);
         }
         
         return convertToDTO(sceneGroup);
+    }
+    
+    private void addDefaultParticipants(SceneGroup sceneGroup, String creatorId, String templateId) {
+        try {
+            Participant creator = new Participant(
+                "p-" + System.currentTimeMillis() + "-creator",
+                creatorId,
+                creatorId,
+                Participant.Type.USER
+            );
+            creator.setRole(Participant.Role.MANAGER);
+            creator.join();
+            creator.activate();
+            sceneGroupManager.addParticipant(sceneGroup.getSceneGroupId(), creator);
+            log.info("Added creator {} as MANAGER to scene group {}", creatorId, sceneGroup.getSceneGroupId());
+            
+            Participant llmAssistant = new Participant(
+                "p-" + System.currentTimeMillis() + "-llm",
+                "llm-assistant",
+                "LLM智能助手",
+                Participant.Type.AGENT
+            );
+            llmAssistant.setRole(Participant.Role.LLM_ASSISTANT);
+            llmAssistant.join();
+            llmAssistant.activate();
+            sceneGroupManager.addParticipant(sceneGroup.getSceneGroupId(), llmAssistant);
+            log.info("Added LLM Assistant to scene group {}", sceneGroup.getSceneGroupId());
+            
+        } catch (Exception e) {
+            log.warn("Failed to add default participants to scene group {}: {}", sceneGroup.getSceneGroupId(), e.getMessage());
+        }
     }
 
     @Override
@@ -562,27 +595,31 @@ public class SceneGroupServiceSEImpl implements SceneGroupService {
         return dto;
     }
 
-    private SceneGroup.CreatorType convertCreatorType(ParticipantType type) {
+    private SceneGroup.CreatorType convertCreatorType(SceneGroupConfigDTO.CreatorType type) {
         if (type == null) {
             return SceneGroup.CreatorType.USER;
         }
         switch (type) {
             case AGENT:
                 return SceneGroup.CreatorType.AGENT;
+            case SYSTEM:
+                return SceneGroup.CreatorType.SYSTEM;
             default:
                 return SceneGroup.CreatorType.USER;
         }
     }
 
-    private ParticipantType convertCreatorTypeFromSE(SceneGroup.CreatorType type) {
+    private SceneGroupConfigDTO.CreatorType convertCreatorTypeFromSE(SceneGroup.CreatorType type) {
         if (type == null) {
-            return ParticipantType.USER;
+            return SceneGroupConfigDTO.CreatorType.USER;
         }
         switch (type) {
             case AGENT:
-                return ParticipantType.AGENT;
+                return SceneGroupConfigDTO.CreatorType.AGENT;
+            case SYSTEM:
+                return SceneGroupConfigDTO.CreatorType.SYSTEM;
             default:
-                return ParticipantType.USER;
+                return SceneGroupConfigDTO.CreatorType.USER;
         }
     }
 

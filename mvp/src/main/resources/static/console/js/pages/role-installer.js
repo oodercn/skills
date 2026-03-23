@@ -17,6 +17,7 @@
     var capabilityConfig = {};
     var extendedConfig = {};
     var expandedCapabilities = new Set();
+    var autoActivate = false;
 
     var requiredSkills = [
         { id: 'skill-scene', name: 'skill-scene 基础场景技能包', desc: '核心场景管理功能', isCurrentSystem: true },
@@ -673,6 +674,7 @@
 
             if (result.status === 'success' && result.data) {
                 var installResult = result.data;
+                var capabilityId = installResult.capabilityId || skillId;
                 
                 if (installResult.status === 'installed' || installResult.status === 'success') {
                     installedSkillIds.add(skillId);
@@ -680,6 +682,10 @@
                     
                     if (installResult.installedDependencies && installResult.installedDependencies.length > 0) {
                         addLog('安装了 ' + installResult.installedDependencies.length + ' 个依赖', 'info');
+                    }
+                    
+                    if (typeof autoActivate !== 'undefined' && autoActivate) {
+                        await activateSkillAfterInstall(capabilityId, skill.name);
                     }
                     
                     updateProgress();
@@ -699,9 +705,32 @@
             addLog(skill.name + ' 安装异常: ' + e.message, 'error');
         }
     }
+    
+    async function activateSkillAfterInstall(capabilityId, skillName) {
+        addLog('正在激活 ' + skillName + '...', 'info');
+        try {
+            var response = await fetch('/api/v1/scene-capabilities/' + capabilityId + '/activate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' }
+            });
+            var result = await response.json();
+            if (result.success) {
+                addLog(skillName + ' 激活成功', 'success');
+            } else {
+                addLog(skillName + ' 激活失败: ' + (result.message || '未知错误'), 'warning');
+            }
+        } catch (e) {
+            addLog(skillName + ' 激活异常: ' + e.message, 'warning');
+        }
+    }
 
     window.installSkill = installSkill;
     window.goToNextStep = goToNextStep;
+    
+    window.toggleAutoActivate = function(checked) {
+        autoActivate = checked;
+        addLog(checked ? '已启用安装后自动激活' : '已禁用安装后自动激活', 'info');
+    };
     
     window.selectProfile = function(profile) {
         selectedProfile = profile;
