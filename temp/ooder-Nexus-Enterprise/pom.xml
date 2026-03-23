@@ -32,21 +32,14 @@
             <version>${spring-boot.version}</version>
         </dependency>
 
-        <!-- Agent SDK Core 2.3 -->
+        <!-- Agent SDK Core 3.0 -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-core</artifactId>
             <version>${agent-sdk.version}</version>
         </dependency>
 
-        <!-- Agent SDK API 2.3 (SceneDefinition, Capability, SceneManager) -->
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk-api</artifactId>
-            <version>${agent-sdk.version}</version>
-        </dependency>
-
-        <!-- Scene Engine 2.3 (包含 skill 服务) -->
+        <!-- Scene Engine 3.0 (包含 skill 服务) -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>scene-engine</artifactId>

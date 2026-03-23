@@ -10,7 +10,7 @@
     <packaging>pom</packaging>
 
     <name>Ooder Nexus Development Platform</name>
-    <description>Ooder Nexus 统一开发平台 - 支持个人版、企业版、技能中心三种产品组装</description>
+    <description>Ooder Nexus 统一开发平�?- 支持个人版、企业版、技能中心三种产品组�?/description>
     <url>https://github.com/ooderCN/ooder-nexus-dev</url>
 
     <licenses>
@@ -65,12 +65,6 @@
                 <version>${spring-boot.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>agent-sdk-api</artifactId>
-                <version>${agent-sdk.version}</version>
             </dependency>
 
             <dependency>

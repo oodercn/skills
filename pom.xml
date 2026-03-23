@@ -189,11 +189,6 @@
             </dependency>
             <dependency>
                 <groupId>net.ooder</groupId>
-                <artifactId>agent-sdk-api</artifactId>
-                <version>${agent-sdk.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
                 <artifactId>agent-sdk-core</artifactId>
                 <version>${agent-sdk.version}</version>
             </dependency>
@@ -236,11 +231,6 @@
                 <groupId>org.projectlombok</groupId>
                 <artifactId>lombok</artifactId>
                 <version>1.18.30</version>
-            </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>agent-sdk-core</artifactId>
-                <version>${agent-sdk.version}</version>
             </dependency>
             <dependency>
                 <groupId>net.ooder</groupId>

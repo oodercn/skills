@@ -23,7 +23,7 @@
         <!-- SDK 2.3 核心 -->
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk-api</artifactId>
+            <artifactId>agent-sdk-core</artifactId>
             <scope>provided</scope>
         </dependency>
         

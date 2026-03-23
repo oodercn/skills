@@ -48,12 +48,6 @@
 
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk-api</artifactId>
-            <version>${ooder.sdk.version}</version>
-        </dependency>
-
-        <dependency>
-            <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-core</artifactId>
             <version>${ooder.sdk.version}</version>
         </dependency>
