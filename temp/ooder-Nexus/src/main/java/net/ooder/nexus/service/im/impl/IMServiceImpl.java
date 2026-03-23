@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.stream.Collectors;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 
 /**
  * 即时通讯服务实现
@@ -63,7 +63,7 @@ public class IMServiceImpl implements IMService {
         c2.setContactId("user-003");
         c2.setContactType("user");
         c2.setName("李四");
-        c2.setDepartmentName("产品部");
+        c2.setDepartmentName("产品�?);
         c2.setOnline(false);
         defaultContacts.add(c2);
         
@@ -85,7 +85,7 @@ public class IMServiceImpl implements IMService {
         Contact c5 = new Contact();
         c5.setContactId("dept-002");
         c5.setContactType("department");
-        c5.setName("产品部");
+        c5.setName("产品�?);
         c5.setOnline(false);
         defaultContacts.add(c5);
         
@@ -115,7 +115,7 @@ public class IMServiceImpl implements IMService {
         group1.setTargetType("group");
         group1.setCreatedAt(System.currentTimeMillis() - 86400000 * 7);
         group1.setUpdatedAt(System.currentTimeMillis());
-        group1.setLastMessage("好的，收到");
+        group1.setLastMessage("好的，收�?);
         group1.setLastMessageTime(System.currentTimeMillis() - 3600000);
         group1.setStatus("active");
         
@@ -154,7 +154,7 @@ public class IMServiceImpl implements IMService {
         dept1.setTargetType("department");
         dept1.setCreatedAt(System.currentTimeMillis() - 86400000 * 30);
         dept1.setUpdatedAt(System.currentTimeMillis());
-        dept1.setLastMessage("周报已发送");
+        dept1.setLastMessage("周报已发�?);
         dept1.setLastMessageTime(System.currentTimeMillis() - 86400000);
         dept1.setStatus("active");
         

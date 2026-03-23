@@ -14,7 +14,7 @@ import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -26,7 +26,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 /**
- * 列表数据抽取任务服务实现类
+ * 列表数据抽取任务服务实现�?
  */
 @Service
 public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskService {
@@ -56,14 +56,14 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
         try {
             Files.createDirectories(Paths.get(DATA_DIR));
             loadTasks();
-            log.info("列表数据抽取任务服务初始化完成，共加载 {} 个任务", taskCache.size());
+            log.info("列表数据抽取任务服务初始化完成，共加�?{} 个任�?, taskCache.size());
         } catch (IOException e) {
-            log.error("初始化列表数据抽取任务服务失败", e);
+            log.error("初始化列表数据抽取任务服务失�?, e);
         }
     }
 
     /**
-     * 从文件加载任务
+     * 从文件加载任�?
      */
     private void loadTasks() {
         if (!Files.exists(storagePath)) {
@@ -80,7 +80,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
     }
 
     /**
-     * 保存任务到文件
+     * 保存任务到文�?
      */
     private void saveTasks() {
         try {
@@ -114,7 +114,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
     public ListDataExtractTask updateTask(String id, ListDataExtractTask task) {
         ListDataExtractTask existingTask = taskCache.get(id);
         if (existingTask == null) {
-            log.warn("任务不存在: {}", id);
+            log.warn("任务不存�? {}", id);
             return null;
         }
 
@@ -166,7 +166,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
     public boolean executeTask(String id) {
         ListDataExtractTask task = taskCache.get(id);
         if (task == null) {
-            log.warn("任务不存在: {}", id);
+            log.warn("任务不存�? {}", id);
             return false;
         }
 
@@ -176,14 +176,14 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
         task.incrementExecuteCount();
         saveTasks();
 
-        log.info("开始执行列表数据抽取任务: {}", task.getName());
+        log.info("开始执行列表数据抽取任�? {}", task.getName());
 
         // 异步执行实际任务逻辑
         new Thread(() -> {
             try {
                 List<Map<String, Object>> extractedData = doExtract(task);
 
-                // 保存到目标集合
+                // 保存到目标集�?
                 if (task.getTargetCollection() != null && !task.getTargetCollection().isEmpty()) {
                     for (Map<String, Object> record : extractedData) {
                         String recordId = task.getPrimaryKey() != null ?
@@ -193,13 +193,13 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
                     }
                 }
 
-                // 更新任务状态
+                // 更新任务状�?
                 task.setStatus(ListDataExtractTask.TaskStatus.COMPLETED);
                 task.incrementSuccessCount();
                 task.setLastErrorMessage(null);
                 task.addExtractedRecords(extractedData.size());
 
-                log.info("列表数据抽取任务执行成功: {}, 抽取 {} 条记录", task.getName(), extractedData.size());
+                log.info("列表数据抽取任务执行成功: {}, 抽取 {} 条记�?, task.getName(), extractedData.size());
             } catch (Exception e) {
                 task.setStatus(ListDataExtractTask.TaskStatus.FAILED);
                 task.incrementFailCount();
@@ -262,7 +262,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        // 添加请求头
+        // 添加请求�?
         if (task.getApiHeaders() != null) {
             task.getApiHeaders().forEach(headers::set);
         }
@@ -304,7 +304,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
     }
 
     /**
-     * 从文件抽取数据
+     * 从文件抽取数�?
      */
     private List<Map<String, Object>> extractFromFile(ListDataExtractTask task) throws Exception {
         List<Map<String, Object>> result = new ArrayList<>();
@@ -312,7 +312,7 @@ public class ListDataExtractTaskServiceImpl implements ListDataExtractTaskServic
         String format = task.getFileFormat();
 
         if (filePath == null || !Files.exists(Paths.get(filePath))) {
-            throw new RuntimeException("文件不存在: " + filePath);
+            throw new RuntimeException("文件不存�? " + filePath);
         }
 
         if ("JSON".equalsIgnoreCase(format)) {

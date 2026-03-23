@@ -10,7 +10,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -20,7 +20,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 菜单控制器
+ * 菜单控制�?
  * 提供动态菜单获取接口，所有角色过滤在后端完成
  */
 @RestController
@@ -49,7 +49,7 @@ public class MenuController {
         try {
             ClassPathResource resource = new ClassPathResource(MENU_CONFIG_PATH);
             if (!resource.exists()) {
-                log.error("菜单配置文件不存在: {}", MENU_CONFIG_PATH);
+                log.error("菜单配置文件不存�? {}", MENU_CONFIG_PATH);
                 menuConfig = new MenuConfig();
                 menuConfig.setMenu(new ArrayList<>());
                 return;
@@ -70,8 +70,8 @@ public class MenuController {
     }
 
     /**
-     * 获取当前用户的菜单
-     * 从 menu-config.json 读取，根据用户角色过滤
+     * 获取当前用户的菜�?
+     * �?menu-config.json 读取，根据用户角色过�?
      * @return 菜单数据
      */
     @PostMapping
@@ -82,15 +82,15 @@ public class MenuController {
         log.info("menuConfig.getMenu() is null: {}", menuConfig == null ? "N/A" : (menuConfig.getMenu() == null));
         
         if (menuConfig == null || menuConfig.getMenu() == null) {
-            log.error("菜单配置未加载");
-            return ResultModel.error("菜单配置未加载", new ArrayList<>(), 500);
+            log.error("菜单配置未加�?);
+            return ResultModel.error("菜单配置未加�?, new ArrayList<>(), 500);
         }
 
         try {
             // 获取当前用户角色（暂时返回所有已实现的功能）
             String currentRole = getCurrentUserRole();
             log.info("当前用户角色: {}", currentRole);
-            log.info("原始菜单项数量: {}", menuConfig.getMenu().size());
+            log.info("原始菜单项数�? {}", menuConfig.getMenu().size());
 
             // 根据角色过滤菜单
             List<Menu> filteredMenu = filterMenuByRole(menuConfig.getMenu(), currentRole);
@@ -107,14 +107,14 @@ public class MenuController {
 
     /**
      * 获取完整菜单（所有已实现的功能）
-     * 用于开发调试或管理员查看
+     * 用于开发调试或管理员查�?
      * @return 完整菜单数据
      */
     @PostMapping("/all")
     @ResponseBody
     public ResultModel<List<Menu>> getAllMenu() {
         if (menuConfig == null || menuConfig.getMenu() == null) {
-            return ResultModel.error("菜单配置未加载", new ArrayList<>(), 500);
+            return ResultModel.error("菜单配置未加�?, new ArrayList<>(), 500);
         }
 
         try {
@@ -130,25 +130,25 @@ public class MenuController {
     }
 
     /**
-     * 获取菜单树结构
+     * 获取菜单树结�?
      * @return 树形菜单数据
      */
     @PostMapping("/tree")
     @ResponseBody
     public ResultModel<List<Menu>> getMenuTree() {
         if (menuConfig == null || menuConfig.getMenu() == null) {
-            return ResultModel.error("菜单配置未加载", new ArrayList<>(), 500);
+            return ResultModel.error("菜单配置未加�?, new ArrayList<>(), 500);
         }
 
         try {
             String currentRole = getCurrentUserRole();
             List<Menu> filteredMenu = filterMenuByRole(menuConfig.getMenu(), currentRole);
 
-            return ResultModel.success("菜单树获取成功", filteredMenu);
+            return ResultModel.success("菜单树获取成�?, filteredMenu);
 
         } catch (Exception e) {
-            log.error("获取菜单树失败", e);
-            return ResultModel.error("菜单树加载失败: " + e.getMessage(), new ArrayList<>(), 500);
+            log.error("获取菜单树失�?, e);
+            return ResultModel.error("菜单树加载失�? " + e.getMessage(), new ArrayList<>(), 500);
         }
     }
 
@@ -161,7 +161,7 @@ public class MenuController {
     public ResultModel<String> reloadMenu() {
         loadMenuConfig();
         if (menuConfig != null && menuConfig.getMenu() != null) {
-            return ResultModel.success("菜单配置重新加载成功", "共 " + menuConfig.getMenu().size() + " 个菜单项");
+            return ResultModel.success("菜单配置重新加载成功", "�?" + menuConfig.getMenu().size() + " 个菜单项");
         } else {
             return ResultModel.error("菜单配置重新加载失败", 500);
         }
@@ -182,7 +182,7 @@ public class MenuController {
 
     /**
      * 根据角色过滤菜单
-     * @param menuItems 菜单项列表
+     * @param menuItems 菜单项列�?
      * @param role 用户角色
      * @return 过滤后的菜单
      */
@@ -192,21 +192,21 @@ public class MenuController {
         List<Menu> result = new ArrayList<>();
 
         for (Menu item : menuItems) {
-            // 检查状态
+            // 检查状�?
             if (!"implemented".equals(item.getStatus())) {
                 continue;
             }
 
-            // 检查角色权限
+            // 检查角色权�?
             List<String> roles = item.getRoles();
             if (roles != null && !roles.contains(role)) {
                 continue;
             }
 
-            // 复制菜单项
+            // 复制菜单�?
             Menu filteredItem = copyMenu(item);
 
-            // 递归处理子菜单
+            // 递归处理子菜�?
             if (item.hasChildren()) {
                 List<Menu> filteredChildren = filterMenuByRole(item.getChildren(), role);
                 if (!filteredChildren.isEmpty()) {
@@ -223,8 +223,8 @@ public class MenuController {
     }
 
     /**
-     * 只过滤未实现的功能
-     * @param menuItems 菜单项列表
+     * 只过滤未实现的功�?
+     * @param menuItems 菜单项列�?
      * @return 过滤后的菜单
      */
     private List<Menu> filterImplementedOnly(List<Menu> menuItems) {
@@ -256,8 +256,8 @@ public class MenuController {
 
     /**
      * 复制菜单对象
-     * @param source 源菜单
-     * @return 复制的菜单
+     * @param source 源菜�?
+     * @return 复制的菜�?
      */
     private Menu copyMenu(Menu source) {
         Menu copy = new Menu();

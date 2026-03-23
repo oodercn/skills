@@ -44,7 +44,7 @@ public class LlmProviderController {
     public LlmProviderController() {
     }
     
-    @javax.annotation.PostConstruct
+    @jakarta.annotation.PostConstruct
     public void init() {
         initProviders();
     }

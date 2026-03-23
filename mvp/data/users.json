@@ -1,7 +1,7 @@
 {
 	"user-default-001":{
 		"active":true,
-		"createTime":1774304565301,
+		"createTime":1774306414803,
 		"departmentId":"dept-rd",
 		"email":"user@example.com",
 		"name":"默认用户",
@@ -12,7 +12,7 @@
 	},
 	"user-admin-001":{
 		"active":true,
-		"createTime":1774304565301,
+		"createTime":1774306414803,
 		"departmentId":"dept-it",
 		"email":"admin@example.com",
 		"name":"系统管理员",

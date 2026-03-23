@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 
 @Service
@@ -33,7 +33,7 @@ public class RoleManagementService {
     }
 
     private void initDefaultRoles() {
-        createRole("admin", "管理员", "系统运维、能力管理、用户管理", "ri-admin-line",
+        createRole("admin", "管理�?, "系统运维、能力管理、用户管�?, "ri-admin-line",
             "admin", Arrays.asList(
                 "system:init", "system:config",
                 "capability:discover", "capability:install", "capability:distribute", "capability:manage",
@@ -43,7 +43,7 @@ public class RoleManagementService {
                 "audit:view"
             ));
 
-        createRole("user", "普通用户", "场景参与、任务执行、业务流转", "ri-user-line",
+        createRole("user", "普通用�?, "场景参与、任务执行、业务流�?, "ri-user-line",
             "user", Arrays.asList(
                 "scene:view", "scene:activate", "scene:participate",
                 "task:view", "task:execute", "task:submit",
@@ -51,7 +51,7 @@ public class RoleManagementService {
                 "history:view", "key:manage"
             ));
 
-        createRole("developer", "开发者", "能力开发、测试、发布", "ri-code-line",
+        createRole("developer", "开发�?, "能力开发、测试、发�?, "ri-code-line",
             "developer", Arrays.asList(
                 "capability:create", "capability:edit", "capability:test", "capability:publish", "capability:view",
                 "llm:execute", "arch:check"
@@ -60,9 +60,9 @@ public class RoleManagementService {
 
     private void initDefaultMenus() {
         List<MenuItemDTO> adminMenus = Arrays.asList(
-            createMenuItem("menu-admin-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true),
+            createMenuItem("menu-admin-1", "工作�?, "/console/pages/role-admin.html", "ri-home-line", 1, true),
             createMenuItem("menu-admin-2", "能力市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 2, false),
-            createMenuItem("menu-admin-3", "已安装能力", "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false),
+            createMenuItem("menu-admin-3", "已安装能�?, "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false),
             createMenuItem("menu-admin-4", "场景管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false),
             createMenuItem("menu-admin-5", "组织管理", "/console/pages/org-management.html", "ri-organization-chart", 5, false),
             createMenuItem("menu-admin-6", "系统配置", "/console/pages/llm-config.html", "ri-settings-3-line", 6, false),
@@ -72,7 +72,7 @@ public class RoleManagementService {
         roleMenus.put("admin", adminMenus);
 
         List<MenuItemDTO> userMenus = Arrays.asList(
-            createMenuItem("menu-user-1", "工作台", "/console/pages/role-user.html", "ri-home-line", 1, true),
+            createMenuItem("menu-user-1", "工作�?, "/console/pages/role-user.html", "ri-home-line", 1, true),
             createMenuItem("menu-user-2", "我的待办", "/console/pages/my-todos.html", "ri-task-line", 2, false),
             createMenuItem("menu-user-3", "我的场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false),
             createMenuItem("menu-user-4", "历史记录", "/console/pages/my-history.html", "ri-history-line", 4, false),
@@ -81,19 +81,19 @@ public class RoleManagementService {
         roleMenus.put("user", userMenus);
 
         List<MenuItemDTO> developerMenus = Arrays.asList(
-            createMenuItem("menu-developer-1", "工作台", "/console/pages/role-developer.html", "ri-home-line", 1, true),
+            createMenuItem("menu-developer-1", "工作�?, "/console/pages/role-developer.html", "ri-home-line", 1, true),
             createMenuItem("menu-developer-2", "我的能力", "/console/pages/my-capabilities.html", "ri-puzzle-line", 2, false),
             createMenuItem("menu-developer-3", "创建能力", "/console/pages/capability-create.html", "ri-add-circle-line", 3, false),
-            createMenuItem("menu-developer-4", "架构检查", "/console/pages/arch-check.html", "ri-shield-check-line", 4, false),
+            createMenuItem("menu-developer-4", "架构检�?, "/console/pages/arch-check.html", "ri-shield-check-line", 4, false),
             createMenuItem("menu-developer-5", "能力统计", "/console/pages/capability-stats.html", "ri-bar-chart-box-line", 5, false)
         );
         roleMenus.put("developer", developerMenus);
     }
 
     private void initDefaultUsers() {
-        initUserIfNotExists("admin", "管理员", "admin@ooder.local", "root", Arrays.asList("admin"));
-        initUserIfNotExists("user", "普通用户", "user@ooder.local", "root", Arrays.asList("user"));
-        initUserIfNotExists("developer", "开发者", "developer@ooder.local", "root", Arrays.asList("developer"));
+        initUserIfNotExists("admin", "管理�?, "admin@ooder.local", "root", Arrays.asList("admin"));
+        initUserIfNotExists("user", "普通用�?, "user@ooder.local", "root", Arrays.asList("user"));
+        initUserIfNotExists("developer", "开发�?, "developer@ooder.local", "root", Arrays.asList("developer"));
     }
 
     private void initUserIfNotExists(String username, String nickname, String email, String orgId, List<String> roles) {

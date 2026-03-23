@@ -8,7 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -53,7 +53,7 @@ public class InstallLogServiceImpl implements InstallLogService {
         entry.setSceneGroupId(request.getSceneGroupId());
         entry.setLevel(InstallLogEntry.Level.INFO.name());
         entry.setAction("INSTALL_STARTED");
-        entry.setMessage("安装开始");
+        entry.setMessage("安装开�?);
         entry.setTimestamp(System.currentTimeMillis());
         
         addLogToCache(entry);

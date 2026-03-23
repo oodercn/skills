@@ -1,6 +1,6 @@
 package net.ooder.mvp.skill.scene.dto.capability;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 import java.util.Map;
 
 public class InvokeCapabilityRequestDTO {

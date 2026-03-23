@@ -10,7 +10,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 
 @Service
@@ -43,7 +43,7 @@ public class RoleManagementService {
                 "audit:view"
             ));
 
-        createRole("user", "普通用户", "场景参与、任务执行、业务流转", "ri-user-line",
+        createRole("user", "普通用户", "场景参与、任务执行、业务流程", "ri-user-line",
             "user", Arrays.asList(
                 "scene:view", "scene:activate", "scene:participate",
                 "task:view", "task:execute", "task:submit",

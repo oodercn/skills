@@ -7,8 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
+import jakarta.annotation.PostConstruct;
+import jakarta.annotation.PreDestroy;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 /**
- * 协议中枢实现类
+ * 协议中枢实现�?
  */
 @Service
 public class ProtocolHubImpl implements ProtocolHub {
@@ -35,7 +35,7 @@ public class ProtocolHubImpl implements ProtocolHub {
     private final Map<String, ProtocolStats> statsMap = new ConcurrentHashMap<>();
 
     /**
-     * 异步执行器
+     * 异步执行�?
      */
     private ExecutorService executorService;
 

@@ -1,0 +1,18 @@
+{
+	"dept-rd":{
+		"createTime":1774305274611,
+		"departmentId":"dept-rd",
+		"description":"负责产品研发和技术创新",
+		"managerId":"user-manager-001",
+		"memberIds":[
+			"user-manager-001",
+			"user-employee-001",
+			"user-employee-002",
+			"user-employee-003",
+			"user-leader-001",
+			"user-collaborator-001"
+		],
+		"name":"研发部",
+		"updateTime":1774305274611
+	}
+}

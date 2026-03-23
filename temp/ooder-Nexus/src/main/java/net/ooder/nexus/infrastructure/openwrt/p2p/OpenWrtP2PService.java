@@ -6,15 +6,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * ooderAgent 0.7.0 OpenWrt P2P 服务实现
  *
- * <p>实现ooderAgent协议0.7.0定义的OpenWrt P2P桥接接口，
- * 提供软硬一体化的P2P通讯能力。</p>
+ * <p>实现ooderAgent协议0.7.0定义的OpenWrt P2P桥接接口�?
+ * 提供软硬一体化的P2P通讯能力�?/p>
  *
  * @author ooder Team
  * @version 0.7.0
@@ -34,7 +34,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
     /** 已注册的Agent存储 */
     private final Map<String, Map<String, Object>> registeredAgents = new ConcurrentHashMap<>();
 
-    /** 端口池存储 */
+    /** 端口池存�?*/
     private final Map<String, PortPool> portPools = new ConcurrentHashMap<>();
 
     /** P2P连接存储 */
@@ -82,7 +82,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
     }
 
     private void initMockData() {
-        // 初始化示例数据
+        // 初始化示例数�?
         log.info("Mock data initialized for P2P service");
     }
 
@@ -178,7 +178,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
     public Map<String, Object> allocatePortPool(String agentId, int poolSize, int basePort) {
         log.info("Allocating port pool for agent {}: size={}, basePort={}", agentId, poolSize, basePort);
 
-        // 检查是否已存在端口池
+        // 检查是否已存在端口�?
         if (portPools.containsKey(agentId)) {
             PortPool existing = portPools.get(agentId);
             if (existing.active) {
@@ -198,7 +198,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
             ports.add(startPort + i);
         }
 
-        // 创建端口池
+        // 创建端口�?
         PortPool pool = new PortPool(agentId, ports);
         portPools.put(agentId, pool);
 
@@ -422,13 +422,13 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
         // 基于常见NAT分配规律生成预测
         int basePort = 30000 + random.nextInt(10000);
         for (int i = 0; i < targetCount; i++) {
-            // 模拟顺序分配或哈希分配
+            // 模拟顺序分配或哈希分�?
             predictions.add(basePort + i * (random.nextInt(3) + 1));
         }
 
         Map<String, Object> result = new HashMap<>();
         result.put("predictions", predictions);
-        result.put("confidence", 0.65);  // 65%置信度
+        result.put("confidence", 0.65);  // 65%置信�?
         result.put("algorithm", "hybrid");  // 混合预测算法
         return result;
     }
@@ -445,7 +445,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
 
         log.info("Registering ooderAgent: {}", wid);
 
-        // 检查协议版本
+        // 检查协议版�?
         String protocolVersion = (String) agentInfo.getOrDefault("protocolVersion", "unknown");
         if (!PROTOCOL_VERSION.equals(protocolVersion)) {
             log.warn("Protocol version mismatch: expected {}, got {}", PROTOCOL_VERSION, protocolVersion);
@@ -456,7 +456,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
         agentInfo.put("status", "active");
         registeredAgents.put(wid, agentInfo);
 
-        // 创建Agent专用的iptables链
+        // 创建Agent专用的iptables�?
         if (!useMock) {
             String createChainCmd = String.format("iptables -N OODER_P2P_%s 2>/dev/null || iptables -F OODER_P2P_%s",
                     wid.replace("-", "_"), wid.replace("-", "_"));
@@ -479,7 +479,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
             // 清理相关资源
             releasePortPool(wid);
 
-            // 删除iptables链
+            // 删除iptables�?
             if (!useMock) {
                 String deleteChainCmd = String.format("iptables -X OODER_P2P_%s 2>/dev/null",
                         wid.replace("-", "_"));
@@ -516,9 +516,9 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
             result.put("wid", wid);
             result.put("status", agent.get("status"));
 
-            // 如果提供了AgentCap，进行额外验证
+            // 如果提供了AgentCap，进行额外验�?
             if (agentCap != null && !agentCap.isEmpty()) {
-                // 实际实现中应与安全认证中心交互验证
+                // 实际实现中应与安全认证中心交互验�?
                 result.put("capVerified", true);
             }
         } else {
@@ -650,7 +650,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
     public Map<String, Object> testP2PConnectivity(String targetIp, int targetPort, String protocol) {
         log.info("Testing P2P connectivity: {}:{}/{}", targetIp, targetPort, protocol);
 
-        // 模拟连通性测试
+        // 模拟连通性测�?
         Map<String, Object> result = new HashMap<>();
         result.put("target", targetIp + ":" + targetPort);
         result.put("protocol", protocol);
@@ -682,7 +682,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
         // NAT信息
         diagnostics.put("nat", detectNATType());
 
-        // 端口池状态
+        // 端口池状�?
         diagnostics.put("portPool", getPortPoolStatus(wid));
 
         // 连接统计
@@ -707,7 +707,7 @@ public class OpenWrtP2PService implements OpenWrtP2PBridge {
             resources.put("memoryUsed", 256 * 1024 * 1024L);   // 256MB
             resources.put("cpuUsage", 0.25);  // 25%
         } else {
-            // 真实模式：读取系统资源
+            // 真实模式：读取系统资�?
             resources.put("conntrackTotal", 0);
             resources.put("conntrackUsed", 0);
         }

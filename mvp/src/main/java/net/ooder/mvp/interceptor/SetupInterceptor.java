@@ -21,6 +21,7 @@ public class SetupInterceptor implements HandlerInterceptor {
         if (requestURI.startsWith("/setup") || 
             requestURI.startsWith("/api/v1/setup") ||
             requestURI.startsWith("/api/v1/plugin") ||
+            requestURI.startsWith("/console") ||
             requestURI.equals("/favicon.svg") ||
             requestURI.startsWith("/css/") ||
             requestURI.startsWith("/js/") ||

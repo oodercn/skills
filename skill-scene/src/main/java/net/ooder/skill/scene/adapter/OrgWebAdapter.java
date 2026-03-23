@@ -9,7 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -68,7 +68,7 @@ public class OrgWebAdapter {
         if (users.isEmpty()) {
             OrgUserDTO manager = new OrgUserDTO();
             manager.setUserId("user-manager-001");
-            manager.setName("张经理");
+            manager.setName("张经�?);
             manager.setEmail("zhang.manager@example.com");
             manager.setDepartmentId("dept-rd");
             manager.setRole("manager");
@@ -79,33 +79,33 @@ public class OrgWebAdapter {
 
             OrgUserDTO employee1 = new OrgUserDTO();
             employee1.setUserId("user-employee-001");
-            employee1.setName("李员工");
+            employee1.setName("李员�?);
             employee1.setEmail("li.employee@example.com");
             employee1.setDepartmentId("dept-rd");
             employee1.setRole("employee");
-            employee1.setTitle("高级工程师");
+            employee1.setTitle("高级工程�?);
             employee1.setCreateTime(System.currentTimeMillis());
             employee1.setActive(true);
             users.put(employee1.getUserId(), employee1);
 
             OrgUserDTO employee2 = new OrgUserDTO();
             employee2.setUserId("user-employee-002");
-            employee2.setName("王员工");
+            employee2.setName("王员�?);
             employee2.setEmail("wang.employee@example.com");
             employee2.setDepartmentId("dept-rd");
             employee2.setRole("employee");
-            employee2.setTitle("工程师");
+            employee2.setTitle("工程�?);
             employee2.setCreateTime(System.currentTimeMillis());
             employee2.setActive(true);
             users.put(employee2.getUserId(), employee2);
 
             OrgUserDTO employee3 = new OrgUserDTO();
             employee3.setUserId("user-employee-003");
-            employee3.setName("赵员工");
+            employee3.setName("赵员�?);
             employee3.setEmail("zhao.employee@example.com");
             employee3.setDepartmentId("dept-rd");
             employee3.setRole("employee");
-            employee3.setTitle("工程师");
+            employee3.setTitle("工程�?);
             employee3.setCreateTime(System.currentTimeMillis());
             employee3.setActive(true);
             users.put(employee3.getUserId(), employee3);
@@ -123,29 +123,29 @@ public class OrgWebAdapter {
 
             OrgUserDTO admin = new OrgUserDTO();
             admin.setUserId("user-admin-001");
-            admin.setName("系统管理员");
+            admin.setName("系统管理�?);
             admin.setEmail("admin@example.com");
             admin.setDepartmentId("dept-it");
             admin.setRole("admin");
-            admin.setTitle("系统管理员");
+            admin.setTitle("系统管理�?);
             admin.setCreateTime(System.currentTimeMillis());
             admin.setActive(true);
             users.put(admin.getUserId(), admin);
 
             OrgUserDTO installer = new OrgUserDTO();
             installer.setUserId("user-installer-001");
-            installer.setName("安装者");
+            installer.setName("安装�?);
             installer.setEmail("installer@example.com");
             installer.setDepartmentId("dept-it");
             installer.setRole("installer");
-            installer.setTitle("系统安装者");
+            installer.setTitle("系统安装�?);
             installer.setCreateTime(System.currentTimeMillis());
             installer.setActive(true);
             users.put(installer.getUserId(), installer);
 
             OrgUserDTO leader = new OrgUserDTO();
             leader.setUserId("user-leader-001");
-            leader.setName("主导者");
+            leader.setName("主导�?);
             leader.setEmail("leader@example.com");
             leader.setDepartmentId("dept-rd");
             leader.setRole("leader");
@@ -156,7 +156,7 @@ public class OrgWebAdapter {
 
             OrgUserDTO collaborator = new OrgUserDTO();
             collaborator.setUserId("user-collaborator-001");
-            collaborator.setName("协作者");
+            collaborator.setName("协作�?);
             collaborator.setEmail("collaborator@example.com");
             collaborator.setDepartmentId("dept-rd");
             collaborator.setRole("collaborator");
@@ -172,8 +172,8 @@ public class OrgWebAdapter {
         if (departments.isEmpty()) {
             OrgDepartmentDTO rd = new OrgDepartmentDTO();
             rd.setDepartmentId("dept-rd");
-            rd.setName("研发部");
-            rd.setDescription("负责产品研发和技术创新");
+            rd.setName("研发�?);
+            rd.setDescription("负责产品研发和技术创�?);
             rd.setParentId(null);
             rd.setManagerId("user-manager-001");
             rd.setMemberIds(Arrays.asList("user-manager-001", "user-employee-001", "user-employee-002", "user-employee-003", "user-leader-001", "user-collaborator-001"));
@@ -182,8 +182,8 @@ public class OrgWebAdapter {
 
             OrgDepartmentDTO hr = new OrgDepartmentDTO();
             hr.setDepartmentId("dept-hr");
-            hr.setName("人力资源部");
-            hr.setDescription("负责人才招聘和员工管理");
+            hr.setName("人力资源�?);
+            hr.setDescription("负责人才招聘和员工管�?);
             hr.setParentId(null);
             hr.setManagerId("user-hr-001");
             hr.setMemberIds(Arrays.asList("user-hr-001"));
@@ -193,7 +193,7 @@ public class OrgWebAdapter {
             OrgDepartmentDTO it = new OrgDepartmentDTO();
             it.setDepartmentId("dept-it");
             it.setName("信息技术部");
-            it.setDescription("负责系统运维和技术支持");
+            it.setDescription("负责系统运维和技术支�?);
             it.setParentId(null);
             it.setManagerId("user-admin-001");
             it.setMemberIds(Arrays.asList("user-admin-001", "user-installer-001"));

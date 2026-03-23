@@ -699,8 +699,12 @@ public class AgentServiceImpl implements AgentService {
             }
         }
         
+        Set<String> existingAgentIds = agents.stream()
+            .map(AgentDTO::getAgentId)
+            .collect(Collectors.toSet());
+        
         agents.addAll(agentCache.values().stream()
-            .filter(a -> !agents.stream().anyMatch(existing -> existing.getAgentId().equals(a.getAgentId())))
+            .filter(a -> !existingAgentIds.contains(a.getAgentId()))
             .collect(Collectors.toList()));
         
         if (agents.isEmpty()) {

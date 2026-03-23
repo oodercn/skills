@@ -9,7 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -19,7 +19,7 @@ import java.util.*;
 
 /**
  * 菜单角色配置服务
- * 使用 fastjson 完成持久化
+ * 使用 fastjson 完成持久�?
  */
 @Service
 public class MenuRoleConfigService {
@@ -79,7 +79,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 初始化默认配置
+     * 初始化默认配�?
      */
     private void initDefaultConfig() {
         menuConfig = new JSONObject();
@@ -88,9 +88,9 @@ public class MenuRoleConfigService {
         
         JSONObject roles = new JSONObject();
         
-        roles.put("admin", createRoleConfig("admin", "管理员", getAdminMenus()));
-        roles.put("user", createRoleConfig("user", "普通用户", getUserMenus()));
-        roles.put("developer", createRoleConfig("developer", "开发者", getDeveloperMenus()));
+        roles.put("admin", createRoleConfig("admin", "管理�?, getAdminMenus()));
+        roles.put("user", createRoleConfig("user", "普通用�?, getUserMenus()));
+        roles.put("developer", createRoleConfig("developer", "开发�?, getDeveloperMenus()));
         
         menuConfig.put("roles", roles);
     }
@@ -105,9 +105,9 @@ public class MenuRoleConfigService {
     
     private JSONArray getAdminMenus() {
         JSONArray menus = new JSONArray();
-        menus.add(createMenuItem("menu-admin-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true));
+        menus.add(createMenuItem("menu-admin-1", "工作�?, "/console/pages/role-admin.html", "ri-home-line", 1, true));
         menus.add(createMenuItem("menu-admin-2", "能力市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 2, false));
-        menus.add(createMenuItem("menu-admin-3", "已安装能力", "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false));
+        menus.add(createMenuItem("menu-admin-3", "已安装能�?, "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false));
         menus.add(createMenuItem("menu-admin-4", "场景管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false));
         menus.add(createMenuItem("menu-admin-5", "组织管理", "/console/pages/org-management.html", "ri-organization-chart", 5, false));
         menus.add(createMenuItem("menu-admin-6", "系统配置", "/console/pages/llm-config.html", "ri-settings-3-line", 6, false));
@@ -118,7 +118,7 @@ public class MenuRoleConfigService {
     
     private JSONArray getUserMenus() {
         JSONArray menus = new JSONArray();
-        menus.add(createMenuItem("menu-user-1", "工作台", "/console/pages/role-user.html", "ri-home-line", 1, true));
+        menus.add(createMenuItem("menu-user-1", "工作�?, "/console/pages/role-user.html", "ri-home-line", 1, true));
         menus.add(createMenuItem("menu-user-2", "我的待办", "/console/pages/my-todos.html", "ri-task-line", 2, false));
         menus.add(createMenuItem("menu-user-3", "我的场景", "/console/pages/my-scenes.html", "ri-artboard-line", 3, false));
         menus.add(createMenuItem("menu-user-4", "历史记录", "/console/pages/my-history.html", "ri-history-line", 4, false));
@@ -128,10 +128,10 @@ public class MenuRoleConfigService {
     
     private JSONArray getDeveloperMenus() {
         JSONArray menus = new JSONArray();
-        menus.add(createMenuItem("menu-developer-1", "工作台", "/console/pages/role-developer.html", "ri-home-line", 1, true));
+        menus.add(createMenuItem("menu-developer-1", "工作�?, "/console/pages/role-developer.html", "ri-home-line", 1, true));
         menus.add(createMenuItem("menu-developer-2", "我的能力", "/console/pages/my-capabilities.html", "ri-puzzle-line", 2, false));
         menus.add(createMenuItem("menu-developer-3", "创建能力", "/console/pages/capability-create.html", "ri-add-circle-line", 3, false));
-        menus.add(createMenuItem("menu-developer-4", "架构检查", "/console/pages/arch-check.html", "ri-shield-check-line", 4, false));
+        menus.add(createMenuItem("menu-developer-4", "架构检�?, "/console/pages/arch-check.html", "ri-shield-check-line", 4, false));
         menus.add(createMenuItem("menu-developer-5", "能力统计", "/console/pages/capability-stats.html", "ri-bar-chart-box-line", 5, false));
         return menus;
     }
@@ -163,7 +163,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取角色的菜单列表
+     * 获取角色的菜单列�?
      */
     public List<MenuItemDTO> getMenusByRole(String roleId) {
         List<MenuItemDTO> items = new ArrayList<>();
@@ -196,7 +196,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取所有角色配置
+     * 获取所有角色配�?
      */
     public JSONObject getAllRoles() {
         if (menuConfig == null) {
@@ -206,7 +206,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取所有角色配置 (DTO)
+     * 获取所有角色配�?(DTO)
      */
     public Map<String, MenuConfigDTO.MenuRoleDTO> getAllRolesAsDTO() {
         Map<String, MenuConfigDTO.MenuRoleDTO> result = new HashMap<String, MenuConfigDTO.MenuRoleDTO>();
@@ -266,7 +266,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 添加菜单到角色 (DTO)
+     * 添加菜单到角�?(DTO)
      */
     public void addMenuToRole(String roleId, MenuItemDTO menu) {
         JSONObject menuJson = convertFromMenuItem(menu);
@@ -290,14 +290,14 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取用户最终菜单 (DTO)
+     * 获取用户最终菜�?(DTO)
      */
     public List<MenuItemDTO> getFinalMenusForUserAsDTO(String userId, String roleId) {
         return getFinalMenusForUser(userId, roleId);
     }
     
     /**
-     * 转换 JSONArray 到 MenuItemDTO 列表
+     * 转换 JSONArray �?MenuItemDTO 列表
      */
     private List<MenuItemDTO> convertToMenuItemList(JSONArray menus) {
         List<MenuItemDTO> items = new ArrayList<MenuItemDTO>();
@@ -315,7 +315,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 转换 JSONArray 到 MenuConfigDTO 列表
+     * 转换 JSONArray �?MenuConfigDTO 列表
      */
     private List<MenuConfigDTO> convertToMenuConfigDTOList(JSONArray menus) {
         List<MenuConfigDTO> items = new ArrayList<MenuConfigDTO>();
@@ -333,7 +333,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 转换 JSONObject 到 MenuConfigDTO
+     * 转换 JSONObject �?MenuConfigDTO
      */
     private MenuConfigDTO convertToMenuConfigDTO(JSONObject menu) {
         MenuConfigDTO item = new MenuConfigDTO();
@@ -353,7 +353,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 转换 JSONObject 到 MenuItemDTO
+     * 转换 JSONObject �?MenuItemDTO
      */
     private MenuItemDTO convertToMenuItem(JSONObject menu) {
         MenuItemDTO item = new MenuItemDTO();
@@ -369,7 +369,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 转换 MenuItemDTO 列表到 JSONArray
+     * 转换 MenuItemDTO 列表�?JSONArray
      */
     private JSONArray convertFromMenuItemList(List<MenuItemDTO> items) {
         JSONArray array = new JSONArray();
@@ -383,7 +383,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 转换 MenuItemDTO 到 JSONObject
+     * 转换 MenuItemDTO �?JSONObject
      */
     private JSONObject convertFromMenuItem(MenuItemDTO item) {
         JSONObject json = new JSONObject();
@@ -425,7 +425,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 添加菜单到角色
+     * 添加菜单到角�?
      */
     public void addMenuToRole(String roleId, JSONObject menu) {
         if (menuConfig == null) {
@@ -478,7 +478,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取用户的菜单配置
+     * 获取用户的菜单配�?
      */
     public JSONArray getUserMenus(String userId) {
         if (menuConfig == null) {
@@ -521,7 +521,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取所有用户配置
+     * 获取所有用户配�?
      */
     public JSONObject getAllUsers() {
         if (menuConfig == null) {
@@ -591,7 +591,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 构建菜单树
+     * 构建菜单�?
      */
     private List<MenuItemDTO> buildMenuTree(List<MenuItemDTO> allMenus) {
         Map<String, MenuItemDTO> menuMap = new LinkedHashMap<>();
@@ -623,7 +623,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 排序菜单树
+     * 排序菜单�?
      */
     private void sortMenuTree(List<MenuItemDTO> menus) {
         if (menus == null || menus.isEmpty()) {
@@ -640,7 +640,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 添加子菜单
+     * 添加子菜�?
      */
     public void addChildMenu(String roleId, String parentId, MenuItemDTO menu) {
         if (menuConfig == null) {
@@ -756,7 +756,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 删除菜单及其子菜单
+     * 删除菜单及其子菜�?
      */
     public void deleteMenuWithChildren(String roleId, String menuId) {
         if (menuConfig == null) {
@@ -851,12 +851,12 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 注册场景技能菜单
+     * 注册场景技能菜�?
      * @param sceneGroupId 场景组ID
      * @param sceneName 场景名称
      * @param userId 用户ID
-     * @param roleInScene 用户在场景中的角色 (MANAGER, EMPLOYEE, HR等)
-     * @param menuItems 菜单项列表
+     * @param roleInScene 用户在场景中的角�?(MANAGER, EMPLOYEE, HR�?
+     * @param menuItems 菜单项列�?
      */
     public void registerSceneMenus(String sceneGroupId, String sceneName, String userId, String roleInScene, List<MenuItemDTO> menuItems) {
         log.info("Registering scene menus for user: {}, scene: {}, role: {}", userId, sceneName, roleInScene);
@@ -908,7 +908,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取用户的场景菜单
+     * 获取用户的场景菜�?
      */
     public List<MenuItemDTO> getUserSceneMenus(String userId) {
         List<MenuItemDTO> result = new ArrayList<>();
@@ -946,7 +946,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 移除用户的场景菜单
+     * 移除用户的场景菜�?
      */
     public void removeSceneMenus(String userId, String sceneGroupId) {
         log.info("Removing scene menus for user: {}, scene: {}", userId, sceneGroupId);
@@ -974,7 +974,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取用户在指定场景中的菜单
+     * 获取用户在指定场景中的菜�?
      */
     public List<MenuItemDTO> getUserSceneMenu(String userId, String sceneGroupId) {
         List<MenuItemDTO> result = new ArrayList<>();
@@ -1014,7 +1014,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 从场景模板注册菜单
+     * 从场景模板注册菜�?
      */
     public void registerSceneMenusFromTemplate(String sceneGroupId, String sceneName, String userId, String roleInScene, List<net.ooder.skill.scene.template.MenuConfig> templateMenus) {
         List<MenuItemDTO> menuItems = new ArrayList<>();
@@ -1030,7 +1030,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 从场景模板注册菜单 (DTO版本)
+     * 从场景模板注册菜�?(DTO版本)
      */
     public void registerSceneMenusFromTemplateDTO(String sceneGroupId, String sceneName, String userId, String roleInScene, List<MenuConfigDTO> templateMenus) {
         List<MenuItemDTO> menuItems = new ArrayList<>();
@@ -1152,7 +1152,7 @@ public class MenuRoleConfigService {
     }
     
     /**
-     * 获取用户的场景菜单树（按场景分组）
+     * 获取用户的场景菜单树（按场景分组�?
      */
     public Map<String, List<MenuItemDTO>> getUserSceneMenuTree(String userId) {
         Map<String, List<MenuItemDTO>> result = new LinkedHashMap<>();

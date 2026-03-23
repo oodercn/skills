@@ -10,7 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
@@ -22,7 +22,7 @@ import java.util.stream.Collectors;
 
 /**
  * 技能同步服务实现类
- * 参考agent-skillcenter设计，支持个人使用和小规模办公分享
+ * 参考agent-skillcenter设计，支持个人使用和小规模办公分�?
  */
 @Service
 public class SkillSyncServiceImpl implements SkillSyncService {
@@ -56,9 +56,9 @@ public class SkillSyncServiceImpl implements SkillSyncService {
                 initDefaultData();
             }
             
-            log.info("技能同步服务初始化完成，共加载 {} 个任务", taskCache.size());
+            log.info("技能同步服务初始化完成，共加载 {} 个任�?, taskCache.size());
         } catch (IOException e) {
-            log.error("初始化技能同步服务失败", e);
+            log.error("初始化技能同步服务失�?, e);
         }
     }
 
@@ -79,7 +79,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
                 List<SyncedSkill> skills = objectMapper.readValue(json, new TypeReference<List<SyncedSkill>>() {});
                 skills.forEach(s -> syncedSkillCache.put(s.getId(), s));
             } catch (IOException e) {
-                log.error("加载已同步技能失败", e);
+                log.error("加载已同步技能失�?, e);
             }
         }
     }
@@ -102,7 +102,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
             Files.write(syncedSkillsPath, json.getBytes(StandardCharsets.UTF_8),
                     StandardOpenOption.CREATE, StandardOpenOption.TRUNCATE_EXISTING);
         } catch (IOException e) {
-            log.error("保存已同步技能失败", e);
+            log.error("保存已同步技能失�?, e);
         }
     }
 
@@ -126,7 +126,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
         taskCache.put(task1.getId(), task1);
         saveTasks();
         
-        log.info("初始化默认同步数据完成");
+        log.info("初始化默认同步数据完�?);
     }
 
     @Override
@@ -187,7 +187,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
                 task.setStatus("completed");
                 task.setEndTime(LocalDateTime.now());
                 
-                // 更新已同步技能列表
+                // 更新已同步技能列�?
                 if (task.getItems() != null) {
                     for (SyncTask.SyncItem item : task.getItems()) {
                         SyncedSkill skill = new SyncedSkill();
@@ -208,7 +208,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
                 task.setStatus("failed");
-                task.setErrorMessage("同步被中断");
+                task.setErrorMessage("同步被中�?);
                 saveTasks();
             }
         }).start();
@@ -251,13 +251,13 @@ public class SkillSyncServiceImpl implements SkillSyncService {
         stats.setPendingTasks((int) tasks.stream().filter(t -> "pending".equals(t.getStatus())).count());
         stats.setTotalSyncedSkills(syncedSkillCache.size());
         
-        // 获取最后同步时间
+        // 获取最后同步时�?
         tasks.stream()
                 .filter(t -> "completed".equals(t.getStatus()))
                 .max(Comparator.comparing(SyncTask::getEndTime))
                 .ifPresent(t -> stats.setLastSyncTime(t.getEndTime().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME)));
         
-        // 计算成功率
+        // 计算成功�?
         int completed = stats.getCompletedTasks();
         int total = completed + stats.getFailedTasks();
         stats.setSuccessRate(total > 0 ? (double) completed / total * 100 : 0);
@@ -267,13 +267,13 @@ public class SkillSyncServiceImpl implements SkillSyncService {
 
     @Override
     public List<SyncableSkill> getSyncableSkills() {
-        // 模拟可同步技能列表
+        // 模拟可同步技能列�?
         List<SyncableSkill> skills = new ArrayList<>();
         
         SyncableSkill skill1 = new SyncableSkill();
         skill1.setId("skill-001");
         skill1.setName("文本处理工具");
-        skill1.setDescription("文本转换和处理工具");
+        skill1.setDescription("文本转换和处理工�?);
         skill1.setVersion("1.0.0");
         skill1.setCategory("productivity");
         skill1.setSize(1024);
@@ -283,7 +283,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
         
         SyncableSkill skill2 = new SyncableSkill();
         skill2.setId("skill-002");
-        skill2.setName("代码生成器");
+        skill2.setName("代码生成�?);
         skill2.setDescription("自动生成代码片段");
         skill2.setVersion("1.2.0");
         skill2.setCategory("development");
@@ -314,7 +314,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
     @Override
     public SyncTask uploadSkill(String skillId, String target) {
         SyncTask task = new SyncTask();
-        task.setName("上传技能: " + skillId);
+        task.setName("上传技�? " + skillId);
         task.setType("upload");
         task.setSource("本地");
         task.setTarget(target != null ? target : "云端");
@@ -334,7 +334,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
     @Override
     public SyncTask downloadSkill(String skillId, String source) {
         SyncTask task = new SyncTask();
-        task.setName("下载技能: " + skillId);
+        task.setName("下载技�? " + skillId);
         task.setType("download");
         task.setSource(source != null ? source : "云端");
         task.setTarget("本地");
@@ -354,7 +354,7 @@ public class SkillSyncServiceImpl implements SkillSyncService {
     @Override
     public SyncTask batchSync(List<String> skillIds, String type) {
         SyncTask task = new SyncTask();
-        task.setName("批量同步: " + skillIds.size() + " 个技能");
+        task.setName("批量同步: " + skillIds.size() + " 个技�?);
         task.setType(type);
         task.setSource("本地");
         task.setTarget("云端");
