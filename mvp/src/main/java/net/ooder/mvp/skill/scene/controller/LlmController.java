@@ -1,6 +1,6 @@
 package net.ooder.mvp.skill.scene.controller;
 
-import javax.validation.Valid;
+import jakarta.validation.Valid;
 import net.ooder.mvp.skill.scene.model.ResultModel;
 import net.ooder.scene.skill.LlmProvider;
 import net.ooder.scene.skill.tool.ToolOrchestrator;

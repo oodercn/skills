@@ -1,7 +1,7 @@
 package net.ooder.mvp.skill.scene.capability.connector;
 
 import org.springframework.stereotype.Component;
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 

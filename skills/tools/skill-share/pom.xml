@@ -27,7 +27,7 @@
             <scope>provided</scope>
         </dependency>
         
-        <!-- LLM能力 (可�? -->
+        <!-- LLM能力 (可选) -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>llm-sdk</artifactId>
@@ -36,7 +36,7 @@
             <optional>true</optional>
         </dependency>
         
-        <!-- AI能力 (可�? -->
+        <!-- AI能力 (可选) -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-ai</artifactId>
