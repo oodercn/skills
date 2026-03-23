@@ -123,16 +123,7 @@ if (window.MenuLoader) {
             if (!staticConfig) staticConfig = { menu: [] };
             if (!staticConfig.menu) staticConfig.menu = [];
             
-            const existingIds = new Set(staticConfig.menu.map(m => m.id));
-            
-            for (const dynamicMenu of dynamicMenus) {
-                if (!existingIds.has(dynamicMenu.id)) {
-                    dynamicMenu.status = 'implemented';
-                    dynamicMenu.roles = dynamicMenu.roles || [this.currentRole];
-                    staticConfig.menu.push(dynamicMenu);
-                    existingIds.add(dynamicMenu.id);
-                }
-            }
+            console.log('[MenuLoader] 动态菜单已加载但不添加到一级目录:', dynamicMenus.length, '项');
             
             return staticConfig;
         }

@@ -594,7 +594,7 @@
 			"skillId":"skill-recruitment-management",
 			"createTime":1774088004961,
 			"sceneType":"TRIGGER",
-			"updateTime":1774307809855,
+			"updateTime":1774308125212,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -630,7 +630,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774307809855,
+		"updateTime":1774308125212,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -5661,7 +5661,7 @@
 			"skillId":"skill-management",
 			"createTime":1774143656922,
 			"sceneType":"TRIGGER",
-			"updateTime":1774229750795,
+			"updateTime":1774308125201,
 			"version":"0.1.0",
 			"skillForm":"SCENE"
 		},
@@ -5697,7 +5697,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774229750795,
+		"updateTime":1774308125201,
 		"version":"0.1.0",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -8590,7 +8590,7 @@
 			"skillId":"skill-approval-form",
 			"createTime":1774088003860,
 			"sceneType":"TRIGGER",
-			"updateTime":1774307807280,
+			"updateTime":1774308125178,
 			"version":"2.3.1",
 			"skillForm":"SCENE"
 		},
@@ -8626,7 +8626,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774307807280,
+		"updateTime":1774308125178,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
@@ -13507,7 +13507,7 @@
 			"skillId":"skill-recording-qa",
 			"createTime":1774147545273,
 			"sceneType":"TRIGGER",
-			"updateTime":1774307809784,
+			"updateTime":1774308125223,
 			"skillForm":"SCENE",
 			"version":"2.3.1"
 		},
@@ -13543,7 +13543,7 @@
 		"tags":[
 			
 		],
-		"updateTime":1774307809784,
+		"updateTime":1774308125223,
 		"version":"2.3.1",
 		"visibility":"public",
 		"visibilityEnum":"PUBLIC"
