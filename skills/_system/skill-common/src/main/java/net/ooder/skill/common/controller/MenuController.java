@@ -12,7 +12,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.util.StreamUtils;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.PostConstruct;
+import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -49,7 +49,7 @@ public class MenuController {
     @GetMapping
     public ResultModel<List<Map<String, Object>>> getCurrentUserMenu(
             @RequestParam(required = false) String role,
-            javax.servlet.http.HttpServletRequest request) {
+            jakarta.servlet.http.HttpServletRequest request) {
         
         String roleType = role;
         
