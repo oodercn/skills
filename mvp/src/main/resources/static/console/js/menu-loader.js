@@ -132,6 +132,10 @@ if (window.MenuLoader) {
          * 检查菜单项是否对当前角色可见
          */
         isMenuItemVisible(menuItem) {
+            // 如果 visible 属性为 false，则不显示
+            if (menuItem.visible === false) {
+                return false;
+            }
             return menuItem.roles && menuItem.roles.includes(this.currentRole);
         }
 
