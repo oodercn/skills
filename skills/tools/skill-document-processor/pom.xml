@@ -10,7 +10,7 @@
     <packaging>jar</packaging>
 
     <name>Skill Document Processor</name>
-    <description>文档处理�?- 文档解析、分块、元数据提取</description>
+    <description>文档处理器 - 文档解析、分块、元数据提取</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>

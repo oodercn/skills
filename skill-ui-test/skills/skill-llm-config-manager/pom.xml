@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <name>Skill LLM Config Manager</name>
-    <description>LLM配置管理 - 多级配置、加密存储、配置解�?/description>
+    <description>LLM配置管理 - 多级配置、加密存储、配置解析</description>
 
     <dependencies>
         <dependency>
