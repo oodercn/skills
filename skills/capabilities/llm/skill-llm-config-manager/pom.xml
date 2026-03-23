@@ -6,9 +6,9 @@
 
     <parent>
         <groupId>net.ooder</groupId>
-        <artifactId>skill-ui-test</artifactId>
+        <artifactId>ooder-skills</artifactId>
         <version>3.0.0</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>skill-llm-config-manager</artifactId>

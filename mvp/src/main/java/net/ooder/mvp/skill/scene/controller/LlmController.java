@@ -118,7 +118,7 @@ public class LlmController extends BaseController {
         loadProviders();
     }
     
-    @javax.annotation.PostConstruct
+    @jakarta.annotation.PostConstruct
     public void init() {
         initBaiduProvider();
         initDeepSeekProvider();

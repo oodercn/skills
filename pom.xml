@@ -53,13 +53,17 @@
         
         <!-- System Skills -->
         <module>skills/_system/skill-common</module>
+        <!-- TODO: implement these modules
         <module>skills/_system/skill-capability</module>
         <module>skills/_system/skill-capability-coordinator</module>
         <module>skills/_system/skill-llm</module>
+        -->
         <module>skills/_system/skill-llm-chat</module>
+        <!-- TODO: implement these modules
         <module>skills/_system/skill-management</module>
         <module>skills/_system/skill-protocol</module>
         <module>skills/_system/skill-scene-management</module>
+        -->
         
         <!-- LLM Drivers -->
         <module>skills/_drivers/llm/skill-llm-base</module>
@@ -122,18 +126,24 @@
         <module>skills/capabilities/infrastructure/skill-load-balancer</module>
         
         <!-- Capabilities - Knowledge -->
+        <!-- TODO: implement these modules
         <module>skills/capabilities/knowledge/skill-knowledge-base</module>
         <module>skills/capabilities/knowledge/skill-local-knowledge</module>
         <module>skills/capabilities/knowledge/skill-rag</module>
         <module>skills/capabilities/knowledge/skill-vector-sqlite</module>
+        -->
         
         <!-- Capabilities - LLM -->
         <module>skills/capabilities/llm/skill-llm-config-manager</module>
+        <!-- TODO: implement these modules
         <module>skills/capabilities/llm/skill-llm-context-builder</module>
         <module>skills/capabilities/llm/skill-llm-conversation</module>
+        -->
         
         <!-- Capabilities - Monitor -->
+        <!-- TODO: implement these modules
         <module>skills/capabilities/monitor/skill-agent</module>
+        -->
         <module>skills/capabilities/monitor/skill-cmd-service</module>
         <module>skills/capabilities/monitor/skill-health</module>
         <module>skills/capabilities/monitor/skill-monitor</module>
@@ -149,9 +159,11 @@
         <module>skills/capabilities/search/skill-search</module>
         
         <!-- Capabilities - Security -->
+        <!-- TODO: implement these modules
         <module>skills/capabilities/security/skill-access-control</module>
         <module>skills/capabilities/security/skill-audit</module>
         <module>skills/capabilities/security/skill-security</module>
+        -->
         
         <!-- Scenes -->
         <module>skills/scenes/skill-agent-recommendation</module>

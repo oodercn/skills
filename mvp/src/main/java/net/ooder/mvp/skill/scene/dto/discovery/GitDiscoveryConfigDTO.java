@@ -1,6 +1,6 @@
 package net.ooder.mvp.skill.scene.dto.discovery;
 
-import javax.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotBlank;
 
 public class GitDiscoveryConfigDTO {
     

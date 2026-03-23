@@ -15,7 +15,8 @@ import org.springframework.context.annotation.FilterType;
         "net.ooder.mvp.skill.scene",
         "net.ooder.skill.common",
         "net.ooder.skill.capability",
-        "net.ooder.skill.llm"
+        "net.ooder.skill.llm",
+        "net.ooder.skill.hotplug"
     },
     excludeFilters = {
         @ComponentScan.Filter(
