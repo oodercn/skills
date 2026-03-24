@@ -9,17 +9,19 @@ import net.ooder.skill.common.service.OrgService;
 import net.ooder.skill.common.storage.JsonStorageService;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ConditionalOnProperty(name = "skill.common.enabled", havingValue = "true", matchIfMissing = true)
 public class SkillCommonAutoConfiguration {
 
     @Value("${app.storage.path:./data}")
     private String storagePath;
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(JsonStorageService.class)
     public JsonStorageService jsonStorageService() {
         JsonStorageService service = new JsonStorageService(storagePath);
         service.init();

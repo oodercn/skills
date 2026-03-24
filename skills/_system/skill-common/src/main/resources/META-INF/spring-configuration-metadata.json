@@ -1,0 +1,16 @@
+{
+  "properties": [
+    {
+      "name": "skill.common.enabled",
+      "type": "java.lang.Boolean",
+      "description": "Enable skill-common auto configuration",
+      "defaultValue": true
+    },
+    {
+      "name": "app.storage.path",
+      "type": "java.lang.String",
+      "description": "Storage path for JSON files",
+      "defaultValue": "./data"
+    }
+  ]
+}

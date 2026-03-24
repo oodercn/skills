@@ -363,4 +363,8 @@ public class JsonStorageService {
     public void setMaxBackups(int maxBackups) {
         this.maxBackups = maxBackups;
     }
+
+    public String getStorageRoot() {
+        return this.storagePath;
+    }
 }
