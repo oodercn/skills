@@ -253,29 +253,8 @@ public class AuthMenuController {
     }
 
     private List<Map<String, Object>> mergeMenus(List<Map<String, Object>> staticMenus, List<MenuItemDTO> dynamicMenus) {
-        Map<String, Map<String, Object>> menuMap = new LinkedHashMap<>();
-        
-        for (Map<String, Object> menu : staticMenus) {
-            String id = (String) menu.get("id");
-            menuMap.put(id, menu);
-        }
-        
-        for (MenuItemDTO dto : dynamicMenus) {
-            String id = dto.getId();
-            if (!menuMap.containsKey(id)) {
-                Map<String, Object> menu = convertDtoToMap(dto);
-                menuMap.put(id, menu);
-            }
-        }
-        
-        List<Map<String, Object>> result = new ArrayList<>(menuMap.values());
-        result.sort((a, b) -> {
-            int sortA = (Integer) a.getOrDefault("sort", a.getOrDefault("order", 999));
-            int sortB = (Integer) b.getOrDefault("sort", b.getOrDefault("order", 999));
-            return Integer.compare(sortA, sortB);
-        });
-        
-        return result;
+        log.info("[mergeMenus] 动态菜单不添加到一级目录，共 {} 项", dynamicMenus.size());
+        return staticMenus;
     }
 
     private Map<String, Object> convertDtoToMap(MenuItemDTO dto) {
