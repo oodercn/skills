@@ -8,6 +8,7 @@ import net.ooder.mvp.skill.scene.dto.scene.SceneParticipantDTO;
 import net.ooder.mvp.skill.scene.dto.scene.ParticipantType;
 import net.ooder.mvp.skill.scene.service.SceneGroupService;
 import net.ooder.skill.common.storage.JsonStorageService;
+import net.ooder.mvp.skill.scene.agent.config.AgentHeartbeatConfig;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -274,6 +275,14 @@ public class AgentSessionServiceImpl implements AgentSessionService {
     @Override
     public void setSessionTimeout(int timeoutSeconds) {
         this.sessionTimeout = timeoutSeconds;
+    }
+    
+    @Override
+    public void updateSession(AgentSessionDTO session) {
+        if (session != null && session.getAgentId() != null) {
+            sessions.put(session.getAgentId(), session);
+            persistSession(session);
+        }
     }
 
     private String generateToken(String agentId) {

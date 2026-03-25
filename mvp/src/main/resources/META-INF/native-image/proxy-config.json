@@ -1,0 +1,58 @@
+[
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.engine.ScriptExecutor"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.service.HistoryService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.capability.service.CapabilityService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.agent.service.AgentService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.spi.UserService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.spi.OrganizationService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.spi.MessageService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  },
+  {
+    "interfaces": [
+      "net.ooder.mvp.skill.scene.spi.AuditService"
+    ],
+    "allDeclaredConstructors": true,
+    "allDeclaredMethods": true
+  }
+]

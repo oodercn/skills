@@ -1,0 +1,24 @@
+{
+	"user-default-001":{
+		"active":true,
+		"createTime":1774429165577,
+		"departmentId":"dept-rd",
+		"email":"user@example.com",
+		"name":"默认用户",
+		"role":"user",
+		"title":"工程师",
+		"updateTime":0,
+		"userId":"user-default-001"
+	},
+	"user-admin-001":{
+		"active":true,
+		"createTime":1774429165577,
+		"departmentId":"dept-it",
+		"email":"admin@example.com",
+		"name":"系统管理员",
+		"role":"admin",
+		"title":"系统管理员",
+		"updateTime":0,
+		"userId":"user-admin-001"
+	}
+}

@@ -8,36 +8,30 @@ import net.ooder.mvp.skill.scene.capability.service.impl.CapabilityBindingServic
 import net.ooder.mvp.skill.scene.capability.service.impl.CapabilityStateServiceImpl;
 import net.ooder.skill.common.storage.JsonStorageService;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 @Configuration
 public class CapabilityConfig {
 
-    @Value("${app.storage.path:./data}")
-    private String storagePath;
+    @Autowired
+    private JsonStorageService jsonStorageService;
 
     @Bean
-    public JsonStorageService jsonStorageService() {
-        JsonStorageService service = new JsonStorageService(storagePath);
-        service.init();
-        return service;
-    }
-
-    @Bean
-    @org.springframework.context.annotation.Primary
+    @Primary
     public CapabilityStateService capabilityStateService() {
         return new CapabilityStateServiceImpl();
     }
 
     @Bean
     public CapabilityService capabilityService() {
-        return new CapabilityServiceImpl(jsonStorageService(), capabilityStateService());
+        return new CapabilityServiceImpl(jsonStorageService, capabilityStateService());
     }
 
     @Bean
     public CapabilityBindingService capabilityBindingService() {
-        return new CapabilityBindingServiceImpl(jsonStorageService());
+        return new CapabilityBindingServiceImpl(jsonStorageService);
     }
 }

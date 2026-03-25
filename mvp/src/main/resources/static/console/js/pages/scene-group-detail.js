@@ -1611,19 +1611,23 @@ async function loadLlmConfig() {
 
 async function loadLlmProviders(currentProvider) {
     try {
-        const response = await fetch('/api/v1/scene-groups/' + sceneGroupId + '/llm/providers');
+        const response = await fetch('/api/v1/llm-providers/providers?configuredOnly=true');
         const result = await response.json();
         
         const providerSelect = document.getElementById('llmProvider');
         providerSelect.innerHTML = '<option value="">请选择提供者</option>';
         
         if (result.status === 'success' && result.data) {
+            if (result.data.length === 0) {
+                providerSelect.innerHTML = '<option value="">暂无可用Provider，请先配置API Key</option>';
+                return;
+            }
+            
             result.data.forEach(p => {
                 const option = document.createElement('option');
-                option.value = p.id;
-                option.textContent = p.name + (p.configured ? '' : ' (未配置)');
-                if (!p.configured) option.disabled = true;
-                if (p.id === currentProvider) option.selected = true;
+                option.value = p.providerId;
+                option.textContent = p.name;
+                if (p.providerId === currentProvider) option.selected = true;
                 providerSelect.appendChild(option);
             });
         }

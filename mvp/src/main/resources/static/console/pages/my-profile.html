@@ -377,11 +377,201 @@
         }
         
         function showPasswordModal() {
-            showToast('密码修改功能开发中', 'error');
+            var modalHtml = `
+                <div class="modal-overlay" id="passwordModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                    <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 400px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; font-size: 16px;"><i class="ri-lock-password-line"></i> 修改密码</h3>
+                            <button class="modal-close" onclick="closePasswordModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--nx-text-secondary);">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 20px;">
+                            <div class="nx-form-group nx-mb-3">
+                                <label class="nx-form-label">当前密码</label>
+                                <input type="password" class="nx-input" id="currentPassword" placeholder="请输入当前密码">
+                            </div>
+                            <div class="nx-form-group nx-mb-3">
+                                <label class="nx-form-label">新密码</label>
+                                <input type="password" class="nx-input" id="newPassword" placeholder="请输入新密码">
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-form-label">确认新密码</label>
+                                <input type="password" class="nx-input" id="confirmPassword" placeholder="请再次输入新密码">
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: flex-end; gap: 8px;">
+                            <button class="nx-btn nx-btn--secondary" onclick="closePasswordModal()">取消</button>
+                            <button class="nx-btn nx-btn--primary" onclick="submitPasswordChange()">确认修改</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            var existingModal = document.getElementById('passwordModal');
+            if (existingModal) existingModal.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closePasswordModal() {
+            var modal = document.getElementById('passwordModal');
+            if (modal) modal.remove();
+        }
+        
+        function submitPasswordChange() {
+            var currentPassword = document.getElementById('currentPassword').value;
+            var newPassword = document.getElementById('newPassword').value;
+            var confirmPassword = document.getElementById('confirmPassword').value;
+            
+            if (!currentPassword || !newPassword || !confirmPassword) {
+                showToast('请填写所有密码字段', 'error');
+                return;
+            }
+            
+            if (newPassword !== confirmPassword) {
+                showToast('两次输入的新密码不一致', 'error');
+                return;
+            }
+            
+            if (newPassword.length < 6) {
+                showToast('新密码长度至少6位', 'error');
+                return;
+            }
+            
+            fetch('/api/v1/users/password', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    currentPassword: currentPassword,
+                    newPassword: newPassword
+                })
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        closePasswordModal();
+                        showToast('密码修改成功', 'success');
+                    } else {
+                        showToast(result.message || '密码修改失败', 'error');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Failed to change password:', error);
+                    showToast('密码修改失败', 'error');
+                });
         }
         
         function showDevicesModal() {
-            showToast('设备管理功能开发中', 'error');
+            fetch('/api/v1/users/devices')
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    var devices = [];
+                    if (result.status === 'success' && result.data) {
+                        devices = result.data;
+                    }
+                    renderDevicesModal(devices);
+                })
+                .catch(function(error) {
+                    console.error('Failed to load devices:', error);
+                    renderDevicesModal([]);
+                });
+        }
+        
+        function renderDevicesModal(devices) {
+            var devicesHtml = devices.length > 0 ? devices.map(function(device) {
+                return `
+                    <div class="device-item" style="display: flex; align-items: center; justify-content: space-between; padding: 12px; border: 1px solid var(--nx-border-color); border-radius: 8px; margin-bottom: 8px;">
+                        <div style="display: flex; align-items: center; gap: 12px;">
+                            <i class="ri-${device.deviceType === 'mobile' ? 'smartphone' : 'computer'}-line" style="font-size: 24px; color: var(--nx-color-primary);"></i>
+                            <div>
+                                <div style="font-weight: 500;">${device.deviceName || '未知设备'}</div>
+                                <div style="font-size: 12px; color: var(--nx-text-secondary);">
+                                    ${device.ip || '-'} · ${device.lastLoginTime ? formatTime(device.lastLoginTime) : '-'}
+                                </div>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            ${device.isCurrent ? '<span class="nx-badge nx-badge--success">当前设备</span>' : ''}
+                            <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="removeDevice('${device.deviceId}')" ${device.isCurrent ? 'disabled' : ''}>
+                                <i class="ri-delete-bin-line"></i>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('') : '<p style="text-align: center; color: var(--nx-text-secondary); padding: 20px;">暂无登录设备记录</p>';
+            
+            var modalHtml = `
+                <div class="modal-overlay" id="devicesModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                    <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 500px; width: 100%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; font-size: 16px;"><i class="ri-device-line"></i> 登录设备管理</h3>
+                            <button class="modal-close" onclick="closeDevicesModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--nx-text-secondary);">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 20px; max-height: 400px; overflow-y: auto;">
+                            ${devicesHtml}
+                        </div>
+                        <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: space-between;">
+                            <button class="nx-btn nx-btn--danger" onclick="removeAllDevices()">移除其他所有设备</button>
+                            <button class="nx-btn nx-btn--secondary" onclick="closeDevicesModal()">关闭</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            var existingModal = document.getElementById('devicesModal');
+            if (existingModal) existingModal.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+        }
+        
+        function closeDevicesModal() {
+            var modal = document.getElementById('devicesModal');
+            if (modal) modal.remove();
+        }
+        
+        function removeDevice(deviceId) {
+            if (!confirm('确定要移除此设备吗？')) return;
+            
+            fetch('/api/v1/users/devices/' + deviceId, {
+                method: 'DELETE'
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        showToast('设备已移除', 'success');
+                        showDevicesModal();
+                    } else {
+                        showToast(result.message || '移除失败', 'error');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Failed to remove device:', error);
+                    showToast('移除失败', 'error');
+                });
+        }
+        
+        function removeAllDevices() {
+            if (!confirm('确定要移除其他所有登录设备吗？')) return;
+            
+            fetch('/api/v1/users/devices/others', {
+                method: 'DELETE'
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        showToast('已移除其他所有设备', 'success');
+                        showDevicesModal();
+                    } else {
+                        showToast(result.message || '移除失败', 'error');
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Failed to remove devices:', error);
+                    showToast('移除失败', 'error');
+                });
         }
         
         function showToast(message, type) {

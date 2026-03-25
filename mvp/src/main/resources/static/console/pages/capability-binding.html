@@ -6,6 +6,7 @@
     <title>能力绑定管理 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/nx-page.css">
     <link rel="stylesheet" href="/console/css/pages/capability-pages.css">
 </head>
 <body>
@@ -439,6 +440,14 @@
             
             function closeCreateModal() {
                 document.getElementById('create-modal').classList.remove('active');
+                document.querySelector('#create-modal .modal-header h3').textContent = '创建能力绑定';
+                document.querySelector('#create-modal .modal-footer .btn-primary').textContent = '创建';
+                document.querySelector('#create-modal .modal-footer .btn-primary').removeAttribute('data-edit-id');
+                document.getElementById('create-scene-group').value = '';
+                document.getElementById('create-capability-id').value = '';
+                document.getElementById('create-cap-id').value = '';
+                selectedAgentId = null;
+                selectedLinkId = null;
             }
             
             function renderAgentSelectList() {
@@ -510,36 +519,51 @@
                 const providerType = document.getElementById('create-provider-type').value;
                 const connectorType = document.getElementById('create-connector-type').value;
                 
+                const editBtn = document.querySelector('#create-modal .modal-footer .btn-primary');
+                const editId = editBtn.getAttribute('data-edit-id');
+                
                 if (!sceneGroupId || !capabilityId) {
                     alert('请填写场景组和能力 ID');
                     return;
                 }
                 
+                const payload = {
+                    sceneGroupId,
+                    capabilityId,
+                    capId,
+                    providerType,
+                    connectorType,
+                    agentId: selectedAgentId,
+                    linkId: selectedLinkId
+                };
+                
                 try {
-                    const response = await fetch('/api/v1/capabilities/bindings', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sceneGroupId,
-                            capabilityId,
-                            capId,
-                            providerType,
-                            connectorType,
-                            agentId: selectedAgentId,
-                            linkId: selectedLinkId
-                        })
-                    });
+                    let response;
+                    if (editId) {
+                        response = await fetch('/api/v1/capabilities/bindings/' + editId, {
+                            method: 'PUT',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                    } else {
+                        response = await fetch('/api/v1/capabilities/bindings', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+                    }
                     
                     const result = await response.json();
                     
                     if (result.status === 'success') {
                         closeCreateModal();
                         loadData();
+                        alert(editId ? '绑定更新成功' : '绑定创建成功');
                     } else {
-                        alert('创建失败: ' + (result.message || '未知错误'));
+                        alert((editId ? '更新失败: ' : '创建失败: ') + (result.message || '未知错误'));
                     }
                 } catch (e) {
-                    alert('创建失败: ' + e.message);
+                    alert((editId ? '更新失败: ' : '创建失败: ') + e.message);
                 }
             }
             
@@ -610,7 +634,29 @@
             }
             
             function editBinding(bindingId) {
-                alert('编辑功能开发中: ' + bindingId);
+                const binding = allBindings.find(b => b.bindingId === bindingId);
+                if (!binding) {
+                    alert('绑定不存在');
+                    return;
+                }
+                
+                document.getElementById('create-scene-group').value = binding.sceneGroupId || '';
+                document.getElementById('create-capability-id').value = binding.capabilityId || '';
+                document.getElementById('create-cap-id').value = binding.capId || '';
+                document.getElementById('create-provider-type').value = binding.providerType || 'SKILL';
+                document.getElementById('create-connector-type').value = binding.connectorType || 'INTERNAL';
+                
+                selectedAgentId = binding.agentId || null;
+                selectedLinkId = binding.linkId || null;
+                
+                renderAgentSelectList();
+                renderLinkSelectList();
+                
+                document.querySelector('#create-modal .modal-header h3').textContent = '编辑能力绑定';
+                document.querySelector('#create-modal .modal-footer .btn-primary').textContent = '保存';
+                document.querySelector('#create-modal .modal-footer .btn-primary').setAttribute('data-edit-id', bindingId);
+                
+                document.getElementById('create-modal').classList.add('active');
             }
             
             async function testBinding(bindingId) {

@@ -63,7 +63,7 @@
 }
 
 .skill-status.inactive {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -114,7 +114,7 @@
     width: 150px;
     font-weight: 500;
     color: var(--nx-text-secondary);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .skill-param-name {
@@ -124,13 +124,13 @@
 
 .skill-param-type {
     padding: 2px 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 4px;
     font-size: 11px;
 }
 
 .skill-code-block {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     padding: 16px;
     font-family: monospace;
@@ -434,7 +434,7 @@
     display: inline-flex;
     align-items: center;
     padding: 4px 10px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 4px;
     font-size: 12px;
     color: var(--nx-text-secondary);
@@ -461,7 +461,7 @@
 .param-table th {
     color: var(--nx-text-secondary);
     font-weight: 500;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .param-table td {
@@ -475,7 +475,7 @@
 
 .param-type {
     padding: 2px 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 4px;
     font-size: 11px;
     font-family: monospace;
@@ -487,7 +487,7 @@
 }
 
 .json-block {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     padding: 16px;
     font-family: monospace;
@@ -533,7 +533,7 @@
 }
 
 .status-badge--disabled {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -542,7 +542,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     margin-bottom: 8px;
 }
@@ -674,7 +674,7 @@
     border-radius: 8px;
     font-size: 14px;
     color: var(--nx-text-primary);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .form-control:focus {

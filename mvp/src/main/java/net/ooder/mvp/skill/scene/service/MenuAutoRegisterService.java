@@ -6,11 +6,15 @@ import net.ooder.mvp.skill.scene.dto.scene.SceneTemplateDTO;
 import net.ooder.mvp.skill.scene.template.SceneTemplate;
 import net.ooder.mvp.skill.scene.template.MenuConfig;
 import net.ooder.mvp.skill.scene.template.SceneTemplateLoader;
+import net.ooder.mvp.skill.scene.capability.install.SkillDirectoryMigrator;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +22,8 @@ import java.util.List;
 public class MenuAutoRegisterService {
 
     private static final Logger log = LoggerFactory.getLogger(MenuAutoRegisterService.class);
+    
+    private final ObjectMapper yamlMapper = new ObjectMapper(new YAMLFactory());
 
     @Autowired
     private MenuRoleConfigService menuRoleConfigService;
@@ -27,6 +33,9 @@ public class MenuAutoRegisterService {
     
     @Autowired(required = false)
     private SceneTemplateLoader sceneTemplateLoader;
+    
+    @Autowired
+    private SkillDirectoryMigrator skillDirectoryMigrator;
 
     public void registerMenusOnActivation(String sceneGroupId, String templateId, String userId, String roleInScene) {
         log.info("Auto registering menus for user: {}, sceneGroup: {}, template: {}, role: {}", 
@@ -59,6 +68,18 @@ public class MenuAutoRegisterService {
             }
             
             if (menuConfigs == null || menuConfigs.isEmpty()) {
+                SceneTemplate skillTemplate = loadTemplateFromSkillYaml(templateId);
+                if (skillTemplate != null) {
+                    sceneName = skillTemplate.getName();
+                    List<MenuConfig> templateMenus = skillTemplate.getMenus(roleInScene);
+                    if (templateMenus != null && !templateMenus.isEmpty()) {
+                        menuConfigs = convertToMenuConfigDTO(templateMenus);
+                        log.info("Found {} menus from skill.yaml for role: {}", menuConfigs.size(), roleInScene);
+                    }
+                }
+            }
+            
+            if (menuConfigs == null || menuConfigs.isEmpty()) {
                 log.warn("No menu config found for template: {}, role: {}", templateId, roleInScene);
                 return;
             }
@@ -73,6 +94,21 @@ public class MenuAutoRegisterService {
         } catch (Exception e) {
             log.error("Failed to register menus for user: {}, sceneGroup: {}", userId, sceneGroupId, e);
         }
+    }
+    
+    private SceneTemplate loadTemplateFromSkillYaml(String skillId) {
+        try {
+            java.nio.file.Path skillYamlPath = skillDirectoryMigrator.getSkillYamlPath(skillId);
+            if (skillYamlPath != null && java.nio.file.Files.exists(skillYamlPath)) {
+                File yamlFile = skillYamlPath.toFile();
+                SceneTemplate template = yamlMapper.readValue(yamlFile, SceneTemplate.class);
+                log.info("Loaded template from skill.yaml: {} - {}", skillId, template.getName());
+                return template;
+            }
+        } catch (Exception e) {
+            log.warn("Failed to load skill.yaml for {}: {}", skillId, e.getMessage());
+        }
+        return null;
     }
     
     private List<MenuConfigDTO> convertToMenuConfigDTO(List<MenuConfig> templateMenus) {

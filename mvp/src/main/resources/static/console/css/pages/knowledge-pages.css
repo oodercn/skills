@@ -21,8 +21,8 @@
     padding: 10px 12px 10px 36px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
     font-size: 14px;
 }
 
@@ -100,7 +100,7 @@
 .knowledge-stat-item {
     text-align: center;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
 }
 
@@ -124,7 +124,7 @@
 
 .knowledge-result-item {
     padding: 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     border-left: 3px solid var(--nx-primary);
 }
@@ -319,7 +319,7 @@
 }
 
 .kc-stat-card {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 12px;
     padding: 20px;
@@ -355,7 +355,7 @@
 .kc-stat-value {
     font-size: 28px;
     font-weight: 600;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .kc-stat-label {
@@ -388,7 +388,7 @@
 }
 
 .kb-card {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 12px;
     padding: 16px;
@@ -520,7 +520,7 @@
 .stat-value {
     font-size: 28px;
     font-weight: 600;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .stat-label {
@@ -574,12 +574,12 @@
     align-items: center;
     gap: 8px;
     padding: 20px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 12px;
     cursor: pointer;
     text-decoration: none;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
     transition: all 0.2s;
 }
 
@@ -609,7 +609,7 @@
     align-items: center;
     gap: 16px;
     padding: 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 12px;
     cursor: pointer;
     transition: all 0.2s;
@@ -766,8 +766,8 @@
     border: 1px solid var(--nx-border);
     border-radius: 6px;
     font-size: 14px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
     transition: border-color 0.2s;
 }
 
@@ -792,7 +792,7 @@
 .tree-count {
     margin-left: auto;
     font-size: 11px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     padding: 2px 8px;
     border-radius: 10px;
     color: var(--nx-text-secondary);
@@ -869,8 +869,8 @@
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     font-size: 15px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
 }
 
 .search-input-wrapper input:focus {
@@ -892,7 +892,7 @@
     padding: 6px 12px;
     border-radius: 20px;
     font-size: 13px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     cursor: pointer;
     transition: all 0.2s;
@@ -930,8 +930,8 @@
     border: 1px solid var(--nx-border);
     border-radius: 6px;
     font-size: 13px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
 }
 
 .search-results {
@@ -984,7 +984,7 @@
 
 .history-tag {
     padding: 6px 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 20px;
     font-size: 13px;
@@ -1027,7 +1027,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     cursor: pointer;
     transition: all 0.2s;
@@ -1263,7 +1263,7 @@
     align-items: center;
     gap: 12px;
     padding: 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
 }
 

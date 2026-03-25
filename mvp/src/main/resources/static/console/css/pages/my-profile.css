@@ -130,7 +130,7 @@
 .quick-stat {
     text-align: center;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
 }
 
@@ -184,7 +184,7 @@
     font-size: 13px;
     font-weight: 500;
     margin-bottom: 6px;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .profile-form-input {
@@ -192,7 +192,7 @@
     padding: 10px 12px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     font-size: 14px;
     transition: all 0.2s;
 }
@@ -252,7 +252,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     margin-bottom: 12px;
 }

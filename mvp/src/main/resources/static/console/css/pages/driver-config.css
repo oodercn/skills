@@ -221,7 +221,7 @@
     border-radius: 6px;
     font-size: 13px;
     font-family: 'Consolas', monospace;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     resize: vertical;
 }

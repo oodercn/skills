@@ -461,7 +461,98 @@
         };
         
         window.showAddOrgModal = function() {
-            alert('添加组织节点功能开发中...');
+            var modalHtml = `
+                <div class="modal-overlay" id="addOrgModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                    <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 450px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                        <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                            <h3 style="margin: 0; font-size: 16px;"><i class="ri-organization-chart"></i> 添加组织节点</h3>
+                            <button class="modal-close" onclick="closeAddOrgModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--nx-text-secondary);">
+                                <i class="ri-close-line"></i>
+                            </button>
+                        </div>
+                        <div class="modal-body" style="padding: 20px;">
+                            <div class="nx-form-group nx-mb-3">
+                                <label class="nx-form-label">节点名称 <span class="nx-text-error">*</span></label>
+                                <input type="text" class="nx-input" id="newOrgName" placeholder="请输入组织节点名称">
+                            </div>
+                            <div class="nx-form-group nx-mb-3">
+                                <label class="nx-form-label">节点编码</label>
+                                <input type="text" class="nx-input" id="newOrgCode" placeholder="请输入唯一编码（可选）">
+                            </div>
+                            <div class="nx-form-group nx-mb-3">
+                                <label class="nx-form-label">父级节点</label>
+                                <select class="nx-input" id="newOrgParent">
+                                    <option value="">无（顶级节点）</option>
+                                </select>
+                            </div>
+                            <div class="nx-form-group">
+                                <label class="nx-form-label">节点描述</label>
+                                <textarea class="nx-input" id="newOrgDesc" rows="3" placeholder="描述此组织节点的用途..."></textarea>
+                            </div>
+                        </div>
+                        <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: flex-end; gap: 8px;">
+                            <button class="nx-btn nx-btn--secondary" onclick="closeAddOrgModal()">取消</button>
+                            <button class="nx-btn nx-btn--primary" onclick="submitAddOrg()">添加</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            var existingModal = document.getElementById('addOrgModal');
+            if (existingModal) existingModal.remove();
+            
+            document.body.insertAdjacentHTML('beforeend', modalHtml);
+            
+            var parentSelect = document.getElementById('newOrgParent');
+            var orgs = BusinessKnowledge.orgs || [];
+            orgs.forEach(function(org) {
+                var option = document.createElement('option');
+                option.value = org.orgId;
+                option.textContent = org.name;
+                parentSelect.appendChild(option);
+            });
+        };
+        
+        window.closeAddOrgModal = function() {
+            var modal = document.getElementById('addOrgModal');
+            if (modal) modal.remove();
+        };
+        
+        window.submitAddOrg = function() {
+            var name = document.getElementById('newOrgName').value.trim();
+            var code = document.getElementById('newOrgCode').value.trim();
+            var parentId = document.getElementById('newOrgParent').value;
+            var description = document.getElementById('newOrgDesc').value.trim();
+            
+            if (!name) {
+                alert('请输入节点名称');
+                return;
+            }
+            
+            fetch('/api/v1/knowledge-organizations', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    name: name,
+                    code: code || null,
+                    parentId: parentId || null,
+                    description: description
+                })
+            })
+                .then(function(response) { return response.json(); })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        closeAddOrgModal();
+                        alert('组织节点添加成功');
+                        BusinessKnowledge.loadOrgs();
+                    } else {
+                        alert('添加失败: ' + (result.message || '未知错误'));
+                    }
+                })
+                .catch(function(error) {
+                    console.error('Failed to add org:', error);
+                    alert('添加失败: ' + error.message);
+                });
         };
         
         document.addEventListener('DOMContentLoaded', BusinessKnowledge.init.bind(BusinessKnowledge));

@@ -37,7 +37,7 @@
 
 .llm-status-item .value {
     font-weight: 500;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .llm-status-item.success .value {
@@ -52,7 +52,7 @@
     color: #dc2626;
 }
 
-/* ==================== 上下文层级展示 ==================== */
+/* ==================== 上下文层级展�?==================== */
 .context-level-viewer {
     background: var(--nx-bg-elevated);
     border: 1px solid var(--nx-border);
@@ -77,7 +77,7 @@
     align-items: center;
     gap: 10px;
     padding: 12px 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -156,7 +156,7 @@
 }
 
 .level-item .item-value {
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
     font-weight: 500;
 }
 
@@ -181,7 +181,7 @@
     background: var(--nx-bg-hover);
 }
 
-/* ==================== 配置继承链 ==================== */
+/* ==================== 配置继承�?==================== */
 .config-chain {
     display: flex;
     flex-direction: column;
@@ -193,7 +193,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     transition: all 0.2s;
@@ -295,7 +295,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .llm-assistant-title {
@@ -376,7 +376,7 @@
     align-items: center;
     gap: 4px;
     padding: 4px 10px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 16px;
     font-size: 11px;
@@ -425,7 +425,7 @@
 }
 
 .tool-definition-card {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     padding: 12px;
@@ -472,7 +472,7 @@
     line-height: 1.4;
 }
 
-/* ==================== 知识库绑定展示 ==================== */
+/* ==================== 知识库绑定展�?==================== */
 .kb-bindings-panel {
     background: var(--nx-bg-elevated);
     border: 1px solid var(--nx-border);
@@ -505,7 +505,7 @@
     align-items: center;
     gap: 12px;
     padding: 10px 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     margin-bottom: 8px;
@@ -588,7 +588,7 @@
 .context-switcher-header {
     padding: 12px 16px;
     border-bottom: 1px solid var(--nx-border);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .context-switcher-title {
@@ -634,7 +634,7 @@
     align-items: center;
     gap: 8px;
     padding: 10px 16px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     cursor: pointer;
@@ -671,7 +671,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .prompt-editor-title {
@@ -705,8 +705,8 @@
     font-size: 13px;
     line-height: 1.6;
     resize: vertical;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
 }
 
 .prompt-textarea:focus {
@@ -855,7 +855,7 @@
 
 .tool-param-item {
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
 }

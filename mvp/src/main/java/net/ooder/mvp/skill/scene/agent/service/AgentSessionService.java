@@ -34,4 +34,6 @@ public interface AgentSessionService {
     int getSessionTimeout();
     
     void setSessionTimeout(int timeoutSeconds);
+    
+    void updateSession(AgentSessionDTO session);
 }

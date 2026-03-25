@@ -6,6 +6,7 @@
     <title>Agent 管理 - Nexus Console</title>
     <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
     <link rel="stylesheet" href="/console/css/nexus.css">
+    <link rel="stylesheet" href="/console/css/nx-page.css">
     <link rel="stylesheet" href="/console/css/pages/agent-pages.css">
 </head>
 <body>
@@ -268,9 +269,11 @@
                 
                 const statusClass = status === 'online' || status === 'running' ? 'online' : 
                                    status === 'busy' ? 'busy' : 
+                                   status === 'recovering' ? 'recovering' :
                                    status === 'error' ? 'error' : 'offline';
                 const statusText = status === 'online' || status === 'running' ? '在线' :
                                   status === 'busy' ? '忙碌' :
+                                  status === 'recovering' ? '恢复中' :
                                   status === 'error' ? '错误' : '离线';
                 
                 return `
@@ -305,6 +308,9 @@
                                 </button>
                                 <button class="action-btn" onclick="sendHeartbeat('${agentId}')" title="发送心跳">
                                     <i class="ri-heart-pulse-line"></i>
+                                </button>
+                                <button class="action-btn ${status === 'offline' ? '' : 'warning'}" onclick="toggleAgentStatus('${agentId}', '${status}')" title="${status === 'offline' ? '启用' : '停用'}">
+                                    <i class="${status === 'offline' ? 'ri-play-line' : 'ri-pause-line'}"></i>
                                 </button>
                                 <button class="action-btn danger" onclick="deleteAgent('${agentId}')" title="删除">
                                     <i class="ri-delete-bin-line"></i>
@@ -439,6 +445,27 @@
                     }
                 } catch (e) {
                     alert('心跳发送失败: ' + e.message);
+                }
+            }
+            
+            async function toggleAgentStatus(agentId, currentStatus) {
+                const newStatus = currentStatus === 'offline' ? 'online' : 'offline';
+                const action = currentStatus === 'offline' ? '启用' : '停用';
+                
+                if (!confirm(`确定要${action} Agent ${agentId} 吗？`)) return;
+                
+                try {
+                    const response = await fetch(`/api/agent/${agentId}/status?status=${newStatus}`, { method: 'PUT' });
+                    const result = await response.json();
+                    
+                    if (result.status === 'success') {
+                        alert(`Agent ${action}成功`);
+                        loadAgents();
+                    } else {
+                        alert(`${action}失败: ` + (result.message || '未知错误'));
+                    }
+                } catch (e) {
+                    alert(`${action}失败: ` + e.message);
                 }
             }
             

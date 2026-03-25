@@ -88,10 +88,10 @@ var CapabilityDiscovery = {
     renderUserFacingCategories: function(categories) {
         var container = document.getElementById('businessCategoryFilter');
         if (!container) return;
-        var html = '<span class="filter-label">业务领域:</span>';
-        html += '<span class="filter-chip active" data-bc="" onclick="selectBusinessCategory(\'\')">全部</span>';
+        var html = '<span class="filter-group-label">业务领域:</span>';
+        html += '<span class="filter-chip" data-bc="" onclick="selectBusinessCategory(\'\')" title="全部业务领域"><i class="ri-apps-line"></i> 全部</span>';
         categories.forEach(function(cat) {
-            html += '<span class="filter-chip" data-bc="' + cat.id + '" onclick="selectBusinessCategory(\'' + cat.id + '\')">' +
+            html += '<span class="filter-chip" data-bc="' + cat.id + '" onclick="selectBusinessCategory(\'' + cat.id + '\')" title="' + (cat.desc || cat.name) + '">' +
                 '<i class="' + cat.icon + '"></i> ' + cat.name + '</span>';
         });
         container.innerHTML = html;
@@ -101,10 +101,10 @@ var CapabilityDiscovery = {
         var container = document.getElementById('businessCategoryFilter');
         if (!container) return;
         var userFacingCategories = CategoryService.getUserFacing();
-        var html = '<span class="filter-label">业务领域:</span>';
-        html += '<span class="filter-chip active" data-bc="" onclick="selectBusinessCategory(\'\')">全部</span>';
+        var html = '<span class="filter-group-label">业务领域:</span>';
+        html += '<span class="filter-chip" data-bc="" onclick="selectBusinessCategory(\'\')" title="全部业务领域"><i class="ri-apps-line"></i> 全部</span>';
         userFacingCategories.forEach(function(cat) {
-            html += '<span class="filter-chip" data-bc="' + cat.code + '" onclick="selectBusinessCategory(\'' + cat.code + '\')">' +
+            html += '<span class="filter-chip" data-bc="' + cat.code + '" onclick="selectBusinessCategory(\'' + cat.code + '\')" title="' + (cat.desc || cat.name) + '">' +
                 '<i class="' + cat.icon + '"></i> ' + cat.name + '</span>';
         });
         container.innerHTML = html;
@@ -121,11 +121,7 @@ var CapabilityDiscovery = {
         var method = DISCOVERY_METHODS.find(function(m) { return m.id === methodId; });
         if (method) {
             document.getElementById('radarTitle').textContent = method.name + ' 扫描';
-            if (method.requiresConfig) {
-                CapabilityDiscovery.showConfig(method);
-            } else {
-                CapabilityDiscovery.hideConfig();
-            }
+            CapabilityDiscovery.hideConfig();
         }
     },
 
@@ -359,18 +355,30 @@ var CapabilityDiscovery = {
     },
 
     initFilters: function() {
-        var filterContainer = document.querySelector('.results-filter');
-        if (!filterContainer) return;
-        filterContainer.addEventListener('click', function(e) {
-            var chip = e.target.closest('.filter-chip');
-            if (!chip) return;
-            if (chip.dataset.bc !== undefined) return;
-            if (chip.dataset.score !== undefined) return;
-            filterContainer.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
-            chip.classList.add('active');
-            var filter = chip.dataset.filter;
-            CapabilityDiscovery.applyFilter(filter);
-        });
+        var primaryFilterContainer = document.querySelector('.results-filter--primary');
+        if (primaryFilterContainer) {
+            primaryFilterContainer.addEventListener('click', function(e) {
+                var chip = e.target.closest('.filter-chip');
+                if (!chip || chip.dataset.bc !== undefined) return;
+                primaryFilterContainer.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+                var filter = chip.dataset.filter;
+                CapabilityDiscovery.applyFilter(filter);
+            });
+        }
+        
+        var businessFilterContainer = document.getElementById('businessCategoryFilter');
+        if (businessFilterContainer) {
+            businessFilterContainer.addEventListener('click', function(e) {
+                var chip = e.target.closest('.filter-chip');
+                if (!chip || chip.dataset.bc === undefined) return;
+                businessFilterContainer.querySelectorAll('.filter-chip').forEach(function(c) { c.classList.remove('active'); });
+                chip.classList.add('active');
+                var bc = chip.dataset.bc;
+                selectedBusinessCategory = bc;
+                CapabilityDiscovery.applyBusinessCategoryFilter(bc);
+            });
+        }
         
         var scoreFilterContainer = document.getElementById('scoreFilter');
         if (scoreFilterContainer) {
@@ -418,6 +426,27 @@ var CapabilityDiscovery = {
         document.getElementById('resultsCount').textContent = visibleCount;
     },
 
+    applyBusinessCategoryFilter: function(bc) {
+        var container = document.getElementById('resultsBody');
+        if (!container) return;
+        var items = container.querySelectorAll('.result-item');
+        var visibleCount = 0;
+        
+        items.forEach(function(item) {
+            var itemBc = item.dataset.businessCategory;
+            var show = !bc || itemBc === bc;
+            
+            if (show) {
+                item.style.display = '';
+                visibleCount++;
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        document.getElementById('resultsCount').textContent = visibleCount;
+    },
+
     selectBusinessCategory: function(bc) {
         selectedBusinessCategory = bc;
         var container = document.getElementById('businessCategoryFilter');
@@ -428,7 +457,7 @@ var CapabilityDiscovery = {
                 chip.classList.add('active');
             }
         });
-        CapabilityDiscovery.applyFilter(bc ? 'bc_' + bc : 'all');
+        CapabilityDiscovery.applyBusinessCategoryFilter(bc);
     },
 
     applyFilter: function(filter) {
@@ -1327,7 +1356,10 @@ var CapabilityDiscovery = {
         logs.unshift(log);
         if (logs.length > 100) { logs.pop(); }
         var container = document.getElementById('logsBody');
-        if (!container) return;
+        if (!container) {
+            container = document.getElementById('logsBody');
+            if (!container) return;
+        }
         var item = document.createElement('div');
         item.className = 'log-item log-' + level;
         item.innerHTML = '<span class="log-time">' + log.time.toLocaleTimeString() + '</span><span class="log-message">' + message + '</span>';
@@ -1335,6 +1367,41 @@ var CapabilityDiscovery = {
         if (container.children.length > 50) {
             container.removeChild(container.lastChild);
         }
+        
+        if (level === 'error') {
+            CapabilityDiscovery.showToast(message, 'error');
+        } else if (level === 'success') {
+            CapabilityDiscovery.showToast(message, 'success');
+        }
+    },
+    
+    showToast: function(message, type) {
+        type = type || 'info';
+        var existing = document.querySelector('.nx-notification');
+        if (existing) existing.remove();
+        
+        var notification = document.createElement('div');
+        notification.className = 'nx-notification nx-notification--' + type;
+        
+        var icon = '';
+        if (type === 'error') {
+            icon = '<i class="ri-error-warning-line" style="margin-right: 8px;"></i>';
+        } else if (type === 'success') {
+            icon = '<i class="ri-checkbox-circle-line" style="margin-right: 8px;"></i>';
+        } else if (type === 'warning') {
+            icon = '<i class="ri-alert-line" style="margin-right: 8px;"></i>';
+        } else {
+            icon = '<i class="ri-information-line" style="margin-right: 8px;"></i>';
+        }
+        
+        notification.innerHTML = icon + message;
+        document.body.appendChild(notification);
+        
+        setTimeout(function() {
+            notification.style.opacity = '0';
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(function() { notification.remove(); }, 300);
+        }, 5000);
     }
 };
 
@@ -1815,6 +1882,167 @@ global.closeBatchInstall = function() {
     }
     global.toggleBatchMode();
     CapabilityDiscovery.startScan();
+};
+
+global.openDiscoveryConfig = function() {
+    var modal = document.getElementById('discoveryConfigModal');
+    if (!modal) {
+        modal = document.createElement('div');
+        modal.id = 'discoveryConfigModal';
+        modal.className = 'modal-overlay';
+        modal.innerHTML = 
+            '<div class="modal-content" style="max-width: 600px;">' +
+            '<div class="modal-header">' +
+            '<h3><i class="ri-settings-3-line"></i> 发现源配置</h3>' +
+            '<button class="modal-close" onclick="closeDiscoveryConfig()"><i class="ri-close-line"></i></button>' +
+            '</div>' +
+            '<div class="modal-body">' +
+            '<div class="config-tabs">' +
+            '<div class="config-tab active" data-tab="gitee" onclick="switchConfigTab(\'gitee\')">Gitee</div>' +
+            '<div class="config-tab" data-tab="github" onclick="switchConfigTab(\'github\')">GitHub</div>' +
+            '</div>' +
+            '<div class="config-tab-content active" id="configTabGitee">' +
+            '<div class="config-form-vertical">' +
+            '<div class="form-group">' +
+            '<label class="form-label">仓库地址</label>' +
+            '<input type="text" class="form-input" id="configGiteeRepo" placeholder="例如: owner/repo">' +
+            '<div class="form-hint">Gitee 仓库地址，格式: owner/repo</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">访问令牌 (可选)</label>' +
+            '<input type="password" class="form-input" id="configGiteeToken" placeholder="用于访问私有仓库">' +
+            '<div class="form-hint">私有仓库需要提供访问令牌</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">分支</label>' +
+            '<input type="text" class="form-input" id="configGiteeBranch" value="main" placeholder="默认: main">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="config-tab-content" id="configTabGithub">' +
+            '<div class="config-form-vertical">' +
+            '<div class="form-group">' +
+            '<label class="form-label">仓库地址</label>' +
+            '<input type="text" class="form-input" id="configGithubRepo" placeholder="例如: owner/repo">' +
+            '<div class="form-hint">GitHub 仓库地址，格式: owner/repo</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">访问令牌 (可选)</label>' +
+            '<input type="password" class="form-input" id="configGithubToken" placeholder="用于访问私有仓库">' +
+            '<div class="form-hint">私有仓库需要提供访问令牌</div>' +
+            '</div>' +
+            '<div class="form-group">' +
+            '<label class="form-label">分支</label>' +
+            '<input type="text" class="form-input" id="configGithubBranch" value="main" placeholder="默认: main">' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '</div>' +
+            '<div class="modal-footer">' +
+            '<button class="nx-btn nx-btn--secondary" onclick="closeDiscoveryConfig()">取消</button>' +
+            '<button class="nx-btn nx-btn--primary" onclick="saveDiscoveryConfig()">保存配置</button>' +
+            '</div>' +
+            '</div>';
+        document.body.appendChild(modal);
+        
+        var style = document.createElement('style');
+        style.textContent = 
+            '.config-tabs { display: flex; gap: 4px; margin-bottom: 20px; border-bottom: 1px solid var(--nx-border); padding-bottom: 12px; }' +
+            '.config-tab { padding: 8px 16px; border-radius: 6px; cursor: pointer; font-size: 14px; color: var(--nx-text-secondary); transition: all 0.2s; }' +
+            '.config-tab:hover { background: var(--nx-bg-hover); color: var(--nx-text-primary); }' +
+            '.config-tab.active { background: var(--nx-primary); color: white; }' +
+            '.config-tab-content { display: none; }' +
+            '.config-tab-content.active { display: block; }' +
+            '.config-form-vertical { display: flex; flex-direction: column; gap: 16px; }';
+        document.head.appendChild(style);
+        
+        CapabilityDiscovery.loadDiscoveryConfig();
+    }
+    
+    modal.classList.add('show');
+};
+
+global.closeDiscoveryConfig = function() {
+    var modal = document.getElementById('discoveryConfigModal');
+    if (modal) {
+        modal.classList.remove('show');
+    }
+};
+
+global.switchConfigTab = function(tab) {
+    var tabs = document.querySelectorAll('.config-tab');
+    var contents = document.querySelectorAll('.config-tab-content');
+    
+    tabs.forEach(function(t) {
+        t.classList.remove('active');
+        if (t.dataset.tab === tab) {
+            t.classList.add('active');
+        }
+    });
+    
+    contents.forEach(function(c) {
+        c.classList.remove('active');
+        if (c.id === 'configTab' + tab.charAt(0).toUpperCase() + tab.slice(1)) {
+            c.classList.add('active');
+        }
+    });
+};
+
+CapabilityDiscovery.loadDiscoveryConfig = function() {
+    ApiClient.get('/api/v1/discovery/config')
+        .then(function(result) {
+            if (result.status === 'success' && result.data) {
+                if (result.data.gitee) {
+                    var gitee = result.data.gitee;
+                    var repoEl = document.getElementById('configGiteeRepo');
+                    var tokenEl = document.getElementById('configGiteeToken');
+                    var branchEl = document.getElementById('configGiteeBranch');
+                    if (repoEl) repoEl.value = gitee.repo || '';
+                    if (tokenEl) tokenEl.value = gitee.token || '';
+                    if (branchEl) branchEl.value = gitee.branch || 'main';
+                }
+                if (result.data.github) {
+                    var github = result.data.github;
+                    var repoEl = document.getElementById('configGithubRepo');
+                    var tokenEl = document.getElementById('configGithubToken');
+                    var branchEl = document.getElementById('configGithubBranch');
+                    if (repoEl) repoEl.value = github.repo || '';
+                    if (tokenEl) tokenEl.value = github.token || '';
+                    if (branchEl) branchEl.value = github.branch || 'main';
+                }
+            }
+        })
+        .catch(function(error) {
+            console.error('[loadDiscoveryConfig] Error:', error);
+        });
+};
+
+global.saveDiscoveryConfig = function() {
+    var config = {
+        gitee: {
+            repo: document.getElementById('configGiteeRepo')?.value || '',
+            token: document.getElementById('configGiteeToken')?.value || '',
+            branch: document.getElementById('configGiteeBranch')?.value || 'main'
+        },
+        github: {
+            repo: document.getElementById('configGithubRepo')?.value || '',
+            token: document.getElementById('configGithubToken')?.value || '',
+            branch: document.getElementById('configGithubBranch')?.value || 'main'
+        }
+    };
+    
+    ApiClient.put('/api/v1/discovery/config', config)
+        .then(function(result) {
+            if (result.status === 'success') {
+                CapabilityDiscovery.addLog('success', '配置保存成功');
+                global.closeDiscoveryConfig();
+            } else {
+                CapabilityDiscovery.addLog('error', '配置保存失败: ' + (result.message || '未知错误'));
+            }
+        })
+        .catch(function(error) {
+            CapabilityDiscovery.addLog('error', '配置保存失败: ' + error.message);
+        });
 };
 
 CapabilityDiscovery.init();

@@ -79,8 +79,11 @@
                                 </div>
                                 <div class="radar-status">
                                     <span id="radarStatusText">就绪</span>
-                                    <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="forceRefresh()" title="强制刷新（清除缓存）">
+                                    <button class="nx-btn nx-btn--ghost nx-btn--sm" onclick="forceRefresh()" title="强制刷新（清除缓存）">
                                         <i class="ri-refresh-line"></i>
+                                    </button>
+                                    <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="openDiscoveryConfig()" title="配置发现源">
+                                        <i class="ri-settings-3-line"></i>
                                     </button>
                                     <button class="nx-btn nx-btn--primary nx-btn--sm" id="startBtn" onclick="startDiscovery()">
                                         <i class="ri-search-line"></i> 开始扫描
@@ -128,17 +131,7 @@
                             </div>
                         </div>
                         
-                        <div class="config-panel" id="configPanel">
-                            <div class="config-title">
-                                <i class="ri-settings-3-line"></i>
-                                <span id="configTitle">配置</span>
-                            </div>
-                            <div class="config-form" id="configForm">
-                            </div>
-                            <div style="margin-top: 16px; display: flex; gap: 8px;">
-                                <button class="nx-btn nx-btn--secondary" onclick="hideConfig()">取消</button>
-                                <button class="nx-btn nx-btn--primary" onclick="applyConfig()">应用并扫描</button>
-                            </div>
+                        <div class="config-panel" id="configPanel" style="display: none;">
                         </div>
                         
                         <div class="results-panel">
@@ -148,21 +141,25 @@
                                     发现结果
                                     <span class="results-count" id="resultsCount">0</span>
                                 </div>
-                                <div class="results-filter">
-                                    <span class="filter-chip active" data-filter="all">全部 <span class="filter-count" id="filterCountAll">0</span></span>
-                                    <span class="filter-chip" data-filter="scene" title="场景应用">
-                                        <i class="ri-layout-grid-line"></i> 场景应用 <span class="filter-count" id="filterCountScene">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="provider" title="能力服务">
-                                        <i class="ri-cpu-line"></i> 能力服务 <span class="filter-count" id="filterCountProvider">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="driver" title="驱动适配">
-                                        <i class="ri-steering-line"></i> 驱动适配 <span class="filter-count" id="filterCountDriver">0</span>
-                                    </span>
-                                    <span class="filter-chip" data-filter="new">新能力 <span class="filter-count" id="filterCountNew">0</span></span>
-                                    <span class="filter-chip" data-filter="installed">已安装 <span class="filter-count" id="filterCountInstalled">0</span></span>
-                                </div>
-                                <div class="results-filter results-filter--business" id="businessCategoryFilter" style="margin-top: 8px;">
+                                <div class="results-filter-wrapper">
+                                    <div class="results-filter results-filter--primary">
+                                        <span class="filter-group-label">技能形态:</span>
+                                        <span class="filter-chip active" data-filter="all" title="全部能力">全部 <span class="filter-count" id="filterCountAll">0</span></span>
+                                        <span class="filter-chip" data-filter="scene" title="场景应用 - 自驱型SuperAgent能力，包含完整业务流程">
+                                            <i class="ri-layout-grid-line"></i> 场景应用 <span class="filter-count" id="filterCountScene">0</span>
+                                        </span>
+                                        <span class="filter-chip" data-filter="provider" title="能力服务 - 独立能力单元，可被场景调用">
+                                            <i class="ri-cpu-line"></i> 能力服务 <span class="filter-count" id="filterCountProvider">0</span>
+                                        </span>
+                                        <span class="filter-chip" data-filter="driver" title="驱动适配 - 意图/时间/事件驱动型能力">
+                                            <i class="ri-steering-line"></i> 驱动适配 <span class="filter-count" id="filterCountDriver">0</span>
+                                        </span>
+                                        <span class="filter-divider"></span>
+                                        <span class="filter-chip" data-filter="new" title="尚未安装的新能力">新能力 <span class="filter-count" id="filterCountNew">0</span></span>
+                                        <span class="filter-chip" data-filter="installed" title="已安装的能力">已安装 <span class="filter-count" id="filterCountInstalled">0</span></span>
+                                    </div>
+                                    <div class="results-filter results-filter--business" id="businessCategoryFilter">
+                                    </div>
                                 </div>
                             </div>
                             

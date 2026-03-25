@@ -270,12 +270,16 @@
         },
 
         loadRelatedData: function(sceneGroupId) {
-            ApiClient.get('/api/v1/audit/logs?resourceId=' + sceneGroupId + '&pageSize=20')
+            ApiClient.get('/api/v1/scene-groups/' + sceneGroupId + '/event-log?limit=20')
                 .then(function(result) {
                     if (result.status === 'success' && result.data) {
-                        auditLogs = result.data.list || result.data || [];
+                        auditLogs = result.data || [];
                         if (currentTab === 'audit') MyScenes.renderAuditTab();
                     }
+                })
+                .catch(function(error) {
+                    console.error('Failed to load audit logs:', error);
+                    auditLogs = [];
                 });
 
             ApiClient.get('/api/v1/knowledge-bases')
@@ -286,7 +290,7 @@
                     }
                 });
 
-            fetch('/api/v1/llm/providers', { method: 'POST', headers: { 'Content-Type': 'application/json' } })
+            fetch('/api/v1/llm-providers/providers?configuredOnly=true', { method: 'GET', headers: { 'Content-Type': 'application/json' } })
                 .then(function(response) { return response.json(); })
                 .then(function(result) {
                     var data = result.data || result.Data || [];
@@ -633,21 +637,23 @@
                 '<div class="detail-section-title"><i class="ri-server-line"></i> 可用Provider</div>';
 
             if (llmProviders.length === 0) {
-                html += '<p style="color: var(--nx-text-secondary);">正在加载Provider列表...</p>';
+                html += '<p style="color: var(--nx-text-secondary);">暂无可用Provider，请先在系统配置中配置API Key</p>';
             } else {
                 html += '<div class="list-container">';
                 llmProviders.forEach(function(provider) {
-                    var providerName = provider.name || provider.type || 'Unknown';
+                    var providerName = provider.name || 'Unknown';
+                    var providerId = provider.providerId || providerName;
                     var providerModels = provider.models || [];
-                    var isActive = providerName === group.llmProvider;
+                    var modelNames = providerModels.map(function(m) { return m.displayName || m.modelId; });
+                    var isActive = providerId === group.llmProvider || providerName === group.llmProvider;
                     html += '<div class="list-item">' +
                         '<div class="list-item-icon" style="background: ' + (isActive ? '#d1fae5' : '#f1f5f9') + '; color: ' + (isActive ? '#059669' : '#64748b') + ';"><i class="ri-brain-line"></i></div>' +
                         '<div class="list-item-content">' +
                         '<div class="list-item-title">' + providerName + '</div>' +
-                        '<div class="list-item-subtitle">模型: ' + (providerModels.length > 0 ? providerModels.join(', ') : '-') + '</div>' +
+                        '<div class="list-item-subtitle">模型: ' + (modelNames.length > 0 ? modelNames.slice(0, 3).join(', ') + (modelNames.length > 3 ? '...' : '') : '-') + '</div>' +
                         '</div>' +
                         (isActive ? '<span class="status-badge" style="background: #d1fae5; color: #059669;"><span class="status-dot"></span>当前使用</span>' :
-                        '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="switchLLMProvider(\'' + providerName + '\')">切换</button>') +
+                        '<button class="nx-btn nx-btn--sm nx-btn--secondary" onclick="switchLLMProvider(\'' + providerId + '\')">切换</button>') +
                         '</div>';
                 });
                 html += '</div>';
@@ -956,7 +962,7 @@
 
         inviteParticipant: function() {
             if (!currentSceneGroup) return;
-            window.location.href = '/console/pages/my-scenes.html';
+            window.location.href = '/console/pages/scene-group-detail.html?id=' + currentSceneGroup.sceneGroupId;
         },
 
         changeParticipantRole: function(participantId) {
@@ -1011,7 +1017,22 @@
 
         bindKnowledgeBaseToScene: function(kbId) {
             if (!currentSceneGroup) return;
-            alert('绑定知识库功能需要后端API支持，请联系后端开发人员添加场景组绑定知识库的API。\n\nAPI路径: POST /api/v1/scene-groups/{sceneGroupId}/knowledge-bases');
+            
+            ApiClient.post('/api/v1/scene-groups/' + currentSceneGroup.sceneGroupId + '/knowledge-bases', {
+                kbId: kbId,
+                bindingType: 'SCENE_GROUP'
+            })
+                .then(function(result) {
+                    if (result.status === 'success') {
+                        alert('知识库绑定成功');
+                        MyScenes.openSceneGroupDetail(currentSceneGroup.sceneGroupId);
+                    } else {
+                        alert('绑定失败: ' + (result.message || '未知错误'));
+                    }
+                })
+                .catch(function(error) {
+                    alert('绑定失败: ' + error.message);
+                });
         },
 
         showKnowledgeDetail: function(kbId) {

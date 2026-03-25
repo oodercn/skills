@@ -355,11 +355,138 @@ function configureAddress(addr) {
 }
 
 function testConnection(addr) {
-    alert('测试连接功能开发中: 地址 0x' + addr.toString(16).toUpperCase());
+    var addrInfo = AddressSpace.findAddress(addr);
+    if (!addrInfo) {
+        alert('地址信息不存在');
+        return;
+    }
+    
+    var modalHtml = `
+        <div class="modal-overlay" id="testConnectionModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 450px; width: 90%;">
+                <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 16px;"><i class="ri-link"></i> 测试连接 - 0x${addr.toString(16).toUpperCase()}</h3>
+                    <button class="modal-close" onclick="closeTestConnectionModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;"><i class="ri-close-line"></i></button>
+                </div>
+                <div class="modal-body" style="padding: 20px;" id="testConnectionContent">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
+                        <p>正在测试连接...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    var existing = document.getElementById('testConnectionModal');
+    if (existing) existing.remove();
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    fetch('/api/v1/config/addresses/' + addr + '/test', {
+        method: 'POST'
+    })
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            var content = document.getElementById('testConnectionContent');
+            var isSuccess = result.status === 'success' || result.connected === true;
+            content.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="ri-${isSuccess ? 'checkbox-circle' : 'close-circle'}-line" style="font-size: 48px; color: var(--nx-${isSuccess ? 'success' : 'danger'}-color);"></i>
+                    <h4 style="margin: 16px 0 8px;">${isSuccess ? '连接成功' : '连接失败'}</h4>
+                    <p style="color: var(--nx-text-secondary);">${result.message || ''}</p>
+                    ${result.latency ? '<p style="font-size: 12px; color: var(--nx-text-secondary);">延迟: ' + result.latency + 'ms</p>' : ''}
+                </div>
+            `;
+        })
+        .catch(function(error) {
+            var content = document.getElementById('testConnectionContent');
+            content.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                    <i class="ri-close-circle-line" style="font-size: 48px; color: var(--nx-danger-color);"></i>
+                    <h4 style="margin: 16px 0 8px;">测试失败</h4>
+                    <p style="color: var(--nx-text-secondary);">${error.message}</p>
+                </div>
+            `;
+        });
+}
+
+function closeTestConnectionModal() {
+    var modal = document.getElementById('testConnectionModal');
+    if (modal) modal.remove();
 }
 
 function viewLogs(addr) {
-    alert('查看日志功能开发中: 地址 0x' + addr.toString(16).toUpperCase());
+    var modalHtml = `
+        <div class="modal-overlay" id="viewLogsModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+            <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 700px; width: 90%; max-height: 80vh;">
+                <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                    <h3 style="margin: 0; font-size: 16px;"><i class="ri-file-list-3-line"></i> 日志 - 0x${addr.toString(16).toUpperCase()}</h3>
+                    <button class="modal-close" onclick="closeViewLogsModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;"><i class="ri-close-line"></i></button>
+                </div>
+                <div class="modal-body" style="padding: 20px; max-height: 500px; overflow-y: auto;" id="viewLogsContent">
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i>
+                        <p>正在加载日志...</p>
+                    </div>
+                </div>
+                <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: space-between;">
+                    <button class="nx-btn nx-btn--secondary" onclick="refreshLogs(${addr})"><i class="ri-refresh-line"></i> 刷新</button>
+                    <button class="nx-btn nx-btn--secondary" onclick="closeViewLogsModal()">关闭</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    var existing = document.getElementById('viewLogsModal');
+    if (existing) existing.remove();
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    
+    loadLogs(addr);
+}
+
+function loadLogs(addr) {
+    fetch('/api/v1/config/addresses/' + addr + '/logs?limit=100')
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            var content = document.getElementById('viewLogsContent');
+            var logs = result.data || result.logs || [];
+            
+            if (logs.length === 0) {
+                content.innerHTML = '<p style="text-align: center; color: var(--nx-text-secondary); padding: 40px;">暂无日志记录</p>';
+                return;
+            }
+            
+            var html = '<div style="font-family: monospace; font-size: 12px;">';
+            logs.forEach(function(log) {
+                var levelClass = log.level === 'ERROR' ? 'color: var(--nx-danger-color);' : 
+                                 log.level === 'WARN' ? 'color: var(--nx-warning-color);' : 
+                                 log.level === 'INFO' ? 'color: var(--nx-success-color);' : '';
+                html += `
+                    <div style="padding: 8px; border-bottom: 1px solid var(--nx-border-color);">
+                        <div style="display: flex; gap: 8px; margin-bottom: 4px;">
+                            <span style="${levelClass}">[${log.level || 'INFO'}]</span>
+                            <span style="color: var(--nx-text-secondary);">${log.timestamp || ''}</span>
+                        </div>
+                        <div style="color: var(--nx-text-primary);">${log.message || log.content || ''}</div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            content.innerHTML = html;
+        })
+        .catch(function(error) {
+            var content = document.getElementById('viewLogsContent');
+            content.innerHTML = '<p style="text-align: center; color: var(--nx-danger-color); padding: 40px;">加载日志失败: ' + error.message + '</p>';
+        });
+}
+
+function refreshLogs(addr) {
+    loadLogs(addr);
+}
+
+function closeViewLogsModal() {
+    var modal = document.getElementById('viewLogsModal');
+    if (modal) modal.remove();
 }
 
 AddressSpace.init();

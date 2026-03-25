@@ -1,0 +1,277 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-local
+  name: 本地组织管理服务
+  version: 2.3
+  description: 本地组织管理服务 - 提供基于JSON存储的用户认证、组织管理、角色识别能力，作为其他OrgSkill实现的降级方案
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-base
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - org
+    - local
+    - auth
+    - user
+    - department
+    - role
+    - fallback
+
+spec:
+  skillForm: PROVIDER
+  type: service-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x08
+    category: ORG
+    code: ORG_LOCAL
+    operations: [auth, user-manage, org-manage, role-detect]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.base.LocalOrgSkill
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  supportedSceneTypes:
+    - org-management
+    - user-auth
+    - scene-activation
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 2s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies: []
+  
+  providedInterfaces:
+    - id: user-auth
+      version: "1.0"
+      description: "用户认证接口"
+    - id: org-management
+      version: "1.0"
+      description: "组织管理接口"
+    - id: role-detection
+      version: "1.0"
+      description: "角色识别接口"
+  
+  capabilities:
+    - id: user.auth
+      name: 用户认证
+      description: 用户认证能力，支持登录/登出/Token验证
+      category: auth
+    - id: user.manage
+      name: 用户管理
+      description: 用户管理能力，支持用户CRUD
+      category: management
+    - id: org.manage
+      name: 组织管理
+      description: 组织管理能力，支持组织树管理
+      category: management
+    - id: role.manage
+      name: 角色管理
+      description: 角色管理能力，支持角色定义与分配
+      category: management
+    - id: role.detection
+      name: 角色识别
+      description: 根据用户属性识别用户角色(MANAGER/EMPLOYEE/HR/ADMIN等)
+      category: ai
+    - id: permission.check
+      name: 权限检查
+      description: 检查用户对资源的访问权限
+      category: security
+    - id: sync
+      name: 数据同步
+      description: 数据同步能力
+      category: sync
+  
+  roleDetection:
+    enabled: true
+    rules:
+      - role: ADMIN
+        condition: "user.permissions contains 'admin'"
+        description: 系统管理员
+      - role: MANAGER
+        condition: "user.position contains '经理' or user.position contains '主管'"
+        description: 部门经理
+      - role: HR
+        condition: "user.department contains '人力资源' or user.department contains 'HR'"
+        description: 人力资源
+      - role: EMPLOYEE
+        condition: "default"
+        description: 普通员工
+  
+  scenes:
+    - name: org-local
+      description: 本地组织管理场景
+      capabilities:
+        - user.auth
+        - user.manage
+        - org.manage
+        - role.manage
+        - role.detection
+  
+  endpoints:
+    - path: /api/org/login
+      method: POST
+      description: 用户登录
+      capability: user.auth
+    - path: /api/org/logout
+      method: POST
+      description: 用户登出
+      capability: user.auth
+    - path: /api/org/users
+      method: GET
+      description: 获取用户列表
+      capability: user.manage
+    - path: /api/org/users/{userId}
+      method: GET
+      description: 获取用户信息
+      capability: user.manage
+    - path: /api/org/tree
+      method: GET
+      description: 获取组织树
+      capability: org.manage
+    - path: /api/org/roles
+      method: GET
+      description: 获取角色列表
+      capability: role.manage
+    - path: /api/org/users/{userId}/role
+      method: GET
+      description: 识别用户角色
+      capability: role.detection
+    - path: /api/org/users/{userId}/permissions
+      method: GET
+      description: 获取用户权限
+      capability: permission.check
+    - path: /api/health
+      method: GET
+      description: 健康检查
+  
+  config:
+    optional:
+      - name: org.local.enabled
+        type: boolean
+        default: true
+        description: 是否启用本地组织服务
+      - name: org.local.data-path
+        type: string
+        default: ./data/org
+        description: JSON数据存储路径
+      - name: org.local.token-expire
+        type: integer
+        default: 86400
+        description: Token过期时间(秒)
+      - name: org.local.role-detection.enabled
+        type: boolean
+        default: true
+        description: 是否启用角色识别
+      - name: org.local.role-detection.cache-ttl
+        type: integer
+        default: 300
+        description: 角色识别缓存时间(秒)
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "100Mi"
+  
+  offline:
+    enabled: true
+    cacheStrategy: local
+    syncOnReconnect: false
+  
+  fallback:
+    enabled: true
+    priority: 100
+    description: 作为其他OrgSkill实现的降级方案，当外部组织系统不可用时自动启用

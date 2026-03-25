@@ -27,7 +27,7 @@
                     </button>
                     <div class="nx-page__title">
                         <h1><i class="ri-robot-line" aria-hidden="true"></i> LLM知识配置</h1>
-                        <p>知识库与LLM的关联配置、字典表、接口表述</p>
+                        <p>知识库与LLM的关联配置、字典表、接口表等</p>
                     </div>
                 </div>
                 <div class="nx-page__actions">
@@ -137,7 +137,7 @@
                                     <i class="ri-play-line"></i> 测试向量化
                                 </button>
                             </div>
-                            <div id="testResult" style="display: none; padding: 16px; background: var(--nx-bg); border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all;"></div>
+                            <div id="testResult" style="display: none; padding: 16px; background: var(--nx-bg-input); border-radius: 8px; font-family: monospace; font-size: 12px; word-break: break-all;"></div>
                         </div>
                     </div>
                 </div>
@@ -312,7 +312,7 @@
                                     </div>
                                     <div>
                                         <h4 style="margin: 0 0 8px 0; font-size: 14px;">LLM调用提示</h4>
-                                        <div style="background: var(--nx-bg); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
+                                        <div style="background: var(--nx-bg-input); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
                                             当用户询问与{知识库名称}相关的问题时，使用此接口检索相关文档。
                                         </div>
                                     </div>
@@ -334,7 +334,7 @@
                                     </div>
                                     <div>
                                         <h4 style="margin: 0 0 8px 0; font-size: 14px;">LLM调用提示</h4>
-                                        <div style="background: var(--nx-bg); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
+                                        <div style="background: var(--nx-bg-input); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
                                             当需要了解有哪些知识库可用时，调用此接口获取列表。
                                         </div>
                                     </div>
@@ -389,7 +389,7 @@
                                     </div>
                                     <div>
                                         <h4 style="margin: 0 0 8px 0; font-size: 14px;">LLM调用提示</h4>
-                                        <div style="background: var(--nx-bg); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
+                                        <div style="background: var(--nx-bg-input); padding: 12px; border-radius: 6px; font-size: 13px; font-family: monospace;">
                                             在场景对话中，使用此接口检索与场景相关的知识。检索会按场景层→专业层→通用层的优先级进行。
                                         </div>
                                     </div>
@@ -448,27 +448,27 @@
                         </div>
                         <div class="config-section-body">
                             <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px;">
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{knowledge_context}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">检索到的知识内容</div>
                                 </div>
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{user_query}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">用户问题</div>
                                 </div>
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{scene_name}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">当前场景名称</div>
                                 </div>
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{kb_names}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">检索的知识库名称</div>
                                 </div>
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{confidence_score}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">检索置信度分数</div>
                                 </div>
-                                <div style="padding: 12px; background: var(--nx-bg); border-radius: 8px;">
+                                <div style="padding: 12px; background: var(--nx-bg-input); border-radius: 8px;">
                                     <div style="font-family: monospace; color: var(--nx-primary); margin-bottom: 4px;">{{conversation_history}}</div>
                                     <div style="font-size: 12px; color: var(--nx-text-secondary);">对话历史</div>
                                 </div>

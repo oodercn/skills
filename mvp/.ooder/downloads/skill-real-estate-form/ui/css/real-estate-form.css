@@ -1,0 +1,221 @@
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--nx-space-1);
+    padding: var(--nx-space-1) var(--nx-space-2);
+    border-radius: var(--nx-radius-full);
+    font-size: var(--nx-text-xs);
+    font-weight: 500;
+}
+
+.status-badge--available {
+    background: rgba(34, 197, 94, 0.1);
+    color: var(--ns-success);
+}
+
+.status-badge--reserved {
+    background: rgba(245, 158, 11, 0.1);
+    color: var(--ns-warning);
+}
+
+.status-badge--sold {
+    background: rgba(107, 114, 128, 0.1);
+    color: var(--nx-text-secondary);
+}
+
+.nx-radio-group {
+    display: flex;
+    gap: var(--nx-space-4);
+}
+
+.nx-radio {
+    display: flex;
+    align-items: center;
+    gap: var(--nx-space-2);
+    cursor: pointer;
+}
+
+.nx-radio input[type="radio"] {
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+}
+
+.nx-input-suffix {
+    padding: var(--nx-space-2) var(--nx-space-3);
+    background: var(--nx-bg-elevated);
+    border: 1px solid var(--nx-border);
+    border-radius: 0 var(--nx-radius) var(--nx-radius) 0;
+    color: var(--nx-text-secondary);
+    font-size: var(--nx-text-sm);
+}
+
+.nx-input-group {
+    display: flex;
+    align-items: stretch;
+}
+
+.nx-input-group .nx-input {
+    border-radius: var(--nx-radius) 0 0 var(--nx-radius);
+    border-right: none;
+}
+
+.nx-input-group .nx-input:read-only {
+    background: var(--nx-bg-elevated);
+    cursor: not-allowed;
+}
+
+.image-upload-area {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--nx-space-3);
+    padding: var(--nx-space-3);
+    background: var(--nx-bg-elevated);
+    border-radius: var(--nx-radius);
+    border: 2px dashed var(--nx-border);
+}
+
+.image-preview {
+    position: relative;
+    width: 100px;
+    height: 100px;
+    border-radius: var(--nx-radius);
+    overflow: hidden;
+}
+
+.image-preview img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.image-remove {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0, 0, 0, 0.6);
+    color: white;
+    border: none;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.image-upload-btn {
+    width: 100px;
+    height: 100px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--nx-bg-card);
+    border: 2px dashed var(--nx-border);
+    border-radius: var(--nx-radius);
+    cursor: pointer;
+    color: var(--nx-text-secondary);
+    transition: all 0.2s;
+}
+
+.image-upload-btn:hover {
+    border-color: var(--ns-primary);
+    color: var(--ns-primary);
+}
+
+.image-upload-btn i {
+    font-size: 24px;
+    margin-bottom: 4px;
+}
+
+.image-upload-btn span {
+    font-size: var(--nx-text-xs);
+}
+
+.action-btns {
+    display: flex;
+    gap: var(--nx-space-1);
+}
+
+.nx-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: var(--nx-space-1) var(--nx-space-2);
+    background: var(--nx-bg-elevated);
+    border-radius: var(--nx-radius-full);
+    font-size: var(--nx-text-xs);
+    color: var(--nx-text-secondary);
+}
+
+.nx-card__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: var(--nx-space-4);
+    border-bottom: 1px solid var(--nx-border);
+}
+
+.nx-card__title {
+    margin: 0;
+    font-size: var(--nx-text-lg);
+    font-weight: 600;
+}
+
+.nx-mb-4 {
+    margin-bottom: var(--nx-space-4);
+}
+
+.modal {
+    display: none;
+}
+
+.modal.modal--open {
+    display: flex;
+}
+
+.nx-textarea {
+    width: 100%;
+    resize: vertical;
+}
+
+.nx-form-group {
+    margin-bottom: var(--nx-space-4);
+}
+
+.nx-label {
+    display: block;
+    margin-bottom: var(--nx-space-2);
+    font-size: var(--nx-text-sm);
+    font-weight: var(--nx-font-medium);
+    color: var(--nx-text-primary);
+}
+
+.nx-form-row {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: var(--nx-space-4);
+}
+
+.nx-form-divider {
+    display: flex;
+    align-items: center;
+    margin: var(--nx-space-4) 0;
+    color: var(--nx-text-secondary);
+    font-size: var(--nx-text-sm);
+    font-weight: var(--nx-font-medium);
+}
+
+.nx-form-divider::before,
+.nx-form-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--nx-border);
+}
+
+.nx-form-divider span {
+    padding: 0 var(--nx-space-3);
+}

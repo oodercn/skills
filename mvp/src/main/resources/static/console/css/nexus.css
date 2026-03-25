@@ -725,6 +725,35 @@ ul, ol {
   color: var(--nx-text-primary);
 }
 
+.nx-textarea {
+  width: 100%;
+  padding: var(--nx-space-2) var(--nx-space-3);
+  border: 1px solid var(--nx-border);
+  border-radius: var(--nx-radius);
+  font-size: var(--nx-text-sm);
+  background: var(--nx-bg-input);
+  color: var(--nx-text-primary);
+  transition: border-color var(--nx-transition-fast);
+  resize: vertical;
+  min-height: 80px;
+  font-family: inherit;
+}
+
+.nx-textarea:focus {
+  outline: none;
+  border-color: var(--nx-primary);
+}
+
+.nx-textarea::placeholder {
+  color: var(--nx-text-tertiary);
+}
+
+.nx-textarea:disabled {
+  background: var(--nx-bg-elevated);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 /* 开关 */
 .nx-switch {
   position: relative;

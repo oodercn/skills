@@ -7,12 +7,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Method;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+
+import jakarta.annotation.PostConstruct;
 
 @Service
 public class SceneEngineIntegration {
@@ -22,16 +24,11 @@ public class SceneEngineIntegration {
     @Value("${ooder.mock.enabled:false}")
     private boolean mockEnabled;
 
-    @Autowired(required = false)
-    @Lazy
+    @Autowired
+    private ApplicationContext applicationContext;
+
     private Object skillPackageManager;
-
-    @Autowired(required = false)
-    @Lazy
     private Object capabilityRegistry;
-
-    @Autowired(required = false)
-    @Lazy
     private Object skillManager;
 
     @Autowired
@@ -41,6 +38,30 @@ public class SceneEngineIntegration {
     private SceneTemplateService templateService;
 
     private final Map<String, Object> sdkCache = new ConcurrentHashMap<>();
+
+    @PostConstruct
+    public void init() {
+        try {
+            Map<String, Object> packageManagers = applicationContext.getBeansOfType(Object.class);
+            for (Map.Entry<String, Object> entry : packageManagers.entrySet()) {
+                String beanName = entry.getKey();
+                Object bean = entry.getValue();
+                String className = bean.getClass().getName();
+                if (className.contains("SkillPackageManager") || className.contains("skillPackageManager")) {
+                    skillPackageManager = bean;
+                    log.info("[init] Found skillPackageManager: {}", beanName);
+                } else if (className.contains("CapabilityRegistry") || className.contains("capabilityRegistry")) {
+                    capabilityRegistry = bean;
+                    log.info("[init] Found capabilityRegistry: {}", beanName);
+                } else if (className.contains("SkillManager") && !className.contains("Test")) {
+                    skillManager = bean;
+                    log.info("[init] Found skillManager: {}", beanName);
+                }
+            }
+        } catch (Exception e) {
+            log.debug("[init] Error discovering SDK beans: {}", e.getMessage());
+        }
+    }
 
     public boolean isSdkAvailable() {
         return skillPackageManager != null || capabilityRegistry != null;

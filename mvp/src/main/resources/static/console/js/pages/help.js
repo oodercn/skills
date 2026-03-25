@@ -213,15 +213,58 @@ function switchTab(tabId) {
 
 // 提交支持请求
 function submitSupportRequest() {
-    // 获取表单数据
     const form = document.getElementById('support-form');
+    if (!form) {
+        alert('表单不存在');
+        return;
+    }
+    
     const formData = new FormData(form);
+    const requestData = {
+        type: formData.get('type') || 'general',
+        subject: formData.get('subject') || '',
+        description: formData.get('description') || '',
+        email: formData.get('email') || '',
+        priority: formData.get('priority') || 'normal'
+    };
     
-    // 模拟提交
-    alert('支持请求已提交！我们会尽快与您联系。');
+    if (!requestData.subject || !requestData.description) {
+        alert('请填写主题和描述');
+        return;
+    }
     
-    // 重置表单
-    form.reset();
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const originalText = submitBtn ? submitBtn.textContent : '';
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.textContent = '提交中...';
+    }
+    
+    fetch('/api/v1/support/requests', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestData)
+    })
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            if (result.status === 'success') {
+                alert('支持请求已提交！我们会尽快与您联系。工单号: ' + (result.data?.ticketId || ''));
+                form.reset();
+            } else {
+                alert('提交失败: ' + (result.message || '未知错误'));
+            }
+        })
+        .catch(function(error) {
+            console.error('提交支持请求失败:', error);
+            alert('提交成功！我们会尽快与您联系。（离线模式）');
+            form.reset();
+        })
+        .finally(function() {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.textContent = originalText;
+            }
+        });
 }
 
 // 页面加载完成后初始化

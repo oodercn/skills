@@ -177,7 +177,7 @@
             "id": "agent-management",
             "name": "Agent管理",
             "icon": "ri-robot-line",
-            "roles": ["admin", "enterprise", "leader"],
+            "roles": ["admin", "enterprise", "leader", "collaborator", "installer"],
             "status": "implemented",
             "children": [
                 {
@@ -185,15 +185,7 @@
                     "name": "Agent列表",
                     "icon": "ri-list-check",
                     "url": "/console/pages/agent-list.html",
-                    "roles": ["admin", "enterprise", "leader"],
-                    "status": "implemented"
-                },
-                {
-                    "id": "agent-register",
-                    "name": "Agent注册",
-                    "icon": "ri-add-circle-line",
-                    "url": "/console/pages/agent-register.html",
-                    "roles": ["admin"],
+                    "roles": ["admin", "enterprise", "leader", "collaborator", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -201,7 +193,7 @@
                     "name": "拓扑视图",
                     "icon": "ri-node-tree",
                     "url": "/console/pages/agent-topology.html",
-                    "roles": ["admin", "enterprise", "leader"],
+                    "roles": ["admin", "enterprise", "leader", "collaborator", "installer"],
                     "status": "implemented"
                 },
                 {
@@ -209,7 +201,15 @@
                     "name": "实时监控",
                     "icon": "ri-line-chart-line",
                     "url": "/console/pages/agent-monitor.html",
-                    "roles": ["admin", "enterprise", "leader"],
+                    "roles": ["admin", "enterprise", "leader", "collaborator", "installer"],
+                    "status": "implemented"
+                },
+                {
+                    "id": "agent-register",
+                    "name": "Agent注册",
+                    "icon": "ri-add-circle-line",
+                    "url": "/console/pages/agent-register.html",
+                    "roles": ["admin", "installer"],
                     "status": "implemented"
                 },
                 {

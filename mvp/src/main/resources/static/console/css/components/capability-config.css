@@ -1,10 +1,10 @@
 /**
  * 能力配置组件样式
- * 用于 role-installer.html 和 my-capabilities.html
+ * 用于 role-installer.html �?my-capabilities.html
  */
 
 .capability-config-card {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     margin-bottom: 12px;
@@ -128,7 +128,7 @@
     border: 1px solid var(--nx-border);
     border-radius: 6px;
     background: var(--nx-bg-elevated);
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
     font-size: 13px;
 }
 
@@ -213,7 +213,7 @@
 }
 
 .config-field.recommended-field label::after {
-    content: ' ⚡';
+    content: ' �?;
     color: var(--nx-warning);
     font-size: 10px;
 }
@@ -234,7 +234,7 @@
 }
 
 .config-field .error-message::before {
-    content: '⚠';
+    content: '�?;
 }
 
 .config-field input.validation-error,

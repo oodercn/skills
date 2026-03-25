@@ -9,7 +9,7 @@ async function init() {
 
 async function loadConfig() {
     try {
-        var result = await ApiClient.get('/api/security/config');
+        var result = await ApiClient.get('/api/v1/security/config');
         
         var configData;
         if (result && result.status === 'success') {
@@ -74,7 +74,7 @@ async function loadStats() {
     }
     
     try {
-        var result = await ApiClient.get('/api/security/stats');
+        var result = await ApiClient.get('/api/v1/security/stats');
         
         var stats;
         if (result && result.status === 'success') {

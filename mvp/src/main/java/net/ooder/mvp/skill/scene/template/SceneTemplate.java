@@ -11,6 +11,8 @@ public class SceneTemplate {
     private String kind;
     private Metadata metadata;
     private Spec spec;
+    private UiConfig ui;
+    private List<MenuConfig> menu;
 
     public static class Metadata {
         private String id;
@@ -217,12 +219,48 @@ public class SceneTemplate {
     }
 
     public List<MenuConfig> getMenus(String role) {
-        if (spec == null || spec.getMenus() == null) {
-            return Collections.emptyList();
+        if (spec != null && spec.getMenus() != null) {
+            List<MenuConfig> menus = spec.getMenus().get(role);
+            if (menus != null && !menus.isEmpty()) {
+                return menus;
+            }
         }
-        List<MenuConfig> menus = spec.getMenus().get(role);
-        return menus != null ? menus : Collections.emptyList();
+        
+        if (menu != null && !menu.isEmpty()) {
+            return menu;
+        }
+        
+        if (ui != null && ui.getNexusUi() != null) {
+            NexusUiConfig nexusUi = ui.getNexusUi();
+            MenuConfig menuConfig = new MenuConfig();
+            menuConfig.setId(getId() != null ? getId() : "menu-" + System.currentTimeMillis());
+            menuConfig.setName(nexusUi.getEntry() != null ? nexusUi.getEntry().getTitle() : getName());
+            menuConfig.setIcon(nexusUi.getEntry() != null ? nexusUi.getEntry().getIcon() : getIcon());
+            
+            String entryPage = nexusUi.getEntry() != null ? nexusUi.getEntry().getPage() : "index.html";
+            String skillId = getId();
+            if (skillId != null) {
+                menuConfig.setUrl("/skills/" + skillId + "/" + entryPage);
+            } else {
+                menuConfig.setUrl("/skills/" + entryPage);
+            }
+            
+            if (nexusUi.getMenu() != null) {
+                menuConfig.setOrder(nexusUi.getMenu().getOrder());
+                menuConfig.setVisible(true);
+            }
+            
+            return Collections.singletonList(menuConfig);
+        }
+        
+        return Collections.emptyList();
     }
+
+    public List<MenuConfig> getMenu() { return menu; }
+    public void setMenu(List<MenuConfig> menu) { this.menu = menu; }
+
+    public UiConfig getUi() { return ui; }
+    public void setUi(UiConfig ui) { this.ui = ui; }
 
     public List<UiSkillConfig> getUiSkills() {
         return spec != null && spec.getUiSkills() != null ? spec.getUiSkills() : Collections.emptyList();

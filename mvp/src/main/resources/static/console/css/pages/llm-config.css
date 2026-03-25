@@ -213,7 +213,7 @@
     padding: 4px 10px;
     border-radius: var(--nx-radius);
     font-size: var(--nx-text-xs);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     cursor: pointer;
     transition: all 0.2s;
@@ -305,7 +305,7 @@
 
 .test-options {
     padding: var(--nx-space-3);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: var(--nx-radius);
 }
 
@@ -540,13 +540,13 @@
 
 .doc-tab:hover {
     color: var(--nx-primary);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .doc-tab.active {
     color: var(--nx-primary);
     border-bottom-color: var(--nx-primary);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .doc-content {

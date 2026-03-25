@@ -12,6 +12,11 @@ spring:
     resources:
       static-locations: classpath:/static/
 
+reactor:
+  netty:
+    resolver:
+      transport: jdk
+
 app:
   storage:
     path: ./data
@@ -26,19 +31,27 @@ agent:
   message:
     expire: 86400
     max-queue: 1000
+  heartbeat:
+    interval: 30000
+    timeout: 60000
+    offline-threshold: 3
+    check-interval: 30000
 
 ooder:
+  scene:
+    auto-init: true
+    default-group-id: sg-default
   sdk:
     enabled: true
-  skills:
-    path: ../skills
-    auto-sync: true
-    directories:
-      downloads: ./.ooder/downloads
-      installed: ./.ooder/installed
-      activated: ./.ooder/activated
-      dev: ./.ooder/dev
-      cache: ./.ooder/cache
+    skills:
+      path: ../skills
+      auto-sync: true
+      directories:
+        downloads: ./.ooder/downloads
+        installed: ./.ooder/installed
+        activated: ./.ooder/activated
+        dev: ./.ooder/dev
+        cache: ./.ooder/cache
   mock:
     enabled: false
   discovery:
@@ -70,7 +83,7 @@ scene:
         default-owner: ooderCN
         default-repo: skills
         default-branch: master
-        skills-path: "skills"
+        skills-path: ""
         cache-ttl-ms: 3600000
       github:
         enabled: false

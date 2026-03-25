@@ -139,7 +139,7 @@
     align-items: flex-start;
     gap: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
 }
@@ -165,7 +165,7 @@
     border-radius: 6px;
     font-size: 14px;
     background: var(--nx-bg-elevated);
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
     resize: vertical;
 }
 
@@ -216,8 +216,8 @@
     font-size: 14px;
     line-height: 1.6;
     resize: vertical;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
 }
 
 .issues-input:focus {
@@ -261,7 +261,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
 }
@@ -356,7 +356,7 @@
 }
 
 .history-item {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid var(--nx-border);
     border-radius: 8px;
     padding: 16px;

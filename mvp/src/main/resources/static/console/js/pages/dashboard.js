@@ -23,21 +23,21 @@ async function loadDashboardData() {
         showLoading('dashboard-stats', '加载仪表盘数据...');
         
         // 获取系统概览统计数据
-        const statsResult = await ApiClient.post('/api/dashboard/stats');
+        const statsResult = await ApiClient.post('/api/v1/dashboard/stats');
         if (statsResult && statsResult.data) {
             const skillCount = document.getElementById('skill-count');
             if (skillCount) skillCount.textContent = statsResult.data.totalSkills || 0;
         }
         
         // 获取技能执行统计数据
-        const executionStatsResult = await ApiClient.post('/api/dashboard/execution-stats');
+        const executionStatsResult = await ApiClient.post('/api/v1/dashboard/execution-stats');
         if (executionStatsResult && executionStatsResult.data) {
             const executionSuccessRate = document.getElementById('execution-success-rate');
             if (executionSuccessRate) executionSuccessRate.textContent = `${executionStatsResult.data.successRate || 0}%`;
         }
         
         // 获取市场活跃度统计数据
-        const marketStatsResult = await ApiClient.post('/api/dashboard/market-stats');
+        const marketStatsResult = await ApiClient.post('/api/v1/dashboard/market-stats');
         if (marketStatsResult && marketStatsResult.data) {
             const downloads = marketStatsResult.data.totalDownloads || 0;
             const reviews = marketStatsResult.data.totalReviews || 0;
@@ -48,7 +48,7 @@ async function loadDashboardData() {
         }
         
         // 获取系统资源使用统计数据
-        const systemStatsResult = await ApiClient.post('/api/dashboard/system-stats');
+        const systemStatsResult = await ApiClient.post('/api/v1/dashboard/system-stats');
         if (systemStatsResult && systemStatsResult.data) {
             const cpuUsage = document.getElementById('cpu-usage');
             if (cpuUsage) cpuUsage.textContent = `${systemStatsResult.data.cpuUsage || 0}%`;

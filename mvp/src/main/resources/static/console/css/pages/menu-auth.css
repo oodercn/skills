@@ -128,7 +128,7 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .role-item.active .role-icon {
@@ -168,7 +168,7 @@
     padding: 8px 16px;
     border-radius: 6px;
     border: 1px solid var(--nx-border);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     font-size: 13px;
     cursor: pointer;
@@ -249,7 +249,7 @@
     align-items: center;
     justify-content: center;
     font-size: 14px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-primary);
 }
 
@@ -294,7 +294,7 @@
 }
 
 .tree-action-btn:hover {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
 }
 
@@ -351,7 +351,7 @@
 }
 
 .status-badge.inactive {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -464,7 +464,7 @@
     padding: 10px 12px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     font-size: 14px;
 }
@@ -503,7 +503,7 @@
 }
 
 .btn-secondary {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     border: 1px solid var(--nx-border);
 }

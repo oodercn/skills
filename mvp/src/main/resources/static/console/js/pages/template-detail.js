@@ -658,11 +658,364 @@ async function deleteRole(roleName) {
 }
 
 function editWorkflow() {
-    alert('工作流编辑功能开发中...');
+    if (!currentTemplate) {
+        alert('请先加载模板');
+        return;
+    }
+    
+    const workflow = currentTemplate.workflow || { triggers: [], steps: [] };
+    
+    const modalHtml = `
+        <div class="modal-overlay" id="workflowModal" style="display: flex;">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3><i class="ri-flow-chart"></i> 编辑工作流</h3>
+                    <button class="modal-close" onclick="closeWorkflowModal()">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="nx-mb-4">
+                        <h4 class="nx-text-sm nx-font-semibold nx-mb-2">触发器</h4>
+                        <div id="workflowTriggers">
+                            ${(workflow.triggers || []).map((t, i) => `
+                                <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+                                    <select class="nx-input" style="width: 150px;" data-trigger-type="${i}">
+                                        <option value="MANUAL" ${t.type === 'MANUAL' ? 'selected' : ''}>手动触发</option>
+                                        <option value="SCHEDULE" ${t.type === 'SCHEDULE' ? 'selected' : ''}>定时触发</option>
+                                        <option value="EVENT" ${t.type === 'EVENT' ? 'selected' : ''}>事件触发</option>
+                                    </select>
+                                    <input type="text" class="nx-input" style="flex: 1;" value="${t.config || ''}" placeholder="配置参数" data-trigger-config="${i}">
+                                    <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="removeWorkflowTrigger(${i})">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addWorkflowTrigger()">
+                            <i class="ri-add-line"></i> 添加触发器
+                        </button>
+                    </div>
+                    <div>
+                        <h4 class="nx-text-sm nx-font-semibold nx-mb-2">执行步骤</h4>
+                        <div id="workflowSteps">
+                            ${(workflow.steps || []).map((s, i) => `
+                                <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+                                    <span class="nx-badge nx-badge--secondary">${i + 1}</span>
+                                    <input type="text" class="nx-input" style="flex: 1;" value="${s.name || ''}" placeholder="步骤名称" data-step-name="${i}">
+                                    <select class="nx-input" style="width: 150px;" data-step-action="${i}">
+                                        <option value="INVOKE" ${s.action === 'INVOKE' ? 'selected' : ''}>调用能力</option>
+                                        <option value="WAIT" ${s.action === 'WAIT' ? 'selected' : ''}>等待</option>
+                                        <option value="NOTIFY" ${s.action === 'NOTIFY' ? 'selected' : ''}>通知</option>
+                                        <option value="APPROVE" ${s.action === 'APPROVE' ? 'selected' : ''}>审批</option>
+                                    </select>
+                                    <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="removeWorkflowStep(${i})">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addWorkflowStep()">
+                            <i class="ri-add-line"></i> 添加步骤
+                        </button>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="nx-btn nx-btn--secondary" onclick="closeWorkflowModal()">取消</button>
+                    <button class="nx-btn nx-btn--primary" onclick="saveWorkflow()">保存</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('workflowModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeWorkflowModal() {
+    const modal = document.getElementById('workflowModal');
+    if (modal) modal.remove();
+}
+
+function addWorkflowTrigger() {
+    const container = document.getElementById('workflowTriggers');
+    const index = container.children.length;
+    const html = `
+        <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+            <select class="nx-input" style="width: 150px;" data-trigger-type="${index}">
+                <option value="MANUAL">手动触发</option>
+                <option value="SCHEDULE">定时触发</option>
+                <option value="EVENT">事件触发</option>
+            </select>
+            <input type="text" class="nx-input" style="flex: 1;" placeholder="配置参数" data-trigger-config="${index}">
+            <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="this.parentElement.remove()">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function addWorkflowStep() {
+    const container = document.getElementById('workflowSteps');
+    const index = container.children.length;
+    const html = `
+        <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+            <span class="nx-badge nx-badge--secondary">${index + 1}</span>
+            <input type="text" class="nx-input" style="flex: 1;" placeholder="步骤名称" data-step-name="${index}">
+            <select class="nx-input" style="width: 150px;" data-step-action="${index}">
+                <option value="INVOKE">调用能力</option>
+                <option value="WAIT">等待</option>
+                <option value="NOTIFY">通知</option>
+                <option value="APPROVE">审批</option>
+            </select>
+            <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="this.parentElement.remove()">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function saveWorkflow() {
+    if (!currentTemplate) return;
+    
+    const triggers = [];
+    document.querySelectorAll('#workflowTriggers > div').forEach((div, i) => {
+        const typeSelect = div.querySelector('[data-trigger-type]');
+        const configInput = div.querySelector('[data-trigger-config]');
+        if (typeSelect && configInput) {
+            triggers.push({
+                type: typeSelect.value,
+                config: configInput.value
+            });
+        }
+    });
+    
+    const steps = [];
+    document.querySelectorAll('#workflowSteps > div').forEach((div, i) => {
+        const nameInput = div.querySelector('[data-step-name]');
+        const actionSelect = div.querySelector('[data-step-action]');
+        if (nameInput && actionSelect) {
+            steps.push({
+                name: nameInput.value,
+                action: actionSelect.value
+            });
+        }
+    });
+    
+    currentTemplate.workflow = { triggers, steps };
+    closeWorkflowModal();
+    renderWorkflow();
+    alert('工作流已更新，请保存模板以生效');
+}
+
+function renderWorkflow() {
+    if (!currentTemplate || !currentTemplate.workflow) return;
+    
+    const workflow = currentTemplate.workflow;
+    
+    const triggerList = document.getElementById('triggerList');
+    if (triggerList && workflow.triggers && workflow.triggers.length > 0) {
+        triggerList.innerHTML = workflow.triggers.map(t => `
+            <div class="nx-flex nx-items-center nx-gap-2 nx-py-2">
+                <i class="ri-flashlight-line nx-text-primary"></i>
+                <span>${t.type === 'MANUAL' ? '手动触发' : t.type === 'SCHEDULE' ? '定时触发' : '事件触发'}</span>
+                <span class="nx-text-secondary nx-text-sm">${t.config || ''}</span>
+            </div>
+        `).join('');
+    }
+    
+    const stepList = document.getElementById('stepList');
+    if (stepList && workflow.steps && workflow.steps.length > 0) {
+        stepList.innerHTML = workflow.steps.map((s, i) => `
+            <div class="nx-flex nx-items-center nx-gap-2 nx-py-2">
+                <span class="nx-badge nx-badge--primary">${i + 1}</span>
+                <span>${s.name || '未命名步骤'}</span>
+                <span class="nx-badge nx-badge--secondary">${s.action}</span>
+            </div>
+        `).join('');
+    }
 }
 
 function editSecurity() {
-    alert('安全策略编辑功能开发中...');
+    if (!currentTemplate) {
+        alert('请先加载模板');
+        return;
+    }
+    
+    const security = currentTemplate.security || { dataIsolation: [], auditConfig: {} };
+    
+    const modalHtml = `
+        <div class="modal-overlay" id="securityModal" style="display: flex;">
+            <div class="modal" style="max-width: 800px;">
+                <div class="modal-header">
+                    <h3><i class="ri-shield-check-line"></i> 编辑安全策略</h3>
+                    <button class="modal-close" onclick="closeSecurityModal()">
+                        <i class="ri-close-line"></i>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <div class="nx-mb-4">
+                        <h4 class="nx-text-sm nx-font-semibold nx-mb-2">数据隔离规则</h4>
+                        <div id="dataIsolationRules">
+                            ${(security.dataIsolation || []).map((r, i) => `
+                                <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+                                    <select class="nx-input" style="width: 150px;" data-isolation-type="${i}">
+                                        <option value="ORG" ${r.type === 'ORG' ? 'selected' : ''}>组织隔离</option>
+                                        <option value="ROLE" ${r.type === 'ROLE' ? 'selected' : ''}>角色隔离</option>
+                                        <option value="USER" ${r.type === 'USER' ? 'selected' : ''}>用户隔离</option>
+                                    </select>
+                                    <input type="text" class="nx-input" style="flex: 1;" value="${r.field || ''}" placeholder="隔离字段" data-isolation-field="${i}">
+                                    <label class="nx-flex nx-items-center nx-gap-1">
+                                        <input type="checkbox" ${r.enforced ? 'checked' : ''} data-isolation-enforced="${i}">
+                                        <span class="nx-text-sm">强制执行</span>
+                                    </label>
+                                    <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="this.parentElement.remove()">
+                                        <i class="ri-delete-bin-line"></i>
+                                    </button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button class="nx-btn nx-btn--secondary nx-btn--sm" onclick="addDataIsolationRule()">
+                            <i class="ri-add-line"></i> 添加规则
+                        </button>
+                    </div>
+                    <div>
+                        <h4 class="nx-text-sm nx-font-semibold nx-mb-2">审计日志配置</h4>
+                        <div class="nx-grid nx-grid-cols-2 nx-gap-4">
+                            <label class="nx-flex nx-items-center nx-gap-2">
+                                <input type="checkbox" id="auditEnabled" ${security.auditConfig?.enabled !== false ? 'checked' : ''}>
+                                <span>启用审计日志</span>
+                            </label>
+                            <label class="nx-flex nx-items-center nx-gap-2">
+                                <input type="checkbox" id="auditDataAccess" ${security.auditConfig?.dataAccess === true ? 'checked' : ''}>
+                                <span>记录数据访问</span>
+                            </label>
+                            <label class="nx-flex nx-items-center nx-gap-2">
+                                <input type="checkbox" id="auditCapabilityCall" ${security.auditConfig?.capabilityCall !== false ? 'checked' : ''}>
+                                <span>记录能力调用</span>
+                            </label>
+                            <label class="nx-flex nx-items-center nx-gap-2">
+                                <input type="checkbox" id="auditSensitiveOp" ${security.auditConfig?.sensitiveOp === true ? 'checked' : ''}>
+                                <span>记录敏感操作</span>
+                            </label>
+                        </div>
+                        <div class="nx-mt-3">
+                            <label class="nx-form-label">日志保留天数</label>
+                            <input type="number" class="nx-input" style="width: 150px;" id="auditRetentionDays" value="${security.auditConfig?.retentionDays || 90}" min="1" max="365">
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button class="nx-btn nx-btn--secondary" onclick="closeSecurityModal()">取消</button>
+                    <button class="nx-btn nx-btn--primary" onclick="saveSecurity()">保存</button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    const existingModal = document.getElementById('securityModal');
+    if (existingModal) existingModal.remove();
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+}
+
+function closeSecurityModal() {
+    const modal = document.getElementById('securityModal');
+    if (modal) modal.remove();
+}
+
+function addDataIsolationRule() {
+    const container = document.getElementById('dataIsolationRules');
+    const index = container.children.length;
+    const html = `
+        <div class="nx-flex nx-items-center nx-gap-2 nx-mb-2">
+            <select class="nx-input" style="width: 150px;" data-isolation-type="${index}">
+                <option value="ORG">组织隔离</option>
+                <option value="ROLE">角色隔离</option>
+                <option value="USER">用户隔离</option>
+            </select>
+            <input type="text" class="nx-input" style="flex: 1;" placeholder="隔离字段" data-isolation-field="${index}">
+            <label class="nx-flex nx-items-center nx-gap-1">
+                <input type="checkbox" data-isolation-enforced="${index}">
+                <span class="nx-text-sm">强制执行</span>
+            </label>
+            <button class="nx-btn nx-btn--ghost nx-btn--icon" onclick="this.parentElement.remove()">
+                <i class="ri-delete-bin-line"></i>
+            </button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', html);
+}
+
+function saveSecurity() {
+    if (!currentTemplate) return;
+    
+    const dataIsolation = [];
+    document.querySelectorAll('#dataIsolationRules > div').forEach((div, i) => {
+        const typeSelect = div.querySelector('[data-isolation-type]');
+        const fieldInput = div.querySelector('[data-isolation-field]');
+        const enforcedCheckbox = div.querySelector('[data-isolation-enforced]');
+        if (typeSelect && fieldInput) {
+            dataIsolation.push({
+                type: typeSelect.value,
+                field: fieldInput.value,
+                enforced: enforcedCheckbox ? enforcedCheckbox.checked : false
+            });
+        }
+    });
+    
+    const auditConfig = {
+        enabled: document.getElementById('auditEnabled')?.checked !== false,
+        dataAccess: document.getElementById('auditDataAccess')?.checked === true,
+        capabilityCall: document.getElementById('auditCapabilityCall')?.checked !== false,
+        sensitiveOp: document.getElementById('auditSensitiveOp')?.checked === true,
+        retentionDays: parseInt(document.getElementById('auditRetentionDays')?.value || '90', 10)
+    };
+    
+    currentTemplate.security = { dataIsolation, auditConfig };
+    closeSecurityModal();
+    renderSecurity();
+    alert('安全策略已更新，请保存模板以生效');
+}
+
+function renderSecurity() {
+    if (!currentTemplate || !currentTemplate.security) return;
+    
+    const security = currentTemplate.security;
+    
+    const dataIsolationList = document.getElementById('dataIsolationList');
+    if (dataIsolationList && security.dataIsolation && security.dataIsolation.length > 0) {
+        dataIsolationList.innerHTML = security.dataIsolation.map(r => `
+            <div class="nx-flex nx-items-center nx-gap-2 nx-py-2">
+                <i class="ri-lock-line nx-text-primary"></i>
+                <span>${r.type === 'ORG' ? '组织隔离' : r.type === 'ROLE' ? '角色隔离' : '用户隔离'}</span>
+                <span class="nx-text-secondary nx-text-sm">${r.field || ''}</span>
+                ${r.enforced ? '<span class="nx-badge nx-badge--warning">强制</span>' : ''}
+            </div>
+        `).join('');
+    }
+    
+    const auditConfig = document.getElementById('auditConfig');
+    if (auditConfig && security.auditConfig) {
+        const ac = security.auditConfig;
+        auditConfig.innerHTML = `
+            <div class="nx-space-y-2">
+                <div class="nx-flex nx-items-center nx-gap-2">
+                    <i class="ri-${ac.enabled !== false ? 'checkbox-circle' : 'close-circle'}-line ${ac.enabled !== false ? 'nx-text-success' : 'nx-text-secondary'}"></i>
+                    <span>审计日志: ${ac.enabled !== false ? '已启用' : '已禁用'}</span>
+                </div>
+                <div class="nx-flex nx-items-center nx-gap-2">
+                    <i class="ri-${ac.capabilityCall !== false ? 'checkbox-circle' : 'close-circle'}-line ${ac.capabilityCall !== false ? 'nx-text-success' : 'nx-text-secondary'}"></i>
+                    <span>能力调用记录: ${ac.capabilityCall !== false ? '已启用' : '已禁用'}</span>
+                </div>
+                <div class="nx-text-sm nx-text-secondary">日志保留: ${ac.retentionDays || 90} 天</div>
+            </div>
+        `;
+    }
 }
 
 function editTemplate() {

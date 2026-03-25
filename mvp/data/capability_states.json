@@ -2,10 +2,10 @@
 	{
 		"capabilityId":"skill-recording-qa",
 		"installSource":"activate",
-		"installTime":1774170979035,
+		"installTime":1774394327198,
 		"installed":true,
-		"status":"REGISTERED",
-		"updateTime":1774182059556
+		"status":"PENDING",
+		"updateTime":1774394327198
 	},
 	{
 		"capabilityId":"skill-management",
@@ -18,11 +18,11 @@
 	{
 		"capabilityId":"skill-recruitment-management",
 		"installSource":"activate",
-		"installTime":1774182070726,
+		"installTime":1774394525589,
 		"installed":true,
-		"sceneGroupId":"sg-1774182070728",
+		"sceneGroupId":"sg-1774394525596",
 		"status":"PENDING",
-		"updateTime":1774182070730
+		"updateTime":1774394525616
 	},
 	{
 		"capabilityId":"skill-llm",
@@ -31,6 +31,14 @@
 		"installed":true,
 		"status":"REGISTERED",
 		"updateTime":1774135953416
+	},
+	{
+		"capabilityId":"skill-real-estate-form",
+		"installSource":"activate",
+		"installTime":1774392310796,
+		"installed":true,
+		"status":"PENDING",
+		"updateTime":1774392310796
 	},
 	{
 		"capabilityId":"skill-capability",

@@ -1,0 +1,26 @@
+{
+  "resources": {
+    "includes": [
+      {"pattern": ".*\\.html$"},
+      {"pattern": ".*\\.css$"},
+      {"pattern": ".*\\.js$"},
+      {"pattern": ".*\\.json$"},
+      {"pattern": ".*\\.yaml$"},
+      {"pattern": ".*\\.yml$"},
+      {"pattern": ".*\\.properties$"},
+      {"pattern": ".*\\.xml$"},
+      {"pattern": ".*\\.md$"},
+      {"pattern": ".*\\.svg$"},
+      {"pattern": ".*\\.ttf$"},
+      {"pattern": ".*\\.woff$"},
+      {"pattern": ".*\\.woff2$"},
+      {"pattern": ".*\\.eot$"},
+      {"pattern": "application.*"},
+      {"pattern": "static/.*"}
+    ]
+  },
+  "bundles": [
+    {"name": "application"},
+    {"name": "ValidationMessages"}
+  ]
+}

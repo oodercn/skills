@@ -99,7 +99,7 @@
     width: 150px;
     font-weight: 500;
     color: var(--nx-text-secondary);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .scene-participant-list {
@@ -113,7 +113,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
 }
 
@@ -275,7 +275,7 @@
 
 .capability-card-footer {
     padding: 12px 20px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -349,8 +349,8 @@
     padding: 10px 12px 10px 36px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
     font-size: 14px;
 }
 
@@ -429,7 +429,7 @@
 .empty-state h3 {
     margin: 16px 0 8px;
     font-size: 16px;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .empty-state p {
@@ -657,7 +657,7 @@
 }
 
 .action-link--secondary {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
     border: 1px solid var(--nx-border);
 }

@@ -8,7 +8,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
 }
 
 .login-container {
@@ -79,7 +79,7 @@
     font-size: 14px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     transition: all 0.2s;
 }
@@ -96,7 +96,7 @@
     font-size: 14px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-primary);
     cursor: pointer;
 }
@@ -161,7 +161,7 @@
     font-size: 12px;
     border: 1px solid var(--nx-border);
     border-radius: 6px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
     cursor: pointer;
     transition: all 0.2s;

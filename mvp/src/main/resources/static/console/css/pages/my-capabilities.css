@@ -51,7 +51,7 @@
     border-radius: 8px;
     font-size: 13px;
     cursor: pointer;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border: 1px solid transparent;
     transition: all 0.2s;
     color: var(--nx-text-secondary);
@@ -182,7 +182,7 @@
 }
 
 .cap-table th {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     padding: 14px 16px;
     text-align: left;
     font-weight: 500;
@@ -330,7 +330,7 @@
 }
 
 .binding-list {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     overflow: hidden;
 }
@@ -426,12 +426,12 @@
     padding: 2px 8px;
     border-radius: 4px;
     font-size: 11px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
 .classification-info {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     padding: 12px;
     margin-bottom: 16px;
@@ -503,7 +503,7 @@
     padding: 4px 10px;
     border-radius: 4px;
     font-size: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
     margin: 2px;
 }
@@ -520,7 +520,7 @@
 }
 
 .bind-section {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     padding: 16px;
     margin-top: 16px;
@@ -577,7 +577,7 @@
 }
 
 .bind-option.selected .bind-checkbox::after {
-    content: 'âœ“';
+    content: 'âœ?;
     color: white;
     font-size: 12px;
 }
@@ -698,7 +698,7 @@
 .stat-value {
     font-size: 28px;
     font-weight: 700;
-    color: var(--nx-text);
+    color: var(--nx-text-primary);
 }
 
 .stat-label {

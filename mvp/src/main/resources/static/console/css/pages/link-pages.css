@@ -21,8 +21,8 @@
     padding: 10px 12px 10px 36px;
     border: 1px solid var(--nx-border);
     border-radius: 8px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
     font-size: 14px;
 }
 
@@ -95,6 +95,6 @@
 }
 
 .link-status.inactive {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }

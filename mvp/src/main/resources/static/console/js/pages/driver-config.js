@@ -445,11 +445,92 @@ function saveDriverConfig() {
 }
 
 function testDriver(driverId) {
-    alert('测试连接: ' + driverId + ' (功能开发中)');
+    var driver = DriverConfig.configs.find(function(d) { return d.driverId === driverId || d.id === driverId; });
+    if (!driver) {
+        alert('驱动配置不存在');
+        return;
+    }
+    
+    var resultContainer = document.getElementById('testResultContent');
+    if (resultContainer) {
+        resultContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i><p>正在测试连接...</p></div>';
+        document.getElementById('testResultModal').style.display = 'flex';
+    }
+    
+    fetch('/api/v1/drivers/' + driverId + '/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(driver.config || {})
+    })
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            if (resultContainer) {
+                var isSuccess = result.status === 'success' || result.connected === true;
+                resultContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="ri-${isSuccess ? 'checkbox-circle' : 'close-circle'}-line" style="font-size: 48px; color: var(--nx-${isSuccess ? 'success' : 'danger'}-color);"></i>
+                        <h4 style="margin: 16px 0 8px;">${isSuccess ? '连接成功' : '连接失败'}</h4>
+                        <p style="color: var(--nx-text-secondary);">${result.message || (isSuccess ? '驱动连接测试通过' : '无法连接到驱动')}</p>
+                        ${result.latency ? '<p style="font-size: 12px; color: var(--nx-text-secondary);">延迟: ' + result.latency + 'ms</p>' : ''}
+                    </div>
+                `;
+            }
+        })
+        .catch(function(error) {
+            if (resultContainer) {
+                resultContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="ri-close-circle-line" style="font-size: 48px; color: var(--nx-danger-color);"></i>
+                        <h4 style="margin: 16px 0 8px;">测试失败</h4>
+                        <p style="color: var(--nx-text-secondary);">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
 }
 
 function testAllConnections() {
-    alert('测试全部连接 (功能开发中)');
+    var resultContainer = document.getElementById('testResultContent');
+    if (resultContainer) {
+        resultContainer.innerHTML = '<div style="text-align: center; padding: 20px;"><i class="ri-loader-4-line ri-spin" style="font-size: 24px;"></i><p>正在测试所有连接...</p></div>';
+        document.getElementById('testResultModal').style.display = 'flex';
+    }
+    
+    fetch('/api/v1/drivers/test-all', {
+        method: 'POST'
+    })
+        .then(function(response) { return response.json(); })
+        .then(function(result) {
+            if (resultContainer) {
+                var results = result.results || [];
+                var successCount = results.filter(function(r) { return r.success; }).length;
+                var html = '<div style="padding: 16px;"><h4 style="margin-bottom: 12px;">测试结果</h4>';
+                html += '<p style="margin-bottom: 16px;">成功: ' + successCount + ' / ' + results.length + '</p>';
+                html += '<div style="max-height: 300px; overflow-y: auto;">';
+                results.forEach(function(r) {
+                    html += `
+                        <div style="display: flex; align-items: center; gap: 8px; padding: 8px; border-bottom: 1px solid var(--nx-border-color);">
+                            <i class="ri-${r.success ? 'checkbox-circle' : 'close-circle'}-line" style="color: var(--nx-${r.success ? 'success' : 'danger'}-color);"></i>
+                            <span>${r.driverId || r.name}</span>
+                            <span style="color: var(--nx-text-secondary); font-size: 12px;">${r.message || ''}</span>
+                        </div>
+                    `;
+                });
+                html += '</div></div>';
+                resultContainer.innerHTML = html;
+            }
+        })
+        .catch(function(error) {
+            if (resultContainer) {
+                resultContainer.innerHTML = `
+                    <div style="text-align: center; padding: 20px;">
+                        <i class="ri-close-circle-line" style="font-size: 48px; color: var(--nx-danger-color);"></i>
+                        <h4 style="margin: 16px 0 8px;">测试失败</h4>
+                        <p style="color: var(--nx-text-secondary);">${error.message}</p>
+                    </div>
+                `;
+            }
+        });
 }
 
 function saveAllConfigs() {

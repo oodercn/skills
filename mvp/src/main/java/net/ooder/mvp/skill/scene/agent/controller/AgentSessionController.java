@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/agents")
+@RequestMapping("/api/v1/agent-sessions")
 public class AgentSessionController {
 
     private static final Logger log = LoggerFactory.getLogger(AgentSessionController.class);

@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MVP 功能手册：从安装到能力激活</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+            --success-color: #059669;
+            --warning-color: #d97706;
+        }
+        
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+        }
+        
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        h2 {
+            font-size: 1.6rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        h3 {
+            font-size: 1.3rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+        }
+        
+        h4 {
+            font-size: 1.1rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+        }
+        
+        p {
+            margin: 15px 0;
+        }
+        
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.9rem;
+        }
+        
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.9rem;
+        }
+        
+        pre code {
+            background: none;
+            padding: 0;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+        }
+        
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        
+        tr:last-child td {
+            border-bottom: none;
+        }
+        
+        tr:hover {
+            background: var(--highlight-bg);
+        }
+        
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 25px;
+            margin: 25px 0;
+            background: var(--highlight-bg);
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+        }
+        
+        blockquote p {
+            margin: 0;
+        }
+        
+        .screenshot {
+            margin: 30px 0;
+            text-align: center;
+            background: var(--code-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 60px 20px;
+            color: #64748b;
+        }
+        
+        .screenshot-placeholder {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+        }
+        
+        .screenshot-path {
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.85rem;
+            color: #94a3b8;
+        }
+        
+        .step-box {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            background: var(--primary-color);
+            color: white;
+            border-radius: 50%;
+            font-weight: bold;
+            margin-right: 12px;
+        }
+        
+        .step-title {
+            display: flex;
+            align-items: center;
+            font-size: 1.1rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border: 2px solid #d97706;
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .highlight-box h4 {
+            color: #92400e;
+            margin-top: 0;
+        }
+        
+        .story-box {
+            background: linear-gradient(135deg, #dbeafe, #bfdbfe);
+            border: 2px solid var(--primary-color);
+            border-radius: 12px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+        
+        .story-box h4 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .story-box .role {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 2px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+        }
+        
+        .tag {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+        
+        .tag.success { background: var(--success-color); }
+        .tag.warning { background: var(--warning-color); }
+        
+        .menu-tree {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.9rem;
+        }
+        
+        .menu-item {
+            padding: 4px 0;
+        }
+        
+        .menu-item.level-1 { padding-left: 20px; }
+        .menu-item.level-2 { padding-left: 40px; }
+        
+        .menu-item::before {
+            content: "├─ ";
+            color: #64748b;
+        }
+        
+        .menu-item:last-child::before {
+            content: "└─ ";
+        }
+        
+        .footer {
+            background: var(--code-bg);
+            padding: 40px;
+            text-align: center;
+            border-top: 1px solid var(--border-color);
+        }
+        
+        .footer p {
+            color: #64748b;
+        }
+        
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 25px;
+        }
+        
+        li {
+            margin: 8px 0;
+        }
+        
+        .tip-box {
+            background: #d1fae5;
+            border: 1px solid var(--success-color);
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin: 20px 0;
+        }
+        
+        .tip-box::before {
+            content: "💡 提示：";
+            font-weight: bold;
+            color: var(--success-color);
+        }
+        
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .header { padding: 40px 20px; }
+            .header h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.3rem; }
+            table { font-size: 0.9rem; }
+            th, td { padding: 10px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>MVP 功能手册</h1>
+            <p class="subtitle">从安装到能力激活，一站式新手指南</p>
+        </div>
+        
+        <div class="content">
+            <h2>前言</h2>
+            
+            <p>MVP 是一个场景驱动的 AI Agent 基础设施。本手册将带你从零开始，完成程序的安装、能力的发现、安装与激活全流程。</p>
+            
+            <blockquote>
+                <p>本手册适用于 MVP 3.0 (Apex) 版本</p>
+            </blockquote>
+            
+            <h2>第一部分：程序安装</h2>
+            
+            <h3>1.1 环境要求</h3>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>项目</th>
+                        <th>要求</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Java</td>
+                        <td>JDK 21+</td>
+                    </tr>
+                    <tr>
+                        <td>内存</td>
+                        <td>128MB ~ 1GB（根据 Profile）</td>
+                    </tr>
+                    <tr>
+                        <td>端口</td>
+                        <td>8084（默认）</td>
+                    </tr>
+                    <tr>
+                        <td>操作系统</td>
+                        <td>Windows / Linux / macOS</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h3>1.2 快速启动</h3>
+            
+            <div class="step-box">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    下载程序包
+                </div>
+                <p>从 GitHub Releases 下载最新版本的 <code>mvp-core.jar</code></p>
+                <pre><code># 下载地址
+https://github.com/ooder-skills/mvp/releases</code></pre>
+            </div>
+            
+            <div class="step-box">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    启动程序
+                </div>
+                <pre><code># Windows
+java -jar mvp-core.jar
+
+# Linux/macOS
+./mvnw spring-boot:run
+
+# 指定 Profile
+java -jar mvp-core.jar --spring.profiles.active=small</code></pre>
+            </div>
+            
+            <div class="step-box">
+                <div class="step-title">
+                    <span class="step-number">3</span>
+                    访问控制台
+                </div>
+                <p>启动成功后，浏览器访问：</p>
+                <pre><code>http://localhost:8084</code></pre>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📷 控制台首页截图</div>
+                    <div class="screenshot-path">截图路径: screenshots/console-home.png</div>
+                </div>
+            </div>
+            
+            <h3>1.3 首次登录</h3>
+            
+            <p>默认管理员账号：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>用户名</th>
+                        <th>密码</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>admin</td>
+                        <td>admin123</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="tip-box">
+                首次登录后请及时修改默认密码
+            </div>
+            
+            <h3>1.4 Profile 配置</h3>
+            
+            <p>MVP 提供四级部署配置：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>Profile</th>
+                        <th>内存</th>
+                        <th>启动时间</th>
+                        <th>包含功能</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>micro</td>
+                        <td>128MB</td>
+                        <td>5s</td>
+                        <td>核心功能</td>
+                    </tr>
+                    <tr>
+                        <td>small</td>
+                        <td>256MB</td>
+                        <td>10s</td>
+                        <td>核心 + 本地 LLM</td>
+                    </tr>
+                    <tr>
+                        <td>large</td>
+                        <td>512MB</td>
+                        <td>15s</td>
+                        <td>核心 + LLM + 知识库</td>
+                    </tr>
+                    <tr>
+                        <td>enterprise</td>
+                        <td>1GB</td>
+                        <td>30s</td>
+                        <td>全功能</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <h2>第二部分：能力发现</h2>
+            
+            <div class="story-box">
+                <h4>📖 用户故事</h4>
+                <p><span class="role">角色</span> 小明是某企业的 IT 管理员，他希望为团队引入一个智能问答能力，帮助员工快速查询公司内部知识。</p>
+                <p><strong>目标</strong>：发现并安装一个知识问答能力</p>
+            </div>
+            
+            <h3>2.1 进入能力发现</h3>
+            
+            <p>登录控制台后，点击左侧菜单 <strong>「能力中心」→「发现能力」</strong></p>
+            
+            <div class="menu-tree">
+                <div class="menu-item">能力中心</div>
+                <div class="menu-item level-1">发现能力</div>
+                <div class="menu-item level-1">能力管理</div>
+                <div class="menu-item level-1">我的能力</div>
+                <div class="menu-item level-1">能力激活</div>
+            </div>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 能力发现页面截图</div>
+                <div class="screenshot-path">截图路径: screenshots/capability-discovery.png</div>
+            </div>
+            
+            <h3>2.2 选择发现途径</h3>
+            
+            <p>MVP 支持多种能力发现途径：</p>
+            
+            <table>
+                <thead>
+                    <tr>
+                        <th>途径</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>本地技能目录</td>
+                        <td>扫描本地 skills 目录下的技能</td>
+                    </tr>
+                    <tr>
+                        <td>Gitee 仓库</td>
+                        <td>从 Gitee 发现公开技能</td>
+                    </tr>
+                    <tr>
+                        <td>GitHub 仓库</td>
+                        <td>从 GitHub 发现公开技能</td>
+                    </tr>
+                    <tr>
+                        <td>网络节点</td>
+                        <td>从 P2P 网络其他节点发现</td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="step-box">
+                <div class="step-title">
+                    <span class="step-number">1</span>
+                    选择发现途径
+                </div>
+                <p>在左侧「发现途径」面板中，勾选需要扫描的渠道</p>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📷 发现途径选择截图</div>
+                    <div class="screenshot-path">截图路径: screenshots/discovery-methods.png</div>
+                </div>
+            </div>
+            
+            <div class="step-box">
+                <div class="step-title">
+                    <span class="step-number">2</span>
+                    开始扫描
+                </div>
+                <p>点击右上角「开始扫描」按钮，系统将自动扫描所选渠道的能力</p>
+                <div class="screenshot">
+                    <div class="screenshot-placeholder">📷 扫描进度截图</div>
+                    <div class="screenshot-path">截图路径: screenshots/discovery-scanning.png</div>
+                </div>
+            </div>
+            
+            <h3>2.3 查看发现结果</h3>
+            
+            <p>扫描完成后，结果将展示在「发现结果」区域：</p>
+            
+            <ul>
+                <li><strong>已扫描</strong>：扫描的技能总数</li>
+                <li><strong>已发现</strong>：发现的能力总数</li>
+                <li><strong>新能力</strong>：尚未安装的能力</li>
+                <li><strong>已安装</strong>：已安装的能力</li>
+            </ul>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 发现结果截图</div>
+                <div class="screenshot-path">截图路径: screenshots/discovery-results.png</div>
+            </div>
+            
+            <h3>2.4 筛选能力</h3>
+            
+            <p>可通过以下维度筛选能力：</p>
+            
+            <p><span class="tag">场景应用</span> 自驱型 SuperAgent 能力，包含完整业务流程</p>
+            <p><span class="tag">能力服务</span> 独立能力单元，可被场景调用</p>
+            <p><span class="tag">驱动适配</span> 意图/时间/事件驱动型能力</p>
+            <p><span class="tag success">新能力</span> 尚未安装的新能力</p>
+            <p><span class="tag warning">已安装</span> 已安装的能力</p>
+            
+            <h2>第三部分：能力安装</h2>
+            
+            <div class="story-box">
+                <h4>📖 用户故事（续）</h4>
+                <p>小明在发现结果中找到了「知识问答」能力，现在需要安装它。</p>
+            </div>
+            
+            <h3>3.1 查看能力详情</h3>
+            
+            <p>点击能力卡片，查看详细信息：</p>
+            
+            <ul>
+                <li>能力名称、ID、版本</li>
+                <li>功能特性描述</li>
+                <li>支持的角色</li>
+                <li>依赖项</li>
+            </ul>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 能力详情截图</div>
+                <div class="screenshot-path">截图路径: screenshots/capability-detail.png</div>
+            </div>
+            
+            <h3>3.2 安装向导</h3>
+            
+            <p>点击「安装」按钮，进入安装向导。安装向导包含以下步骤：</p>
+            
+            <div class="svg-diagram" style="margin: 30px 0; text-align: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 100" width="700px" height="100px">
+                    <defs>
+                        <style>
+                            .step-circle { fill: #2563eb; }
+                            .step-text { font-family: -apple-system, sans-serif; font-size: 11px; fill: #334155; }
+                            .step-num { font-family: -apple-system, sans-serif; font-size: 12px; fill: white; font-weight: bold; }
+                            .connector { stroke: #e2e8f0; stroke-width: 2; fill: none; }
+                        </style>
+                    </defs>
+                    <line class="connector" x1="60" y1="35" x2="640" y2="35"/>
+                    
+                    <circle class="step-circle" cx="50" cy="35" r="18"/>
+                    <text class="step-num" x="50" y="40" text-anchor="middle">1</text>
+                    <text class="step-text" x="50" y="70" text-anchor="middle">预览详情</text>
+                    
+                    <circle class="step-circle" cx="150" cy="35" r="18"/>
+                    <text class="step-num" x="150" y="40" text-anchor="middle">2</text>
+                    <text class="step-text" x="150" y="70" text-anchor="middle">选择角色</text>
+                    
+                    <circle class="step-circle" cx="250" cy="35" r="18"/>
+                    <text class="step-num" x="250" y="40" text-anchor="middle">3</text>
+                    <text class="step-text" x="250" y="70" text-anchor="middle">配置参与者</text>
+                    
+                    <circle class="step-circle" cx="350" cy="35" r="18"/>
+                    <text class="step-num" x="350" y="40" text-anchor="middle">4</text>
+                    <text class="step-text" x="350" y="70" text-anchor="middle">驱动条件</text>
+                    
+                    <circle class="step-circle" cx="450" cy="35" r="18"/>
+                    <text class="step-num" x="450" y="40" text-anchor="middle">5</text>
+                    <text class="step-text" x="450" y="70" text-anchor="middle">确认依赖</text>
+                    
+                    <circle class="step-circle" cx="550" cy="35" r="18"/>
+                    <text class="step-num" x="550" y="40" text-anchor="middle">6</text>
+                    <text class="step-text" x="550" y="70" text-anchor="middle">LLM配置</text>
+                    
+                    <circle class="step-circle" cx="650" cy="35" r="18"/>
+                    <text class="step-num" x="650" y="40" text-anchor="middle">7</text>
+                    <text class="step-text" x="650" y="70" text-anchor="middle">安装进度</text>
+                </svg>
+            </div>
+            
+            <h4>步骤 1：预览详情</h4>
+            <p>查看能力的完整信息，确认是否满足需求</p>
+            
+            <h4>步骤 2：选择角色</h4>
+            <p>选择您在场景中的角色，不同角色拥有不同的权限和功能</p>
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 选择角色截图</div>
+                <div class="screenshot-path">截图路径: screenshots/install-role.png</div>
+            </div>
+            
+            <h4>步骤 3：配置参与者</h4>
+            <p>添加场景的参与者：</p>
+            <ul>
+                <li><strong>主导者</strong>：拥有激活权限，默认为当前用户</li>
+                <li><strong>协作者</strong>：共同参与场景的其他用户</li>
+            </ul>
+            
+            <h4>步骤 4：驱动条件</h4>
+            <p>选择场景的触发条件（如适用）</p>
+            
+            <h4>步骤 5：确认依赖</h4>
+            <p>查看并确认能力所需的依赖项</p>
+            
+            <h4>步骤 6：LLM 配置</h4>
+            <p>配置场景所需的 LLM：</p>
+            <ul>
+                <li>选择 Provider（DeepSeek / OpenAI / 千问 / Ollama）</li>
+                <li>选择模型</li>
+                <li>配置参数（Temperature、Max Tokens 等）</li>
+                <li>配置 Function Calling</li>
+                <li>绑定知识库（可选）</li>
+            </ul>
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 LLM 配置截图</div>
+                <div class="screenshot-path">截图路径: screenshots/install-llm.png</div>
+            </div>
+            
+            <h4>步骤 7：安装进度</h4>
+            <p>等待安装完成，查看安装日志</p>
+            
+            <h3>3.3 安装完成</h3>
+            
+            <p>安装成功后，将显示：</p>
+            <ul>
+                <li>场景信息摘要</li>
+                <li>为您生成的菜单</li>
+                <li>通知状态</li>
+            </ul>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 安装完成截图</div>
+                <div class="screenshot-path">截图路径: screenshots/install-complete.png</div>
+            </div>
+            
+            <h2>第四部分：能力激活</h2>
+            
+            <div class="story-box">
+                <h4>📖 用户故事（续）</h4>
+                <p>小明成功安装了「知识问答」能力，现在需要激活它，让团队成员可以使用。</p>
+            </div>
+            
+            <h3>4.1 进入能力激活</h3>
+            
+            <p>安装完成后，系统会自动跳转到能力激活页面。也可以通过菜单进入：</p>
+            <p><strong>「能力中心」→「能力激活」</strong></p>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 能力激活页面截图</div>
+                <div class="screenshot-path">截图路径: screenshots/capability-activation.png</div>
+            </div>
+            
+            <h3>4.2 激活步骤</h3>
+            
+            <div class="svg-diagram" style="margin: 30px 0; text-align: center;">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 100" width="600px" height="100px">
+                    <defs>
+                        <style>
+                            .step-circle { fill: #059669; }
+                            .step-text { font-family: -apple-system, sans-serif; font-size: 11px; fill: #334155; }
+                            .step-num { font-family: -apple-system, sans-serif; font-size: 12px; fill: white; font-weight: bold; }
+                            .connector { stroke: #e2e8f0; stroke-width: 2; fill: none; }
+                        </style>
+                    </defs>
+                    <line class="connector" x1="60" y1="35" x2="540" y2="35"/>
+                    
+                    <circle class="step-circle" cx="50" cy="35" r="18"/>
+                    <text class="step-num" x="50" y="40" text-anchor="middle">1</text>
+                    <text class="step-text" x="50" y="70" text-anchor="middle">确认参与者</text>
+                    
+                    <circle class="step-circle" cx="170" cy="35" r="18"/>
+                    <text class="step-num" x="170" y="40" text-anchor="middle">2</text>
+                    <text class="step-text" x="170" y="70" text-anchor="middle">配置条件</text>
+                    
+                    <circle class="step-circle" cx="290" cy="35" r="18"/>
+                    <text class="step-num" x="290" y="40" text-anchor="middle">3</text>
+                    <text class="step-text" x="290" y="70" text-anchor="middle">获取KEY</text>
+                    
+                    <circle class="step-circle" cx="410" cy="35" r="18"/>
+                    <text class="step-num" x="410" y="40" text-anchor="middle">4</text>
+                    <text class="step-text" x="410" y="70" text-anchor="middle">网络动作</text>
+                    
+                    <circle class="step-circle" cx="530" cy="35" r="18"/>
+                    <text class="step-num" x="530" y="40" text-anchor="middle">5</text>
+                    <text class="step-text" x="530" y="70" text-anchor="middle">激活完成</text>
+                </svg>
+            </div>
+            
+            <h4>步骤 1：确认参与者</h4>
+            <p>确认能力的主导者和协作者信息</p>
+            
+            <h4>步骤 2：配置条件</h4>
+            <p>选择能力运行的驱动条件</p>
+            
+            <h4>步骤 3：获取 KEY</h4>
+            <p>获取访问安全数据的密钥，用于能力运行时访问受保护资源</p>
+            <div class="tip-box">
+                请妥善保管密钥，密钥只显示一次
+            </div>
+            
+            <h4>步骤 4：网络动作</h4>
+            <p>执行入网通知：</p>
+            <ul>
+                <li>通知其他场景</li>
+                <li>更新我的能力</li>
+                <li>更新我的待办</li>
+                <li>通知协作者</li>
+            </ul>
+            
+            <h4>步骤 5：激活完成</h4>
+            <p>能力已成功激活，可以开始使用</p>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 激活完成截图</div>
+                <div class="screenshot-path">截图路径: screenshots/activation-complete.png</div>
+            </div>
+            
+            <h2>第五部分：使用能力</h2>
+            
+            <div class="story-box">
+                <h4>📖 用户故事（完结）</h4>
+                <p>小明成功激活了「知识问答」能力。现在，他和团队成员可以在「我的能力」中看到并使用这个能力了。</p>
+            </div>
+            
+            <h3>5.1 查看我的能力</h3>
+            
+            <p>进入 <strong>「能力中心」→「我的能力」</strong>，查看所有已激活的能力</p>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 我的能力截图</div>
+                <div class="screenshot-path">截图路径: screenshots/my-capabilities.png</div>
+            </div>
+            
+            <h3>5.2 使用能力</h3>
+            
+            <p>点击能力卡片，进入能力详情页，可以：</p>
+            <ul>
+                <li>查看能力状态和统计信息</li>
+                <li>调用能力执行操作</li>
+                <li>查看执行日志</li>
+                <li>管理能力配置</li>
+            </ul>
+            
+            <h3>5.3 场景菜单</h3>
+            
+            <p>安装能力后，系统会自动为用户生成专属菜单。菜单项与能力绑定的场景相关联。</p>
+            
+            <div class="screenshot">
+                <div class="screenshot-placeholder">📷 场景菜单截图</div>
+                <div class="screenshot-path">截图路径: screenshots/scene-menu.png</div>
+            </div>
+            
+            <h2>第六部分：常见问题</h2>
+            
+            <h3>Q1：能力发现扫描不到结果？</h3>
+            <p>请检查：</p>
+            <ul>
+                <li>本地 skills 目录是否存在且有内容</li>
+                <li>网络连接是否正常</li>
+                <li>GitHub/Gitee 访问权限是否配置</li>
+            </ul>
+            
+            <h3>Q2：安装失败怎么办？</h3>
+            <p>请查看安装日志，常见原因：</p>
+            <ul>
+                <li>依赖项未满足</li>
+                <li>LLM 配置错误</li>
+                <li>权限不足</li>
+            </ul>
+            
+            <h3>Q3：如何添加协作者？</h3>
+            <p>在安装向导的「配置参与者」步骤，点击「添加协作者」按钮，选择或输入用户 ID</p>
+            
+            <h3>Q4：密钥忘记了怎么办？</h3>
+            <p>可以在「能力详情」页面重新生成密钥</p>
+            
+            <h2>附录：菜单导航</h2>
+            
+            <div class="menu-tree">
+                <div class="menu-item">能力中心</div>
+                <div class="menu-item level-1">发现能力 - 发现新能力</div>
+                <div class="menu-item level-1">能力管理 - 管理已注册能力</div>
+                <div class="menu-item level-1">我的能力 - 查看已激活能力</div>
+                <div class="menu-item level-1">能力激活 - 激活待激活能力</div>
+                <div class="menu-item">场景管理</div>
+                <div class="menu-item level-1">场景列表 - 管理场景</div>
+                <div class="menu-item level-1">场景组 - 管理场景组</div>
+                <div class="menu-item">知识库</div>
+                <div class="menu-item level-1">知识中心 - 管理知识库</div>
+                <div class="menu-item">LLM 配置</div>
+                <div class="menu-item level-1">模型配置 - 配置 LLM</div>
+                <div class="menu-item level-1">调用监控 - 查看 LLM 调用</div>
+            </div>
+            
+            <div class="highlight-box">
+                <h4>总结</h4>
+                <p>通过本手册，你已经学会了：</p>
+                <ul>
+                    <li>✅ 安装和启动 MVP 程序</li>
+                    <li>✅ 发现和筛选能力</li>
+                    <li>✅ 安装能力并配置参与者</li>
+                    <li>✅ 激活能力并获取密钥</li>
+                    <li>✅ 使用已激活的能力</li>
+                </ul>
+                <p>现在，开始探索更多能力，构建你的 AI 应用吧！</p>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p>© 2026 Ooder Team | MIT License</p>
+            <p>MVP 3.0 (Apex) 功能手册</p>
+        </div>
+    </div>
+</body>
+</html>

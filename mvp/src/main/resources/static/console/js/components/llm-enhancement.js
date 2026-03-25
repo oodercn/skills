@@ -48,24 +48,29 @@ const LLMEnhancement = {
     updateStatusIndicator: function() {
         const indicators = document.querySelectorAll('.llm-status-indicator');
         indicators.forEach(indicator => {
-            if (this.contextStatus) {
-                const skillEl = indicator.querySelector('#current-skill');
-                const levelEl = indicator.querySelector('#context-level');
-                const toolsEl = indicator.querySelector('#tools-count');
-                const kbEl = indicator.querySelector('#kb-bindings');
+            const skillEl = indicator.querySelector('#current-skill');
+            const levelEl = indicator.querySelector('#context-level');
+            const toolsEl = indicator.querySelector('#tools-count');
+            const kbEl = indicator.querySelector('#kb-bindings');
 
-                if (skillEl && this.contextStatus.skill) {
-                    skillEl.textContent = this.contextStatus.skill.currentSkillId || '-';
+            if (this.contextStatus) {
+                if (skillEl) {
+                    skillEl.textContent = (this.contextStatus.skill && this.contextStatus.skill.currentSkillId) || '-';
                 }
-                if (levelEl && this.contextStatus.level) {
-                    levelEl.textContent = this.contextStatus.level;
+                if (levelEl) {
+                    levelEl.textContent = this.contextStatus.level || '-';
                 }
-                if (toolsEl && this.contextStatus.skill) {
-                    levelEl.textContent = (this.contextStatus.skill.toolsCount || 0) + '个';
+                if (toolsEl) {
+                    toolsEl.textContent = (this.contextStatus.skill && this.contextStatus.skill.toolsCount || 0) + '个';
                 }
-                if (kbEl && this.contextStatus.skill) {
-                    kbEl.textContent = (this.contextStatus.skill.kbBindings || 0) + '个';
+                if (kbEl) {
+                    kbEl.textContent = (this.contextStatus.skill && this.contextStatus.skill.kbBindings || 0) + '个';
                 }
+            } else {
+                if (skillEl) skillEl.textContent = '-';
+                if (levelEl) levelEl.textContent = '-';
+                if (toolsEl) toolsEl.textContent = '-';
+                if (kbEl) kbEl.textContent = '-';
             }
         });
     },

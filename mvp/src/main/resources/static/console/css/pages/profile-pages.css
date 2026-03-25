@@ -125,8 +125,8 @@
     border: 1px solid var(--nx-border);
     border-radius: 6px;
     font-size: 14px;
-    background: var(--nx-bg);
-    color: var(--nx-text);
+    background: var(--nx-bg-input);
+    color: var(--nx-text-primary);
 }
 
 .profile-input:focus {
@@ -143,7 +143,7 @@
 .profile-stat-card {
     text-align: center;
     padding: 20px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
 }
 

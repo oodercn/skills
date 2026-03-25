@@ -362,6 +362,15 @@ public class ActivationServiceImpl implements ActivationService {
                 } catch (Exception e) {
                     log.error("[confirmActivation] Failed to register menus: {}", e.getMessage());
                 }
+                
+                try {
+                    if (sceneGroupService != null) {
+                        sceneGroupService.activate(sceneGroupId);
+                        log.info("[confirmActivation] SceneGroup activated: {}", sceneGroupId);
+                    }
+                } catch (Exception e) {
+                    log.error("[confirmActivation] Failed to activate SceneGroup: {}", e.getMessage());
+                }
             } else {
                 log.warn("[confirmActivation] Cannot register menus - no SceneGroup available. " +
                     "sceneGroupService={}", sceneGroupService != null ? "available" : "not available");

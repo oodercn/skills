@@ -430,13 +430,125 @@
             }
             
             function createNewVersion() {
-                alert('发布新版本功能开发中');
+                if (!capabilityId) {
+                    alert('能力ID不存在');
+                    return;
+                }
+                
+                const latestVersion = versions.find(v => v.status === 'latest');
+                const newVersionNum = latestVersion ? (parseFloat(latestVersion.version) + 0.1).toFixed(1) : '1.0';
+                
+                const modalHtml = `
+                    <div class="modal-overlay" id="newVersionModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                        <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 500px; width: 90%; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                            <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                                <h3 style="margin: 0; font-size: 16px;"><i class="ri-upload-cloud-line"></i> 发布新版本</h3>
+                                <button class="modal-close" onclick="closeNewVersionModal()" style="background: none; border: none; font-size: 20px; cursor: pointer; color: var(--nx-text-secondary);">
+                                    <i class="ri-close-line"></i>
+                                </button>
+                            </div>
+                            <div class="modal-body" style="padding: 20px;">
+                                <div class="nx-form-group nx-mb-3">
+                                    <label class="nx-form-label">版本号</label>
+                                    <input type="text" class="nx-input" id="newVersionNumber" value="${newVersionNum}" placeholder="例如: 1.1">
+                                </div>
+                                <div class="nx-form-group nx-mb-3">
+                                    <label class="nx-form-label">变更说明</label>
+                                    <textarea class="nx-input" id="newVersionChangelog" rows="4" placeholder="描述此版本的变更内容..."></textarea>
+                                </div>
+                                <div class="nx-form-group">
+                                    <label class="nx-form-label">配置JSON (可选)</label>
+                                    <textarea class="nx-input" id="newVersionConfig" rows="6" placeholder='{"key": "value"}'>${latestVersion ? JSON.stringify(latestVersion.config || {}, null, 2) : '{}'}</textarea>
+                                </div>
+                            </div>
+                            <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: flex-end; gap: 8px;">
+                                <button class="nx-btn nx-btn--secondary" onclick="closeNewVersionModal()">取消</button>
+                                <button class="nx-btn nx-btn--primary" onclick="submitNewVersion()">发布</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                const existingModal = document.getElementById('newVersionModal');
+                if (existingModal) existingModal.remove();
+                
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+            }
+            
+            function closeNewVersionModal() {
+                const modal = document.getElementById('newVersionModal');
+                if (modal) modal.remove();
+            }
+            
+            function submitNewVersion() {
+                const version = document.getElementById('newVersionNumber').value.trim();
+                const changelog = document.getElementById('newVersionChangelog').value.trim();
+                const configStr = document.getElementById('newVersionConfig').value.trim();
+                
+                if (!version) {
+                    alert('请输入版本号');
+                    return;
+                }
+                
+                let config = {};
+                try {
+                    config = configStr ? JSON.parse(configStr) : {};
+                } catch (e) {
+                    alert('配置JSON格式错误');
+                    return;
+                }
+                
+                fetch('/api/v1/capabilities/' + capabilityId + '/versions', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        version: version,
+                        changelog: changelog,
+                        config: config
+                    })
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            closeNewVersionModal();
+                            alert('新版本发布成功');
+                            loadData();
+                        } else {
+                            alert('发布失败: ' + (result.message || '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to create version:', error);
+                        alert('发布失败: ' + error.message);
+                    });
             }
             
             function rollbackVersion() {
-                if (currentVersion && confirm('确定要回滚到 v' + currentVersion.version + ' 吗？')) {
-                    alert('回滚功能开发中');
+                if (!currentVersion) {
+                    alert('请先选择要回滚的版本');
+                    return;
                 }
+                
+                if (!confirm('确定要回滚到 v' + currentVersion.version + ' 吗？此操作将把该版本设为当前使用版本。')) {
+                    return;
+                }
+                
+                fetch('/api/v1/capabilities/' + capabilityId + '/versions/' + currentVersion.version + '/rollback', {
+                    method: 'POST'
+                })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.status === 'success') {
+                            alert('已成功回滚到 v' + currentVersion.version);
+                            loadData();
+                        } else {
+                            alert('回滚失败: ' + (result.message || '未知错误'));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Failed to rollback version:', error);
+                        alert('回滚失败: ' + error.message);
+                    });
             }
             
             function downloadVersion() {

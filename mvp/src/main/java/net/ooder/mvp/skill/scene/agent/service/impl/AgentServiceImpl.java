@@ -222,8 +222,14 @@ public class AgentServiceImpl implements AgentService {
         List<AgentNode> nodes = new ArrayList<>();
         List<AgentEdge> edges = new ArrayList<>();
         
+        if (agents == null || agents.isEmpty()) {
+            topology.setNodes(nodes);
+            topology.setEdges(edges);
+            return topology;
+        }
+        
         Map<String, List<AgentDTO>> clusterGroups = agents.stream()
-            .filter(a -> a.getClusterId() != null)
+            .filter(a -> a != null && a.getClusterId() != null)
             .collect(Collectors.groupingBy(AgentDTO::getClusterId));
         
         int clusterIndex = 0;
@@ -419,6 +425,21 @@ public class AgentServiceImpl implements AgentService {
     private Map<String, Object> calculateStats(List<AgentDTO> agents) {
         Map<String, Object> stats = new HashMap<>();
         
+        if (agents == null || agents.isEmpty()) {
+            stats.put("total", 0);
+            stats.put("online", 0);
+            stats.put("busy", 0);
+            stats.put("offline", 0);
+            stats.put("healthy", 0);
+            stats.put("unhealthy", 0);
+            stats.put("avgCpuUsage", 0.0);
+            stats.put("avgMemoryUsage", 0.0);
+            stats.put("totalRequests", 0L);
+            stats.put("totalSuccess", 0L);
+            stats.put("successRate", 100.0);
+            return stats;
+        }
+        
         int total = agents.size();
         int online = 0, busy = 0, offline = 0;
         int healthy = 0;
@@ -426,16 +447,18 @@ public class AgentServiceImpl implements AgentService {
         long totalRequests = 0, totalSuccess = 0;
         
         for (AgentDTO agent : agents) {
+            if (agent == null) continue;
+            
             String status = agent.getStatus();
             if ("online".equalsIgnoreCase(status)) online++;
             else if ("busy".equalsIgnoreCase(status)) busy++;
             else offline++;
             
             if (agent.isHealthy()) healthy++;
-            totalCpu += agent.getCpuUsage();
-            totalMemory += agent.getMemoryUsage();
-            totalRequests += agent.getTotalRequests();
-            totalSuccess += agent.getSuccessRequests();
+            totalCpu += agent.getCpuUsage() != null ? agent.getCpuUsage() : 0.0;
+            totalMemory += agent.getMemoryUsage() != null ? agent.getMemoryUsage() : 0.0;
+            totalRequests += agent.getTotalRequests() != null ? agent.getTotalRequests() : 0L;
+            totalSuccess += agent.getSuccessRequests() != null ? agent.getSuccessRequests() : 0L;
         }
         
         stats.put("total", total);

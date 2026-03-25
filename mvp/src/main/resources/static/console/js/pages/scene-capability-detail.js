@@ -376,9 +376,27 @@
 
     global.uninstallCapability = function() {
         if (!capability) return;
-        if (!confirm('确定要卸载此场景能力吗？')) return;
+        if (!confirm('确定要卸载此场景能力吗？此操作不可恢复。')) return;
         
-        alert('卸载功能开发中...');
+        var sceneGroupId = capability.sceneGroupId;
+        var capabilityId = capability.id;
+        
+        fetch('/api/v1/scene-capabilities/' + capabilityId + '/uninstall', {
+            method: 'POST'
+        })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.status === 'success') {
+                    alert('卸载成功');
+                    window.location.href = 'scene-group-detail.html?id=' + sceneGroupId;
+                } else {
+                    alert('卸载失败: ' + (result.message || '未知错误'));
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to uninstall:', error);
+                alert('卸载失败: ' + error.message);
+            });
     };
 
     global.viewSource = function() {

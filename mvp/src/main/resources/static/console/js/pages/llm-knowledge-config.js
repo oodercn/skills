@@ -232,11 +232,159 @@
     };
     
     window.showAddSynonymModal = function() {
-        alert('添加同义词映射功能开发中...');
+        var modalHtml = `
+            <div class="modal-overlay" id="synonymModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 450px; width: 90%;">
+                    <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; font-size: 16px;"><i class="ri-exchange-line"></i> 添加同义词映射</h3>
+                        <button class="modal-close" onclick="closeSynonymModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;"><i class="ri-close-line"></i></button>
+                    </div>
+                    <div class="modal-body" style="padding: 20px;">
+                        <div class="nx-form-group nx-mb-3">
+                            <label class="nx-form-label">原词 <span class="nx-text-error">*</span></label>
+                            <input type="text" class="nx-input" id="synonymSource" placeholder="输入原词">
+                        </div>
+                        <div class="nx-form-group nx-mb-3">
+                            <label class="nx-form-label">同义词 <span class="nx-text-error">*</span></label>
+                            <input type="text" class="nx-input" id="synonymTarget" placeholder="输入同义词（多个用逗号分隔）">
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-form-label">说明</label>
+                            <input type="text" class="nx-input" id="synonymDesc" placeholder="映射说明（可选）">
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: flex-end; gap: 8px;">
+                        <button class="nx-btn nx-btn--secondary" onclick="closeSynonymModal()">取消</button>
+                        <button class="nx-btn nx-btn--primary" onclick="submitSynonym()">添加</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        var existing = document.getElementById('synonymModal');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+    
+    window.closeSynonymModal = function() {
+        var modal = document.getElementById('synonymModal');
+        if (modal) modal.remove();
+    };
+    
+    window.submitSynonym = function() {
+        var source = document.getElementById('synonymSource').value.trim();
+        var target = document.getElementById('synonymTarget').value.trim();
+        var desc = document.getElementById('synonymDesc').value.trim();
+        
+        if (!source || !target) {
+            alert('请填写原词和同义词');
+            return;
+        }
+        
+        fetch('/api/v1/llm-knowledge-config/synonyms', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ source: source, targets: target.split(',').map(function(t) { return t.trim(); }), description: desc })
+        })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.status === 'success') {
+                    closeSynonymModal();
+                    alert('同义词映射添加成功');
+                    LlmKnowledgeConfigPage.loadSynonyms();
+                } else {
+                    alert('添加失败: ' + (result.message || '未知错误'));
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to add synonym:', error);
+                alert('添加失败');
+            });
     };
     
     window.showAddInterfaceModal = function() {
-        alert('添加接口定义功能开发中...');
+        var modalHtml = `
+            <div class="modal-overlay" id="interfaceModal" style="display: flex; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+                <div class="modal" style="background: var(--nx-bg-elevated); border-radius: 12px; max-width: 550px; width: 90%;">
+                    <div class="modal-header" style="padding: 16px 20px; border-bottom: 1px solid var(--nx-border-color); display: flex; justify-content: space-between; align-items: center;">
+                        <h3 style="margin: 0; font-size: 16px;"><i class="ri-code-box-line"></i> 添加接口定义</h3>
+                        <button class="modal-close" onclick="closeInterfaceModal()" style="background: none; border: none; font-size: 20px; cursor: pointer;"><i class="ri-close-line"></i></button>
+                    </div>
+                    <div class="modal-body" style="padding: 20px;">
+                        <div class="nx-form-group nx-mb-3">
+                            <label class="nx-form-label">接口名称 <span class="nx-text-error">*</span></label>
+                            <input type="text" class="nx-input" id="interfaceName" placeholder="例如: getUserInfo">
+                        </div>
+                        <div class="nx-form-group nx-mb-3">
+                            <label class="nx-form-label">接口描述</label>
+                            <input type="text" class="nx-input" id="interfaceDesc" placeholder="接口用途说明">
+                        </div>
+                        <div class="nx-form-group nx-mb-3">
+                            <label class="nx-form-label">参数定义 (JSON)</label>
+                            <textarea class="nx-input" id="interfaceParams" rows="4" placeholder='{"param1": {"type": "string", "desc": "参数说明"}}'></textarea>
+                        </div>
+                        <div class="nx-form-group">
+                            <label class="nx-form-label">返回值定义 (JSON)</label>
+                            <textarea class="nx-input" id="interfaceReturn" rows="3" placeholder='{"type": "object", "properties": {...}}'></textarea>
+                        </div>
+                    </div>
+                    <div class="modal-footer" style="padding: 16px 20px; border-top: 1px solid var(--nx-border-color); display: flex; justify-content: flex-end; gap: 8px;">
+                        <button class="nx-btn nx-btn--secondary" onclick="closeInterfaceModal()">取消</button>
+                        <button class="nx-btn nx-btn--primary" onclick="submitInterface()">添加</button>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        var existing = document.getElementById('interfaceModal');
+        if (existing) existing.remove();
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    };
+    
+    window.closeInterfaceModal = function() {
+        var modal = document.getElementById('interfaceModal');
+        if (modal) modal.remove();
+    };
+    
+    window.submitInterface = function() {
+        var name = document.getElementById('interfaceName').value.trim();
+        var desc = document.getElementById('interfaceDesc').value.trim();
+        var paramsStr = document.getElementById('interfaceParams').value.trim();
+        var returnStr = document.getElementById('interfaceReturn').value.trim();
+        
+        if (!name) {
+            alert('请输入接口名称');
+            return;
+        }
+        
+        var params = {}, returnDef = {};
+        try {
+            if (paramsStr) params = JSON.parse(paramsStr);
+            if (returnStr) returnDef = JSON.parse(returnStr);
+        } catch (e) {
+            alert('JSON格式错误: ' + e.message);
+            return;
+        }
+        
+        fetch('/api/v1/llm-knowledge-config/interfaces', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ name: name, description: desc, parameters: params, returnType: returnDef })
+        })
+            .then(function(response) { return response.json(); })
+            .then(function(result) {
+                if (result.status === 'success') {
+                    closeInterfaceModal();
+                    alert('接口定义添加成功');
+                    LlmKnowledgeConfigPage.loadInterfaces();
+                } else {
+                    alert('添加失败: ' + (result.message || '未知错误'));
+                }
+            })
+            .catch(function(error) {
+                console.error('Failed to add interface:', error);
+                alert('添加失败');
+            });
     };
     
     window.closeModal = function(id) {

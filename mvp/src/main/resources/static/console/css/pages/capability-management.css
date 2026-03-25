@@ -98,7 +98,7 @@
     align-items: center;
     justify-content: center;
     font-size: 18px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-primary);
 }
 
@@ -124,7 +124,7 @@
 }
 
 .discovery-method-status.idle {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -174,7 +174,7 @@
 
 .cap-filter-bar {
     padding: 12px 20px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-bottom: 1px solid var(--nx-border);
     display: flex;
     align-items: center;
@@ -397,7 +397,7 @@
 
 .cap-card-deps {
     padding: 10px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 6px;
     margin-bottom: 12px;
 }
@@ -516,7 +516,7 @@
 }
 
 .cap-rel-graph {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     padding: 16px;
     min-height: 200px;
@@ -619,7 +619,7 @@
     padding: 8px 12px;
     border: 1px solid var(--nx-border);
     border-radius: 6px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     font-size: 14px;
 }
 
@@ -636,7 +636,7 @@
 
 .cap-logs-panel {
     border-top: 1px solid var(--nx-border);
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     max-height: 200px;
     overflow-y: auto;
     font-family: monospace;

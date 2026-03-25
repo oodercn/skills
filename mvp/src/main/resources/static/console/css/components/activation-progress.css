@@ -27,13 +27,13 @@
     font-size: 13px;
     color: var(--nx-text-secondary);
     padding: 4px 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 12px;
 }
 
 .progress-bar-container {
     height: 8px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 4px;
     overflow: hidden;
     margin-bottom: 8px;
@@ -71,7 +71,7 @@
     align-items: center;
     gap: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     transition: all 0.2s ease;
 }
@@ -87,7 +87,7 @@
 }
 
 .step-pending .step-icon {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -109,7 +109,7 @@
 }
 
 .step-skipped .step-icon {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -126,7 +126,7 @@
 }
 
 .step-pending .step-status {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
@@ -147,14 +147,14 @@
 }
 
 .step-skipped .step-status {
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     color: var(--nx-text-secondary);
 }
 
 .progress-message {
     margin-top: 12px;
     padding: 12px;
-    background: var(--nx-bg);
+    background: var(--nx-bg-input);
     border-radius: 8px;
     font-size: 13px;
     color: var(--nx-text-secondary);
