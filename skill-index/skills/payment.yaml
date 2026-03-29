@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: payment
       subCategory: alipay
+      skillForm: DRIVER
       tags:
         - payment
         - alipay
@@ -30,6 +31,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: payment
       subCategory: wechat
+      skillForm: DRIVER
       tags:
         - payment
         - wechat
@@ -47,6 +49,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: payment
       subCategory: unionpay
+      skillForm: DRIVER
       tags:
         - payment
         - unionpay

@@ -15,6 +15,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: document
+      skillForm: PROVIDER
       tags:
         - document
         - processor
@@ -28,6 +29,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: general
+      skillForm: PROVIDER
       tags:
         - utility
         - tools
@@ -43,6 +45,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: share
+      skillForm: PROVIDER
       tags:
         - share
         - collaboration
@@ -58,6 +61,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
+      skillForm: PROVIDER
       tags:
         - llm
         - volcengine
@@ -75,6 +79,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
+      skillForm: PROVIDER
       tags:
         - llm
         - qianwen
@@ -92,6 +97,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
+      skillForm: PROVIDER
       tags:
         - llm
         - deepseek
@@ -109,6 +115,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: market
+      skillForm: PROVIDER
       tags:
         - market
         - skill
@@ -126,6 +133,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: collaboration
+      skillForm: SCENE
       tags:
         - collaboration
         - scene

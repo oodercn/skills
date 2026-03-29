@@ -26,6 +26,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: database
+      skillForm: DRIVER
       tags:
         - vfs
         - database
@@ -42,6 +43,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: local
+      skillForm: DRIVER
       tags:
         - vfs
         - local
@@ -75,6 +77,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
+      skillForm: DRIVER
       tags:
         - vfs
         - oss
@@ -92,6 +95,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
+      skillForm: DRIVER
       tags:
         - vfs
         - s3

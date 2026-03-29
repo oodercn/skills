@@ -13,6 +13,7 @@ scenes:
       description: UI生成场景，支持图转代码、组件生成等能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - generate-ui
         - preview-ui
@@ -23,6 +24,7 @@ scenes:
       description: 会议协作场景，提供会议、白板、共享等协作能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - meeting-create
         - whiteboard-share
@@ -34,6 +36,7 @@ scenes:
       description: 文档协作场景，提供文档编辑、评论、版本等协作能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - document-edit
         - document-comment
@@ -45,6 +48,7 @@ scenes:
       description: 任务协作场景，提供任务分配、跟踪、报告等协作能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - task-create
         - task-assign
@@ -57,6 +61,7 @@ scenes:
       description: 技能分享场景，提供技能分享、接收管理能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - skill-sharing
         - skill-receiving
@@ -68,6 +73,7 @@ scenes:
       description: 技能市场场景，提供技能发现、搜索、安装和管理能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - skill-discovery
         - skill-search
@@ -80,6 +86,7 @@ scenes:
       description: 协作场景，提供场景创建、成员管理、密钥管理能力
       version: "2.3.1"
       capabilityCategory: collaboration
+      skillForm: SCENE
       requiredCapabilities:
         - scene-management
         - member-management

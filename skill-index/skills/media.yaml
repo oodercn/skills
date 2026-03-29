@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: wechat
+      skillForm: DRIVER
       tags:
         - media
         - wechat
@@ -30,6 +31,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: weibo
+      skillForm: DRIVER
       tags:
         - media
         - weibo
@@ -47,6 +49,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: zhihu
+      skillForm: DRIVER
       tags:
         - media
         - zhihu
@@ -64,6 +67,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: toutiao
+      skillForm: DRIVER
       tags:
         - media
         - toutiao
@@ -81,6 +85,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: xiaohongshu
+      skillForm: DRIVER
       tags:
         - media
         - xiaohongshu

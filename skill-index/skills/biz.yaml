@@ -14,6 +14,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: scenario
+      skillForm: SCENE
       tags:
         - business
         - scenario
@@ -28,6 +29,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: hr
+      skillForm: SCENE
       tags:
         - recruitment
         - hr
@@ -43,6 +45,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: approval
+      skillForm: SCENE
       tags:
         - approval
         - form
@@ -57,6 +60,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: crm
+      skillForm: SCENE
       tags:
         - realestate
         - property
@@ -72,6 +76,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: qa
+      skillForm: SCENE
       tags:
         - recording
         - qa

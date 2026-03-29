@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: base
+      skillForm: PROVIDER
       tags:
         - org
         - base
@@ -43,6 +44,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: feishu
+      skillForm: DRIVER
       tags:
         - feishu
         - lark
@@ -93,6 +95,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: auth
+      skillForm: PROVIDER
       tags:
         - auth
         - authentication

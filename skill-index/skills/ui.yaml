@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: ui
       subCategory: code-gen
+      skillForm: PROVIDER
       tags:
         - a2ui
         - ui-generation

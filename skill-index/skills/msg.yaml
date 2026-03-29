@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: mqtt
+      skillForm: PROVIDER
       tags:
         - mqtt
         - messaging
@@ -29,6 +30,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: im
+      skillForm: PROVIDER
       tags:
         - im
         - messaging
@@ -47,6 +49,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: group
+      skillForm: PROVIDER
       tags:
         - group
         - team
@@ -65,6 +68,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: message
+      skillForm: PROVIDER
       tags:
         - message
         - push
@@ -83,6 +87,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: notify
+      skillForm: PROVIDER
       tags:
         - notify
         - notification
@@ -100,6 +105,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: email
+      skillForm: PROVIDER
       tags:
         - email
         - smtp
@@ -117,6 +123,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: message
+      skillForm: PROVIDER
       tags:
         - message
         - msg

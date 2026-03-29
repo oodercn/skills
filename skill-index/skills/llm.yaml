@@ -13,6 +13,8 @@ skills:
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: chat
+      skillForm: SCENE
+      sceneType: AUTO
       tags:
         - llm
         - chat
@@ -39,6 +41,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: config
+      skillForm: PROVIDER
       tags:
         - llm
         - config
@@ -53,6 +56,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: provider
+      skillForm: PROVIDER
       tags:
         - llm
         - baidu

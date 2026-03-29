@@ -13,6 +13,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: knowledge
+      skillForm: SCENE
       tags:
         - knowledge
         - ui
@@ -33,6 +34,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: llm
+      skillForm: SCENE
       tags:
         - llm
         - assistant
@@ -56,6 +58,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: llm
+      skillForm: PROVIDER
       tags:
         - llm
         - management
@@ -73,6 +76,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: dashboard
+      skillForm: PROVIDER
       tags:
         - nexus
         - dashboard
@@ -90,6 +94,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: status
+      skillForm: PROVIDER
       tags:
         - nexus
         - system
@@ -107,6 +112,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: personal
+      skillForm: PROVIDER
       tags:
         - nexus
         - personal
@@ -124,6 +130,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: health
+      skillForm: PROVIDER
       tags:
         - nexus
         - health
@@ -141,6 +148,7 @@ skills:
       version: "2.3.1"
       capabilityCategory: nexus-ui
       subCategory: storage
+      skillForm: PROVIDER
       tags:
         - nexus
         - storage

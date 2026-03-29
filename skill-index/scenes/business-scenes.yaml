@@ -13,6 +13,7 @@ scenes:
       description: 人力资源场景，提供员工管理、考勤、薪酬、招聘等HR能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - employee-create
         - employee-update
@@ -25,6 +26,7 @@ scenes:
       description: 客户管理场景，提供客户、联系人、商机、合同等CRM能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - customer-create
         - customer-update
@@ -37,6 +39,7 @@ scenes:
       description: 财务管理场景，提供账务、报销、预算、结算等财务能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - account-manage
         - expense-manage
@@ -48,6 +51,7 @@ scenes:
       description: 审批流程场景，提供流程定义、审批、流转等工作流能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - flow-start
         - flow-query
@@ -60,6 +64,7 @@ scenes:
       description: 项目管理场景，提供项目、任务、文档、进度等项目管理能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - project-create
         - task-create
@@ -72,6 +77,7 @@ scenes:
       description: 知识管理场景，提供知识库、文档、搜索等知识管理能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - knowledge-create
         - document-search
@@ -83,6 +89,7 @@ scenes:
       description: 业务场景，提供业务场景管理、工作流执行、数据处理能力
       version: "2.3.1"
       capabilityCategory: business
+      skillForm: SCENE
       requiredCapabilities:
         - scenario-management
         - workflow-execution

@@ -11,11 +11,12 @@ metadata:
 
 skills:
 
-    - skillId: skill-network
+    - id: skill-network
       name: Network Management Skill
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: network
+      skillForm: DRIVER
       tags:
         - network
         - ip
@@ -25,11 +26,12 @@ skills:
       sceneId: network
       path: skills/capabilities/monitor/skill-network
 
-    - skillId: skill-protocol
+    - id: skill-protocol
       name: Protocol Management Skill
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: protocol
+      skillForm: DRIVER
       tags:
         - protocol
         - handler
@@ -38,11 +40,12 @@ skills:
       sceneId: protocol
       path: skills/_system/skill-protocol
 
-    - skillId: skill-openwrt
+    - id: skill-openwrt
       name: OpenWrt Management Skill
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: router
+      skillForm: DRIVER
       tags:
         - openwrt
         - router
@@ -51,11 +54,12 @@ skills:
       sceneId: openwrt
       path: skills/capabilities/infrastructure/skill-openwrt
 
-    - skillId: skill-monitor
+    - id: skill-monitor
       name: Monitoring Service
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: monitor
+      skillForm: PROVIDER
       tags:
         - monitor
         - metrics
@@ -66,97 +70,87 @@ skills:
       sceneId: monitor
       path: skills/capabilities/monitor/skill-monitor
 
-    - skillId: skill-health
+    - id: skill-health
       name: Health Check Service
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: health
+      skillForm: PROVIDER
       tags:
         - health
         - check
-        - monitor
-        - service
-        - report
-      description: 健康检查服务 - 提供系统健康检查、服务检查和报告生成能力
+        - status
+      description: 健康检查服务 - 提供系统健康检查、状态监控能力
       sceneId: health
       path: skills/capabilities/monitor/skill-health
 
-    - skillId: skill-remote-terminal
-      name: Remote Terminal Service
+    - id: skill-cmd-service
+      name: Command Service
       version: "2.3.1"
-      capabilityCategory: sys
-      subCategory: remote
+      category: sys
+      subCategory: command
+      skillForm: PROVIDER
       tags:
-        - remote
-        - terminal
-        - ssh
+        - command
+        - exec
         - shell
-        - command
-        - sftp
-      description: 远程终端服务 - 提供SSH远程连接、命令执行和文件传输能力
-      sceneId: remote
-      path: skills/capabilities/monitor/skill-remote-terminal
-
-    - skillId: skill-cmd-service
-      name: Command Monitoring Service
-      version: "2.3.1"
-      capabilityCategory: sys
-      subCategory: cmd
-      tags:
-        - command
-        - monitor
-        - dispatch
-        - task
-        - schedule
-      description: 命令监控服务 - 提供命令分发、任务调度和执行追踪能力
+      description: 命令服务 - 提供命令执行、脚本运行能力
       sceneId: cmd
       path: skills/capabilities/monitor/skill-cmd-service
 
-    - skillId: skill-res-service
-      name: Resource Management Service
+    - id: skill-res-service
+      name: Resource Service
       version: "2.3.1"
-      capabilityCategory: sys
-      subCategory: res
+      category: sys
+      subCategory: resource
+      skillForm: PROVIDER
       tags:
         - resource
-        - organization
-        - department
-        - management
-        - hierarchy
-      description: 资源管理服务 - 提供组织、部门和资源管理能力
+        - system
+        - monitor
+      description: 资源服务 - 提供系统资源监控、资源管理能力
       sceneId: res
       path: skills/capabilities/monitor/skill-res-service
 
-    - skillId: skill-k8s
-      name: Kubernetes Cluster Management
+    - id: skill-remote-terminal
+      name: Remote Terminal Service
       version: "2.3.1"
-      capabilityCategory: sys
-      subCategory: kubernetes
+      category: sys
+      subCategory: terminal
+      skillForm: PROVIDER
       tags:
-        - kubernetes
-        - k8s
-        - cluster
-        - container
-      description: Kubernetes集群管理服务 - 提供集群管理、节点、命名空间、Pod管理能力
-      sceneId: kubernetes
-      path: skills/skill-k8s
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-k8s-2.3.1.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-k8s-2.3.1.jar
-      checksum: ""
+        - terminal
+        - remote
+        - ssh
+      description: 远程终端服务 - 提供远程终端连接、命令执行能力
+      sceneId: terminal
+      path: skills/capabilities/monitor/skill-remote-terminal
 
-    - skillId: skill-scheduler-quartz
-      name: Quartz Scheduler Service
+    - id: skill-scheduler-quartz
+      name: Scheduler Quartz Service
       version: "2.3.1"
-      capabilityCategory: sys
+      category: sys
       subCategory: scheduler
+      skillForm: PROVIDER
       tags:
         - scheduler
         - quartz
         - cron
+        - job
+      description: 定时任务服务 - 提供基于Quartz的定时任务调度能力
+      sceneId: scheduler
+      path: skills/capabilities/scheduler/skill-scheduler-quartz
+
+    - id: skill-task
+      name: Task Management Service
+      version: "2.3.1"
+      category: sys
+      subCategory: task
+      skillForm: PROVIDER
+      tags:
         - task
-      description: Quartz调度服务 - 提供任务调度、执行、历史查询能力
-      sceneId: scheduling
-      path: skills/skill-scheduler-quartz
-      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-scheduler-quartz-2.3.1.jar
-      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-scheduler-quartz-2.3.1.jar
-      checksum: ""
+        - management
+        - async
+      description: 任务管理服务 - 提供异步任务管理、任务调度能力
+      sceneId: task
+      path: skills/capabilities/scheduler/skill-task
