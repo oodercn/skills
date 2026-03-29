@@ -1,0 +1,17 @@
+server:
+  port: 8086
+
+spring:
+  application:
+    name: skill-im-dingding
+
+dingtalk:
+  api:
+    endpoint: https://oapi.dingtalk.com
+  app:
+    key: ${DINGTALK_APP_KEY:}
+    secret: ${DINGTALK_APP_SECRET:}
+
+logging:
+  level:
+    net.ooder.skill.im.dingding: DEBUG

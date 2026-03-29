@@ -6,45 +6,64 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>ooder-skills</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>pom</packaging>
 
     <name>ooder-skills</name>
     <description>Ooder Skills Repository - Shared skills for Ooder Agent Platform</description>
     <url>https://github.com/ooderCN/ooder-skills</url>
 
+    <organization>
+        <name>ooder</name>
+        <url>https://ooder.cn</url>
+    </organization>
+
     <licenses>
         <license>
-            <name>Apache License, Version 2.0</name>
-            <url>https://www.apache.org/licenses/LICENSE-2.0</url>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
             <distribution>repo</distribution>
+            <comments>MIT License</comments>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <id>ooder</id>
-            <name>Ooder Team</name>
-            <email>team@ooder.net</email>
-            <organization>Ooder</organization>
-            <organizationUrl>https://ooder.net</organizationUrl>
+            <name>IhyTdX</name>
+            <email>18683731@qq.com</email>
+            <organization>ooder</organization>
+            <organizationUrl>https://ooder.cn</organizationUrl>
+            <roles>
+                <role>Developer</role>
+            </roles>
+            <timezone>+8</timezone>
         </developer>
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/ooderCN/ooder-skills.git</connection>
-        <developerConnection>scm:git:ssh://github.com/ooderCN/ooder-skills.git</developerConnection>
         <url>https://github.com/ooderCN/ooder-skills</url>
+        <connection>scm:git:https://github.com/ooderCN/ooder-skills.git</connection>
+        <developerConnection>scm:git:https://github.com/ooderCN/ooder-skills.git</developerConnection>
+        <tag>v3.0.0</tag>
     </scm>
 
     <properties>
+        <java.version>21</java.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
-        <spring-boot.version>3.2.5</spring-boot.version>
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+        <maven.javadoc.skip>false</maven.javadoc.skip>
+        <maven.source.skip>false</maven.source.skip>
+        
+        <ooder.version>3.0.1</ooder.version>
         <agent-sdk.version>3.0.0</agent-sdk.version>
         <scene-engine.version>3.0.0</scene-engine.version>
         <llm-sdk.version>3.0.0</llm-sdk.version>
+        <spring-boot.version>3.2.5</spring-boot.version>
+        <lombok.version>1.18.36</lombok.version>
+        <fastjson2.version>2.0.52</fastjson2.version>
+        <jackson.version>2.18.2</jackson.version>
     </properties>
 
     <modules>
@@ -53,17 +72,7 @@
         
         <!-- System Skills -->
         <module>skills/_system/skill-common</module>
-        <!-- TODO: implement these modules
-        <module>skills/_system/skill-capability</module>
-        <module>skills/_system/skill-capability-coordinator</module>
-        <module>skills/_system/skill-llm</module>
-        -->
         <module>skills/_system/skill-llm-chat</module>
-        <!-- TODO: implement these modules
-        <module>skills/_system/skill-management</module>
-        <module>skills/_system/skill-protocol</module>
-        <module>skills/_system/skill-scene-management</module>
-        -->
         
         <!-- LLM Drivers -->
         <module>skills/_drivers/llm/skill-llm-base</module>
@@ -87,11 +96,6 @@
         <module>skills/_drivers/vfs/skill-vfs-minio</module>
         <module>skills/_drivers/vfs/skill-vfs-oss</module>
         <module>skills/_drivers/vfs/skill-vfs-s3</module>
-        
-        <!-- IoT Drivers - TODO: implement these modules -->
-        <!-- <module>skills/_drivers/iot/skill-openwrt</module>
-        <module>skills/_drivers/iot/skill-hosting</module>
-        <module>skills/_drivers/iot/skill-k8s</module> -->
         
         <!-- Media Drivers -->
         <module>skills/_drivers/media/skill-media-toutiao</module>
@@ -125,25 +129,10 @@
         <module>skills/capabilities/infrastructure/skill-httpclient-okhttp</module>
         <module>skills/capabilities/infrastructure/skill-load-balancer</module>
         
-        <!-- Capabilities - Knowledge -->
-        <!-- TODO: implement these modules
-        <module>skills/capabilities/knowledge/skill-knowledge-base</module>
-        <module>skills/capabilities/knowledge/skill-local-knowledge</module>
-        <module>skills/capabilities/knowledge/skill-rag</module>
-        <module>skills/capabilities/knowledge/skill-vector-sqlite</module>
-        -->
-        
         <!-- Capabilities - LLM -->
         <module>skills/capabilities/llm/skill-llm-config-manager</module>
-        <!-- TODO: implement these modules
-        <module>skills/capabilities/llm/skill-llm-context-builder</module>
-        <module>skills/capabilities/llm/skill-llm-conversation</module>
-        -->
         
         <!-- Capabilities - Monitor -->
-        <!-- TODO: implement these modules
-        <module>skills/capabilities/monitor/skill-agent</module>
-        -->
         <module>skills/capabilities/monitor/skill-cmd-service</module>
         <module>skills/capabilities/monitor/skill-health</module>
         <module>skills/capabilities/monitor/skill-monitor</module>
@@ -158,25 +147,11 @@
         <!-- Capabilities - Search -->
         <module>skills/capabilities/search/skill-search</module>
         
-        <!-- Capabilities - Security -->
-        <!-- TODO: implement these modules
-        <module>skills/capabilities/security/skill-access-control</module>
-        <module>skills/capabilities/security/skill-audit</module>
-        <module>skills/capabilities/security/skill-security</module>
-        -->
-        
         <!-- Scenes -->
         <module>skills/scenes/skill-agent-recommendation</module>
         <module>skills/scenes/skill-business</module>
         <module>skills/scenes/skill-collaboration</module>
         <module>skills/scenes/skill-document-assistant</module>
-        <!-- TODO: implement these modules
-        <module>skills/scenes/skill-knowledge-qa</module>
-        <module>skills/scenes/skill-knowledge-share</module>
-        <module>skills/scenes/skill-meeting-minutes</module>
-        <module>skills/scenes/skill-onboarding-assistant</module>
-        <module>skills/scenes/skill-project-knowledge</module>
-        -->
         
         <!-- Tools -->
         <module>skills/tools/skill-command-shortcut</module>
@@ -199,94 +174,68 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+            
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>agent-sdk-core</artifactId>
                 <version>${agent-sdk.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skills-framework</artifactId>
                 <version>${agent-sdk.version}</version>
             </dependency>
+
             <dependency>
                 <groupId>net.ooder</groupId>
-                <artifactId>skill-common</artifactId>
-                <version>${project.version}</version>
+                <artifactId>llm-sdk</artifactId>
+                <version>${llm-sdk.version}</version>
             </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>skill-capability</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>skill-llm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>skill-llm-base</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>mvp-core</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.alibaba.fastjson2</groupId>
-                <artifactId>fastjson2</artifactId>
-                <version>2.0.43</version>
-            </dependency>
-            <dependency>
-                <groupId>org.projectlombok</groupId>
-                <artifactId>lombok</artifactId>
-                <version>1.18.30</version>
-            </dependency>
+
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>scene-engine</artifactId>
                 <version>${scene-engine.version}</version>
             </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-common</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-llm-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skill-org-base</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-vfs-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skill-hotplug-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
+            
             <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-starter-mail</artifactId>
-                <version>${spring-boot.version}</version>
+                <groupId>net.ooder</groupId>
+                <artifactId>mvp-core</artifactId>
+                <version>${project.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
-
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
 
     <repositories>
         <repository>
@@ -328,62 +277,26 @@
     </distributionManagement>
 
     <build>
-        <pluginManagement>
-            <plugins>
-                <plugin>
-                    <groupId>org.springframework.boot</groupId>
-                    <artifactId>spring-boot-maven-plugin</artifactId>
-                    <version>${spring-boot.version}</version>
-                    <executions>
-                        <execution>
-                            <id>repackage</id>
-                            <goals>
-                                <goal>repackage</goal>
-                            </goals>
-                        </execution>
-                    </executions>
-                </plugin>
-                <plugin>
-                    <groupId>org.apache.maven.plugins</groupId>
-                    <artifactId>maven-compiler-plugin</artifactId>
-                    <version>3.11.0</version>
-                    <configuration>
-                        <source>21</source>
-                        <target>21</target>
-                        <encoding>UTF-8</encoding>
-                        <annotationProcessorPaths>
-                            <path>
-                                <groupId>org.projectlombok</groupId>
-                                <artifactId>lombok</artifactId>
-                                <version>1.18.30</version>
-                            </path>
-                        </annotationProcessorPaths>
-                    </configuration>
-                </plugin>
-            </plugins>
-        </pluginManagement>
-        
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>repackage</id>
-                        <goals>
-                            <goal>repackage</goal>
-                        </goals>
-                        <configuration>
-                            <skip>true</skip>
-                        </configuration>
-                    </execution>
-                </executions>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <encoding>UTF-8</encoding>
+                    <release>21</release>
+                </configuration>
             </plugin>
             
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
                 <version>3.3.1</version>
+                <configuration>
+                    <skipSource>${maven.source.skip}</skipSource>
+                </configuration>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -399,6 +312,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.6.3</version>
                 <configuration>
+                    <skip>${maven.javadoc.skip}</skip>
                     <source>21</source>
                     <additionalJOption>-Xdoclint:none</additionalJOption>
                     <failOnError>false</failOnError>

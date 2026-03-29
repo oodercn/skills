@@ -1,0 +1,150 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-dingding
+  name: DingTalk IM Service
+  version: 2.3.1
+  description: 钉钉IM服务，提供消息发送、DING消息、日程管理、待办同步等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-dingding
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - dingtalk
+    - dingding
+    - im
+    - message
+    - ding
+    - calendar
+    - todo
+
+spec:
+  skillForm: DRIVER
+  type: im-skill
+  
+  ownership: platform
+  
+  capability:
+    category: IM
+    code: IM_DINGDING
+    operations: [send-message, send-ding, send-markdown, send-action-card, calendar, todo]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.im.dingding.DingTalkImSkillApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    functionCalling:
+      enabled: true
+      tools:
+        - name: send_message
+          description: "发送钉钉消息"
+          parameters:
+            type: object
+            properties:
+              receiver:
+                type: string
+                enum: [user, group]
+                description: "接收者类型"
+              receiverId:
+                type: string
+                description: "接收者ID"
+              msgType:
+                type: string
+                enum: [text, markdown, action_card]
+                default: text
+                description: "消息类型"
+              title:
+                type: string
+                description: "消息标题"
+              content:
+                type: string
+                description: "消息内容"
+        - name: send_ding
+          description: "发送钉钉DING消息（高优先级提醒）"
+          parameters:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: "用户ID"
+              title:
+                type: string
+                description: "消息标题"
+              content:
+                type: string
+                description: "消息内容"
+              reminderType:
+                type: integer
+                enum: [1, 2]
+                default: 1
+                description: "提醒类型：1-应用内，2-短信"
+
+  capabilities:
+    - id: send-message
+      name: Send Message
+      description: 发送消息
+      category: messaging
+    - id: send-ding
+      name: Send DING
+      description: 发送DING消息
+      category: notification
+    - id: send-markdown
+      name: Send Markdown
+      description: 发送Markdown消息
+      category: messaging
+    - id: send-action-card
+      name: Send Action Card
+      description: 发送交互卡片
+      category: messaging
+
+  config:
+    required:
+      - name: DINGTALK_APP_KEY
+        type: string
+        description: 钉钉应用Key
+      - name: DINGTALK_APP_SECRET
+        type: string
+        secret: true
+        description: 钉钉应用Secret
+    optional:
+      - name: dingtalk.api.endpoint
+        type: string
+        default: https://oapi.dingtalk.com
+        description: 钉钉API端点
+
+  endpoints:
+    - path: /api/v1/im/dingding/send
+      method: POST
+      description: 发送消息
+      capability: send-message
+    - path: /api/v1/im/dingding/ding
+      method: POST
+      description: 发送DING消息
+      capability: send-ding
+    - path: /api/v1/im/dingding/send/user
+      method: POST
+      description: 发送消息给用户
+      capability: send-message
+    - path: /api/v1/im/dingding/send/group
+      method: POST
+      description: 发送消息给群组
+      capability: send-message
+    - path: /api/v1/im/dingding/send/markdown
+      method: POST
+      description: 发送Markdown消息
+      capability: send-markdown
+    - path: /api/v1/im/dingding/send/action-card
+      method: POST
+      description: 发送交互卡片
+      capability: send-action-card

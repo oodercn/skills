@@ -1,0 +1,151 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-msg-push
+  name: Multi-Channel Message Push Service
+  version: 2.3.1
+  description: 多渠道消息推送服务，支持钉钉DING、飞书消息、企业微信
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/tools/skill-msg-push
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - message
+    - push
+    - notification
+    - dingtalk
+    - feishu
+    - wecom
+
+spec:
+  skillForm: PROVIDER
+  type: tool-skill
+  
+  ownership: platform
+  
+  capability:
+    category: MSG
+    code: MSG_PUSH
+    operations: [send, broadcast, ding-notify]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.msg.push.MsgPushSkillApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    functionCalling:
+      enabled: true
+      tools:
+        - name: send_message
+          description: "发送消息到指定渠道"
+          parameters:
+            type: object
+            properties:
+              channel:
+                type: string
+                enum: [dingtalk, feishu, wecom]
+                description: "消息渠道"
+              receiver:
+                type: string
+                enum: [user, group]
+                description: "接收者类型"
+              receiverId:
+                type: string
+                description: "接收者ID"
+              title:
+                type: string
+                description: "消息标题"
+              content:
+                type: string
+                description: "消息内容"
+        - name: send_ding
+          description: "发送钉钉DING消息（高优先级提醒）"
+          parameters:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: "用户ID"
+              title:
+                type: string
+                description: "消息标题"
+              content:
+                type: string
+                description: "消息内容"
+
+  capabilities:
+    - id: msg-send
+      name: Message Send
+      description: 消息发送
+      category: messaging
+    - id: msg-broadcast
+      name: Message Broadcast
+      description: 消息广播
+      category: messaging
+    - id: ding-notify
+      name: DING Notification
+      description: DING高优先级通知
+      category: notification
+
+  config:
+    optional:
+      - name: channel.dingtalk.enabled
+        type: boolean
+        default: true
+        description: 启用钉钉渠道
+      - name: channel.dingtalk.endpoint
+        type: string
+        default: http://localhost:8082
+        description: 钉钉服务端点
+      - name: channel.feishu.enabled
+        type: boolean
+        default: true
+        description: 启用飞书渠道
+      - name: channel.feishu.endpoint
+        type: string
+        default: http://localhost:8083
+        description: 飞书服务端点
+      - name: channel.wecom.enabled
+        type: boolean
+        default: true
+        description: 启用企业微信渠道
+      - name: channel.wecom.endpoint
+        type: string
+        default: http://localhost:8084
+        description: 企业微信服务端点
+
+  endpoints:
+    - path: /api/v1/msg/push/channels
+      method: GET
+      description: 获取可用渠道列表
+      capability: msg-send
+    - path: /api/v1/msg/push/send
+      method: POST
+      description: 发送消息
+      capability: msg-send
+    - path: /api/v1/msg/push/send/user
+      method: POST
+      description: 发送消息给用户
+      capability: msg-send
+    - path: /api/v1/msg/push/send/group
+      method: POST
+      description: 发送消息给群组
+      capability: msg-send
+    - path: /api/v1/msg/push/broadcast
+      method: POST
+      description: 广播消息
+      capability: msg-broadcast
+    - path: /api/v1/msg/push/dingtalk/ding
+      method: POST
+      description: 发送DING消息
+      capability: ding-notify

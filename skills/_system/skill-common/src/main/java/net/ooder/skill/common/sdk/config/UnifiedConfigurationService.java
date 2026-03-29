@@ -1,8 +1,7 @@
 package net.ooder.skill.common.sdk.config;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import jakarta.annotation.PostConstruct;
@@ -15,16 +14,19 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.List;
 
 /**
- * 缁熶竴閰嶇疆鏈嶅姟
+ * 统一配置服务
  *
- * 涓?Skills 鎻愪緵缁熶竴鐨勯厤缃鐞嗚兘鍔? * 鏀寔鏈湴鏂囦欢銆佺幆澧冨彉閲忋€佺郴缁熷睘鎬х瓑澶氱閰嶇疆婧? *
+ * 为 Skills 提供统一的配置管理能力
+ * 支持本地文件、环境变量、系统属性等多种配置源
+ *
  * @author Skills Team
  * @version 2.3.0
  * @since 2026-02-24
  */
-@Slf4j
 @Service
 public class UnifiedConfigurationService {
+
+    private static final Logger log = LoggerFactory.getLogger(UnifiedConfigurationService.class);
 
     private Path configRoot;
     private final Map<String, Configuration> configCache = new ConcurrentHashMap<>();
@@ -53,7 +55,7 @@ public class UnifiedConfigurationService {
             configCache.put(configId, config);
             return config;
         }
-        return Configuration.builder()
+        return new Configuration.Builder()
                 .configId(configId)
                 .build();
     }
@@ -184,7 +186,7 @@ public class UnifiedConfigurationService {
     }
 
     private Configuration fromYaml(String content, String configId) {
-        Configuration config = Configuration.builder()
+        Configuration config = new Configuration.Builder()
                 .configId(configId)
                 .build();
 
@@ -213,15 +215,25 @@ public class UnifiedConfigurationService {
         return new String(bytes, StandardCharsets.UTF_8);
     }
 
-    @Data
-    @Builder
     public static class Configuration {
         private String configId;
         private String version;
         private String description;
-
-        @Builder.Default
         private Map<String, String> values = new ConcurrentHashMap<>();
+
+        public Configuration() {
+        }
+
+        private Configuration(Builder builder) {
+            this.configId = builder.configId;
+            this.version = builder.version;
+            this.description = builder.description;
+            this.values = builder.values != null ? builder.values : new ConcurrentHashMap<>();
+        }
+
+        public static Builder builder() {
+            return new Builder();
+        }
 
         public String getString(String key, String defaultValue) {
             return values != null ? values.getOrDefault(key, defaultValue) : defaultValue;
@@ -246,6 +258,70 @@ public class UnifiedConfigurationService {
                 values = new ConcurrentHashMap<>();
             }
             values.put(key, value);
+        }
+
+        // Getters and Setters
+        public String getConfigId() {
+            return configId;
+        }
+
+        public void setConfigId(String configId) {
+            this.configId = configId;
+        }
+
+        public String getVersion() {
+            return version;
+        }
+
+        public void setVersion(String version) {
+            this.version = version;
+        }
+
+        public String getDescription() {
+            return description;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
+        public Map<String, String> getValues() {
+            return values;
+        }
+
+        public void setValues(Map<String, String> values) {
+            this.values = values;
+        }
+
+        public static class Builder {
+            private String configId;
+            private String version;
+            private String description;
+            private Map<String, String> values;
+
+            public Builder configId(String configId) {
+                this.configId = configId;
+                return this;
+            }
+
+            public Builder version(String version) {
+                this.version = version;
+                return this;
+            }
+
+            public Builder description(String description) {
+                this.description = description;
+                return this;
+            }
+
+            public Builder values(Map<String, String> values) {
+                this.values = values;
+                return this;
+            }
+
+            public Configuration build() {
+                return new Configuration(this);
+            }
         }
     }
 

@@ -1,0 +1,108 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-wecom
+  name: WeCom IM Service
+  version: 2.3.1
+  description: 企业微信IM服务，提供消息发送、应用消息等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-wecom
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - wecom
+    - enterprise-wechat
+    - im
+    - messaging
+
+spec:
+  skillForm: DRIVER
+  type: im-skill
+  
+  ownership: platform
+  
+  capability:
+    category: IM
+    code: IM_WECOM
+    operations: [send-message, send-text, send-markdown]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.im.wecom.WeComImSkillApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    functionCalling:
+      enabled: true
+      tools:
+        - name: send_message
+          description: "发送企业微信消息"
+          parameters:
+            type: object
+            properties:
+              receiver:
+                type: string
+                enum: [user, party]
+                description: "接收者类型"
+              receiverId:
+                type: string
+                description: "接收者ID"
+              msgType:
+                type: string
+                enum: [text, markdown, news]
+                default: text
+                description: "消息类型"
+              content:
+                type: string
+                description: "消息内容"
+
+  capabilities:
+    - id: send-message
+      name: Send Message
+      description: 发送消息
+      category: messaging
+    - id: send-text
+      name: Send Text
+      description: 发送文本消息
+      category: messaging
+    - id: send-markdown
+      name: Send Markdown
+      description: 发送Markdown消息
+      category: messaging
+
+  config:
+    required:
+      - name: WECOM_CORP_ID
+        type: string
+        description: 企业微信CorpId
+      - name: WECOM_AGENT_ID
+        type: string
+        description: 企业微信AgentId
+      - name: WECOM_AGENT_SECRET
+        type: string
+        secret: true
+        description: 企业微信AgentSecret
+    optional:
+      - name: wecom.api.endpoint
+        type: string
+        default: https://qyapi.weixin.qq.com
+        description: 企业微信API端点
+
+  endpoints:
+    - path: /api/v1/im/wecom/send
+      method: POST
+      description: 发送消息
+      capability: send-message
+    - path: /api/v1/im/wecom/send/user
+      method: POST
+      description: 发送给用户
+      capability: send-text
+    - path: /api/v1/im/wecom/send/markdown
+      method: POST
+      description: 发送Markdown消息
+      capability: send-markdown

@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>平台绑定管理 - OODER Console</title>
+    <link rel="stylesheet" href="/console/css/remixicon/remixicon.css">
+    <link rel="stylesheet" href="/console/css/nexus.css">
+    <style>
+        .platform-binding-page { padding: 24px; max-width: 1200px; margin: 0 auto; }
+        .platform-binding-page__header { margin-bottom: 32px; }
+        .platform-binding-page__title { font-size: 24px; font-weight: 600; margin: 0 0 8px 0; }
+        .platform-binding-page__subtitle { color: var(--nx-text-secondary); font-size: 14px; margin: 0; }
+        .platform-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 24px; margin-bottom: 32px; }
+        .platform-card { background: var(--nx-bg-card); border-radius: 12px; border: 1px solid var(--nx-border); padding: 24px; transition: all 0.2s; }
+        .platform-card:hover { box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); }
+        .platform-card__header { display: flex; align-items: center; gap: 16px; margin-bottom: 16px; }
+        .platform-card__icon { width: 56px; height: 56px; border-radius: 12px; display: flex; align-items: center; justify-content: center; }
+        .platform-card__icon i { font-size: 28px; color: white; }
+        .platform-card__icon--dingtalk { background: linear-gradient(135deg, #0089FF 0%, #0066CC 100%); }
+        .platform-card__icon--feishu { background: linear-gradient(135deg, #3370FF 0%, #2258E8 100%); }
+        .platform-card__icon--wecom { background: linear-gradient(135deg, #07C160 0%, #059A4D 100%); }
+        .platform-card__info { flex: 1; }
+        .platform-card__name { font-size: 18px; font-weight: 600; margin-bottom: 4px; }
+        .platform-card__status { display: inline-flex; align-items: center; gap: 6px; font-size: 13px; padding: 4px 10px; border-radius: 12px; }
+        .platform-card__status--bound { background: rgba(7, 193, 96, 0.1); color: #07C160; }
+        .platform-card__status--unbound { background: rgba(102, 126, 234, 0.1); color: #667EEA; }
+        .platform-card__desc { color: var(--nx-text-secondary); font-size: 14px; margin-bottom: 20px; line-height: 1.5; }
+        .platform-card__actions { display: flex; gap: 12px; }
+        .platform-card__btn { flex: 1; padding: 10px 16px; border-radius: 8px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .platform-card__btn--primary { background: var(--nx-primary); color: white; border: none; }
+        .platform-card__btn--primary:hover { background: var(--nx-primary-dark); }
+        .platform-card__btn--secondary { background: transparent; color: var(--nx-text-secondary); border: 1px solid var(--nx-border); }
+        .platform-card__btn--secondary:hover { background: var(--nx-bg-hover); color: var(--nx-text); }
+        .platform-card__btn--danger { background: transparent; color: #F56C6C; border: 1px solid #F56C6C; }
+        .platform-card__btn--danger:hover { background: #FEF0F0; }
+        .binding-history { background: var(--nx-bg-card); border-radius: 12px; border: 1px solid var(--nx-border); }
+        .binding-history__header { padding: 20px 24px; border-bottom: 1px solid var(--nx-border); display: flex; justify-content: space-between; align-items: center; }
+        .binding-history__title { font-size: 16px; font-weight: 600; }
+        .binding-history__list { max-height: 400px; overflow-y: auto; }
+        .qrcode-modal { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0, 0, 0, 0.5); z-index: 1000; align-items: center; justify-content: center; }
+        .qrcode-modal.active { display: flex; }
+        .qrcode-modal__content { background: var(--nx-bg-card); border-radius: 16px; padding: 32px; max-width: 400px; width: 90%; text-align: center; }
+        .qrcode-modal__title { font-size: 18px; font-weight: 600; margin: 0 0 8px 0; }
+        .qrcode-modal__desc { color: var(--nx-text-secondary); font-size: 14px; margin: 0 0 24px 0; }
+        .qrcode-modal__qr { width: 280px; height: 280px; margin: 0 auto 24px; background: white; border-radius: 8px; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+        .qrcode-modal__qr iframe { width: 100%; height: 100%; border: none; }
+        .qrcode-modal__status { display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 8px 16px; border-radius: 20px; background: var(--nx-bg-hover); margin-bottom: 24px; }
+        .qrcode-modal__status--pending { color: var(--nx-text-secondary); }
+        .qrcode-modal__status--scanned { color: #E6A23C; }
+        .qrcode-modal__status--confirmed { color: #07C160; }
+        .qrcode-modal__status--expired { color: #F56C6C; }
+        .qrcode-modal__close { padding: 10px 24px; background: var(--nx-bg-hover); border: none; border-radius: 8px; font-size: 14px; cursor: pointer; }
+        .loading-spinner { width: 40px; height: 40px; border: 3px solid var(--nx-border); border-top-color: var(--nx-primary); border-radius: 50%; animation: spin 1s linear infinite; }
+        @keyframes spin { to { transform: rotate(360deg); } }
+        .empty-state { text-align: center; padding: 48px 24px; color: var(--nx-text-secondary); }
+        .empty-state i { font-size: 48px; margin-bottom: 16px; opacity: 0.5; }
+    </style>
+</head>
+<body>
+    <div class="platform-binding-page">
+        <div class="platform-binding-page__header">
+            <h1 class="platform-binding-page__title">平台绑定管理</h1>
+            <p class="platform-binding-page__subtitle">绑定企业平台账号，实现组织架构同步和消息推送</p>
+        </div>
+        <div class="platform-cards" id="platformCards">
+            <div class="platform-card" data-platform="dingtalk">
+                <div class="platform-card__header">
+                    <div class="platform-card__icon platform-card__icon--dingtalk"><i class="ri-dingding-fill"></i></div>
+                    <div class="platform-card__info">
+                        <div class="platform-card__name">钉钉</div>
+                        <div class="platform-card__status platform-card__status--unbound" id="dingtalk-status"><i class="ri-link"></i><span>未绑定</span></div>
+                    </div>
+                </div>
+                <div class="platform-card__desc">绑定钉钉账号后，可同步组织架构、发送DING消息、管理日程待办</div>
+                <div class="platform-card__actions">
+                    <button class="platform-card__btn platform-card__btn--primary" onclick="bindPlatform('dingtalk')"><i class="ri-qr-code-line"></i><span>扫码绑定</span></button>
+                </div>
+            </div>
+            <div class="platform-card" data-platform="feishu">
+                <div class="platform-card__header">
+                    <div class="platform-card__icon platform-card__icon--feishu"><i class="ri-lark-fill"></i></div>
+                    <div class="platform-card__info">
+                        <div class="platform-card__name">飞书</div>
+                        <div class="platform-card__status platform-card__status--unbound" id="feishu-status"><i class="ri-link"></i><span>未绑定</span></div>
+                    </div>
+                </div>
+                <div class="platform-card__desc">绑定飞书账号后，可同步组织架构、发送消息、创建文档和管理日程</div>
+                <div class="platform-card__actions">
+                    <button class="platform-card__btn platform-card__btn--primary" onclick="bindPlatform('feishu')"><i class="ri-qr-code-line"></i><span>扫码绑定</span></button>
+                </div>
+            </div>
+            <div class="platform-card" data-platform="wecom">
+                <div class="platform-card__header">
+                    <div class="platform-card__icon platform-card__icon--wecom"><i class="ri-wechat-fill"></i></div>
+                    <div class="platform-card__info">
+                        <div class="platform-card__name">企业微信</div>
+                        <div class="platform-card__status platform-card__status--unbound" id="wecom-status"><i class="ri-link"></i><span>未绑定</span></div>
+                    </div>
+                </div>
+                <div class="platform-card__desc">绑定企业微信账号后，可同步组织架构、发送应用消息</div>
+                <div class="platform-card__actions">
+                    <button class="platform-card__btn platform-card__btn--primary" onclick="bindPlatform('wecom')"><i class="ri-qr-code-line"></i><span>扫码绑定</span></button>
+                </div>
+            </div>
+        </div>
+        <div class="binding-history">
+            <div class="binding-history__header">
+                <h2 class="binding-history__title">绑定历史</h2>
+                <button class="platform-card__btn platform-card__btn--secondary" onclick="loadBindingHistory()"><i class="ri-refresh-line"></i><span>刷新</span></button>
+            </div>
+            <div class="binding-history__list" id="bindingHistoryList">
+                <div class="empty-state"><i class="ri-history-line"></i><p>暂无绑定记录</p></div>
+            </div>
+        </div>
+    </div>
+    <div class="qrcode-modal" id="qrcodeModal">
+        <div class="qrcode-modal__content">
+            <h3 class="qrcode-modal__title" id="modalTitle">扫码绑定</h3>
+            <p class="qrcode-modal__desc" id="modalDesc">请使用APP扫描下方二维码完成授权</p>
+            <div class="qrcode-modal__qr" id="qrcodeContainer"><div class="loading-spinner"></div></div>
+            <div class="qrcode-modal__status" id="scanStatus"><i class="ri-time-line"></i><span>等待扫码...</span></div>
+            <button class="qrcode-modal__close" onclick="closeModal()">关闭</button>
+        </div>
+    </div>
+    <script>
+        const API_BASE='/api/v1/auth/bind';let pollInterval=null;let currentSession=null;const platformNames={dingtalk:'钉钉',feishu:'飞书',wecom:'企业微信'};
+        document.addEventListener('DOMContentLoaded',function(){loadPlatforms();loadBindingHistory();});
+        async function loadPlatforms(){try{const r=await fetch(API_BASE+'/platforms');const rj=await r.json();if(rj.code===200&&rj.data){Object.keys(rj.data).forEach(function(p){const i=rj.data[p];const s=document.getElementById(p+'-status');if(i.enabled&&s){const b=i.bound===true;s.className='platform-card__status platform-card__status--'+(b?'bound':'unbound');s.innerHTML='<i class="ri-'+(b?'check':'link')+'"></i><span>'+(b?'已绑定':'未绑定')+'</span>';if(b){const c=document.querySelector('[data-platform="'+p+'"]');const a=c.querySelector('.platform-card__actions');a.innerHTML='<button class="platform-card__btn platform-card__btn--secondary" onclick="bindPlatform(\''+p+'\')"><i class="ri-refresh-line"></i><span>重新绑定</span></button><button class="platform-card__btn platform-card__btn--danger" onclick="unbindPlatform(\''+p+'\')"><i class="ri-link-unlink"></i><span>解绑</span></button>';}}}}}catch(e){console.error(e);}}
+        async function bindPlatform(p){document.getElementById('modalTitle').textContent=platformNames[p]+'扫码绑定';document.getElementById('modalDesc').textContent='请使用'+platformNames[p]+'APP扫描下方二维码完成授权';document.getElementById('qrcodeContainer').innerHTML='<div class="loading-spinner"></div>';updateScanStatus('pending','等待扫码...');document.getElementById('qrcodeModal').classList.add('active');try{const r=await fetch(API_BASE+'/'+p+'/qrcode',{method:'POST'});const rj=await r.json();if(rj.code===200&&rj.data){currentSession=rj.data.sessionId;document.getElementById('qrcodeContainer').innerHTML='<iframe src="'+rj.data.qrCodeUrl+'" sandbox="allow-scripts allow-same-origin"></iframe>';startPolling(p,currentSession);}else{updateScanStatus('expired',rj.message||'获取二维码失败');}}catch(e){console.error(e);updateScanStatus('expired','网络错误，请重试');}}
+        function startPolling(p,s){if(pollInterval)clearInterval(pollInterval);pollInterval=setInterval(async function(){try{const r=await fetch(API_BASE+'/status/'+p+'/'+s);const rj=await r.json();if(rj.code===200&&rj.data){const st=rj.data.scanStatus;if(st==='PENDING')updateScanStatus('pending','等待扫码...');else if(st==='SCANNED')updateScanStatus('scanned','已扫码，请在手机上确认');else if(st==='CONFIRMED'){updateScanStatus('confirmed','授权成功！');clearInterval(pollInterval);setTimeout(function(){closeModal();loadPlatforms();loadBindingHistory();},1500);}else if(st==='EXPIRED'||st==='NOT_FOUND'){updateScanStatus('expired',st==='EXPIRED'?'二维码已过期':'会话已失效');clearInterval(pollInterval);}}}catch(e){console.error(e);}},2000);}
+        function updateScanStatus(st,m){const s=document.getElementById('scanStatus');const ic={pending:'ri-time-line',scanned:'ri-smartphone-line',confirmed:'ri-check-line',expired:'ri-close-line'};s.className='qrcode-modal__status qrcode-modal__status--'+st;s.innerHTML='<i class="'+ic[st]+'"></i><span>'+m+'</span>';}
+        async function unbindPlatform(p){if(!confirm('确定要解除绑定吗？'))return;try{const r=await fetch(API_BASE+'/'+p,{method:'DELETE'});const rj=await r.json();if(rj.code===200){alert('解绑成功');loadPlatforms();loadBindingHistory();}else alert(rj.message||'解绑失败');}catch(e){console.error(e);alert('解绑失败');}}
+        function closeModal(){document.getElementById('qrcodeModal').classList.remove('active');if(pollInterval){clearInterval(pollInterval);pollInterval=null;}currentSession=null;}
+        async function loadBindingHistory(){document.getElementById('bindingHistoryList').innerHTML='<div class="empty-state"><i class="ri-history-line"></i><p>暂无绑定记录</p></div>';}
+    </script>
+</body>
+</html>

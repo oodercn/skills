@@ -1,0 +1,39 @@
+server:
+  port: 8094
+
+spring:
+  application:
+    name: skill-platform-bind
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+platform:
+  dingtalk:
+    app-key: ${DINGTALK_APP_KEY:}
+    app-secret: ${DINGTALK_APP_SECRET:}
+    callback-url: ${DINGTALK_CALLBACK_URL:http://localhost:8094/api/v1/bind/callback/dingtalk}
+  feishu:
+    app-id: ${FEISHU_APP_ID:}
+    app-secret: ${FEISHU_APP_SECRET:}
+    callback-url: ${FEISHU_CALLBACK_URL:http://localhost:8094/api/v1/bind/callback/feishu}
+  wecom:
+    corp-id: ${WECOM_CORP_ID:}
+    agent-id: ${WECOM_AGENT_ID:}
+    secret: ${WECOM_SECRET:}
+    callback-url: ${WECOM_CALLBACK_URL:http://localhost:8094/api/v1/bind/callback/wecom}
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.platform.bind: DEBUG

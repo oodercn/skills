@@ -1,0 +1,30 @@
+server:
+  port: 8098
+
+spring:
+  application:
+    name: skill-agent-cli
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+agent-cli:
+  enable-auto-parse: true
+  command-timeout: 30
+  max-retry-count: 3
+  enable-cache: true
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.agent.cli: DEBUG

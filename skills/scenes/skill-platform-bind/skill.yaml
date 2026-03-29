@@ -1,0 +1,170 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-platform-bind
+  name: 平台绑定场景服务
+  version: "2.3.1"
+  category: auth
+  subCategory: binding
+  description: 多平台扫码绑定场景服务，支持钉钉、飞书、企业微信扫码授权绑定
+  author: Ooder Team
+  icon: ri-link-line
+
+spec:
+  capabilities:
+    - id: qrcode-generation
+      name: 二维码生成
+      description: 生成平台扫码绑定二维码
+      category: service
+      autoBind: true
+      
+    - id: bind-status-check
+      name: 绑定状态检查
+      description: 轮询检查绑定状态
+      category: service
+      autoBind: true
+      
+    - id: oauth-callback
+      name: OAuth回调处理
+      description: 处理平台OAuth授权回调
+      category: service
+      autoBind: true
+      
+    - id: platform-unbind
+      name: 平台解绑
+      description: 解除平台绑定关系
+      category: service
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-org-dingding
+      version: "2.3.1"
+      required: false
+    - skillId: skill-org-feishu
+      version: "2.3.1"
+      required: false
+    - skillId: skill-org-wecom
+      version: "2.3.1"
+      required: false
+      
+  skillForm: SCENE
+  
+  scene:
+    type: TRIGGER
+    visibility: public
+    name: 平台绑定
+    description: 扫码绑定第三方平台账号
+    
+  roles:
+    - id: user
+      name: 普通用户
+      description: 绑定自己账号的用户
+      required: true
+      minCount: 1
+      maxCount: 10000
+      permissions:
+        - bind-platform
+        - unbind-platform
+        - view-status
+    - id: admin
+      name: 系统管理员
+      description: 管理平台绑定配置
+      required: false
+      minCount: 0
+      maxCount: 10
+      permissions:
+        - configure
+        - view-all
+        - manage-bindings
+        
+  activationSteps:
+    user:
+      - stepId: select-platform
+        step: 1
+        action: select-platform
+        title: 选择平台
+        description: 选择要绑定的平台
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: scan-qrcode
+        step: 2
+        action: scan-qrcode
+        title: 扫码授权
+        description: 使用平台App扫描二维码
+        required: true
+        skippable: false
+        autoExecute: false
+      - stepId: confirm-bind
+        step: 3
+        action: confirm-bind
+        title: 确认绑定
+        description: 在平台确认授权
+        required: true
+        skippable: false
+        autoExecute: false
+    admin:
+      - stepId: configure-platforms
+        step: 1
+        action: configure-platforms
+        title: 配置平台
+        description: 配置各平台AppKey和AppSecret
+        required: true
+        skippable: false
+        autoExecute: false
+        
+  menus:
+    user:
+      - id: bind-center
+        name: 绑定中心
+        icon: ri-link-line
+        path: /platform-bind
+        order: 1
+        visible: true
+      - id: bind-history
+        name: 绑定历史
+        icon: ri-history-line
+        path: /platform-bind/history
+        order: 2
+        visible: true
+    admin:
+      - id: platform-config
+        name: 平台配置
+        icon: ri-settings-3-line
+        path: /platform-bind/config
+        order: 1
+        visible: true
+      - id: bind-management
+        name: 绑定管理
+        icon: ri-user-settings-line
+        path: /platform-bind/management
+        order: 2
+        visible: true
+        
+  configSchema:
+    type: object
+    properties:
+      qrcodeExpireSeconds:
+        type: integer
+        default: 300
+        title: 二维码有效期(秒)
+      maxRetryCount:
+        type: integer
+        default: 3
+        title: 最大重试次数
+      enableMultiBind:
+        type: boolean
+        default: false
+        title: 允许绑定多平台
+      callbackTimeout:
+        type: integer
+        default: 30
+        title: 回调超时(秒)
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"
+    
+  estimatedDuration: "1-2分钟"

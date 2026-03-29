@@ -1,0 +1,78 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-agent-cli
+  name: AI Agent CLI Skills 集成
+  version: "2.3.1"
+  category: ai
+  subCategory: agent
+  description: AI Agent CLI Skills集成服务，封装钉钉CLI 10项核心能力和飞书CLI 19个Agent Skills
+  author: Ooder Team
+  icon: ri-robot-line
+
+spec:
+  capabilities:
+    - id: natural-language-parse
+      name: 自然语言解析
+      description: 解析自然语言指令为CLI命令
+      category: service
+      autoBind: true
+      
+    - id: dingtalk-cli
+      name: 钉钉CLI能力
+      description: 钉钉CLI 10项核心能力封装
+      category: service
+      autoBind: true
+      
+    - id: feishu-cli
+      name: 飞书CLI能力
+      description: 飞书CLI 19个Agent Skills封装
+      category: service
+      autoBind: true
+      
+    - id: command-execute
+      name: 命令执行
+      description: 执行CLI命令并返回结果
+      category: service
+      autoBind: true
+      
+    - id: result-format
+      name: 结果格式化
+      description: 格式化CLI执行结果
+      category: service
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-platform-bind
+      version: "2.3.1"
+      required: true
+      
+  skillForm: PROVIDER
+  
+  configSchema:
+    type: object
+    properties:
+      enableAutoParse:
+        type: boolean
+        default: true
+        title: 启用自动解析
+      commandTimeout:
+        type: integer
+        default: 30
+        title: 命令超时(秒)
+      maxRetryCount:
+        type: integer
+        default: 3
+        title: 最大重试次数
+      enableCache:
+        type: boolean
+        default: true
+        title: 启用结果缓存
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"
+    
+  estimatedDuration: "即时"

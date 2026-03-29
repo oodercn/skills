@@ -1,0 +1,17 @@
+server:
+  port: 8087
+
+spring:
+  application:
+    name: skill-im-feishu
+
+feishu:
+  api:
+    endpoint: https://open.feishu.cn/open-apis
+  app:
+    id: ${FEISHU_APP_ID:}
+    secret: ${FEISHU_APP_SECRET:}
+
+logging:
+  level:
+    net.ooder.skill.im.feishu: DEBUG

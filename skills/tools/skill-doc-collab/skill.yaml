@@ -1,0 +1,78 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-doc-collab
+  name: 文档协作服务
+  version: "2.3.1"
+  category: productivity
+  subCategory: document
+  description: 多平台文档协作服务，支持飞书文档、钉钉文档、企业微信文档的创建和协作
+  author: Ooder Team
+  icon: ri-file-text-line
+
+spec:
+  capabilities:
+    - id: create-doc
+      name: 创建文档
+      description: 创建新的协作文档
+      category: service
+      autoBind: true
+      
+    - id: share-doc
+      name: 分享文档
+      description: 分享文档给其他用户
+      category: service
+      autoBind: true
+      
+    - id: edit-doc
+      name: 编辑文档
+      description: 在线编辑协作文档
+      category: service
+      autoBind: true
+      
+    - id: comment-doc
+      name: 文档评论
+      description: 添加文档评论和批注
+      category: service
+      autoBind: true
+      
+    - id: export-doc
+      name: 导出文档
+      description: 导出文档为各种格式
+      category: service
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-platform-bind
+      version: "2.3.1"
+      required: true
+      
+  skillForm: PROVIDER
+  
+  configSchema:
+    type: object
+    properties:
+      maxFileSizeMB:
+        type: integer
+        default: 100
+        title: 最大文件大小(MB)
+      allowedFormats:
+        type: array
+        default: ["docx", "xlsx", "pptx", "pdf", "md"]
+        title: 允许的格式
+      enableVersionHistory:
+        type: boolean
+        default: true
+        title: 启用版本历史
+      maxVersions:
+        type: integer
+        default: 50
+        title: 最大版本数
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "1Gi"
+    
+  estimatedDuration: "2-3分钟"

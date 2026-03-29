@@ -1,8 +1,7 @@
 package net.ooder.skill.common.sdk.resource;
 
-import lombok.Builder;
-import lombok.Data;
-import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -18,9 +17,10 @@ import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
-@Slf4j
 @Component
 public class ResourceManager {
+
+    private static final Logger log = LoggerFactory.getLogger(ResourceManager.class);
 
     private MemoryMXBean memoryMXBean;
     private OperatingSystemMXBean osMXBean;
@@ -38,12 +38,12 @@ public class ResourceManager {
     public StorageResource getStorageResource(Path path) {
         try {
             FileStore store = Files.getFileStore(path);
-            return StorageResource.builder()
-                    .totalSpace(store.getTotalSpace())
-                    .usableSpace(store.getUsableSpace())
-                    .unallocatedSpace(store.getUnallocatedSpace())
-                    .path(path.toString())
-                    .build();
+            return new StorageResource(
+                    store.getTotalSpace(),
+                    store.getUsableSpace(),
+                    store.getUnallocatedSpace(),
+                    path.toString()
+            );
         } catch (Exception e) {
             log.error("Failed to get storage resource for: {}", path, e);
             return null;
@@ -75,13 +75,13 @@ public class ResourceManager {
     }
 
     public ComputeResource getComputeResource() {
-        return ComputeResource.builder()
-                .availableProcessors(osMXBean.getAvailableProcessors())
-                .systemLoadAverage(osMXBean.getSystemLoadAverage())
-                .heapMemoryUsed(memoryMXBean.getHeapMemoryUsage().getUsed())
-                .heapMemoryMax(memoryMXBean.getHeapMemoryUsage().getMax())
-                .nonHeapMemoryUsed(memoryMXBean.getNonHeapMemoryUsage().getUsed())
-                .build();
+        return new ComputeResource(
+                osMXBean.getAvailableProcessors(),
+                osMXBean.getSystemLoadAverage(),
+                memoryMXBean.getHeapMemoryUsage().getUsed(),
+                memoryMXBean.getHeapMemoryUsage().getMax(),
+                memoryMXBean.getNonHeapMemoryUsage().getUsed()
+        );
     }
 
     public boolean allocateComputeQuota(String skillId, int maxCpuPercent, long maxMemoryBytes) {
@@ -101,11 +101,11 @@ public class ResourceManager {
     }
 
     public NetworkResource getNetworkResource() {
-        return NetworkResource.builder()
-                .hostname(getHostname())
-                .portRangeStart(10000)
-                .portRangeEnd(20000)
-                .build();
+        return new NetworkResource(
+                getHostname(),
+                10000,
+                20000
+        );
     }
 
     public boolean allocateNetworkQuota(String skillId, int maxConnections, int maxBandwidthKbps) {
@@ -147,22 +147,60 @@ public class ResourceManager {
         }
     }
 
-    @Data
-    @Builder
     public static class StorageResource {
         private long totalSpace;
         private long usableSpace;
         private long unallocatedSpace;
         private String path;
 
+        public StorageResource() {
+        }
+
+        public StorageResource(long totalSpace, long usableSpace, long unallocatedSpace, String path) {
+            this.totalSpace = totalSpace;
+            this.usableSpace = usableSpace;
+            this.unallocatedSpace = unallocatedSpace;
+            this.path = path;
+        }
+
         public double getUsagePercent() {
             if (totalSpace == 0) return 0;
             return (double) (totalSpace - usableSpace) / totalSpace * 100;
         }
+
+        public long getTotalSpace() {
+            return totalSpace;
+        }
+
+        public void setTotalSpace(long totalSpace) {
+            this.totalSpace = totalSpace;
+        }
+
+        public long getUsableSpace() {
+            return usableSpace;
+        }
+
+        public void setUsableSpace(long usableSpace) {
+            this.usableSpace = usableSpace;
+        }
+
+        public long getUnallocatedSpace() {
+            return unallocatedSpace;
+        }
+
+        public void setUnallocatedSpace(long unallocatedSpace) {
+            this.unallocatedSpace = unallocatedSpace;
+        }
+
+        public String getPath() {
+            return path;
+        }
+
+        public void setPath(String path) {
+            this.path = path;
+        }
     }
 
-    @Data
-    @Builder
     public static class ComputeResource {
         private int availableProcessors;
         private double systemLoadAverage;
@@ -170,31 +208,150 @@ public class ResourceManager {
         private long heapMemoryMax;
         private long nonHeapMemoryUsed;
 
+        public ComputeResource() {
+        }
+
+        public ComputeResource(int availableProcessors, double systemLoadAverage, long heapMemoryUsed, long heapMemoryMax, long nonHeapMemoryUsed) {
+            this.availableProcessors = availableProcessors;
+            this.systemLoadAverage = systemLoadAverage;
+            this.heapMemoryUsed = heapMemoryUsed;
+            this.heapMemoryMax = heapMemoryMax;
+            this.nonHeapMemoryUsed = nonHeapMemoryUsed;
+        }
+
         public double getMemoryUsagePercent() {
             if (heapMemoryMax == 0) return 0;
             return (double) heapMemoryUsed / heapMemoryMax * 100;
         }
+
+        public int getAvailableProcessors() {
+            return availableProcessors;
+        }
+
+        public void setAvailableProcessors(int availableProcessors) {
+            this.availableProcessors = availableProcessors;
+        }
+
+        public double getSystemLoadAverage() {
+            return systemLoadAverage;
+        }
+
+        public void setSystemLoadAverage(double systemLoadAverage) {
+            this.systemLoadAverage = systemLoadAverage;
+        }
+
+        public long getHeapMemoryUsed() {
+            return heapMemoryUsed;
+        }
+
+        public void setHeapMemoryUsed(long heapMemoryUsed) {
+            this.heapMemoryUsed = heapMemoryUsed;
+        }
+
+        public long getHeapMemoryMax() {
+            return heapMemoryMax;
+        }
+
+        public void setHeapMemoryMax(long heapMemoryMax) {
+            this.heapMemoryMax = heapMemoryMax;
+        }
+
+        public long getNonHeapMemoryUsed() {
+            return nonHeapMemoryUsed;
+        }
+
+        public void setNonHeapMemoryUsed(long nonHeapMemoryUsed) {
+            this.nonHeapMemoryUsed = nonHeapMemoryUsed;
+        }
     }
 
-    @Data
-    @Builder
     public static class NetworkResource {
         private String hostname;
         private int portRangeStart;
         private int portRangeEnd;
+
+        public NetworkResource() {
+        }
+
+        public NetworkResource(String hostname, int portRangeStart, int portRangeEnd) {
+            this.hostname = hostname;
+            this.portRangeStart = portRangeStart;
+            this.portRangeEnd = portRangeEnd;
+        }
+
+        public String getHostname() {
+            return hostname;
+        }
+
+        public void setHostname(String hostname) {
+            this.hostname = hostname;
+        }
+
+        public int getPortRangeStart() {
+            return portRangeStart;
+        }
+
+        public void setPortRangeStart(int portRangeStart) {
+            this.portRangeStart = portRangeStart;
+        }
+
+        public int getPortRangeEnd() {
+            return portRangeEnd;
+        }
+
+        public void setPortRangeEnd(int portRangeEnd) {
+            this.portRangeEnd = portRangeEnd;
+        }
     }
 
-    @Data
     public static class ResourceQuota {
         private long storageQuota;
         private int maxCpuPercent;
         private long maxMemoryBytes;
         private int maxConnections;
         private int maxBandwidthKbps;
+
+        public long getStorageQuota() {
+            return storageQuota;
+        }
+
+        public void setStorageQuota(long storageQuota) {
+            this.storageQuota = storageQuota;
+        }
+
+        public int getMaxCpuPercent() {
+            return maxCpuPercent;
+        }
+
+        public void setMaxCpuPercent(int maxCpuPercent) {
+            this.maxCpuPercent = maxCpuPercent;
+        }
+
+        public long getMaxMemoryBytes() {
+            return maxMemoryBytes;
+        }
+
+        public void setMaxMemoryBytes(long maxMemoryBytes) {
+            this.maxMemoryBytes = maxMemoryBytes;
+        }
+
+        public int getMaxConnections() {
+            return maxConnections;
+        }
+
+        public void setMaxConnections(int maxConnections) {
+            this.maxConnections = maxConnections;
+        }
+
+        public int getMaxBandwidthKbps() {
+            return maxBandwidthKbps;
+        }
+
+        public void setMaxBandwidthKbps(int maxBandwidthKbps) {
+            this.maxBandwidthKbps = maxBandwidthKbps;
+        }
     }
 
-    @Data
-    @Builder
     public static class ResourceUsage {
         private String skillId;
         private long storageUsed;
@@ -202,5 +359,65 @@ public class ResourceManager {
         private int cpuPercent;
         private int activeConnections;
         private long timestamp;
+
+        public ResourceUsage() {
+        }
+
+        public ResourceUsage(String skillId, long storageUsed, long memoryUsed, int cpuPercent, int activeConnections, long timestamp) {
+            this.skillId = skillId;
+            this.storageUsed = storageUsed;
+            this.memoryUsed = memoryUsed;
+            this.cpuPercent = cpuPercent;
+            this.activeConnections = activeConnections;
+            this.timestamp = timestamp;
+        }
+
+        public String getSkillId() {
+            return skillId;
+        }
+
+        public void setSkillId(String skillId) {
+            this.skillId = skillId;
+        }
+
+        public long getStorageUsed() {
+            return storageUsed;
+        }
+
+        public void setStorageUsed(long storageUsed) {
+            this.storageUsed = storageUsed;
+        }
+
+        public long getMemoryUsed() {
+            return memoryUsed;
+        }
+
+        public void setMemoryUsed(long memoryUsed) {
+            this.memoryUsed = memoryUsed;
+        }
+
+        public int getCpuPercent() {
+            return cpuPercent;
+        }
+
+        public void setCpuPercent(int cpuPercent) {
+            this.cpuPercent = cpuPercent;
+        }
+
+        public int getActiveConnections() {
+            return activeConnections;
+        }
+
+        public void setActiveConnections(int activeConnections) {
+            this.activeConnections = activeConnections;
+        }
+
+        public long getTimestamp() {
+            return timestamp;
+        }
+
+        public void setTimestamp(long timestamp) {
+            this.timestamp = timestamp;
+        }
     }
 }

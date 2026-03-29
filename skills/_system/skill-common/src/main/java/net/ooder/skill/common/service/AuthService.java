@@ -39,7 +39,12 @@ public class AuthService {
     }
     
     public interface UserInfoProvider {
-        Object login(String username, String password, String clientIp);
+        Object login(String username, String password, String clientIp, String role);
+        
+        default Object login(String username, String password, String clientIp) {
+            return login(username, password, clientIp, null);
+        }
+        
         void logout(String token);
         boolean validateToken(String token);
         Object getUser(String userId);
@@ -93,7 +98,7 @@ public class AuthService {
         String clientIp = getClientIp(httpRequest);
 
         if (userInfoProvider != null) {
-            Object userInfo = userInfoProvider.login(username, password, clientIp);
+            Object userInfo = userInfoProvider.login(username, password, clientIp, requestedRole);
             if (userInfo == null) {
                 log.warn("[login] Login failed for user: {}", username);
                 return null;

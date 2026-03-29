@@ -3,12 +3,12 @@ kind: Skill
 
 metadata:
   id: skill-org-feishu
-  name: Feishu Organization
-  version: 0.7.3
-  description: 飞书组织数据集成服务，包括组织架构同步和用户认证
+  name: Feishu Organization Service
+  version: 2.3.1
+  description: 飞书组织数据集成服务，包括组织架构同步、用户认证、扫码登录，支持飞书CLI集成
   author: Ooder Team
   license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-org-feishu
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/org/skill-org-feishu
   repository: https://gitee.com/ooderCN/skills.git
   keywords:
     - feishu
@@ -16,18 +16,19 @@ metadata:
     - organization
     - enterprise
     - authentication
+    - qrcode-auth
+    - cli
 
 spec:
-  skillForm: PROVIDER
+  skillForm: DRIVER
   type: enterprise-skill
   
   ownership: platform
   
   capability:
-    address: 0x0A
     category: ORG
     code: ORG_FEISHU
-    operations: [auth, org-sync, user-query]
+    operations: [auth, org-sync, user-query, qrcode-login, cli-integration]
   
   runtime:
     language: java
@@ -66,52 +67,35 @@ spec:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
-        - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+        - name: sync_organization
+          description: "从飞书同步组织架构"
           parameters:
             type: object
             properties:
-              expression:
+              syncType:
                 type: string
-                description: "MVEL表达式"
-              context:
-                type: object
-        - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+                enum: [full, users, departments]
+                default: "full"
+        - name: search_user
+          description: "搜索飞书用户"
           parameters:
             type: object
             properties:
-              formType:
+              keyword:
                 type: string
-              fields:
-                type: array
-                items:
-                  type: object
-        - name: execute_batch_operation
-          description: "执行批量操作"
+                description: "搜索关键词（姓名/邮箱/手机号）"
+              departmentId:
+                type: string
+                description: "部门ID（可选）"
+        - name: generate_auth_qrcode
+          description: "生成飞书扫码登录二维码"
           parameters:
             type: object
             properties:
-              operation:
-                type: string
-              items:
-                type: array
-                items:
-                  type: object
-        - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
-          parameters:
-            type: object
-            properties:
-              action:
-                type: string
-              parameters:
-                type: object
-      toolChoice: auto
-    rateLimits:
-      requestsPerMinute: 60
-      tokensPerMinute: 100000
-
+              withRecommend:
+                type: boolean
+                default: true
+                description: "是否使用推荐权限范围"
   
   capabilities:
     - id: org-data-read
@@ -122,25 +106,47 @@ spec:
       name: User Authentication
       description: 用户认证
       category: authentication
+    - id: qrcode-login
+      name: QR Code Login
+      description: 扫码登录
+      category: authentication
+    - id: org-sync
+      name: Organization Sync
+      description: 组织架构同步
+      category: organization
+    - id: user-search
+      name: User Search
+      description: 用户搜索
+      category: organization
   
   scenes:
     - name: auth
       description: 认证场景
       capabilities:
-        - org-data-read
         - user-auth
-  
+        - qrcode-login
+    - name: org-sync
+      description: 组织同步场景
+      capabilities:
+        - org-data-read
+        - org-sync
+    - name: user-search
+      description: 用户搜索场景
+      capabilities:
+        - org-data-read
+        - user-search
+
   dependencies:
     - id: skill-org-base
       version: ">=2.3.0"
       required: true
       description: "组织基础服务"
     - id: skill-user-auth
-      version: ">=0.7.0"
+      version: ">=2.3.0"
       required: false
       description: "用户认证服务(间接)"
     - id: skill-common
-      version: ">=1.0.0"
+      version: ">=2.3.0"
       required: false
       description: "通用工具库(间接)"
   
@@ -158,30 +164,49 @@ spec:
         type: string
         default: https://open.feishu.cn/open-apis
         description: 飞书API基础URL
+      - name: FEISHU_AUTH_REDIRECT_URI
+        type: string
+        default: http://localhost:8083/api/v1/org/feishu/auth/callback
+        description: 扫码登录回调地址
   
   endpoints:
-    - path: /api/org/departments
+    - path: /api/v1/org/feishu/auth/qrcode
+      method: POST
+      description: 生成扫码登录二维码
+      capability: qrcode-login
+    - path: /api/v1/org/feishu/auth/login
+      method: POST
+      description: 生成推荐权限扫码二维码
+      capability: qrcode-login
+    - path: /api/v1/org/feishu/auth/callback
       method: GET
-      description: 获取部门列表
-      capability: org-data-read
-    - path: /api/org/users
+      description: 扫码登录回调
+      capability: qrcode-login
+    - path: /api/v1/org/feishu/sync/all
+      method: POST
+      description: 全量同步组织架构
+      capability: org-sync
+    - path: /api/v1/org/feishu/sync/users
+      method: POST
+      description: 同步用户
+      capability: org-sync
+    - path: /api/v1/org/feishu/sync/departments
+      method: POST
+      description: 同步部门
+      capability: org-sync
+    - path: /api/v1/org/feishu/users
       method: GET
       description: 获取用户列表
       capability: org-data-read
-    - path: /api/auth/login
-      method: POST
-      description: 用户登录
-      capability: user-auth
-    - path: /api/health
+    - path: /api/v1/org/feishu/users/search
       method: GET
-      description: 健康检查
-  
-  resources:
-    cpu: "200m"
-    memory: "512Mi"
-    storage: "100Mi"
-  
-  offline:
-    enabled: true
-    cacheStrategy: local
-    syncOnReconnect: true
+      description: 搜索用户
+      capability: user-search
+    - path: /api/v1/org/feishu/departments
+      method: GET
+      description: 获取部门列表
+      capability: org-data-read
+    - path: /api/v1/org/feishu/tree
+      method: GET
+      description: 获取组织树
+      capability: org-data-read

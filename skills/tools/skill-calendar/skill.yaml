@@ -1,0 +1,78 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-calendar
+  name: 日程管理服务
+  version: "2.3.1"
+  category: productivity
+  subCategory: calendar
+  description: 多平台日程管理服务，支持钉钉、飞书、企业微信日程同步和管理
+  author: Ooder Team
+  icon: ri-calendar-line
+
+spec:
+  capabilities:
+    - id: create-event
+      name: 创建日程
+      description: 创建新的日程事件
+      category: service
+      autoBind: true
+      
+    - id: query-free-time
+      name: 查询空闲
+      description: 查询用户空闲时段
+      category: service
+      autoBind: true
+      
+    - id: schedule-meeting
+      name: 预约会议
+      description: 预约会议并邀请参会人
+      category: service
+      autoBind: true
+      
+    - id: sync-calendar
+      name: 同步日程
+      description: 同步日程到各平台
+      category: service
+      autoBind: true
+      
+    - id: reminder
+      name: 日程提醒
+      description: 设置日程提醒通知
+      category: service
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-platform-bind
+      version: "2.3.1"
+      required: true
+      
+  skillForm: PROVIDER
+  
+  configSchema:
+    type: object
+    properties:
+      defaultReminderMinutes:
+        type: integer
+        default: 15
+        title: 默认提醒时间(分钟)
+      maxEventsPerDay:
+        type: integer
+        default: 20
+        title: 每日最大事件数
+      enableAutoSync:
+        type: boolean
+        default: true
+        title: 启用自动同步
+      syncIntervalMinutes:
+        type: integer
+        default: 30
+        title: 同步间隔(分钟)
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"
+    
+  estimatedDuration: "1-2分钟"

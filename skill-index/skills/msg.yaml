@@ -3,7 +3,7 @@ kind: Skills
 metadata:
   name: msg-skills
   category: msg
-  count: 7
+  count: 8
   version: "2.3.1"
 
 skills:
@@ -134,4 +134,25 @@ skills:
       path: skills/skill-msg
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-2.3.1.jar
+      checksum: ""
+
+    - skillId: skill-msg-push
+      name: Multi-Channel Message Push Service
+      version: "2.3.1"
+      capabilityCategory: msg
+      subCategory: push
+      skillForm: PROVIDER
+      tags:
+        - message
+        - push
+        - notification
+        - dingtalk
+        - feishu
+        - wecom
+        - ding
+      description: 多渠道消息推送服务，支持钉钉DING、飞书消息、企业微信，提供统一的消息推送接口
+      sceneId: messaging
+      path: skills/tools/skill-msg-push
+      downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-push-2.3.1.jar
+      giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-push-2.3.1.jar
       checksum: ""

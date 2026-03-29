@@ -1,0 +1,30 @@
+server:
+  port: 8096
+
+spring:
+  application:
+    name: skill-todo-sync
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+todo:
+  default-due-days: 7
+  max-todos-per-user: 100
+  enable-auto-sync: true
+  reminder-advance-minutes: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.todo.sync: DEBUG

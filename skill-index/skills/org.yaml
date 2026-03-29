@@ -20,21 +20,24 @@ skills:
         - organization
       description: 组织基础服务，提供组织架构、岗位管理等基础能力
       sceneId: org
-      path: skills/skill-org-base
+      path: skills/_drivers/org/skill-org-base
 
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: dingtalk
+      skillForm: DRIVER
       tags:
         - dingtalk
         - dingding
         - organization
         - auth
-      description: 钉钉组织数据集成服务，包括组织架构同步、用户认证
+        - qrcode-login
+        - cli
+      description: 钉钉组织数据集成服务，包括组织架构同步、用户认证、扫码登录，支持钉钉CLI集成
       sceneId: auth
-      path: skills/skill-org-dingding
+      path: skills/_drivers/org/skill-org-dingding
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
       checksum: ""
@@ -50,9 +53,11 @@ skills:
         - lark
         - organization
         - auth
-      description: 飞书组织数据集成服务，包括组织架构同步、用户认证
+        - qrcode-login
+        - cli
+      description: 飞书组织数据集成服务，包括组织架构同步、用户认证、扫码登录，支持飞书CLI集成
       sceneId: auth
-      path: skills/skill-org-feishu
+      path: skills/_drivers/org/skill-org-feishu
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
       checksum: ""
@@ -62,14 +67,16 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: wecom
+      skillForm: DRIVER
       tags:
         - wecom
         - enterprise-wechat
         - organization
         - auth
-      description: 企业微信组织数据集成服务，包括组织架构同步、用户认证
+        - qrcode-login
+      description: 企业微信组织数据集成服务，包括组织架构同步、用户认证、扫码登录
       sceneId: auth
-      path: skills/skill-org-wecom
+      path: skills/_drivers/org/skill-org-wecom
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
       checksum: ""
@@ -79,13 +86,14 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: ldap
+      skillForm: DRIVER
       tags:
         - ldap
         - organization
         - auth
       description: LDAP组织服务，提供基于LDAP的组织架构和用户认证
       sceneId: auth
-      path: skills/skill-org-ldap
+      path: skills/_drivers/org/skill-org-ldap
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
       checksum: ""

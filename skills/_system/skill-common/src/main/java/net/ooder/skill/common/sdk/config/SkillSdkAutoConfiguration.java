@@ -1,5 +1,7 @@
 package net.ooder.skill.common.sdk.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -7,19 +9,20 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 import jakarta.annotation.PostConstruct;
-import lombok.extern.slf4j.Slf4j;
 
 /**
- * Skill SDK 2.3 鑷姩閰嶇疆绫? * 
+ * Skill SDK 2.3 自动配置类
+ * 
  * @author Skills Team
  * @version 2.3.0
  * @since 2026-02-24
  */
-@Slf4j
 @Configuration
 @EnableScheduling
 @EnableAspectJAutoProxy
 public class SkillSdkAutoConfiguration {
+
+    private static final Logger log = LoggerFactory.getLogger(SkillSdkAutoConfiguration.class);
 
     @PostConstruct
     public void init() {

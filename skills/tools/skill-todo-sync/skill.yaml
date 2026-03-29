@@ -1,0 +1,72 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-todo-sync
+  name: 待办同步服务
+  version: "2.3.1"
+  category: productivity
+  subCategory: todo
+  description: 多平台待办同步服务，支持钉钉、飞书、企业微信待办任务同步
+  author: Ooder Team
+  icon: ri-checkbox-line
+
+spec:
+  capabilities:
+    - id: create-todo
+      name: 创建待办
+      description: 创建新的待办任务
+      category: service
+      autoBind: true
+      
+    - id: sync-todo
+      name: 同步待办
+      description: 同步待办到各平台
+      category: service
+      autoBind: true
+      
+    - id: complete-todo
+      name: 完成待办
+      description: 标记待办为已完成
+      category: service
+      autoBind: true
+      
+    - id: remind-todo
+      name: 待办提醒
+      description: 设置待办提醒
+      category: service
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-platform-bind
+      version: "2.3.1"
+      required: true
+      
+  skillForm: PROVIDER
+  
+  configSchema:
+    type: object
+    properties:
+      defaultDueDays:
+        type: integer
+        default: 7
+        title: 默认截止天数
+      maxTodosPerUser:
+        type: integer
+        default: 100
+        title: 每用户最大待办数
+      enableAutoSync:
+        type: boolean
+        default: true
+        title: 启用自动同步
+      reminderAdvanceMinutes:
+        type: integer
+        default: 30
+        title: 提前提醒时间(分钟)
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"
+    
+  estimatedDuration: "1分钟"

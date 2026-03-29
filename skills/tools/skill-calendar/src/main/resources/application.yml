@@ -1,0 +1,30 @@
+server:
+  port: 8095
+
+spring:
+  application:
+    name: skill-calendar
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+calendar:
+  default-reminder-minutes: 15
+  max-events-per-day: 20
+  enable-auto-sync: true
+  sync-interval-minutes: 30
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.calendar: DEBUG

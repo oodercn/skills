@@ -1,0 +1,21 @@
+server:
+  port: 8085
+
+spring:
+  application:
+    name: skill-msg-push
+
+channel:
+  dingtalk:
+    enabled: true
+    endpoint: http://localhost:8082
+  feishu:
+    enabled: true
+    endpoint: http://localhost:8083
+  wecom:
+    enabled: true
+    endpoint: http://localhost:8084
+
+logging:
+  level:
+    net.ooder.skill.msg: DEBUG

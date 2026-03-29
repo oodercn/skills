@@ -1,0 +1,129 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-feishu
+  name: Feishu IM Service
+  version: 2.3.1
+  description: 飞书IM服务，提供消息发送、文档创建、日程管理等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-feishu
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - feishu
+    - lark
+    - im
+    - messaging
+    - document
+    - calendar
+
+spec:
+  skillForm: DRIVER
+  type: im-skill
+  
+  ownership: platform
+  
+  capability:
+    category: IM
+    code: IM_FEISHU
+    operations: [send-message, send-post, send-interactive, document, calendar]
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+    mainClass: net.ooder.skill.im.feishu.FeishuImSkillApplication
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    functionCalling:
+      enabled: true
+      tools:
+        - name: send_message
+          description: "发送飞书消息"
+          parameters:
+            type: object
+            properties:
+              receiver:
+                type: string
+                enum: [user, group]
+                description: "接收者类型"
+              receiverId:
+                type: string
+                description: "接收者ID"
+              msgType:
+                type: string
+                enum: [text, post, interactive]
+                default: text
+                description: "消息类型"
+              content:
+                type: string
+                description: "消息内容"
+        - name: send_interactive_card
+          description: "发送飞书交互卡片"
+          parameters:
+            type: object
+            properties:
+              userId:
+                type: string
+                description: "用户ID"
+              title:
+                type: string
+                description: "卡片标题"
+              elements:
+                type: array
+                description: "卡片元素"
+
+  capabilities:
+    - id: send-message
+      name: Send Message
+      description: 发送消息
+      category: messaging
+    - id: send-post
+      name: Send Post
+      description: 发送富文本消息
+      category: messaging
+    - id: send-interactive
+      name: Send Interactive Card
+      description: 发送交互卡片
+      category: messaging
+
+  config:
+    required:
+      - name: FEISHU_APP_ID
+        type: string
+        description: 飞书应用ID
+      - name: FEISHU_APP_SECRET
+        type: string
+        secret: true
+        description: 飞书应用Secret
+    optional:
+      - name: feishu.api.endpoint
+        type: string
+        default: https://open.feishu.cn/open-apis
+        description: 飞书API端点
+
+  endpoints:
+    - path: /api/v1/im/feishu/send
+      method: POST
+      description: 发送消息
+      capability: send-message
+    - path: /api/v1/im/feishu/send/user
+      method: POST
+      description: 发送给用户
+      capability: send-message
+    - path: /api/v1/im/feishu/send/post
+      method: POST
+      description: 发送富文本消息
+      capability: send-post
+    - path: /api/v1/im/feishu/send/interactive
+      method: POST
+      description: 发送交互卡片
+      capability: send-interactive

@@ -1,0 +1,30 @@
+server:
+  port: 8097
+
+spring:
+  application:
+    name: skill-doc-collab
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+doc:
+  max-file-size-mb: 100
+  allowed-formats: docx,xlsx,pptx,pdf,md
+  enable-version-history: true
+  max-versions: 50
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.doc.collab: DEBUG
