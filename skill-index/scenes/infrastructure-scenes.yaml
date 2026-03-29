@@ -4,14 +4,14 @@ metadata:
   name: infrastructure-scenes
   category: infrastructure
   count: 1
-  version: "2.3.1"
+  version: "3.0.1"
 
 scenes:
 
     - sceneId: kubernetes
       name: Kubernetes Management
       description: Kubernetes管理场景，提供集群、节点、命名空间、Pod管理能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: infrastructure
       requiredCapabilities:
         - cluster-management

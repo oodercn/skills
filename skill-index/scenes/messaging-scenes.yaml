@@ -4,14 +4,14 @@ metadata:
   name: messaging-scenes
   category: messaging
   count: 1
-  version: "2.3.1"
+  version: "3.0.1"
 
 scenes:
 
     - sceneId: msg
       name: Message Service
       description: 消息服务场景，提供消息推送、Topic管理和P2P通信能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: messaging
       requiredCapabilities:
         - message-push

@@ -4,13 +4,13 @@ metadata:
   name: media-skills
   category: media
   count: 5
-  version: "2.3.1"
+  version: "3.0.1"
 
 skills:
 
     - skillId: skill-media-wechat
       name: WeChat MP Publish Provider
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: media
       subCategory: wechat
       tags:
@@ -18,7 +18,7 @@ skills:
         - wechat
         - mp
         - official-account
-      description: 微信公众号发布Provider - 提供图文发布、素材管理功能
+      description: 微信公众号发布Provider - 提供图文发布、素材管理功�?
       sceneId: media
       path: skills/skill-media-wechat
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-wechat-2.3.1.jar
@@ -29,7 +29,7 @@ skills:
 
     - skillId: skill-media-weibo
       name: Weibo Publish Provider
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: media
       subCategory: weibo
       tags:
@@ -37,7 +37,7 @@ skills:
         - weibo
         - sina
         - microblog
-      description: 微博发布Provider - 提供微博发布、文章发布功能
+      description: 微博发布Provider - 提供微博发布、文章发布功�?
       sceneId: media
       path: skills/skill-media-weibo
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-weibo-2.3.1.jar
@@ -48,7 +48,7 @@ skills:
 
     - skillId: skill-media-zhihu
       name: Zhihu Publish Provider
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: media
       subCategory: zhihu
       tags:
@@ -56,7 +56,7 @@ skills:
         - zhihu
         - article
         - q&a
-      description: 知乎发布Provider - 提供专栏文章、回答发布功能
+      description: 知乎发布Provider - 提供专栏文章、回答发布功�?
       sceneId: media
       path: skills/skill-media-zhihu
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-zhihu-2.3.1.jar
@@ -67,7 +67,7 @@ skills:
 
     - skillId: skill-media-toutiao
       name: Toutiao Publish Provider
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: media
       subCategory: toutiao
       tags:
@@ -75,7 +75,7 @@ skills:
         - toutiao
         - bytedance
         - news
-      description: 头条发布Provider - 提供头条号文章发布功能
+      description: 头条发布Provider - 提供头条号文章发布功�?
       sceneId: media
       path: skills/skill-media-toutiao
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-toutiao-2.3.1.jar
@@ -86,7 +86,7 @@ skills:
 
     - skillId: skill-media-xiaohongshu
       name: Xiaohongshu Publish Provider
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: media
       subCategory: xiaohongshu
       tags:
@@ -94,7 +94,7 @@ skills:
         - xiaohongshu
         - red
         - note
-      description: 小红书发布Provider - 提供笔记发布、图文发布功能
+      description: 小红书发布Provider - 提供笔记发布、图文发布功�?
       sceneId: media
       path: skills/skill-media-xiaohongshu
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-xiaohongshu-2.3.1.jar

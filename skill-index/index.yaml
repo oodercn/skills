@@ -3,7 +3,7 @@ kind: SkillIndex
 
 metadata:
   name: ooder-skills
-  version: "2.3.1"
+  version: "3.0.1"
   description: Ooder Skills Repository - Shared skills for Ooder Agent Platform
   author: Ooder Team
   license: Apache-2.0

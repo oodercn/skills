@@ -4,14 +4,14 @@ metadata:
   name: iot-scenes
   category: iot
   count: 4
-  version: "2.3.1"
+  version: "3.0.1"
 
 scenes:
 
     - sceneId: iot-device
       name: IoT Device
       description: IoT设备场景，提供设备连接、数据上报和命令控制能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: iot
       requiredCapabilities:
         - mqtt-broker
@@ -21,7 +21,7 @@ scenes:
     - sceneId: device
       name: Device Management
       description: 设备管理场景，提供设备注册、监控、控制等IoT能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: iot
       requiredCapabilities:
         - device-register
@@ -32,7 +32,7 @@ scenes:
     - sceneId: collection
       name: Data Collection
       description: 数据采集场景，提供数据采集、存储、分析等IoT能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: iot
       requiredCapabilities:
         - data-collect
@@ -43,7 +43,7 @@ scenes:
     - sceneId: edge
       name: Edge Computing
       description: 边缘计算场景，提供边缘节点、边缘应用等边缘计算能力
-      version: "2.3.1"
+      version: "3.0.1"
       capabilityCategory: iot
       requiredCapabilities:
         - edge-node
