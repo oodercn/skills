@@ -14,7 +14,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: scenario
-      skillForm: SCENE
       tags:
         - business
         - scenario
@@ -23,13 +22,14 @@ skills:
       description: 业务场景服务 - 提供业务场景管理、工作流执行、数据处理能力
       sceneId: business
       path: skills/scenes/skill-business
+      spec:
+        skillForm: SCENE
 
     - skillId: skill-recruitment-management
       name: 招聘管理系统
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: hr
-      skillForm: SCENE
       tags:
         - recruitment
         - hr
@@ -39,13 +39,14 @@ skills:
       description: 企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批
       sceneId: recruitment
       path: skills/scenes/skill-recruitment-management
+      spec:
+        skillForm: SCENE
 
     - skillId: skill-approval-form
       name: 审批表单系统
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: approval
-      skillForm: SCENE
       tags:
         - approval
         - form
@@ -54,13 +55,14 @@ skills:
       description: 通用审批表单系统，支持自定义审批流程、多级审批、审批模板
       sceneId: approval
       path: skills/scenes/skill-approval-form
+      spec:
+        skillForm: SCENE
 
     - skillId: skill-real-estate-form
       name: 房产中介房源表单
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: crm
-      skillForm: SCENE
       tags:
         - realestate
         - property
@@ -70,13 +72,14 @@ skills:
       description: 房产中介房源信息采集表单，支持房源录入、图片上传、地图定位、智能估值
       sceneId: realestate
       path: skills/scenes/skill-real-estate-form
+      spec:
+        skillForm: SCENE
 
     - skillId: skill-recording-qa
       name: 录音质检系统
       version: "2.3.1"
       capabilityCategory: biz
       subCategory: qa
-      skillForm: SCENE
       tags:
         - recording
         - qa
@@ -85,3 +88,5 @@ skills:
       description: 录音质检系统，支持录音上传、人工审核、质检分析
       sceneId: recording-qa
       path: skills/scenes/skill-recording-qa
+      spec:
+        skillForm: SCENE

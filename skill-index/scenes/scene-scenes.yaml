@@ -13,7 +13,6 @@ scenes:
       description: LLM智能对话场景能力，自驱型SuperAgent，支持多轮对话、上下文感知、流式输出
       version: "2.3.1"
       capabilityCategory: scene
-      skillForm: SCENE
       sceneType: AUTO
       mainFirst: true
       requiredCapabilities:
@@ -27,3 +26,5 @@ scenes:
       collaborativeCapabilities:
         - scene-knowledge-qa
       maxMembers: 100
+      spec:
+        skillForm: SCENE

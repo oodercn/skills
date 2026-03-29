@@ -16,7 +16,6 @@ skills:
       version: "2.3.1"
       category: sys
       subCategory: network
-      skillForm: DRIVER
       tags:
         - network
         - ip
@@ -25,13 +24,14 @@ skills:
       description: 网络管理技能 - 提供网络配置、IP管理、设备扫描能力
       sceneId: network
       path: skills/capabilities/monitor/skill-network
+      spec:
+        skillForm: DRIVER
 
     - id: skill-protocol
       name: Protocol Management Skill
       version: "2.3.1"
       category: sys
       subCategory: protocol
-      skillForm: DRIVER
       tags:
         - protocol
         - handler
@@ -39,13 +39,14 @@ skills:
       description: 协议管理技能 - 提供协议处理器注册、命令分发能力
       sceneId: protocol
       path: skills/_system/skill-protocol
+      spec:
+        skillForm: DRIVER
 
     - id: skill-openwrt
       name: OpenWrt Management Skill
       version: "2.3.1"
       category: sys
       subCategory: router
-      skillForm: DRIVER
       tags:
         - openwrt
         - router
@@ -53,13 +54,14 @@ skills:
       description: OpenWrt管理技能 - 提供OpenWrt路由器连接、配置、命令执行能力
       sceneId: openwrt
       path: skills/capabilities/infrastructure/skill-openwrt
+      spec:
+        skillForm: DRIVER
 
     - id: skill-monitor
       name: Monitoring Service
       version: "2.3.1"
       category: sys
       subCategory: monitor
-      skillForm: PROVIDER
       tags:
         - monitor
         - metrics
@@ -69,13 +71,14 @@ skills:
       description: 监控服务 - 提供指标采集、告警管理、日志查询和观测能力
       sceneId: monitor
       path: skills/capabilities/monitor/skill-monitor
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-health
       name: Health Check Service
       version: "2.3.1"
       category: sys
       subCategory: health
-      skillForm: PROVIDER
       tags:
         - health
         - check
@@ -83,13 +86,14 @@ skills:
       description: 健康检查服务 - 提供系统健康检查、状态监控能力
       sceneId: health
       path: skills/capabilities/monitor/skill-health
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-cmd-service
       name: Command Service
       version: "2.3.1"
       category: sys
       subCategory: command
-      skillForm: PROVIDER
       tags:
         - command
         - exec
@@ -97,13 +101,14 @@ skills:
       description: 命令服务 - 提供命令执行、脚本运行能力
       sceneId: cmd
       path: skills/capabilities/monitor/skill-cmd-service
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-res-service
       name: Resource Service
       version: "2.3.1"
       category: sys
       subCategory: resource
-      skillForm: PROVIDER
       tags:
         - resource
         - system
@@ -111,13 +116,14 @@ skills:
       description: 资源服务 - 提供系统资源监控、资源管理能力
       sceneId: res
       path: skills/capabilities/monitor/skill-res-service
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-remote-terminal
       name: Remote Terminal Service
       version: "2.3.1"
       category: sys
       subCategory: terminal
-      skillForm: PROVIDER
       tags:
         - terminal
         - remote
@@ -125,13 +131,14 @@ skills:
       description: 远程终端服务 - 提供远程终端连接、命令执行能力
       sceneId: terminal
       path: skills/capabilities/monitor/skill-remote-terminal
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-scheduler-quartz
       name: Scheduler Quartz Service
       version: "2.3.1"
       category: sys
       subCategory: scheduler
-      skillForm: PROVIDER
       tags:
         - scheduler
         - quartz
@@ -140,13 +147,14 @@ skills:
       description: 定时任务服务 - 提供基于Quartz的定时任务调度能力
       sceneId: scheduler
       path: skills/capabilities/scheduler/skill-scheduler-quartz
+      spec:
+        skillForm: PROVIDER
 
     - id: skill-task
       name: Task Management Service
       version: "2.3.1"
       category: sys
       subCategory: task
-      skillForm: PROVIDER
       tags:
         - task
         - management
@@ -154,3 +162,5 @@ skills:
       description: 任务管理服务 - 提供异步任务管理、任务调度能力
       sceneId: task
       path: skills/capabilities/scheduler/skill-task
+      spec:
+        skillForm: PROVIDER

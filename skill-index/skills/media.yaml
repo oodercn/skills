@@ -13,7 +13,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: media
       subCategory: wechat
-      skillForm: DRIVER
       tags:
         - media
         - wechat
@@ -25,13 +24,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-wechat-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-media-wechat-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-media-weibo
       name: Weibo Publish Provider
       version: "2.3.1"
       capabilityCategory: media
       subCategory: weibo
-      skillForm: DRIVER
       tags:
         - media
         - weibo
@@ -43,13 +43,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-weibo-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-media-weibo-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-media-zhihu
       name: Zhihu Publish Provider
       version: "2.3.1"
       capabilityCategory: media
       subCategory: zhihu
-      skillForm: DRIVER
       tags:
         - media
         - zhihu
@@ -61,13 +62,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-zhihu-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-media-zhihu-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-media-toutiao
       name: Toutiao Publish Provider
       version: "2.3.1"
       capabilityCategory: media
       subCategory: toutiao
-      skillForm: DRIVER
       tags:
         - media
         - toutiao
@@ -79,13 +81,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-toutiao-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-media-toutiao-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-media-xiaohongshu
       name: Xiaohongshu Publish Provider
       version: "2.3.1"
       capabilityCategory: media
       subCategory: xiaohongshu
-      skillForm: DRIVER
       tags:
         - media
         - xiaohongshu
@@ -97,3 +100,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-media-xiaohongshu-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-media-xiaohongshu-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER

@@ -20,13 +20,14 @@ skills:
       description: VFS基础服务，提供文件系统抽象接口
       sceneId: vfs
       path: skills/skill-vfs-base
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-vfs-database
       name: Database VFS Service
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: database
-      skillForm: DRIVER
       tags:
         - vfs
         - database
@@ -37,13 +38,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-database-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-database-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-vfs-local
       name: Local VFS Service
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: local
-      skillForm: DRIVER
       tags:
         - vfs
         - local
@@ -54,6 +56,8 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-local-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-local-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-vfs-minio
       name: MinIO VFS Service
@@ -71,13 +75,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-minio-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-minio-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-vfs-oss
       name: Aliyun OSS VFS Service
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
-      skillForm: DRIVER
       tags:
         - vfs
         - oss
@@ -89,13 +94,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-oss-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-oss-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-vfs-s3
       name: AWS S3 VFS Service
       version: "2.3.1"
       capabilityCategory: vfs
       subCategory: object-storage
-      skillForm: DRIVER
       tags:
         - vfs
         - s3
@@ -107,3 +113,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-s3-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-vfs-s3-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER

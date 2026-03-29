@@ -3,7 +3,7 @@ kind: Skills
 metadata:
   name: llm-skills
   category: llm
-  count: 3
+  count: 7
   version: "2.3.1"
 
 skills:
@@ -13,35 +13,24 @@ skills:
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: chat
-      skillForm: SCENE
-      sceneType: AUTO
       tags:
         - llm
         - chat
-        - ai
         - conversation
-        - scene-capability
-        - mainFirst
-      description: LLM智能对话场景能力，支持多轮对话、上下文感知、流式输出、Function Calling
+        - streaming
+        - multi-turn
+      description: LLM智能对话场景能力，自驱型SuperAgent，支持多轮对话、上下文感知、流式输出
       sceneId: llm-chat
       path: skills/_system/skill-llm-chat
       mainFirst: true
-      capabilities:
-        - llm-chat
-        - session-manage
-        - history-record
-        - context-extraction
-        - context-merging
-        - function-calling
-      driverCapabilities:
-        - intent-receiver
+      spec:
+        skillForm: SCENE
 
     - skillId: skill-llm-config-manager
-      name: LLM配置管理
+      name: LLM Config Manager
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: config
-      skillForm: PROVIDER
       tags:
         - llm
         - config
@@ -50,13 +39,14 @@ skills:
       description: LLM配置管理服务，支持多级配置、加密存储、配置解析
       sceneId: llm-config
       path: skills/capabilities/llm/skill-llm-config-manager
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-llm-baidu
       name: 百度千帆LLM Provider
       version: "2.3.1"
       capabilityCategory: llm
       subCategory: provider
-      skillForm: PROVIDER
       tags:
         - llm
         - baidu
@@ -66,3 +56,5 @@ skills:
       description: 百度千帆大模型Provider，提供ERNIE系列模型对话、嵌入能力
       sceneId: llm-baidu
       path: skills/_drivers/llm/skill-llm-baidu
+      spec:
+        skillForm: PROVIDER

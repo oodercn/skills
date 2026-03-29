@@ -15,7 +15,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: util
       subCategory: document
-      skillForm: PROVIDER
       tags:
         - document
         - processor
@@ -23,13 +22,14 @@ skills:
       description: 文档处理服务，提供文档解析、转换、提取功能
       sceneId: document
       path: skills/skill-document-processor
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-trae-solo
       name: Trae Solo Service
       version: "2.3.1"
       capabilityCategory: util
       subCategory: general
-      skillForm: PROVIDER
       tags:
         - utility
         - tools
@@ -39,13 +39,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-trae-solo-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-trae-solo-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-share
       name: Skill Share Skill
       version: "2.3.1"
       capabilityCategory: util
       subCategory: share
-      skillForm: PROVIDER
       tags:
         - share
         - collaboration
@@ -55,13 +56,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-share-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-share-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-llm-volcengine
       name: VolcEngine (Doubao) LLM Provider
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
-      skillForm: PROVIDER
       tags:
         - llm
         - volcengine
@@ -73,13 +75,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-volcengine-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-volcengine-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-llm-qianwen
       name: Qianwen (Tongyi) LLM Provider
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
-      skillForm: PROVIDER
       tags:
         - llm
         - qianwen
@@ -91,13 +94,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-qianwen-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-qianwen-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-llm-deepseek
       name: DeepSeek LLM Provider
       version: "2.3.1"
       capabilityCategory: util
       subCategory: llm
-      skillForm: PROVIDER
       tags:
         - llm
         - deepseek
@@ -109,13 +113,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-deepseek-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-llm-deepseek-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-market
       name: Skill Market Service
       version: "2.3.1"
       capabilityCategory: util
       subCategory: market
-      skillForm: PROVIDER
       tags:
         - market
         - skill
@@ -127,13 +132,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-market-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-market-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-collaboration
       name: Collaboration Scene Service
       version: "2.3.1"
       capabilityCategory: util
       subCategory: collaboration
-      skillForm: SCENE
       tags:
         - collaboration
         - scene
@@ -145,3 +151,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-collaboration-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-collaboration-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: SCENE

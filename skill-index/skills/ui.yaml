@@ -13,7 +13,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: ui
       subCategory: code-gen
-      skillForm: PROVIDER
       tags:
         - a2ui
         - ui-generation
@@ -24,3 +23,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-a2ui-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-a2ui-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER

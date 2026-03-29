@@ -13,7 +13,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: org
       subCategory: base
-      skillForm: PROVIDER
       tags:
         - org
         - base
@@ -21,13 +20,14 @@ skills:
       description: 组织基础服务，提供组织架构、岗位管理等基础能力
       sceneId: org
       path: skills/_drivers/org/skill-org-base
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-org-dingding
       name: DingTalk Organization Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: dingtalk
-      skillForm: DRIVER
       tags:
         - dingtalk
         - dingding
@@ -41,13 +41,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-dingding-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-org-feishu
       name: Feishu Organization Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: feishu
-      skillForm: DRIVER
       tags:
         - feishu
         - lark
@@ -61,13 +62,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-feishu-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-org-wecom
       name: WeCom Organization Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: wecom
-      skillForm: DRIVER
       tags:
         - wecom
         - enterprise-wechat
@@ -80,13 +82,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-org-ldap
       name: LDAP Organization Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: ldap
-      skillForm: DRIVER
       tags:
         - ldap
         - organization
@@ -97,13 +100,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-org-ldap-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: DRIVER
 
     - skillId: skill-user-auth
       name: User Authentication Service
       version: "2.3.1"
       capabilityCategory: org
       subCategory: auth
-      skillForm: PROVIDER
       tags:
         - auth
         - authentication
@@ -114,3 +118,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-user-auth-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-user-auth-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER

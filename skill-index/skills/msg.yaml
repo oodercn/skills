@@ -13,7 +13,6 @@ skills:
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: mqtt
-      skillForm: PROVIDER
       tags:
         - mqtt
         - messaging
@@ -24,13 +23,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-mqtt-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-mqtt-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-im
       name: Instant Messaging Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: im
-      skillForm: PROVIDER
       tags:
         - im
         - messaging
@@ -43,13 +43,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-im-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-im-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-group
       name: Group Management Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: group
-      skillForm: PROVIDER
       tags:
         - group
         - team
@@ -62,13 +63,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-group-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-group-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-msg-service
       name: Message Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: message
-      skillForm: PROVIDER
       tags:
         - message
         - push
@@ -81,13 +83,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-service-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-service-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-notify
       name: Notification Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: notify
-      skillForm: PROVIDER
       tags:
         - notify
         - notification
@@ -99,13 +102,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-notify-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-notify-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-email
       name: Email Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: email
-      skillForm: PROVIDER
       tags:
         - email
         - smtp
@@ -117,13 +121,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-email-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-email-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-msg
       name: Message Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: message
-      skillForm: PROVIDER
       tags:
         - message
         - msg
@@ -135,13 +140,14 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
 
     - skillId: skill-msg-push
       name: Multi-Channel Message Push Service
       version: "2.3.1"
       capabilityCategory: msg
       subCategory: push
-      skillForm: PROVIDER
       tags:
         - message
         - push
@@ -156,3 +162,5 @@ skills:
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-push-2.3.1.jar
       giteeDownloadUrl: https://gitee.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-push-2.3.1.jar
       checksum: ""
+      spec:
+        skillForm: PROVIDER
