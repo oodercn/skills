@@ -15,10 +15,10 @@ metadata:
 
 spec:
   includes:
-    - categories.yaml
-    - scene-drivers.yaml
-    - skills/*.yaml
-    - scenes/*.yaml
+    - skill-index/categories.yaml
+    - skill-index/scene-drivers.yaml
+    - skill-index/skills/*.yaml
+    - skill-index/scenes/*.yaml
   
   statistics:
     totalSkills: 63
