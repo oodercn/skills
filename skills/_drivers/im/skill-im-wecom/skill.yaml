@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-im-wecom
   name: WeCom IM Service
-  version: 2.3.1
+  version: 3.0.1
   description: 企业微信IM服务，提供消息发送、应用消息等功能
   author: Ooder Team
   license: Apache-2.0
@@ -37,6 +37,10 @@ spec:
     required: false
     defaultProvider: "deepseek"
     defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
     functionCalling:
       enabled: true
       tools:

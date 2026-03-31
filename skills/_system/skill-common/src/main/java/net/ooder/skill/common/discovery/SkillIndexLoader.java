@@ -8,6 +8,7 @@ import org.yaml.snakeyaml.Yaml;
 
 import jakarta.annotation.PostConstruct;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.function.Function;
 
@@ -104,8 +105,8 @@ public class SkillIndexLoader {
         
         File categoriesFile = new File(indexDir, "categories.yaml");
         if (categoriesFile.exists()) {
-            try (InputStream is = new FileInputStream(categoriesFile)) {
-                Map<String, Object> data = yaml.load(is);
+            try (Reader reader = new InputStreamReader(new FileInputStream(categoriesFile), StandardCharsets.UTF_8)) {
+                Map<String, Object> data = yaml.load(reader);
                 List<Map<String, Object>> cats = (List<Map<String, Object>>) data.get("categories");
                 if (cats != null && !cats.isEmpty()) {
                     categories = cats;
@@ -118,8 +119,8 @@ public class SkillIndexLoader {
 
         File sceneDriversFile = new File(indexDir, "scene-drivers.yaml");
         if (sceneDriversFile.exists()) {
-            try (InputStream is = new FileInputStream(sceneDriversFile)) {
-                Map<String, Object> data = yaml.load(is);
+            try (Reader reader = new InputStreamReader(new FileInputStream(sceneDriversFile), StandardCharsets.UTF_8)) {
+                Map<String, Object> data = yaml.load(reader);
                 List<Map<String, Object>> drivers = (List<Map<String, Object>>) data.get("sceneDrivers");
                 if (drivers != null && !drivers.isEmpty()) {
                     sceneDrivers = drivers;
@@ -135,8 +136,8 @@ public class SkillIndexLoader {
             File[] skillFiles = skillsDir.listFiles((dir, name) -> name.endsWith(".yaml"));
             if (skillFiles != null) {
                 for (File skillFile : skillFiles) {
-                    try (InputStream is = new FileInputStream(skillFile)) {
-                        Map<String, Object> data = yaml.load(is);
+                    try (Reader reader = new InputStreamReader(new FileInputStream(skillFile), StandardCharsets.UTF_8)) {
+                        Map<String, Object> data = yaml.load(reader);
                         List<Map<String, Object>> fileSkills = (List<Map<String, Object>>) data.get("skills");
                         if (fileSkills != null) {
                             skills.addAll(fileSkills);
@@ -154,8 +155,8 @@ public class SkillIndexLoader {
             File[] sceneFiles = scenesDir.listFiles((dir, name) -> name.endsWith(".yaml"));
             if (sceneFiles != null) {
                 for (File sceneFile : sceneFiles) {
-                    try (InputStream is = new FileInputStream(sceneFile)) {
-                        Map<String, Object> data = yaml.load(is);
+                    try (Reader reader = new InputStreamReader(new FileInputStream(sceneFile), StandardCharsets.UTF_8)) {
+                        Map<String, Object> data = yaml.load(reader);
                         List<Map<String, Object>> fileScenes = (List<Map<String, Object>>) data.get("scenes");
                         if (fileScenes != null) {
                             scenes.addAll(fileScenes);
@@ -212,6 +213,12 @@ public class SkillIndexLoader {
         cap.setSceneCapability(isScene);
         
         Object skillFormObj = skill.get("skillForm");
+        if (skillFormObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                skillFormObj = spec.get("skillForm");
+            }
+        }
         String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : null;
         if (skillFormCode == null) {
             skillFormCode = isScene ? "SCENE" : "PROVIDER";
@@ -219,11 +226,23 @@ public class SkillIndexLoader {
         cap.setSkillForm(skillFormCode);
         
         Object businessCategoryObj = skill.get("businessCategory");
+        if (businessCategoryObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                businessCategoryObj = spec.get("businessCategory");
+            }
+        }
         if (businessCategoryObj != null) {
             cap.setBusinessCategory(String.valueOf(businessCategoryObj));
         }
         
         Object categoryObj = skill.get("category");
+        if (categoryObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                categoryObj = spec.get("category");
+            }
+        }
         if (categoryObj != null) {
             cap.setCategory(String.valueOf(categoryObj));
         }
@@ -245,6 +264,12 @@ public class SkillIndexLoader {
     @SuppressWarnings("unchecked")
     private void populateSceneFields(CapabilityDTO cap, Map<String, Object> skill) {
         Object sceneTypeObj = skill.get("sceneType");
+        if (sceneTypeObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                sceneTypeObj = spec.get("sceneType");
+            }
+        }
         String sceneTypeCode = sceneTypeObj != null ? String.valueOf(sceneTypeObj) : "MANUAL";
         
         boolean hasSelfDrive = "AUTO".equals(sceneTypeCode);
@@ -253,12 +278,24 @@ public class SkillIndexLoader {
         cap.setMainFirst(hasSelfDrive);
         
         Object driverConditionsObj = skill.get("driverConditions");
+        if (driverConditionsObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                driverConditionsObj = spec.get("driverConditions");
+            }
+        }
         if (driverConditionsObj instanceof List) {
             List<Map<String, Object>> driverConditions = (List<Map<String, Object>>) driverConditionsObj;
             cap.setDriverConditions(convertToMapList(driverConditions));
         }
         
         Object participantsObj = skill.get("participants");
+        if (participantsObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) skill.get("spec");
+            if (spec != null) {
+                participantsObj = spec.get("participants");
+            }
+        }
         if (participantsObj instanceof List) {
             List<Map<String, Object>> participants = (List<Map<String, Object>>) participantsObj;
             cap.setParticipants(convertToMapList(participants));
@@ -283,8 +320,8 @@ public class SkillIndexLoader {
         Yaml yaml = new Yaml();
         
         for (File entryFile : entryFiles) {
-            try (InputStream is = new FileInputStream(entryFile)) {
-                Map<String, Object> entry = yaml.load(is);
+            try (Reader reader = new InputStreamReader(new FileInputStream(entryFile), StandardCharsets.UTF_8)) {
+                Map<String, Object> entry = yaml.load(reader);
                 if (entry == null) continue;
                 
                 Map<String, Object> metadata = (Map<String, Object>) entry.get("metadata");
@@ -510,9 +547,21 @@ public class SkillIndexLoader {
         }
         
         Object sceneTypeObj = scene.get("sceneType");
+        if (sceneTypeObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) scene.get("spec");
+            if (spec != null) {
+                sceneTypeObj = spec.get("sceneType");
+            }
+        }
         String sceneTypeCode = sceneTypeObj != null ? String.valueOf(sceneTypeObj) : "MANUAL";
         
         Object skillFormObj = scene.get("skillForm");
+        if (skillFormObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) scene.get("spec");
+            if (spec != null) {
+                skillFormObj = spec.get("skillForm");
+            }
+        }
         String skillFormCode = skillFormObj != null ? String.valueOf(skillFormObj) : "STANDALONE";
         
         cap.setSceneType(sceneTypeCode);
@@ -520,15 +569,33 @@ public class SkillIndexLoader {
         cap.setMainFirst("AUTO".equals(sceneTypeCode));
         
         Object visibilityObj = scene.get("visibility");
+        if (visibilityObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) scene.get("spec");
+            if (spec != null) {
+                visibilityObj = spec.get("visibility");
+            }
+        }
         cap.setVisibility(visibilityObj != null ? String.valueOf(visibilityObj) : "public");
         
         Object driverConditionsObj = scene.get("driverConditions");
+        if (driverConditionsObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) scene.get("spec");
+            if (spec != null) {
+                driverConditionsObj = spec.get("driverConditions");
+            }
+        }
         if (driverConditionsObj instanceof List) {
             List<Map<String, Object>> driverConditions = (List<Map<String, Object>>) driverConditionsObj;
             cap.setDriverConditions(convertToMapList(driverConditions));
         }
         
         Object participantsObj = scene.get("participants");
+        if (participantsObj == null) {
+            Map<String, Object> spec = (Map<String, Object>) scene.get("spec");
+            if (spec != null) {
+                participantsObj = spec.get("participants");
+            }
+        }
         if (participantsObj instanceof List) {
             List<Map<String, Object>> participants = (List<Map<String, Object>>) participantsObj;
             cap.setParticipants(convertToMapList(participants));

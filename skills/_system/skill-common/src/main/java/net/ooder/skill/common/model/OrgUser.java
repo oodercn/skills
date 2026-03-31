@@ -43,4 +43,8 @@ public class OrgUser {
     public void setUpdateTime(long updateTime) { this.updateTime = updateTime; }
     public boolean isActive() { return active; }
     public void setActive(boolean active) { this.active = active; }
+    
+    public String getDepartmentName() {
+        return departmentId != null ? departmentId.replace("dept-", "") : null;
+    }
 }

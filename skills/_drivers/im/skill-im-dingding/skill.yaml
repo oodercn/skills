@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-im-dingding
   name: DingTalk IM Service
-  version: 2.3.1
+  version: 3.0.1
   description: 钉钉IM服务，提供消息发送、DING消息、日程管理、待办同步等功能
   author: Ooder Team
   license: Apache-2.0

@@ -3,6 +3,7 @@ package net.ooder.skill.common.config;
 import net.ooder.skill.common.api.AuthApi;
 import net.ooder.skill.common.api.ConfigApi;
 import net.ooder.skill.common.discovery.DiscoveryOrchestrator;
+import net.ooder.skill.common.discovery.LocalSkillDiscoverer;
 import net.ooder.skill.common.discovery.SkillIndexLoader;
 import net.ooder.skill.common.service.AuthService;
 import net.ooder.skill.common.service.OrgService;
@@ -58,6 +59,14 @@ public class SkillCommonAutoConfiguration {
     @ConditionalOnMissingBean
     public SkillIndexLoader skillIndexLoader() {
         return new SkillIndexLoader();
+    }
+    
+    @Bean
+    @ConditionalOnMissingBean
+    @ConditionalOnProperty(name = "ooder.discovery.local.enabled", havingValue = "true", matchIfMissing = true)
+    public LocalSkillDiscoverer localSkillDiscoverer() {
+        LocalSkillDiscoverer discoverer = new LocalSkillDiscoverer();
+        return discoverer;
     }
     
     @Bean

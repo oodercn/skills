@@ -1,0 +1,31 @@
+server:
+  port: 8093
+
+spring:
+  application:
+    name: skill-im-wecom
+  redis:
+    host: localhost
+    port: 6379
+    database: 0
+    timeout: 3000
+
+wecom:
+  corp-id: ${WECOM_CORP_ID:}
+  agent-id: ${WECOM_AGENT_ID:}
+  secret: ${WECOM_AGENT_SECRET:}
+  api-endpoint: ${WECOM_API_ENDPOINT:https://qyapi.weixin.qq.com}
+  token-cache-seconds: 7200
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    net.ooder.skill.im.wecom: DEBUG

@@ -82,8 +82,11 @@ public class SkillConfiguration {
                 config.lifecycle.setShutdown((String) lifecycleData.get("shutdown"));
             }
 
-            // 解析路由配置
+            // 解析路由配置（支持 routes 和 endpoints 两种字段名）
             List<Map<String, Object>> routesData = (List<Map<String, Object>>) spec.get("routes");
+            if (routesData == null) {
+                routesData = (List<Map<String, Object>>) spec.get("endpoints");
+            }
             if (routesData != null) {
                 config.routes = RouteDefinition.fromList(routesData);
             }

@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.servlet.mvc.method.RequestMappingInfo;
@@ -31,6 +32,9 @@ public class RouteRegistry {
     @Autowired
     @Qualifier("requestMappingHandlerMapping")
     private RequestMappingHandlerMapping handlerMapping;
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     // Skill ID -> 注册的路由信息映射
     private final Map<String, Set<RegisteredRoute>> registeredRoutes = new ConcurrentHashMap<>();
@@ -106,26 +110,28 @@ public class RouteRegistry {
 
     private RegisteredRoute registerRoute(String skillId, RouteDefinition routeDef, 
                                            PluginClassLoader classLoader) throws Exception {
-        // 加载Controller类
+        logger.info("Registering route: {} {} -> {}.{}", 
+                routeDef.getMethod(), routeDef.getPath(),
+                routeDef.getControllerClass(), routeDef.getMethodName());
+        
         Class<?> controllerClass = classLoader.loadClass(routeDef.getControllerClass());
+        logger.debug("Loaded controller class: {}", controllerClass.getName());
 
-        // 创建Controller实例
         Object controller = createControllerInstance(controllerClass);
+        logger.debug("Created controller instance: {}", controller.getClass().getName());
 
-        // 查找方法
         Method method = findMethod(controllerClass, routeDef.getMethodName(), routeDef.getParameterTypes());
+        logger.debug("Found method: {} with {} parameters", method.getName(), method.getParameterCount());
 
-        // 创建RequestMappingInfo
         RequestMappingInfo mappingInfo = createMappingInfo(routeDef);
+        logger.debug("Created RequestMappingInfo: {}", mappingInfo);
 
-        // 创建HandlerMethod
         org.springframework.web.method.HandlerMethod handlerMethod = 
                 new org.springframework.web.method.HandlerMethod(controller, method);
 
-        // 注册到Spring MVC
         handlerMapping.registerMapping(mappingInfo, controller, method);
+        logger.info("Successfully registered route: {} {} to Spring MVC", routeDef.getMethod(), routeDef.getPath());
 
-        // 创建注册信息
         RegisteredRoute registeredRoute = new RegisteredRoute();
         registeredRoute.setSkillId(skillId);
         registeredRoute.setMappingInfo(mappingInfo);
@@ -142,14 +148,31 @@ public class RouteRegistry {
     }
 
     private Object createControllerInstance(Class<?> controllerClass) throws Exception {
-        // 尝试使用默认构造器
+        String beanName = controllerClass.getSimpleName();
+        String className = controllerClass.getName();
+        
         try {
-            return controllerClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            // 尝试使用Spring的依赖注入
-            logger.debug("Creating controller with Spring dependency injection: {}", controllerClass.getName());
-            // 这里可以扩展为使用ApplicationContext来创建
-            throw new RuntimeException("Failed to create controller instance: " + controllerClass.getName(), e);
+            Object existingBean = applicationContext.getBean(className);
+            if (existingBean != null) {
+                logger.debug("Using existing Spring bean for controller: {}", className);
+                return existingBean;
+            }
+        } catch (Exception e) {
+            logger.debug("No existing bean found for controller: {}", className);
+        }
+        
+        try {
+            Object bean = applicationContext.getAutowireCapableBeanFactory()
+                    .createBean(controllerClass);
+            logger.info("Created and autowired controller instance: {}", className);
+            return bean;
+        } catch (Exception e) {
+            logger.warn("Failed to create controller with Spring autowiring, trying default constructor: {}", className);
+            try {
+                return controllerClass.getDeclaredConstructor().newInstance();
+            } catch (Exception ex) {
+                throw new RuntimeException("Failed to create controller instance: " + className, ex);
+            }
         }
     }
 

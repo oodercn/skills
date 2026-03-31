@@ -25,6 +25,9 @@ public class DiscoveryOrchestrator {
     @Autowired
     private SkillIndexLoader skillIndexLoader;
     
+    @Autowired(required = false)
+    private LocalSkillDiscoverer localSkillDiscoverer;
+    
     private final Map<DiscoveryMethod, SkillDiscoverer> discoverers = new HashMap<>();
     
     private Function<String, Boolean> installedChecker;
@@ -34,6 +37,11 @@ public class DiscoveryOrchestrator {
     @PostConstruct
     public void init() {
         log.info("[DiscoveryOrchestrator] Initialized with useIndexFirst: {}", useIndexFirst);
+        
+        if (localSkillDiscoverer != null && localSkillDiscoverer.isAvailable()) {
+            registerDiscoverer(DiscoveryMethod.LOCAL, localSkillDiscoverer);
+            log.info("[init] LocalSkillDiscoverer registered successfully");
+        }
     }
     
     public void registerDiscoverer(DiscoveryMethod method, SkillDiscoverer discoverer) {

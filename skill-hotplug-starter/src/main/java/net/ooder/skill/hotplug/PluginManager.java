@@ -301,9 +301,12 @@ public class PluginManager {
 
     private void registerRoutes(PluginContext context) {
         SkillConfiguration config = context.getConfiguration();
-        if (config.getRoutes() != null) {
-            routeRegistry.registerRoutes(context.getSkillId(), config.getRoutes(), context.getClassLoader());
+        if (config.getRoutes() == null || config.getRoutes().isEmpty()) {
+            logger.warn("No routes defined in skill configuration for: {}", context.getSkillId());
+            return;
         }
+        logger.info("Registering {} routes for skill: {}", config.getRoutes().size(), context.getSkillId());
+        routeRegistry.registerRoutes(context.getSkillId(), config.getRoutes(), context.getClassLoader());
     }
 
     private void unregisterRoutes(PluginContext context) {

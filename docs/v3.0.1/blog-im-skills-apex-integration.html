@@ -1,0 +1,496 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三大IM Skills与Apex深度融合：从扫码开始的智能平台体验</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+        .header h1 { font-size: 2rem; margin-bottom: 15px; }
+        .header .subtitle { font-size: 1.1rem; opacity: 0.9; }
+        .header .meta { font-size: 0.9rem; margin-top: 20px; opacity: 0.8; }
+        .content { padding: 40px; }
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+        h3 {
+            font-size: 1.4rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+        }
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+        }
+        p { margin: 15px 0; }
+        blockquote {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px 25px;
+            margin: 25px 0;
+            font-style: italic;
+        }
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.9em;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 12px 15px;
+            text-align: left;
+        }
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+        tr:hover { background: var(--highlight-bg); }
+        .svg-diagram {
+            margin: 30px 0;
+            text-align: center;
+        }
+        .svg-diagram img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .diagram-caption {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 10px;
+            font-style: italic;
+        }
+        ul, ol { margin: 15px 0 15px 25px; }
+        li { margin: 8px 0; }
+        .highlight-box {
+            background: #fef3c7;
+            border: 1px solid #d97706;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+        .resource-list {
+            background: var(--code-bg);
+            border-radius: 8px;
+            padding: 20px 25px;
+            margin: 25px 0;
+        }
+        .resource-list li { margin: 10px 0; }
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 30px 40px;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+        hr {
+            border: none;
+            border-top: 1px solid var(--border-color);
+            margin: 40px 0;
+        }
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            h2 { font-size: 1.5rem; }
+            .header { padding: 40px 20px; }
+            .header h1 { font-size: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <header class="header">
+        <h1>三大IM Skills与Apex深度融合</h1>
+        <p class="subtitle">从扫码开始的智能平台体验</p>
+        <p class="meta">OoderAgent Team | 2026-03-29 | v1.0</p>
+    </header>
+
+    <main class="content">
+        <blockquote>
+            当企业微信、钉钉、飞书三大平台的IM Skills接入Apex，一个从"扫码授权"到"智能协作"的完整闭环就此形成。
+        </blockquote>
+
+        <h2>一、Apex：轻量级Agent OS的定位</h2>
+
+        <h3>1.1 什么是Apex？</h3>
+        <p>根据Apex官方架构文档的定义：</p>
+        <blockquote>
+            <strong>Apex是一款轻量级Agent OS</strong>，它将大语言模型（LLM）技术与企业业务场景深度融合，实现了从"文档规范"到"可执行场景"的自动化转换。
+        </blockquote>
+        <p>Apex的核心定位是作为企业数字化转型的"中枢神经系统"，通过AI技术重构企业流程规范的建设、执行和优化全生命周期。</p>
+
+        <h3>1.2 核心架构</h3>
+        <p>Apex采用分层架构设计：</p>
+
+        <div class="svg-diagram">
+            <img src="diagrams/diagram_apex_layered_architecture.svg" alt="Apex分层架构图"/>
+            <p class="diagram-caption">图1：Apex四层架构设计</p>
+        </div>
+
+        <p><strong>核心概念：</strong></p>
+        <table>
+            <tr><th>概念</th><th>定义</th></tr>
+            <tr><td><strong>场景（Scene）</strong></td><td>场景是Apex的核心概念，代表一个完整的业务场景。场景 = 参与者 + 能力 + 知识库 + LLM</td></tr>
+            <tr><td><strong>能力（Capability）</strong></td><td>可复用的功能单元，支持热插拔，状态流转：INSTALLED → ACTIVATED → RUNNING → DEACTIVATED → UNINSTALLED</td></tr>
+            <tr><td><strong>Agent</strong></td><td>场景中的智能代理，负责执行任务。类型包括：PageAgent、SuperAgent、SubAgent</td></tr>
+            <tr><td><strong>技能（Skill）</strong></td><td>能力的载体，通过YAML定义，支持三种形式：DRIVER、PROVIDER、SCENE</td></tr>
+        </table>
+
+        <h2>二、三大IM Skills：企业级消息能力的统一封装</h2>
+
+        <h3>2.1 技能概述</h3>
+        <p>OoderAgent生态为Apex提供了三大IM Skills，实现了企业微信、钉钉、飞书三大平台的统一接入：</p>
+        <table>
+            <tr><th>Skill ID</th><th>名称</th><th>平台</th><th>核心能力</th></tr>
+            <tr><td><code>skill-im-wecom</code></td><td>WeCom IM Service</td><td>企业微信</td><td>send-message, send-text, send-markdown</td></tr>
+            <tr><td><code>skill-im-dingding</code></td><td>DingTalk IM Service</td><td>钉钉</td><td>send-message, send-ding, send-markdown, send-action-card</td></tr>
+            <tr><td><code>skill-im-feishu</code></td><td>Feishu IM Service</td><td>飞书</td><td>send-message, send-post, send-interactive</td></tr>
+        </table>
+
+        <h3>2.2 技能配置规范</h3>
+        <p>每个IM Skill都遵循OoderAgent技能配置规范，以<code>skill-im-dingding</code>为例：</p>
+        <pre><code>apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-dingding
+  name: DingTalk IM Service
+  version: 2.3.1
+  description: 钉钉IM服务，提供消息发送、DING消息、日程管理、待办同步等功能
+
+spec:
+  skillForm: DRIVER
+  type: im-skill
+  
+  ownership: platform
+  
+  capability:
+    category: IM
+    code: IM_DINGDING
+    operations: [send-message, send-ding, send-markdown, send-action-card]
+  
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    functionCalling:
+      enabled: true
+      tools:
+        - name: send_message
+          description: "发送钉钉消息"
+          parameters:
+            type: object
+            properties:
+              receiver:
+                type: string
+                enum: [user, group]
+              receiverId:
+                type: string
+              msgType:
+                type: string
+                enum: [text, markdown, action_card]
+              content:
+                type: string
+
+  config:
+    required:
+      - name: DINGTALK_APP_KEY
+        type: string
+      - name: DINGTALK_APP_SECRET
+        type: string
+        secret: true</code></pre>
+
+        <h3>2.3 LLM Function Calling集成</h3>
+        <p>三大IM Skills都支持LLM Function Calling，使得Agent可以通过自然语言调用消息能力。</p>
+        <p><strong>钉钉DING消息示例：</strong></p>
+        <pre><code>{
+  "name": "send_ding",
+  "description": "发送钉钉DING消息（高优先级提醒）",
+  "parameters": {
+    "type": "object",
+    "properties": {
+      "userId": { "type": "string", "description": "用户ID" },
+      "title": { "type": "string", "description": "消息标题" },
+      "content": { "type": "string", "description": "消息内容" },
+      "reminderType": { "type": "integer", "enum": [1, 2], "default": 1 }
+    }
+  }
+}</code></pre>
+
+        <h2>三、从扫码开始：平台绑定与授权流程</h2>
+
+        <h3>3.1 平台绑定场景</h3>
+        <p>Apex通过<code>skill-platform-bind</code>场景技能实现多平台绑定：</p>
+
+        <div class="svg-diagram">
+            <img src="diagrams/diagram_platform_binding_flow.svg" alt="平台绑定流程图"/>
+            <p class="diagram-caption">图2：平台绑定与授权流程</p>
+        </div>
+
+        <h3>3.2 OAuth授权流程</h3>
+        <p>根据skill-common认证模块的设计，授权流程遵循标准OAuth 2.0：</p>
+        <pre><code>// 授权服务接口
+public interface AuthService {
+    Object login(String username, String password, String clientIp);
+    Object getCurrentUser();
+    void logout();
+}
+
+// 用户信息提供者
+public interface UserInfoProvider {
+    Object login(String username, String password, String clientIp, String role);
+}</code></pre>
+
+        <h2>四、深度融合：场景组与智能协作</h2>
+
+        <h3>4.1 场景组概念</h3>
+        <p>根据Apex场景组需求文档，场景组是Agent协作的容器：</p>
+        <blockquote>
+            场景组定义了一组参与者、目标、规则和资源，支持用户与Agent在同一场景组中协作。
+        </blockquote>
+
+        <p><strong>场景组核心要素：</strong></p>
+        <table>
+            <tr><th>要素</th><th>说明</th></tr>
+            <tr><td><strong>参与者</strong></td><td>用户、Agent、设备等</td></tr>
+            <tr><td><strong>角色</strong></td><td>企业管理员、部门经理、普通员工、Agent</td></tr>
+            <tr><td><strong>能力</strong></td><td>场景组可用的能力绑定</td></tr>
+            <tr><td><strong>知识库</strong></td><td>场景组关联的知识库</td></tr>
+        </table>
+
+        <h3>4.2 IM Skills在场景组中的角色</h3>
+        <p>当IM Skills与Apex场景组融合后，每个场景组都可以：</p>
+        <ol>
+            <li><strong>消息通知</strong>：通过IM平台推送场景组动态</li>
+            <li><strong>待办同步</strong>：将场景组任务同步到IM平台待办</li>
+            <li><strong>日程管理</strong>：场景组会议自动同步到IM日历</li>
+            <li><strong>文档协作</strong>：场景组文档与IM平台文档互通</li>
+        </ol>
+
+        <pre><code>SceneGroup: 2024春季招聘
+├── Participants: [张三(MANAGER), 李四(HR), Agent]
+├── Capabilities: [简历筛选, 面试安排, Offer生成]
+├── Knowledge: [招聘知识库, 岗位说明]
+└── IM Bindings:
+    ├── skill-im-dingding → 钉钉群通知
+    ├── skill-im-wecom → 企业微信审批
+    └── skill-im-feishu → 飞书文档协作</code></pre>
+
+        <h2>五、扫码后：LLM参与的智能活动</h2>
+
+        <h3>5.1 能力矩阵</h3>
+        <p>用户扫码授权后，Apex可以获得以下能力：</p>
+        <table>
+            <tr><th>能力类别</th><th>钉钉</th><th>飞书</th><th>企业微信</th></tr>
+            <tr><td>用户信息</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>组织架构</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>消息发送</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>DING/提醒</td><td>✓</td><td>-</td><td>-</td></tr>
+            <tr><td>日程管理</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>待办同步</td><td>✓</td><td>✓</td><td>✓</td></tr>
+            <tr><td>文档协作</td><td>-</td><td>✓</td><td>-</td></tr>
+            <tr><td>审批流程</td><td>✓</td><td>✓</td><td>✓</td></tr>
+        </table>
+
+        <h3>5.2 LLM参与的智能活动</h3>
+        <p>当这些能力与Apex的LLM层结合后，会产生以下"化学反应"：</p>
+
+        <h4>5.2.1 智能消息助手</h4>
+        <pre><code>用户: "帮我通知所有面试官明天下午2点开会"
+
+Agent处理流程:
+1. LLM理解意图 → 创建会议通知任务
+2. 查询组织架构 → 获取面试官列表
+3. 调用skill-im-dingding → send_message
+4. 调用skill-im-dingding → calendar.create_event
+5. 返回执行结果
+
+输出: 已向5位面试官发送会议通知，日程已同步</code></pre>
+
+        <h4>5.2.2 智能日程协调</h4>
+        <pre><code>用户: "安排下周的面试，避开面试官的忙碌时间"
+
+Agent处理流程:
+1. LLM解析时间范围 → 下周一至周五
+2. 调用calendar API → 获取面试官日程
+3. LLM分析空闲时段 → 推荐可用时间
+4. 调用skill-im-feishu → 创建飞书日程
+5. 调用skill-im-dingding → 发送DING提醒
+
+输出: 已安排3场面试，时间：周二14:00、周三10:00、周四15:00</code></pre>
+
+        <h4>5.2.3 智能文档生成</h4>
+        <pre><code>用户: "生成这份面试评估报告，发送给HR"
+
+Agent处理流程:
+1. LLM理解需求 → 面试评估报告
+2. 查询知识库 → 获取评估模板
+3. LLM生成内容 → 填充评估数据
+4. 调用skill-im-feishu → 创建飞书文档
+5. 调用skill-im-wecom → 发送企业微信通知
+
+输出: 评估报告已生成，已发送给HR李四</code></pre>
+
+        <h3>5.3 Agent Chat统一接口</h3>
+        <p>根据Agent Chat SE SDK需求文档，Apex实现了完整的Agent通信架构：</p>
+        <pre><code>// 统一会话管理
+public interface UnifiedSessionManager {
+    Session createSession(SessionType type, String ownerId, Map&lt;String, Object&gt; metadata);
+    Session getSession(String sessionId);
+    OnlineStatus getOnlineStatus(String ownerId);
+    List&lt;Session&gt; getActiveSessionsByScene(String sceneGroupId);
+}
+
+// 消息队列服务
+public interface MessageQueueService {
+    String sendMessage(MessageEnvelope message);
+    List&lt;MessageEnvelope&gt; getOfflineMessages(String recipientId);
+    void acknowledgeMessage(String messageId, String recipientId);
+}
+
+// A2A协议服务
+public interface A2AProtocolService {
+    String sendA2AMessage(A2AMessage message);
+    void broadcastToAgents(String sceneGroupId, A2AMessage message);
+    A2AResponse sendRequest(A2ARequest request, long timeoutMs);
+}</code></pre>
+
+        <h2>六、技术实现：SE SDK 3.0.1</h2>
+
+        <h3>6.1 核心服务</h3>
+        <p>根据MVP协同开发任务清单，SE SDK 3.0.1已实现：</p>
+        <table>
+            <tr><th>服务</th><th>实现类</th><th>Maven坐标</th></tr>
+            <tr><td>企业规范流程服务</td><td><code>EnterpriseProcedureServiceImpl</code></td><td><code>net.ooder:scene-engine:3.0.1</code></td></tr>
+            <tr><td>融合模板服务</td><td><code>FusionTemplateServiceImpl</code></td><td><code>net.ooder:scene-engine:3.0.1</code></td></tr>
+            <tr><td>完善度评估器</td><td><code>DefaultCompletenessEvaluator</code></td><td><code>net.ooder:scene-engine:3.0.1</code></td></tr>
+        </table>
+
+        <h3>6.2 激活步骤执行器</h3>
+        <p>SE SDK提供了6个内置执行器：</p>
+        <table>
+            <tr><th>执行器</th><th>stepType</th><th>功能</th></tr>
+            <tr><td>ConfirmParticipantsExecutor</td><td>confirm-participants</td><td>确认参与者</td></tr>
+            <tr><td>SelectPushTargetsExecutor</td><td>select-push-targets</td><td>选择推送目标</td></tr>
+            <tr><td>BindKnowledgeExecutor</td><td>bind-knowledge</td><td>绑定知识库</td></tr>
+            <tr><td>ConfigConditionsExecutor</td><td>config-conditions</td><td>配置驱动条件</td></tr>
+            <tr><td>ConfigPrivateCapabilitiesExecutor</td><td>config-private-capabilities</td><td>配置私有能力</td></tr>
+            <tr><td>ConfigWorkflowExecutor</td><td>config-workflow</td><td>配置工作流</td></tr>
+        </table>
+
+        <h3>6.3 Maven仓库位置</h3>
+        <pre><code>D:\maven\.m2\repository\net\ooder\scene-engine\3.0.1\
+├── scene-engine-3.0.1.jar
+├── scene-engine-3.0.1-sources.jar
+└── scene-engine-3.0.1.pom</code></pre>
+
+        <h2>七、范式突破：从流程管理到场景智能</h2>
+
+        <h3>7.1 传统范式的困境</h3>
+        <p>根据Apex系统重构文档的分析：</p>
+        <table>
+            <tr><th>维度</th><th>传统范式</th><th>面临挑战</th></tr>
+            <tr><td>需求响应</td><td>瀑布式开发，周期长</td><td>业务需求变化快，系统刚上线即落后</td></tr>
+            <tr><td>知识沉淀</td><td>文档化存储，静态化</td><td>文档分散、版本混乱、难以执行</td></tr>
+            <tr><td>系统架构</td><td>单体应用或简单集成</td><td>系统孤岛，数据不通，重复建设</td></tr>
+            <tr><td>用户体验</td><td>功能导向，千人一面</td><td>角色差异大，个性化需求难满足</td></tr>
+        </table>
+
+        <h3>7.2 新范式的核心特征</h3>
+        <p>Apex所代表的新范式实现了四个转变：</p>
+        <ol>
+            <li><strong>从"文档规范"到"可执行模板"</strong>：通过LLM将非结构化流程文档转化为结构化SceneTemplate</li>
+            <li><strong>从"人工配置"到"AI驱动生成"</strong>：LLM作为"智能架构师"理解业务语义、生成系统配置</li>
+            <li><strong>从"静态系统"到"动态场景"</strong>：场景根据用户角色、业务上下文自动适配</li>
+            <li><strong>从"功能堆砌"到"能力编排"</strong>：通过SKILL机制实现灵活组合和快速迭代</li>
+        </ol>
+
+        <h2>八、结语：IM的第三次革命</h2>
+        <p>正如《IM的第三次革命》博文所述：</p>
+        <blockquote>
+            当消息体制从"人 → 人"演进到"人 → Agent → Agent → 场景"，IM的定位也在发生根本性变化。<strong>IM不再只是通信工具，而是Agent的操作系统。</strong>
+        </blockquote>
+
+        <p>三大IM Skills与Apex的深度融合，正是这一变革的生动实践：</p>
+        <ul>
+            <li><strong>消息总线</strong>：Agent之间的通信基础设施</li>
+            <li><strong>场景容器</strong>：Agent协作的运行环境</li>
+            <li><strong>上下文管理</strong>：Agent的记忆和知识</li>
+            <li><strong>能力市场</strong>：Agent的技能商店</li>
+        </ul>
+        <p>从扫码授权开始，到智能协作结束，一个完整的企业级智能平台体验就此形成。</p>
+
+        <hr>
+
+        <h2>相关资源</h2>
+        <ul class="resource-list">
+            <li><strong>Apex架构文档</strong>：<code>E:\apex\app\docs\ARCHITECTURE.md</code></li>
+            <li><strong>技能开发指南</strong>：<code>E:\apex\app\docs\SKILL_DEVELOPMENT.md</code></li>
+            <li><strong>场景组需求规格</strong>：<code>E:\apex\app\docs\requirements\scene-group-requirements.md</code></li>
+            <li><strong>Agent Chat需求</strong>：<code>E:\apex\app\docs\requirements\agent-chat-se-sdk-requirements.md</code></li>
+            <li><strong>MVP协同任务</strong>：<code>E:\apex\app\docs\collaboration\MVP_DEVELOPMENT_TASKS.md</code></li>
+            <li><strong>IM Skills配置</strong>：<code>e:\github\ooder-skills\skills\_drivers\im\</code></li>
+        </ul>
+    </main>
+
+    <footer class="footer">
+        <p>© 2026 OoderAgent Team | 文档版本 v1.0</p>
+        <p>基于 Apex V1.0.0 & SE SDK 3.0.1</p>
+    </footer>
+</div>
+</body>
+</html>

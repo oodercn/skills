@@ -65,6 +65,9 @@ public class RouteDefinition {
             route.path = (String) data.get("path");
             route.method = (String) data.getOrDefault("method", "GET");
             route.controllerClass = (String) data.get("controller");
+            if (route.controllerClass == null) {
+                route.controllerClass = (String) data.get("controllerClass");
+            }
             route.methodName = (String) data.get("methodName");
 
             List<String> params = (List<String>) data.get("parameterTypes");

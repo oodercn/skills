@@ -1,6 +1,7 @@
 package net.ooder.skill.common.service;
 
 import net.ooder.skill.common.model.LoginRequest;
+import net.ooder.skill.common.model.RoleConfig;
 import net.ooder.skill.common.model.UserSession;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -19,25 +20,8 @@ public class AuthService {
     private final Map<String, RoleConfig> roleConfigs = new LinkedHashMap<>();
     
     private UserInfoProvider userInfoProvider;
+    private RoleConfigProvider roleConfigProvider;
 
-    private static class RoleConfig {
-        String id;
-        String name;
-        String description;
-        String icon;
-        String orgRole;
-        List<String> permissions;
-
-        RoleConfig(String id, String name, String description, String icon, String orgRole, List<String> permissions) {
-            this.id = id;
-            this.name = name;
-            this.description = description;
-            this.icon = icon;
-            this.orgRole = orgRole;
-            this.permissions = permissions;
-        }
-    }
-    
     public interface UserInfoProvider {
         Object login(String username, String password, String clientIp, String role);
         
@@ -55,14 +39,56 @@ public class AuthService {
     }
 
     public AuthService() {
-        initRoleConfigs();
+        initDefaultRoleConfigs();
     }
     
     public void setUserInfoProvider(UserInfoProvider provider) {
         this.userInfoProvider = provider;
     }
+    
+    public void setRoleConfigProvider(RoleConfigProvider provider) {
+        this.roleConfigProvider = provider;
+        refreshRoleConfigs();
+    }
+    
+    public void addRoleConfig(RoleConfig config) {
+        if (config != null && config.getId() != null) {
+            roleConfigs.put(config.getId(), config);
+            log.info("Added role config: {}", config.getId());
+        }
+    }
+    
+    public void setRoleConfigs(List<RoleConfig> configs) {
+        roleConfigs.clear();
+        if (configs != null) {
+            for (RoleConfig config : configs) {
+                if (config.getId() != null) {
+                    roleConfigs.put(config.getId(), config);
+                }
+            }
+        }
+        log.info("Set {} role configs", roleConfigs.size());
+    }
+    
+    public List<RoleConfig> getRoleConfigs() {
+        return new ArrayList<>(roleConfigs.values());
+    }
+    
+    public RoleConfig getRoleConfig(String roleId) {
+        return roleConfigs.get(roleId);
+    }
+    
+    private void refreshRoleConfigs() {
+        if (roleConfigProvider != null) {
+            List<RoleConfig> configs = roleConfigProvider.getRoleConfigs();
+            if (configs != null && !configs.isEmpty()) {
+                setRoleConfigs(configs);
+                log.info("Refreshed role configs from provider: {} configs", configs.size());
+            }
+        }
+    }
 
-    private void initRoleConfigs() {
+    private void initDefaultRoleConfigs() {
         roleConfigs.put("installer", new RoleConfig(
             "installer", "系统安装者", "安装基础技能包，初始化系统环境", "ri-install-line",
             "installer", Arrays.asList("skill:install", "skill:view", "system:init")
@@ -85,7 +111,7 @@ public class AuthService {
             "collaborator", Arrays.asList("task:view", "task:execute", "task:submit", "scene:view", "todo:view")
         ));
 
-        log.info("AuthService initialized with {} role configs", roleConfigs.size());
+        log.info("AuthService initialized with {} default role configs", roleConfigs.size());
     }
 
     public UserSession login(LoginRequest request, HttpServletRequest httpRequest) {
@@ -123,7 +149,7 @@ public class AuthService {
                 log.info("[login] Session created for user: {}", session.getUserId());
             }
 
-            log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.id);
+            log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.getId());
             return session;
         }
 
@@ -147,7 +173,7 @@ public class AuthService {
             log.info("[login] Session created for user: {}", session.getUserId());
         }
 
-        log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.id);
+        log.info("[login] Login successful: userId={}, role={}", session.getUserId(), config.getId());
         return session;
     }
     
@@ -196,9 +222,9 @@ public class AuthService {
             }
         }
         
-        session.setRole(config.orgRole);
-        session.setRoleType(config.id);
-        session.setPermissions(config.permissions);
+        session.setRole(config.getOrgRole());
+        session.setRoleType(config.getId());
+        session.setPermissions(config.getPermissions());
         session.setLoginTime(System.currentTimeMillis());
         
         return session;
@@ -231,12 +257,12 @@ public class AuthService {
         session.setUserId("user-" + username);
         session.setUsername(username);
         session.setName(username.equals("admin") ? "管理员" : "用户");
-        session.setRole(config.orgRole);
-        session.setRoleType(config.id);
+        session.setRole(config.getOrgRole());
+        session.setRoleType(config.getId());
         session.setEmail(username + "@ooder.local");
         session.setDepartmentId("root");
         session.setDepartmentName("根组织");
-        session.setPermissions(config.permissions);
+        session.setPermissions(config.getPermissions());
         session.setLoginTime(System.currentTimeMillis());
         return session;
     }
@@ -333,10 +359,10 @@ public class AuthService {
 
         for (RoleConfig config : roleConfigs.values()) {
             Map<String, Object> role = new HashMap<>();
-            role.put("id", config.id);
-            role.put("name", config.name);
-            role.put("description", config.description);
-            role.put("icon", config.icon);
+            role.put("id", config.getId());
+            role.put("name", config.getName());
+            role.put("description", config.getDescription());
+            role.put("icon", config.getIcon());
             roles.add(role);
         }
 
@@ -380,7 +406,7 @@ public class AuthService {
                         continue;
                     }
                 }
-                if (roles != null && roles.contains(config.orgRole)) {
+                if (roles != null && roles.contains(config.getOrgRole())) {
                     filtered.add(user);
                 }
             }
@@ -459,8 +485,8 @@ public class AuthService {
             if (roles == null) {
                 roles = new ArrayList<>();
             }
-            if (!roles.contains(config.orgRole)) {
-                roles.add(config.orgRole);
+            if (!roles.contains(config.getOrgRole())) {
+                roles.add(config.getOrgRole());
             }
             ((Map<String, Object>) userObj).put("roles", roles);
             userInfoProvider.updateUser(userId, userObj);
@@ -470,8 +496,8 @@ public class AuthService {
                 if (roles == null) {
                     roles = new ArrayList<>();
                 }
-                if (!roles.contains(config.orgRole)) {
-                    roles.add(config.orgRole);
+                if (!roles.contains(config.getOrgRole())) {
+                    roles.add(config.getOrgRole());
                 }
                 userObj.getClass().getMethod("setRoles", List.class).invoke(userObj, roles);
                 userInfoProvider.updateUser(userId, userObj);

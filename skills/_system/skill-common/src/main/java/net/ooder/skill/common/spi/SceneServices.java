@@ -15,4 +15,14 @@ public interface SceneServices {
     MessageService getMessageService();
     
     AuditService getAuditService();
+    
+    ImService getImService();
+    
+    OrgSyncService getOrgSyncService();
+    
+    PlatformBindService getPlatformBindService();
+    
+    TodoSyncService getTodoSyncService();
+    
+    CalendarService getCalendarService();
 }
