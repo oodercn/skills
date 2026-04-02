@@ -5,6 +5,7 @@ metadata:
   id: skill-share
   name: 分享服务
   version: 0.7.3
+  category: biz
   description: 分享服务，提供内容分享、链接管理、权限控制
   author: ooder Team
   type: provider-skill

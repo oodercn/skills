@@ -6,7 +6,7 @@ metadata:
   name: 业务场景服务
   version: "2.3.1"
   category: biz
-  subCategory: scenario
+  subCategory: business
   description: 业务场景服务，提供业务场景管理、工作流执行、数据处理能力
   author: Ooder Team
   icon: ri-briefcase-line

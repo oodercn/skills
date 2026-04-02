@@ -5,6 +5,7 @@ metadata:
   id: skill-res-service
   name: 资源管理服务
   version: 0.7.3
+  category: sys
   description: 资源管理服务，提供CPU、内存、磁盘监控
   author: ooder Team
   type: provider-skill

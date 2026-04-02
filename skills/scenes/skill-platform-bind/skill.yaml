@@ -5,7 +5,7 @@ metadata:
   id: skill-platform-bind
   name: 平台绑定场景服务
   version: "2.3.1"
-  category: auth
+  category: biz
   subCategory: binding
   description: 多平台扫码绑定场景服务，支持钉钉、飞书、企业微信扫码授权绑定
   author: Ooder Team

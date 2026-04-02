@@ -5,6 +5,7 @@ metadata:
   id: skill-org-feishu
   name: Feishu Organization Service
   version: 2.3.1
+  category: org
   description: 飞书组织数据集成服务，包括组织架构同步、用户认证、扫码登录，支持飞书CLI集成
   author: Ooder Team
   license: Apache-2.0

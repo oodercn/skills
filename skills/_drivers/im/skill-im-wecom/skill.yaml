@@ -5,6 +5,7 @@ metadata:
   id: skill-im-wecom
   name: WeCom IM Service
   version: 3.0.1
+  category: msg
   description: 企业微信IM服务，提供消息发送、应用消息等功能
   author: Ooder Team
   license: Apache-2.0

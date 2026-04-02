@@ -5,6 +5,7 @@ metadata:
   id: skill-network
   name: Network Management Skill
   version: 0.7.3
+  category: sys
   description: 网络管理技能，提供网络配置、IP管理、设备扫描等功能
   author: Ooder Team
   license: Apache-2.0

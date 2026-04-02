@@ -5,6 +5,7 @@ metadata:
   id: skill-media-xiaohongshu
   name: 小红书发布服务
   version: 0.7.3
+  category: biz
   description: 小红书内容发布服务，支持笔记发布、管理
   author: ooder Team
   type: driver-skill

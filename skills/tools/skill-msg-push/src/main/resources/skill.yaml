@@ -5,6 +5,7 @@ metadata:
   id: skill-msg-push
   name: Multi-Channel Message Push Service
   version: 2.3.1
+  category: msg
   description: 多渠道消息推送服务，支持钉钉DING、飞书消息、企业微信
   author: Ooder Team
   license: Apache-2.0

@@ -5,6 +5,7 @@ metadata:
   id: skill-media-toutiao
   name: 头条发布服务
   version: 0.7.3
+  category: biz
   description: 头条内容发布服务，支持文章发布、更新、删除、统计
   author: ooder Team
   type: driver-skill

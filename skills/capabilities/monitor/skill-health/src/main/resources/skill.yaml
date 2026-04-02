@@ -5,6 +5,7 @@ metadata:
   id: skill-health
   name: 健康检查服务
   version: 2.3.0
+  category: sys
   description: 系统健康检查、服务状态监控、报告生成
   author: ooder Team
   type: system-service

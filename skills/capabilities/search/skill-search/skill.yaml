@@ -5,6 +5,7 @@ metadata:
   id: skill-search
   name: 搜索服务
   version: 0.7.3
+  category: knowledge
   description: 搜索服务，提供全文搜索、语义搜索功能
   author: ooder Team
   type: provider-skill

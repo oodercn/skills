@@ -5,6 +5,7 @@ metadata:
   id: skill-document-processor
   name: 文档处理器
   version: 2.3
+  category: knowledge
   description: 文档处理服务 - 支持多格式文档解析(TXT/MD/PDF/DOCX)、智能分块、元数据提取、Token估算
   author: ooder Team
   type: utility-service

@@ -5,6 +5,7 @@ metadata:
   id: skill-openwrt
   name: OpenWrt Router Driver
   version: 0.7.3
+  category: sys
   description: OpenWrt路由器驱动，提供路由器连接、配置管理和命令执行功能
   author: Ooder Team
   license: Apache-2.0

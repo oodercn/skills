@@ -5,6 +5,7 @@ metadata:
   id: skill-common
   name: 通用工具库
   version: 2.3.1
+  category: sys
   description: 通用工具库 - 提供认证、组织、配置等核心 API
   author: ooder Team
   type: system-service

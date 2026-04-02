@@ -5,6 +5,7 @@ metadata:
   id: skill-im
   name: 即时通讯服务
   version: 0.7.3
+  category: msg
   description: 即时通讯服务，支持实时消息、群聊、在线状态
   author: ooder Team
   type: provider-skill

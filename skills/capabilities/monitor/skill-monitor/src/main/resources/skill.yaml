@@ -5,6 +5,7 @@ metadata:
   id: skill-monitor
   name: 监控服务
   version: 2.3.0
+  category: sys
   description: 系统监控、指标采集、告警管理、日志查询
   author: ooder Team
   type: system-service

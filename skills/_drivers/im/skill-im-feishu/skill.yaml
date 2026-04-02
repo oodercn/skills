@@ -5,6 +5,7 @@ metadata:
   id: skill-im-feishu
   name: Feishu IM Service
   version: 3.0.1
+  category: msg
   description: 飞书IM服务，提供消息发送、文档创建、日程管理等功能
   author: Ooder Team
   license: Apache-2.0

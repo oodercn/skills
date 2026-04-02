@@ -5,6 +5,7 @@ metadata:
   id: skill-task
   name: 任务管理服务
   version: 0.7.3
+  category: sys
   description: 任务管理服务，提供任务创建、执行、状态管理
   author: ooder Team
   type: provider-skill

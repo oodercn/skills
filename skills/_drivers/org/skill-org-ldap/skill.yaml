@@ -5,6 +5,7 @@ metadata:
   id: skill-org-ldap
   name: LDAP Organization
   version: 0.7.3
+  category: org
   description: LDAP组织服务 - 提供基于LDAP的组织架构管理和用户认证能力
   author: Ooder Team
   license: Apache-2.0

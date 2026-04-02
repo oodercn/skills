@@ -5,6 +5,7 @@ metadata:
   id: skill-onboarding-assistant
   name: 新人培训助手
   version: 1.0.0
+  category: biz
   description: 新员工入职培训助手场景能力，帮助新人快速了解公司和岗位知识
   author: Ooder Team
   type: scene-skill

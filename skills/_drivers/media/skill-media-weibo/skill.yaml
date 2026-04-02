@@ -5,6 +5,7 @@ metadata:
   id: skill-media-weibo
   name: 微博发布服务
   version: 0.7.3
+  category: biz
   description: 微博内容发布服务，支持微博发布、互动管理
   author: ooder Team
   type: driver-skill

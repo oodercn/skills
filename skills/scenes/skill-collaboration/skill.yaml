@@ -3,9 +3,9 @@ kind: SkillPackage
 
 metadata:
   id: skill-collaboration
-  name: 协作场景服务
+  name: 协作场景
   version: "2.3.1"
-  category: util
+  category: biz
   subCategory: collaboration
   description: 协作场景服务，提供场景创建、成员管理、密钥管理能力
   author: Ooder Team

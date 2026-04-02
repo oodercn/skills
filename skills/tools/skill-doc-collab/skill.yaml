@@ -5,7 +5,7 @@ metadata:
   id: skill-doc-collab
   name: 文档协作服务
   version: "2.3.1"
-  category: productivity
+  category: biz
   subCategory: document
   description: 多平台文档协作服务，支持飞书文档、钉钉文档、企业微信文档的创建和协作
   author: Ooder Team

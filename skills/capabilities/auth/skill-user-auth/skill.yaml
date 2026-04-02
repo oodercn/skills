@@ -5,6 +5,7 @@ metadata:
   id: skill-user-auth
   name: 用户认证服务
   version: 2.3
+  category: org
   description: 用户认证服务 - 支持多种认证方式(密码/Token/OAuth)、会话管理、Token刷新
   author: ooder Team
   type: system-service

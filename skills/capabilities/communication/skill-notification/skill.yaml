@@ -5,6 +5,7 @@ metadata:
   id: skill-notification
   name: 通知服务
   version: 1.0.0
+  category: msg
   description: 通知服务 - 提供站内通知、消息推送、通知管理能力
   author: ooder Team
   type: provider-skill

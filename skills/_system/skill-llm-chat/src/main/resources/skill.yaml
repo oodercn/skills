@@ -5,6 +5,7 @@ metadata:
   id: skill-llm-chat
   name: LLM聊天助手
   version: 2.3.1
+  category: llm
   description: LLM聊天助手 - 内置知识资料库功能，支持多轮对话和知识检索
   author: ooder Team
   license: Apache-2.0

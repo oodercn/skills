@@ -5,6 +5,7 @@ metadata:
   id: skill-llm-config-manager
   name: LLM Config Manager
   version: 1.0.0
+  category: llm
   description: LLM配置管理 - 多级配置、加密存储、配置解析
   author: Ooder Team
   license: Apache-2.0

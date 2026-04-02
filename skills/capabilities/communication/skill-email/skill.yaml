@@ -5,6 +5,7 @@ metadata:
   id: skill-email
   name: 邮件服务
   version: 0.7.3
+  category: msg
   description: 邮件服务，支持邮件发送、接收、模板管理
   author: ooder Team
   type: provider-skill

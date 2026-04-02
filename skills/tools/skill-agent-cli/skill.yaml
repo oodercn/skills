@@ -5,7 +5,7 @@ metadata:
   id: skill-agent-cli
   name: AI Agent CLI Skills 集成
   version: "2.3.1"
-  category: ai
+  category: sys
   subCategory: agent
   description: AI Agent CLI Skills集成服务，封装钉钉CLI 10项核心能力和飞书CLI 19个Agent Skills
   author: Ooder Team

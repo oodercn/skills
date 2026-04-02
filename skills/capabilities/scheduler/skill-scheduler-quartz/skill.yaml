@@ -5,6 +5,7 @@ metadata:
   id: skill-scheduler-quartz
   name: Quartz调度服务
   version: 0.7.3
+  category: sys
   description: Quartz调度服务，提供定时任务调度、执行管理
   author: ooder Team
   type: provider-skill

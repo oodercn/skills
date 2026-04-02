@@ -5,6 +5,7 @@ metadata:
   id: skill-msg
   name: 消息服务
   version: 0.7.3
+  category: msg
   description: 消息服务，支持消息队列、订阅发布能力
   author: ooder Team
   type: provider-skill

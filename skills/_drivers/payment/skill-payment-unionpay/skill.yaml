@@ -5,6 +5,7 @@ metadata:
   id: skill-payment-unionpay
   name: 银联支付服务
   version: 0.7.3
+  category: biz
   description: 银联支付服务，支持支付、退款、回调处理
   author: ooder Team
   type: driver-skill

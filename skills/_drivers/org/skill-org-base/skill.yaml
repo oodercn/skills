@@ -5,6 +5,7 @@ metadata:
   id: skill-org-local
   name: 本地组织管理服务
   version: 2.3
+  category: org
   description: 本地组织管理服务 - 提供基于JSON存储的用户认证、组织管理、角色识别能力，作为其他OrgSkill实现的降级方案
   author: ooder Team
   type: system-service

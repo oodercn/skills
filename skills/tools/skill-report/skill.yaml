@@ -5,6 +5,7 @@ metadata:
   id: skill-report
   name: 报表服务
   version: 0.7.3
+  category: biz
   description: 报表服务，提供报表生成、导出、定时推送
   author: ooder Team
   type: provider-skill

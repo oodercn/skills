@@ -5,7 +5,7 @@ metadata:
   id: skill-todo-sync
   name: 待办同步服务
   version: "2.3.1"
-  category: productivity
+  category: biz
   subCategory: todo
   description: 多平台待办同步服务，支持钉钉、飞书、企业微信待办任务同步
   author: Ooder Team

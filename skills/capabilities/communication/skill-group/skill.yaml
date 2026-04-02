@@ -5,6 +5,7 @@ metadata:
   id: skill-group
   name: 群组服务
   version: 0.7.3
+  category: org
   description: 群组服务，支持群组管理、成员管理、权限控制
   author: ooder Team
   type: provider-skill

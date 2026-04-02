@@ -5,6 +5,7 @@ metadata:
   id: skill-mqtt
   name: MQTT Service
   version: 0.7.3
+  category: msg
   description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
   author: Ooder Team
   license: Apache-2.0
