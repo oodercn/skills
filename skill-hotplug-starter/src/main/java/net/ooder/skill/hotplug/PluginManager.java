@@ -8,6 +8,8 @@ import net.ooder.skill.hotplug.exception.PluginException;
 import net.ooder.skill.hotplug.model.*;
 import net.ooder.skill.hotplug.registry.RouteRegistry;
 import net.ooder.skill.hotplug.registry.ServiceRegistry;
+import net.ooder.skill.hotplug.ui.UiConfigResolver;
+import net.ooder.skill.hotplug.ui.UiRouteRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +43,12 @@ public class PluginManager {
 
     @Autowired
     private HotPlugProperties properties;
+
+    @Autowired(required = false)
+    private UiRouteRegistry uiRouteRegistry;
+
+    @Autowired(required = false)
+    private UiConfigResolver uiConfigResolver;
 
     // 已激活的插件上下文
     private final Map<String, PluginContext> activePlugins = new ConcurrentHashMap<>();
@@ -213,13 +221,16 @@ public class PluginManager {
             // 5. 注册路由
             registerRoutes(context);
 
-            // 6. 启动Skill
+            // 6. 注册UI配置
+            registerUiConfig(context);
+
+            // 7. 启动Skill
             startSkill(context);
 
-            // 7. 保存到激活列表
+            // 8. 保存到激活列表
             activePlugins.put(skillId, context);
 
-            // 8. 通知监听器
+            // 9. 通知监听器
             notifyListeners(PluginState.INSTALLED, context);
 
             logger.info("Skill installed successfully: {}", skillId);
@@ -252,13 +263,16 @@ public class PluginManager {
             // 3. 注销服务
             unregisterServices(context);
 
-            // 4. 关闭类加载器
+            // 4. 注销UI配置
+            unregisterUiConfig(skillId);
+
+            // 5. 关闭类加载器
             classLoaderManager.destroyClassLoader(skillId);
 
-            // 5. 从激活列表移除
+            // 6. 从激活列表移除
             activePlugins.remove(skillId);
 
-            // 6. 通知监听器
+            // 7. 通知监听器
             notifyListeners(PluginState.UNINSTALLED, context);
 
             logger.info("Skill uninstalled successfully: {}", skillId);
@@ -438,6 +452,43 @@ public class PluginManager {
 
     private void unregisterRoutes(PluginContext context) {
         routeRegistry.unregisterRoutes(context.getSkillId());
+    }
+
+    private void registerUiConfig(PluginContext context) {
+        if (uiRouteRegistry == null || uiConfigResolver == null) {
+            logger.debug("UI registry not available, skipping UI config registration for: {}", context.getSkillId());
+            return;
+        }
+
+        try {
+            SkillPackage skillPackage = context.getSkillPackage();
+            if (skillPackage == null || skillPackage.getMetadata() == null) {
+                return;
+            }
+
+            SkillMetadata metadata = skillPackage.getMetadata();
+            Map<String, Object> uiData = metadata.getUi();
+            if (uiData == null || uiData.isEmpty()) {
+                logger.debug("No UI config found for skill: {}", context.getSkillId());
+                return;
+            }
+
+            SkillUiConfig uiConfig = uiConfigResolver.resolve(context.getSkillId(), uiData);
+            if (uiConfig != null) {
+                uiRouteRegistry.register(context.getSkillId(), uiConfig);
+                logger.info("Registered UI config for skill: {}, menus={}, pages={}",
+                        context.getSkillId(), uiConfig.getMenus().size(), uiConfig.getPages().size());
+            }
+        } catch (Exception e) {
+            logger.error("Failed to register UI config for skill: {}", context.getSkillId(), e);
+        }
+    }
+
+    private void unregisterUiConfig(String skillId) {
+        if (uiRouteRegistry != null) {
+            uiRouteRegistry.unregister(skillId);
+            logger.info("Unregistered UI config for skill: {}", skillId);
+        }
     }
 
     private void startSkill(PluginContext context) {

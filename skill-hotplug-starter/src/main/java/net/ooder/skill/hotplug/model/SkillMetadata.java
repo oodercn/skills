@@ -74,6 +74,18 @@ public class SkillMetadata {
             if (specData.containsKey("nexusUi")) {
                 uiData.put("nexusUi", specData.get("nexusUi"));
             }
+            if (specData.containsKey("menus")) {
+                uiData.put("menus", specData.get("menus"));
+            }
+            if (specData.containsKey("pages")) {
+                uiData.put("pages", specData.get("pages"));
+            }
+            if (specData.containsKey("components")) {
+                uiData.put("components", specData.get("components"));
+            }
+            if (specData.containsKey("routes")) {
+                uiData.put("routes", specData.get("routes"));
+            }
             if (!uiData.isEmpty()) {
                 metadata.ui = uiData;
             }

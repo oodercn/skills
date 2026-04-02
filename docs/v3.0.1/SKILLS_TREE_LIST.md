@@ -339,11 +339,11 @@ _system (系统技能)
 │   └── provides: 基础DTO、工具类、配置
 │
 ├── skill-protocol              # 协议模块 - 协议解析
-│   ├── version: 2.3.1
+│   ├── version: 3.0.1
 │   └── provides: 协议解析、消息处理
 │
 ├── skill-management            # 管理模块 - 技能管理
-│   ├── version: 2.3.1
+│   ├── version: 3.0.1
 │   └── provides: 技能安装/卸载/更新
 │
 └── skill-llm-chat              # LLM聊天 - 聊天助手
