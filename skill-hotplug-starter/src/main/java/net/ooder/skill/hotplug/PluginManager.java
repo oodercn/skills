@@ -17,8 +17,7 @@ import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
@@ -54,8 +53,136 @@ public class PluginManager {
         logger.info("Initializing PluginManager...");
         // 初始化插件目录
         initPluginDirectory();
-        // 加载已安装的插件
-        loadInstalledPlugins();
+        // 从多来源加载插件
+        loadSkillsFromSources();
+    }
+
+    /**
+     * 从多来源加载 Skill
+     * 支持 system、plugins、external 三种来源
+     */
+    public void loadSkillsFromSources() {
+        if (!properties.isEnabled() || !properties.isAutoLoad()) {
+            logger.info("PluginManager auto-load is disabled");
+            return;
+        }
+
+        List<HotPlugProperties.SkillSource> sources = properties.getSources();
+        
+        // 如果没有配置 sources，使用向后兼容的方式加载
+        if (sources == null || sources.isEmpty()) {
+            logger.info("No sources configured, using backward compatible loading");
+            loadInstalledPlugins();
+            return;
+        }
+
+        // 按优先级排序
+        sources.stream()
+                .filter(HotPlugProperties.SkillSource::isEnabled)
+                .sorted(Comparator.comparingInt(HotPlugProperties.SkillSource::getPriority))
+                .forEach(this::loadFromSource);
+    }
+
+    /**
+     * 从指定来源加载 Skill
+     */
+    private void loadFromSource(HotPlugProperties.SkillSource source) {
+        String type = source.getType();
+        String path = source.getPath();
+        
+        logger.info("Loading skills from source: type={}, path={}", type, path);
+        
+        try {
+            switch (type) {
+                case "system":
+                    loadFromSystem(path);
+                    break;
+                case "plugins":
+                    loadFromPlugins(path);
+                    break;
+                case "external":
+                    loadFromExternal(path);
+                    break;
+                default:
+                    logger.warn("Unknown source type: {}", type);
+            }
+        } catch (Exception e) {
+            logger.error("Failed to load skills from source: type={}, path={}", type, path, e);
+        }
+    }
+
+    /**
+     * 从 system 目录加载 Skill
+     */
+    public void loadFromSystem(String path) {
+        logger.info("Loading system skills from: {}", path);
+        loadFromDirectory(path, "system");
+    }
+
+    /**
+     * 从 plugins 目录加载 Skill
+     */
+    public void loadFromPlugins(String path) {
+        logger.info("Loading plugin skills from: {}", path);
+        loadFromDirectory(path, "plugins");
+    }
+
+    /**
+     * 从 external 目录加载 Skill
+     */
+    public void loadFromExternal(String path) {
+        logger.info("Loading external skills from: {}", path);
+        loadFromDirectory(path, "external");
+    }
+
+    /**
+     * 从目录加载 JAR 文件
+     */
+    private void loadFromDirectory(String path, String sourceType) {
+        File dir = new File(path);
+        if (!dir.exists() || !dir.isDirectory()) {
+            logger.warn("Directory does not exist: {}", path);
+            return;
+        }
+
+        File[] jarFiles = dir.listFiles((d, name) -> name.endsWith(".jar"));
+        if (jarFiles == null || jarFiles.length == 0) {
+            logger.info("No JAR files found in: {}", path);
+            return;
+        }
+
+        logger.info("Found {} JAR files in {}: {}", jarFiles.length, sourceType, path);
+        
+        for (File jarFile : jarFiles) {
+            try {
+                loadSkillJar(jarFile, sourceType);
+            } catch (Exception e) {
+                logger.error("Failed to load skill JAR: {} from {}", jarFile.getName(), sourceType, e);
+            }
+        }
+    }
+
+    /**
+     * 加载单个 Skill JAR 文件
+     */
+    public PluginInstallResult loadSkillJar(File jarFile, String sourceType) {
+        logger.info("Loading skill JAR from {}: {}", sourceType, jarFile.getName());
+        
+        try {
+            SkillPackage skillPackage = SkillPackage.fromFile(jarFile);
+            String skillId = skillPackage.getMetadata().getId();
+            
+            // 防重复加载检查
+            if (isInstalled(skillId)) {
+                logger.info("Skill {} is already installed (from {}), skipping", skillId, sourceType);
+                return PluginInstallResult.success(skillId);
+            }
+            
+            return installSkill(skillPackage);
+        } catch (Exception e) {
+            logger.error("Failed to load skill JAR: {} from {}", jarFile.getName(), sourceType, e);
+            return PluginInstallResult.failure(jarFile.getName(), e.getMessage());
+        }
     }
 
     /**
@@ -78,7 +205,7 @@ public class PluginManager {
             SkillConfiguration config = loadSkillConfiguration(skillPackage, classLoader);
 
             // 3. 创建插件上下文
-            PluginContext context = new PluginContext(skillId, classLoader, config);
+            PluginContext context = new PluginContext(skillId, classLoader, config, skillPackage);
 
             // 4. 注册服务
             registerServices(context);
@@ -349,6 +476,14 @@ public class PluginManager {
                 logger.error("Error notifying listener", e);
             }
         }
+    }
+
+    /**
+     * 获取插件上下文
+     * 用于访问SkillPackage和静态资源
+     */
+    public PluginContext getPluginContext(String skillId) {
+        return activePlugins.get(skillId);
     }
 
     private PluginInfo toPluginInfo(PluginContext context) {

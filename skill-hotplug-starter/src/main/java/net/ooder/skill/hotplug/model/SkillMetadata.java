@@ -1,5 +1,7 @@
 package net.ooder.skill.hotplug.model;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.yaml.snakeyaml.Yaml;
 
 import java.io.InputStream;
@@ -12,12 +14,16 @@ import java.util.Map;
  */
 public class SkillMetadata {
 
+    private static final Logger logger = LoggerFactory.getLogger(SkillMetadata.class);
+
     private String id;
     private String name;
     private String version;
     private String description;
     private String author;
     private String type;
+    private String form;        // Skill 形态：SCENE、DRIVER、PROVIDER
+    private String category;    // 分类
     private List<String> dependencies;
     private Map<String, Object> config;
     private Map<String, Object> ui;
@@ -40,6 +46,8 @@ public class SkillMetadata {
             metadata.description = (String) metaData.get("description");
             metadata.author = (String) metaData.get("author");
             metadata.type = (String) metaData.get("type");
+            metadata.form = (String) metaData.get("form");     // 新增：加载 form 字段
+            metadata.category = (String) metaData.get("category"); // 新增：加载 category 字段
             metadata.dependencies = (List<String>) metaData.get("dependencies");
         }
         
@@ -49,7 +57,19 @@ public class SkillMetadata {
                 metadata.type = (String) specData.get("type");
             }
             metadata.config = (Map<String, Object>) specData.get("config");
-            
+
+            Object specSkillForm = specData.get("skillForm");
+            if (specSkillForm != null) {
+                if (metadata.form == null) {
+                    metadata.form = (String) specSkillForm;
+                    logger.info("[SkillMetadata] Loaded spec.skillForm: {} for skill: {}", specSkillForm, metadata.id);
+                } else {
+                    logger.info("[SkillMetadata] Skill {} has both metadata.form ({}) and spec.skillForm ({}), using metadata.form", metadata.id, metadata.form, specSkillForm);
+                }
+            } else {
+                logger.debug("[SkillMetadata] Skill {} has no spec.skillForm", metadata.id);
+            }
+
             Map<String, Object> uiData = new java.util.HashMap<>();
             if (specData.containsKey("nexusUi")) {
                 uiData.put("nexusUi", specData.get("nexusUi"));
@@ -57,6 +77,8 @@ public class SkillMetadata {
             if (!uiData.isEmpty()) {
                 metadata.ui = uiData;
             }
+        } else {
+            logger.debug("[SkillMetadata] No spec section found for skill: {}", metadata.id);
         }
         
         if (metadata.config == null) {
@@ -114,6 +136,22 @@ public class SkillMetadata {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getForm() {
+        return form;
+    }
+
+    public void setForm(String form) {
+        this.form = form;
+    }
+
+    public String getCategory() {
+        return category;
+    }
+
+    public void setCategory(String category) {
+        this.category = category;
     }
 
     public List<String> getDependencies() {

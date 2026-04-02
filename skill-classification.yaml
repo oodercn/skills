@@ -3,30 +3,40 @@ kind: SkillClassificationConfig
 
 metadata:
   name: skill-classification
-  version: "2.3"
-  description: Skills场景分类配置 - 支持ABS/ASS/TBS/SVC四大分类
+  version: "3.0.1"
+  description: Skills分类配置 - 采用SceneType + visibility二维分类体系
   author: Ooder Team
-  createdAt: "2026-03-06T00:00:00Z"
+  createdAt: "2026-04-02T00:00:00Z"
+  updatedAt: "2026-04-02T00:00:00Z"
+  changeLog:
+    - version: "3.0.1"
+      date: "2026-04-02"
+      changes:
+        - "废弃ABS/ASS/TBS分类，改用SceneType + visibility二维分类"
+        - "SceneType: AUTO(自驱场景), TRIGGER(触发场景)"
+        - "visibility: public(公开可见), internal(内部使用)"
+        - "对照关系: ABS→AUTO+public, ASS→AUTO+internal, TBS→TRIGGER+public"
+    - version: "2.3"
+      date: "2026-03-06"
+      changes:
+        - "初始版本，使用ABS/ASS/TBS/SVC分类"
 
 spec:
-  sceneCategories:
-    - id: abs
-      name: 自驱业务场景
-      nameEn: Auto Business Scene
-      shortName: ABS
-      description: 自动启动、业务闭环的场景技能，具备完整的业务语义和自驱能力
+  sceneTypes:
+    - id: AUTO
+      name: 自驱场景
+      nameEn: Auto Scene
+      description: 自动启动、自驱运行的场景技能，具备完整的自驱能力
       icon: auto-scene
       order: 1
-      type: scene-skill
       criteria:
+        hasSelfDrive: true
         mainFirst: true
-        hasSceneCapabilities: true
-        businessSemanticsScoreMin: 8
       features:
         - autoStart
-        - businessLoop
+        - selfDrive
         - driverCapability
-        - collaborationSupport
+        - scheduledTask
       lifecycle:
         initPhase: selfCheck
         startPhase: selfStart
@@ -36,55 +46,23 @@ spec:
         - skill-llm-chat
         - skill-knowledge-qa
         - skill-daily-report
-        - skill-llm-workspace
-
-    - id: ass
-      name: 自驱系统场景
-      nameEn: Auto System Scene
-      shortName: ASS
-      description: 自动启动、系统功能的场景技能，具备系统级自驱能力但无业务语义
-      icon: auto-system
-      order: 2
-      type: scene-skill
-      criteria:
-        mainFirst: true
-        hasSceneCapabilities: true
-        businessSemanticsScoreMax: 7
-      features:
-        - autoStart
-        - systemFunction
-        - driverCapability
-      lifecycle:
-        initPhase: selfCheck
-        startPhase: selfStart
-        runPhase: scheduledTask
-        stopPhase: gracefulShutdown
-      examples:
-        - skill-health
-        - skill-monitor
-        - skill-scheduler-quartz
+        - skill-health-monitor
         - skill-update-checker
-        - skill-failover-manager
-        - skill-load-balancer
-        - skill-capability-coordinator
-        - skill-agent
+        - skill-agent-cli
 
-    - id: tbs
-      name: 触发业务场景
-      nameEn: Trigger Business Scene
-      shortName: TBS
-      description: 人工触发、被动响应的场景技能，具备业务语义但无自驱能力
+    - id: TRIGGER
+      name: 触发场景
+      nameEn: Trigger Scene
+      description: 人工触发、被动响应的场景技能，需要外部触发才能运行
       icon: trigger-scene
-      order: 3
-      type: scene-skill
+      order: 2
       criteria:
+        hasSelfDrive: false
         mainFirst: false
-        hasSceneCapabilities: true
-        businessSemanticsScoreMin: 8
       features:
         - triggerStart
-        - businessFunction
         - passiveResponse
+        - eventDriven
       lifecycle:
         initPhase: register
         startPhase: waitForTrigger
@@ -93,197 +71,367 @@ spec:
       examples:
         - skill-business
         - skill-collaboration
-        - skill-report
-        - skill-task
-        - skill-market
-        - skill-share
+        - skill-approval-form
+        - skill-meeting-minutes
+        - skill-document-assistant
+        - skill-recruitment-management
 
-    - id: svc
-      name: 服务技能
-      nameEn: Service Skill
-      shortName: SVC
-      description: 纯服务提供的技能，无场景特性，作为能力提供者被其他技能依赖
-      icon: service
-      order: 4
-      type: service-skill
+  visibilityTypes:
+    - id: public
+      name: 公开可见
+      nameEn: Public Visibility
+      description: 用户可发现、可激活的场景技能，具备业务语义
+      icon: public
+      order: 1
       criteria:
-        hasSceneCapabilities: false
+        userDiscoverable: true
+        userActivatable: true
       features:
-        - serviceProvider
-        - capabilityProvider
-        - dependency
-      lifecycle:
-        initPhase: register
-        startPhase: ready
-        runPhase: serve
-        stopPhase: cleanup
-      subCategories:
-        - id: org
-          name: 组织服务
-          description: 企业组织架构、用户认证相关服务
-          skills:
-            - skill-user-auth
-            - skill-org-dingding
-            - skill-org-feishu
-            - skill-org-wecom
-            - skill-org-ldap
-            - skill-org-base
-            - skill-access-control
-            - skill-security
-            - skill-audit
-            
-        - id: vfs
-          name: 存储服务
-          description: 文件存储、对象存储相关服务
-          skills:
-            - skill-vfs-local
-            - skill-vfs-database
-            - skill-vfs-minio
-            - skill-vfs-oss
-            - skill-vfs-s3
-            - skill-vfs-base
-            
-        - id: msg
-          name: 消息通讯
-          description: 消息队列、通讯协议服务
-          skills:
-            - skill-mqtt
-            - skill-msg
-            - skill-msg-service
-            - skill-im
-            - skill-group
-            - skill-email
-            - skill-notify
-            
-        - id: llm
-          name: LLM服务
-          description: 大语言模型相关服务
-          skills:
-            - skill-llm-conversation
-            - skill-llm-context-builder
-            - skill-llm-config-manager
-            - skill-llm-openai
-            - skill-llm-qianwen
-            - skill-llm-deepseek
-            - skill-llm-volcengine
-            - skill-llm-ollama
-            
-        - id: knowledge
-          name: 知识服务
-          description: 知识库、搜索、RAG相关服务
-          skills:
-            - skill-knowledge-base
-            - skill-local-knowledge
-            - skill-rag
-            - skill-vector-sqlite
-            - skill-search
-            
-        - id: sys
-          name: 系统服务
-          description: 系统监控、网络管理、安全审计
-          skills:
-            - skill-network
-            - skill-protocol
-            - skill-openwrt
-            - skill-hosting
-            - skill-k8s
-            - skill-cmd-service
-            - skill-res-service
-            - skill-remote-terminal
-            
-        - id: payment
-          name: 支付服务
-          description: 支付渠道、退款管理、交易处理
-          skills:
-            - skill-payment-alipay
-            - skill-payment-wechat
-            - skill-payment-unionpay
-            
-        - id: media
-          name: 媒体服务
-          description: 自媒体文章发布、内容管理、数据分析
-          skills:
-            - skill-media-wechat
-            - skill-media-weibo
-            - skill-media-zhihu
-            - skill-media-toutiao
-            - skill-media-xiaohongshu
-            
-        - id: util
-          name: 工具服务
-          description: 通用工具、辅助功能
-          skills:
-            - skill-a2ui
-            - skill-trae-solo
-            - skill-common
-            - skill-document-processor
-            - skill-command-shortcut
-            - skill-httpclient-okhttp
+        - userFacing
+        - businessSemantics
+        - marketplace
+      examples:
+        - skill-llm-chat
+        - skill-knowledge-qa
+        - skill-daily-report
+        - skill-business
+        - skill-collaboration
 
-  businessSemanticsScoring:
-    description: 业务语义评分标准（10分制）
-    criteria:
-      - item: driverConditions非空
-        score: 3
-        description: 有驱动条件定义
-      - item: participants非空
-        score: 3
-        description: 有参与者定义
-      - item: visibility为public
-        score: 2
-        description: 对外可见
-      - item: 有协作能力
-        score: 1
-        description: collaborativeCapabilities非空
-      - item: 有业务标签
-        score: 1
-        description: labels.scene.category存在
-    thresholds:
-      abs:
-        min: 8
-        description: ABS需要≥8分
-      ass:
-        max: 7
-        description: ASS需要<8分
-      tbs:
-        min: 8
-        description: TBS需要≥8分
+    - id: internal
+      name: 内部使用
+      nameEn: Internal Visibility
+      description: 系统内部使用的场景技能，用户不可见，后台自动运行
+      icon: internal
+      order: 2
+      criteria:
+        userDiscoverable: false
+        userActivatable: false
+      features:
+        - systemFunction
+        - backgroundTask
+        - autoManaged
+      examples:
+        - skill-health-monitor
+        - skill-update-checker
+        - skill-agent-cli
+        - skill-scheduler-quartz
+
+  serviceCategories:
+    - id: org
+      name: 组织服务
+      nameEn: Organization Service
+      description: 企业组织架构、用户认证相关服务
+      icon: org
+      order: 1
+      skills:
+        - skill-user-auth
+        - skill-org-dingding
+        - skill-org-feishu
+        - skill-org-wecom
+        - skill-org-ldap
+        - skill-org-base
+        - skill-access-control
+        - skill-security
+        - skill-audit
+
+    - id: vfs
+      name: 存储服务
+      nameEn: Virtual File System
+      description: 文件存储、对象存储相关服务
+      icon: storage
+      order: 2
+      skills:
+        - skill-vfs-local
+        - skill-vfs-database
+        - skill-vfs-minio
+        - skill-vfs-oss
+        - skill-vfs-s3
+        - skill-vfs-base
+
+    - id: msg
+      name: 消息通讯
+      nameEn: Messaging Service
+      description: 消息队列、通讯协议服务
+      icon: message
+      order: 3
+      skills:
+        - skill-mqtt
+        - skill-msg
+        - skill-msg-service
+        - skill-im
+        - skill-group
+        - skill-email
+        - skill-notify
+
+    - id: llm
+      name: LLM服务
+      nameEn: LLM Service
+      description: 大语言模型相关服务
+      icon: ai
+      order: 4
+      skills:
+        - skill-llm-base
+        - skill-llm-openai
+        - skill-llm-qianwen
+        - skill-llm-deepseek
+        - skill-llm-volcengine
+        - skill-llm-ollama
+        - skill-llm-baidu
+        - skill-llm-monitor
+
+    - id: knowledge
+      name: 知识服务
+      nameEn: Knowledge Service
+      description: 知识库、搜索、RAG相关服务
+      icon: knowledge
+      order: 5
+      skills:
+        - skill-knowledge-base
+        - skill-local-knowledge
+        - skill-rag
+        - skill-vector-sqlite
+        - skill-search
+
+    - id: sys
+      name: 系统服务
+      nameEn: System Service
+      description: 系统监控、网络管理、安全审计
+      icon: system
+      order: 6
+      skills:
+        - skill-network
+        - skill-protocol
+        - skill-openwrt
+        - skill-hosting
+        - skill-k8s
+        - skill-cmd-service
+        - skill-res-service
+        - skill-remote-terminal
+
+    - id: payment
+      name: 支付服务
+      nameEn: Payment Service
+      description: 支付渠道、退款管理、交易处理
+      icon: payment
+      order: 7
+      skills:
+        - skill-payment-alipay
+        - skill-payment-wechat
+        - skill-payment-unionpay
+
+    - id: media
+      name: 媒体服务
+      nameEn: Media Service
+      description: 自媒体文章发布、内容管理、数据分析
+      icon: media
+      order: 8
+      skills:
+        - skill-media-wechat
+        - skill-media-weibo
+        - skill-media-zhihu
+        - skill-media-toutiao
+        - skill-media-xiaohongshu
+
+    - id: util
+      name: 工具服务
+      nameEn: Utility Service
+      description: 通用工具、辅助功能
+      icon: tool
+      order: 9
+      skills:
+        - skill-a2ui
+        - skill-trae-solo
+        - skill-common
+        - skill-document-processor
+        - skill-command-shortcut
+        - skill-httpclient-okhttp
+
+  capabilityTypes:
+    - id: ATOMIC
+      name: 原子能力
+      nameEn: Atomic Capability
+      description: 单一功能，不可分解
+      icon: ri-flashlight-line
+      order: 1
+
+    - id: COMPOSITE
+      name: 组合能力
+      nameEn: Composite Capability
+      description: 组合多个原子能力
+      icon: ri-links-line
+      order: 2
+
+    - id: SCENE
+      name: 场景能力
+      nameEn: Scene Capability
+      description: 自驱型SuperAgent能力
+      icon: ri-layout-grid-line
+      order: 3
+
+    - id: DRIVER
+      name: 驱动能力
+      nameEn: Driver Capability
+      description: 意图/时间/事件驱动
+      icon: ri-timer-line
+      order: 4
+
+    - id: COLLABORATIVE
+      name: 协作能力
+      nameEn: Collaborative Capability
+      description: 跨场景协作能力
+      icon: ri-team-line
+      order: 5
+
+    - id: SERVICE
+      name: 服务能力
+      nameEn: Service Capability
+      description: 业务服务、API服务
+      icon: ri-server-line
+      order: 6
+
+    - id: AI
+      name: AI能力
+      nameEn: AI Capability
+      description: LLM、机器学习
+      icon: ri-brain-line
+      order: 7
+
+    - id: TOOL
+      name: 工具能力
+      nameEn: Tool Capability
+      description: 工具类功能
+      icon: ri-tools-line
+      order: 8
+
+    - id: CONNECTOR
+      name: 连接器能力
+      nameEn: Connector Capability
+      description: 连接协议类
+      icon: ri-plug-line
+      order: 9
+
+    - id: DATA
+      name: 数据能力
+      nameEn: Data Capability
+      description: 数据存储、处理
+      icon: ri-database-2-line
+      order: 10
+
+    - id: MANAGEMENT
+      name: 管理能力
+      nameEn: Management Capability
+      description: 配置管理、监控管理
+      icon: ri-settings-3-line
+      order: 11
+
+    - id: COMMUNICATION
+      name: 通信能力
+      nameEn: Communication Capability
+      description: 消息、通知
+      icon: ri-message-3-line
+      order: 12
+
+    - id: SECURITY
+      name: 安全能力
+      nameEn: Security Capability
+      description: 认证、加密
+      icon: ri-shield-check-line
+      order: 13
+
+    - id: MONITORING
+      name: 监控能力
+      nameEn: Monitoring Capability
+      description: 日志、指标
+      icon: ri-pulse-line
+      order: 14
+
+    - id: SKILL
+      name: 技能能力
+      nameEn: Skill Capability
+      description: 可安装的技能包
+      icon: ri-flashlight-line
+      order: 15
+
+    - id: CUSTOM
+      name: 自定义能力
+      nameEn: Custom Capability
+      description: 用户自定义
+      icon: ri-tools-line
+      order: 16
 
   detection:
     autoDetect: true
-    detectionVersion: "2.3.0"
+    detectionVersion: "3.0.1"
     rules:
-      - name: scene-skill-check
+      - name: scene-type-check
         priority: 1
         condition: "spec.sceneCapabilities != null && spec.sceneCapabilities.size() > 0"
         result: scene-skill
-        
-      - name: abs-check
+        description: 检查是否为场景技能
+
+      - name: auto-scene-check
         priority: 2
-        condition: "scene-skill && mainFirst == true && businessSemanticsScore >= 8"
-        result: ABS
-        
-      - name: ass-check
+        condition: "scene-skill && spec.hasSelfDrive == true"
+        result: AUTO
+        description: 检查是否为自驱场景
+
+      - name: trigger-scene-check
         priority: 3
-        condition: "scene-skill && mainFirst == true && businessSemanticsScore < 8"
-        result: ASS
-        
-      - name: tbs-check
+        condition: "scene-skill && spec.hasSelfDrive == false"
+        result: TRIGGER
+        description: 检查是否为触发场景
+
+      - name: public-visibility-check
         priority: 4
-        condition: "scene-skill && mainFirst == false && businessSemanticsScore >= 8"
-        result: TBS
-        
-      - name: svc-check
+        condition: "spec.visibility == 'public' || (spec.userDiscoverable == true && spec.userActivatable == true)"
+        result: public
+        description: 检查是否为公开可见
+
+      - name: internal-visibility-check
         priority: 5
+        condition: "spec.visibility == 'internal' || (spec.userDiscoverable == false && spec.userActivatable == false)"
+        result: internal
+        description: 检查是否为内部使用
+
+      - name: service-skill-check
+        priority: 6
         condition: "spec.sceneCapabilities == null || spec.sceneCapabilities.size() == 0"
-        result: SVC
+        result: service-skill
+        description: 检查是否为服务技能
+
+  legacyMapping:
+    description: 旧版ABS/ASS/TBS到新版SceneType + visibility的映射
+    mappings:
+      - legacy: ABS
+        modern:
+          sceneType: AUTO
+          visibility: public
+        description: 自驱业务场景 → 自驱场景 + 公开可见
+
+      - legacy: ASS
+        modern:
+          sceneType: AUTO
+          visibility: internal
+        description: 自驱系统场景 → 自驱场景 + 内部使用
+
+      - legacy: TBS
+        modern:
+          sceneType: TRIGGER
+          visibility: public
+        description: 触发业务场景 → 触发场景 + 公开可见
+
+      - legacy: SVC
+        modern:
+          type: service-skill
+        description: 服务技能保持不变
 
   pathMapping:
     enabled: true
     structure:
-      abs: "skills/scene-skills/abs/{skillId}"
-      ass: "skills/scene-skills/ass/{skillId}"
-      tbs: "skills/scene-skills/tbs/{skillId}"
-      svc: "skills/service-skills/{subCategory}/{skillId}"
+      AUTO_PUBLIC: "skills/scenes/auto-public/{skillId}"
+      AUTO_INTERNAL: "skills/scenes/auto-internal/{skillId}"
+      TRIGGER_PUBLIC: "skills/scenes/trigger-public/{skillId}"
+      TRIGGER_INTERNAL: "skills/scenes/trigger-internal/{skillId}"
+      SERVICE: "skills/services/{category}/{skillId}"
     legacySupport: true
     legacyPath: "skills/{skillId}"

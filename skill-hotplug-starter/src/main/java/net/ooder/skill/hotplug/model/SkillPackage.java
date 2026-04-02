@@ -1,5 +1,9 @@
 package net.ooder.skill.hotplug.model;
 
+import net.ooder.skill.hotplug.CategoryResolver;
+import net.ooder.skill.hotplug.SkillForm;
+import net.ooder.skill.hotplug.SkillFormResolver;
+
 import java.io.*;
 import java.net.URL;
 import java.util.Enumeration;
@@ -129,6 +133,77 @@ public class SkillPackage {
 
     public String getVersion() {
         return metadata.getVersion();
+    }
+
+    /**
+     * 获取 Skill ID
+     */
+    public String getSkillId() {
+        return metadata != null ? metadata.getId() : null;
+    }
+
+    /**
+     * 获取 Skill 名称
+     */
+    public String getName() {
+        return metadata != null ? metadata.getName() : null;
+    }
+
+    /**
+     * 获取描述
+     */
+    public String getDescription() {
+        return metadata != null ? metadata.getDescription() : null;
+    }
+
+    /**
+     * 获取作者
+     */
+    public String getAuthor() {
+        return metadata != null ? metadata.getAuthor() : null;
+    }
+
+    /**
+     * 获取分类（自动推断）
+     * 优先使用 metadata.category，如果为空则从 skillId 推断
+     */
+    public String getCategory() {
+        try {
+            if (metadata == null) {
+                return "sys";
+            }
+            // 使用 CategoryResolver 进行推断
+            String category = new CategoryResolver().resolve(metadata);
+            return category != null ? category : "sys";
+        } catch (Exception e) {
+            // 捕获任何异常，返回默认值
+            return "sys";
+        }
+    }
+
+    /**
+     * 获取 Skill 形态（自动推断）
+     * 优先使用 metadata.form，如果为空则从 skillId 推断
+     */
+    public String getSkillForm() {
+        try {
+            if (metadata == null) {
+                return SkillForm.PROVIDER.name();
+            }
+            // 使用 SkillFormResolver 进行推断
+            SkillForm form = new SkillFormResolver().resolve(metadata);
+            return form != null ? form.name() : SkillForm.PROVIDER.name();
+        } catch (Exception e) {
+            // 捕获任何异常，返回默认值
+            return SkillForm.PROVIDER.name();
+        }
+    }
+
+    /**
+     * 判断是否为场景应用
+     */
+    public boolean isSceneCapability() {
+        return SkillForm.SCENE.name().equals(getSkillForm());
     }
 
     @Override

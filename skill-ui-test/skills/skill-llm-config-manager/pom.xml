@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>skill-ui-test</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -15,7 +15,7 @@
     <packaging>jar</packaging>
 
     <name>Skill LLM Config Manager</name>
-    <description>LLM配置管理 - 多级配置、加密存储、配置解析</description>
+    <description>LLM配置管理 - 多级配置、加密存储、配置解�?/description>
 
     <dependencies>
         <dependency>

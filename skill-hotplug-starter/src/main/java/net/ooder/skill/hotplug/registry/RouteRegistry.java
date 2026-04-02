@@ -51,21 +51,30 @@ public class RouteRegistry {
         logger.info("Registering {} routes for skill: {}", routes.size(), skillId);
 
         Set<RegisteredRoute> skillRoutes = ConcurrentHashMap.newKeySet();
+        int skippedCount = 0;
 
         for (RouteDefinition route : routes) {
             try {
                 RegisteredRoute registeredRoute = registerRoute(skillId, route, classLoader);
-                skillRoutes.add(registeredRoute);
-                logger.debug("Registered route: {} {} -> {}.{}",
-                        route.getMethod(), route.getPath(),
-                        route.getControllerClass(), route.getMethodName());
+                if (registeredRoute != null) {
+                    skillRoutes.add(registeredRoute);
+                    logger.debug("Registered route: {} {} -> {}.{}",
+                            route.getMethod(), route.getPath(),
+                            route.getControllerClass(), route.getMethodName());
+                } else {
+                    skippedCount++;
+                    logger.debug("Skipped route: {} {} -> {}.{}",
+                            route.getMethod(), route.getPath(),
+                            route.getControllerClass(), route.getMethodName());
+                }
             } catch (Exception e) {
                 logger.error("Failed to register route: {}", route, e);
             }
         }
 
         registeredRoutes.put(skillId, skillRoutes);
-        logger.info("Successfully registered {} routes for skill: {}", skillRoutes.size(), skillId);
+        logger.info("Successfully registered {} routes for skill: {} (skipped: {})", 
+                skillRoutes.size(), skillId, skippedCount);
     }
 
     /**
@@ -117,10 +126,24 @@ public class RouteRegistry {
         Class<?> controllerClass = classLoader.loadClass(routeDef.getControllerClass());
         logger.debug("Loaded controller class: {}", controllerClass.getName());
 
+        // 检查是否已由 Spring 管理（方案B：跳过已注册路由）
+        Object existingController = findExistingSpringController(controllerClass);
+        if (existingController != null) {
+            logger.debug("Controller {} is already managed by Spring, checking route registration", 
+                    controllerClass.getName());
+            
+            // 检查路由是否已存在
+            if (isRouteAlreadyRegistered(routeDef.getPath(), routeDef.getMethod())) {
+                logger.warn("Route {} {} is already registered by Spring, skipping", 
+                        routeDef.getMethod(), routeDef.getPath());
+                return null;
+            }
+        }
+
         Object controller = createControllerInstance(controllerClass);
         logger.debug("Created controller instance: {}", controller.getClass().getName());
 
-        Method method = findMethod(controllerClass, routeDef.getMethodName(), routeDef.getParameterTypes());
+        Method method = findMethod(controllerClass, routeDef.getMethodName(), routeDef.getParameterTypes(), classLoader);
         logger.debug("Found method: {} with {} parameters", method.getName(), method.getParameterCount());
 
         RequestMappingInfo mappingInfo = createMappingInfo(routeDef);
@@ -147,12 +170,81 @@ public class RouteRegistry {
         handlerMapping.unregisterMapping(route.getMappingInfo());
     }
 
+    /**
+     * 查找是否已由 Spring 管理的 Controller Bean
+     * @param controllerClass Controller 类
+     * @return 如果存在返回 Bean 实例，否则返回 null
+     */
+    private Object findExistingSpringController(Class<?> controllerClass) {
+        try {
+            // 尝试按类型获取
+            Object bean = applicationContext.getBean(controllerClass);
+            if (bean != null) {
+                logger.debug("Found existing Spring controller by type: {}", controllerClass.getName());
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("No existing Spring controller found by type: {}", controllerClass.getName());
+        }
+        
+        // 尝试按简单类名获取
+        String beanName = controllerClass.getSimpleName();
+        // 首字母小写（Spring 默认命名规则）
+        beanName = Character.toLowerCase(beanName.charAt(0)) + beanName.substring(1);
+        try {
+            Object bean = applicationContext.getBean(beanName);
+            if (bean != null) {
+                logger.debug("Found existing Spring controller by name: {}", beanName);
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("No existing Spring controller found by name: {}", beanName);
+        }
+        
+        return null;
+    }
+
+    /**
+     * 检查路由是否已注册
+     * @param path 路由路径
+     * @param method HTTP 方法
+     * @return 如果已存在返回 true
+     */
+    private boolean isRouteAlreadyRegistered(String path, String method) {
+        try {
+            // 获取已注册的所有处理器映射
+            Map<?, ?> handlerMethods = handlerMapping.getHandlerMethods();
+            
+            // 遍历检查是否存在相同路径和方法的映射
+            for (Object mappingInfo : handlerMethods.keySet()) {
+                if (mappingInfo instanceof RequestMappingInfo) {
+                    RequestMappingInfo existingMapping = (RequestMappingInfo) mappingInfo;
+                    
+                    // 检查路径是否匹配
+                    Set<String> existingPatterns = existingMapping.getPatternValues();
+                    if (existingPatterns != null && existingPatterns.contains(path)) {
+                        // 检查 HTTP 方法是否匹配
+                        Set<RequestMethod> existingMethods = existingMapping.getMethodsCondition().getMethods();
+                        if (existingMethods == null || existingMethods.isEmpty() || 
+                            existingMethods.contains(RequestMethod.valueOf(method.toUpperCase()))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Error checking existing route registration: {}", e.getMessage());
+        }
+        return false;
+    }
+
     private Object createControllerInstance(Class<?> controllerClass) throws Exception {
         String beanName = controllerClass.getSimpleName();
         String className = controllerClass.getName();
         
+        // 首先尝试按类型获取已存在的 Spring Bean，避免重复创建
         try {
-            Object existingBean = applicationContext.getBean(className);
+            Object existingBean = applicationContext.getBean(controllerClass);
             if (existingBean != null) {
                 logger.debug("Using existing Spring bean for controller: {}", className);
                 return existingBean;
@@ -161,6 +253,18 @@ public class RouteRegistry {
             logger.debug("No existing bean found for controller: {}", className);
         }
         
+        // 其次尝试按 beanName 获取
+        try {
+            Object existingBean = applicationContext.getBean(beanName);
+            if (existingBean != null) {
+                logger.debug("Using existing Spring bean by name for controller: {}", beanName);
+                return existingBean;
+            }
+        } catch (Exception e) {
+            logger.debug("No existing bean found by name for controller: {}", beanName);
+        }
+        
+        // 创建新的 Bean 实例
         try {
             Object bean = applicationContext.getAutowireCapableBeanFactory()
                     .createBean(controllerClass);
@@ -176,18 +280,32 @@ public class RouteRegistry {
         }
     }
 
-    private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes) throws NoSuchMethodException {
+    private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes, 
+                              PluginClassLoader classLoader) throws NoSuchMethodException {
         if (parameterTypes == null || parameterTypes.length == 0) {
+            // 当没有指定参数类型时，查找所有同名方法并选择参数最少的一个
+            // 这样可以避免重载方法匹配错误
+            Method bestMatch = null;
+            int minParams = Integer.MAX_VALUE;
+            
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals(methodName)) {
-                    return method;
+                    int paramCount = method.getParameterCount();
+                    if (paramCount < minParams) {
+                        minParams = paramCount;
+                        bestMatch = method;
+                    }
                 }
+            }
+            
+            if (bestMatch != null) {
+                return bestMatch;
             }
         } else {
             Class<?>[] paramClasses = new Class<?>[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
                 try {
-                    paramClasses[i] = loadClass(parameterTypes[i]);
+                    paramClasses[i] = loadClass(parameterTypes[i], classLoader);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Class not found: " + parameterTypes[i], e);
                 }
@@ -229,8 +347,17 @@ public class RouteRegistry {
         return builder.build();
     }
 
-    private Class<?> loadClass(String className) throws ClassNotFoundException {
+    private Class<?> loadClass(String className, PluginClassLoader classLoader) throws ClassNotFoundException {
         try {
+            // 首先尝试使用 PluginClassLoader 加载类（优先）
+            if (classLoader != null) {
+                try {
+                    return classLoader.loadClass(className);
+                } catch (ClassNotFoundException e) {
+                    logger.debug("PluginClassLoader failed to load class: {}, falling back to system classloader", className);
+                }
+            }
+            // 回退到系统类加载器
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Class not found: " + className, e);

@@ -17,6 +17,7 @@ public class PluginContext {
     private final String skillId;
     private final PluginClassLoader classLoader;
     private final SkillConfiguration configuration;
+    private final SkillPackage skillPackage;
     private final Date installTime;
 
     private PluginState state;
@@ -24,9 +25,14 @@ public class PluginContext {
     private final Map<String, Object> attributes;
 
     public PluginContext(String skillId, PluginClassLoader classLoader, SkillConfiguration configuration) {
+        this(skillId, classLoader, configuration, null);
+    }
+
+    public PluginContext(String skillId, PluginClassLoader classLoader, SkillConfiguration configuration, SkillPackage skillPackage) {
         this.skillId = skillId;
         this.classLoader = classLoader;
         this.configuration = configuration;
+        this.skillPackage = skillPackage;
         this.installTime = new Date();
         this.state = PluginState.INITIALIZING;
         this.attributes = new ConcurrentHashMap<>();
@@ -69,6 +75,10 @@ public class PluginContext {
 
     public SkillConfiguration getConfiguration() {
         return configuration;
+    }
+
+    public SkillPackage getSkillPackage() {
+        return skillPackage;
     }
 
     public Date getInstallTime() {

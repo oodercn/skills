@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>independent-nexus</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <name>ooderNexus</name>
     <description>ooderNexus P2P AI Capability Distribution Hub built with Ooder SDK 3.0.0</description>
 

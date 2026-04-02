@@ -2,14 +2,18 @@ package net.ooder.skill.hotplug;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * 热插拔配置属性
+ * 支持多来源加载：system、plugins、external
  */
 @ConfigurationProperties(prefix = "ooder.skill.hotplug")
 public class HotPlugProperties {
 
     /**
-     * 插件目录
+     * 插件目录（向后兼容）
      */
     private String pluginDirectory = "./plugins";
 
@@ -37,6 +41,46 @@ public class HotPlugProperties {
      * 是否启用插件隔离
      */
     private boolean isolationEnabled = true;
+
+    /**
+     * 多来源加载配置
+     */
+    private List<SkillSource> sources = new ArrayList<>();
+
+    /**
+     * Skill 来源配置
+     */
+    public static class SkillSource {
+        /**
+         * 来源类型：system、plugins、external
+         */
+        private String type;
+
+        /**
+         * 来源路径
+         */
+        private String path;
+
+        /**
+         * 是否启用
+         */
+        private boolean enabled = true;
+
+        /**
+         * 加载优先级（数字越小优先级越高）
+         */
+        private int priority = 100;
+
+        // Getters and Setters
+        public String getType() { return type; }
+        public void setType(String type) { this.type = type; }
+        public String getPath() { return path; }
+        public void setPath(String path) { this.path = path; }
+        public boolean isEnabled() { return enabled; }
+        public void setEnabled(boolean enabled) { this.enabled = enabled; }
+        public int getPriority() { return priority; }
+        public void setPriority(int priority) { this.priority = priority; }
+    }
 
     // Getters and Setters
 
@@ -86,5 +130,13 @@ public class HotPlugProperties {
 
     public void setIsolationEnabled(boolean isolationEnabled) {
         this.isolationEnabled = isolationEnabled;
+    }
+
+    public List<SkillSource> getSources() {
+        return sources;
+    }
+
+    public void setSources(List<SkillSource> sources) {
+        this.sources = sources;
     }
 }

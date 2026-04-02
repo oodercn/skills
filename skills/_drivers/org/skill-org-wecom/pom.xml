@@ -7,12 +7,12 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>3.0.0</version>
+        <version>3.0.1</version>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-org-wecom</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <name>Skill Org WeCom - WeCom (Enterprise WeChat) Organization Implementation</name>
     <description>WeCom (Enterprise WeChat) organization structure implementation for OoderAgent</description>
 

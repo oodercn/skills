@@ -6,7 +6,7 @@
 
     <groupId>net.ooder.skill</groupId>
     <artifactId>skill-scene</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
 
     <name>Skill Scene</name>
@@ -54,28 +54,28 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-org-base</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
 
         <!-- Skill Common - Shared utilities including JsonStorage -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
 
         <!-- Skill Capability - Capability discovery and management -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-capability</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
 
         <!-- Skill LLM - LLM service and monitoring -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-llm</artifactId>
-            <version>3.0.0</version>
+            <version>3.0.1</version>
         </dependency>
 
         <dependency>

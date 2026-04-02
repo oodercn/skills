@@ -47,9 +47,18 @@ public class RouteRegistry {
         logger.info("Registering {} routes for skill: {}", routes.size(), skillId);
 
         Set<RegisteredRoute> skillRoutes = ConcurrentHashMap.newKeySet();
+        int skippedCount = 0;
 
         for (RouteDefinition route : routes) {
             try {
+                // 检查路由是否已存在（方案B：跳过已注册路由）
+                if (isRouteAlreadyRegistered(route.getPath(), route.getMethod())) {
+                    logger.warn("Route {} {} is already registered, skipping", 
+                            route.getMethod(), route.getPath());
+                    skippedCount++;
+                    continue;
+                }
+                
                 RegisteredRoute registeredRoute = registerRoute(skillId, route, classLoader);
                 skillRoutes.add(registeredRoute);
                 logger.debug("Registered route: {} {} -> {}.{}",
@@ -61,7 +70,8 @@ public class RouteRegistry {
         }
 
         registeredRoutes.put(skillId, skillRoutes);
-        logger.info("Successfully registered {} routes for skill: {}", skillRoutes.size(), skillId);
+        logger.info("Successfully registered {} routes for skill: {} (skipped: {})", 
+                skillRoutes.size(), skillId, skippedCount);
     }
 
     /**
@@ -113,7 +123,7 @@ public class RouteRegistry {
         Object controller = createControllerInstance(controllerClass);
 
         // 查找方法
-        Method method = findMethod(controllerClass, routeDef.getMethodName(), routeDef.getParameterTypes());
+        Method method = findMethod(controllerClass, routeDef.getMethodName(), routeDef.getParameterTypes(), classLoader);
 
         // 创建RequestMappingInfo
         RequestMappingInfo mappingInfo = createMappingInfo(routeDef);
@@ -141,6 +151,40 @@ public class RouteRegistry {
         handlerMapping.unregisterMapping(route.getMappingInfo());
     }
 
+    /**
+     * 检查路由是否已注册
+     * @param path 路由路径
+     * @param method HTTP 方法
+     * @return 如果已存在返回 true
+     */
+    private boolean isRouteAlreadyRegistered(String path, String method) {
+        try {
+            // 获取已注册的所有处理器映射
+            Map<?, ?> handlerMethods = handlerMapping.getHandlerMethods();
+            
+            // 遍历检查是否存在相同路径和方法的映射
+            for (Object mappingInfo : handlerMethods.keySet()) {
+                if (mappingInfo instanceof RequestMappingInfo) {
+                    RequestMappingInfo existingMapping = (RequestMappingInfo) mappingInfo;
+                    
+                    // 检查路径是否匹配
+                    Set<String> existingPatterns = existingMapping.getPatternValues();
+                    if (existingPatterns != null && existingPatterns.contains(path)) {
+                        // 检查 HTTP 方法是否匹配
+                        Set<RequestMethod> existingMethods = existingMapping.getMethodsCondition().getMethods();
+                        if (existingMethods == null || existingMethods.isEmpty() || 
+                            existingMethods.contains(RequestMethod.valueOf(method.toUpperCase()))) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            logger.debug("Error checking existing route registration: {}", e.getMessage());
+        }
+        return false;
+    }
+
     private Object createControllerInstance(Class<?> controllerClass) throws Exception {
         // 尝试使用默认构造器
         try {
@@ -153,18 +197,32 @@ public class RouteRegistry {
         }
     }
 
-    private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes) throws NoSuchMethodException {
+    private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes,
+                              PluginClassLoader classLoader) throws NoSuchMethodException {
         if (parameterTypes == null || parameterTypes.length == 0) {
+            // 当没有指定参数类型时，查找所有同名方法并选择参数最少的一个
+            // 这样可以避免重载方法匹配错误
+            Method bestMatch = null;
+            int minParams = Integer.MAX_VALUE;
+
             for (Method method : clazz.getMethods()) {
                 if (method.getName().equals(methodName)) {
-                    return method;
+                    int paramCount = method.getParameterCount();
+                    if (paramCount < minParams) {
+                        minParams = paramCount;
+                        bestMatch = method;
+                    }
                 }
+            }
+
+            if (bestMatch != null) {
+                return bestMatch;
             }
         } else {
             Class<?>[] paramClasses = new Class<?>[parameterTypes.length];
             for (int i = 0; i < parameterTypes.length; i++) {
                 try {
-                    paramClasses[i] = loadClass(parameterTypes[i]);
+                    paramClasses[i] = loadClass(parameterTypes[i], classLoader);
                 } catch (ClassNotFoundException e) {
                     throw new RuntimeException("Class not found: " + parameterTypes[i], e);
                 }
@@ -206,8 +264,17 @@ public class RouteRegistry {
         return builder.build();
     }
 
-    private Class<?> loadClass(String className) throws ClassNotFoundException {
+    private Class<?> loadClass(String className, PluginClassLoader classLoader) throws ClassNotFoundException {
         try {
+            // 首先尝试使用 PluginClassLoader 加载类（优先）
+            if (classLoader != null) {
+                try {
+                    return classLoader.loadClass(className);
+                } catch (ClassNotFoundException e) {
+                    logger.debug("PluginClassLoader failed to load class: {}, falling back to system classloader", className);
+                }
+            }
+            // 回退到系统类加载器
             return Class.forName(className);
         } catch (ClassNotFoundException e) {
             throw new RuntimeException("Class not found: " + className, e);

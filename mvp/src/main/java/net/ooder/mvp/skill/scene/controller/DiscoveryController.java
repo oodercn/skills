@@ -636,11 +636,84 @@ public class DiscoveryController {
             dto.setCapabilities(capNames);
         }
         
+        // 推断 skillForm
+        String skillForm = inferSkillForm(pkg.getSkillId(), pkg.getCategory(), metadata);
+        dto.setSkillForm(skillForm);
+        
         boolean installed = checkIfInstalled(pkg.getSkillId());
         dto.setInstalled(installed);
         dto.setStatus(installed ? "installed" : "available");
         
         return dto;
+    }
+    
+    /**
+     * 推断技能的 skillForm
+     * 基于技能ID、category和metadata进行推断
+     */
+    private String inferSkillForm(String skillId, String category, Map<String, Object> metadata) {
+        if (skillId == null) {
+            return "PROVIDER";
+        }
+
+        String skillIdLower = skillId.toLowerCase();
+
+        // 已知场景技能列表（来自 Gitee 的技能，SE SDK 未正确读取 spec.skillForm）
+        String[] knownSceneSkills = {
+            "skill-approval-form", "skill-recruitment-management", "skill-real-estate-form",
+            "skill-meeting-minutes", "skill-daily-report", "skill-recording-qa",
+            "skill-knowledge-management", "skill-knowledge-qa", "skill-knowledge-share",
+            "skill-document-assistant", "skill-onboarding-assistant", "skill-business",
+            "skill-collaboration", "skill-platform-bind", "skill-project-knowledge",
+            "skill-scene", "skill-form-builder", "skill-workflow-engine"
+        };
+
+        for (String known : knownSceneSkills) {
+            if (skillIdLower.equals(known)) {
+                log.debug("[inferSkillForm] Skill {} matched known scene skill", skillId);
+                return "SCENE";
+            }
+        }
+
+        // 场景技能关键字
+        String[] sceneKeywords = {
+            "scene", "approval", "recruitment", "real-estate", "meeting",
+            "daily-report", "knowledge", "collaboration", "business",
+            "onboarding", "project", "recording", "document", "platform-bind",
+            "workflow", "form"
+        };
+
+        for (String keyword : sceneKeywords) {
+            if (skillIdLower.contains(keyword)) {
+                log.debug("[inferSkillForm] Skill {} matched scene keyword: {}", skillId, keyword);
+                return "SCENE";
+            }
+        }
+
+        // 检查 metadata 中的 type 字段
+        if (metadata != null) {
+            Object type = metadata.get("type");
+            if (type != null) {
+                String typeStr = type.toString().toLowerCase();
+                if (typeStr.contains("scene") || typeStr.contains("scene-skill")) {
+                    log.debug("[inferSkillForm] Skill {} matched type: {}", skillId, typeStr);
+                    return "SCENE";
+                }
+            }
+
+            // 检查 metadata 中的 form 字段
+            Object form = metadata.get("form");
+            if (form != null) {
+                String formStr = form.toString().toUpperCase();
+                if ("SCENE".equals(formStr) || "PROVIDER".equals(formStr) || "DRIVER".equals(formStr)) {
+                    log.debug("[inferSkillForm] Skill {} has explicit form: {}", skillId, formStr);
+                    return formStr;
+                }
+            }
+        }
+
+        log.debug("[inferSkillForm] Skill {} defaulted to PROVIDER", skillId);
+        return "PROVIDER";
     }
     
     @GetMapping("/categories/stats")
