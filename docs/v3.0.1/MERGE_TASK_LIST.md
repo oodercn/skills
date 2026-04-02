@@ -19,7 +19,7 @@
 |------|------|--------|
 | Phase 0: 分析与规划 | ✅ 已完成 | 100% |
 | Phase 1: 核心功能补齐 | ✅ 已完成 | 100% |
-| Phase 2: UI配置处理 | ⏳ 待执行 | 0% |
+| Phase 2: UI配置处理 | ✅ 已完成 | 100% |
 | Phase 3: 性能优化 | ⏳ 待执行 | 0% |
 | Phase 4: 技能迁移 | ⏳ 待执行 | 0% |
 | Phase 5: 测试与验证 | ⏳ 待执行 | 0% |
@@ -96,23 +96,35 @@
 
 ---
 
-## 四、Phase 2: UI配置处理 (待执行)
+## 四、Phase 2: UI配置处理 (进行中)
 
 ### 4.1 UI配置加载机制
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
-| 实现 UI配置解析器 | P0 | ⏳ 待执行 | 解析skill.yaml中的ui配置 |
-| 实现页面路由注册 | P0 | ⏳ 待执行 | 将UI页面注册到前端路由 |
+| 实现 UI配置解析器 | P0 | ✅ 完成 | 解析skill.yaml中的ui配置 |
+| 实现页面路由注册 | P0 | ✅ 完成 | 将UI页面注册到前端路由 |
 | 实现组件动态加载 | P1 | ⏳ 待执行 | 支持远程组件加载 |
 
 ### 4.2 页面资源处理
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
-| 页面资源打包规范 | P0 | ⏳ 待执行 | 定义页面资源在JAR中的存放规范 |
+| 页面资源打包规范 | P0 | ✅ 完成 | 定义页面资源在JAR中的存放规范 |
 | 页面缓存策略 | P1 | ⏳ 待执行 | 实现页面资源缓存优化 |
 | 页面版本管理 | P1 | ⏳ 待执行 | 支持页面版本控制 |
+
+### 4.3 已完成文件
+
+| 文件 | 路径 | 说明 |
+|------|------|------|
+| SkillUiConfig | `skill-hotplug-starter/.../model/SkillUiConfig.java` | UI配置模型 |
+| SkillMenu | `skill-hotplug-starter/.../model/SkillMenu.java` | 菜单配置模型 |
+| SkillPage | `skill-hotplug-starter/.../model/SkillPage.java` | 页面配置模型 |
+| SkillComponent | `skill-hotplug-starter/.../model/SkillComponent.java` | 组件配置模型 |
+| UiConfigResolver | `skill-hotplug-starter/.../ui/UiConfigResolver.java` | UI配置解析器 |
+| UiRouteRegistry | `skill-hotplug-starter/.../ui/UiRouteRegistry.java` | UI路由注册器 |
+| UiConfigController | `skill-hotplug-starter/.../controller/UiConfigController.java` | UI配置API控制器 |
 
 ---
 

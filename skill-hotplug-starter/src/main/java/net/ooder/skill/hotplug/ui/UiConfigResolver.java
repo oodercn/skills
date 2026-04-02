@@ -4,24 +4,19 @@ import net.ooder.skill.hotplug.model.SkillComponent;
 import net.ooder.skill.hotplug.model.SkillMenu;
 import net.ooder.skill.hotplug.model.SkillPage;
 import net.ooder.skill.hotplug.model.SkillUiConfig;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
 /**
- * UI配置解析器
- * 从skill.yaml中解析UI配置
+ * UI配置解析辅助类
  */
 public class UiConfigResolver {
 
-    private static final Logger logger = LoggerFactory.getLogger(UiConfigResolver.class);
-
-    @SuppressWarnings("unchecked")
-    public SkillUiConfig resolve(String skillId, Map<String, Object> uiData) {
-        if (uiData == null || uiData.isEmpty()) {
+    public SkillUiConfig resolve(String skillId, Map<String, Object> spec) {
+        if (spec == null) {
             return null;
         }
 
@@ -29,13 +24,10 @@ public class UiConfigResolver {
         config.setSkillId(skillId);
         config.setBasePath("/skill/" + skillId);
 
-        resolveMenus(config, uiData);
-        resolvePages(config, uiData);
-        resolveComponents(config, uiData);
-        resolveNexusUi(config, uiData);
-
-        logger.info("[UiConfigResolver] Resolved UI config for skill: {}, menus={}, pages={}, components={}",
-                skillId, config.getMenus().size(), config.getPages().size(), config.getComponents().size());
+        resolveMenus(config, spec);
+        resolvePages(config, spec);
+        resolveComponents(config, spec);
+        resolveNexusUi(config, spec);
 
         return config;
     }

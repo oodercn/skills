@@ -2,6 +2,9 @@ package net.ooder.skill.hotplug.controller;
 
 import net.ooder.skill.hotplug.PluginManager;
 import net.ooder.skill.hotplug.model.SkillUiConfig;
+import net.ooder.skill.hotplug.ui.ComponentLoader;
+import net.ooder.skill.hotplug.ui.PageCacheManager;
+import net.ooder.skill.hotplug.ui.PageVersionManager;
 import net.ooder.skill.hotplug.ui.UiRouteRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import jakarta.servlet.http.HttpServletRequest;
 import java.util.*;
 
 /**
@@ -26,6 +30,15 @@ public class UiConfigController {
 
     @Autowired
     private UiRouteRegistry uiRouteRegistry;
+
+    @Autowired(required = false)
+    private ComponentLoader componentLoader;
+
+    @Autowired(required = false)
+    private PageCacheManager pageCacheManager;
+
+    @Autowired(required = false)
+    private PageVersionManager pageVersionManager;
 
     @GetMapping("/menus")
     public ResponseEntity<Map<String, Object>> getAllMenus() {
@@ -136,6 +149,186 @@ public class UiConfigController {
         result.put("success", true);
         result.put("data", skills);
         result.put("total", skills.size());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/components/{skillId}")
+    public ResponseEntity<Map<String, Object>> listComponents(@PathVariable String skillId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (componentLoader == null) {
+            result.put("success", false);
+            result.put("error", "Component loader not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        List<Map<String, Object>> components = componentLoader.listComponents(skillId);
+        result.put("success", true);
+        result.put("data", components);
+        result.put("total", components.size());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/components/{skillId}/{componentId}")
+    public ResponseEntity<Map<String, Object>> getComponent(
+            @PathVariable String skillId,
+            @PathVariable String componentId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (componentLoader == null) {
+            result.put("success", false);
+            result.put("error", "Component loader not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        Map<String, Object> component = componentLoader.loadComponentWithMetadata(skillId, componentId);
+        if (component.isEmpty()) {
+            result.put("success", false);
+            result.put("error", "Component not found: " + componentId);
+            return ResponseEntity.status(404).body(result);
+        }
+
+        result.put("success", true);
+        result.put("data", component);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/page-content/{skillId}/**")
+    public ResponseEntity<Map<String, Object>> getPageContent(
+            @PathVariable String skillId,
+            HttpServletRequest request) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageCacheManager == null) {
+            result.put("success", false);
+            result.put("error", "Page cache manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        String requestPath = request.getRequestURI();
+        String prefix = "/api/v1/skill-ui/page-content/" + skillId + "/";
+        String pagePath = requestPath.substring(prefix.length());
+
+        Map<String, Object> pageData = pageCacheManager.getPageWithMetadata(skillId, pagePath);
+        if (!pageData.containsKey("content")) {
+            result.put("success", false);
+            result.put("error", "Page not found: " + pagePath);
+            return ResponseEntity.status(404).body(result);
+        }
+
+        result.put("success", true);
+        result.put("data", pageData);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/cache/{skillId}")
+    public ResponseEntity<Map<String, Object>> clearSkillCache(@PathVariable String skillId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageCacheManager == null) {
+            result.put("success", false);
+            result.put("error", "Page cache manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        pageCacheManager.clearCacheForSkill(skillId);
+        
+        if (componentLoader != null) {
+            componentLoader.clearCache(skillId);
+        }
+
+        result.put("success", true);
+        result.put("message", "Cache cleared for skill: " + skillId);
+        return ResponseEntity.ok(result);
+    }
+
+    @DeleteMapping("/cache")
+    public ResponseEntity<Map<String, Object>> clearAllCache() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageCacheManager == null) {
+            result.put("success", false);
+            result.put("error", "Page cache manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        pageCacheManager.clearAllCache();
+        
+        if (componentLoader != null) {
+            componentLoader.clearAllCache();
+        }
+
+        result.put("success", true);
+        result.put("message", "All cache cleared");
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/cache/stats")
+    public ResponseEntity<Map<String, Object>> getCacheStats() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageCacheManager == null) {
+            result.put("success", false);
+            result.put("error", "Page cache manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        result.put("success", true);
+        result.put("data", pageCacheManager.getCacheStats());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/versions/{skillId}")
+    public ResponseEntity<Map<String, Object>> getSkillVersionInfo(@PathVariable String skillId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageVersionManager == null) {
+            result.put("success", false);
+            result.put("error", "Page version manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        Map<String, Object> versionInfo = pageVersionManager.getSkillVersionInfo(skillId);
+        if (versionInfo.isEmpty()) {
+            result.put("success", false);
+            result.put("error", "Skill version not found: " + skillId);
+            return ResponseEntity.status(404).body(result);
+        }
+
+        result.put("success", true);
+        result.put("data", versionInfo);
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/versions/{skillId}/pages")
+    public ResponseEntity<Map<String, Object>> getPageVersions(@PathVariable String skillId) {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageVersionManager == null) {
+            result.put("success", false);
+            result.put("error", "Page version manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        List<Map<String, Object>> versions = pageVersionManager.getAllPageVersions(skillId);
+        result.put("success", true);
+        result.put("data", versions);
+        result.put("total", versions.size());
+        return ResponseEntity.ok(result);
+    }
+
+    @GetMapping("/versions/stats")
+    public ResponseEntity<Map<String, Object>> getVersionStats() {
+        Map<String, Object> result = new LinkedHashMap<>();
+
+        if (pageVersionManager == null) {
+            result.put("success", false);
+            result.put("error", "Page version manager not available");
+            return ResponseEntity.status(503).body(result);
+        }
+
+        result.put("success", true);
+        result.put("data", pageVersionManager.getVersionStats());
         return ResponseEntity.ok(result);
     }
 }
