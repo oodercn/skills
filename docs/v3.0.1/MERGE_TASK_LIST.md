@@ -20,7 +20,7 @@
 | Phase 0: 分析与规划 | ✅ 已完成 | 100% |
 | Phase 1: 核心功能补齐 | ✅ 已完成 | 100% |
 | Phase 2: UI配置处理 | ✅ 已完成 | 100% |
-| Phase 3: 性能优化 | ⏳ 待执行 | 0% |
+| Phase 3: 性能优化 | ✅ 已完成 | 90% |
 | Phase 4: 技能迁移 | ⏳ 待执行 | 0% |
 | Phase 5: 测试与验证 | ⏳ 待执行 | 0% |
 
@@ -96,7 +96,7 @@
 
 ---
 
-## 四、Phase 2: UI配置处理 (进行中)
+## 四、Phase 2: UI配置处理 (已完成)
 
 ### 4.1 UI配置加载机制
 
@@ -104,15 +104,15 @@
 |------|--------|------|------|
 | 实现 UI配置解析器 | P0 | ✅ 完成 | 解析skill.yaml中的ui配置 |
 | 实现页面路由注册 | P0 | ✅ 完成 | 将UI页面注册到前端路由 |
-| 实现组件动态加载 | P1 | ⏳ 待执行 | 支持远程组件加载 |
+| 实现组件动态加载 | P1 | ✅ 完成 | 支持远程组件加载 |
 
 ### 4.2 页面资源处理
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
 | 页面资源打包规范 | P0 | ✅ 完成 | 定义页面资源在JAR中的存放规范 |
-| 页面缓存策略 | P1 | ⏳ 待执行 | 实现页面资源缓存优化 |
-| 页面版本管理 | P1 | ⏳ 待执行 | 支持页面版本控制 |
+| 页面缓存策略 | P1 | ✅ 完成 | 实现页面资源缓存优化 |
+| 页面版本管理 | P1 | ✅ 完成 | 支持页面版本控制 |
 
 ### 4.3 已完成文件
 
@@ -124,7 +124,31 @@
 | SkillComponent | `skill-hotplug-starter/.../model/SkillComponent.java` | 组件配置模型 |
 | UiConfigResolver | `skill-hotplug-starter/.../ui/UiConfigResolver.java` | UI配置解析器 |
 | UiRouteRegistry | `skill-hotplug-starter/.../ui/UiRouteRegistry.java` | UI路由注册器 |
+| ComponentLoader | `skill-hotplug-starter/.../ui/ComponentLoader.java` | 组件动态加载器 |
+| PageCacheManager | `skill-hotplug-starter/.../ui/PageCacheManager.java` | 页面缓存管理器 |
+| PageVersionManager | `skill-hotplug-starter/.../ui/PageVersionManager.java` | 页面版本管理器 |
 | UiConfigController | `skill-hotplug-starter/.../controller/UiConfigController.java` | UI配置API控制器 |
+
+### 4.4 API端点
+
+```
+GET  /api/v1/skill-ui/menus                    # 获取所有Skill的菜单
+GET  /api/v1/skill-ui/menus/{skillId}          # 获取指定Skill的菜单
+GET  /api/v1/skill-ui/menus/{skillId}/role/{role}  # 按角色获取菜单
+GET  /api/v1/skill-ui/pages/{skillId}          # 获取指定Skill的页面
+GET  /api/v1/skill-ui/config/{skillId}         # 获取UI配置
+GET  /api/v1/skill-ui/route-info/{skillId}     # 获取路由信息
+GET  /api/v1/skill-ui/list                     # 列出有UI的Skill
+GET  /api/v1/skill-ui/components/{skillId}     # 列出组件
+GET  /api/v1/skill-ui/components/{skillId}/{componentId}  # 获取组件内容
+GET  /api/v1/skill-ui/page-content/{skillId}/**  # 获取页面内容
+DEL  /api/v1/skill-ui/cache/{skillId}          # 清除指定Skill缓存
+DEL  /api/v1/skill-ui/cache                    # 清除所有缓存
+GET  /api/v1/skill-ui/cache/stats              # 获取缓存统计
+GET  /api/v1/skill-ui/versions/{skillId}       # 获取Skill版本信息
+GET  /api/v1/skill-ui/versions/{skillId}/pages # 获取页面版本列表
+GET  /api/v1/skill-ui/versions/stats           # 获取版本统计
+```
 
 ---
 
