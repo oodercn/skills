@@ -28,13 +28,10 @@ spec:
     visibility: public
     participantMode: multi-role
     name: 房源管理
-    description: 房产中介房源信息采集与管理
-    
+    description: 房产中介房源信息采集与管�?    
   roles:
     - id: BROKER
-      name: 房产经纪人
-      description: 房产经纪人，负责房源录入和管理
-      required: true
+      name: 房产经纪�?      description: 房产经纪人，负责房源录入和管�?      required: true
       minCount: 1
       maxCount: 100
       permissions:
@@ -54,8 +51,7 @@ spec:
         - property:view-all
         - property:export
     - id: ADMIN
-      name: 系统管理员
-      description: 系统管理员，负责系统配置
+      name: 系统管理�?      description: 系统管理员，负责系统配置
       required: true
       minCount: 1
       maxCount: 5
@@ -70,8 +66,7 @@ spec:
         step: 1
         action: register-account
         title: 注册账号
-        description: 创建经纪人账号
-        type: CONFIRM_JOIN
+        description: 创建经纪人账�?        type: CONFIRM_JOIN
         required: true
         skippable: false
         autoExecute: false
@@ -79,8 +74,7 @@ spec:
         step: 2
         action: configure-profile
         title: 配置个人信息
-        description: 设置联系方式和负责区域
-        type: CONFIG_PRIVATE_CAPABILITIES
+        description: 设置联系方式和负责区�?        type: CONFIG_PRIVATE_CAPABILITIES
         required: false
         skippable: true
         autoExecute: false
@@ -88,8 +82,7 @@ spec:
       - stepId: accept-invitation
         step: 1
         action: accept-invitation
-        title: 接受邀请
-        description: 加入门店管理
+        title: 接受邀�?        description: 加入门店管理
         type: CONFIRM_JOIN
         required: true
         skippable: false
@@ -117,17 +110,14 @@ spec:
         step: 3
         action: invite-brokers
         title: 邀请经纪人
-        description: 添加经纪人账号
-        type: CONFIRM_PARTICIPANTS
+        description: 添加经纪人账�?        type: CONFIRM_PARTICIPANTS
         required: false
         skippable: true
         autoExecute: false
       - stepId: confirm-activation
         step: 4
         action: confirm-activation
-        title: 确认激活
-        description: 确认场景激活
-        type: CONFIRM_ACTIVATION
+        title: 确认激�?        description: 确认场景激�?        type: CONFIRM_ACTIVATION
         required: true
         skippable: false
         autoExecute: false
@@ -166,8 +156,7 @@ spec:
         order: 2
         visible: true
       - id: pending-approval
-        name: 待审核
-        icon: ri-checkbox-line
+        name: 待审�?        icon: ri-checkbox-line
         path: /real-estate/pending
         order: 3
         visible: true
@@ -265,8 +254,7 @@ spec:
       
     - id: property-search
       name: 房源查询
-      description: 多条件房源搜索
-      category: search
+      description: 多条件房源搜�?      category: search
       type: ATOMIC
 
   capabilityChains:
@@ -294,8 +282,7 @@ spec:
       
     - path: /api/real-estate/properties
       method: POST
-      description: 创建新房源
-      capability: property-listing
+      description: 创建新房�?      capability: property-listing
       
     - path: /api/real-estate/properties/{id}
       method: GET
@@ -340,23 +327,21 @@ spec:
       - name: MAX_IMAGES
         type: integer
         default: 20
-        description: 最大图片数量
-      - name: MAX_IMAGE_SIZE
+        description: 最大图片数�?      - name: MAX_IMAGE_SIZE
         type: integer
         default: 10485760
-        description: 单张图片最大大小(字节)
+        description: 单张图片最大大�?字节)
       - name: SUPPORTED_IMAGE_TYPES
         type: string
         default: "jpg,jpeg,png,webp"
-        description: 支持的图片格式
-      - name: VALUATION_ENABLED
+        description: 支持的图片格�?      - name: VALUATION_ENABLED
         type: boolean
         default: true
         description: 启用智能估价功能
       - name: MAP_PROVIDER
         type: string
         default: "amap"
-        description: 地图服务商(amap/baidu/tencent)
+        description: 地图服务�?amap/baidu/tencent)
 
   resources:
     cpu: "100m"

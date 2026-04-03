@@ -49,14 +49,14 @@ spec:
       enabled: true
       tools:
         - name: send_message
-          description: "发送钉钉消息"
+          description: "发送钉钉消�?
           parameters:
             type: object
             properties:
               receiver:
                 type: string
                 enum: [user, group]
-                description: "接收者类型"
+                description: "接收者类�?
               receiverId:
                 type: string
                 description: "接收者ID"
@@ -89,13 +89,12 @@ spec:
                 type: integer
                 enum: [1, 2]
                 default: 1
-                description: "提醒类型：1-应用内，2-短信"
+                description: "提醒类型�?-应用内，2-短信"
 
   capabilities:
     - id: send-message
       name: Send Message
-      description: 发送消息
-      category: messaging
+      description: 发送消�?      category: messaging
     - id: send-ding
       name: Send DING
       description: 发送DING消息
@@ -106,8 +105,7 @@ spec:
       category: messaging
     - id: send-action-card
       name: Send Action Card
-      description: 发送交互卡片
-      category: messaging
+      description: 发送交互卡�?      category: messaging
 
   config:
     required:
@@ -127,8 +125,7 @@ spec:
   endpoints:
     - path: /api/v1/im/dingding/send
       method: POST
-      description: 发送消息
-      capability: send-message
+      description: 发送消�?      capability: send-message
     - path: /api/v1/im/dingding/ding
       method: POST
       description: 发送DING消息
@@ -147,5 +144,4 @@ spec:
       capability: send-markdown
     - path: /api/v1/im/dingding/send/action-card
       method: POST
-      description: 发送交互卡片
-      capability: send-action-card
+      description: 发送交互卡�?      capability: send-action-card

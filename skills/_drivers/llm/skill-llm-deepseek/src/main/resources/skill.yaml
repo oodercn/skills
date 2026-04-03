@@ -7,8 +7,7 @@ metadata:
   version: "3.0.1"
   category: llm
   subCategory: provider
-  description: DeepSeek LLM Provider，支持deepseek-chat、deepseek-coder、deepseek-reasoner等模型
-  author: Ooder Team
+  description: DeepSeek LLM Provider，支持deepseek-chat、deepseek-coder、deepseek-reasoner等模�?  author: Ooder Team
   icon: ri-robot-line
 
 spec:
@@ -22,8 +21,7 @@ spec:
       autoBind: true
     - id: code-generation
       name: 代码生成
-      description: 代码生成与补全
-      category: ai
+      description: 代码生成与补�?      category: ai
       autoBind: true
     - id: reasoning
       name: 推理能力
@@ -65,8 +63,7 @@ spec:
       maxTokens:
         type: integer
         default: 64000
-        title: 最大Token数
-      temperature:
+        title: 最大Token�?      temperature:
         type: number
         default: 0.7
         title: 温度参数

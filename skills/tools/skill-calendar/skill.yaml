@@ -4,7 +4,7 @@ kind: SkillPackage
 metadata:
   id: skill-calendar
   name: 日程管理服务
-  version: "2.3.1"
+  version: "3.0.1"
   category: biz
   subCategory: calendar
   description: 多平台日程管理服务，支持钉钉、飞书、企业微信日程同步和管理
@@ -45,7 +45,7 @@ spec:
       
   dependencies:
     - skillId: skill-platform-bind
-      version: "2.3.1"
+      version: "3.0.1"
       required: true
       
   skillForm: PROVIDER
