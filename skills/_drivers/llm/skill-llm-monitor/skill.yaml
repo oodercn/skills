@@ -1,0 +1,131 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-monitor
+  name: LLM监控服务
+  version: 1.0.0
+  description: 提供LLM调用统计、日志查询、性能监控等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: DRIVER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2D
+    category: LLM
+    code: LLM_MONITOR
+    operations: [stats, logs, monitor, ranking]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  dependencies:
+    - skillId: skill-llm-base
+      version: ">=1.0.0"
+      required: true
+  
+  endpoints:
+    - path: /api/v1/llm/monitor/stats
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getStats
+      description: 获取LLM统计信息
+      capability: stats
+    - path: /api/v1/llm/monitor/logs
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getLogs
+      description: 获取LLM调用日志
+      capability: logs
+    - path: /api/v1/llm/monitor/logs/{logId}
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getLogDetail
+      description: 获取日志详情
+      capability: logs
+    - path: /api/v1/llm/monitor/provider-stats
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getProviderStats
+      description: 获取提供商统计
+      capability: stats
+    - path: /api/v1/llm/monitor/engine/status
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getEngineStatus
+      description: 获取引擎状态
+      capability: monitor
+    - path: /api/v1/llm/monitor/logs
+      method: DELETE
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: clearLogs
+      description: 清除日志
+      capability: logs
+    - path: /api/v1/llm/monitor/stats/company/{companyId}
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getCompanyStats
+      description: 获取公司统计
+      capability: stats
+    - path: /api/v1/llm/monitor/stats/department/{departmentId}
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getDepartmentStats
+      description: 获取部门统计
+      capability: stats
+    - path: /api/v1/llm/monitor/stats/user/{userId}
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getUserStats
+      description: 获取用户统计
+      capability: stats
+    - path: /api/v1/llm/monitor/stats/module/{moduleId}
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getModuleStats
+      description: 获取模块统计
+      capability: stats
+    - path: /api/v1/llm/monitor/ranking/departments
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getDepartmentRanking
+      description: 获取部门排名
+      capability: ranking
+    - path: /api/v1/llm/monitor/ranking/users
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getUserRanking
+      description: 获取用户排名
+      capability: ranking
+    - path: /api/v1/llm/monitor/ranking/modules
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getModuleRanking
+      description: 获取模块排名
+      capability: ranking
+    - path: /api/v1/llm/monitor/overall-stats
+      method: GET
+      controllerClass: net.ooder.skill.llm.monitor.controller.LlmMonitorController
+      methodName: getOverallStats
+      description: 获取总体统计
+      capability: stats
+  
+  config:
+    optional:
+      - name: LOG_RETENTION_DAYS
+        type: integer
+        default: 30
+        description: 日志保留天数
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

@@ -152,23 +152,53 @@ GET  /api/v1/skill-ui/versions/stats           # 获取版本统计
 
 ---
 
-## 五、Phase 3: 性能优化 (待执行)
+## 五、Phase 3: 性能优化 (已完成90%)
 
 ### 5.1 加载优化
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
-| Skill懒加载 | P0 | ⏳ 待执行 | 按需加载Skill JAR |
-| 资源预加载 | P1 | ⏳ 待执行 | 预加载常用资源 |
+| Skill懒加载 | P0 | ✅ 完成 | 按需加载Skill JAR |
+| 资源预加载 | P1 | ✅ 完成 | 预加载常用资源 |
 | 类加载优化 | P1 | ⏳ 待执行 | 优化PluginClassLoader |
 
 ### 5.2 缓存优化
 
 | 任务 | 优先级 | 状态 | 说明 |
 |------|--------|------|------|
-| 元数据缓存 | P0 | ⏳ 待执行 | 缓存SkillMetadata |
-| 路由缓存 | P1 | ⏳ 待执行 | 缓存路由映射 |
-| 服务缓存 | P1 | ⏳ 待执行 | 缓存服务实例 |
+| 元数据缓存 | P0 | ✅ 完成 | 缓存SkillMetadata |
+| 路由缓存 | P1 | ✅ 完成 | 缓存路由映射 |
+| 服务缓存 | P1 | ✅ 完成 | 缓存服务实例 |
+
+### 5.3 已完成文件
+
+| 文件 | 路径 | 说明 |
+|------|------|------|
+| MetadataCache | `skill-hotplug-starter/.../cache/MetadataCache.java` | 元数据缓存 |
+| LazySkillLoader | `skill-hotplug-starter/.../cache/LazySkillLoader.java` | 懒加载器 |
+| RouteCache | `skill-hotplug-starter/.../cache/RouteCache.java` | 路由缓存 |
+| ServiceCache | `skill-hotplug-starter/.../cache/ServiceCache.java` | 服务缓存 |
+| CacheManager | `skill-hotplug-starter/.../cache/CacheManager.java` | 缓存管理器 |
+| CacheManagementController | `skill-hotplug-starter/.../controller/CacheManagementController.java` | 缓存管理API |
+
+### 5.4 API端点
+
+```
+GET  /api/v1/skill-cache/stats                # 获取所有缓存统计
+GET  /api/v1/skill-cache/health               # 获取缓存健康状态
+DEL  /api/v1/skill-cache/all                  # 清除所有缓存
+POST /api/v1/skill-cache/evict-expired        # 清除过期缓存
+GET  /api/v1/skill-cache/metadata/stats       # 获取元数据缓存统计
+DEL  /api/v1/skill-cache/metadata             # 清除元数据缓存
+GET  /api/v1/skill-cache/route/stats          # 获取路由缓存统计
+DEL  /api/v1/skill-cache/route                # 清除路由缓存
+GET  /api/v1/skill-cache/service/stats        # 获取服务缓存统计
+DEL  /api/v1/skill-cache/service              # 清除服务缓存
+GET  /api/v1/skill-cache/lazy-loader/stats    # 获取懒加载器统计
+POST /api/v1/skill-cache/lazy-loader/preload  # 执行预加载
+POST /api/v1/skill-cache/lazy-loader/enable   # 启用懒加载
+POST /api/v1/skill-cache/lazy-loader/disable  # 禁用懒加载
+```
 
 ---
 

@@ -1,0 +1,34 @@
+skill:
+  id: skill-llm-config
+  name: LLM配置管理
+  version: 1.0.0
+  description: 提供LLM配置、Provider管理、模型配置等功能
+  category: business
+  author: ooder
+  entryPoint: net.ooder.skill.llm.config.LlmConfigSkillAutoConfiguration
+  dependencies:
+    - skill-common
+    - skill-scene
+    - skill-dict
+  endpoints:
+    - path: /api/v1/llm-config
+      method: GET
+      description: 获取LLM配置列表
+    - path: /api/v1/llm-config
+      method: POST
+      description: 创建LLM配置
+    - path: /api/v1/llm-config/{id}
+      method: PUT
+      description: 更新LLM配置
+    - path: /api/v1/llm-config/{id}
+      method: DELETE
+      description: 删除LLM配置
+    - path: /api/v1/llm-config/providers
+      method: GET
+      description: 获取Providers
+    - path: /api/v1/llm-config/templates
+      method: GET
+      description: 获取配置模板
+    - path: /api/v1/llm-config/{id}/usage-stats
+      method: GET
+      description: 获取使用统计
