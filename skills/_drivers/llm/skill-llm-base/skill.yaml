@@ -1,0 +1,49 @@
+id: skill-llm-base
+name: LLM Base Driver
+version: 3.0.1
+description: LLM驱动基类模块，定义LLM Provider标准接口和数据模型
+author: ooder
+skillForm: DRIVER
+visibility: internal
+
+capabilities:
+  - id: llm-provider
+    name: LLM Provider接口
+    description: 定义LLM提供商标准接口
+    autoBind: true
+  - id: llm-models
+    name: LLM数据模型
+    description: 请求/响应/消息/使用量等核心模型
+    autoBind: true
+  - id: llm-registry
+    name: Provider注册表
+    description: 动态Provider发现与管理
+    autoBind: true
+
+provides:
+  - id: LlmProvider
+    type: interface
+    description: LLM提供商标准接口
+  - id: LlmRequest
+    type: model
+    description: LLM请求模型
+  - id: LlmResponse
+    type: model
+    description: LLM响应模型
+  - id: LlmMessage
+    type: model
+    description: LLM消息模型
+  - id: LlmUsage
+    type: model
+    description: Token使用量模型
+  - id: LlmModel
+    type: model
+    description: 模型定义
+
+dependencies:
+  - skill-common@3.0.1
+
+config:
+  default-provider: deepseek
+  timeout: 60000
+  retry-count: 3
