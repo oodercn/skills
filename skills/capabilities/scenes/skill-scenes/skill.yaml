@@ -1,0 +1,29 @@
+name: skill-scenes
+version: 1.0.0
+description: Scenes Skill - Scene management service for scene operations
+type: business
+owner: ooder
+
+dependencies:
+  - skill-common
+
+apis:
+  - /api/v1/scenes/list
+  - /api/v1/scenes/create
+  - /api/v1/scenes/get
+  - /api/v1/scenes/delete
+  - /api/v1/scenes/activate
+  - /api/v1/scenes/deactivate
+  - /api/v1/scenes/capabilities/list
+  - /api/v1/scenes/capabilities/add
+  - /api/v1/scenes/capabilities/remove
+  - /api/v1/scenes/collaborative/list
+  - /api/v1/scenes/collaborative/add
+  - /api/v1/scenes/collaborative/remove
+  - /api/v1/scenes/snapshot/create
+  - /api/v1/scenes/snapshot/list
+  - /api/v1/scenes/snapshot/restore
+  - /api/v1/scenes/logs
+
+config:
+  ooder.scenes.enabled: true

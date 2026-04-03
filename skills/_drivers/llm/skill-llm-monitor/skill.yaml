@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-llm-monitor
   name: LLM监控服务
-  version: 1.0.0
+  version: "3.0.1"
   description: 提供LLM调用统计、日志查询、性能监控等功能
   author: ooder Team
   type: system-service

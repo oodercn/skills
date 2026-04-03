@@ -4,7 +4,7 @@ kind: SkillPackage
 metadata:
   id: skill-llm-ollama
   name: Ollama LLM Provider
-  version: "2.3.1"
+  version: "3.0.1"
   category: llm
   subCategory: provider
   description: Ollama本地LLM Provider，支持运行本地开源大模型

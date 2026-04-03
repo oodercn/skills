@@ -4,7 +4,7 @@ kind: SkillPackage
 metadata:
   id: skill-llm-qianwen
   name: Qianwen (Tongyi) LLM Provider
-  version: "2.3.1"
+  version: "3.0.1"
   category: llm
   subCategory: provider
   description: 通义千问LLM Provider，提供Qwen模型对话、补全、嵌入能力
@@ -28,7 +28,7 @@ spec:
       
   dependencies:
     - skillId: llm-sdk
-      version: ">=2.3.1"
+      version: ">=3.0.1"
       required: true
       
   configSchema:

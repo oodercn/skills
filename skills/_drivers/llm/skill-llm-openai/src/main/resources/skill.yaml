@@ -4,7 +4,7 @@ kind: SkillPackage
 metadata:
   id: skill-llm-openai
   name: OpenAI LLM Provider
-  version: "2.3.1"
+  version: "3.0.1"
   category: llm
   subCategory: provider
   description: OpenAI LLM Provider，支持GPT-4、GPT-4o、GPT-3.5-turbo等模型
@@ -38,7 +38,7 @@ spec:
       
   dependencies:
     - skillId: llm-sdk
-      version: ">=2.3.1"
+      version: ">=3.0.1"
       required: true
       
   configSchema:
