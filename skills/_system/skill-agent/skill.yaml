@@ -1,0 +1,566 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-agent
+  name: Agent管理服务
+  version: 1.0.0
+  description: 提供Agent注册、监控、拓扑管理、聊天、会话管理等完整功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x2C
+    category: SYS
+    code: SYS_AGENT
+    operations: [register, unregister, heartbeat, monitor, topology, chat, session, message, a2a]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies:
+    - skillId: skill-llm-base
+      version: "1.0.0"
+      required: false
+      description: "LLM基础服务，用于Agent LLM功能"
+
+  providedInterfaces:
+    - id: agent-service
+      version: "1.0"
+      description: "Agent管理服务接口"
+    - id: agent-chat-service
+      version: "1.0"
+      description: "Agent聊天服务接口"
+    - id: agent-session-service
+      version: "1.0"
+      description: "Agent会话服务接口"
+    - id: agent-message-service
+      version: "1.0"
+      description: "Agent消息服务接口"
+    - id: a2a-protocol-service
+      version: "1.0"
+      description: "Agent间通信协议服务"
+
+  capabilities:
+    - id: register
+      name: Agent注册
+      description: 注册新Agent
+      category: agent
+    - id: unregister
+      name: Agent注销
+      description: 注销Agent
+      category: agent
+    - id: heartbeat
+      name: 心跳检测
+      description: Agent心跳检测
+      category: agent
+    - id: monitor
+      name: 监控指标
+      description: 获取Agent监控指标
+      category: agent
+    - id: topology
+      name: 拓扑管理
+      description: 获取Agent拓扑结构
+      category: agent
+    - id: chat
+      name: 聊天交互
+      description: Agent聊天交互功能
+      category: agent
+    - id: session
+      name: 会话管理
+      description: Agent会话管理功能
+      category: agent
+    - id: message
+      name: 消息服务
+      description: Agent消息队列服务
+      category: agent
+    - id: a2a
+      name: A2A通信
+      description: Agent间通信协议
+      category: agent
+
+  endpoints:
+    # ==================== AgentController - /api/agent ====================
+    - path: /api/agent/list
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: listAgents
+      description: 获取Agent列表
+      capability: monitor
+    - path: /api/agent/{id}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: getAgent
+      parameterTypes:
+        - java.lang.String
+      description: 获取Agent详情
+      capability: monitor
+    - path: /api/agent/{id}/heartbeat
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: heartbeat
+      parameterTypes:
+        - java.lang.String
+      description: Agent心跳
+      capability: heartbeat
+    - path: /api/agent/{id}/status
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: getStatus
+      parameterTypes:
+        - java.lang.String
+      description: 获取Agent状态
+      capability: monitor
+    - path: /api/agent/alerts
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: getAlerts
+      description: 获取告警列表
+      capability: monitor
+    - path: /api/agent/stats
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: getStats
+      description: 获取统计信息
+      capability: monitor
+    - path: /api/agent/topology
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentController
+      methodName: getTopology
+      description: 获取拓扑结构
+      capability: topology
+
+    # ==================== AgentHeartbeatTestController - /api/agent/heartbeat ====================
+    - path: /api/agent/heartbeat/stats/{agentId}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: getHeartbeatStats
+      parameterTypes:
+        - java.lang.String
+      description: 获取心跳统计
+      capability: heartbeat
+    - path: /api/agent/heartbeat/status/{agentId}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: getAgentDeviceStatus
+      parameterTypes:
+        - java.lang.String
+      description: 获取Agent设备状态
+      capability: heartbeat
+    - path: /api/agent/heartbeat/all/stats
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: getAllAgentsStats
+      description: 获取所有Agent统计
+      capability: heartbeat
+    - path: /api/agent/heartbeat/trigger/{agentId}
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: triggerHeartbeat
+      parameterTypes:
+        - java.lang.String
+      description: 触发心跳
+      capability: heartbeat
+    - path: /api/agent/heartbeat/test
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: testHeartbeat
+      parameterTypes:
+        - java.util.Map
+      description: 测试心跳
+      capability: heartbeat
+    - path: /api/agent/heartbeat/status
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentHeartbeatTestController
+      methodName: getHeartbeatStatus
+      description: 获取心跳状态
+      capability: heartbeat
+
+    # ==================== AgentSessionController - /api/v1/agents ====================
+    - path: /api/v1/agents/register
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: register
+      parameterTypes:
+        - net.ooder.skill.agent.dto.AgentRegistrationDTO
+      description: Agent注册
+      capability: register
+    - path: /api/v1/agents/login
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: login
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: Agent登录
+      capability: session
+    - path: /api/v1/agents/logout
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: logout
+      parameterTypes:
+        - java.lang.String
+      description: Agent登出
+      capability: session
+    - path: /api/v1/agents/{agentId}/heartbeat
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: heartbeat
+      parameterTypes:
+        - java.lang.String
+      description: Agent心跳
+      capability: heartbeat
+    - path: /api/v1/agents/{agentId}/status
+      method: PUT
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: updateStatus
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 更新Agent状态
+      capability: session
+    - path: /api/v1/agents/{agentId}/session
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: getSession
+      parameterTypes:
+        - java.lang.String
+      description: 获取Agent会话
+      capability: session
+    - path: /api/v1/agents/session/validate
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: validateToken
+      parameterTypes:
+        - java.lang.String
+      description: 验证会话令牌
+      capability: session
+    - path: /api/v1/agents/active
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: getActiveSessions
+      description: 获取活跃会话
+      capability: session
+    - path: /api/v1/agents/scene/{sceneGroupId}/sessions
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: getSessionsByScene
+      parameterTypes:
+        - java.lang.String
+      description: 获取场景组会话
+      capability: session
+    - path: /api/v1/agents/stats
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentSessionController
+      methodName: getStats
+      description: 获取会话统计
+      capability: session
+
+    # ==================== AgentChatController - /api/v1/scene-groups/{sceneGroupId}/chat ====================
+    # 注意：AgentChatController 的路径包含动态参数 {sceneGroupId}
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/context
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: getChatContext
+      description: 获取聊天上下文
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: getMessages
+      description: 获取消息列表
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/{messageId}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: getMessage
+      parameterTypes:
+        - java.lang.String
+      description: 获取消息详情
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: sendMessage
+      parameterTypes:
+        - net.ooder.skill.agent.dto.AgentChatMessageDTO
+      description: 发送消息
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/{messageId}/read
+      method: PUT
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: markAsRead
+      parameterTypes:
+        - java.lang.String
+      description: 标记已读
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/read-all
+      method: PUT
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: markAllAsRead
+      description: 全部标记已读
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/unread-counts
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: getUnreadCounts
+      description: 获取未读数
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/{messageId}/action
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: executeAction
+      parameterTypes:
+        - java.lang.String
+        - java.util.Map
+      description: 执行消息动作
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/todos
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: getTodos
+      description: 获取待办列表
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/todos/{todoId}/accept
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: acceptTodo
+      parameterTypes:
+        - java.lang.String
+      description: 接受待办
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/todos/{todoId}/reject
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: rejectTodo
+      parameterTypes:
+        - java.lang.String
+        - java.util.Map
+      description: 拒绝待办
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/todos/{todoId}/delegate
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: delegateTodo
+      parameterTypes:
+        - java.lang.String
+        - java.util.Map
+      description: 委托待办
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/todos/{todoId}/complete
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: completeTodo
+      parameterTypes:
+        - java.lang.String
+      description: 完成待办
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/{messageId}/reactions
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: addReaction
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 添加反应
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/messages/{messageId}/reactions
+      method: DELETE
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: removeReaction
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 移除反应
+      capability: message
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/ws-token
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: generateWsToken
+      parameterTypes:
+        - java.util.Map
+      description: 生成WebSocket令牌
+      capability: chat
+    - path: /api/v1/scene-groups/{sceneGroupId}/chat/ws-token/refresh
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentChatController
+      methodName: refreshWsToken
+      parameterTypes:
+        - java.util.Map
+      description: 刷新WebSocket令牌
+      capability: chat
+
+    # ==================== AgentMessageController - /api/v1/agents/{agentId}/messages ====================
+    - path: /api/v1/agents/{agentId}/messages
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: sendMessage
+      parameterTypes:
+        - java.lang.String
+        - net.ooder.skill.agent.dto.AgentMessageDTO
+      description: 发送Agent消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: receiveMessages
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 接收Agent消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/unread
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: receiveUnreadMessages
+      parameterTypes:
+        - java.lang.String
+      description: 获取未读消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/{messageId}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: getMessage
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 获取Agent消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/{messageId}/ack
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: acknowledge
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 确认消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/{messageId}/read
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: markAsRead
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 标记已读
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/{messageId}/processed
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: markAsProcessed
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 标记已处理
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/pending
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: getPendingCount
+      parameterTypes:
+        - java.lang.String
+      description: 获取待处理消息数
+      capability: message
+    - path: /api/v1/agents/messages/scene/{sceneGroupId}
+      method: GET
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: getMessagesByScene
+      parameterTypes:
+        - java.lang.String
+      description: 获取场景组消息
+      capability: message
+    - path: /api/v1/agents/{agentId}/messages/{messageId}
+      method: DELETE
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: deleteMessage
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 删除消息
+      capability: message
+    - path: /api/v1/agents/task-delegate
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: delegateTask
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.util.Map
+      description: 委托任务
+      capability: a2a
+    - path: /api/v1/agents/task-result
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: submitTaskResult
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.util.Map
+      description: 提交任务结果
+      capability: a2a
+    - path: /api/v1/agents/collab-request
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: requestCollaboration
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.util.Map
+      description: 请求协作
+      capability: a2a
+    - path: /api/v1/agents/data-share
+      method: POST
+      controllerClass: net.ooder.skill.agent.controller.AgentMessageController
+      methodName: shareData
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.util.Map
+      description: 共享数据
+      capability: a2a
+
+  config:
+    optional:
+      - name: AGENT_STORAGE_TYPE
+        type: string
+        default: "memory"
+        description: 存储类型
+
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "50Mi"

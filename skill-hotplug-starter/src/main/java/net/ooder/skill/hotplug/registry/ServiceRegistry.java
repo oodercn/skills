@@ -8,9 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.proxy.Enhancer;
 import org.springframework.cglib.proxy.MethodInterceptor;
 import org.springframework.cglib.proxy.MethodProxy;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
@@ -25,6 +27,9 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ServiceRegistry {
 
     private static final Logger logger = LoggerFactory.getLogger(ServiceRegistry.class);
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     // Skill ID -> 服务代理映射
     private final Map<String, Map<String, ServiceProxy>> serviceProxies = new ConcurrentHashMap<>();
@@ -75,6 +80,40 @@ public class ServiceRegistry {
         } catch (Exception e) {
             logger.error("Failed to register service: {} for skill: {}", serviceDef.getName(), skillId, e);
             throw new RuntimeException("Service registration failed", e);
+        }
+    }
+
+    /**
+     * 注册已创建的服务实例（用于 @Bean 方法创建的实例）
+     */
+    public void registerServiceInstance(String skillId, String serviceName, Class<?> interfaceClass, Object instance) {
+        logger.info("Registering service instance: {} (type: {}) for skill: {}", serviceName, interfaceClass.getName(), skillId);
+
+        try {
+            Object proxy = instance;
+            
+            if (interfaceClass.isInterface()) {
+                proxy = Proxy.newProxyInstance(
+                        instance.getClass().getClassLoader(),
+                        new Class<?>[]{interfaceClass},
+                        new ServiceInvocationHandler(instance, skillId)
+                );
+            }
+
+            Map<String, ServiceProxy> skillServices = serviceProxies.computeIfAbsent(skillId, k -> new ConcurrentHashMap<>());
+            ServiceProxy serviceProxy = new ServiceProxy(skillId, serviceName, interfaceClass, instance, proxy);
+            skillServices.put(serviceName, serviceProxy);
+
+            String interfaceName = interfaceClass.getName();
+            List<ServiceReference> references = interfaceRegistry.computeIfAbsent(interfaceName, k -> new ArrayList<>());
+            references.add(new ServiceReference(skillId, serviceName, serviceProxy));
+
+            logger.info("Successfully registered service instance: {}.{} (interface: {})",
+                    skillId, serviceName, interfaceName);
+
+        } catch (Exception e) {
+            logger.error("Failed to register service instance: {} for skill: {}", serviceName, skillId, e);
+            throw new RuntimeException("Service instance registration failed", e);
         }
     }
 
@@ -180,12 +219,186 @@ public class ServiceRegistry {
     // ==================== 私有方法 ====================
 
     private Object createServiceInstance(Class<?> implClass) throws Exception {
+        Object instance = null;
+        
         try {
-            return implClass.newInstance();
-        } catch (InstantiationException | IllegalAccessException e) {
-            logger.warn("Could not create service instance via default constructor: {}, skipping service registration", implClass.getName());
+            instance = applicationContext.getAutowireCapableBeanFactory().createBean(implClass);
+            logger.info("Created service instance with Spring autowiring: {}", implClass.getName());
+            return instance;
+        } catch (Exception e) {
+            logger.debug("Failed to create service with Spring autowiring ({}), trying constructor injection. Error: {}", 
+                    implClass.getName(), e.getMessage());
+        }
+        
+        instance = createInstanceWithConstructorInjection(implClass);
+        if (instance != null) {
+            return instance;
+        }
+        
+        try {
+            instance = implClass.getDeclaredConstructor().newInstance();
+            logger.info("Created service instance with default constructor: {}", implClass.getName());
+            
+            manualInjectDependencies(instance, implClass);
+            
+            logger.info("Service {} dependencies manually injected successfully", implClass.getSimpleName());
+            return instance;
+        } catch (Exception e) {
+            logger.warn("Could not create service instance: {}. Error: {}", implClass.getName(), e.getMessage());
             return null;
         }
+    }
+
+    /**
+     * 通过构造函数注入创建实例
+     * 分析构造函数参数并从 Spring 容器获取依赖
+     */
+    private Object createInstanceWithConstructorInjection(Class<?> implClass) {
+        java.lang.reflect.Constructor<?>[] constructors = implClass.getDeclaredConstructors();
+        
+        java.lang.reflect.Constructor<?> selectedConstructor = null;
+        for (java.lang.reflect.Constructor<?> constructor : constructors) {
+            if (constructor.getParameterCount() == 0) {
+                continue;
+            }
+            
+            if (selectedConstructor == null || 
+                constructor.getParameterCount() > selectedConstructor.getParameterCount()) {
+                selectedConstructor = constructor;
+            }
+        }
+        
+        if (selectedConstructor == null) {
+            logger.debug("No suitable constructor found for constructor injection in {}", implClass.getName());
+            return null;
+        }
+        
+        Class<?>[] paramTypes = selectedConstructor.getParameterTypes();
+        Object[] args = new Object[paramTypes.length];
+        
+        for (int i = 0; i < paramTypes.length; i++) {
+            Object dependency = resolveDependencyByType(paramTypes[i]);
+            if (dependency == null) {
+                logger.debug("Could not resolve constructor parameter {} (type: {}) for {}", 
+                        i, paramTypes[i].getName(), implClass.getName());
+                return null;
+            }
+            args[i] = dependency;
+        }
+        
+        try {
+            selectedConstructor.setAccessible(true);
+            Object instance = selectedConstructor.newInstance(args);
+            logger.info("Created service instance with constructor injection: {} ({} parameters)", 
+                    implClass.getName(), args.length);
+            
+            manualInjectDependencies(instance, implClass);
+            
+            return instance;
+        } catch (Exception e) {
+            logger.warn("Failed to create instance with constructor injection for {}: {}", 
+                    implClass.getName(), e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * 按类型从 Spring 容器获取 Bean
+     */
+    private Object resolveDependencyByType(Class<?> type) {
+        try {
+            return applicationContext.getBean(type);
+        } catch (Exception e) {
+            logger.debug("Bean not found by type: {}", type.getName());
+            return null;
+        }
+    }
+
+    /**
+     * 手动注入依赖
+     * 扫描 @Autowired 和 @Resource 字段并从 Spring 容器注入
+     */
+    private void manualInjectDependencies(Object bean, Class<?> clazz) {
+        Class<?> currentClass = clazz;
+        while (currentClass != null && currentClass != Object.class) {
+            for (Field field : currentClass.getDeclaredFields()) {
+                if (field.isAnnotationPresent(org.springframework.beans.factory.annotation.Autowired.class) ||
+                    field.isAnnotationPresent(jakarta.annotation.Resource.class)) {
+                    
+                    try {
+                        Object dependency = resolveDependency(field);
+                        if (dependency != null) {
+                            field.setAccessible(true);
+                            field.set(bean, dependency);
+                            logger.info("Manually injected dependency: {} -> {} in {}", 
+                                    field.getName(), dependency.getClass().getSimpleName(), clazz.getSimpleName());
+                        } else {
+                            boolean required = true;
+                            org.springframework.beans.factory.annotation.Autowired autowired = 
+                                field.getAnnotation(org.springframework.beans.factory.annotation.Autowired.class);
+                            if (autowired != null) {
+                                required = autowired.required();
+                            }
+                            
+                            if (required) {
+                                logger.warn("Failed to resolve required dependency: {} in {}", 
+                                        field.getName(), clazz.getSimpleName());
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Failed to inject dependency: {} in {}. Error: {}", 
+                                field.getName(), clazz.getSimpleName(), e.getMessage());
+                    }
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+    }
+
+    /**
+     * 解析依赖
+     * 优先按类型查找，其次按名称查找
+     */
+    private Object resolveDependency(Field field) {
+        Class<?> fieldType = field.getType();
+        
+        jakarta.annotation.Resource resource = field.getAnnotation(jakarta.annotation.Resource.class);
+        if (resource != null && resource.name() != null && !resource.name().isEmpty()) {
+            try {
+                return applicationContext.getBean(resource.name(), fieldType);
+            } catch (Exception e) {
+                logger.debug("Bean not found by name: {}", resource.name());
+            }
+        }
+        
+        try {
+            return applicationContext.getBean(fieldType);
+        } catch (Exception e) {
+            logger.debug("Bean not found by type: {}", fieldType.getName());
+        }
+        
+        String beanName = field.getName();
+        try {
+            Object bean = applicationContext.getBean(beanName);
+            if (fieldType.isInstance(bean)) {
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found by field name: {}", beanName);
+        }
+        
+        String classNameBeanName = Character.toLowerCase(fieldType.getSimpleName().charAt(0)) + 
+                                   fieldType.getSimpleName().substring(1);
+        try {
+            Object bean = applicationContext.getBean(classNameBeanName);
+            if (fieldType.isInstance(bean)) {
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found by class name: {}", classNameBeanName);
+        }
+        
+        return null;
     }
 
     private Object createProxy(Class<?> interfaceClass, Object target, PluginClassLoader classLoader, String skillId) {

@@ -160,4 +160,80 @@ public class DingTalkOrgSyncService {
         lastSyncTime = 0;
         log.info("Organization cache cleared");
     }
+    
+    // ==================== 带缓存同步的 CRUD 操作 ====================
+    
+    public DingdingUser createUserWithCache(String name, String mobile, List<Long> departmentIds,
+                                              String position, String jobNumber, String email) {
+        log.info("Creating user and updating cache: name={}", name);
+        DingdingUser user = apiClient.createUser(name, mobile, departmentIds, position, jobNumber, email);
+        if (user != null) {
+            userCache.put(user.getUserid(), user);
+        }
+        return user;
+    }
+    
+    public boolean updateUserWithCache(String userId, String name, String mobile, String email,
+                                        Long departmentId, String position, int status) {
+        log.info("Updating user and refreshing cache: userId={}", userId);
+        boolean success = apiClient.updateUser(userId, name, mobile, email, departmentId, position, status);
+        if (success) {
+            DingdingUser refreshed = apiClient.getUser(userId);
+            if (refreshed != null) {
+                userCache.put(userId, refreshed);
+            } else {
+                userCache.remove(userId);
+            }
+        }
+        return success;
+    }
+    
+    public boolean deleteUserWithCache(String userId) {
+        log.info("Deleting user from cache: userId={}", userId);
+        boolean success = apiClient.deleteUser(userId);
+        if (success) {
+            userCache.remove(userId);
+        }
+        return success;
+    }
+    
+    public DingdingDepartment createDepartmentWithCache(String parentId, String name, Long order, String deptManagerUserId) {
+        log.info("Creating department and updating cache: name={}", name);
+        DingdingDepartment dept = apiClient.createDepartment(parentId, name, order, deptManagerUserId);
+        if (dept != null) {
+            deptCache.put(dept.getDeptId(), dept);
+        }
+        return dept;
+    }
+    
+    public boolean updateDepartmentWithCache(String departmentId, String name, Long order, String deptManagerUserId) {
+        log.info("Updating department and refreshing cache: deptId={}", departmentId);
+        boolean success = apiClient.updateDepartment(departmentId, name, order, deptManagerUserId);
+        if (success) {
+            DingdingDepartment refreshed = apiClient.getDepartment(departmentId);
+            if (refreshed != null) {
+                deptCache.put(departmentId, refreshed);
+            } else {
+                deptCache.remove(departmentId);
+            }
+        }
+        return success;
+    }
+    
+    public boolean deleteDepartmentWithCache(String departmentId) {
+        log.info("Deleting department from cache: deptId={}", departmentId);
+        boolean success = apiClient.deleteDepartment(departmentId);
+        if (success) {
+            deptCache.remove(departmentId);
+        }
+        return success;
+    }
+    
+    public DingdingUser getUserByEmailFromApi(String email) {
+        return apiClient.getUserByEmail(email);
+    }
+    
+    public DingdingUser getFreeLoginUserFromApi(String authCode) {
+        return apiClient.getFreeLoginUser(authCode);
+    }
 }

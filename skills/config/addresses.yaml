@@ -2,8 +2,8 @@ apiVersion: config.ooder.net/v1
 kind: CapabilityAddressConfig
 
 metadata:
-  version: "2.3.1"
-  lastUpdated: "2026-03-11"
+  version: "3.0.1"
+  lastUpdated: "2026-04-03"
   description: "能力地址空间配置 - 128个固定地址"
 
 spec:

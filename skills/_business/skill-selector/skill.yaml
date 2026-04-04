@@ -1,0 +1,123 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-selector
+  name: 选择器服务
+  version: "3.0.1"
+  description: 提供统一的UI组件选择器数据服务，包括能力选择器、提供商选择器、组织树选择器等
+  author: ooder Team
+  type: business-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - selector
+    - ui
+    - dropdown
+    - picker
+
+spec:
+  skillForm: PROVIDER
+  type: business-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x2D
+    category: BIZ
+    code: BIZ_SELECTOR
+    operations: [capabilities, providers, types, org-tree, templates]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.1"
+      required: true
+
+  providedInterfaces:
+    - id: selector-service
+      version: "1.0"
+      description: "选择器服务接口"
+
+  capabilities:
+    - id: capabilities
+      name: 能力选择器
+      description: 获取能力选择器数据
+      category: selector
+    - id: providers
+      name: 提供商选择器
+      description: 获取提供商选择器数据
+      category: selector
+    - id: types
+      name: 类型选择器
+      description: 获取能力类型选择器数据
+      category: selector
+    - id: org-tree
+      name: 组织树选择器
+      description: 获取组织树选择器数据
+      category: selector
+    - id: templates
+      name: 模板选择器
+      description: 获取模板选择器数据
+      category: selector
+
+  endpoints:
+    - path: /api/v1/selectors/capabilities
+      method: GET
+      controllerClass: net.ooder.skill.selector.controller.SelectorController
+      methodName: getCapabilities
+      description: 获取能力选择器数据
+      capability: capabilities
+    - path: /api/v1/selectors/providers
+      method: GET
+      controllerClass: net.ooder.skill.selector.controller.SelectorController
+      methodName: getProviders
+      description: 获取提供商选择器数据
+      capability: providers
+    - path: /api/v1/selectors/capability-types
+      method: GET
+      controllerClass: net.ooder.skill.selector.controller.SelectorController
+      methodName: getCapabilityTypes
+      description: 获取能力类型选择器数据
+      capability: types
+    - path: /api/v1/selectors/org-tree
+      method: GET
+      controllerClass: net.ooder.skill.selector.controller.SelectorController
+      methodName: getOrgTree
+      description: 获取组织树选择器数据
+      capability: org-tree
+    - path: /api/v1/selectors/templates
+      method: GET
+      controllerClass: net.ooder.skill.selector.controller.SelectorController
+      methodName: getTemplates
+      description: 获取模板选择器数据
+      capability: templates
+
+  config:
+    optional:
+      - name: SELECTOR_ENABLED
+        type: boolean
+        default: "true"
+        description: 是否启用选择器服务
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

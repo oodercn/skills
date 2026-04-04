@@ -6,6 +6,7 @@ import net.ooder.skill.hotplug.classloader.ClassLoaderManager;
 import net.ooder.skill.hotplug.controller.PluginController;
 import net.ooder.skill.hotplug.registry.RouteRegistry;
 import net.ooder.skill.hotplug.registry.ServiceRegistry;
+import net.ooder.skill.hotplug.ui.UiRouteRegistry;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
@@ -38,6 +39,12 @@ public class HotPlugAutoConfiguration {
     @ConditionalOnMissingBean
     public ServiceRegistry serviceRegistry() {
         return new ServiceRegistry();
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public UiRouteRegistry uiRouteRegistry() {
+        return new UiRouteRegistry();
     }
 
     @Bean

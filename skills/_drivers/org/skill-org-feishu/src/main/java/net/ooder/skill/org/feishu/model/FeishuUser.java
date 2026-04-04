@@ -1,5 +1,7 @@
 package net.ooder.skill.org.feishu.model;
 
+import java.util.List;
+
 public class FeishuUser {
 
     private String openId;
@@ -9,6 +11,7 @@ public class FeishuUser {
     private String mobile;
     private String email;
     private String departmentId;
+    private List<String> departmentIds;
     private int status;
 
     public String getOpenId() {
@@ -73,5 +76,14 @@ public class FeishuUser {
 
     public void setStatus(int status) {
         this.status = status;
+    }
+
+    public List<String> getDepartmentIds() {
+        return departmentIds;
+    }
+
+    public void setDepartmentIds(List<String> departmentIds) {
+        this.departmentId = (departmentIds != null && !departmentIds.isEmpty()) ? departmentIds.get(0) : null;
+        this.departmentIds = departmentIds;
     }
 }

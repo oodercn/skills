@@ -52,7 +52,7 @@
     </scm>
 
     <properties>
-        <agent-sdk.version>3.0.0</agent-sdk.version>
+        <agent-sdk.version>3.0.1</agent-sdk.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <maven.javadoc.skip>false</maven.javadoc.skip>
         <maven.source.skip>false</maven.source.skip>

@@ -61,19 +61,19 @@ public class WeComOrgSyncService {
         
         for (WeComDepartment dept : rootDepts) {
             allDepts.add(dept);
-            deptCache.put(String.valueOf(dept.getId()), dept);
-            syncSubDepartments(dept.getId(), allDepts);
+            deptCache.put(dept.getDeptId(), dept);
+            syncSubDepartments(dept.getDeptId(), allDepts);
         }
         
         log.info("Synced {} departments", allDepts.size());
         return allDepts;
     }
     
-    private void syncSubDepartments(Long parentId, List<WeComDepartment> allDepts) {
+    private void syncSubDepartments(String parentId, List<WeComDepartment> allDepts) {
         List<WeComDepartment> subDepts = apiClient.getDepartments(parentId);
         for (WeComDepartment dept : subDepts) {
             allDepts.add(dept);
-            deptCache.put(String.valueOf(dept.getId()), dept);
+            deptCache.put(dept.getDeptId(), dept);
         }
     }
     
@@ -83,7 +83,7 @@ public class WeComOrgSyncService {
         List<WeComUser> allUsers = new ArrayList<>();
         
         for (WeComDepartment dept : deptCache.values()) {
-            List<WeComUser> deptUsers = apiClient.getUsersByDepartment(dept.getId());
+            List<WeComUser> deptUsers = apiClient.getUsersByDepartment(dept.getDeptId());
             for (WeComUser user : deptUsers) {
                 userCache.put(user.getUserid(), user);
                 if (!containsUser(allUsers, user.getUserid())) {

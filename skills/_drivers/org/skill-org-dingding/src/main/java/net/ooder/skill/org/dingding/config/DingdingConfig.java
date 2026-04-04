@@ -10,6 +10,7 @@ public class DingdingConfig {
     private String appKey;
     private String appSecret;
     private String apiBaseUrl = "https://oapi.dingtalk.com";
+    private String redirectUri;
     private boolean enabled = true;
 
     public String getAppKey() {
@@ -34,6 +35,14 @@ public class DingdingConfig {
 
     public void setApiBaseUrl(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     public boolean isEnabled() {

@@ -11,6 +11,7 @@ public class WeComConfig {
     private String agentId;
     private String secret;
     private String apiBaseUrl = "https://qyapi.weixin.qq.com";
+    private String redirectUri;
     private int timeout = 30000;
     private boolean cacheEnabled = true;
     private long cacheTtl = 300000L;
@@ -45,6 +46,14 @@ public class WeComConfig {
 
     public void setApiBaseUrl(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     public int getTimeout() {

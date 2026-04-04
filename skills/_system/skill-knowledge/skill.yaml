@@ -1,0 +1,210 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-knowledge
+  name: 知识库管理服务
+  version: 1.0.0
+  description: 提供知识库创建、文档管理、知识检索等功能（基于SE SDK 3.0.1）
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2A
+    category: SYS
+    code: SYS_KNOWLEDGE
+    operations: [create, read, update, delete, search]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: knowledge-service
+      version: "1.0"
+      description: "知识库管理服务接口（SE SDK实现）"
+    - id: document-service
+      version: "1.0"
+      description: "文档管理服务接口（SE SDK实现）"
+  
+  capabilities:
+    - id: knowledge-create
+      name: 创建知识库
+      description: 创建新的知识库
+      category: knowledge
+    - id: knowledge-manage
+      name: 管理知识库
+      description: 知识库的增删改查
+      category: knowledge
+    - id: document-manage
+      name: 文档管理
+      description: 文档的上传、删除、查询
+      category: knowledge
+    - id: knowledge-search
+      name: 知识检索
+      description: 在知识库中检索相关内容
+      category: knowledge
+    - id: knowledge-organization
+      name: 知识组织管理
+      description: 知识组织的增删改查
+      category: knowledge
+  
+  endpoints:
+    # 知识库管理端点
+    - path: /api/v1/knowledge-bases
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: listKnowledgeBases
+      description: 获取知识库列表
+      capability: knowledge-manage
+    - path: /api/v1/knowledge-bases
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: createKnowledgeBase
+      description: 创建知识库
+      capability: knowledge-create
+    - path: /api/v1/knowledge-bases/{kbId}
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: getKnowledgeBase
+      description: 获取知识库详情
+      capability: knowledge-manage
+    - path: /api/v1/knowledge-bases/{kbId}
+      method: PUT
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: updateKnowledgeBase
+      description: 更新知识库
+      capability: knowledge-manage
+    - path: /api/v1/knowledge-bases/{kbId}
+      method: DELETE
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: deleteKnowledgeBase
+      description: 删除知识库
+      capability: knowledge-manage
+    - path: /api/v1/knowledge-bases/{kbId}/rebuild-index
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: rebuildIndex
+      description: 重建索引
+      capability: knowledge-manage
+    
+    # 文档管理端点
+    - path: /api/v1/knowledge-bases/{kbId}/documents
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: listDocuments
+      description: 获取知识库文档列表
+      capability: document-manage
+    - path: /api/v1/knowledge-bases/{kbId}/documents
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: addDocument
+      description: 添加文档
+      capability: document-manage
+    - path: /api/v1/knowledge-bases/{kbId}/documents/{docId}
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: getDocument
+      description: 获取文档详情
+      capability: document-manage
+    - path: /api/v1/knowledge-bases/{kbId}/documents/{docId}
+      method: DELETE
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: deleteDocument
+      description: 删除文档
+      capability: document-manage
+    - path: /api/v1/knowledge-bases/{kbId}/documents/upload
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: uploadDocument
+      description: 上传文件文档
+      capability: document-manage
+    
+    # 知识检索端点
+    - path: /api/v1/knowledge-bases/{kbId}/search
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeBaseController
+      methodName: search
+      description: 知识检索
+      capability: knowledge-search
+    
+    # 知识组织端点
+    - path: /api/v1/knowledge-organizations
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeOrganizationController
+      methodName: listOrganizations
+      description: 获取知识组织列表
+      capability: knowledge-organization
+    - path: /api/v1/knowledge-organizations
+      method: POST
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeOrganizationController
+      methodName: createOrganization
+      description: 创建知识组织
+      capability: knowledge-organization
+    - path: /api/v1/knowledge-organizations/{orgId}
+      method: GET
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeOrganizationController
+      methodName: getOrganization
+      description: 获取知识组织详情
+      capability: knowledge-organization
+    - path: /api/v1/knowledge-organizations/{orgId}
+      method: PUT
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeOrganizationController
+      methodName: updateOrganization
+      description: 更新知识组织
+      capability: knowledge-organization
+    - path: /api/v1/knowledge-organizations/{orgId}
+      method: DELETE
+      controllerClass: net.ooder.skill.knowledge.controller.KnowledgeOrganizationController
+      methodName: deleteOrganization
+      description: 删除知识组织
+      capability: knowledge-organization
+
+  config:
+    schema:
+      type: object
+      properties:
+        persistence:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [memory, json, sql]
+              default: json
+        vectorStore:
+          type: object
+          properties:
+            type:
+              type: string
+              enum: [in-memory, milvus, chroma, pgvector]
+              default: in-memory
+        embedding:
+          type: object
+          properties:
+            model:
+              type: string
+              enum: [mock, dashscope, openai, ollama]
+              default: dashscope

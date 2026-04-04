@@ -1,0 +1,1 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.vfs.s3.config.VfsS3AutoConfiguration

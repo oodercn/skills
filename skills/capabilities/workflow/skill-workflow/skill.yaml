@@ -1,0 +1,39 @@
+id: skill-workflow
+name: Workflow Service
+version: 3.0.1
+description: Workflow service with REST API for process definition, execution and management
+category: capabilities
+subcategory: workflow
+author: ooder
+license: MIT
+
+capabilities:
+  - process_definition_management
+  - process_instance_management
+  - task_management
+  - workflow_monitoring
+  - workflow_history
+
+dependencies:
+  - skill-common
+  - skill-bpm
+
+exports:
+  - net.ooder.skill.workflow.controller.*
+  - net.ooder.skill.workflow.service.*
+
+configuration:
+  auto_configure: true
+  config_class: net.ooder.skill.workflow.config.WorkflowAutoConfiguration
+
+api:
+  base_path: /api/v1/workflow
+  endpoints:
+    - path: /process-definitions
+      methods: [GET, POST, PUT, DELETE]
+    - path: /process-instances
+      methods: [GET, POST, PUT, DELETE]
+    - path: /tasks
+      methods: [GET, POST, PUT]
+    - path: /my-tasks
+      methods: [GET]

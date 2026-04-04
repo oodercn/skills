@@ -8,21 +8,62 @@
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
         <version>3.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>skill-vfs-base</artifactId>
     <packaging>jar</packaging>
 
     <name>skill-vfs-base</name>
-    <description>VFS Skill Base - Core interfaces and models for virtual file system</description>
+    <description>VFS Base Module - Provides common interfaces for virtual file system providers</description>
 
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-core</artifactId>
+            <version>${agent-sdk.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-autoconfigure</artifactId>
             <scope>provided</scope>
         </dependency>
+        
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+        </dependency>
     </dependencies>
-</project>
 
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+            </resource>
+            <resource>
+                <directory>.</directory>
+                <includes>
+                    <include>skill.yaml</include>
+                </includes>
+            </resource>
+        </resources>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.11.0</version>
+                <configuration>
+                    <source>21</source>
+                    <target>21</target>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

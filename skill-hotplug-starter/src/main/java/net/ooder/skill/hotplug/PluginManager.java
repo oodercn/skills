@@ -13,11 +13,15 @@ import net.ooder.skill.hotplug.ui.UiRouteRegistry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
+import java.lang.reflect.Method;
+import java.net.URL;
 import java.nio.file.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
@@ -217,6 +221,9 @@ public class PluginManager {
 
             // 4. 注册服务
             registerServices(context);
+
+            // 4.1 处理 @Configuration 类中的 @Bean
+            processConfigurations(context);
 
             // 5. 注册路由
             registerRoutes(context);
@@ -432,6 +439,124 @@ public class PluginManager {
         if (config.getServices() != null) {
             for (ServiceDefinition service : config.getServices()) {
                 serviceRegistry.registerService(context.getSkillId(), service, context.getClassLoader());
+            }
+        }
+    }
+
+    private void processConfigurations(PluginContext context) {
+        PluginClassLoader classLoader = context.getClassLoader();
+        String skillId = context.getSkillId();
+        
+        try {
+            URL factoriesUrl = classLoader.findResource("META-INF/spring.factories");
+            if (factoriesUrl == null) {
+                logger.debug("No META-INF/spring.factories found for skill: {}", skillId);
+                return;
+            }
+            
+            logger.info("Processing META-INF/spring.factories for skill: {}", skillId);
+            
+            Properties properties = new Properties();
+            try (InputStream is = factoriesUrl.openStream()) {
+                properties.load(is);
+            }
+            
+            String configClasses = properties.getProperty(EnableAutoConfiguration.class.getName());
+            if (configClasses == null || configClasses.isEmpty()) {
+                configClasses = properties.getProperty("org.springframework.boot.autoconfigure.EnableAutoConfiguration");
+            }
+            
+            if (configClasses == null || configClasses.isEmpty()) {
+                logger.debug("No auto-configuration classes found for skill: {}", skillId);
+                return;
+            }
+            
+            String[] classNames = configClasses.split(",");
+            for (String className : classNames) {
+                String trimmedName = className.trim();
+                if (trimmedName.isEmpty()) continue;
+                
+                try {
+                    Class<?> configClass = classLoader.loadClass(trimmedName);
+                    processConfigurationClass(context, configClass);
+                } catch (ClassNotFoundException e) {
+                    logger.warn("Configuration class not found: {} for skill: {}", trimmedName, skillId);
+                } catch (Exception e) {
+                    logger.error("Failed to process configuration class: {} for skill: {}", trimmedName, skillId, e);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Failed to process configurations for skill: {}", skillId, e);
+        }
+    }
+    
+    private void processConfigurationClass(PluginContext context, Class<?> configClass) {
+        String skillId = context.getSkillId();
+        
+        boolean isConfiguration = false;
+        for (java.lang.annotation.Annotation annotation : configClass.getAnnotations()) {
+            if (annotation.annotationType().getName().equals("org.springframework.context.annotation.Configuration")) {
+                isConfiguration = true;
+                break;
+            }
+        }
+        
+        if (!isConfiguration) {
+            logger.debug("Class {} is not a @Configuration class", configClass.getName());
+            return;
+        }
+        
+        logger.info("Processing @Configuration class: {} for skill: {}", configClass.getName(), skillId);
+        
+        Object configInstance = null;
+        
+        for (Method method : configClass.getDeclaredMethods()) {
+            boolean hasBeanAnnotation = false;
+            for (java.lang.annotation.Annotation annotation : method.getAnnotations()) {
+                if (annotation.annotationType().getName().equals("org.springframework.context.annotation.Bean")) {
+                    hasBeanAnnotation = true;
+                    break;
+                }
+            }
+            
+            if (!hasBeanAnnotation) {
+                continue;
+            }
+            
+            try {
+                if (configInstance == null) {
+                    configInstance = configClass.getDeclaredConstructor().newInstance();
+                }
+                
+                method.setAccessible(true);
+                Object beanInstance = method.invoke(configInstance);
+                
+                if (beanInstance != null) {
+                    Class<?> beanType = method.getReturnType();
+                    String beanName = method.getName();
+                    
+                    for (java.lang.annotation.Annotation annotation : method.getAnnotations()) {
+                        if (annotation.annotationType().getName().equals("org.springframework.context.annotation.Bean")) {
+                            try {
+                                Method nameMethod = annotation.annotationType().getMethod("name");
+                                String[] names = (String[]) nameMethod.invoke(annotation);
+                                if (names != null && names.length > 0 && !names[0].isEmpty()) {
+                                    beanName = names[0];
+                                }
+                            } catch (Exception e) {
+                                logger.debug("Could not get bean name from @Bean annotation: {}", e.getMessage());
+                            }
+                            break;
+                        }
+                    }
+                    
+                    serviceRegistry.registerServiceInstance(skillId, beanName, beanType, beanInstance);
+                    
+                    logger.info("Registered @Bean '{}' (type: {}) for skill: {}", 
+                            beanName, beanType.getName(), skillId);
+                }
+            } catch (Exception e) {
+                logger.error("Failed to create @Bean '{}' for skill: {}", method.getName(), skillId, e);
             }
         }
     }

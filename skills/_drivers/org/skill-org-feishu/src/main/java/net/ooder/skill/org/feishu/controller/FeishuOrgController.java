@@ -5,6 +5,7 @@ import net.ooder.skill.org.feishu.dto.QrCodeDTO;
 import net.ooder.skill.org.feishu.dto.SyncResultDTO;
 import net.ooder.skill.org.feishu.model.FeishuDepartment;
 import net.ooder.skill.org.feishu.model.FeishuUser;
+import net.ooder.skill.org.feishu.client.FeishuApiClient;
 import net.ooder.skill.org.feishu.service.FeishuAuthService;
 import net.ooder.skill.org.feishu.service.FeishuOrgSyncService;
 import org.slf4j.Logger;
@@ -29,6 +30,9 @@ public class FeishuOrgController {
     
     @Autowired
     private FeishuOrgSyncService syncService;
+    
+    @Autowired
+    private FeishuApiClient apiClient;
     
     @PostMapping("/auth/qrcode")
     public Map<String, Object> generateQrCode() {
@@ -361,6 +365,271 @@ public class FeishuOrgController {
             result.put("code", 500);
             result.put("status", "error");
             result.put("message", "缓存清理失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    // ==================== 部门 CRUD 端点 ====================
+    
+    @PostMapping("/departments")
+    public Map<String, Object> createDepartment(@RequestBody Map<String, Object> body) {
+        log.info("[createDepartment] Creating department: {}", body);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String parentDeptId = (String) body.getOrDefault("parentDeptId", "0");
+            String name = (String) body.get("name");
+            String leaderUserId = (String) body.get("leaderUserId");
+            
+            if (name == null || name.isEmpty()) {
+                result.put("code", 400);
+                result.put("status", "error");
+                result.put("message", "部门名称不能为空");
+                return result;
+            }
+            
+            boolean success = apiClient.createDepartment(parentDeptId, name, leaderUserId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "部门创建成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "部门创建失败，请检查权限或参数");
+            }
+        } catch (Exception e) {
+            log.error("Failed to create department", e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "部门创建失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @PutMapping("/departments/{deptId}")
+    public Map<String, Object> updateDepartment(@PathVariable String deptId, @RequestBody Map<String, Object> body) {
+        log.info("[updateDepartment] Updating department: {}, body: {}", deptId, body);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String name = (String) body.get("name");
+            String leaderUserId = (String) body.get("leaderUserId");
+            
+            boolean success = apiClient.updateDepartment(deptId, name, leaderUserId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "部门更新成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "部门更新失败，请检查参数或权限");
+            }
+        } catch (Exception e) {
+            log.error("Failed to update department: {}", deptId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "部门更新失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @DeleteMapping("/departments/{deptId}")
+    public Map<String, Object> deleteDepartment(@PathVariable String deptId) {
+        log.info("[deleteDepartment] Deleting department: {}", deptId);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean success = apiClient.deleteDepartment(deptId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "部门删除成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "部门删除失败，可能存在子部门或成员");
+            }
+        } catch (Exception e) {
+            log.error("Failed to delete department: {}", deptId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "部门删除失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    // ==================== 用户 CRUD 端点 ====================
+    
+    @PostMapping("/users")
+    public Map<String, Object> createUser(@RequestBody Map<String, Object> body) {
+        log.info("[createUser] Creating user: {}", body);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String name = (String) body.get("name");
+            String mobile = (String) body.get("mobile");
+            String email = (String) body.get("email");
+            String position = (String) body.get("position");
+            
+            List<String> deptIds = null;
+            if (body.get("departmentIds") instanceof List) {
+                @SuppressWarnings("unchecked")
+                List<Object> rawList = (List<Object>) body.get("departmentIds");
+                deptIds = new ArrayList<>();
+                for (Object o : rawList) {
+                    deptIds.add(o.toString());
+                }
+            }
+            
+            if (name == null || name.isEmpty()) {
+                result.put("code", 400);
+                result.put("status", "error");
+                result.put("message", "用户姓名不能为空");
+                return result;
+            }
+            
+            boolean success = apiClient.createUser(name, mobile, deptIds, position, email);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "用户创建成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "用户创建失败，请检查手机号/邮箱是否已存在");
+            }
+        } catch (Exception e) {
+            log.error("Failed to create user", e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "用户创建失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @PutMapping("/users/{userId}")
+    public Map<String, Object> updateUser(@PathVariable String userId, @RequestBody Map<String, Object> body) {
+        log.info("[updateUser] Updating user: {}, body: {}", userId, body);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            String name = (String) body.get("name");
+            String mobile = (String) body.get("mobile");
+            String email = (String) body.get("email");
+            String departmentId = (String) body.get("departmentId");
+            int status = body.containsKey("status") ? Integer.parseInt(body.get("status").toString()) : -1;
+            
+            boolean success = apiClient.updateUser(userId, name, mobile, email, departmentId, status);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "用户更新成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "用户更新失败，请检查参数或权限");
+            }
+        } catch (Exception e) {
+            log.error("Failed to update user: {}", userId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "用户更新失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @DeleteMapping("/users/{userId}")
+    public Map<String, Object> deleteUser(@PathVariable String userId) {
+        log.info("[deleteUser] Deleting user: {}", userId);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean success = apiClient.deleteUser(userId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "用户删除成功");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "用户删除失败，请检查权限");
+            }
+        } catch (Exception e) {
+            log.error("Failed to delete user: {}", userId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "用户删除失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @PostMapping("/users/{userId}/disable")
+    public Map<String, Object> disableUser(@PathVariable String userId) {
+        log.info("[disableUser] Disabling user: {}", userId);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean success = apiClient.disableUser(userId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "用户已禁用");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "禁用用户失败");
+            }
+        } catch (Exception e) {
+            log.error("Failed to disable user: {}", userId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "禁用用户失败: " + e.getMessage());
+        }
+        return result;
+    }
+    
+    @PostMapping("/users/{userId}/enable")
+    public Map<String, Object> enableUser(@PathVariable String userId) {
+        log.info("[enableUser] Enabling user: {}", userId);
+        Map<String, Object> result = new HashMap<>();
+        try {
+            boolean success = apiClient.enableUser(userId);
+            if (success) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("message", "用户已启用");
+            } else {
+                result.put("code", 500);
+                result.put("status", "error");
+                result.put("message", "启用用户失败");
+            }
+        } catch (Exception e) {
+            log.error("Failed to enable user: {}", userId, e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "启用用户失败: " + e.getMessage());
+        }
+        return result;
+    }
+
+    // ==================== 免登接口（OAuth2 OIDC） ====================
+    
+    @GetMapping("/auth/free-login")
+    public Map<String, Object> freeLogin(@RequestParam String access_token) {
+        log.info("[freeLogin] Feishu OIDC free login");
+        Map<String, Object> result = new HashMap<>();
+        try {
+            FeishuUser user = apiClient.getFreeLoginUser(access_token);
+            if (user != null) {
+                result.put("code", 200);
+                result.put("status", "success");
+                result.put("data", user);
+                result.put("message", "免登成功");
+            } else {
+                result.put("code", 401);
+                result.put("status", "error");
+                result.put("message", "免登失败，无效的access_token");
+            }
+        } catch (Exception e) {
+            log.error("Failed to free login", e);
+            result.put("code", 500);
+            result.put("status", "error");
+            result.put("message", "免登接口异常: " + e.getMessage());
         }
         return result;
     }

@@ -28,6 +28,41 @@
         </dependency>
         
         <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-management</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.ooder.skill</groupId>
+            <artifactId>skill-agent</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.ooder.skill</groupId>
+            <artifactId>skill-scene</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.ooder.skill</groupId>
+            <artifactId>skill-capability</artifactId>
+            <version>1.0.0</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-group</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>provided</scope>

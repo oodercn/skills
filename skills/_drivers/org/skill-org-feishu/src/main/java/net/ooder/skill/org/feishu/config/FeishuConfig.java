@@ -10,6 +10,7 @@ public class FeishuConfig {
     private String appId;
     private String appSecret;
     private String apiBaseUrl = "https://open.feishu.cn/open-apis";
+    private String redirectUri;
     private boolean enabled = true;
 
     public String getAppId() {
@@ -34,6 +35,14 @@ public class FeishuConfig {
 
     public void setApiBaseUrl(String apiBaseUrl) {
         this.apiBaseUrl = apiBaseUrl;
+    }
+
+    public String getRedirectUri() {
+        return redirectUri;
+    }
+
+    public void setRedirectUri(String redirectUri) {
+        this.redirectUri = redirectUri;
     }
 
     public boolean isEnabled() {

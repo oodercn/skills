@@ -1,0 +1,148 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-config
+  name: LLM配置管理服务
+  version: "3.0.1"
+  description: 提供LLM配置、Provider管理、模型配置、使用统计等功能
+  author: ooder Team
+  type: business-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - llm
+    - config
+    - provider
+    - model
+    - ai
+
+spec:
+  skillForm: DRIVER
+  type: business-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x2E
+    category: LLM
+    code: BIZ_LLM_CONFIG
+    operations: [config, providers, templates, usage-stats]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.1"
+      required: true
+
+  providedInterfaces:
+    - id: llm-config-service
+      version: "1.0"
+      description: "LLM配置管理服务接口"
+
+  capabilities:
+    - id: config
+      name: LLM配置
+      description: LLM配置管理
+      category: llm
+    - id: providers
+      name: Provider管理
+      description: LLM Provider管理
+      category: llm
+    - id: templates
+      name: 配置模板
+      description: LLM配置模板
+      category: llm
+    - id: usage-stats
+      name: 使用统计
+      description: LLM使用统计
+      category: llm
+
+  endpoints:
+    - path: /api/v1/llm-config
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: listConfigs
+      description: 获取LLM配置列表
+      capability: config
+    - path: /api/v1/llm-config/all
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: listAllConfigs
+      description: 获取所有LLM配置
+      capability: config
+    - path: /api/v1/llm-config/{id}
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: getConfig
+      description: 获取单个LLM配置
+      capability: config
+    - path: /api/v1/llm-config
+      method: POST
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: createConfig
+      description: 创建LLM配置
+      capability: config
+    - path: /api/v1/llm-config/{id}
+      method: PUT
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: updateConfig
+      description: 更新LLM配置
+      capability: config
+    - path: /api/v1/llm-config/{id}
+      method: DELETE
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: deleteConfig
+      description: 删除LLM配置
+      capability: config
+    - path: /api/v1/llm-config/providers
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: getAvailableProviders
+      description: 获取Providers
+      capability: providers
+    - path: /api/v1/llm-config/templates
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: getConfigTemplates
+      description: 获取配置模板
+      capability: templates
+    - path: /api/v1/llm-config/{id}/usage-stats
+      method: GET
+      controllerClass: net.ooder.skill.llm.config.controller.LlmConfigController
+      methodName: getUsageStats
+      description: 获取使用统计
+      capability: usage-stats
+
+  config:
+    optional:
+      - name: LLM_CONFIG_ENABLED
+        type: boolean
+        default: "true"
+        description: 是否启用LLM配置服务
+      - name: LLM_DEFAULT_PROVIDER
+        type: string
+        default: "deepseek"
+        description: 默认LLM Provider
+
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "20Mi"

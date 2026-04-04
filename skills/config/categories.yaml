@@ -2,8 +2,8 @@ apiVersion: config.ooder.net/v1
 kind: CategoryConfig
 
 metadata:
-  version: "2.3.1"
-  lastUpdated: "2026-03-11"
+  version: "3.0.1"
+  lastUpdated: "2026-04-03"
   description: "分类枚举配置"
 
 spec:

@@ -2,6 +2,7 @@ package net.ooder.skill.hotplug.registry;
 
 import net.ooder.skill.hotplug.classloader.PluginClassLoader;
 import net.ooder.skill.hotplug.config.RouteDefinition;
+import net.ooder.skill.hotplug.exception.RouteConflictException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,6 +19,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -36,6 +38,11 @@ public class RouteRegistry {
     @Autowired
     private ApplicationContext applicationContext;
 
+    @Autowired
+    private ServiceRegistry serviceRegistry;
+
+    private String currentSkillId;
+
     // Skill ID -> 注册的路由信息映射
     private final Map<String, Set<RegisteredRoute>> registeredRoutes = new ConcurrentHashMap<>();
 
@@ -49,6 +56,8 @@ public class RouteRegistry {
      */
     public void registerRoutes(String skillId, List<RouteDefinition> routes, PluginClassLoader classLoader) {
         logger.info("Registering {} routes for skill: {}", routes.size(), skillId);
+        
+        this.currentSkillId = skillId;
 
         Set<RegisteredRoute> skillRoutes = ConcurrentHashMap.newKeySet();
         int skippedCount = 0;
@@ -126,15 +135,26 @@ public class RouteRegistry {
         Class<?> controllerClass = classLoader.loadClass(routeDef.getControllerClass());
         logger.debug("Loaded controller class: {}", controllerClass.getName());
 
-        // 检查是否已由 Spring 管理（方案B：跳过已注册路由）
-        Object existingController = findExistingSpringController(controllerClass);
-        if (existingController != null) {
-            logger.debug("Controller {} is already managed by Spring, checking route registration", 
-                    controllerClass.getName());
+        Optional<RouteRegistrationInfo> existingRegistration = findExistingRouteRegistration(
+                routeDef.getPath(), routeDef.getMethod());
+        
+        if (existingRegistration.isPresent()) {
+            RouteRegistrationInfo regInfo = existingRegistration.get();
+            String existingSkillId = regInfo.getSkillId();
             
-            // 检查路由是否已存在
-            if (isRouteAlreadyRegistered(routeDef.getPath(), routeDef.getMethod())) {
-                logger.warn("Route {} {} is already registered by Spring, skipping", 
+            if (existingSkillId != null && existingSkillId.equals(skillId)) {
+                logger.info("Route {} {} already registered by same skill {}, updating", 
+                        routeDef.getMethod(), routeDef.getPath(), skillId);
+                unregisterRouteByInfo(regInfo);
+            } else if (existingSkillId != null) {
+                throw new RouteConflictException(
+                        routeDef.getPath(), 
+                        routeDef.getMethod(), 
+                        existingSkillId, 
+                        skillId);
+            } else {
+                logger.warn("Route {} {} is already registered by Spring (not by any skill), skipping. " +
+                        "To enable dynamic loading, remove the skill from compile-time dependencies.", 
                         routeDef.getMethod(), routeDef.getPath());
                 return null;
             }
@@ -205,29 +225,27 @@ public class RouteRegistry {
     }
 
     /**
-     * 检查路由是否已注册
+     * 查找已存在的路由注册信息
      * @param path 路由路径
      * @param method HTTP 方法
-     * @return 如果已存在返回 true
+     * @return 如果已存在返回 RouteRegistrationInfo，否则返回 Optional.empty()
      */
-    private boolean isRouteAlreadyRegistered(String path, String method) {
+    private Optional<RouteRegistrationInfo> findExistingRouteRegistration(String path, String method) {
         try {
-            // 获取已注册的所有处理器映射
             Map<?, ?> handlerMethods = handlerMapping.getHandlerMethods();
             
-            // 遍历检查是否存在相同路径和方法的映射
-            for (Object mappingInfo : handlerMethods.keySet()) {
-                if (mappingInfo instanceof RequestMappingInfo) {
-                    RequestMappingInfo existingMapping = (RequestMappingInfo) mappingInfo;
+            for (Map.Entry<?, ?> entry : handlerMethods.entrySet()) {
+                if (entry.getKey() instanceof RequestMappingInfo) {
+                    RequestMappingInfo existingMapping = (RequestMappingInfo) entry.getKey();
                     
-                    // 检查路径是否匹配
                     Set<String> existingPatterns = existingMapping.getPatternValues();
                     if (existingPatterns != null && existingPatterns.contains(path)) {
-                        // 检查 HTTP 方法是否匹配
                         Set<RequestMethod> existingMethods = existingMapping.getMethodsCondition().getMethods();
                         if (existingMethods == null || existingMethods.isEmpty() || 
                             existingMethods.contains(RequestMethod.valueOf(method.toUpperCase()))) {
-                            return true;
+                            
+                            String skillId = findSkillIdByMapping(existingMapping);
+                            return Optional.of(new RouteRegistrationInfo(skillId, existingMapping));
                         }
                     }
                 }
@@ -235,49 +253,243 @@ public class RouteRegistry {
         } catch (Exception e) {
             logger.debug("Error checking existing route registration: {}", e.getMessage());
         }
-        return false;
+        return Optional.empty();
     }
 
+    /**
+     * 根据 MappingInfo 查找对应的 Skill ID
+     */
+    private String findSkillIdByMapping(RequestMappingInfo mappingInfo) {
+        for (Map.Entry<String, Set<RegisteredRoute>> entry : registeredRoutes.entrySet()) {
+            for (RegisteredRoute route : entry.getValue()) {
+                if (route.getMappingInfo().equals(mappingInfo)) {
+                    return entry.getKey();
+                }
+            }
+        }
+        return null;
+    }
+
+    /**
+     * 根据路由注册信息注销路由
+     */
+    private void unregisterRouteByInfo(RouteRegistrationInfo regInfo) {
+        if (regInfo.getMappingInfo() != null) {
+            handlerMapping.unregisterMapping(regInfo.getMappingInfo());
+            logger.debug("Unregistered route by info: {}", regInfo);
+        }
+    }
+
+    /**
+     * 检查路由是否已注册（向后兼容方法）
+     * @param path 路由路径
+     * @param method HTTP 方法
+     * @return 如果已存在返回 true
+     */
+    private boolean isRouteAlreadyRegistered(String path, String method) {
+        return findExistingRouteRegistration(path, method).isPresent();
+    }
+
+    /**
+     * 创建 Controller 实例
+     * 优先级：Spring容器已存在Bean > AutowireCapableBeanFactory创建 > 默认构造器
+     */
     private Object createControllerInstance(Class<?> controllerClass) throws Exception {
-        String beanName = controllerClass.getSimpleName();
+        String beanName = Character.toLowerCase(controllerClass.getSimpleName().charAt(0)) + 
+                          controllerClass.getSimpleName().substring(1);
         String className = controllerClass.getName();
         
-        // 首先尝试按类型获取已存在的 Spring Bean，避免重复创建
-        try {
-            Object existingBean = applicationContext.getBean(controllerClass);
-            if (existingBean != null) {
-                logger.debug("Using existing Spring bean for controller: {}", className);
-                return existingBean;
-            }
-        } catch (Exception e) {
-            logger.debug("No existing bean found for controller: {}", className);
+        logger.debug("Creating controller instance for: {}", className);
+        
+        Object existingBean = tryGetExistingBean(controllerClass, beanName, className);
+        if (existingBean != null) {
+            return existingBean;
         }
         
-        // 其次尝试按 beanName 获取
+        return createNewBean(controllerClass, className);
+    }
+
+    /**
+     * 尝试从 Spring 容器获取已存在的 Bean
+     */
+    private Object tryGetExistingBean(Class<?> controllerClass, String beanName, String className) {
         try {
-            Object existingBean = applicationContext.getBean(beanName);
-            if (existingBean != null) {
-                logger.debug("Using existing Spring bean by name for controller: {}", beanName);
-                return existingBean;
+            Object bean = applicationContext.getBean(controllerClass);
+            logger.info("Using existing Spring bean (by type) for controller: {}", className);
+            return bean;
+        } catch (Exception e) {
+            logger.debug("No existing bean found by type for controller: {}", className);
+        }
+        
+        try {
+            Object bean = applicationContext.getBean(beanName);
+            if (bean != null && controllerClass.isInstance(bean)) {
+                logger.info("Using existing Spring bean (by name) for controller: {}", className);
+                return bean;
             }
         } catch (Exception e) {
             logger.debug("No existing bean found by name for controller: {}", beanName);
         }
         
-        // 创建新的 Bean 实例
+        return null;
+    }
+
+    /**
+     * 创建新的 Bean 实例
+     */
+    private Object createNewBean(Class<?> controllerClass, String className) throws Exception {
         try {
             Object bean = applicationContext.getAutowireCapableBeanFactory()
                     .createBean(controllerClass);
             logger.info("Created and autowired controller instance: {}", className);
             return bean;
         } catch (Exception e) {
-            logger.warn("Failed to create controller with Spring autowiring, trying default constructor: {}", className);
+            logger.warn("Failed to create controller with Spring autowiring ({}), trying default constructor with manual injection. Error: {}", 
+                    className, e.getMessage());
+            logger.debug("Autowiring failure details", e);
+            
             try {
-                return controllerClass.getDeclaredConstructor().newInstance();
+                Object bean = controllerClass.getDeclaredConstructor().newInstance();
+                logger.info("Created controller instance with default constructor: {}", className);
+                
+                manualInjectDependencies(bean, controllerClass);
+                
+                logger.info("Controller {} dependencies manually injected successfully", className);
+                return bean;
             } catch (Exception ex) {
-                throw new RuntimeException("Failed to create controller instance: " + className, ex);
+                throw new RuntimeException("Failed to create controller instance: " + className + 
+                        ". Ensure the controller has a no-arg constructor or can be autowired by Spring.", ex);
             }
         }
+    }
+
+    /**
+     * 手动注入依赖
+     * 扫描 @Autowired 和 @Resource 字段并从 Spring 容器注入
+     */
+    private void manualInjectDependencies(Object bean, Class<?> clazz) {
+        Class<?> currentClass = clazz;
+        while (currentClass != null && currentClass != Object.class) {
+            for (java.lang.reflect.Field field : currentClass.getDeclaredFields()) {
+                if (field.isAnnotationPresent(org.springframework.beans.factory.annotation.Autowired.class) ||
+                    field.isAnnotationPresent(jakarta.annotation.Resource.class)) {
+                    
+                    try {
+                        Object dependency = resolveDependency(field);
+                        if (dependency != null) {
+                            field.setAccessible(true);
+                            field.set(bean, dependency);
+                            logger.info("Manually injected dependency: {} -> {} in {}", 
+                                    field.getName(), dependency.getClass().getSimpleName(), clazz.getSimpleName());
+                        } else {
+                            boolean required = true;
+                            org.springframework.beans.factory.annotation.Autowired autowired = 
+                                field.getAnnotation(org.springframework.beans.factory.annotation.Autowired.class);
+                            if (autowired != null) {
+                                required = autowired.required();
+                            }
+                            
+                            if (required) {
+                                logger.warn("Failed to resolve required dependency: {} in {}", 
+                                        field.getName(), clazz.getSimpleName());
+                            }
+                        }
+                    } catch (Exception e) {
+                        logger.warn("Failed to inject dependency: {} in {}. Error: {}", 
+                                field.getName(), clazz.getSimpleName(), e.getMessage());
+                    }
+                }
+            }
+            currentClass = currentClass.getSuperclass();
+        }
+    }
+
+    /**
+     * 解析依赖
+     * 优先级：
+     * 1. 从 Spring 容器按名称查找（@Resource 指定名称）
+     * 2. 从 Spring 容器按类型查找
+     * 3. 从 ServiceRegistry 按接口类型查找（当前 Skill）
+     * 4. 从 ServiceRegistry 按服务名称查找（当前 Skill）
+     * 5. 从 Spring 容器按字段名查找
+     * 6. 从 Spring 容器按类名查找
+     */
+    private Object resolveDependency(java.lang.reflect.Field field) {
+        Class<?> fieldType = field.getType();
+        
+        jakarta.annotation.Resource resource = field.getAnnotation(jakarta.annotation.Resource.class);
+        if (resource != null && resource.name() != null && !resource.name().isEmpty()) {
+            try {
+                return applicationContext.getBean(resource.name(), fieldType);
+            } catch (Exception e) {
+                logger.debug("Bean not found by name: {}", resource.name());
+            }
+        }
+        
+        try {
+            return applicationContext.getBean(fieldType);
+        } catch (Exception e) {
+            logger.debug("Bean not found by type: {}", fieldType.getName());
+        }
+        
+        if (currentSkillId != null && serviceRegistry != null) {
+            try {
+                List<?> services = serviceRegistry.getServicesByInterface(fieldType);
+                if (services != null && !services.isEmpty()) {
+                    logger.info("Found service from ServiceRegistry by interface: {} for skill {}", 
+                            fieldType.getName(), currentSkillId);
+                    return services.get(0);
+                }
+            } catch (Exception e) {
+                logger.debug("Service not found in ServiceRegistry by interface: {}", fieldType.getName());
+            }
+            
+            try {
+                Map<String, ServiceRegistry.ServiceProxy> skillServices = serviceRegistry.getServices(currentSkillId);
+                if (skillServices != null) {
+                    String serviceName = field.getName();
+                    ServiceRegistry.ServiceProxy proxy = skillServices.get(serviceName);
+                    if (proxy != null && fieldType.isInstance(proxy.getProxy())) {
+                        logger.info("Found service from ServiceRegistry by name: {} for skill {}", 
+                                serviceName, currentSkillId);
+                        return proxy.getProxy();
+                    }
+                    
+                    for (ServiceRegistry.ServiceProxy serviceProxy : skillServices.values()) {
+                        if (fieldType.isInstance(serviceProxy.getProxy())) {
+                            logger.info("Found service from ServiceRegistry by type match: {} for skill {}", 
+                                    fieldType.getName(), currentSkillId);
+                            return serviceProxy.getProxy();
+                        }
+                    }
+                }
+            } catch (Exception e) {
+                logger.debug("Service not found in ServiceRegistry by name: {}", field.getName());
+            }
+        }
+        
+        String beanName = field.getName();
+        try {
+            Object bean = applicationContext.getBean(beanName);
+            if (fieldType.isInstance(bean)) {
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found by field name: {}", beanName);
+        }
+        
+        String classNameBeanName = Character.toLowerCase(fieldType.getSimpleName().charAt(0)) + 
+                                   fieldType.getSimpleName().substring(1);
+        try {
+            Object bean = applicationContext.getBean(classNameBeanName);
+            if (fieldType.isInstance(bean)) {
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found by class name: {}", classNameBeanName);
+        }
+        
+        return null;
     }
 
     private Method findMethod(Class<?> clazz, String methodName, String[] parameterTypes, 
@@ -395,6 +607,35 @@ public class RouteRegistry {
                     "skillId='" + skillId + '\'' +
                     ", path='" + (routeDefinition != null ? routeDefinition.getPath() : "null") + '\'' +
                     ", method='" + (routeDefinition != null ? routeDefinition.getMethod() : "null") + '\'' +
+                    '}';
+        }
+    }
+
+    /**
+     * 路由注册信息（用于冲突检测）
+     */
+    private static class RouteRegistrationInfo {
+        private final String skillId;
+        private final RequestMappingInfo mappingInfo;
+
+        public RouteRegistrationInfo(String skillId, RequestMappingInfo mappingInfo) {
+            this.skillId = skillId;
+            this.mappingInfo = mappingInfo;
+        }
+
+        public String getSkillId() {
+            return skillId;
+        }
+
+        public RequestMappingInfo getMappingInfo() {
+            return mappingInfo;
+        }
+
+        @Override
+        public String toString() {
+            return "RouteRegistrationInfo{" +
+                    "skillId='" + skillId + '\'' +
+                    ", mappingInfo=" + mappingInfo +
                     '}';
         }
     }

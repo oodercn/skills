@@ -1,0 +1,153 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org
+  name: 组织管理
+  version: 1.0.0
+  description: 系统级组织管理 - 提供用户、部门、组织树管理
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x02
+    category: SYS
+    code: SYS_ORG
+    operations: [user, department, tree, role]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies: []
+
+  providedInterfaces:
+    - id: org-service
+      version: "1.0"
+      description: "组织管理接口"
+    - id: user-service
+      version: "1.0"
+      description: "用户服务接口"
+
+  capabilities:
+    - id: user
+      name: 用户管理
+      description: 用户增删改查
+      category: org
+    - id: department
+      name: 部门管理
+      description: 部门增删改查
+      category: org
+    - id: tree
+      name: 组织树
+      description: 组织树查询
+      category: org
+    - id: role
+      name: 角色管理
+      description: 角色查询
+      category: org
+
+  endpoints:
+    - path: /api/v1/org/users
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getUsers
+      description: 列出用户
+      capability: user
+    - path: /api/v1/org/users/current
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getCurrentUser
+      description: 获取当前用户
+      capability: user
+    - path: /api/v1/org/users/current/stats
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getCurrentUserStats
+      description: 获取当前用户统计
+      capability: user
+    - path: /api/v1/org/departments
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getDepartments
+      description: 列出部门
+      capability: department
+    - path: /api/v1/org/tree
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getOrgTree
+      description: 获取组织树
+      capability: tree
+    - path: /api/v1/org/roles
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.OrgController
+      methodName: getRoles
+      description: 获取角色列表
+      capability: role
+
+    # ==================== UserController - /api/v1/users ====================
+    - path: /api/v1/users/password
+      method: POST
+      controllerClass: net.ooder.skill.org.controller.UserController
+      methodName: changePassword
+      parameterTypes:
+        - net.ooder.skill.org.dto.PasswordChangeDTO
+      description: 修改密码
+      capability: user
+    - path: /api/v1/users/devices
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.UserController
+      methodName: getDevices
+      description: 获取用户设备
+      capability: user
+    - path: /api/v1/users/devices/{deviceId}
+      method: DELETE
+      controllerClass: net.ooder.skill.org.controller.UserController
+      methodName: removeDevice
+      parameterTypes:
+        - java.lang.String
+      description: 删除设备
+      capability: user
+    - path: /api/v1/users/devices/others
+      method: GET
+      controllerClass: net.ooder.skill.org.controller.UserController
+      methodName: getOtherDevices
+      description: 获取其他设备
+      capability: user
+
+  config:
+    optional:
+      - name: STORAGE_TYPE
+        type: string
+        default: "json"
+        description: 存储类型 (json/memory/sqlite)
+      - name: STORAGE_PATH
+        type: string
+        default: "./data/org"
+        description: 存储路径
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "20Mi"

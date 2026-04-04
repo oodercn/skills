@@ -8,49 +8,37 @@
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
         <version>3.0.1</version>
-        <relativePath>../../pom.xml</relativePath>
+        <relativePath>../../../pom.xml</relativePath>
     </parent>
 
     <artifactId>skill-org-dingding</artifactId>
+    <version>3.0.1</version>
     <packaging>jar</packaging>
 
     <name>skill-org-dingding</name>
-    <description>钉钉组织数据集成服务，包括组织架构同步和用户认证</description>
+    <description>钉钉组织架构服务，提供部门管理、用户管理、组织同步、免登认证等功能</description>
 
     <dependencies>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk-core</artifactId>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-org-web</artifactId>
-            <version>3.0.1</version>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-validation</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-common-client</artifactId>
-            <version>3.0.1</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
         </dependency>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-config</artifactId>
-            <version>3.0.1</version>
+            <groupId>com.alibaba</groupId>
+            <artifactId>fastjson</artifactId>
+            <version>1.2.83</version>
         </dependency>
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-server</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>ooder-msg-web</artifactId>
-            <version>3.0.1</version>
-        </dependency>
-        <dependency>
-            <groupId>com.alibaba.fastjson2</groupId>
-            <artifactId>fastjson2</artifactId>
-            <version>2.0.57</version>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -63,4 +51,3 @@
         </plugins>
     </build>
 </project>
-

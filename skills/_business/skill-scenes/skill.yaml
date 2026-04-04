@@ -1,0 +1,194 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-scenes
+  name: 场景管理服务
+  version: "3.0.1"
+  description: 场景与场景组管理服务 - 提供场景CRUD、场景组管理、参与者管理、能力绑定、知识库绑定等核心功能
+  author: ooder Team
+  type: business-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - scene
+    - scene-group
+    - workflow
+    - collaboration
+
+spec:
+  skillForm: PROVIDER
+  type: business-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x21
+    category: BIZ
+    code: BIZ_SCENES
+    operations: [create, list, get, update, delete, activate, deactivate, participant, capability, knowledge, workflow]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.1"
+      required: true
+    - skillId: skill-agent
+      version: ">=3.0.1"
+      required: false
+      description: "Agent服务，用于场景执行"
+
+  providedInterfaces:
+    - id: scene-service
+      version: "1.0"
+      description: "场景管理服务接口"
+    - id: scene-group-service
+      version: "1.0"
+      description: "场景组管理服务接口"
+
+  capabilities:
+    - id: create
+      name: 创建场景
+      description: 创建新场景或场景组
+      category: scene
+    - id: list
+      name: 场景列表
+      description: 获取场景列表
+      category: scene
+    - id: get
+      name: 场景详情
+      description: 获取场景详情
+      category: scene
+    - id: update
+      name: 更新场景
+      description: 更新场景配置
+      category: scene
+    - id: delete
+      name: 删除场景
+      description: 删除场景
+      category: scene
+    - id: activate
+      name: 激活场景
+      description: 激活场景或场景组
+      category: scene
+    - id: deactivate
+      name: 停用场景
+      description: 停用场景或场景组
+      category: scene
+    - id: participant
+      name: 参与者管理
+      description: 管理场景参与者
+      category: scene
+    - id: capability
+      name: 能力绑定
+      description: 管理场景能力绑定
+      category: scene
+    - id: knowledge
+      name: 知识库绑定
+      description: 管理场景知识库绑定
+      category: scene
+    - id: workflow
+      name: 工作流
+      description: 场景工作流管理
+      category: scene
+
+  endpoints:
+    - path: /api/v1/scene-groups/my/created
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getMyCreatedGroups
+      description: 获取我创建的场景组
+      capability: list
+    - path: /api/v1/scene-groups/my/led
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getMyLedGroups
+      description: 获取我领导的场景组
+      capability: list
+    - path: /api/v1/scene-groups/my/participated
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getMyParticipatedGroups
+      description: 获取我参与的场景组
+      capability: list
+    - path: /api/v1/scene-groups
+      method: POST
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: createGroup
+      description: 创建场景组
+      capability: create
+    - path: /api/v1/scene-groups/{id}
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getGroup
+      description: 获取场景组详情
+      capability: get
+    - path: /api/v1/scene-groups/{id}
+      method: PUT
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: updateGroup
+      description: 更新场景组
+      capability: update
+    - path: /api/v1/scene-groups/{id}
+      method: DELETE
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: deleteGroup
+      description: 删除场景组
+      capability: delete
+    - path: /api/v1/scene-groups/{id}/activate
+      method: POST
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: activateGroup
+      description: 激活场景组
+      capability: activate
+    - path: /api/v1/scene-groups/{id}/participants
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getParticipants
+      description: 获取参与者列表
+      capability: participant
+    - path: /api/v1/scene-groups/{id}/capabilities
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getGroupCapabilities
+      description: 获取能力列表
+      capability: capability
+    - path: /api/v1/scene-groups/{id}/knowledge
+      method: GET
+      controllerClass: net.ooder.skill.scenes.controller.SceneGroupController
+      methodName: getKnowledgeBases
+      description: 获取知识库列表
+      capability: knowledge
+
+  config:
+    optional:
+      - name: SCENES_ENABLED
+        type: boolean
+        default: "true"
+        description: 是否启用场景服务
+      - name: SCENES_MAX_PER_USER
+        type: integer
+        default: "100"
+        description: 每用户最大场景组数
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "50Mi"

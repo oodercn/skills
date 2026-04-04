@@ -57,9 +57,9 @@
         <maven.source.skip>false</maven.source.skip>
         
         <ooder.version>3.0.1</ooder.version>
-        <agent-sdk.version>3.0.0</agent-sdk.version>
+        <agent-sdk.version>3.0.1</agent-sdk.version>
         <scene-engine.version>3.0.1</scene-engine.version>
-        <llm-sdk.version>3.0.0</llm-sdk.version>
+        <llm-sdk.version>3.0.1</llm-sdk.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <lombok.version>1.18.36</lombok.version>
         <fastjson2.version>2.0.52</fastjson2.version>
@@ -71,8 +71,20 @@
         <module>mvp</module>
         
         <!-- System Skills -->
+        <module>skills/_system/skill-agent</module>
+        <module>skills/_system/skill-auth</module>
+        <module>skills/_system/skill-capability</module>
         <module>skills/_system/skill-common</module>
+        <module>skills/_system/skill-discovery</module>
+        <module>skills/_system/skill-install</module>
+        <module>skills/_system/skill-knowledge</module>
         <module>skills/_system/skill-llm-chat</module>
+        <module>skills/_system/skill-management</module>
+        <module>skills/_system/skill-menu</module>
+        <module>skills/_system/skill-org</module>
+        <module>skills/_system/skill-protocol</module>
+        <module>skills/_system/skill-role</module>
+        <module>skills/_system/skill-scene</module>
         
         <!-- LLM Drivers -->
         <module>skills/_drivers/llm/skill-llm-base</module>
@@ -96,6 +108,9 @@
         <module>skills/_drivers/vfs/skill-vfs-minio</module>
         <module>skills/_drivers/vfs/skill-vfs-oss</module>
         <module>skills/_drivers/vfs/skill-vfs-s3</module>
+        
+        <!-- BPM Drivers -->
+        <module>skills/_drivers/bpm/skill-bpm</module>
         
         <!-- Media Drivers -->
         <module>skills/_drivers/media/skill-media-toutiao</module>
@@ -143,6 +158,9 @@
         <!-- Capabilities - Scheduler -->
         <module>skills/capabilities/scheduler/skill-scheduler-quartz</module>
         <module>skills/capabilities/scheduler/skill-task</module>
+        
+        <!-- Capabilities - Workflow -->
+        <module>skills/capabilities/workflow/skill-workflow</module>
         
         <!-- Capabilities - Search -->
         <module>skills/capabilities/search/skill-search</module>
@@ -220,6 +238,18 @@
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skill-vfs-base</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-bpm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skill-workflow</artifactId>
                 <version>${project.version}</version>
             </dependency>
             

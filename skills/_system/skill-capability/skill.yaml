@@ -1,0 +1,283 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-capability
+  name: 能力管理服务
+  version: 1.0.0
+  description: 提供能力注册、发现、绑定、调用等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x2F
+    category: SYS
+    code: SYS_CAPABILITY
+    operations: [register, discover, bind, invoke, sync]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skillId: skill-discovery
+      version: ">=1.0.0"
+      required: true
+    - skillId: skill-install
+      version: ">=1.0.0"
+      required: true
+
+  endpoints:
+    # ==================== CapabilityController - /api/v1/capabilities ====================
+    - path: /api/v1/capabilities/stats/overview
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getStatsOverview
+      description: 获取能力统计概览
+      capability: discover
+    - path: /api/v1/capabilities/stats/rank
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getCapabilityRank
+      parameterTypes:
+        - java.lang.String
+        - java.lang.Integer
+      description: 获取能力调用排名
+      capability: discover
+    - path: /api/v1/capabilities/stats/top
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getTopCapabilities
+      parameterTypes:
+        - java.lang.Integer
+      description: 获取热门能力
+      capability: discover
+    - path: /api/v1/capabilities/stats/errors
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getRecentErrors
+      parameterTypes:
+        - java.lang.Integer
+      description: 获取最近错误
+      capability: discover
+    - path: /api/v1/capabilities/stats/scores
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getScoreDistribution
+      description: 获取评分分布
+      capability: discover
+    - path: /api/v1/capabilities/stats/categories
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getCategoryDistribution
+      description: 获取分类分布
+      capability: discover
+    - path: /api/v1/capabilities/stats/logs
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getRecentLogs
+      parameterTypes:
+        - java.lang.Integer
+      description: 获取最近日志
+      capability: discover
+    - path: /api/v1/capabilities
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: listCapabilities
+      parameterTypes:
+        - java.lang.Boolean
+        - java.lang.String
+        - java.lang.String
+        - java.lang.Integer
+        - java.lang.Integer
+      description: 获取能力列表
+      capability: discover
+    - path: /api/v1/capabilities/{id}
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getCapability
+      parameterTypes:
+        - java.lang.String
+      description: 获取能力详情
+      capability: discover
+    - path: /api/v1/capabilities/discoverable
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getDiscoverableCapabilities
+      description: 获取可发现能力
+      capability: discover
+    - path: /api/v1/capabilities/updates
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getCapabilityUpdates
+      description: 获取能力更新
+      capability: discover
+    - path: /api/v1/capabilities/{id}/deactivate
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: deactivateCapability
+      parameterTypes:
+        - java.lang.String
+      description: 停用能力
+      capability: register
+    - path: /api/v1/capabilities/scene/{id}
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: getSceneCapability
+      parameterTypes:
+        - java.lang.String
+      description: 获取场景能力
+      capability: discover
+    - path: /api/v1/capabilities/scene/{id}/activate
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: activateSceneCapability
+      parameterTypes:
+        - java.lang.String
+      description: 激活场景能力
+      capability: register
+    - path: /api/v1/capabilities/scene/{id}/deactivate
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: deactivateSceneCapability
+      parameterTypes:
+        - java.lang.String
+      description: 停用场景能力
+      capability: register
+    - path: /api/v1/capabilities/scene/capabilities/search
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: searchCapabilities
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.lang.Integer
+        - java.lang.Integer
+      description: 搜索能力
+      capability: discover
+    - path: /api/v1/capabilities/scene/capabilities/types
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: listCapabilityTypes
+      description: 获取能力类型列表
+      capability: discover
+    - path: /api/v1/capabilities/scene/capabilities
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: createCapability
+      parameterTypes:
+        - net.ooder.skill.capability.dto.CapabilityDTO
+      description: 创建能力
+      capability: register
+    - path: /api/v1/capabilities/scene/capabilities/bindings/{bindingId}/status
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityController
+      methodName: updateBindingStatus
+      parameterTypes:
+        - java.lang.String
+        - java.util.Map
+      description: 更新绑定状态
+      capability: bind
+
+    # ==================== CapabilityBindingController - /api/v1/capabilities/bindings ====================
+    - path: /api/v1/capabilities/bindings
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: listBindings
+      description: 获取绑定列表
+      capability: bind
+    - path: /api/v1/capabilities/bindings/{id}
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: getBinding
+      parameterTypes:
+        - java.lang.String
+      description: 获取绑定详情
+      capability: bind
+    - path: /api/v1/capabilities/bindings
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: createBinding
+      parameterTypes:
+        - java.util.Map
+      description: 创建绑定
+      capability: bind
+    - path: /api/v1/capabilities/bindings/{id}
+      method: PUT
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: updateBinding
+      parameterTypes:
+        - java.lang.String
+        - java.util.Map
+      description: 更新绑定
+      capability: bind
+    - path: /api/v1/capabilities/bindings/{id}
+      method: DELETE
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: deleteBinding
+      parameterTypes:
+        - java.lang.String
+      description: 删除绑定
+      capability: bind
+    - path: /api/v1/capabilities/bindings/{id}/test
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: testBinding
+      parameterTypes:
+        - java.lang.String
+      description: 测试绑定
+      capability: bind
+    - path: /api/v1/capabilities/bindings/by-link/{linkId}
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.CapabilityBindingController
+      methodName: getBindingsByLink
+      parameterTypes:
+        - java.lang.String
+      description: 按链接获取绑定
+      capability: bind
+    # ==================== SceneCapabilityController - /api/v1/scene-capabilities ====================
+    - path: /api/v1/scene-capabilities/{id}
+      method: GET
+      controllerClass: net.ooder.skill.capability.controller.SceneCapabilityController
+      methodName: getCapability
+      parameterTypes:
+        - java.lang.String
+      description: 获取场景能力
+      capability: discover
+    - path: /api/v1/scene-capabilities/{id}/activate
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.SceneCapabilityController
+      methodName: activateCapability
+      parameterTypes:
+        - java.lang.String
+      description: 激活场景能力
+      capability: register
+    - path: /api/v1/scene-capabilities/{id}/deactivate
+      method: POST
+      controllerClass: net.ooder.skill.capability.controller.SceneCapabilityController
+      methodName: deactivateCapability
+      parameterTypes:
+        - java.lang.String
+      description: 停用场景能力
+      capability: register
+
+  config:
+    optional:
+      - name: CAPABILITY_REGISTRY_TYPE
+        type: string
+        default: "memory"
+        description: 能力注册表类型
+
+  resources:
+    cpu: "100m"
+    memory: "128Mi"
+    storage: "20Mi"

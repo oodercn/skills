@@ -30,9 +30,9 @@
         <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <ooder.sdk.version>3.0.1</ooder.sdk.version>
-        <agent-sdk.version>3.0.0</agent-sdk.version>
-        <scene-engine.version>3.0.0</scene-engine.version>
-        <llm-sdk.version>3.0.0</llm-sdk.version>
+        <agent-sdk.version>3.0.1</agent-sdk.version>
+        <scene-engine.version>3.0.1</scene-engine.version>
+        <llm-sdk.version>3.0.1</llm-sdk.version>
         <fastjson2.version>2.0.57</fastjson2.version>
     </properties>
 

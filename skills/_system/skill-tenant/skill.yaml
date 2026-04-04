@@ -1,0 +1,218 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-tenant
+  name: 多租户管理服务
+  version: "3.0.1"
+  description: 提供企业级多租户管理能力，包括租户CRUD、数据隔离、配额管理、成员管理等核心功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - tenant
+    - multi-tenant
+    - saas
+    - isolation
+    - quota
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x04
+    category: SYS
+    code: SYS_TENANT
+    operations: [create, list, get, update, delete, switch, quota, member, isolate]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies: []
+
+  providedInterfaces:
+    - id: tenant-service
+      version: "1.0"
+      description: "多租户管理服务接口"
+    - id: tenant-context
+      version: "1.0"
+      description: "租户上下文接口"
+
+  capabilities:
+    - id: create
+      name: 创建租户
+      description: 创建新的租户实例
+      category: tenant
+    - id: list
+      name: 租户列表
+      description: 获取当前用户可访问的租户列表
+      category: tenant
+    - id: get
+      name: 租户详情
+      description: 获取租户详细信息
+      category: tenant
+    - id: update
+      name: 更新租户
+      description: 更新租户配置信息
+      category: tenant
+    - id: delete
+      name: 删除租户
+      description: 删除或停用租户
+      category: tenant
+    - id: switch
+      name: 切换租户
+      description: 切换当前用户的活跃租户
+      category: tenant
+    - id: quota
+      name: 配额管理
+      description: 管理租户资源配额（用户数、存储、API调用等）
+      category: tenant
+    - id: member
+      name: 成员管理
+      description: 管理租户成员及角色
+      category: tenant
+    - id: isolate
+      name: 数据隔离
+      description: 基于租户ID的数据自动隔离
+      category: tenant
+
+  endpoints:
+    - path: /api/v1/tenants
+      method: GET
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: listTenants
+      description: 获取租户列表
+      capability: list
+    - path: /api/v1/tenants
+      method: POST
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: createTenant
+      parameterTypes:
+        - net.ooder.skill.tenant.model.TenantCreateRequest
+      description: 创建租户
+      capability: create
+    - path: /api/v1/tenants/{id}
+      method: GET
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: getTenant
+      parameterTypes:
+        - java.lang.String
+      description: 获取租户详情
+      capability: get
+    - path: /api/v1/tenants/{id}
+      method: PUT
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: updateTenant
+      parameterTypes:
+        - java.lang.String
+        - net.ooder.skill.tenant.model.TenantUpdateRequest
+      description: 更新租户
+      capability: update
+    - path: /api/v1/tenants/{id}
+      method: DELETE
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: deleteTenant
+      parameterTypes:
+        - java.lang.String
+      description: 删除/停用租户
+      capability: delete
+    - path: /api/v1/tenants/current
+      method: GET
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: getCurrentTenant
+      description: 获取当前活跃租户
+      capability: get
+    - path: /api/v1/tenants/{id}/switch
+      method: POST
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: switchTenant
+      parameterTypes:
+        - java.lang.String
+      description: 切换到指定租户
+      capability: switch
+    - path: /api/v1/tenants/{id}/quota
+      method: GET
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: getQuota
+      parameterTypes:
+        - java.lang.String
+      description: 获取租户配额信息
+      capability: quota
+    - path: /api/v1/tenants/{id}/quota
+      method: PUT
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: updateQuota
+      parameterTypes:
+        - java.lang.String
+        - net.ooder.skill.tenant.model.TenantQuotaDTO
+      description: 更新租户配额
+      capability: quota
+    - path: /api/v1/tenants/{id}/members
+      method: GET
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: listMembers
+      parameterTypes:
+        - java.lang.String
+      description: 获取租户成员列表
+      capability: member
+    - path: /api/v1/tenants/{id}/members
+      method: POST
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: addMember
+      parameterTypes:
+        - java.lang.String
+        - net.ooder.skill.tenant.model.TenantMemberDTO
+      description: 添加租户成员
+      capability: member
+    - path: /api/v1/tenants/{id}/members/{userId}
+      method: DELETE
+      controllerClass: net.ooder.skill.tenant.controller.TenantController
+      methodName: removeMember
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+      description: 移除租户成员
+      capability: member
+
+  config:
+    optional:
+      - name: TENANT_ISOLATION_MODE
+        type: string
+        default: "schema"
+        description: 隔离模式(schema/database/row_level)
+      - name: DEFAULT_TENANT_ID
+        type: string
+        default: "default"
+        description: 默认租户ID
+      - name: MAX_TENANTS_PER_USER
+        type: integer
+        default: "10"
+        description: 每用户最大可创建租户数
+      - name: ENABLE_TENANT_QUOTA
+        type: boolean
+        default: "true"
+        description: 是否启用配额限制
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "50Mi"

@@ -1,0 +1,116 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-context
+  name: 上下文管理服务
+  version: "3.0.1"
+  description: 多级上下文管理服务 - 提供页面导航、技能切换、上下文更新等核心能力
+  author: ooder Team
+  type: business-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - context
+    - navigation
+    - state-management
+
+spec:
+  skillForm: PROVIDER
+  type: business-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x20
+    category: BIZ
+    code: BIZ_CONTEXT
+    operations: [status, navigate, skill-change, update]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.1"
+      required: true
+
+  providedInterfaces:
+    - id: context-service
+      version: "1.0"
+      description: "上下文管理服务接口"
+
+  capabilities:
+    - id: status
+      name: 上下文状态
+      description: 获取当前上下文状态
+      category: context
+    - id: navigate
+      name: 页面导航
+      description: 页面导航事件处理
+      category: context
+    - id: skill-change
+      name: 技能切换
+      description: 技能切换事件处理
+      category: context
+    - id: update
+      name: 上下文更新
+      description: 推送上下文更新
+      category: context
+
+  endpoints:
+    - path: /api/v1/context/status
+      method: GET
+      controllerClass: net.ooder.skill.context.controller.ContextEventController
+      methodName: getContextStatus
+      description: 获取上下文状态
+      capability: status
+    - path: /api/v1/context/navigate
+      method: POST
+      controllerClass: net.ooder.skill.context.controller.ContextEventController
+      methodName: onPageNavigate
+      description: 页面导航
+      capability: navigate
+    - path: /api/v1/context/skill-change
+      method: POST
+      controllerClass: net.ooder.skill.context.controller.ContextEventController
+      methodName: onSkillChange
+      description: 技能切换
+      capability: skill-change
+    - path: /api/v1/context/update
+      method: POST
+      controllerClass: net.ooder.skill.context.controller.ContextEventController
+      methodName: pushContextUpdate
+      description: 更新上下文
+      capability: update
+
+  config:
+    optional:
+      - name: CONTEXT_ENABLED
+        type: boolean
+        default: "true"
+        description: 是否启用上下文服务
+      - name: CONTEXT_CACHE_TTL
+        type: integer
+        default: "3600"
+        description: 上下文缓存过期时间(秒)
+
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"

@@ -1,0 +1,27 @@
+id: skill-bpm
+name: BPM Workflow Engine Driver
+version: 3.0.1
+description: BPM workflow engine client library for process definition, execution and management
+category: _drivers
+subcategory: bpm
+author: ooder
+license: MIT
+
+capabilities:
+  - process_definition
+  - process_instance
+  - activity_management
+  - workflow_execution
+  - task_assignment
+
+dependencies:
+  - skill-common
+
+exports:
+  - net.ooder.skill.bpm.client.WorkflowClientService
+  - net.ooder.skill.bpm.engine.ProcessEngine
+  - net.ooder.skill.bpm.model.*
+
+configuration:
+  auto_configure: true
+  config_class: net.ooder.skill.bpm.config.BpmAutoConfiguration

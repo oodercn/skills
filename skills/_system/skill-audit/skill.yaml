@@ -1,0 +1,129 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-audit
+  name: 日志审计服务
+  version: "3.0.1"
+  description: 提供操作日志记录、审计追踪、安全审计、合规报告等企业级审计能力，支持多维度查询和导出
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - audit
+    - log
+    - security
+    - compliance
+    - trace
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x35
+    category: SYS
+    code: SYS_AUDIT
+    operations: [log, query, stats, export]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies: []
+
+  providedInterfaces:
+    - id: audit-service
+      version: "1.0"
+      description: "审计日志服务接口"
+
+  capabilities:
+    - id: log
+      name: 日志记录
+      description: 记录操作日志（用户操作、系统事件、安全事件）
+      category: audit
+    - id: query
+      name: 日志查询
+      description: 多维度查询审计日志
+      category: audit
+    - id: stats
+      name: 统计分析
+      description: 审计日志统计分析
+      category: audit
+    - id: export
+      name: 导出报告
+      description: 导出审计报告（CSV/Excel）
+      category: audit
+
+  endpoints:
+    - path: /api/v1/audit/logs
+      method: GET
+      controllerClass: net.ooder.skill.audit.controller.AuditController
+      methodName: listLogs
+      description: 查询审计日志列表
+      capability: query
+    - path: /api/v1/audit/logs/{recordId}
+      method: GET
+      controllerClass: net.ooder.skill.audit.controller.AuditController
+      methodName: getLogById
+      parameterTypes:
+        - java.lang.String
+      description: 获取审计日志详情
+      capability: query
+    - path: /api/v1/audit/logs
+      method: POST
+      controllerClass: net.ooder.skill.audit.controller.AuditController
+      methodName: createLog
+      parameterTypes:
+        - net.ooder.skill.audit.dto.AuditLogDTO
+      description: 创建审计日志
+      capability: log
+    - path: /api/v1/audit/stats
+      method: GET
+      controllerClass: net.ooder.skill.audit.controller.AuditController
+      methodName: getStats
+      description: 获取审计统计
+      capability: stats
+    - path: /api/v1/audit/export
+      method: GET
+      controllerClass: net.ooder.skill.audit.controller.AuditController
+      methodName: exportLogs
+      description: 导出审计日志
+      capability: export
+
+  config:
+    optional:
+      - name: AUDIT_LOG_RETENTION_DAYS
+        type: integer
+        default: "90"
+        description: 日志保留天数
+      - name: AUDIT_LOG_LEVEL
+        type: string
+        default: "INFO"
+        description: 日志级别(DEBUG/INFO/WARN/ERROR)
+      - name: AUDIT_ENABLE_ASYNC
+        type: boolean
+        default: "true"
+        description: 是否异步记录日志
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "100Mi"

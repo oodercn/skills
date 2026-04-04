@@ -227,4 +227,275 @@ public class WeComApiClient {
         WeComUser user = getUser(userId);
         return user != null && user.getStatus() != null && user.getStatus() == 1;
     }
+
+    public WeComUser getUserByEmail(String email) {
+        String token = getAccessToken();
+        if (token == null) return null;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/user/getuserid?access_token=" + token;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            JSONObject body = new JSONObject();
+            body.put("email", email);
+
+            HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            JSONObject json = JSON.parseObject(response.getBody());
+            if (json.getInteger("errcode") == 0) {
+                String userId = json.getString("userid");
+                if (userId != null) {
+                    return getUser(userId);
+                }
+            }
+            logger.warn("getUserByEmail failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Error getting user by email: {}", email, e);
+        }
+        return null;
+    }
+
+    public WeComUser getFreeLoginUser(String code) {
+        String token = getAccessToken();
+        if (token == null) return null;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/auth/getuserinfo?access_token=" + token + "&code=" + code;
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JSONObject json = JSON.parseObject(response.getBody());
+
+            if (json.getInteger("errcode") == 0) {
+                String userId = json.getString("userid");
+                if (userId != null) {
+                    return getUser(userId);
+                }
+            }
+            logger.warn("getFreeLoginUser failed: errcode={}", json.getInteger("errcode"));
+        } catch (Exception e) {
+            logger.error("Error getting free login user", e);
+        }
+        return null;
+    }
+
+    public Map<String, Object> getUserInfoByCode(String code) {
+        String token = getAccessToken();
+        if (token == null) return null;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/auth/getuserinfo?access_token=" + token + "&code=" + code;
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JSONObject json = JSON.parseObject(response.getBody());
+
+            if (json.getInteger("errcode") == 0) {
+                Map<String, Object> result = new java.util.HashMap<>();
+                result.put("UserId", json.getString("userid"));
+                result.put("DeviceId", json.getString("deviceid"));
+                result.put("errcode", json.getInteger("errcode"));
+                result.put("errmsg", "ok");
+                return result;
+            }
+            logger.warn("getUserInfoByCode failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Error getting user info by code: {}", code, e);
+        }
+        return null;
+    }
+
+    // ==================== 部门 CRUD ====================
+
+    public boolean createDepartment(Long parentId, String name, Integer order, Long overrideParentId) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/department/create?access_token=" + token;
+
+            JSONObject body = new JSONObject();
+            body.put("name", name);
+            Long effectiveParentId = (overrideParentId != null) ? overrideParentId : parentId;
+            body.put("parentid", effectiveParentId != null ? effectiveParentId : 1L);
+            if (order != null) body.put("order", order);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            JSONObject json = JSON.parseObject(response.getBody());
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Created department: id={}, name={}", json.getLong("id"), name);
+                return true;
+            }
+            logger.warn("createDepartment failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to create department", e);
+        }
+        return false;
+    }
+
+    public boolean updateDepartment(Long deptId, String name, Integer order, Long parentId) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/department/update?access_token=" + token;
+
+            JSONObject body = new JSONObject();
+            body.put("id", deptId);
+            if (name != null) body.put("name", name);
+            if (order != null) body.put("order", order);
+            if (parentId != null) body.put("parentid", parentId);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            JSONObject json = JSON.parseObject(response.getBody());
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Updated department: {}", deptId);
+                return true;
+            }
+            logger.warn("updateDepartment failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to update department: {}", deptId, e);
+        }
+        return false;
+    }
+
+    public boolean deleteDepartment(Long deptId) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/department/delete?access_token=" + token + "&id=" + deptId;
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JSONObject json = JSON.parseObject(response.getBody());
+
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Deleted department: {}", deptId);
+                return true;
+            }
+            logger.warn("deleteDepartment failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to delete department: {}", deptId, e);
+        }
+        return false;
+    }
+
+    // ==================== 用户 CRUD ====================
+
+    public boolean createUser(String userid, String name, String mobile, List<Long> departmentIds,
+                               Integer position, String email) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/user/create?access_token=" + token;
+
+            JSONObject body = new JSONObject();
+            body.put("userid", userid);
+            body.put("name", name);
+            if (mobile != null && !mobile.isEmpty()) body.put("mobile", mobile);
+            if (departmentIds != null && !departmentIds.isEmpty()) body.put("department", departmentIds);
+            if (position != null) body.put("position", position);
+            if (email != null && !email.isEmpty()) body.put("email", email);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            JSONObject json = JSON.parseObject(response.getBody());
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Created user: userid={}, name={}", userid, name);
+                return true;
+            }
+            logger.warn("createUser failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to create user", e);
+        }
+        return false;
+    }
+
+    public boolean updateUser(String userId, String name, String mobile, String email,
+                               Long departmentId, Integer position, int enable) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/user/update?access_token=" + token;
+
+            JSONObject body = new JSONObject();
+            body.put("userid", userId);
+            if (name != null) body.put("name", name);
+            if (mobile != null) body.put("mobile", mobile);
+            if (email != null) body.put("email", email);
+            if (departmentId != null) body.put("department", java.util.Arrays.asList(departmentId));
+            if (position != null) body.put("position", position);
+            if (enable >= 0) body.put("enable", enable > 0 ? 1 : 0);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            HttpEntity<String> request = new HttpEntity<>(body.toJSONString(), headers);
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
+
+            JSONObject json = JSON.parseObject(response.getBody());
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Updated user: {}", userId);
+                return true;
+            }
+            logger.warn("updateUser failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to update user: {}", userId, e);
+        }
+        return false;
+    }
+
+    public boolean deleteUser(String userId) {
+        String token = getAccessToken();
+        if (token == null) return false;
+
+        try {
+            String url = config.getApiBaseUrl() + "/cgi-bin/user/delete?access_token=" + token + "&userid=" + userId;
+
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            JSONObject json = JSON.parseObject(response.getBody());
+
+            if (json.getInteger("errcode") == 0) {
+                logger.info("Deleted user: {}", userId);
+                return true;
+            }
+            logger.warn("deleteUser failed: errcode={}, errmsg={}",
+                    json.getInteger("errcode"), json.getString("errmsg"));
+        } catch (Exception e) {
+            logger.error("Failed to delete user: {}", userId, e);
+        }
+        return false;
+    }
+
+    public boolean disableUser(String userId) {
+        return updateUser(userId, null, null, null, null, null, 0);
+    }
+
+    public boolean enableUser(String userId) {
+        return updateUser(userId, null, null, null, null, null, 1);
+    }
 }
