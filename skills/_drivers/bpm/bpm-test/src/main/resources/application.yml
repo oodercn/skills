@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: bpm-test
+
+server:
+  port: 8084
+
+bpm:
+  server:
+    url: http://localhost:8083/bpm
+
+logging:
+  level:
+    net.ooder: DEBUG
+    org.springframework: INFO

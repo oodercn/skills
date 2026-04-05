@@ -7,7 +7,6 @@ metadata:
   version: 1.0.0
   description: DeepSeek大模型Provider，提供DeepSeek-Chat、DeepSeek-Coder模型对话、代码生成能力
   author: ooder Team
-  type: provider-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -19,7 +18,7 @@ metadata:
     - provider
 
 spec:
-  type: provider-skill
+  skillForm: PROVIDER
   
   provider:
     type: llm

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<config>
+    <server>
+        <home>.</home>
+        <name>bpmserver</name>
+    </server>
+    
+    <logging>
+        <bpm>
+            <level>DEBUG</level>
+            <pattern>%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </bpm>
+    </logging>
+    
+    <database>
+        <type>sqlite</type>
+        <url>jdbc:sqlite:${user.home}/.ooder/bpm/bpm.db</url>
+    </database>
+</config>

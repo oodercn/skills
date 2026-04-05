@@ -1,0 +1,11 @@
+spring:
+  application:
+    name: bpm-test-test
+
+bpm:
+  server:
+    url: http://localhost:8083/bpm
+
+logging:
+  level:
+    net.ooder: DEBUG

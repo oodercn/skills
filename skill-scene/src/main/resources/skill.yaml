@@ -8,10 +8,9 @@ metadata:
   description: 场景管理技能 - 场景定义、会话管理、能力验证、场景技能分类、LLM集成、知识库管理
   author: ooder Team
   license: Apache-2.0
-  type: scene-skill
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-llm-chat

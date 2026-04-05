@@ -7,7 +7,6 @@ metadata:
   version: 2.3.0
   description: 知识问答场景能力，支持知识库管理、文档管理、语义检索、RAG智能问答
   author: ooder Team
-  type: scene-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -19,7 +18,7 @@ metadata:
     - scene-capability
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-knowledge-base

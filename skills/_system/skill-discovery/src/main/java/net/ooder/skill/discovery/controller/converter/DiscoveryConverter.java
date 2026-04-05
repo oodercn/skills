@@ -3,6 +3,7 @@ package net.ooder.skill.discovery.controller.converter;
 import net.ooder.skill.discovery.dto.discovery.CapabilityDTO;
 import net.ooder.skill.discovery.model.CapabilityCategory;
 import net.ooder.skills.api.InstalledSkill;
+import net.ooder.skills.api.SkillForm;
 import net.ooder.skills.api.SkillPackage;
 
 import org.slf4j.Logger;
@@ -25,6 +26,48 @@ public final class DiscoveryConverter {
     private static final Logger log = LoggerFactory.getLogger(DiscoveryConverter.class);
 
     private DiscoveryConverter() {
+    }
+
+    private static SkillForm mapToSkillForm(String formValue) {
+        if (formValue == null || formValue.trim().isEmpty()) {
+            return null;
+        }
+        
+        String normalized = formValue.toUpperCase().trim();
+        
+        try {
+            return SkillForm.valueOf(normalized);
+        } catch (IllegalArgumentException e) {
+        }
+        
+        switch (normalized) {
+            case "SCENE-SKILL":
+            case "SCENE_SKILL":
+            case "SCENE-SK":
+            case "SCENE_SK":
+                return SkillForm.SCENE;
+            case "PROVIDER-SKILL":
+            case "PROVIDER_SKILL":
+            case "PROVIDER-SK":
+            case "PROVIDER_SK":
+            case "SERVICE-SKILL":
+            case "SERVICE_SKILL":
+                return SkillForm.PROVIDER;
+            case "DRIVER-SKILL":
+            case "DRIVER_SKILL":
+            case "DRIVER-SK":
+            case "DRIVER_SK":
+            case "ENTERPRISE-SKILL":
+            case "ENTERPRISE_SKILL":
+            case "ADAPTER-SKILL":
+            case "ADAPTER_SKILL":
+            case "CONNECTOR-SKILL":
+            case "CONNECTOR_SKILL":
+                return SkillForm.DRIVER;
+            default:
+                log.warn("Unknown skillForm value: {}, defaulting to PROVIDER", formValue);
+                return SkillForm.PROVIDER;
+        }
     }
 
     /**
@@ -73,7 +116,29 @@ public final class DiscoveryConverter {
         }
 
         // SDK 3.0.1+ 自动推断 skillForm，如果 spec.skillForm 为空则从 skillId 推断
-        String skillForm = pkg.getForm() != null ? pkg.getForm().name() : null;
+        // 添加兼容性映射：支持 scene-skill, provider-skill, driver-skill, enterprise-skill 等旧格式
+        SkillForm form = pkg.getForm();
+        String skillForm;
+        if (form != null) {
+            skillForm = form.name();
+        } else {
+            // 尝试从 metadata.type 获取旧格式的类型值
+            Map<String, Object> metadata = pkg.getMetadata();
+            if (metadata != null) {
+                Object typeValue = metadata.get("type");
+                if (typeValue != null) {
+                    SkillForm mappedForm = mapToSkillForm(typeValue.toString());
+                    skillForm = mappedForm != null ? mappedForm.name() : null;
+                    if (skillForm != null) {
+                        log.debug("Mapped skillForm from metadata.type: {} -> {}", typeValue, skillForm);
+                    }
+                } else {
+                    skillForm = null;
+                }
+            } else {
+                skillForm = null;
+            }
+        }
         dto.setSkillForm(skillForm);
         
         if (skillId != null && skillId.contains("approval")) {

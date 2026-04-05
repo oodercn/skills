@@ -6,9 +6,8 @@ metadata:
   name: 远程终端服务
   version: 0.7.3
   category: sys
-  description: 远程终端服务，提供SSH连接、命令执行、文件传�?
+  description: 远程终端服务，提供SSH连接、命令执行、文件传�?
   author: ooder Team
-  type: provider-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -19,7 +18,6 @@ metadata:
 
 spec:
   skillForm: PROVIDER
-  type: provider-skill
   
   ownership: platform
   
@@ -56,7 +54,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方�?
           parameters:
             type: object
             properties:
@@ -68,17 +66,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操�?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达�?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填�?
           parameters:
             type: object
             properties:
@@ -100,7 +98,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使�?
           parameters:
             type: object
             properties:
@@ -178,7 +176,7 @@ spec:
         description: SSH端口
       - name: SSH_USER
         type: string
-        description: SSH用户�?
+        description: SSH用户�?
     optional:
       - name: SSH_KEY
         type: string

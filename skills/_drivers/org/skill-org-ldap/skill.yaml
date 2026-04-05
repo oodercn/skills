@@ -19,8 +19,7 @@ metadata:
     - directory
 
 spec:
-  skillForm: PROVIDER
-  type: enterprise-skill
+  skillForm: DRIVER
   
   ownership: platform
   
@@ -56,7 +55,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方法"
           parameters:
             type: object
             properties:
@@ -68,17 +67,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操作"
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达式"
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填写"
           parameters:
             type: object
             properties:
@@ -100,7 +99,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使用"
           parameters:
             type: object
             properties:
@@ -158,7 +157,7 @@ spec:
     - id: skill-common
       version: ">=1.0.0"
       required: false
-      description: "通用工具�?间接)"
+      description: "通用工具类(间接)"
   
   config:
     required:
@@ -174,7 +173,7 @@ spec:
       - name: LDAP_PASSWORD
         type: string
         secret: true
-        description: LDAP管理员密�?
+        description: LDAP管理员密码
     optional:
       - name: LDAP_USER_SEARCH_BASE
         type: string
@@ -202,7 +201,7 @@ spec:
       capability: user-auth
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 健康检查
   
   resources:
     cpu: "200m"

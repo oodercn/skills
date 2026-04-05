@@ -7,7 +7,6 @@ metadata:
   version: 2.3.0
   description: LLM智能对话场景能力，支持多轮对话、上下文感知、流式输出
   author: ooder Team
-  type: scene-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -19,7 +18,7 @@ metadata:
     - scene-capability
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-llm-conversation

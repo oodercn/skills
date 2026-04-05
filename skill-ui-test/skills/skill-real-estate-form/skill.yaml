@@ -7,7 +7,6 @@ metadata:
   version: 1.0.0
   description: 房产中介房源信息采集表单场景能力，支持房源录入、图片上传、地图定位、智能估价等功能
   author: ooder Team
-  type: scene-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -20,7 +19,7 @@ metadata:
     - scene-capability
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-form-builder

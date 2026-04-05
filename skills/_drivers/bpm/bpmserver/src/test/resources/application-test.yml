@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: bpmserver-test
+  
+  datasource:
+    url: jdbc:h2:mem:testdb;DB_CLOSE_DELAY=-1;MODE=MySQL
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: 
+
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+
+logging:
+  level:
+    net.ooder.bpm: DEBUG
+    org.springframework.jdbc: DEBUG
+
+bpm:
+  database:
+    init-mode: always

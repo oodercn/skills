@@ -1,0 +1,35 @@
+spring:
+  application:
+    name: bpmserver
+  
+  datasource:
+    url: jdbc:sqlite:${user.home}/.ooder/bpm/bpm.db
+    driver-class-name: org.sqlite.JDBC
+    hikari:
+      maximum-pool-size: 5
+      minimum-idle: 1
+  
+  jackson:
+    serialization:
+      write-dates-as-timestamps: false
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: Asia/Shanghai
+
+server:
+  port: 8083
+  servlet:
+    context-path: /bpm
+
+logging:
+  level:
+    net.ooder.bpm: DEBUG
+    org.springframework.jdbc: DEBUG
+
+bpm:
+  database:
+    init-mode: always
+
+jds:
+  home: .
+  server:
+    home: .

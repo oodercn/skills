@@ -1,0 +1,59 @@
+id: skills-bpm-demo
+name: BPM Workflow Demo
+version: 3.0.1
+description: BPM workflow demo implementation - Example usage of skill-bpm for workflow operations
+
+skillForm: INTERNAL
+visibility: developer
+businessCategory: SYSTEM_TOOLS
+category: SERVICE
+
+author: ooder
+license: MIT
+
+capabilities:
+  - workflow_demo
+  - process_operations
+  - worklist_management
+  - mobile_workflow
+
+dependencies:
+  - skill-common
+  - skill-bpm
+  - ooder-bpm-web
+
+exports:
+  - net.ooder.skills.bpm.demo.service.*
+  - net.ooder.skills.bpm.demo.worklist.*
+  - net.ooder.skills.bpm.demo.plugins.*
+
+configuration:
+  auto_configure: false
+
+examples:
+  - title: "Get BPM Client"
+    description: "How to get WorkflowClientService for BPM operations"
+    code: |
+      WorkflowClientService client = EsbUtil.parExpression("$BPMC", WorkflowClientService.class);
+  
+  - title: "Route Back"
+    description: "Route back to previous activity"
+    code: |
+      client.routeBack(activityInstId, activityInstHistoryId, null);
+  
+  - title: "Get Activity Instance List"
+    description: "Query activity instances with conditions"
+    code: |
+      BPMCondition condition = new BPMCondition(BPMConditionKey.ACTIVITYINST_STATE,
+          Operator.EQUALS, ActivityInstStatus.notStarted);
+      ListResultModel<List<ActivityInst>> list = client.getActivityInstList(condition, 
+          RightConditionEnums.CONDITION_WAITEDWORK, null, null);
+
+notes: |
+  This module provides BPM demo implementation examples.
+  It demonstrates how to use skill-bpm for:
+  - Getting BPM client service
+  - Process execution operations (route back, take back, sign receive, etc.)
+  - Worklist management (waited work, completed work, draft, etc.)
+  - Mobile workflow support
+  - Plugin extensions (opinion, attachment, document)

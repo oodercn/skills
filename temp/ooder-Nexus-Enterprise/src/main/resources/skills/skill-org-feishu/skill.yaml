@@ -16,7 +16,7 @@ metadata:
     - enterprise
 
 spec:
-  type: enterprise-skill
+  skillForm: DRIVER
   
   runtime:
     language: java

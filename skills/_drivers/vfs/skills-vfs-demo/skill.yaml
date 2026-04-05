@@ -1,0 +1,55 @@
+id: skills-vfs-demo
+name: VFS Server Demo
+version: 3.0.1
+description: VFS Server demo implementation - Example usage of vfs-web 3.0.1 for virtual file system operations
+category: _drivers
+subcategory: vfs
+author: ooder
+license: MIT
+
+capabilities:
+  - vfs_server_demo
+  - file_management
+  - folder_operations
+  - file_versioning
+  - storage_service
+
+dependencies:
+  - skill-common
+  - skill-vfs-base
+  - ooder-vfs-web
+
+exports:
+  - net.ooder.vfs.service.*
+  - net.ooder.vfs.business.*
+  - net.ooder.vfs.client.*
+  - net.ooder.vfs.engine.*
+  - net.ooder.vfs.store.*
+
+configuration:
+  auto_configure: false
+
+examples:
+  - title: "Get VFS Client"
+    description: "How to get VFSClient for file operations"
+    code: |
+      VFSClient client = VFSServer.getInstance().getVFSService(jdsClientService);
+  
+  - title: "Create Folder"
+    description: "Create a folder by path"
+    code: |
+      Folder folder = client.mkDir("/disk/folder/path/");
+  
+  - title: "Create File"
+    description: "Create a file in a folder"
+    code: |
+      FileInfo fileInfo = client.createFile("/disk/folder/", "filename.txt");
+
+notes: |
+  This module provides VFS server demo implementation examples.
+  It demonstrates how to use ooder-vfs-web 3.0.1 for:
+  - File and folder management
+  - File versioning and views
+  - Storage service operations
+  - Event handling for file operations
+  - Database-backed file metadata management

@@ -7,7 +7,6 @@ metadata:
   version: 1.0.0
   description: 企业招聘全流程管理系统，支持职位发布、简历收集、面试安排、录用审批，含状态看板与数据统计
   author: ooder Team
-  type: scene-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -21,7 +20,7 @@ metadata:
     - scene-capability
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-form-builder

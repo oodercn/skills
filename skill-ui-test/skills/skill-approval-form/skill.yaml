@@ -7,7 +7,6 @@ metadata:
   version: 1.0.0
   description: 通用审批表单系统，支持自定义审批流程、多级审批、审批模板、审批记录追踪等功能
   author: ooder Team
-  type: scene-skill
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
   repository: https://gitee.com/ooderCN/ooder-skills
@@ -20,7 +19,7 @@ metadata:
     - scene-capability
 
 spec:
-  type: scene-skill
+  skillForm: SCENE
   
   dependencies:
     - id: skill-form-builder

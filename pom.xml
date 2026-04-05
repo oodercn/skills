@@ -85,6 +85,7 @@
         <module>skills/_system/skill-protocol</module>
         <module>skills/_system/skill-role</module>
         <module>skills/_system/skill-scene</module>
+        <module>skills/_system/skills-bpm-demo</module>
         
         <!-- LLM Drivers -->
         <module>skills/_drivers/llm/skill-llm-base</module>
@@ -241,6 +242,12 @@
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skill-bpm</artifactId>
+                <version>${project.version}</version>
+            </dependency>
+            
+            <dependency>
+                <groupId>net.ooder</groupId>
+                <artifactId>skills-bpm-demo</artifactId>
                 <version>${project.version}</version>
             </dependency>
             
