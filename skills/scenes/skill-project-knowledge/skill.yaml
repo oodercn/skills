@@ -3,7 +3,7 @@ kind: Skill
 
 metadata:
   id: skill-project-knowledge
-  name: 项目知识库场�?
+  name: 项目知识库场景
   version: "3.0.1"
   category: biz
   subCategory: knowledge
@@ -18,8 +18,6 @@ metadata:
     - extraction
     - classification
     - archive
-  # category 已废弃，请在 skill-index 中定�?
-  # sceneType: tbs
 
 spec:
   skillForm: SCENE
@@ -29,12 +27,12 @@ spec:
     visibility: public
     participantMode: multi-role
     name: 项目知识沉淀
-    description: 项目知识自动沉淀和整�?
+    description: 项目知识自动沉淀和整理
     
   roles:
     - id: PROJECT_MANAGER
       name: 项目经理
-      description: 项目负责人，管理项目知识�?
+      description: 项目负责人，管理项目知识库
       required: true
       minCount: 1
       maxCount: 1
@@ -54,7 +52,7 @@ spec:
         - docs:upload
         - docs:edit
     - id: STAKEHOLDER
-      name: 干系�?
+      name: 干系人
       description: 项目干系人，只读访问
       required: false
       minCount: 0
@@ -69,7 +67,7 @@ spec:
         step: 1
         action: link-project
         title: 关联项目
-        description: 选择要沉淀知识的项�?
+        description: 选择要沉淀知识的项目
         type: CONFIG_SKILL
         required: true
         skippable: false
@@ -86,7 +84,7 @@ spec:
       - stepId: invite-team
         step: 3
         action: invite-team
-        title: 邀请团队成�?
+        title: 邀请团队成员
         description: 添加项目团队成员
         type: CONFIRM_PARTICIPANTS
         required: false
@@ -95,8 +93,8 @@ spec:
       - stepId: confirm-activation
         step: 4
         action: confirm-activation
-        title: 确认激�?
-        description: 确认场景激�?
+        title: 确认激活
+        description: 确认场景激活
         type: CONFIRM_ACTIVATION
         required: true
         skippable: false
@@ -105,8 +103,8 @@ spec:
       - stepId: accept-invitation
         step: 1
         action: accept-invitation
-        title: 接受邀�?
-        description: 加入项目知识�?
+        title: 接受邀请
+        description: 加入项目知识库
         type: CONFIRM_JOIN
         required: true
         skippable: false
@@ -115,8 +113,8 @@ spec:
       - stepId: accept-invitation
         step: 1
         action: accept-invitation
-        title: 接受邀�?
-        description: 获取项目知识库访问权�?
+        title: 接受邀请
+        description: 获取项目知识库访问权限
         type: CONFIRM_JOIN
         required: true
         skippable: false
@@ -201,7 +199,7 @@ spec:
       version: ">=1.0.0"
       required: true
       autoInstall: true
-      description: "知识库核心服�?
+      description: "知识库核心服务"
       capabilities:
         - knowledge-base
         
@@ -247,7 +245,7 @@ spec:
   capabilities:
     - id: import-project-docs
       name: 导入项目文档
-      description: 批量导入项目文档并自动处�?
+      description: 批量导入项目文档并自动处理
       category: service
       type: ATOMIC
       inputSchema:
@@ -322,7 +320,7 @@ spec:
             
     - id: generate-graph
       name: 生成知识图谱
-      description: 提取实体和关系生成知识图�?
+      description: 提取实体和关系生成知识图谱
       category: service
       type: ATOMIC
       inputSchema:
@@ -370,7 +368,7 @@ spec:
       
     - path: /api/v1/project-knowledge/task/{taskId}
       method: GET
-      description: 查询导入任务状�?
+      description: 查询导入任务状态
       capability: import-project-docs
 
   runtime:
@@ -399,7 +397,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方法"
           parameters:
             type: object
             properties:
@@ -411,17 +409,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操作"
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达式"
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填写"
           parameters:
             type: object
             properties:
@@ -443,7 +441,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使用"
           parameters:
             type: object
             properties:
@@ -462,7 +460,7 @@ spec:
       - name: CLASSIFICATION_CONFIDENCE_THRESHOLD
         type: number
         default: 0.8
-        description: 分类置信度阈�?
+        description: 分类置信度阈值
       - name: MAX_IMPORT_FILES
         type: integer
         default: 100
@@ -470,7 +468,7 @@ spec:
       - name: SIMILARITY_THRESHOLD
         type: number
         default: 0.7
-        description: 相似度阈�?
+        description: 相似度阈值
 
   resources:
     cpu: "200m"

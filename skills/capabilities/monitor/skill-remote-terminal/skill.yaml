@@ -6,7 +6,7 @@ metadata:
   name: 远程终端服务
   version: 0.7.3
   category: sys
-  description: 远程终端服务，提供SSH连接、命令执行、文件传�?
+  description: 远程终端服务，提供SSH连接、命令执行、文件传输
   author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills

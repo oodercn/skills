@@ -6,7 +6,7 @@ metadata:
   name: 报表服务
   version: 0.7.3
   category: biz
-  description: 报表服务，提供报表生成、导出、定时推�?
+  description: 报表服务，提供报表生成、导出、定时推送
   author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills

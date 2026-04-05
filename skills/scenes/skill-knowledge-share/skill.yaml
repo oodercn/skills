@@ -5,7 +5,7 @@ metadata:
   id: skill-knowledge-share
   name: 知识共享管理
   version: 1.0.0
-  description: 知识库权限管理和分享场景能力，支持部门内和跨部门的知识共�?
+  description: 知识库权限管理和分享场景能力，支持部门内和跨部门的知识共享
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN
