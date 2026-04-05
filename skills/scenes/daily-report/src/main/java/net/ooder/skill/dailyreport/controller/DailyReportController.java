@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.dailyreport.controller;
+package net.ooder.skill.dailyreport.controller;
 
 import net.ooder.skill.dailyreport.dto.ApiResponse;
 import net.ooder.skill.dailyreport.dto.PageResult;

@@ -1,4 +1,4 @@
-﻿package net.ooder.skills.bpm.demo.worklist;
+package net.ooder.skills.bpm.demo.worklist;
 
 import net.ooder.bpm.client.ActivityInst;
 import net.ooder.bpm.client.ActivityInstHistory;

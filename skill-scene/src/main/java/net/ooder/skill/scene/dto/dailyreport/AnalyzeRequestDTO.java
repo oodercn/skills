@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.dto.dailyreport;
+package net.ooder.skill.scene.dto.dailyreport;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.List;

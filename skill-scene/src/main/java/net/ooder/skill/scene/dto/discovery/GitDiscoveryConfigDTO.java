@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.dto.discovery;
+package net.ooder.skill.scene.dto.discovery;
 
 import jakarta.validation.constraints.NotBlank;
 

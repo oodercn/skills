@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.controller;
+package net.ooder.skill.scene.controller;
 
 import net.ooder.skill.scene.dto.LoginRequest;
 import net.ooder.skill.scene.dto.menu.MenuItemDTO;

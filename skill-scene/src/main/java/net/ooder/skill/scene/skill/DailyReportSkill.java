@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.skill;
+package net.ooder.skill.scene.skill;
 
 import net.ooder.skill.scene.dto.discovery.CapabilityDTO;
 import net.ooder.skill.scene.dto.dailyreport.*;

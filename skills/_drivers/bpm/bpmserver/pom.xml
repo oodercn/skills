@@ -79,6 +79,12 @@
 
         <dependency>
             <groupId>net.ooder</groupId>
+            <artifactId>ooder-config-spring</artifactId>
+            <version>3.0.1</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
             <artifactId>ooder-org-web</artifactId>
             <version>3.0.1</version>
         </dependency>

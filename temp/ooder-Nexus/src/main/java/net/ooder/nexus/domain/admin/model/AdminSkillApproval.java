@@ -1,4 +1,4 @@
-﻿package net.ooder.nexus.domain.admin.model;
+package net.ooder.nexus.domain.admin.model;
 
 import jakarta.persistence.*;
 import java.io.Serializable;

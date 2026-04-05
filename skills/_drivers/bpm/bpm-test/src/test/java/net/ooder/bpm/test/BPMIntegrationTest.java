@@ -1,6 +1,12 @@
 package net.ooder.bpm.test;
 
 import net.ooder.bpm.test.client.BPMRestClient;
+import net.ooder.config.JDSConfig;
+import net.ooder.common.CommonConfig;
+import net.ooder.common.property.Properties;
+import net.ooder.server.JDSServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.DisplayName;
@@ -25,6 +31,25 @@ class BPMIntegrationTest {
 
     private RestTemplate restTemplate;
 
+    @BeforeAll
+    static void setupJDSConfig() {
+        Properties props = new Properties();
+        props.setProperty("JDSHome", System.getProperty("java.io.tmpdir"));
+        props.setProperty("jds.home", System.getProperty("java.io.tmpdir"));
+        props.setProperty("server.home", System.getProperty("java.io.tmpdir"));
+        
+        JDSConfig.initForTest(props);
+        CommonConfig.initForTest(props);
+        JDSServer.setMockMode(true);
+    }
+    
+    @AfterAll
+    static void cleanup() {
+        JDSConfig.reset();
+        CommonConfig.reset();
+        JDSServer.reset();
+    }
+
     @BeforeEach
     void setUp() {
         restTemplate = new RestTemplate();
@@ -34,7 +59,7 @@ class BPMIntegrationTest {
     @DisplayName("测试 BPM 服务器健康检查")
     void testServerHealth() {
         try {
-            ResponseEntity<String> response = restTemplate.getForEntity(bpmServerUrl + "/", String.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(bpmServerUrl + "/api/health", String.class);
             System.out.println("Server response status: " + response.getStatusCode());
             assertNotNull(response);
         } catch (Exception e) {

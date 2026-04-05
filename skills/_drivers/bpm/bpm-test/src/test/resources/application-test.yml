@@ -6,6 +6,31 @@ bpm:
   server:
     url: http://localhost:8083/bpm
 
+ooder:
+  jds:
+    home: ${java.io.tmpdir}
+    config-name: bpm-test
+    
+  server:
+    port: 8083
+    url: http://localhost:8083/bpm
+    admin:
+      enabled: false
+      
+  cluster:
+    enabled: false
+    
+  session:
+    enabled: false
+    
+  cache:
+    enabled: false
+    
+  user:
+    server-url: http://localhost:8083/bpm
+    system-code: bpm-test
+    offline: true
+
 logging:
   level:
     net.ooder: DEBUG

@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.dto.capability;
+package net.ooder.skill.scene.dto.capability;
 
 import jakarta.validation.constraints.NotBlank;
 import java.util.Map;

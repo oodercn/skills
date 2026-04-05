@@ -29,7 +29,27 @@ bpm:
   database:
     init-mode: always
 
-jds:
-  home: .
+ooder:
+  jds:
+    home: ${user.home}/.ooder/bpm
+    config-name: bpmserver
+    
   server:
-    home: .
+    port: 8083
+    url: http://127.0.0.1:8083/bpm
+    admin:
+      enabled: false
+      
+  cluster:
+    enabled: false
+    
+  session:
+    enabled: false
+    
+  cache:
+    enabled: false
+    
+  user:
+    server-url: http://127.0.0.1:8083/bpm
+    system-code: bpm
+    offline: true

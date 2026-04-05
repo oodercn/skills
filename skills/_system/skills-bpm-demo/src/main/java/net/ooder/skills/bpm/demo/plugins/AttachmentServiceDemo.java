@@ -1,4 +1,4 @@
-﻿package net.ooder.skills.bpm.demo.plugins;
+package net.ooder.skills.bpm.demo.plugins;
 
 import net.ooder.bpm.client.ActivityInst;
 import net.ooder.bpm.client.ProcessInst;

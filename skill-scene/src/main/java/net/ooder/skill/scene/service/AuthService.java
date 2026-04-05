@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.service;
+package net.ooder.skill.scene.service;
 
 import net.ooder.skill.org.base.OrgSkill;
 import net.ooder.skill.org.base.UserInfo;

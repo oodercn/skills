@@ -1,4 +1,4 @@
-﻿package net.ooder.nexus.common.audit;
+package net.ooder.nexus.common.audit;
 
 import net.ooder.nexus.domain.skill.model.SkillResourceLog;
 import net.ooder.nexus.service.skill.SkillAuthService;

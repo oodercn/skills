@@ -1,4 +1,4 @@
-﻿package net.ooder.skill.scene.controller;
+package net.ooder.skill.scene.controller;
 
 import jakarta.validation.Valid;
 import net.ooder.config.ResultModel;

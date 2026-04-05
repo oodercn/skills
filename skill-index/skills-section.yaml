@@ -1,4 +1,4 @@
-﻿    - id: skill-capability
+    - id: skill-capability
       name: 能力管理服务
       version: "1.0.0"
       capabilityCategory: sys

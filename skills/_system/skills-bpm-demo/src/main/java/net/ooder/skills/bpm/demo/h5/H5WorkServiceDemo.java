@@ -1,4 +1,4 @@
-﻿package net.ooder.skills.bpm.demo.h5;
+package net.ooder.skills.bpm.demo.h5;
 
 import net.ooder.bpm.client.*;
 import net.ooder.bpm.engine.BPMException;

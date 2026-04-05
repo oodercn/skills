@@ -1,4 +1,4 @@
-﻿package net.ooder.skills.bpm.demo.service;
+package net.ooder.skills.bpm.demo.service;
 
 import net.ooder.bpm.client.*;
 import net.ooder.bpm.client.data.DataMap;
