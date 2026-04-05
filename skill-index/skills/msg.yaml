@@ -37,7 +37,7 @@ skills:
         - conversation
         - contact
         - chat
-      description: 即时通讯服务 - 提供会话、联系人管理、聊天功�?
+      description: 即时通讯服务 - 提供会话、联系人管理、聊天功能
       sceneId: im
       path: skills/skill-im
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-im-2.3.1.jar
@@ -57,7 +57,7 @@ skills:
         - member
         - management
         - collaboration
-      description: 群组管理服务 - 提供群组创建、成员管理、群组设置功�?
+      description: 群组管理服务 - 提供群组创建、成员管理、群组设置功能
       sceneId: group
       path: skills/skill-group
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-group-2.3.1.jar
@@ -115,7 +115,7 @@ skills:
         - smtp
         - mail
         - template
-      description: 邮件服务 - 提供邮件发送、模板管理、附件支�?
+      description: 邮件服务 - 提供邮件发送、模板管理、附件支持
       sceneId: messaging
       path: skills/skill-email
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-email-2.3.1.jar
@@ -134,7 +134,7 @@ skills:
         - msg
         - broadcast
         - group
-      description: 消息服务 - 提供消息发送、广播、群发消息功�?
+      description: 消息服务 - 提供消息发送、广播、群发消息功能
       sceneId: messaging
       path: skills/skill-msg
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-msg-2.3.1.jar

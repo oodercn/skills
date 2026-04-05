@@ -130,7 +130,7 @@ spec:
     - id: skill-common
       version: ">=1.0.0"
       required: true
-      description: "通用工具�?
+      description: "通用工具类"
     - id: skill-user-auth
       version: ">=0.7.0"
       required: false
@@ -147,8 +147,8 @@ spec:
       description: 发起支付请求
       category: service
     - id: refund
-      name: 退�?
-      description: 发起退款请�?
+      name: 退款
+      description: 发起退款请求
       category: service
     - id: callback
       name: 回调处理
@@ -156,7 +156,7 @@ spec:
       category: service
     - id: query
       name: 查询
-      description: 查询支付状�?
+      description: 查询支付状态
       category: service
   
   endpoints:
@@ -166,7 +166,7 @@ spec:
       capability: pay
     - path: /api/payment/alipay/refund
       method: POST
-      description: 发起退�?
+      description: 发起退款
       capability: refund
     - path: /api/payment/alipay/callback
       method: POST
@@ -184,15 +184,15 @@ spec:
         description: 支付宝应用ID
       - name: ALIPAY_PRIVATE_KEY
         type: string
-        description: 支付宝私�?
+        description: 支付宝私钥
       - name: ALIPAY_PUBLIC_KEY
         type: string
-        description: 支付宝公�?
+        description: 支付宝公钥
     optional:
       - name: ALIPAY_GATEWAY
         type: string
         default: "https://openapi.alipay.com/gateway.do"
-        description: 支付宝网�?
+        description: 支付宝网关
   
   resources:
     cpu: "50m"

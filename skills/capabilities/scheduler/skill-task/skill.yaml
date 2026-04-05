@@ -148,8 +148,8 @@ spec:
       description: 执行任务
       category: service
     - id: status
-      name: 状态管�?
-      description: 管理任务状�?
+      name: 状态管理
+      description: 管理任务状态
       category: service
   
   endpoints:
@@ -163,7 +163,7 @@ spec:
       capability: execute
     - path: /api/tasks/{id}/status
       method: GET
-      description: 获取状�?
+      description: 获取状态
       capability: status
   
   config:
@@ -175,7 +175,7 @@ spec:
       - name: TASK_TIMEOUT
         type: integer
         default: 3600
-        description: 任务超时(�?
+        description: 任务超时(秒)
   
   resources:
     cpu: "50m"

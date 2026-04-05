@@ -149,8 +149,8 @@ spec:
       description: 监控命令输出
       category: service
     - id: status
-      name: 状态管�?
-      description: 管理命令状�?
+      name: 状态管理
+      description: 管理命令状态
       category: service
   
   endpoints:
@@ -164,7 +164,7 @@ spec:
       capability: monitor
     - path: /api/commands/{id}/status
       method: GET
-      description: 获取状�?
+      description: 获取状态
       capability: status
   
   config:
@@ -172,15 +172,15 @@ spec:
       - name: COMMAND_TIMEOUT
         type: integer
         default: 300
-        description: 命令超时(�?
+        description: 命令超时(秒)
       - name: MAX_OUTPUT_SIZE
         type: integer
         default: 1048576
-        description: 最大输出大�?
+        description: 最大输出大小
       - name: ALLOWED_COMMANDS
         type: string
         default: "*"
-        description: 允许的命�?
+        description: 允许的命令列表
   
   resources:
     cpu: "50m"

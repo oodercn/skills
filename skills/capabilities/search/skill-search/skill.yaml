@@ -172,7 +172,7 @@ spec:
       - name: INDEX_NAME
         type: string
         default: "default"
-        description: 默认索引�?
+        description: 默认索引名
       - name: MAX_RESULTS
         type: integer
         default: 100

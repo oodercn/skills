@@ -176,7 +176,7 @@ spec:
         description: SSH端口
       - name: SSH_USER
         type: string
-        description: SSH用户�?
+        description: SSH用户名
     optional:
       - name: SSH_KEY
         type: string

@@ -76,7 +76,7 @@ skills:
         - organization
         - auth
         - qrcode-login
-      description: 企业微信组织数据集成服务，包括组织架构同步、用户认证、扫码登�?
+      description: 企业微信组织数据集成服务，包括组织架构同步、用户认证、扫码登录
       sceneId: auth
       path: skills/_drivers/org/skill-org-wecom
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-org-wecom-2.3.1.jar
@@ -112,7 +112,7 @@ skills:
         - auth
         - authentication
         - user
-      description: 用户认证服务，支持多种认证方�?
+      description: 用户认证服务，支持多种认证方式
       sceneId: auth
       path: skills/skill-user-auth
       downloadUrl: https://github.com/ooderCN/skills/releases/download/v2.3.1/skill-user-auth-2.3.1.jar

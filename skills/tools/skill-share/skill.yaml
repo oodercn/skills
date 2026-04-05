@@ -168,15 +168,15 @@ spec:
       - name: LINK_EXPIRY
         type: integer
         default: 604800
-        description: 链接有效�?�?
+        description: 链接有效期(天)
       - name: MAX_SHARE_SIZE
         type: integer
         default: 104857600
-        description: 最大分享大�?
+        description: 最大分享大小
       - name: PASSWORD_REQUIRED
         type: boolean
         default: false
-        description: 需要密�?
+        description: 需要密码
   
   resources:
     cpu: "50m"
