@@ -159,9 +159,6 @@
         <module>skills/capabilities/scheduler/skill-scheduler-quartz</module>
         <module>skills/capabilities/scheduler/skill-task</module>
         
-        <!-- Capabilities - Workflow -->
-        <module>skills/capabilities/workflow/skill-workflow</module>
-        
         <!-- Capabilities - Search -->
         <module>skills/capabilities/search/skill-search</module>
         
@@ -244,12 +241,6 @@
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skill-bpm</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>skill-workflow</artifactId>
                 <version>${project.version}</version>
             </dependency>
             

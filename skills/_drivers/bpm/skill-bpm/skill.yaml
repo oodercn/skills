@@ -1,7 +1,7 @@
 id: skill-bpm
-name: BPM Workflow Engine Driver
+name: BPM Workflow Server
 version: 3.0.1
-description: BPM workflow engine client library for process definition, execution and management
+description: BPM workflow server implementation for Ooder Skills - depends on ooder-bpm-web client library
 category: _drivers
 subcategory: bpm
 author: ooder
@@ -16,12 +16,24 @@ capabilities:
 
 dependencies:
   - skill-common
+  - ooder-bpm-web
 
 exports:
-  - net.ooder.skill.bpm.client.WorkflowClientService
-  - net.ooder.skill.bpm.engine.ProcessEngine
-  - net.ooder.skill.bpm.model.*
+  - net.ooder.bpm.client.service.*
+  - net.ooder.bpm.client.*
+  - net.ooder.bpm.engine.*
 
 configuration:
-  auto_configure: true
-  config_class: net.ooder.skill.bpm.config.BpmAutoConfiguration
+  auto_configure: false
+
+notes: |
+  This module provides BPM server implementation.
+  It depends on ooder-bpm-web (net.ooder:ooder-bpm-web:3.0.1) which contains:
+  - IDSClientService interface
+  - ProcessDefService interface
+  - ProcessInstService interface
+  - ProcessHistoryService interface
+  - RightService interface
+  - FDTService interface
+  - All model classes (ProcessDef, ProcessInst, ActivityDef, ActivityInst, etc.)
+  - All enum classes
