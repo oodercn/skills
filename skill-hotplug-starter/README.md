@@ -34,6 +34,18 @@ ooder:
       auto-load: true            # 自动加载插件目录中的插件
       class-loader-cache-size: 100 # 类加载器缓存大小
       isolation-enabled: true    # 启用插件隔离
+      sources:                   # 多来源加载配置
+        - type: system           # 来源类型：system、plugins、external
+          path: ./skills/_system
+          enabled: true
+          priority: 10           # 加载优先级（数字越小优先级越高）
+          excludes:              # 排除的 Skill ID 列表
+            - skill-tenant       # 排除需要特殊处理的 Skill
+            - skill-rag
+        - type: plugins
+          path: ./skills/_business
+          enabled: true
+          priority: 20
 ```
 
 ### 3. 使用 PluginManager
@@ -75,36 +87,50 @@ List<PluginInfo> plugins = pluginManager.getInstalledSkills();
 支持热插拔的 Skill 包需要包含 `skill.yaml` 配置文件：
 
 ```yaml
-id: skill-example
-name: Example Skill
-version: 1.0.0
-description: An example skill
-author: Ooder Team
-type: service
+apiVersion: skill.ooder.net/v1
+kind: Skill
 
-dependencies:
-  - dependency1.jar
-  - dependency2.jar
+metadata:
+  id: skill-example
+  name: Example Skill
+  version: 1.0.0
+  description: An example skill
+  author: Ooder Team
+  category: business
+  
+spec:
+  # 设计时概念（SkillCard 新字段）
+  skillForm: STANDALONE        # 技能形态：SCENE、STANDALONE、PROVIDER、DRIVER
+  skillCategory: TOOL          # 技能分类：KNOWLEDGE、LLM、TOOL、WORKFLOW、DATA、SERVICE、UI
+  sceneType: AUTO              # 场景类型：AUTO、TRIGGER、PRIMARY、COLLABORATIVE
+  purposes:                    # 服务目的（可多选）
+    - TEAM
+    - PERSISTENT
+  
+  # 运行时配置
+  dependencies:
+    - dependency1.jar
+    - dependency2.jar
 
-lifecycle:
-  startup: com.example.ExampleSkillStartup
-  shutdown: com.example.ExampleSkillShutdown
+  lifecycle:
+    startup: com.example.ExampleSkillStartup
+    shutdown: com.example.ExampleSkillShutdown
 
-routes:
-  - path: /api/example/hello
-    method: GET
-    controller: com.example.ExampleController
-    methodName: hello
-    produces: application/json
+  routes:
+    - path: /api/example/hello
+      method: GET
+      controller: com.example.ExampleController
+      methodName: hello
+      produces: application/json
 
-services:
-  - name: exampleService
-    interface: com.example.ExampleService
-    implementation: com.example.ExampleServiceImpl
-    singleton: true
+  services:
+    - name: exampleService
+      interface: com.example.ExampleService
+      implementation: com.example.ExampleServiceImpl
+      singleton: true
 
-ui:
-  type: html
+  ui:
+    type: html
   entry: index.html
   staticResources:
     - css/
@@ -154,6 +180,83 @@ UNINSTALLED ← STOPPING ← STOPPED ← ERROR
 3. **资源释放**: Skill 应在 `onStop` 回调中释放所有资源
 4. **数据库连接**: Skill 使用数据库连接池时，卸载时需要关闭连接
 5. **依赖注入**: 由于 ClassLoader 隔离，JAR 包中的 Controller 需要特殊处理依赖注入（见下文）
+6. **JPA 配置**: JPA 相关配置（DataSource、EntityManagerFactory、TransactionManager）不通过热加载处理，由 Spring Boot 自动配置机制在应用启动时加载
+
+## JPA 配置说明
+
+### 热加载与 JPA 配置的关系
+
+热加载模块**不会处理** JPA 相关的配置类，包括：
+- `DataSource` 配置
+- `EntityManagerFactory` 配置
+- `TransactionManager` 配置
+- `@EnableJpaRepositories` 注解
+- Hibernate 相关配置
+
+这些配置应该通过 `spring.factories` 注册，由 Spring Boot 在应用启动时自动加载。
+
+### Skill JPA 配置规范
+
+每个需要 JPA 的 Skill 应该：
+
+1. **创建独立的 JPA 配置类**：
+
+```java
+@Configuration
+@EnableJpaRepositories(
+    basePackages = "net.ooder.skill.xxx.repository",
+    entityManagerFactoryRef = "xxxEntityManagerFactory",
+    transactionManagerRef = "xxxTransactionManager"
+)
+@ConditionalOnProperty(name = "skill.xxx.jpa.enabled", havingValue = "true", matchIfMissing = true)
+public class XxxJpaConfiguration extends SkillJpaConfigurationSupport {
+
+    public XxxJpaConfiguration() {
+        super("xxx", "net.ooder.skill.xxx.entity");
+    }
+}
+```
+
+2. **在 spring.factories 中注册**：
+
+```properties
+# META-INF/spring.factories
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+net.ooder.skill.xxx.XxxAutoConfiguration,\
+net.ooder.skill.xxx.config.XxxJpaConfiguration
+```
+
+3. **配置文件**：
+
+```yaml
+# application.yml
+skill:
+  xxx:
+    enabled: true
+    jpa:
+      enabled: true
+    db:
+      path: ./data/xxx.db
+```
+
+### 为什么热加载不处理 JPA 配置？
+
+1. **生命周期问题**: JPA 配置需要在 Spring 上下文启动时处理，而热加载是在运行时
+2. **EntityManager 冲突**: 多个 EntityManager 需要在启动时正确初始化
+3. **事务管理**: 事务管理器需要在 Spring 容器中正确注册
+4. **类加载器隔离**: JPA 实体类需要被正确的 ClassLoader 加载
+
+### 验证 JPA 配置是否生效
+
+启动应用后，检查日志：
+
+```
+INFO  HikariDataSource - HikariPool-1 - Starting...
+INFO  Hibernate: create table if not exists xxx...
+INFO  JpaTransactionManager - Creating new transaction...
+```
+
+如果看到这些日志，说明 JPA 配置已正确加载。
 
 ## 二次开发指南
 
@@ -349,5 +452,6 @@ pluginManager.addStateListener((state, context) -> {
 
 ## 版本历史
 
+- **3.0.2**: 新增 JPA 配置排除机制，新增 excludes 配置支持，新增有参数 @Bean 方法支持，新增 SkillCard 字段解析（skillForm, skillCategory, sceneType, purposes）
 - **3.0.1**: 新增手动依赖注入机制，解决 ClassLoader 隔离导致的 Controller 依赖注入问题
 - **0.7.3**: 初始版本，支持基本的安装/卸载/更新功能

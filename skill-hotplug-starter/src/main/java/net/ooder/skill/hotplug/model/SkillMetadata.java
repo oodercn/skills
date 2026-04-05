@@ -22,8 +22,11 @@ public class SkillMetadata {
     private String description;
     private String author;
     private String type;
-    private String form;        // Skill 形态：SCENE、DRIVER、PROVIDER
-    private String category;    // 分类
+    private String form;            // Skill 形态：SCENE、DRIVER、PROVIDER
+    private String category;        // 分类
+    private String skillCategory;   // 技能分类（枚举类型）
+    private String sceneType;       // 场景类型：AUTO、TRIGGER、PRIMARY、COLLABORATIVE
+    private List<String> purposes;  // 服务目的列表
     private List<String> dependencies;
     private Map<String, Object> config;
     private Map<String, Object> ui;
@@ -48,6 +51,9 @@ public class SkillMetadata {
             metadata.type = (String) metaData.get("type");
             metadata.form = (String) metaData.get("form");     // 新增：加载 form 字段
             metadata.category = (String) metaData.get("category"); // 新增：加载 category 字段
+            metadata.skillCategory = (String) metaData.get("skillCategory"); // 新增：加载 skillCategory 字段
+            metadata.sceneType = (String) metaData.get("sceneType"); // 新增：加载 sceneType 字段
+            metadata.purposes = (List<String>) metaData.get("purposes"); // 新增：加载 purposes 字段
             metadata.dependencies = (List<String>) metaData.get("dependencies");
         }
         
@@ -68,6 +74,29 @@ public class SkillMetadata {
                 }
             } else {
                 logger.debug("[SkillMetadata] Skill {} has no spec.skillForm", metadata.id);
+            }
+
+            if (metadata.skillCategory == null) {
+                metadata.skillCategory = (String) specData.get("skillCategory");
+                if (metadata.skillCategory != null) {
+                    logger.info("[SkillMetadata] Loaded spec.skillCategory: {} for skill: {}", metadata.skillCategory, metadata.id);
+                }
+            }
+
+            if (metadata.sceneType == null) {
+                metadata.sceneType = (String) specData.get("sceneType");
+                if (metadata.sceneType != null) {
+                    logger.info("[SkillMetadata] Loaded spec.sceneType: {} for skill: {}", metadata.sceneType, metadata.id);
+                }
+            }
+
+            if (metadata.purposes == null) {
+                @SuppressWarnings("unchecked")
+                List<String> specPurposes = (List<String>) specData.get("purposes");
+                if (specPurposes != null) {
+                    metadata.purposes = specPurposes;
+                    logger.info("[SkillMetadata] Loaded spec.purposes: {} for skill: {}", specPurposes, metadata.id);
+                }
             }
 
             Map<String, Object> uiData = new java.util.HashMap<>();
@@ -166,6 +195,30 @@ public class SkillMetadata {
         this.category = category;
     }
 
+    public String getSkillCategory() {
+        return skillCategory;
+    }
+
+    public void setSkillCategory(String skillCategory) {
+        this.skillCategory = skillCategory;
+    }
+
+    public String getSceneType() {
+        return sceneType;
+    }
+
+    public void setSceneType(String sceneType) {
+        this.sceneType = sceneType;
+    }
+
+    public List<String> getPurposes() {
+        return purposes;
+    }
+
+    public void setPurposes(List<String> purposes) {
+        this.purposes = purposes;
+    }
+
     public List<String> getDependencies() {
         return dependencies;
     }
@@ -197,6 +250,10 @@ public class SkillMetadata {
                 ", name='" + name + '\'' +
                 ", version='" + version + '\'' +
                 ", type='" + type + '\'' +
+                ", form='" + form + '\'' +
+                ", skillCategory='" + skillCategory + '\'' +
+                ", sceneType='" + sceneType + '\'' +
+                ", purposes=" + purposes +
                 '}';
     }
 }

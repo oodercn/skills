@@ -14,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
@@ -35,6 +36,9 @@ import java.util.stream.Collectors;
 public class PluginManager {
 
     private static final Logger logger = LoggerFactory.getLogger(PluginManager.class);
+
+    @Autowired
+    private ApplicationContext applicationContext;
 
     @Autowired
     private ClassLoaderManager classLoaderManager;
@@ -101,19 +105,20 @@ public class PluginManager {
     private void loadFromSource(HotPlugProperties.SkillSource source) {
         String type = source.getType();
         String path = source.getPath();
+        List<String> excludes = source.getExcludes();
         
-        logger.info("Loading skills from source: type={}, path={}", type, path);
+        logger.info("Loading skills from source: type={}, path={}, excludes={}", type, path, excludes);
         
         try {
             switch (type) {
                 case "system":
-                    loadFromSystem(path);
+                    loadFromSystem(path, excludes);
                     break;
                 case "plugins":
-                    loadFromPlugins(path);
+                    loadFromPlugins(path, excludes);
                     break;
                 case "external":
-                    loadFromExternal(path);
+                    loadFromExternal(path, excludes);
                     break;
                 default:
                     logger.warn("Unknown source type: {}", type);
@@ -126,31 +131,31 @@ public class PluginManager {
     /**
      * 从 system 目录加载 Skill
      */
-    public void loadFromSystem(String path) {
+    public void loadFromSystem(String path, List<String> excludes) {
         logger.info("Loading system skills from: {}", path);
-        loadFromDirectory(path, "system");
+        loadFromDirectory(path, "system", excludes);
     }
 
     /**
      * 从 plugins 目录加载 Skill
      */
-    public void loadFromPlugins(String path) {
+    public void loadFromPlugins(String path, List<String> excludes) {
         logger.info("Loading plugin skills from: {}", path);
-        loadFromDirectory(path, "plugins");
+        loadFromDirectory(path, "plugins", excludes);
     }
 
     /**
      * 从 external 目录加载 Skill
      */
-    public void loadFromExternal(String path) {
+    public void loadFromExternal(String path, List<String> excludes) {
         logger.info("Loading external skills from: {}", path);
-        loadFromDirectory(path, "external");
+        loadFromDirectory(path, "external", excludes);
     }
 
     /**
      * 从目录加载 JAR 文件
      */
-    private void loadFromDirectory(String path, String sourceType) {
+    private void loadFromDirectory(String path, String sourceType, List<String> excludes) {
         File dir = new File(path);
         if (!dir.exists() || !dir.isDirectory()) {
             logger.warn("Directory does not exist: {}", path);
@@ -167,10 +172,28 @@ public class PluginManager {
         
         for (File jarFile : jarFiles) {
             try {
+                String skillId = extractSkillIdFromJar(jarFile);
+                if (skillId != null && excludes != null && excludes.contains(skillId)) {
+                    logger.info("Skipping excluded skill: {} from {}", skillId, sourceType);
+                    continue;
+                }
                 loadSkillJar(jarFile, sourceType);
             } catch (Exception e) {
                 logger.error("Failed to load skill JAR: {} from {}", jarFile.getName(), sourceType, e);
             }
+        }
+    }
+
+    /**
+     * 从 JAR 文件中提取 Skill ID
+     */
+    private String extractSkillIdFromJar(File jarFile) {
+        try {
+            SkillPackage skillPackage = SkillPackage.fromFile(jarFile);
+            return skillPackage.getMetadata().getId();
+        } catch (Exception e) {
+            logger.debug("Could not extract skill ID from JAR: {}", jarFile.getName());
+            return null;
         }
     }
 
@@ -476,6 +499,11 @@ public class PluginManager {
                 String trimmedName = className.trim();
                 if (trimmedName.isEmpty()) continue;
                 
+                if (isJpaConfigurationClass(trimmedName)) {
+                    logger.info("Skipping JPA configuration class: {} for skill: {} (handled by Spring Boot auto-configuration)", trimmedName, skillId);
+                    continue;
+                }
+                
                 try {
                     Class<?> configClass = classLoader.loadClass(trimmedName);
                     processConfigurationClass(context, configClass);
@@ -488,6 +516,81 @@ public class PluginManager {
         } catch (Exception e) {
             logger.error("Failed to process configurations for skill: {}", skillId, e);
         }
+    }
+    
+    private boolean isJpaConfigurationClass(String className) {
+        String lowerClassName = className.toLowerCase();
+        return lowerClassName.contains("jpa") ||
+               lowerClassName.contains("entitymanager") ||
+               lowerClassName.contains("datasource") ||
+               lowerClassName.contains("transactionmanager") ||
+               lowerClassName.contains("hibernate") ||
+               lowerClassName.endsWith("jpaconfiguration") ||
+               lowerClassName.endsWith("dbconfiguration");
+    }
+    
+    private Object[] resolveMethodArguments(Method method, PluginContext context) {
+        Class<?>[] paramTypes = method.getParameterTypes();
+        
+        if (paramTypes.length == 0) {
+            return new Object[0];
+        }
+        
+        Object[] args = new Object[paramTypes.length];
+        
+        for (int i = 0; i < paramTypes.length; i++) {
+            Object dependency = resolveBeanDependency(paramTypes[i], context);
+            
+            if (dependency == null) {
+                logger.warn("Failed to resolve dependency for parameter {} (type: {}) in @Bean method: {}", 
+                        i, paramTypes[i].getName(), method.getName());
+                return null;
+            }
+            
+            args[i] = dependency;
+            logger.debug("Resolved parameter {}: {} -> {}", i, paramTypes[i].getName(), 
+                    dependency.getClass().getName());
+        }
+        
+        return args;
+    }
+    
+    private Object resolveBeanDependency(Class<?> type, PluginContext context) {
+        try {
+            Object bean = applicationContext.getBean(type);
+            if (bean != null) {
+                logger.debug("Resolved dependency from Spring container: {}", type.getName());
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found in Spring container by type: {}", type.getName());
+        }
+        
+        if (serviceRegistry != null) {
+            try {
+                List<?> services = serviceRegistry.getServicesByInterface(type);
+                if (services != null && !services.isEmpty()) {
+                    logger.debug("Resolved dependency from ServiceRegistry: {}", type.getName());
+                    return services.get(0);
+                }
+            } catch (Exception e) {
+                logger.debug("Service not found in ServiceRegistry: {}", type.getName());
+            }
+        }
+        
+        String beanName = Character.toLowerCase(type.getSimpleName().charAt(0)) + 
+                          type.getSimpleName().substring(1);
+        try {
+            Object bean = applicationContext.getBean(beanName);
+            if (type.isInstance(bean)) {
+                logger.debug("Resolved dependency by bean name: {}", beanName);
+                return bean;
+            }
+        } catch (Exception e) {
+            logger.debug("Bean not found by name: {}", beanName);
+        }
+        
+        return null;
     }
     
     private void processConfigurationClass(PluginContext context, Class<?> configClass) {
@@ -529,7 +632,15 @@ public class PluginManager {
                 }
                 
                 method.setAccessible(true);
-                Object beanInstance = method.invoke(configInstance);
+                
+                Object[] args = resolveMethodArguments(method, context);
+                if (args == null) {
+                    logger.warn("Skipping @Bean '{}' for skill: {} - dependency resolution failed", 
+                            method.getName(), skillId);
+                    continue;
+                }
+                
+                Object beanInstance = method.invoke(configInstance, args);
                 
                 if (beanInstance != null) {
                     Class<?> beanType = method.getReturnType();

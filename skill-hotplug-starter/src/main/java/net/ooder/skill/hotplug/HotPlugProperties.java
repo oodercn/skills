@@ -71,6 +71,11 @@ public class HotPlugProperties {
          */
         private int priority = 100;
 
+        /**
+         * 排除的 Skill ID 列表
+         */
+        private List<String> excludes = new ArrayList<>();
+
         // Getters and Setters
         public String getType() { return type; }
         public void setType(String type) { this.type = type; }
@@ -80,6 +85,8 @@ public class HotPlugProperties {
         public void setEnabled(boolean enabled) { this.enabled = enabled; }
         public int getPriority() { return priority; }
         public void setPriority(int priority) { this.priority = priority; }
+        public List<String> getExcludes() { return excludes; }
+        public void setExcludes(List<String> excludes) { this.excludes = excludes; }
     }
 
     // Getters and Setters
