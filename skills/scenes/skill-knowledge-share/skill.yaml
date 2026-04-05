@@ -30,7 +30,7 @@ spec:
     
   roles:
     - id: OWNER
-      name: 知识库所有�?
+      name: 知识库所有者
       description: 知识库创建者，拥有完全控制权限
       required: true
       minCount: 1
@@ -41,7 +41,7 @@ spec:
         - kb:delete
         - permission:manage
     - id: COLLABORATOR
-      name: 协作�?
+      name: 协作者
       description: 参与知识库协作的用户
       required: false
       minCount: 0
@@ -51,8 +51,8 @@ spec:
         - kb:write
         - kb:comment
     - id: VIEWER
-      name: 查看�?
-      description: 只有查看权限的用�?
+      name: 查看者
+      description: 只有查看权限的用户
       required: false
       minCount: 0
       maxCount: 1000
@@ -64,8 +64,8 @@ spec:
       - stepId: configure-kb
         step: 1
         action: configure-kb
-        title: 配置知识�?
-        description: 选择要共享的知识�?
+        title: 配置知识库
+        description: 选择要共享的知识库
         type: CONFIG_SKILL
         required: true
         skippable: false
@@ -74,7 +74,7 @@ spec:
         step: 2
         action: set-permissions
         title: 设置权限
-        description: 配置知识库访问权�?
+        description: 配置知识库访问权限
         type: CONFIG_CONDITIONS
         required: true
         skippable: false
@@ -82,8 +82,8 @@ spec:
       - stepId: invite-collaborators
         step: 3
         action: invite-collaborators
-        title: 邀请协作�?
-        description: 添加知识库协作�?
+        title: 邀请协作者
+        description: 添加知识库协作者
         type: CONFIRM_PARTICIPANTS
         required: false
         skippable: true
@@ -91,8 +91,8 @@ spec:
       - stepId: confirm-activation
         step: 4
         action: confirm-activation
-        title: 确认激�?
-        description: 确认场景激�?
+        title: 确认激活
+        description: 确认场景激活
         type: CONFIRM_ACTIVATION
         required: true
         skippable: false
@@ -101,8 +101,8 @@ spec:
       - stepId: accept-invitation
         step: 1
         action: accept-invitation
-        title: 接受邀�?
-        description: 加入知识库协�?
+        title: 接受邀请
+        description: 加入知识库协作
         type: CONFIRM_JOIN
         required: true
         skippable: false
@@ -111,8 +111,8 @@ spec:
       - stepId: accept-invitation
         step: 1
         action: accept-invitation
-        title: 接受邀�?
-        description: 获取知识库访问权�?
+        title: 接受邀请
+        description: 获取知识库访问权限
         type: CONFIRM_JOIN
         required: true
         skippable: false
@@ -166,7 +166,6 @@ spec:
         visible: true
         
   classification:
-    # category 已废�?
     categoryName: 自驱系统场景
     mainFirst: true
     businessSemanticsScore: 6
@@ -179,7 +178,7 @@ spec:
       version: ">=1.0.0"
       required: true
       autoInstall: true
-      description: "知识库核心服�?
+      description: "知识库核心服务"
       capabilities:
         - knowledge-base
         
@@ -258,7 +257,7 @@ spec:
             
     - id: create-share
       name: 创建分享
-      description: 生成知识库分享链�?
+      description: 生成知识库分享链接
       category: service
       type: ATOMIC
       inputSchema:
@@ -286,7 +285,7 @@ spec:
             
     - id: collaboration
       name: 协作功能
-      description: 多人协同编辑和版本控�?
+      description: 多人协同编辑和版本控制
       category: service
       type: ATOMIC
       inputSchema:
@@ -321,7 +320,7 @@ spec:
       
     - path: /api/v1/knowledge-share/permission/check
       method: GET
-      description: 检查权�?
+      description: 检查权限
       capability: manage-permission
       
     - path: /api/v1/knowledge-share/share
@@ -365,7 +364,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方法"
           parameters:
             type: object
             properties:
@@ -377,17 +376,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操作"
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达式"
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填写"
           parameters:
             type: object
             properties:
@@ -409,7 +408,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使用"
           parameters:
             type: object
             properties:
@@ -432,7 +431,7 @@ spec:
       - name: SHARE_MAX_ACCESS_COUNT
         type: integer
         default: 100
-        description: 默认最大访问次�?
+        description: 默认最大访问次数
 
   resources:
     cpu: "100m"

@@ -17,8 +17,6 @@ metadata:
     - rag
     - knowledge
     - qa
-  # category 已废弃，请在 skill-index 中定�?
-  # sceneType: abs
 
 spec:
   skillForm: SCENE
@@ -33,7 +31,7 @@ spec:
   roles:
     - id: USER
       name: 用户
-      description: 使用文档助手进行问答的用�?
+      description: 使用文档助手进行问答的用户
       required: true
       minCount: 1
       maxCount: 10000
@@ -56,7 +54,7 @@ spec:
       - stepId: create-kb
         step: 2
         action: create-kb
-        title: 创建知识�?
+        title: 创建知识库
         description: 创建第一个知识库
         type: VERIFY_CONFIG
         required: false
@@ -65,8 +63,8 @@ spec:
       - stepId: confirm-activation
         step: 3
         action: confirm-activation
-        title: 确认激�?
-        description: 确认场景激�?
+        title: 确认激活
+        description: 确认场景激活
         type: CONFIRM_ACTIVATION
         required: true
         skippable: false
@@ -87,7 +85,7 @@ spec:
         order: 2
         visible: true
       - id: knowledge-bases
-        name: 知识库管�?
+        name: 知识库管理
         icon: ri-database-2-line
         path: /document-assistant/kb
         order: 3
@@ -100,7 +98,6 @@ spec:
         visible: true
         
   classification:
-    # category 已废�?
     categoryName: 自驱业务场景
     mainFirst: true
     businessSemanticsScore: 9
@@ -113,7 +110,7 @@ spec:
       version: ">=1.0.0"
       required: true
       autoInstall: true
-      description: "知识库核心服�?
+      description: "知识库核心服务"
       capabilities:
         - knowledge-base
         - document-management
@@ -122,7 +119,7 @@ spec:
       version: ">=1.0.0"
       required: true
       autoInstall: true
-      description: "RAG检索增强服�?
+      description: "RAG检索增强服务"
       capabilities:
         - rag-retrieval
         - rag-generation
@@ -221,7 +218,7 @@ spec:
   capabilities:
     - id: query-document
       name: 文档查询
-      description: 基于RAG的智能文档问�?
+      description: 基于RAG的智能文档问答
       category: service
       type: ATOMIC
       inputSchema:
@@ -242,17 +239,17 @@ spec:
         properties:
           answer:
             type: string
-            description: 生成的回�?
+            description: 生成的回答
           sources:
             type: array
             description: 来源文档列表
           confidence:
             type: number
-            description: 置信�?
+            description: 置信度
             
     - id: upload-document
       name: 文档上传
-      description: 上传文档到知识库并自动处�?
+      description: 上传文档到知识库并自动处理
       category: service
       type: ATOMIC
       inputSchema:
@@ -263,7 +260,7 @@ spec:
             description: 知识库ID
           file:
             type: file
-            description: 上传的文�?
+            description: 上传的文件
           autoProcess:
             type: boolean
             default: true
@@ -276,10 +273,10 @@ spec:
             description: 文档ID
           status:
             type: string
-            description: 处理状�?
+            description: 处理状态
             
     - id: manage-kb
-      name: 知识库管�?
+      name: 知识库管理
       description: 创建、更新、删除知识库
       category: service
       type: ATOMIC
@@ -292,12 +289,12 @@ spec:
             description: 操作类型
           name:
             type: string
-            description: 知识库名�?
+            description: 知识库名称
           visibility:
             type: string
             enum: [private, team, public]
             default: private
-            description: 可见�?
+            description: 可见性
       outputSchema:
         type: object
         properties:
@@ -306,7 +303,7 @@ spec:
             description: 知识库ID
           status:
             type: string
-            description: 操作状�?
+            description: 操作状态
 
   capabilityBindings:
     - sceneCapabilityType: document-assistant
@@ -329,12 +326,12 @@ spec:
       
     - path: /api/v1/document-assistant/kb
       method: POST
-      description: 知识库管理接�?
+      description: 知识库管理接口
       capability: manage-kb
       
     - path: /api/v1/document-assistant/kb/{kbId}
       method: GET
-      description: 获取知识库详�?
+      description: 获取知识库详情
       capability: manage-kb
 
   runtime:
@@ -363,7 +360,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方法"
           parameters:
             type: object
             properties:
@@ -375,17 +372,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操作"
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达式"
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填写"
           parameters:
             type: object
             properties:
@@ -407,7 +404,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使用"
           parameters:
             type: object
             properties:
@@ -425,7 +422,7 @@ spec:
     required:
       - name: LLM_PROVIDER
         type: string
-        description: LLM服务提供�?
+        description: LLM服务提供商
       - name: EMBEDDING_MODEL
         type: string
         default: "text-embedding-ada-002"
@@ -442,7 +439,7 @@ spec:
       - name: MAX_HISTORY_LENGTH
         type: integer
         default: 20
-        description: 对话历史最大长�?
+        description: 对话历史最大长度
 
   resources:
     cpu: "200m"
