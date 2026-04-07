@@ -52,3 +52,66 @@ Thumbs.db
 
 # Internal docs (not for git)
 docs/v0.8.0/SKILLS-DEV-TASKS.md
+
+# Data and runtime files
+*.db
+*.mv.db
+*.trace.db
+*.db-journal
+
+# Local data directories
+mvp/data/
+!mvp/data/.gitkeep
+skill-scene/data/
+!skill-scene/data/.gitkeep
+
+# Log directories
+mvp/logs/
+*.log.*.gz
+
+# Temp directories
+temp/
+
+# Local configuration overrides
+application-local.yml
+application-local.yaml
+application-dev.yml
+application-dev.yaml
+
+# Secrets and credentials
+*.pem
+*.key
+*.p12
+*.pfx
+secrets/
+credentials/
+
+# Ooder specific
+.ooder/
+plugins/
+
+# Test outputs
+test-output/
+*.hprof
+heapdump.*
+thread_dump.*
+
+# OS specific
+*.stackdump
+
+# Temp analysis scripts
+analyze_skills.py
+fix_version.py
+*_response.json
+*.json.bak
+
+# Node modules
+node_modules/
+
+# Build outputs
+dist/
+build/
+out/
+
+# BPM web sources (extracted from jar)
+skills/_drivers/bpm/bpm-web-sources/

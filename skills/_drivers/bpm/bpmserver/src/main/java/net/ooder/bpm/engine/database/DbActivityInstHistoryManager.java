@@ -225,7 +225,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 			history.setStartTime(activityInst.getStartTime());
 			history.setUrgency(activityInst.getUrgency());
 			save(history);
-			// 保存扩展属性
+			// 保存扩展属�?
 			Connection c = null;
 			PreparedStatement ps = null;
 			try {
@@ -493,7 +493,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 		if (value == null) {
 			value = "";
 		}
-		// 将值重设回去。
+		// 将值重设回去�?
 		attInst.setValue(value);
 		int block = (value.length() / 500);
 		for (int i = 0; i <= block; i++) {
@@ -566,7 +566,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM BPM_ACTIVITYHISTORY WHERE BPM_ACTIVITYHISTORY.ACTIVITYHISTORY_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityHistoryId);
 			DbActivityInstHistory pReturn[] = (DbActivityInstHistory[]) loadByPreparedStatement(ps);
@@ -604,7 +604,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 									+ " FROM BPM_ACTIVITYHISTORY WHERE PROCESSINST_ID=?");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
 					+ " FROM BPM_ACTIVITYHISTORY WHERE PROCESSINST_ID=?",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			return loadByPreparedStatement(ps);
@@ -682,7 +682,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 					"SELECT " + ALL_FIELDS + " FROM BPM_ACTIVITYHISTORY");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
 					+ " FROM BPM_ACTIVITYHISTORY",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 
 			List list = new DbActivityInstHistoryList(loadByPreparedStatement(
@@ -849,7 +849,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_ACTIVITYHISTORY WHERE BPM_ACTIVITYHISTORY.ACTIVITYHISTORY_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityhistoryId);
 			return ps.executeUpdate();
@@ -955,7 +955,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 			getManager().log(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isActivityhistoryIdInitialized())
@@ -1155,7 +1155,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 
 				getManager().log(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (history.isActivityhistoryIdModified())
@@ -1227,7 +1227,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 				_sql.append("BPM_ACTIVITYHISTORY.ACTIVITYHISTORY_ID=?");
 				getManager().log(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (history.isActivityhistoryIdModified()) {
@@ -1319,7 +1319,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 				// postupdate-
 				afterUpdate(history);
 			}
-			// 保存扩展属性
+			// 保存扩展属�?
 			saveAttribute(history);
 		} catch (SQLException e) {
 			throw new BPMException(e);
@@ -1573,7 +1573,7 @@ public class DbActivityInstHistoryManager extends EIActivityInstHistoryManager {
 			getManager().log(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isActivityhistoryIdModified())

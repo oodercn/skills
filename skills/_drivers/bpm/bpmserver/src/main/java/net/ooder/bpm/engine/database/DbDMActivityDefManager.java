@@ -258,7 +258,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM BPM_ACTIVITYDEF WHERE BPM_ACTIVITYDEF.ACTIVITYDEF_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activitydefId);
 			DbActivityDef pReturn[] = loadByPreparedStatement(ps);
@@ -294,7 +294,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 			ps = c
 					.prepareStatement(
 							"SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			DbActivityDef[] acts = loadByPreparedStatement(ps,
@@ -494,7 +494,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_ACTIVITYDEF WHERE BPM_ACTIVITYDEF.ACTIVITYDEF_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activitydefId);
 			return ps.executeUpdate();
@@ -632,7 +632,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (activityDef.isActivitydefIdInitialized())
@@ -866,7 +866,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (activityDef.isActivitydefIdModified())
@@ -956,7 +956,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (activityDef.isActivitydefIdModified()) {
@@ -1272,7 +1272,7 @@ public class DbDMActivityDefManager extends EIActivityDefManager {
 			ps = c
 					.prepareStatement(
 							"SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=? AND POSITION='START'",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			DbActivityDef[] acts = loadByPreparedStatement(ps,

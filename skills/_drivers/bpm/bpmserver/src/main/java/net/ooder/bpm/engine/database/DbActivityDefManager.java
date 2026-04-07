@@ -32,6 +32,9 @@ import net.ooder.common.logging.Log;
 import net.ooder.common.logging.LogFactory;
 import net.ooder.common.logging.Log;
 
+import org.springframework.stereotype.Component;
+
+@Component
 public class DbActivityDefManager extends EIActivityDefManager {
     private static final Log log = LogFactory.getLog(BPMConstants.CONFIG_KEY, DbActivityDefManager.class);
 
@@ -258,7 +261,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
                             "SELECT "
                                     + ALL_FIELDS
                                     + " FROM BPM_ACTIVITYDEF WHERE BPM_ACTIVITYDEF.ACTIVITYDEF_ID=?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, activitydefId);
             DbActivityDef pReturn[] = loadByPreparedStatement(ps);
@@ -294,7 +297,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
             ps = c
                     .prepareStatement(
                             "SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, value);
             DbActivityDef[] acts = loadByPreparedStatement(ps,
@@ -494,7 +497,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
             ps = c
                     .prepareStatement(
                             "DELETE from BPM_ACTIVITYDEF WHERE BPM_ACTIVITYDEF.ACTIVITYDEF_ID=?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, activitydefId);
             return ps.executeUpdate();
@@ -632,7 +635,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
                 log.debug(sql.toString());
             c = getConnection();
             ps = c.prepareStatement(sql.toString(),
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             int _dirtyCount = 0;
             if (activityDef.isActivitydefIdInitialized())
@@ -866,7 +869,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
                 if (log.isDebugEnabled())
                     log.debug(_sql.toString());
                 ps = c.prepareStatement(_sql.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY);
                 _dirtyCount = 0;
                 if (activityDef.isActivitydefIdModified())
@@ -956,7 +959,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
                 if (log.isDebugEnabled())
                     log.debug(_sql.toString());
                 ps = c.prepareStatement(_sql.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY);
                 int _dirtyCount = 0;
                 if (activityDef.isActivitydefIdModified()) {
@@ -1272,7 +1275,7 @@ public class DbActivityDefManager extends EIActivityDefManager {
             ps = c
                     .prepareStatement(
                             "SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=? AND BPM_ACTIVITYDEF.POSITION='START'",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, value);
             DbActivityDef[] acts = loadByPreparedStatement(ps,
@@ -1392,6 +1395,13 @@ public class DbActivityDefManager extends EIActivityDefManager {
             }
             parent.addChild(extAtt);
             extAtt.setParent(parent);
+            
+            // Also add to top-level container for hierarchical access
+            DbAttributeDef topContainer = (DbAttributeDef) act.attributeTopMap
+                    .get(extAtt.getType());
+            if (topContainer != null) {
+                topContainer.addChild(extAtt);
+            }
         } else { // top attribute (no parent)
             DbAttributeDef att = (DbAttributeDef) act.attributeTopMap
                     .get(extAtt.getType());

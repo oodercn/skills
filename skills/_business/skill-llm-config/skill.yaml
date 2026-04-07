@@ -19,6 +19,11 @@ metadata:
 
 spec:
   skillForm: DRIVER
+  skillCategory: LLM
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - AI_INTEGRATION
   type: business-skill
 
   ownership: platform

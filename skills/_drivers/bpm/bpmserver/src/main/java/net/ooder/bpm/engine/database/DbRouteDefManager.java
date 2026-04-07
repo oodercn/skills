@@ -49,6 +49,9 @@ import net.ooder.common.logging.Log;
  * @author lxl
  * @version 1.0
  */
+import org.springframework.stereotype.Component;
+
+@Component
 public class DbRouteDefManager extends EIRouteDefManager {
 	private static final Log log = LogFactory.getLog(BPMConstants.CONFIG_KEY, DbRouteDefManager.class);
 
@@ -220,7 +223,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 								+ " FROM BPM_ROUTEDEF WHERE BPM_ROUTEDEF.ROUTEDEF_ID=?");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
 					+ " FROM BPM_ROUTEDEF WHERE BPM_ROUTEDEF.ROUTEDEF_ID=?",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, routeDefId);
 			DbRouteDef pReturn[] = loadByPreparedStatement(ps);
@@ -255,7 +258,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 						+ " FROM BPM_ROUTEDEF WHERE PROCESSDEF_VERSION_ID=?");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
 					+ " FROM BPM_ROUTEDEF WHERE PROCESSDEF_VERSION_ID=?",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			DbRouteDef[] routes = loadByPreparedStatement(ps);
@@ -450,7 +453,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_ROUTEDEF WHERE BPM_ROUTEDEF.ROUTEDEF_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, routedefId);
 			return ps.executeUpdate();
@@ -553,7 +556,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (routeDef.isRoutedefIdInitialized())
@@ -748,7 +751,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (routeDef.isRoutedefIdModified())
@@ -816,7 +819,7 @@ public class DbRouteDefManager extends EIRouteDefManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (routeDef.isRoutedefIdModified()) {

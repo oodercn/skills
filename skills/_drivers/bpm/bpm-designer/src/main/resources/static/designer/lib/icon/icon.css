@@ -1,0 +1,90 @@
+@font-face {
+    font-family: 'RemixIcon';
+    src: url('remixicon.woff2') format('woff2');
+    font-display: swap;
+}
+
+[class^="ri-"], [class*=" ri-"] {
+    font-family: 'RemixIcon' !important;
+    font-style: normal;
+    font-weight: normal;
+    font-variant: normal;
+    line-height: 1;
+    display: inline-block;
+    text-transform: none;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+.ri-add-line:before { content: "\ea10"; }
+.ri-arrow-go-back-line:before { content: "\ea34"; }
+.ri-arrow-go-forward-line:before { content: "\ea37"; }
+.ri-arrow-right-s-line:before { content: "\ea5d"; }
+.ri-arrow-right-double-line:before { content: "\ea63"; }
+.ri-align-left:before { content: "\ea60"; }
+.ri-align-center:before { content: "\ea61"; }
+.ri-align-right:before { content: "\ea62"; }
+.ri-close-line:before { content: "\eb99"; }
+.ri-code-line:before { content: "\ec1d"; }
+.ri-cpu-line:before { content: "\ebf0"; }
+.ri-delete-bin-line:before { content: "\ec2b"; }
+.ri-download-line:before { content: "\ec53"; }
+.ri-file-list-3-line:before { content: "\ecf8"; }
+.ri-flow-chart:before { content: "\ed46"; }
+.ri-folder-line:before { content: "\ed31"; }
+.ri-folder-open-line:before { content: "\ed32"; }
+.ri-fullscreen-line:before { content: "\edc7"; }
+.ri-git-branch-line:before { content: "\edc1"; }
+.ri-git-merge-line:before { content: "\edc2"; }
+.ri-git-commit-line:before { content: "\edc0"; }
+.ri-layout-grid-line:before { content: "\ee86"; }
+.ri-play-circle-line:before { content: "\f0a6"; }
+.ri-robot-line:before { content: "\f0a2"; }
+.ri-robot-2-line:before { content: "\f0a3"; }
+.ri-save-line:before { content: "\ef76"; }
+.ri-send-plane-line:before { content: "\eff3"; }
+.ri-server-line:before { content: "\f00c"; }
+.ri-shapes-line:before { content: "\efb6"; }
+.ri-stop-circle-line:before { content: "\f0a9"; }
+.ri-team-line:before { content: "\f03e"; }
+.ri-upload-line:before { content: "\f156"; }
+.ri-user-line:before { content: "\f10d"; }
+.ri-zoom-in-line:before { content: "\f1c8"; }
+.ri-zoom-out-line:before { content: "\f1ca"; }
+.ri-subtask-line:before { content: "\f0b9"; }
+.ri-route-line:before { content: "\f0b5"; }
+.ri-organization-chart:before { content: "\eeb4"; }
+.ri-block-line:before { content: "\eb5a"; }
+.ri-chat-3-line:before { content: "\eb4b"; }
+.ri-search-line:before { content: "\efb0"; }
+.ri-more-line:before { content: "\ee9a"; }
+.ri-settings-3-line:before { content: "\f006"; }
+.ri-edit-line:before { content: "\ec7c"; }
+.ri-checkbox-circle-line:before { content: "\eb80"; }
+.ri-sun-line:before { content: "\ef60"; }
+.ri-moon-line:before { content: "\ee8e"; }
+.ri-pushpin-line:before { content: "\f0d4"; }
+
+.ri-play-fill:before { content: "\f0a5"; }
+.ri-stop-fill:before { content: "\f0a8"; }
+.ri-user-3-fill:before { content: "\f110"; }
+.ri-server-fill:before { content: "\f00b"; }
+.ri-terminal-box-fill:before { content: "\f027"; }
+.ri-git-branch-fill:before { content: "\edbc"; }
+.ri-git-merge-fill:before { content: "\edc0"; }
+.ri-git-commit-fill:before { content: "\edbe"; }
+.ri-arrow-right-double-fill:before { content: "\ea62"; }
+.ri-external-link-fill:before { content: "\ecae"; }
+.ri-brain-fill:before { content: "\eb6a"; }
+.ri-robot-2-fill:before { content: "\f0a4"; }
+.ri-team-fill:before { content: "\f03d"; }
+.ri-layout-4-fill:before { content: "\ee85"; }
+.ri-layout-grid-fill:before { content: "\ee87"; }
+
+.ri-history-line:before { content: "\ee93"; }
+.ri-file-text-line:before { content: "\ed0f"; }
+.ri-notification-3-line:before { content: "\ee9f"; }
+.ri-shield-user-line:before { content: "\f008"; }
+.ri-time-line:before { content: "\f030"; }
+.ri-flashlight-line:before { content: "\ed3d"; }
+.ri-tools-line:before { content: "\f037"; }

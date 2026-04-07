@@ -1,0 +1,59 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-llm-volcengine
+  name: Volcengine (Doubao) LLM Provider
+  version: "3.0.1"
+  description: 火山引擎豆包LLM Provider，提供Doubao模型对话、补全、嵌入能力
+  author: Ooder Team
+  icon: ri-robot-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: LLM
+  sceneType: AUTO
+  purposes:
+    - AI_INTEGRATION
+    - TEAM
+  
+  capability:
+    category: llm
+  
+  capabilities:
+    - id: chat-completion
+      name: 对话补全
+      description: 豆包模型对话补全
+      category: ai
+      autoBind: true
+    - id: embedding
+      name: 文本嵌入
+      description: Text Embedding模型
+      category: ai
+      autoBind: false
+      
+  dependencies:
+    - skillId: llm-sdk
+      version: ">=3.0.1"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      apiKey:
+        type: string
+        title: API Key
+        required: true
+        secret: true
+      baseUrl:
+        type: string
+        default: "https://ark.cn-beijing.volces.com/api/v3"
+        title: API基础URL
+      model:
+        type: string
+        default: "doubao-pro-32k"
+        title: 默认模型
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"

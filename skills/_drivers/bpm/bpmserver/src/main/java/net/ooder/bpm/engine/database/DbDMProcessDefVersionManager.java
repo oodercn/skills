@@ -41,7 +41,7 @@ import net.ooder.common.logging.Log;
  * Title: JDS系统管理系统
  * </p>
  * <p>
- * Description: 流程定义版本数据库实现
+ * Description: 流程定义版本数据库实�?
  * </p>
  * <p>
  * Copyright: Copyright (c) 2008
@@ -276,7 +276,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM BPM_PROCESSDEF_VERSION WHERE BPM_PROCESSDEF_VERSION.PROCESSDEF_VERSION_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, processDefVersionId);
 			DbProcessDefVersion pReturn[] = loadByPreparedStatement(ps);
@@ -312,7 +312,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 			ps = c
 					.prepareStatement(
 							"SELECT PROCESSDEF_VERSION_ID FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			DbProcessDefVersion[] versions = loadByPreparedStatement(ps,
@@ -522,7 +522,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_PROCESSDEF_VERSION WHERE BPM_PROCESSDEF_VERSION.PROCESSDEF_VERSION_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, processdefVersionId);
 			return ps.executeUpdate();
@@ -647,7 +647,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (processDefVersion.isProcessdefVersionIdInitialized())
@@ -886,7 +886,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (processDefVersion.isProcessdefVersionIdModified())
@@ -980,7 +980,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (processDefVersion.isProcessdefVersionIdModified()) {
@@ -1376,7 +1376,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 				log.debug(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (processDefVersion.isProcessdefVersionIdModified())
@@ -1436,7 +1436,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 	}
 
 	/**
-	 * 取得流程定义版本的第一个活动定义
+	 * 取得流程定义版本的第一个活动定�?
 	 * 
 	 * @param processDefVersionId
 	 * @return
@@ -1467,7 +1467,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 					.prepareStatement(
 							"SELECT PROCESSDEF_VERSION_ID FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID=? AND PUBLICATIONSTATUS='"
 									+ ProcessDefVersionStatus.RELEASED.getType() + "'",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, value);
 			DbProcessDefVersion[] versions = loadByPreparedStatement(ps,
@@ -1502,7 +1502,7 @@ public class DbDMProcessDefVersionManager extends EIProcessDefVersionManager {
 			ps = c
 					.prepareStatement(
 							"SELECT PROCESSDEF_VERSION_ID FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID=? AND VERSION=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, processDefId);
 			ps.setInt(2, version);

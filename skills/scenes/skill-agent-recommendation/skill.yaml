@@ -1,0 +1,47 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-agent-recommendation
+  name: Agent Recommendation
+  version: "3.0.2"
+  description: Intelligent agent recommendation based on context and history
+  author: Ooder Team
+  icon: ri-user-star-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - AI_INTEGRATION
+    - TEAM
+  
+  capability:
+    category: biz
+  
+  capabilities:
+    - id: agent-recommendation
+      name: Agent Recommendation
+      description: 智能Agent推荐
+      category: ai
+      autoBind: true
+    - id: context-analysis
+      name: Context Analysis
+      description: 上下文分析
+      category: ai
+      autoBind: false
+    - id: history-learning
+      name: History Learning
+      description: 历史学习
+      category: ai
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

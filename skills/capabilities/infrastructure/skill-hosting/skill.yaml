@@ -1,0 +1,59 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-hosting
+  name: Hosting Service
+  version: "3.0.2"
+  description: Hosting Service Skill for Ooder Agent Platform
+  author: Ooder Team
+  icon: ri-server-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: sys
+  
+  capabilities:
+    - id: service-hosting
+      name: Service Hosting
+      description: 服务托管
+      category: infrastructure
+      autoBind: true
+    - id: process-management
+      name: Process Management
+      description: 进程管理
+      category: infrastructure
+      autoBind: true
+    - id: auto-restart
+      name: Auto Restart
+      description: 自动重启
+      category: infrastructure
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      autoStart:
+        type: boolean
+        default: true
+        title: 自动启动
+      restartPolicy:
+        type: string
+        default: "on-failure"
+        title: 重启策略
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

@@ -6,6 +6,12 @@ category: _drivers
 subcategory: vfs
 author: ooder
 license: MIT
+skillForm: DRIVER
+skillCategory: DATA
+sceneType: AUTO
+purposes:
+  - FILE_MANAGEMENT
+  - DEMO
 
 capabilities:
   - vfs_server_demo

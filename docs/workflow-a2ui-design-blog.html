@@ -1,0 +1,881 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OoderAgent 能力架构：基于 Workflow 控制理论的能力安装管理</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+            --success-bg: #dcfce7;
+            --warning-bg: #fef3c7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, "Microsoft YaHei", "Segoe UI", Roboto, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            font-size: 16px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.0rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.0rem;
+            opacity: 0.9;
+            max-width: 900px;
+            margin: 0 auto;
+            line-height: 1.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 15px 40px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .nav a {
+            color: var(--primary-color);
+            text-decoration: none;
+            padding: 8px 14px;
+            border-radius: 4px;
+            transition: all 0.3s ease;
+            font-size: 14px;
+        }
+
+        .nav a:hover { background: var(--highlight-bg); }
+
+        .content { padding: 40px; }
+
+        .abstract {
+            background: linear-gradient(135deg, #eff6ff, #dbeafe);
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 40px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .abstract h2 {
+            color: var(--secondary-color);
+            margin-bottom: 15px;
+            font-size: 1.4rem;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+            font-weight: 600;
+        }
+
+        p { margin-bottom: 18px; text-align: justify; }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 18px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.85rem;
+            line-height: 1.6;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: "Consolas", "Monaco", monospace;
+            font-size: 0.9em;
+            color: #be123c;
+        }
+
+        pre code { background: none; padding: 0; color: inherit; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        thead tr { background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); }
+
+        th {
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            font-size: 14px;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+            font-size: 14px;
+        }
+
+        tbody tr:hover { background: var(--highlight-bg); }
+        tbody tr:last-child td { border-bottom: none; }
+
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            background: linear-gradient(to right, #eff6ff, transparent);
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+            font-style: italic;
+            color: #475569;
+        }
+
+        ul, ol { margin: 20px 0; padding-left: 30px; }
+        li { margin-bottom: 10px; line-height: 1.7; }
+
+        strong { color: var(--secondary-color); font-weight: 600; }
+
+        .svg-diagram {
+            margin: 35px 0;
+            text-align: center;
+        }
+
+        .svg-diagram img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+        }
+
+        .concept-box {
+            background: white;
+            border: 2px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 25px 0;
+        }
+
+        .concept-box h3 {
+            margin-top: 0;
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--highlight-bg);
+            padding-bottom: 10px;
+        }
+
+        .highlight-box {
+            background: linear-gradient(135deg, #fef3c7, #fde68a);
+            border-left: 4px solid #d97706;
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .value-box {
+            background: linear-gradient(135deg, #dcfce7, #bbf7d0);
+            border-left: 4px solid #16a34a;
+            padding: 20px 25px;
+            margin: 25px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .section-number {
+            display: inline-block;
+            background: var(--primary-color);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 32px;
+            font-weight: bold;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .footer {
+            background: #1e293b;
+            color: white;
+            padding: 40px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .footer p { opacity: 0.8; margin-bottom: 10px; }
+
+        .toc {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 25px;
+            margin: 30px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .toc h3 { margin-top: 0; color: var(--primary-color); }
+
+        .toc ol {
+            counter-reset: toc-counter;
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .toc li {
+            counter-increment: toc-counter;
+            margin-bottom: 8px;
+            padding-left: 30px;
+            position: relative;
+        }
+
+        .toc li::before {
+            content: counter(toc-counter) ".";
+            position: absolute;
+            left: 0;
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+
+        .toc a {
+            color: var(--text-color);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .toc a:hover { color: var(--primary-color); }
+
+        @media (max-width: 768px) {
+            .container { margin: 0; box-shadow: none; }
+            .header { padding: 40px 20px; }
+            .header h1 { font-size: 1.5rem; }
+            .nav { padding: 10px 20px; overflow-x: auto; }
+            .content { padding: 20px; }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.2rem; }
+        }
+
+        @media print {
+            body { background: white; }
+            .container { box-shadow: none; }
+            .nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>OoderAgent 能力架构：基于 Workflow 控制理论的能力安装管理</h1>
+            <p class="subtitle">本文系统阐述了 OoderAgent 能力架构的核心设计理念——以能力安装管理控制为中心，通过 Workflow 控制理论实现能力的"驯化"与可控可用。文章揭示了能力架构的本质：P2P、A2PM、P2A、A2A 四种协作模式，以及 Workflow 如何从传统的 P2P 数据流转转变为 A/UI/P 三元结构控制机制。</p>
+        </header>
+
+        <nav class="nav">
+            <ul>
+                <li><a href="#capability">能力架构本质</a></li>
+                <li><a href="#workflow">Workflow 控制理论</a></li>
+                <li><a href="#taming">能力驯化</a></li>
+                <li><a href="#mapping">场景活动映射</a></li>
+                <li><a href="#mechanism">控制机制</a></li>
+                <li><a href="#management">能力管理</a></li>
+                <li><a href="#scenarios">应用场景</a></li>
+                <li><a href="#summary">设计总结</a></li>
+            </ul>
+        </nav>
+
+        <main class="content">
+            <div class="toc">
+                <h3>目录</h3>
+                <ol>
+                    <li><a href="#capability">能力架构的本质</a></li>
+                    <li><a href="#workflow">为什么需要 Workflow</a></li>
+                    <li><a href="#taming">能力为什么需要 Workflow</a></li>
+                    <li><a href="#mapping">场景与活动的映射创新</a></li>
+                    <li><a href="#mechanism">Workflow 控制理论的核心机制</a></li>
+                    <li><a href="#management">能力安装管理控制</a></li>
+                    <li><a href="#scenarios">实际应用场景</a></li>
+                    <li><a href="#summary">设计理念总结</a></li>
+                </ol>
+            </div>
+
+            <h2 id="capability"><span class="section-number">一</span> 能力架构的本质</h2>
+
+            <h3>1.1 什么是能力架构</h3>
+            <p>能力架构是 OoderAgent 的核心设计理念，它将系统功能抽象为独立的"能力"单元，并通过四种协作模式实现能力的互联互通：</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_capability_collaboration.svg" alt="能力架构协作模式" />
+            </div>
+
+            <h3>1.2 四种协作模式详解</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>协作模式</th>
+                        <th>全称</th>
+                        <th>说明</th>
+                        <th>翻译需求</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>P2P</strong></td>
+                        <td>Person to Person</td>
+                        <td>人与人之间的直接协作</td>
+                        <td>需要 UI 翻译</td>
+                    </tr>
+                    <tr>
+                        <td><strong>P2A</strong></td>
+                        <td>Person to Agent</td>
+                        <td>人与 Agent 的交互</td>
+                        <td>需要 UI/A2UI 翻译</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A2A</strong></td>
+                        <td>Agent to Agent</td>
+                        <td>Agent 之间的自动协作</td>
+                        <td>无需翻译</td>
+                    </tr>
+                    <tr>
+                        <td><strong>A2PM</strong></td>
+                        <td>Agent to Process Manager</td>
+                        <td>Agent 与流程管理的交互</td>
+                        <td>无需翻译</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>1.3 UI/A2UI 的翻译作用</h3>
+            <div class="svg-diagram">
+                <img src="diagram_ui_translation.svg" alt="UI/A2UI 翻译作用" />
+            </div>
+
+            <p><strong>A2UI 的作用</strong>：</p>
+            <ul>
+                <li>自动生成翻译界面</li>
+                <li>动态适配不同能力</li>
+                <li>实现人机交互的标准化</li>
+            </ul>
+
+            <h2 id="workflow"><span class="section-number">二</span> 为什么需要 Workflow</h2>
+
+            <h3>2.1 协作规则的本质</h3>
+            <p>Workflow 不是简单的流程引擎，而是<strong>协作规则的定义与管理机制</strong>。</p>
+
+            <div class="concept-box">
+                <h3>核心问题</h3>
+                <ul>
+                    <li>能力是开放的、不可控的</li>
+                    <li>不同能力之间的协作需要规则约束</li>
+                    <li>业务场景需要特定的协作模式</li>
+                </ul>
+                <div class="value-box">
+                    <p><strong>Workflow 的解决方案</strong>：</p>
+                    <p><code>开放能力 + Workflow 规则 = 可控可用的能力组合</code></p>
+                </div>
+            </div>
+
+            <h3>2.2 Workflow 的控制理论</h3>
+
+            <div class="svg-diagram">
+                <img src="diagram_workflow_control.svg" alt="传统模式 vs OoderAgent 创新模式" />
+            </div>
+
+            <h3>2.3 A (Agent) 的统一整合</h3>
+            <p>Agent 统一了传统分散的概念：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>传统概念</th>
+                        <th>Agent 整合</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>事件 (Event)</td>
+                        <td>Agent 事件处理</td>
+                    </tr>
+                    <tr>
+                        <td>自动任务 (Auto Task)</td>
+                        <td>Agent 自动执行</td>
+                    </tr>
+                    <tr>
+                        <td>业务调用整合</td>
+                        <td>Agent 能力编排</td>
+                    </tr>
+                    <tr>
+                        <td>消息通知</td>
+                        <td>Agent 通信机制</td>
+                    </tr>
+                    <tr>
+                        <td>状态管理</td>
+                        <td>Agent 状态机</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <p><strong>统一后的优势</strong>：</p>
+            <ul>
+                <li>单一入口，统一管理</li>
+                <li>状态可追踪，行为可审计</li>
+                <li>能力可组合，流程可编排</li>
+            </ul>
+
+            <h2 id="taming"><span class="section-number">三</span> 能力为什么需要 Workflow</h2>
+
+            <h3>3.1 能力的开放性与不可控性</h3>
+            <div class="concept-box">
+                <h3>能力的特点</h3>
+                <ul>
+                    <li><strong>开放性</strong>：能力来自不同来源，接口各异</li>
+                    <li><strong>独立性</strong>：能力独立部署，独立运行</li>
+                    <li><strong>不可控性</strong>：能力行为不可预测，需要约束</li>
+                </ul>
+            </div>
+
+            <h3>3.2 Workflow 的"驯化"作用</h3>
+            <p>Workflow 通过适配实现能力的"驯化"：</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_capability_taming.svg" alt="能力驯化过程" />
+            </div>
+
+            <h3>3.3 能力安装的 Workflow 适配</h3>
+            <p>能力安装时的 Workflow 适配流程：</p>
+            <pre><code>能力安装流程：
+
+1. 能力发现
+   └── 扫描能力元数据
+   └── 解析能力接口
+
+2. Workflow 适配
+   └── 创建能力适配器
+   └── 定义输入输出规范
+   └── 配置执行策略
+
+3. 场景绑定
+   └── 关联业务场景
+   └── 配置触发条件
+   └── 设置权限控制
+
+4. 可用性验证
+   └── 测试能力执行
+   └── 验证控制效果
+   └── 确认可用状态</code></pre>
+
+            <h2 id="mapping"><span class="section-number">四</span> 场景与活动的映射创新</h2>
+
+            <h3>4.1 传统活动模型</h3>
+            <p>传统 BPM 的活动模型：</p>
+            <pre><code>流程 (Process)
+├── 活动 (Activity)
+│   ├── 用户任务
+│   ├── 服务任务
+│   └── 脚本任务
+└── 网关 (Gateway)
+    ├── 排他网关
+    ├── 并行网关
+    └── 包容网关</code></pre>
+
+            <h3>4.2 OoderAgent 的创新：A/P/S 拆分</h3>
+
+            <div class="svg-diagram">
+                <img src="diagram_aps_mapping.svg" alt="场景与活动映射：A/P/S 拆分创新" />
+            </div>
+
+            <h3>4.3 设计理念创新</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>传统模式</th>
+                        <th>OoderAgent 模式</th>
+                        <th>创新点</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>活动类型固定</td>
+                        <td>A/P/S 动态组合</td>
+                        <td>灵活性</td>
+                    </tr>
+                    <tr>
+                        <td>流程线性执行</td>
+                        <td>场景嵌套复用</td>
+                        <td>模块化</td>
+                    </tr>
+                    <tr>
+                        <td>人工任务单一</td>
+                        <td>P 支持多种交互</td>
+                        <td>丰富性</td>
+                    </tr>
+                    <tr>
+                        <td>自动任务分散</td>
+                        <td>A 统一管理</td>
+                        <td>一致性</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="mechanism"><span class="section-number">五</span> Workflow 控制理论的核心机制</h2>
+
+            <h3>5.1 三元控制结构</h3>
+            <div class="svg-diagram">
+                <img src="diagram_tri_control_structure.svg" alt="三元控制结构" />
+            </div>
+
+            <h3>5.2 控制流程</h3>
+            <pre><code>控制流程：
+
+1. 触发阶段
+   P 发起请求 ──► UI 翻译 ──► A 接收 ──► Workflow 路由
+
+2. 执行阶段
+   Workflow 分发 ──► A 执行能力 ──► 结果返回 ──► UI 呈现
+
+3. 决策阶段
+   A 提供选项 ──► UI 展示 ──► P 决策 ──► A 继续执行
+
+4. 完成阶段
+   A 完成任务 ──► Workflow 归档 ──► UI 通知 ──► P 确认</code></pre>
+
+            <h3>5.3 控制规则</h3>
+            <div class="value-box">
+                <h4>输入控制</h4>
+                <ul>
+                    <li>参数验证</li>
+                    <li>格式转换</li>
+                    <li>权限检查</li>
+                </ul>
+                <h4>执行控制</h4>
+                <ul>
+                    <li>超时管理</li>
+                    <li>重试策略</li>
+                    <li>并发控制</li>
+                </ul>
+                <h4>输出控制</h4>
+                <ul>
+                    <li>结果标准化</li>
+                    <li>错误处理</li>
+                    <li>状态同步</li>
+                </ul>
+            </div>
+
+            <h2 id="management"><span class="section-number">六</span> 能力安装管理控制</h2>
+
+            <h3>6.1 能力生命周期</h3>
+
+            <div class="svg-diagram">
+                <img src="diagram_capability_lifecycle.svg" alt="能力生命周期管理" />
+            </div>
+
+            <h3>6.2 能力控制矩阵</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>控制维度</th>
+                        <th>控制项</th>
+                        <th>控制方式</th>
+                        <th>控制效果</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>输入控制</strong></td>
+                        <td>参数验证</td>
+                        <td>Schema 校验</td>
+                        <td>数据完整性</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>格式转换</td>
+                        <td>适配器模式</td>
+                        <td>接口兼容性</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>权限检查</td>
+                        <td>RBAC</td>
+                        <td>访问安全性</td>
+                    </tr>
+                    <tr>
+                        <td><strong>执行控制</strong></td>
+                        <td>超时管理</td>
+                        <td>超时配置</td>
+                        <td>资源保护</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>重试策略</td>
+                        <td>指数退避</td>
+                        <td>容错能力</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>并发控制</td>
+                        <td>信号量</td>
+                        <td>性能稳定</td>
+                    </tr>
+                    <tr>
+                        <td><strong>输出控制</strong></td>
+                        <td>结果标准化</td>
+                        <td>响应模板</td>
+                        <td>接口统一</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>错误处理</td>
+                        <td>异常捕获</td>
+                        <td>健壮性</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td>状态同步</td>
+                        <td>事件通知</td>
+                        <td>一致性</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h2 id="scenarios"><span class="section-number">七</span> 实际应用场景</h2>
+
+            <h3>场景一：能力安装与适配</h3>
+            <div class="highlight-box">
+                <h4>用户故事</h4>
+                <p>系统管理员需要安装一个新的"短信发送"能力。</p>
+            </div>
+            <pre><code>流程：
+
+1. 能力发现
+   └── 扫描短信能力包
+   └── 解析接口定义
+   └── 检查依赖项
+
+2. Workflow 适配
+   └── 创建输入适配器（手机号格式验证）
+   └── 创建输出适配器（发送结果标准化）
+   └── 配置执行策略（超时10秒，重试2次）
+
+3. 场景绑定
+   └── 绑定到"验证码发送"场景
+   └── 绑定到"告警通知"场景
+
+4. 可用性验证
+   └── 测试发送验证码
+   └── 验证结果返回
+   └── 确认可用状态</code></pre>
+
+            <h3>场景二：P2A 协作控制</h3>
+            <div class="highlight-box">
+                <h4>用户故事</h4>
+                <p>审批人员需要通过界面审批采购申请。</p>
+            </div>
+            <div class="svg-diagram">
+                <img src="diagram_p2a_collaboration.svg" alt="P2A 协作流程" />
+            </div>
+
+            <h3>场景三：A2A 自动协作</h3>
+            <div class="highlight-box">
+                <h4>用户故事</h4>
+                <p>订单创建后自动触发库存检查和通知发送。</p>
+            </div>
+            <div class="svg-diagram">
+                <img src="diagram_a2a_collaboration.svg" alt="A2A 自动协作" />
+            </div>
+
+            <h2 id="summary"><span class="section-number">八</span> 设计理念总结</h2>
+
+            <h3>8.1 核心创新点</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>创新点</th>
+                        <th>传统方式</th>
+                        <th>OoderAgent 方式</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>协作模式</strong></td>
+                        <td>P2P 数据流转</td>
+                        <td>A/UI/P 三元控制</td>
+                    </tr>
+                    <tr>
+                        <td><strong>活动模型</strong></td>
+                        <td>固定活动类型</td>
+                        <td>A/P/S 动态组合</td>
+                    </tr>
+                    <tr>
+                        <td><strong>能力管理</strong></td>
+                        <td>直接使用</td>
+                        <td>Workflow 适配驯化</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Agent 定位</strong></td>
+                        <td>分散概念</td>
+                        <td>统一整合中心</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>8.2 核心价值</h3>
+            <div class="value-box">
+                <ol>
+                    <li><strong>可控性</strong>：开放能力通过 Workflow 适配变为可控</li>
+                    <li><strong>灵活性</strong>：A/P/S 组合支持复杂业务场景</li>
+                    <li><strong>一致性</strong>：Agent 统一管理，接口标准统一</li>
+                    <li><strong>可追溯</strong>：全流程审计，行为可追踪</li>
+                </ol>
+            </div>
+
+            <h3>8.3 架构优势</h3>
+            <div class="highlight-box">
+                <p style="font-size: 1.2rem; text-align: center; font-weight: bold;">
+                    能力开放性 + Workflow 控制理论 = 可控可用的能力生态
+                </p>
+            </div>
+
+            <h2>附录</h2>
+
+            <h3>A. 关键概念对照表</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>概念</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>P (Person)</td>
+                        <td>人，系统的使用者</td>
+                    </tr>
+                    <tr>
+                        <td>A (Agent)</td>
+                        <td>Agent，统一的能力执行单元</td>
+                    </tr>
+                    <tr>
+                        <td>UI</td>
+                        <td>用户界面，P 与 A 的翻译层</td>
+                    </tr>
+                    <tr>
+                        <td>A2UI</td>
+                        <td>自动生成 UI 的能力</td>
+                    </tr>
+                    <tr>
+                        <td>Scene</td>
+                        <td>场景，业务流程的抽象</td>
+                    </tr>
+                    <tr>
+                        <td>Workflow</td>
+                        <td>工作流，协作规则的定义</td>
+                    </tr>
+                    <tr>
+                        <td>Capability</td>
+                        <td>能力，系统功能的抽象单元</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>B. 技术栈</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>技术领域</th>
+                        <th>技术选型</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>后端框架</td>
+                        <td>Java 21, Spring Boot</td>
+                    </tr>
+                    <tr>
+                        <td>前端框架</td>
+                        <td>Vue 3, Element Plus</td>
+                    </tr>
+                    <tr>
+                        <td>工作流引擎</td>
+                        <td>ooder-bpm-web</td>
+                    </tr>
+                    <tr>
+                        <td>AI 能力</td>
+                        <td>LLM Integration</td>
+                    </tr>
+                    <tr>
+                        <td>数据存储</td>
+                        <td>SQLite</td>
+                    </tr>
+                    <tr>
+                        <td>缓存服务</td>
+                        <td>Redis</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>C. 关键文件路径</h3>
+            <ul>
+                <li><strong>Workflow 场景</strong>: <code>E:\github\ooder-skills\temp\ooder-Nexus\src\main\resources\scenes\workflow-scene.yaml</code></li>
+                <li><strong>A2UI 场景</strong>: <code>E:\github\ooder-skills\temp\ooder-Nexus\src\main\resources\scenes\a2ui-scene.yaml</code></li>
+                <li><strong>能力模型</strong>: <code>E:\github\ooder-skills\mvp\src\main\java\net\ooder\mvp\skill\scene\capability\model\Capability.java</code></li>
+            </ul>
+        </main>
+
+        <footer class="footer">
+            <p><strong>文档版本</strong>：v3.0 | <strong>创建日期</strong>：2026-04-06 | <strong>作者</strong>：Ooder Team</p>
+            <p><strong>项目路径</strong>：E:\github\ooder-skills</p>
+        </footer>
+    </div>
+</body>
+</html>

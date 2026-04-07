@@ -5,7 +5,6 @@ metadata:
   id: skill-res-service
   name: 资源管理服务
   version: 0.7.3
-  category: sys
   description: 资源管理服务，提供CPU、内存、磁盘监控
   author: ooder Team
   license: Apache-2.0
@@ -24,7 +23,7 @@ spec:
   
   capability:
     address: 0x58
-    category: MON
+    category: sys
     code: MON_BASE
     operations: [cpu, memory, disk, network]
   

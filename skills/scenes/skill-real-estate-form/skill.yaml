@@ -5,7 +5,6 @@ metadata:
   id: skill-real-estate-form
   name: 房产中介房源表单
   version: 1.0.0
-  category: biz
   description: 房产中介房源信息采集表单场景能力，支持房源录入、图片上传、地图定位、智能估价等功能
   author: ooder Team
   license: Apache-2.0
@@ -21,6 +20,9 @@ metadata:
 
 spec:
   skillForm: SCENE
+  
+  capability:
+    category: biz
   
   scene:
     type: TRIGGER

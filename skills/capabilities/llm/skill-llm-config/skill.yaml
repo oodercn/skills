@@ -3,13 +3,14 @@ skill:
   name: LLM配置管理
   version: 1.0.0
   description: 提供LLM配置、Provider管理、模型配置等功能
-  category: business
   author: ooder
   entryPoint: net.ooder.skill.llm.config.LlmConfigSkillAutoConfiguration
   dependencies:
     - skill-common
     - skill-scene
     - skill-dict
+  capability:
+    category: llm
   endpoints:
     - path: /api/v1/llm-config
       method: GET

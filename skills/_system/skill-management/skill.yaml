@@ -1,0 +1,99 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-management
+  name: Skill Management
+  version: "3.0.2"
+  description: Skill Management Module - Unified skill registration, lifecycle, and marketplace management
+  author: Ooder Team
+  icon: ri-apps-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: sys
+  
+  capabilities:
+    - id: skill-registration
+      name: Skill Registration
+      description: 技能注册管理
+      category: management
+      autoBind: true
+    - id: skill-lifecycle
+      name: Skill Lifecycle
+      description: 技能生命周期管理
+      category: management
+      autoBind: true
+    - id: skill-marketplace
+      name: Skill Marketplace
+      description: 技能市场
+      category: management
+      autoBind: false
+    - id: skill-execution
+      name: Skill Execution
+      description: 技能执行
+      category: management
+      autoBind: true
+    - id: skill-rating
+      name: Skill Rating
+      description: 技能评分
+      category: management
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      maxConcurrentExecutions:
+        type: integer
+        default: 10
+        title: 最大并发执行数
+      defaultTimeout:
+        type: integer
+        default: 30000
+        title: 默认超时时间(ms)
+      enableMarketplace:
+        type: boolean
+        default: true
+        title: 启用技能市场
+        
+  endpoints:
+    - path: /api/skill/list
+      method: GET
+      description: List all skills
+      capability: skill-registration
+    - path: /api/skill/{skillId}
+      method: GET
+      description: Get skill details
+      capability: skill-registration
+    - path: /api/skill/add
+      method: POST
+      description: Add a new skill
+      capability: skill-registration
+    - path: /api/skill/{skillId}/start
+      method: POST
+      description: Start skill
+      capability: skill-execution
+    - path: /api/skill/{skillId}/stop
+      method: POST
+      description: Stop skill
+      capability: skill-execution
+    - path: /api/skill/{skillId}/execute
+      method: POST
+      description: Execute skill
+      capability: skill-execution
+        
+  estimatedResources:
+    cpu: "200m"
+    memory: "256Mi"

@@ -8,6 +8,8 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
@@ -21,9 +23,9 @@ public class BPMRestClient {
     @Value("${bpm.server.url}")
     private String baseUrl;
 
-    private HttpHeaders createHeaders() {
+    private HttpHeaders createFormHeaders() {
         HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
         return headers;
     }
 
@@ -49,11 +51,10 @@ public class BPMRestClient {
 
     public ResultModel newProcess(String processDefId, String processInstName) {
         String url = baseUrl + "/api/process/new";
-        Map<String, String> request = Map.of(
-            "processDefId", processDefId,
-            "processInstName", processInstName
-        );
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, createHeaders());
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("processDefId", processDefId);
+        request.add("processInstName", processInstName);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
         return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 
@@ -78,32 +79,43 @@ public class BPMRestClient {
     }
 
     public ResultModel endTask(String activityInstId) {
-        String url = baseUrl + "/api/activityinst/endtask?activityInstId=" + activityInstId;
-        return restTemplate.postForObject(url, null, ResultModel.class);
+        String url = baseUrl + "/api/activityinst/endtask";
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("activityInstId", activityInstId);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
+        return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 
     public ResultModel routeBack(String activityInstId, String activityInstHistoryId) {
         String url = baseUrl + "/api/activityinst/routeback";
-        Map<String, String> request = Map.of(
-            "activityInstId", activityInstId,
-            "activityInstHistoryId", activityInstHistoryId
-        );
-        HttpEntity<Map<String, String>> entity = new HttpEntity<>(request, createHeaders());
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("activityInstId", activityInstId);
+        request.add("activityInstHistoryId", activityInstHistoryId);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
         return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 
     public ResultModel signReceive(String activityInstId) {
-        String url = baseUrl + "/api/activityinst/signreceive?activityInstId=" + activityInstId;
-        return restTemplate.postForObject(url, null, ResultModel.class);
+        String url = baseUrl + "/api/activityinst/signreceive";
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("activityInstId", activityInstId);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
+        return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 
     public ResultModel completeProcessInst(String processInstId) {
-        String url = baseUrl + "/api/processinst/complete?processInstId=" + processInstId;
-        return restTemplate.postForObject(url, null, ResultModel.class);
+        String url = baseUrl + "/api/processinst/complete";
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("processInstId", processInstId);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
+        return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 
     public ResultModel abortProcessInst(String processInstId) {
-        String url = baseUrl + "/api/processinst/abort?processInstId=" + processInstId;
-        return restTemplate.postForObject(url, null, ResultModel.class);
+        String url = baseUrl + "/api/processinst/abort";
+        MultiValueMap<String, String> request = new LinkedMultiValueMap<>();
+        request.add("processInstId", processInstId);
+        HttpEntity<MultiValueMap<String, String>> entity = new HttpEntity<>(request, createFormHeaders());
+        return restTemplate.postForObject(url, entity, ResultModel.class);
     }
 }

@@ -190,7 +190,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 									+ " FROM BPM_ROUTEINST WHERE BPM_ROUTEINST.ROUTEINST_ID=?");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
 					+ " FROM BPM_ROUTEINST WHERE BPM_ROUTEINST.ROUTEINST_ID=?",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, routeInstId);
 			DbRouteInst pReturn[] = loadByPreparedStatement(ps);
@@ -225,7 +225,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 			c = getConnection();
 			getManager().log("SELECT " + ALL_FIELDS + " FROM BPM_ROUTEINST");
 			ps = c.prepareStatement("SELECT " + ALL_FIELDS
-					+ " FROM BPM_ROUTEINST", ResultSet.TYPE_SCROLL_INSENSITIVE,
+					+ " FROM BPM_ROUTEINST", ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 
 			List list = new DbRouteInstList(loadByPreparedStatement(ps,
@@ -387,7 +387,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_ROUTEINST WHERE BPM_ROUTEINST.ROUTEINST_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, routeinstId);
 			return ps.executeUpdate();
@@ -475,7 +475,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 			getManager().log(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isRouteinstIdInitialized())
@@ -793,7 +793,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 			getManager().log(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isRouteinstIdModified())
@@ -886,7 +886,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 
 				getManager().log(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (pObject.isRouteinstIdModified())
@@ -943,7 +943,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 				_sql.append("BPM_ROUTEINST.ROUTEINST_ID=?");
 				getManager().log(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (pObject.isRouteinstIdModified()) {
@@ -1106,7 +1106,7 @@ public class DbRouteInstManager extends EIRouteInstManager {
 	}
 
 	/**
-	 * 取得指向该活动实例的所有路由实例
+	 * 取得指向该活动实例的所有路由实�?
 	 */
 	public List getRouteInsts(EIActivityInst activityInst) throws BPMException {
 		String where = " where TOACTIVITY_ID='"

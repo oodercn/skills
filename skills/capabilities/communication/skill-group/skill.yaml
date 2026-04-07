@@ -5,7 +5,6 @@ metadata:
   id: skill-group
   name: 群组服务
   version: 0.7.3
-  category: org
   description: 群组服务，支持群组管理、成员管理、权限控制
   author: ooder Team
   license: Apache-2.0
@@ -23,6 +22,7 @@ spec:
   
   capability:
     address: 0x55
+    category: org
     category: COMM
     code: COMM_GROUP
     operations: [create, delete, member, permission]

@@ -18,6 +18,11 @@ metadata:
 
 spec:
   skillForm: PROVIDER
+  skillCategory: WORKFLOW
+  sceneType: COLLABORATIVE
+  purposes:
+    - TEAM
+    - COLLABORATION
   type: business-skill
 
   ownership: platform

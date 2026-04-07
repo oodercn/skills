@@ -1,0 +1,59 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-failover-manager
+  name: Failover Manager
+  version: "3.0.2"
+  description: Skill for managing failover and circuit breaker patterns
+  author: Ooder Team
+  icon: ri-refresh-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: sys
+  
+  capabilities:
+    - id: failover
+      name: Failover
+      description: 故障转移
+      category: infrastructure
+      autoBind: true
+    - id: circuit-breaker
+      name: Circuit Breaker
+      description: 熔断器
+      category: infrastructure
+      autoBind: true
+    - id: health-monitoring
+      name: Health Monitoring
+      description: 健康监控
+      category: infrastructure
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      failureThreshold:
+        type: integer
+        default: 5
+        title: 故障阈值
+      recoveryTimeout:
+        type: integer
+        default: 30000
+        title: 恢复超时(ms)
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

@@ -5,7 +5,6 @@ metadata:
   id: skill-cmd-service
   name: 命令监控服务
   version: 0.7.3
-  category: sys
   description: 命令监控服务，提供命令执行、输出监控、状态管理
   author: ooder Team
   license: Apache-2.0
@@ -23,7 +22,7 @@ spec:
   
   capability:
     address: 0x58
-    category: MON
+    category: sys
     code: MON_BASE
     operations: [execute, monitor, status]
   

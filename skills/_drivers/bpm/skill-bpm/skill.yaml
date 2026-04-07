@@ -6,6 +6,12 @@ category: _drivers
 subcategory: bpm
 author: ooder
 license: MIT
+skillForm: DRIVER
+skillCategory: WORKFLOW
+sceneType: TRIGGER
+purposes:
+  - WORKFLOW_AUTOMATION
+  - TEAM
 
 capabilities:
   - process_definition

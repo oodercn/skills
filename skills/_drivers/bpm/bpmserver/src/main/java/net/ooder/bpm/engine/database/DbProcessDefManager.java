@@ -30,6 +30,8 @@ import net.ooder.common.logging.Log;
 import net.ooder.common.logging.LogFactory;
 import net.ooder.common.logging.Log;
 
+import org.springframework.stereotype.Component;
+
 /**
  * <p>
  * Title: JDS系统管理系统
@@ -47,6 +49,7 @@ import net.ooder.common.logging.Log;
  * @author lxl
  * @version 1.0
  */
+@Component
 public class DbProcessDefManager extends EIProcessDefManager {
 	private static final Log log = LogFactory.getLog(BPMConstants.CONFIG_KEY, DbProcessDefManager.class);
 
@@ -198,7 +201,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 								"SELECT "
 										+ ALL_FIELDS
 										+ " FROM BPM_PROCESSDEF WHERE BPM_PROCESSDEF.PROCESSDEF_ID=?",
-								ResultSet.TYPE_SCROLL_INSENSITIVE,
+								ResultSet.TYPE_FORWARD_ONLY,
 								ResultSet.CONCUR_READ_ONLY);
 				ps.setString(1, processDefId);
 				List pReturn = loadByPreparedStatement(ps);
@@ -237,7 +240,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 			if (log.isDebugEnabled())
 				log.debug("SELECT PROCESSDEF_ID FROM BPM_PROCESSDEF");
 			ps = c.prepareStatement("SELECT PROCESSDEF_ID FROM BPM_PROCESSDEF",
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			List list = new DbProcessDefList(loadByPreparedStatement(ps,
 					new int[] { ID_PROCESSDEF_ID }));
@@ -393,7 +396,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 			ps = c
 					.prepareStatement(
 							"DELETE from BPM_PROCESSDEF WHERE BPM_PROCESSDEF.PROCESSDEF_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, processDefId);
 			return ps.executeUpdate();
@@ -465,7 +468,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (dbProcessDef.isProcessDefIdInitialized())
@@ -630,7 +633,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 					log.debug(_sql.toString());
 				}
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (dbProcessDef.isProcessDefIdModified())
@@ -680,7 +683,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 						log.debug(_sql.toString());
 					}
 					ps = c.prepareStatement(_sql.toString(),
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 					int _dirtyCount = 0;
 					if (dbProcessDef.isProcessDefIdModified()) {
@@ -960,7 +963,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 			}
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_sql = null;
 			_dirtyCount = 0;
@@ -1074,7 +1077,7 @@ public class DbProcessDefManager extends EIProcessDefManager {
 			}
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (dbProcessDef.isProcessDefIdModified())

@@ -5,7 +5,6 @@ metadata:
   id: skill-msg
   name: 消息服务
   version: 0.7.3
-  category: msg
   description: 消息服务，支持消息队列、订阅发布能力
   author: ooder Team
   license: Apache-2.0
@@ -23,7 +22,7 @@ spec:
   
   capability:
     address: 0x50
-    category: COMM
+    category: msg
     code: COMM_BASE
     operations: [publish, subscribe, queue]
   

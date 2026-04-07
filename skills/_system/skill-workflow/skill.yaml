@@ -1,0 +1,161 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+metadata:
+  name: skill-workflow
+  displayName: "工作流引擎"
+  description: "基于ooder-bpm-web驱动包的企业级BPM流程管理服务，提供流程定义、流程实例、待办任务、已办任务、流程监控等完整功能"
+  version: 3.0.1
+  address: "0x35"
+  author: ooder-team
+  labels:
+    - workflow
+    - bpm
+    - process
+    - enterprise
+
+spec:
+  type: SYSTEM
+  capability:
+    category: sys
+  lifecycle:
+    phase: GA
+    deprecated: false
+
+  dependencies:
+    required:
+      - artifactId: skill-common
+        version: ">=3.0.1"
+      - artifactId: ooder-bpm-web
+        version: ">=3.0.1"
+    optional:
+      - artifactId: skill-audit
+        version: ">=3.0.1"
+      - artifactId: skill-tenant
+        version: ">=3.0.1"
+
+  config:
+    properties:
+      - key: skill.workflow.enabled
+        defaultValue: "true"
+        description: "启用工作流服务"
+      - key: skill.workflow.bpm.server-url
+        defaultValue: ""
+        description: "BPM服务器地址"
+      - key: skill.workflow.bpm.system-code
+        defaultValue: "APEX"
+        description: "系统标识码"
+
+  capabilities:
+    - name: 流程定义管理
+      description: "流程定义的查询、版本管理、属性加载"
+      apiGroup: "/api/v1/workflow/definition"
+    - name: 流程实例管理
+      description: "流程启动、挂起、恢复、终止、删除"
+      apiGroup: "/api/v1/workflow/instance"
+    - name: 待办任务
+      description: "待办列表、签收、办理、发送、退回、收回"
+      apiGroup: "/api/v1/workflow/todo"
+    - name: 已办任务
+      description: "已办理、已阅办、归档文件列表"
+      apiGroup: "/api/v1/workflow/done"
+    - name: 流程监控
+      description: "流程历程查看、活动历史追踪、SVG可视化"
+      apiGroup: "/api/v1/workflow/monitor"
+    - name: 草稿箱
+      description: "未启动流程实例管理"
+      apiGroup: "/api/v1/workflow/draft"
+
+  apis:
+    - path: /api/v1/workflow/definition/list
+      method: POST
+      description: "获取流程定义版本列表"
+    - path: /api/v1/workflow/definition/{id}
+      method: GET
+      description: "获取流程定义详情"
+    - path: /api/v1/workflow/definition/{id}/attributes
+      method: GET
+      description: "获取流程定义属性"
+    - path: /api/v1/workflow/definition/{id}/first-activity
+      method: GET
+      description: "获取流程首节点"
+    - path: /api/v1/workflow/instance/start
+      method: POST
+      description: "启动新流程"
+    - path: /api/v1/workflow/instance/list
+      method: POST
+      description: "获取流程实例列表"
+    - path: /api/v1/workflow/instance/{id}
+      method: GET
+      description: "获取流程实例详情"
+    - path: /api/v1/workflow/instance/{id}/complete
+      method: POST
+      description: "完成流程"
+    - path: /api/v1/workflow/instance/{id}/suspend
+      method: POST
+      description: "挂起流程"
+    - path: /api/v1/workflow/instance/{id}/resume
+      method: POST
+      description: "恢复流程"
+    - path: /api/v1/workflow/instance/{id}/abort
+      method: POST
+      description: "终止流程"
+    - path: /api/v1/workflow/instance/{id}/delete
+      method: DELETE
+      description: "删除流程"
+    - path: /api/v1/workflow/todo/waited
+      method: POST
+      description: "最新待办列表"
+    - path: /api/v1/workflow/todo/my
+      method: POST
+      description: "所有在办列表"
+    - path: /api/v1/workflow/todo/sign
+      method: POST
+      description: "签收任务"
+    - path: /api/v1/workflow/todo/route-to
+      method: POST
+      description: "发送(路由到下一步)"
+    - path: /api/v1/workflow/todo/route-back
+      method: POST
+      description: "退回上一步"
+    - path: /api/v1/workflow/todo/take-back
+      method: POST
+      description: "收回"
+    - path: /api/v1/workflow/todo/end-read
+      method: POST
+      description: "阅毕"
+    - path: /api/v1/workflow/todo/end-task
+      method: POST
+      description: "完成任务"
+    - path: /api/v1/workflow/todo/routes
+      method: GET
+      description: "获取可路由列表"
+    - path: /api/v1/workflow/done/completed
+      method: POST
+      description: "已办理列表"
+    - path: /api/v1/workflow/done/read
+      method: POST
+      description: "已阅办列表"
+    - path: /api/v1/workflow/done/archive
+      method: POST
+      description: "归档文件列表"
+    - path: /api/v1/workflow/draft/list
+      method: POST
+      description: "草稿箱列表"
+    - path: /api/v1/workflow/monitor/history
+      method: GET
+      description: "活动历史记录"
+    - path: /api/v1/workflow/monitor/process-history
+      method: GET
+      description: "流程历程"
+    - path: /api/v1/workflow/monitor/can-take-back
+      method: GET
+      description: "是否可收回"
+    - path: /api/v1/workflow/monitor/can-route-back
+      method: GET
+      description: "是否可退回"
+    - path: /api/v1/workform/values
+      method: GET
+      description: "获取表单数据"
+    - path: /api/v1/workform/save
+      method: POST
+      description: "保存表单数据"

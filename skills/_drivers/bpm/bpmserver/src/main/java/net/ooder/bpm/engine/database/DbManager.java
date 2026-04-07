@@ -53,6 +53,9 @@ public class DbManager {
      * Return the manager singleton instance.
      */
     public static DbManager getInstance() {
+        if (manager_instance == null) {
+            throw new IllegalStateException("DbManager not initialized. Spring context may not be loaded yet.");
+        }
         return manager_instance;
     }
 

@@ -5,7 +5,6 @@ metadata:
   id: skill-notify
   name: 通知服务
   version: 0.7.3
-  category: msg
   description: 通知服务，支持多渠道通知推送
   author: ooder Team
   license: Apache-2.0
@@ -23,7 +22,7 @@ spec:
   
   capability:
     address: 0x53
-    category: COMM
+    category: msg
     code: COMM_NOTIFY
     operations: [push, broadcast, schedule]
   

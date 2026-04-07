@@ -5,7 +5,6 @@ metadata:
   id: skill-im
   name: 即时通讯服务
   version: 0.7.3
-  category: msg
   description: 即时通讯服务，支持实时消息、群聊、在线状态
   author: ooder Team
   license: Apache-2.0
@@ -23,7 +22,7 @@ spec:
   
   capability:
     address: 0x54
-    category: COMM
+    category: msg
     code: COMM_IM
     operations: [send, receive, presence, group]
   

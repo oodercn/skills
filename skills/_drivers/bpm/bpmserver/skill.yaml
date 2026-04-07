@@ -1,0 +1,92 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: bpmserver
+  name: BPM流程引擎服务
+  version: "1.0.0"
+  description: BPM工作流引擎服务，提供流程定义、流程实例、任务管理等功能
+  author: Ooder Team
+  icon: ri-git-branch-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - WORKFLOW
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: biz
+  
+  capabilities:
+    - id: process-definition
+      name: 流程定义
+      description: 流程定义管理
+      category: bpm
+      autoBind: true
+    - id: process-instance
+      name: 流程实例
+      description: 流程实例管理
+      category: bpm
+      autoBind: true
+    - id: task-management
+      name: 任务管理
+      description: 用户任务管理
+      category: bpm
+      autoBind: true
+    - id: route-management
+      name: 路由管理
+      description: 流程路由管理
+      category: bpm
+      autoBind: false
+    - id: activity-execution
+      name: 活动执行
+      description: 流程活动执行
+      category: bpm
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-org
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      dataSource:
+        type: string
+        title: 数据源类型
+        default: "sqlite"
+      storagePath:
+        type: string
+        title: 存储路径
+        default: "./data/bpm"
+        
+  endpoints:
+    - path: /bpm/api/processdef/list
+      method: GET
+      description: 获取流程定义列表
+      capability: process-definition
+    - path: /bpm/api/processdef/{id}
+      method: GET
+      description: 获取流程定义详情
+      capability: process-definition
+    - path: /bpm/api/processinst/start
+      method: POST
+      description: 启动流程实例
+      capability: process-instance
+    - path: /bpm/api/task/list
+      method: GET
+      description: 获取任务列表
+      capability: task-management
+    - path: /bpm/api/task/complete
+      method: POST
+      description: 完成任务
+      capability: task-management
+        
+  estimatedResources:
+    cpu: "200m"
+    memory: "512Mi"

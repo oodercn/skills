@@ -1,0 +1,59 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-httpclient-okhttp
+  name: HTTP Client (OkHttp)
+  version: "3.0.1"
+  description: HTTP客户端服务，  author: Ooder Team
+  icon: ri-global-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: sys
+  
+  capabilities:
+    - id: http-request
+      name: HTTP Request
+      description: HTTP请求处理
+      category: infrastructure
+      autoBind: true
+    - id: connection-pool
+      name: Connection Pool
+      description: 连接池管理
+      category: infrastructure
+      autoBind: false
+    - id: retry-mechanism
+      name: Retry Mechanism
+      description: 重试机制
+      category: infrastructure
+      autoBind: false
+      
+  dependencies: []
+      
+  configSchema:
+    type: object
+    properties:
+      connectionTimeout:
+        type: integer
+        default: 30000
+        title: 连接超时(ms)
+      readTimeout:
+        type: integer
+        default: 60000
+        title: 读取超时(ms)
+      maxConnections:
+        type: integer
+        default: 100
+        title: 最大连接数
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "128Mi"

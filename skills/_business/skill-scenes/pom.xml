@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -7,7 +7,7 @@
     <parent>
         <groupId>net.ooder</groupId>
         <artifactId>ooder-skills</artifactId>
-        <version>3.0.1</version>
+        <version>3.0.2</version>
         <relativePath>../../pom.xml</relativePath>
     </parent>
 
@@ -48,12 +48,12 @@
         <url>https://github.com/ooderCN/ooder-skills</url>
         <connection>scm:git:https://github.com/ooderCN/ooder-skills.git</connection>
         <developerConnection>scm:git:https://github.com/ooderCN/ooder-skills.git</developerConnection>
-        <tag>v3.0.1</tag>
+        <tag>v3.0.2</tag>
     </scm>
 
     <properties>
-        <agent-sdk.version>3.0.1</agent-sdk.version>
-        <scene-engine.version>3.0.1</scene-engine.version>
+        <agent-sdk.version>3.0.2</agent-sdk.version>
+        <scene-engine.version>3.0.2</scene-engine.version>
         <spring-boot.version>3.2.5</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
@@ -216,3 +216,5 @@
         </plugins>
     </build>
 </project>
+
+

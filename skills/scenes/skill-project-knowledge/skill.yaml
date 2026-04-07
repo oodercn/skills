@@ -5,8 +5,6 @@ metadata:
   id: skill-project-knowledge
   name: 项目知识库场景
   version: "3.0.1"
-  category: biz
-  subCategory: knowledge
   description: 项目知识自动沉淀场景能力，将项目文档自动分类整理，形成可复用知识资产
   author: Ooder Team
   license: Apache-2.0
@@ -21,6 +19,9 @@ metadata:
 
 spec:
   skillForm: SCENE
+  
+  capability:
+    category: biz
   
   scene:
     type: TRIGGER

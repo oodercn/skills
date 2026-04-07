@@ -1,0 +1,20 @@
+server:
+  port: 8088
+  servlet:
+    context-path: /
+
+spring:
+  application:
+    name: bpm-designer
+  web:
+    resources:
+      static-locations: classpath:/static/designer/
+
+bpm:
+  server:
+    url: http://127.0.0.1:8084/bpm
+
+logging:
+  level:
+    net.ooder.bpm: DEBUG
+    org.springframework: INFO

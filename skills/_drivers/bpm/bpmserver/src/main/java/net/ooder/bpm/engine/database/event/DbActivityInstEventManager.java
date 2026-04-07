@@ -202,7 +202,7 @@ public class DbActivityInstEventManager implements Serializable{
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM RT_ACTIVITY_EVENT WHERE RT_ACTIVITY_EVENT.ACTIVITYINST_EVENT_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstEndPointId);
 			DbActivityInstEvent pReturn[] = loadByPreparedStatement(ps);
@@ -346,7 +346,7 @@ public class DbActivityInstEventManager implements Serializable{
 			ps = c
 					.prepareStatement(
 							"DELETE from RT_ACTIVITY_EVENT WHERE RT_ACTIVITY_EVENT.ACTIVITYINST_EVENT_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstEndPointId);
 			return ps.executeUpdate();
@@ -436,7 +436,7 @@ public class DbActivityInstEventManager implements Serializable{
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isActivityinstEventIdInitialized())
@@ -611,7 +611,7 @@ public class DbActivityInstEventManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (pObject.isActivityinstEventIdModified())
@@ -678,7 +678,7 @@ public class DbActivityInstEventManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (pObject.isActivityinstEventIdModified()) {
@@ -975,7 +975,7 @@ public class DbActivityInstEventManager implements Serializable{
 				log.debug(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isActivityinstEventIdModified())

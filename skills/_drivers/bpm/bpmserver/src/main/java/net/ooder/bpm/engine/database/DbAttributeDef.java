@@ -72,7 +72,7 @@ public class DbAttributeDef<T> implements EIAttributeDef, Cacheable, Serializabl
 
 	/**
 	 */
-	DbAttributeDef() {
+	public DbAttributeDef() {
 	}
 
 	/**

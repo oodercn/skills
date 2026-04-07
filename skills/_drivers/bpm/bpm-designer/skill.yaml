@@ -1,0 +1,55 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: bpm-designer
+  name: BPM流程设计器
+  version: "3.0.2"
+  description: BPM流程设计器服务，  author: Ooder Team
+  icon: ri-flow-chart
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - WORKFLOW
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: biz
+  
+  capabilities:
+    - id: flow-design
+      name: 流程设计
+      description: 可视化流程设计
+      category: bpm
+      autoBind: true
+    - id: form-binding
+      name: 表单绑定
+      description: 流程节点表单绑定
+      category: bpm
+      autoBind: false
+    - id: node-config
+      name: 节点配置
+      description: 流程节点属性配置
+      category: bpm
+      autoBind: false
+      
+  dependencies: []
+      
+  configSchema:
+    type: object
+    properties:
+      serverUrl:
+        type: string
+        title: BPM服务器地址
+        default: "http://localhost:8084"
+      storagePath:
+        type: string
+        title: 流程定义存储路径
+        default: "./data/bpm"
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

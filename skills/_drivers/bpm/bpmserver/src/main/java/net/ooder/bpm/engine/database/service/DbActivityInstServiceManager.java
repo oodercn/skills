@@ -23,7 +23,7 @@ import net.ooder.common.logging.Log;
  * Title: JDS系统管理系统
  * </p>
  * <p>
- * Description: 活动实例与设备命令关系
+ * Description: 活动实例与设备命令关�?
  * </p>
  * <p>
  * 此数据因为数据量较大，且经常需要更新，所以不使用Cache
@@ -35,7 +35,7 @@ import net.ooder.common.logging.Log;
  * Company: www.justdos.net
  * </p>
  * 
- * @author 李文章
+ * @author 李文�?
  * @version 1.0
  */
 public class DbActivityInstServiceManager implements Serializable{
@@ -222,7 +222,7 @@ public class DbActivityInstServiceManager implements Serializable{
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM RT_ACTIVITY_SERVICE WHERE RT_ACTIVITY_SERVICE.ACTIVITYINST_SERVICE_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstServiceId);
 			DbActivityInstService pReturn[] = loadByPreparedStatement(ps);
@@ -366,7 +366,7 @@ public class DbActivityInstServiceManager implements Serializable{
 			ps = c
 					.prepareStatement(
 							"DELETE from RT_ACTIVITY_SERVICE WHERE RT_ACTIVITY_SERVICE.ACTIVITYINST_SERVICE_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstServiceId);
 			return ps.executeUpdate();
@@ -456,7 +456,7 @@ public class DbActivityInstServiceManager implements Serializable{
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isActivityinstServiceIdInitialized())
@@ -631,7 +631,7 @@ public class DbActivityInstServiceManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (pObject.isActivityinstServiceIdModified())
@@ -698,7 +698,7 @@ public class DbActivityInstServiceManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (pObject.isActivityinstServiceIdModified()) {
@@ -995,7 +995,7 @@ public class DbActivityInstServiceManager implements Serializable{
 				log.debug(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isActivityinstServiceIdModified())

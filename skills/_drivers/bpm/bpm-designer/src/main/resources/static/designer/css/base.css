@@ -1,0 +1,181 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html, body {
+    height: 100%;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    font-size: 14px;
+    color: var(--text);
+    background: var(--bg);
+    overflow: hidden;
+}
+
+.d-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--text);
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.d-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-light);
+}
+
+.d-btn:active {
+    background: var(--bg-active);
+}
+
+.d-btn-primary {
+    color: #fff;
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.d-btn-primary:hover {
+    background: var(--primary-hover);
+    border-color: var(--primary-hover);
+}
+
+.d-btn-secondary {
+    color: var(--text-secondary);
+    background: transparent;
+    border-color: var(--border);
+}
+
+.d-btn-secondary:hover {
+    color: var(--text);
+    background: var(--bg-hover);
+}
+
+.d-btn-icon {
+    padding: 8px;
+    min-width: 32px;
+    color: var(--text);
+}
+
+.d-btn-icon .icon {
+    color: inherit;
+}
+
+.d-btn-icon .icon svg {
+    fill: currentColor;
+}
+
+.d-btn-sm {
+    padding: 4px 8px;
+    font-size: 12px;
+}
+
+.d-input {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    transition: var(--transition);
+}
+
+.d-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.d-input::placeholder {
+    color: var(--text-muted);
+}
+
+.d-select {
+    width: 100%;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    outline: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.d-select:focus {
+    border-color: var(--primary);
+}
+
+.d-textarea {
+    width: 100%;
+    min-height: 300px;
+    padding: 12px;
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 13px;
+    line-height: 1.5;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    resize: vertical;
+    outline: none;
+}
+
+.d-textarea:focus {
+    border-color: var(--primary);
+}
+
+.d-label {
+    display: block;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.d-field {
+    margin-bottom: 12px;
+}
+
+.d-row {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+}
+
+.d-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.d-checkbox input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}
+
+.d-radio {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.d-radio input {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--primary);
+}

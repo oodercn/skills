@@ -1,0 +1,212 @@
+.d-chat {
+    position: fixed;
+    right: 340px;
+    bottom: 20px;
+    width: 380px;
+    height: 500px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    transition: all 0.3s ease;
+}
+
+.d-chat.collapsed {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.d-chat.collapsed .d-chat-header {
+    padding: 0;
+    border: none;
+    justify-content: center;
+    align-items: center;
+    height: 48px;
+}
+
+.d-chat.collapsed .d-chat-title span,
+.d-chat.collapsed .d-chat-header .d-btn {
+    display: none;
+}
+
+.d-chat.collapsed .d-chat-title i {
+    font-size: 24px;
+    color: var(--primary);
+}
+
+.d-chat.collapsed .d-chat-messages,
+.d-chat.collapsed .d-chat-input {
+    display: none;
+}
+
+.d-chat-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+    border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    background: var(--bg-input);
+}
+
+.d-chat-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.d-chat-title i {
+    font-size: 18px;
+    color: var(--primary);
+}
+
+.d-chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+}
+
+.d-chat-welcome {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+    color: var(--text-secondary);
+}
+
+.d-chat-welcome i {
+    font-size: 40px;
+    color: var(--primary);
+    margin-bottom: 12px;
+    opacity: 0.8;
+}
+
+.d-chat-welcome p {
+    font-size: 13px;
+    margin-bottom: 12px;
+}
+
+.d-chat-welcome ul {
+    text-align: left;
+    font-size: 12px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.d-chat-welcome li {
+    padding: 6px 0;
+    padding-left: 18px;
+    position: relative;
+}
+
+.d-chat-welcome li::before {
+    content: '•';
+    position: absolute;
+    left: 6px;
+    color: var(--primary);
+}
+
+.d-chat-message {
+    margin-bottom: 12px;
+}
+
+.d-chat-message.user {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.d-chat-message.user .d-chat-bubble {
+    background: var(--primary);
+    color: #fff;
+    border-radius: 16px 16px 4px 16px;
+}
+
+.d-chat-message.assistant .d-chat-bubble {
+    background: var(--bg-input);
+    color: var(--text);
+    border-radius: 16px 16px 16px 4px;
+}
+
+.d-chat-bubble {
+    max-width: 85%;
+    padding: 10px 14px;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+.d-chat-input {
+    display: flex;
+    gap: 8px;
+    padding: 12px;
+    border-top: 1px solid var(--border);
+    border-radius: 0 0 var(--radius-lg) var(--radius-lg);
+}
+
+.d-chat-textarea {
+    flex: 1;
+    min-height: 36px;
+    max-height: 100px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: 18px;
+    resize: none;
+    outline: none;
+}
+
+.d-chat-textarea:focus {
+    border-color: var(--primary);
+}
+
+.d-chat-textarea::placeholder {
+    color: var(--text-muted);
+}
+
+.d-chat-code {
+    background: var(--bg);
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    font-family: 'Consolas', 'Monaco', monospace;
+    font-size: 11px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    word-break: break-all;
+    margin: 8px 0;
+}
+
+.d-chat-toggle {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    box-shadow: 0 4px 12px rgba(26, 115, 232, 0.4);
+    z-index: 999;
+    transition: all 0.2s ease;
+}
+
+.d-chat-toggle:hover {
+    transform: scale(1.1);
+    box-shadow: 0 6px 16px rgba(26, 115, 232, 0.5);
+}

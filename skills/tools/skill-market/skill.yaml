@@ -5,7 +5,6 @@ metadata:
   id: skill-market
   name: 技能市场服务
   version: 0.7.3
-  category: sys
   description: 技能市场服务，提供技能发布、搜索、安装、更新能力
   author: ooder Team
   license: Apache-2.0
@@ -24,7 +23,7 @@ spec:
   
   capability:
     address: 0xF3
-    category: UTIL
+    category: sys
     code: UTIL_MARKET
     operations: [publish, search, install, update]
   

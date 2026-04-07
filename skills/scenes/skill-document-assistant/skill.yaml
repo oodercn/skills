@@ -5,7 +5,6 @@ metadata:
   id: skill-document-assistant
   name: 智能文档助手
   version: 1.0.0
-  category: biz
   description: 企业文档智能问答场景能力，支持员工通过自然语言查询公司制度、流程文档
   author: Ooder Team
   license: Apache-2.0
@@ -20,6 +19,9 @@ metadata:
 
 spec:
   skillForm: SCENE
+  
+  capability:
+    category: biz
   
   scene:
     type: AUTO

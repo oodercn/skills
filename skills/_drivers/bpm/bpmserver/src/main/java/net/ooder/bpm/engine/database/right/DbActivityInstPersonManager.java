@@ -32,7 +32,7 @@ import net.ooder.common.logging.Log;
  * Title: JDS系统管理系统
  * </p>
  * <p>
- * Description: 活动实例与人员关系
+ * Description: 活动实例与人员关�?
  * </p>
  * <p>
  * 此数据因为数据量较大，且经常需要更新，所以不使用Cache
@@ -212,7 +212,7 @@ public class DbActivityInstPersonManager implements Serializable{
 							"SELECT "
 									+ ALL_FIELDS
 									+ " FROM RT_ACTIVITY_PERSON WHERE RT_ACTIVITY_PERSON.ACTIVITYINST_PERSON_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstPersonId);
 			DbActivityInstPerson pReturn[] = loadByPreparedStatement(ps);
@@ -356,7 +356,7 @@ public class DbActivityInstPersonManager implements Serializable{
 			ps = c
 					.prepareStatement(
 							"DELETE from RT_ACTIVITY_PERSON WHERE RT_ACTIVITY_PERSON.ACTIVITYINST_PERSON_ID=?",
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 			ps.setString(1, activityinstPersonId);
 			return ps.executeUpdate();
@@ -434,7 +434,7 @@ public class DbActivityInstPersonManager implements Serializable{
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isActivityinstPersonIdInitialized())
@@ -597,7 +597,7 @@ public class DbActivityInstPersonManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				_dirtyCount = 0;
 				if (pObject.isActivityinstPersonIdModified())
@@ -656,7 +656,7 @@ public class DbActivityInstPersonManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (pObject.isActivityinstPersonIdModified()) {
@@ -916,7 +916,7 @@ public class DbActivityInstPersonManager implements Serializable{
 				log.debug(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isActivityinstPersonIdModified())

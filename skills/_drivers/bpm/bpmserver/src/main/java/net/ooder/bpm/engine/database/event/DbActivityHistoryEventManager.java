@@ -323,7 +323,7 @@ public class DbActivityHistoryEventManager implements Serializable {
 	    if (log.isDebugEnabled())
 		log.debug(sql.toString());
 	    c = getConnection();
-	    ps = c.prepareStatement(sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+	    ps = c.prepareStatement(sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 	    int _dirtyCount = 0;
 	    if (pObject.isActivityinstHistoryIdInitialized())
 		ps.setString(++_dirtyCount, pObject.getActivityInstHistoryId());
@@ -476,7 +476,7 @@ public class DbActivityHistoryEventManager implements Serializable {
 
 		    if (log.isDebugEnabled())
 			log.debug(_sql.toString());
-		    ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		    ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		    _dirtyCount = 0;
 		    if (pObject.isActivityinstHistoryIdModified())
 			ps.setString(++_dirtyCount, pObject.getActivityInstHistoryId());
@@ -519,7 +519,7 @@ public class DbActivityHistoryEventManager implements Serializable {
 		_sql.append(pObject.getActivityInstHistoryId() + "' AND ENDPONIT_ID='" + pObject.getEndPointId() + "'");
 		if (log.isDebugEnabled())
 		    log.debug(_sql.toString());
-		ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+		ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 		int _dirtyCount = 0;
 		if (pObject.isActivityinstHistoryIdModified()) {
 		    if (pObject.getActivityInstHistoryId() == null)
@@ -702,7 +702,7 @@ public class DbActivityHistoryEventManager implements Serializable {
 	    if (log.isDebugEnabled())
 		log.debug(_sql.toString());
 	    c = getConnection();
-	    ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+	    ps = c.prepareStatement(_sql.toString(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
 	    _dirtyCount = 0;
 	    if (pObject.isActivityinstHistoryIdModified())
 		ps.setString(++_dirtyCount, pObject.getActivityInstHistoryId());

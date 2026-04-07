@@ -1,0 +1,59 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-load-balancer
+  name: Load Balancer
+  version: "3.0.1"
+  description: 负载均衡服务
+  author: Ooder Team
+  icon: ri-scales-line
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
+  
+  capability:
+    category: sys
+  
+  capabilities:
+    - id: load-balancing
+      name: Load Balancing
+      description: 负载均衡
+      category: infrastructure
+      autoBind: true
+    - id: health-check
+      name: Health Check
+      description: 健康检查
+      category: infrastructure
+      autoBind: true
+    - id: traffic-routing
+      name: Traffic Routing
+      description: 流量路由
+      category: infrastructure
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      strategy:
+        type: string
+        title: 负载均衡策略
+        default: "round-robin"
+        enum:
+          - round-robin
+          - weighted
+          - least-connections
+          - random
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

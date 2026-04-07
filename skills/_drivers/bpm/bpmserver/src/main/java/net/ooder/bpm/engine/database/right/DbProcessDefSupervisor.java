@@ -21,7 +21,7 @@ import net.ooder.bpm.engine.inter.EIProcessDefSupervisor;
  * Title: JDS系统管理系统
  * </p>
  * <p>
- * Description: 流程监控人
+ * Description: 流程监控�?
  * </p>
  * <p>
  * The java object mapped on the Relation database table

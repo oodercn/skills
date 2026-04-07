@@ -64,7 +64,7 @@ ooder:
     provider: qianwen
     model: qwen-plus
     qianwen:
-      api-key: sk-f403a6a32efd4b00b75ee4874eec3b6b
+      api-key: ${QIANWEN_API_KEY:}
       model: qwen-plus
   skill:
     hotplug:
@@ -79,7 +79,7 @@ scene:
       enabled: true
       gitee:
         enabled: true
-        token: f0d11903a8e10e3ce09d51bc9552b664
+        token: ${GITEE_TOKEN:}
         default-owner: ooderCN
         default-repo: skills
         default-branch: master

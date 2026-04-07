@@ -217,7 +217,7 @@ public class DbParticipantSelectManager implements Serializable {
                             "SELECT "
                                     + ALL_FIELDS
                                     + " FROM RT_PARTICIPANT_SELECT WHERE RT_PARTICIPANT_SELECT.PARTICIPANT_SELECT_ID=?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, participantSelectId);
             DbParticipantSelect pReturn[] = loadByPreparedStatement(ps);
@@ -249,7 +249,7 @@ public class DbParticipantSelectManager implements Serializable {
                         + " FROM RT_PARTICIPANT_SELECT");
             ps = c.prepareStatement("SELECT " + ALL_FIELDS
                             + " FROM RT_PARTICIPANT_SELECT",
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             return loadByPreparedStatement(ps);
         } finally {
@@ -384,7 +384,7 @@ public class DbParticipantSelectManager implements Serializable {
             ps = c
                     .prepareStatement(
                             "DELETE from RT_PARTICIPANT_SELECT WHERE RT_PARTICIPANT_SELECT.PARTICIPANT_SELECT_ID=?",
-                            ResultSet.TYPE_SCROLL_INSENSITIVE,
+                            ResultSet.TYPE_FORWARD_ONLY,
                             ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, participantSelectId);
             return ps.executeUpdate();
@@ -449,7 +449,7 @@ public class DbParticipantSelectManager implements Serializable {
                 log.debug(sql.toString());
             c = getConnection();
             ps = c.prepareStatement(sql.toString(),
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             int _dirtyCount = 0;
             if (pObject.isParticipantSelectIdInitialized())
@@ -590,7 +590,7 @@ public class DbParticipantSelectManager implements Serializable {
                 if (log.isDebugEnabled())
                     log.debug(_sql.toString());
                 ps = c.prepareStatement(_sql.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY);
                 _dirtyCount = 0;
                 if (pObject.isParticipantSelectIdModified())
@@ -637,7 +637,7 @@ public class DbParticipantSelectManager implements Serializable {
                 if (log.isDebugEnabled())
                     log.debug(_sql.toString());
                 ps = c.prepareStatement(_sql.toString(),
-                        ResultSet.TYPE_SCROLL_INSENSITIVE,
+                        ResultSet.TYPE_FORWARD_ONLY,
                         ResultSet.CONCUR_READ_ONLY);
                 int _dirtyCount = 0;
                 if (pObject.isParticipantSelectIdModified()) {
@@ -853,7 +853,7 @@ public class DbParticipantSelectManager implements Serializable {
                 log.debug(_sql.toString());
             c = getConnection();
             ps = c.prepareStatement(_sql.toString(),
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             _dirtyCount = 0;
             if (pObject.isParticipantSelectIdModified())
@@ -909,7 +909,7 @@ public class DbParticipantSelectManager implements Serializable {
                 log.debug(_sql);
             c = getConnection();
             ps = c.prepareStatement(_sql.toString(),
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, participant.getParticipantSelectId());
             ResultSet rs = ps.executeQuery();
@@ -960,7 +960,7 @@ public class DbParticipantSelectManager implements Serializable {
                 log.debug(_sql);
             c = getConnection();
             ps = c.prepareStatement(_sql.toString(),
-                    ResultSet.TYPE_SCROLL_INSENSITIVE,
+                    ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, parameterId);
             ResultSet rs = ps.executeQuery();
@@ -1012,7 +1012,7 @@ public class DbParticipantSelectManager implements Serializable {
             String sql = DELETE_EXPRESSION_PARAMETER;
             if (log.isDebugEnabled())
                 log.debug(sql);
-            ps = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ps = c.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, participant.getParticipantSelectId());
             ps.executeUpdate();
@@ -1022,7 +1022,7 @@ public class DbParticipantSelectManager implements Serializable {
             sql = SAVE_EXPROCESS_PARAMETER;
             if (log.isDebugEnabled())
                 log.debug(sql);
-            ps = c.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE,
+            ps = c.prepareStatement(sql, ResultSet.TYPE_FORWARD_ONLY,
                     ResultSet.CONCUR_READ_ONLY);
             List parameterList = participant.parameterList;
             for (int i = 0; i < parameterList.size(); i++) {

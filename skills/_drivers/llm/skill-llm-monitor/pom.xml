@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="UTF-8"?>
+﻿<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -6,11 +6,11 @@
 
     <groupId>net.ooder.skill</groupId>
     <artifactId>skill-llm-monitor</artifactId>
-    <version>3.0.1</version>
+    <version>3.0.2</version>
     <packaging>jar</packaging>
 
     <name>skill-llm-monitor</name>
-    <description>LLM监控服务 - 调用统计、日志记录、性能监控、使用排�?/description>
+    <description>LLM监控服务 - 调用统计、日志记录、性能监控、使用排�?/description>
 
     <properties>
         <java.version>21</java.version>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.1</version>
+            <version>3.0.2</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -78,3 +78,4 @@
         </plugins>
     </build>
 </project>
+

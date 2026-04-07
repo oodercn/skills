@@ -5,8 +5,7 @@ metadata:
   id: skill-mqtt
   name: MQTT Service
   version: 0.7.3
-  category: msg
-  description: MQTT服务技�?- 提供轻量级MQTT Broker能力和多提供商支�?
+  description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-mqtt
@@ -26,7 +25,7 @@ spec:
   
   capability:
     address: 0x48
-    category: COMM
+    category: msg
     code: COMM_MSG
     operations: [publish, subscribe, command]
   
@@ -73,7 +72,7 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "查询当前技能的能力和使用方�?
           parameters:
             type: object
             properties:
@@ -85,17 +84,17 @@ spec:
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "通过MVEL表达式执行后台操�?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL表达�?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "生成UI表单供用户填�?
           parameters:
             type: object
             properties:
@@ -117,7 +116,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "转换为JavaScript代码供用户使�?
           parameters:
             type: object
             properties:
@@ -146,7 +145,7 @@ spec:
       category: messaging
     - id: mqtt-p2p
       name: MQTT P2P
-      description: 点对点消�?
+      description: 点对点消�?
       category: messaging
     - id: mqtt-topic
       name: MQTT Topic
@@ -211,7 +210,7 @@ spec:
       capability: mqtt-command
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 健康检�?
   
   resources:
     cpu: "200m"

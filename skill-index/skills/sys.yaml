@@ -14,7 +14,7 @@ skills:
     - id: skill-network
       name: Network Management Skill
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: network
       tags:
         - network
@@ -30,7 +30,7 @@ skills:
     - id: skill-protocol
       name: Protocol Management Skill
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: protocol
       tags:
         - protocol
@@ -45,7 +45,7 @@ skills:
     - id: skill-openwrt
       name: OpenWrt Management Skill
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: router
       tags:
         - openwrt
@@ -60,7 +60,7 @@ skills:
     - id: skill-monitor
       name: Monitoring Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: monitor
       tags:
         - monitor
@@ -77,7 +77,7 @@ skills:
     - id: skill-health
       name: Health Check Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: health
       tags:
         - health
@@ -92,7 +92,7 @@ skills:
     - id: skill-cmd-service
       name: Command Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: command
       tags:
         - command
@@ -107,7 +107,7 @@ skills:
     - id: skill-res-service
       name: Resource Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: resource
       tags:
         - resource
@@ -122,7 +122,7 @@ skills:
     - id: skill-remote-terminal
       name: Remote Terminal Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: terminal
       tags:
         - terminal
@@ -137,7 +137,7 @@ skills:
     - id: skill-scheduler-quartz
       name: Scheduler Quartz Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: scheduler
       tags:
         - scheduler
@@ -153,7 +153,7 @@ skills:
     - id: skill-task
       name: Task Management Service
       version: "3.0.1"
-      category: sys
+      capabilityCategory: sys
       subCategory: task
       tags:
         - task

@@ -168,7 +168,7 @@ skills:
     - skillId: skill-im-dingding
       name: DingTalk IM Service
       version: "3.0.1"
-      capabilityCategory: IM
+      capabilityCategory: msg
       subCategory: dingding
       tags:
         - dingtalk
@@ -197,7 +197,7 @@ skills:
     - skillId: skill-im-feishu
       name: Feishu IM Service
       version: "3.0.1"
-      capabilityCategory: IM
+      capabilityCategory: msg
       subCategory: feishu
       tags:
         - feishu
@@ -225,7 +225,7 @@ skills:
     - skillId: skill-im-wecom
       name: WeCom IM Service
       version: "3.0.1"
-      capabilityCategory: IM
+      capabilityCategory: msg
       subCategory: wecom
       tags:
         - wecom

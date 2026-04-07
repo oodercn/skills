@@ -1,0 +1,455 @@
+.d-app {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    background: var(--bg);
+}
+
+.d-header {
+    display: flex;
+    align-items: center;
+    height: 48px;
+    padding: 0 16px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+
+.d-header-left {
+    display: flex;
+    align-items: center;
+}
+
+.d-logo {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--primary);
+}
+
+.d-header-center {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+}
+
+.d-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.d-header-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.d-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+}
+
+.d-sidebar {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border);
+}
+
+.d-sidebar-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+}
+
+.d-sidebar-tab {
+    flex: 1;
+    padding: 12px;
+    font-size: 18px;
+    color: var(--text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: var(--transition);
+}
+
+.d-sidebar-tab:hover {
+    color: var(--text);
+    background: var(--bg-hover);
+}
+
+.d-sidebar-tab.active {
+    color: var(--primary);
+    background: var(--bg-active);
+}
+
+.d-sidebar-content {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+}
+
+.d-sidebar-page {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    flex-direction: column;
+}
+
+.d-sidebar-page.active {
+    display: flex;
+}
+
+.d-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.d-toolbar {
+    display: flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 12px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    gap: 4px;
+}
+
+.d-toolbar-group {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+}
+
+.d-toolbar-divider {
+    width: 1px;
+    height: 20px;
+    background: var(--border);
+    margin: 0 8px;
+}
+
+.d-zoom-level {
+    font-size: 12px;
+    color: var(--text-secondary);
+    min-width: 40px;
+    text-align: center;
+}
+
+.d-canvas-wrap {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+}
+
+.d-canvas {
+    width: 100%;
+    height: 100%;
+    background: var(--bg);
+    cursor: grab;
+}
+
+.d-canvas:active {
+    cursor: grabbing;
+}
+
+.d-panel {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+}
+
+.d-panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--border);
+}
+
+.d-panel-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.d-panel-tabs {
+    display: flex;
+    border-bottom: 1px solid var(--border);
+    overflow-x: auto;
+}
+
+.d-panel-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px;
+}
+
+.d-chat {
+    width: 320px;
+    display: flex;
+    flex-direction: column;
+    background: var(--bg-card);
+    border-left: 1px solid var(--border);
+    transition: width 0.3s;
+}
+
+.d-chat.collapsed {
+    width: 48px;
+}
+
+.d-tabs {
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+}
+
+.d-tabs-bar {
+    display: flex;
+    align-items: center;
+    height: 36px;
+    padding: 0 8px;
+}
+
+.d-tabs-list {
+    display: flex;
+    flex: 1;
+    overflow-x: auto;
+    gap: 2px;
+}
+
+.d-tabs-list::-webkit-scrollbar {
+    height: 4px;
+}
+
+.d-tabs-list::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 2px;
+}
+
+.d-tab {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background: transparent;
+    border: none;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 13px;
+    white-space: nowrap;
+    transition: all 0.2s;
+    position: relative;
+}
+
+.d-tab:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+}
+
+.d-tab.active {
+    background: var(--bg);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.d-tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: var(--primary);
+}
+
+.d-tab-close {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    opacity: 0;
+    transition: all 0.2s;
+}
+
+.d-tab:hover .d-tab-close {
+    opacity: 1;
+}
+
+.d-tab-close:hover {
+    background: var(--bg-hover);
+    color: var(--rose);
+}
+
+.d-tab-dirty {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--primary);
+}
+
+.d-tabs-new {
+    flex-shrink: 0;
+    margin-left: 4px;
+}
+
+.d-context-menu {
+    position: fixed;
+    z-index: 10000;
+    min-width: 160px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 4px 0;
+}
+
+.d-context-menu-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 13px;
+    color: var(--text);
+    transition: background 0.15s;
+}
+
+.d-context-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.d-context-menu-item.disabled {
+    color: var(--text-muted);
+    cursor: not-allowed;
+}
+
+.d-context-menu-item.disabled:hover {
+    background: transparent;
+}
+
+.d-context-menu-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    color: var(--text-muted);
+}
+
+.d-context-menu-item:hover .d-context-menu-icon {
+    color: var(--primary);
+}
+
+.d-context-menu-label {
+    flex: 1;
+}
+
+.d-context-menu-shortcut {
+    font-size: 11px;
+    color: var(--text-muted);
+    margin-left: 16px;
+}
+
+.d-context-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 8px;
+}
+
+.d-menubar {
+    display: flex;
+    align-items: center;
+    height: 32px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    padding: 0 8px;
+    position: relative;
+    z-index: 100;
+}
+
+.d-menu-item {
+    position: relative;
+    padding: 6px 12px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    user-select: none;
+}
+
+.d-menu-item:hover {
+    background: var(--bg-hover);
+}
+
+.d-menu-dropdown {
+    display: none !important;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    min-width: 200px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    padding: 4px 0;
+    z-index: 1001;
+    margin-top: 2px;
+}
+
+.d-menu-item:hover > .d-menu-dropdown {
+    display: block !important;
+}
+
+.d-menu-option {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    font-size: 13px;
+    color: var(--text);
+    cursor: pointer;
+    white-space: nowrap;
+}
+
+.d-menu-option:hover {
+    background: var(--bg-hover);
+    color: var(--primary);
+}
+
+.d-menu-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: inherit;
+}
+
+.d-menu-icon svg {
+    fill: currentColor;
+}
+
+.d-menu-shortcut {
+    margin-left: auto;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding-left: 24px;
+}
+
+.d-menu-divider {
+    height: 1px;
+    background: var(--border);
+    margin: 4px 8px;
+}

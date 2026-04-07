@@ -358,7 +358,7 @@ public class DbActivityHistoryServiceManager implements Serializable{
 				log.debug(sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			int _dirtyCount = 0;
 			if (pObject.isActivityinstHistoryIdInitialized())
@@ -522,7 +522,7 @@ public class DbActivityHistoryServiceManager implements Serializable{
 					if (log.isDebugEnabled())
 						log.debug(_sql.toString());
 					ps = c.prepareStatement(_sql.toString(),
-							ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.TYPE_FORWARD_ONLY,
 							ResultSet.CONCUR_READ_ONLY);
 					_dirtyCount = 0;
 					if (pObject.isActivityinstHistoryIdModified())
@@ -568,7 +568,7 @@ public class DbActivityHistoryServiceManager implements Serializable{
 				if (log.isDebugEnabled())
 					log.debug(_sql.toString());
 				ps = c.prepareStatement(_sql.toString(),
-						ResultSet.TYPE_SCROLL_INSENSITIVE,
+						ResultSet.TYPE_FORWARD_ONLY,
 						ResultSet.CONCUR_READ_ONLY);
 				int _dirtyCount = 0;
 				if (pObject.isActivityinstHistoryIdModified()) {
@@ -766,7 +766,7 @@ public class DbActivityHistoryServiceManager implements Serializable{
 				log.debug(_sql.toString());
 			c = getConnection();
 			ps = c.prepareStatement(_sql.toString(),
-					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.TYPE_FORWARD_ONLY,
 					ResultSet.CONCUR_READ_ONLY);
 			_dirtyCount = 0;
 			if (pObject.isActivityinstHistoryIdModified())

@@ -1,0 +1,228 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-wechat
+  name: 微信公众号发布服务
+  version: 0.7.3
+  category: biz
+  description: 微信公众号内容发布服务，支持图文消息发布、管理
+  author: ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - media
+    - wechat
+    - publish
+    - mp
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - CONTENT_PUBLISHING
+    - MARKETING
+  
+  ownership: independent
+  
+  capability:
+    address: 0x49
+    category: MEDIA
+    code: MEDIA_WECHAT
+    operations: [publish, update, delete, stats]
+  
+  driverType: media
+  
+  runtime:
+    language: java
+    javaVersion: "8"
+    framework: spring-boot
+
+  llmConfig:
+    required: false
+    defaultProvider: "deepseek"
+    defaultModel: "deepseek-chat"
+    capabilities:
+      - chat
+      - streaming
+      - function-calling
+    modelSelection:
+      allowUserOverride: true
+      availableProviders:
+        - deepseek
+        - openai
+        - qianwen
+        - volcengine
+        - ollama
+    functionCalling:
+      enabled: true
+      tools:
+        - name: query_skill_capability
+          description: "查询当前技能的能力和使用方法"
+          parameters:
+            type: object
+            properties:
+              capability:
+                type: string
+                description: "能力名称"
+              detail:
+                type: string
+                enum: [brief, detailed, examples]
+                default: "brief"
+        - name: execute_mvel_action
+          description: "通过MVEL表达式执行后台操作"
+          parameters:
+            type: object
+            properties:
+              expression:
+                type: string
+                description: "MVEL表达式"
+              context:
+                type: object
+        - name: generate_ui_form
+          description: "生成UI表单供用户填写"
+          parameters:
+            type: object
+            properties:
+              formType:
+                type: string
+              fields:
+                type: array
+                items:
+                  type: object
+        - name: execute_batch_operation
+          description: "执行批量操作"
+          parameters:
+            type: object
+            properties:
+              operation:
+                type: string
+              items:
+                type: array
+                items:
+                  type: object
+        - name: convert_to_javascript
+          description: "转换为JavaScript代码供用户使用"
+          parameters:
+            type: object
+            properties:
+              action:
+                type: string
+              parameters:
+                type: object
+      toolChoice: auto
+    rateLimits:
+      requestsPerMinute: 60
+      tokensPerMinute: 100000
+
+  
+  supportedSceneTypes:
+    - content-publish
+    - marketing-automation
+    - social-media-management
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: false
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    maxSceneGroups: 10
+  
+  dependencies:
+    - id: skill-common
+      version: ">=1.0.0"
+      required: false
+      description: "通用工具类(间接)"
+    - id: skill-protocol
+      version: ">=1.0.0"
+      required: false
+      description: "协议处理服务(间接)"
+    - id: skill-user-auth
+      version: ">=0.7.0"
+      required: false
+      description: "用户认证服务(间接)"
+  
+  providedInterfaces:
+    - id: media-publish
+      version: "1.0"
+      description: "媒体发布接口"
+  
+  capabilities:
+    - id: article-publish
+      name: 图文发布
+      description: 发布图文消息到公众号
+      category: service
+    - id: article-update
+      name: 图文更新
+      description: 更新已发布图文
+      category: service
+    - id: article-delete
+      name: 图文删除
+      description: 删除已发布图文
+      category: service
+    - id: article-stats
+      name: 图文统计
+      description: 获取图文统计数据
+      category: service
+  
+  endpoints:
+    - path: /api/media/wechat/articles
+      method: POST
+      description: 发布图文
+      capability: article-publish
+    - path: /api/media/wechat/articles/{id}
+      method: PUT
+      description: 更新图文
+      capability: article-update
+    - path: /api/media/wechat/articles/{id}
+      method: DELETE
+      description: 删除图文
+      capability: article-delete
+    - path: /api/media/wechat/articles/{id}/stats
+      method: GET
+      description: 获取统计
+      capability: article-stats
+  
+  config:
+    required:
+      - name: WECHAT_APP_ID
+        type: string
+        description: 公众号AppID
+      - name: WECHAT_APP_SECRET
+        type: string
+        description: 公众号AppSecret
+    optional:
+      - name: WECHAT_API_URL
+        type: string
+        default: "https://api.weixin.qq.com"
+        description: API地址
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
+  
+  offline:
+    enabled: false
+
+  knowledge:
+    documents:
+      - id: overview
+        name: 功能概述
+        path: README.md
+        type: guide
+        language: zh
+        priority: high
+    ragConfig:
+      enabled: true
+      indexName: "skill-media-wechat-knowledge"
+      embeddingModel: text-embedding-3-small
+      chunkSize: 1000
+      chunkOverlap: 200
+      searchStrategy: hybrid
+      topK: 5
+      threshold: 0.7

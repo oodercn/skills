@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BPM Designer</title>
+    <link rel="stylesheet" href="css/var.css?v=1775564000">
+    <link rel="stylesheet" href="css/base.css?v=1775564000">
+    <link rel="stylesheet" href="css/main.css?v=1775564000">
+    <link rel="stylesheet" href="css/panel.css?v=1775564000">
+    <link rel="stylesheet" href="css/palette.css?v=1775564000">
+    <link rel="stylesheet" href="css/node.css?v=1775564000">
+    <link rel="stylesheet" href="css/tree.css?v=1775564000">
+    <link rel="stylesheet" href="css/chat.css?v=1775564000">
+    <script src="lib/icon/icons.js"></script>
+</head>
+<body>
+    <div id="app" class="d-app">
+        <div class="d-header">
+            <div class="d-header-left">
+                <span class="d-logo">BPM Designer</span>
+            </div>
+            <div class="d-header-center">
+                <span class="d-title" id="processName">未命名流程</span>
+            </div>
+            <div class="d-header-right">
+                <button class="d-btn d-btn-icon" id="btnTheme" title="切换主题"></button>
+                <button class="d-btn d-btn-secondary" id="btnImport"></button>
+                <button class="d-btn d-btn-secondary" id="btnExport"></button>
+                <button class="d-btn d-btn-primary" id="btnSave"></button>
+            </div>
+        </div>
+        
+        <div class="d-menubar" id="menubar">
+            <div class="d-menu-item" data-menu="file">
+                <span>文件</span>
+                <div class="d-menu-dropdown">
+                    <div class="d-menu-option" data-action="new"><span class="d-menu-icon"></span><span>新建流程</span><span class="d-menu-shortcut">Ctrl+N</span></div>
+                    <div class="d-menu-option" data-action="open"><span class="d-menu-icon"></span><span>打开流程</span><span class="d-menu-shortcut">Ctrl+O</span></div>
+                    <div class="d-menu-divider"></div>
+                    <div class="d-menu-option" data-action="save"><span class="d-menu-icon"></span><span>保存</span><span class="d-menu-shortcut">Ctrl+S</span></div>
+                    <div class="d-menu-option" data-action="saveAs"><span class="d-menu-icon"></span><span>另存为</span></div>
+                    <div class="d-menu-divider"></div>
+                    <div class="d-menu-option" data-action="import"><span class="d-menu-icon"></span><span>导入YAML</span></div>
+                    <div class="d-menu-option" data-action="export"><span class="d-menu-icon"></span><span>导出YAML</span></div>
+                </div>
+            </div>
+            <div class="d-menu-item" data-menu="edit">
+                <span>编辑</span>
+                <div class="d-menu-dropdown">
+                    <div class="d-menu-option" data-action="undo"><span class="d-menu-icon"></span><span>撤销</span><span class="d-menu-shortcut">Ctrl+Z</span></div>
+                    <div class="d-menu-option" data-action="redo"><span class="d-menu-icon"></span><span>重做</span><span class="d-menu-shortcut">Ctrl+Y</span></div>
+                    <div class="d-menu-divider"></div>
+                    <div class="d-menu-option" data-action="copy"><span class="d-menu-icon"></span><span>复制</span><span class="d-menu-shortcut">Ctrl+C</span></div>
+                    <div class="d-menu-option" data-action="paste"><span class="d-menu-icon"></span><span>粘贴</span><span class="d-menu-shortcut">Ctrl+V</span></div>
+                    <div class="d-menu-option" data-action="delete"><span class="d-menu-icon"></span><span>删除</span><span class="d-menu-shortcut">Delete</span></div>
+                </div>
+            </div>
+            <div class="d-menu-item" data-menu="view">
+                <span>视图</span>
+                <div class="d-menu-dropdown">
+                    <div class="d-menu-option" data-action="zoomIn"><span class="d-menu-icon"></span><span>放大</span><span class="d-menu-shortcut">Ctrl++</span></div>
+                    <div class="d-menu-option" data-action="zoomOut"><span class="d-menu-icon"></span><span>缩小</span><span class="d-menu-shortcut">Ctrl+-</span></div>
+                    <div class="d-menu-option" data-action="fit"><span class="d-menu-icon"></span><span>适应画布</span></div>
+                    <div class="d-menu-divider"></div>
+                    <div class="d-menu-option" data-action="togglePanel"><span class="d-menu-icon"></span><span>切换面板</span></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-body">
+            <aside class="d-sidebar" id="sidebar">
+                <div class="d-sidebar-tabs">
+                    <button class="d-sidebar-tab active" data-tab="tree" title="流程工程"></button>
+                    <button class="d-sidebar-tab" data-tab="elements" title="元素库"></button>
+                </div>
+                <div class="d-sidebar-content">
+                    <div class="d-sidebar-page active" id="pageTree">
+                        <div class="d-tree-header">
+                            <span>流程工程</span>
+                            <button class="d-btn d-btn-icon d-btn-sm" id="btnNewProcess" title="新建流程"></button>
+                        </div>
+                        <div class="d-tree-content" id="processTree"></div>
+                    </div>
+                    <div class="d-sidebar-page" id="pageElements">
+                        <div class="d-element-search">
+                            <input type="text" class="d-input" placeholder="搜索元素..." id="elementSearch">
+                        </div>
+                        <div class="d-element-groups" id="elementGroups"></div>
+                    </div>
+                </div>
+            </aside>
+            
+            <main class="d-main">
+                <div class="d-toolbar" id="toolbar">
+                    <div class="d-toolbar-group">
+                        <button class="d-btn d-btn-icon" id="btnUndo" title="撤销 (Ctrl+Z)"></button>
+                        <button class="d-btn d-btn-icon" id="btnRedo" title="重做 (Ctrl+Y)"></button>
+                    </div>
+                    <span class="d-toolbar-divider"></span>
+                    <div class="d-toolbar-group">
+                        <button class="d-btn d-btn-icon" id="btnZoomIn" title="放大"></button>
+                        <button class="d-btn d-btn-icon" id="btnZoomOut" title="缩小"></button>
+                        <button class="d-btn d-btn-icon" id="btnFit" title="适应画布"></button>
+                        <span class="d-zoom-level" id="zoomLevel">100%</span>
+                    </div>
+                    <span class="d-toolbar-divider"></span>
+                    <div class="d-toolbar-group">
+                        <button class="d-btn d-btn-icon" id="btnAlignLeft" title="左对齐"></button>
+                        <button class="d-btn d-btn-icon" id="btnAlignCenter" title="居中对齐"></button>
+                        <button class="d-btn d-btn-icon" id="btnAlignRight" title="右对齐"></button>
+                    </div>
+                    <span class="d-toolbar-divider"></span>
+                    <div class="d-toolbar-group">
+                        <button class="d-btn d-btn-icon" id="btnDelete" title="删除 (Delete)"></button>
+                    </div>
+                </div>
+                
+                <div class="d-tabs" id="processTabs">
+                    <div class="d-tabs-bar">
+                        <div class="d-tabs-list" id="tabsList"></div>
+                        <button class="d-btn d-btn-icon d-btn-sm d-tabs-new" id="btnNewTab" title="新建流程"></button>
+                    </div>
+                </div>
+                
+                <div class="d-canvas-wrap">
+                    <div class="d-canvas" id="canvas"></div>
+                </div>
+            </main>
+            
+            <aside class="d-panel" id="panel">
+                <div class="d-panel-header">
+                    <span class="d-panel-title" id="panelTitle">属性</span>
+                    <div class="d-panel-actions">
+                        <button class="d-btn d-btn-icon d-btn-sm" id="btnPanelPin" title="置顶"></button>
+                        <button class="d-btn d-btn-icon d-btn-sm" id="btnPanelClose" title="关闭"></button>
+                    </div>
+                </div>
+                <div class="d-panel-tabs" id="panelTabs"></div>
+                <div class="d-panel-content" id="panelContent">
+                    <div class="d-empty">
+                        <p>请选择元素查看属性</p>
+                    </div>
+                </div>
+            </aside>
+        </div>
+    </div>
+    
+    <div class="d-chat collapsed" id="chatPanel">
+        <div class="d-chat-header">
+            <span class="d-chat-title">
+                <span class="chat-icon"></span> <span>AI 助手</span>
+            </span>
+            <button class="d-btn d-btn-icon d-btn-sm" id="btnChatToggle"></button>
+        </div>
+        <div class="d-chat-messages" id="chatMessages">
+            <div class="d-chat-welcome">
+                <span class="welcome-icon"></span>
+                <p>你好！我是 BPM 设计助手</p>
+                <ul>
+                    <li>创建和修改流程</li>
+                    <li>配置活动属性</li>
+                    <li>设计 Agent 任务</li>
+                    <li>生成 YAML 定义</li>
+                </ul>
+            </div>
+        </div>
+        <div class="d-chat-input">
+            <textarea class="d-chat-textarea" id="chatInput" placeholder="输入消息..."></textarea>
+            <button class="d-btn d-btn-primary d-btn-sm" id="btnChatSend"></button>
+        </div>
+    </div>
+    
+    <button class="d-chat-toggle" id="btnChatOpen" title="AI 助手"></button>
+    
+    <div class="d-modal" id="modalYaml">
+        <div class="d-modal-mask"></div>
+        <div class="d-modal-content">
+            <div class="d-modal-header">
+                <span class="d-modal-title">YAML 导入/导出</span>
+                <button class="d-btn d-btn-icon" id="btnModalClose"></button>
+            </div>
+            <div class="d-modal-body">
+                <textarea class="d-textarea" id="yamlContent" placeholder="YAML 内容..."></textarea>
+            </div>
+            <div class="d-modal-footer">
+                <button class="d-btn d-btn-secondary" id="btnYamlCancel">取消</button>
+                <button class="d-btn d-btn-primary" id="btnYamlConfirm">确认</button>
+            </div>
+        </div>
+    </div>
+    
+    <div class="d-toast" id="toast"></div>
+    
+    <script src="js/model/ProcessDef.js?v=1775564000"></script>
+    <script src="js/model/ActivityDef.js?v=1775564000"></script>
+    <script src="js/model/RouteDef.js?v=1775564000"></script>
+    <script src="js/model/AgentDef.js?v=1775564000"></script>
+    <script src="js/model/SceneDef.js?v=1775564000"></script>
+    <script src="js/sdk/Api.js?v=1775564000"></script>
+    <script src="js/sdk/Store.js?v=1775564000"></script>
+    <script src="js/sdk/Theme.js?v=1775564000"></script>
+    <script src="js/sdk/PanelSchema.js?v=1775564000"></script>
+    <script src="js/panel/PanelManager.js?v=1775564000"></script>
+    <script src="js/ContextMenu.js?v=1775564000"></script>
+    <script src="js/Tree.js?v=1775564000"></script>
+    <script src="js/Elements.js?v=1775564000"></script>
+    <script src="js/Canvas.js?v=1775564000"></script>
+    <script src="js/Chat.js?v=1775564000"></script>
+    <script src="js/Toolbar.js?v=1775564000"></script>
+    <script src="js/TabManager.js?v=1775564000"></script>
+    <script src="js/App.js?v=1775564000"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            window.app = new App();
+            window.app.init();
+        });
+    </script>
+</body>
+</html>

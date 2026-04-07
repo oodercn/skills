@@ -15,11 +15,13 @@ metadata:
     - share
     - permission
     - collaboration
-  category: biz
   sceneCategory: ass
 
 spec:
   skillForm: SCENE
+  
+  capability:
+    category: biz
   
   scene:
     type: AUTO

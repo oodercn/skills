@@ -12,6 +12,11 @@ metadata:
 
 spec:
   skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - PERSISTENT
   type: system-skill
 
   ownership: platform

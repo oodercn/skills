@@ -1,0 +1,76 @@
+apiVersion: skill.ooder.net/v1
+kind: SkillPackage
+
+metadata:
+  id: skill-llm-chat
+  name: LLM Chat Service
+  version: "3.0.2"
+  description: LLM聊天服务模块 - 提供LLM配置功能、多Provider支持和知识库集成能力
+  author: Ooder Team
+  icon: ri-chat-ai-line
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: LLM
+  sceneType: AUTO
+  purposes:
+    - AI_INTEGRATION
+    - TEAM
+  
+  capability:
+    category: llm
+  
+  capabilities:
+    - id: chat
+      name: 对话服务
+      description: 多轮对话服务
+      category: ai
+      autoBind: true
+    - id: streaming
+      name: 流式输出
+      description: SSE流式输出
+      category: ai
+      autoBind: false
+    - id: function-calling
+      name: 函数调用
+      description: Function Calling支持
+      category: ai
+      autoBind: false
+    - id: knowledge-integration
+      name: 知识库集成
+      description: RAG知识库集成
+      category: ai
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      defaultProvider:
+        type: string
+        title: 默认LLM提供商
+        default: "deepseek"
+      defaultModel:
+        type: string
+        title: 默认模型
+        default: "deepseek-chat"
+      maxTokens:
+        type: integer
+        default: 4096
+        title: 最大Token数
+      temperature:
+        type: number
+        default: 0.7
+        title: 温度参数
+      enableStreaming:
+        type: boolean
+        default: true
+        title: 启用流式输出
+        
+  estimatedResources:
+    cpu: "100m"
+    memory: "256Mi"

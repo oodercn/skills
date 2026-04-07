@@ -20,6 +20,11 @@ metadata:
 
 spec:
   skillForm: PROVIDER
+  skillCategory: KNOWLEDGE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - KNOWLEDGE_MANAGEMENT
   type: system-skill
 
   ownership: platform

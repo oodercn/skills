@@ -17,6 +17,11 @@ metadata:
 
 spec:
   skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - TEAM
+    - STATE_MANAGEMENT
   type: business-skill
 
   ownership: platform
