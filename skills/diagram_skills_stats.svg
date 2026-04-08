@@ -1,0 +1,163 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 580" width="900px" height="580px">
+<defs>
+    <style>
+        .bg { fill: #fafafa; }
+        .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 8; }
+        .title-box { fill: #2563eb; stroke: none; rx: 4; }
+        .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; fill: #334155; }
+        .text-title { font-size: 15px; font-weight: bold; fill: #1e40af; }
+        .text-header { font-size: 17px; font-weight: bold; fill: #ffffff; }
+        .text-small { font-size: 10px; fill: #64748b; }
+        .text-num { font-size: 22px; font-weight: bold; fill: #1e40af; }
+    </style>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+
+<rect class="title-box" x="20" y="10" width="860" height="38" rx="4"/>
+<text class="text-header" x="450" y="36" text-anchor="middle">OoderAgent 技能库分类统计（137个模块）</text>
+
+<!-- Bar Chart - Left Side -->
+<text class="text-title" x="30" y="70">各层技能数量分布</text>
+
+<!-- _drivers bar -->
+<rect x="30" y="85" width="259" height="28" fill="#3b82f6" rx="4"/>
+<text class="text" x="297" y="104">37 驱动层 (_drivers) 27%</text>
+
+<!-- _system bar -->
+<rect x="30" y="120" width="224" height="28" fill="#60a5fa" rx="4"/>
+<text class="text" x="262" y="139">32 系统层 (_system) 23%</text>
+
+<!-- capabilities bar -->
+<rect x="30" y="155" width="168" height="28" fill="#93c5fd" rx="4"/>
+<text class="text" x="206" y="174">24 能力层 (capabilities) 18%</text>
+
+<!-- scenes bar -->
+<rect x="30" y="190" width="112" height="28" fill="#bfdbfe" rx="4"/>
+<text class="text" x="150" y="209">16 场景层 (scenes) 12%</text>
+
+<!-- _business bar -->
+<rect x="30" y="225" width="77" height="28" fill="#dbeafe" stroke="#2563eb" rx="4"/>
+<text class="text" x="115" y="244">11 业务层 (_business) 8%</text>
+
+<!-- tools bar -->
+<rect x="30" y="260" width="70" height="28" fill="#eff6ff" stroke="#2563eb" rx="4"/>
+<text class="text" x="108" y="279">10 工具层 (tools) 7%</text>
+
+<!-- _base bar -->
+<rect x="30" y="295" width="28" height="28" fill="#fef3c7" stroke="#d97706" rx="4"/>
+<text class="text" x="66" y="314">4 基础层 (_base) 3%</text>
+
+<!-- Right Side: Key Skills Detail Cards -->
+<text class="text-title" x="480" y="70">关键技能模块说明</text>
+
+<!-- Card 1: LLM Drivers -->
+<rect class="box" x="480" y="82" width="380" height="75" fill="#fef3c7" stroke="#d97706"/>
+<text class="text-title" x="495" y="100">🤖 LLM 驱动矩阵（8个）</text>
+<text class="text-small" x="495" y="118">DeepSeek · OpenAI · 通义千问 · 文心一言</text>
+<text class="text-small" x="495" y="133">火山引擎(Ollama本地) · LLM Base/Monitor</text>
+<text class="text-small" x="495" y="148">→ 统一 LlmProvider 接口，切换零成本</text>
+
+<!-- Card 2: IM Drivers -->
+<rect class="box" x="480" y="165" width="180" height="55" fill="#dbeafe" stroke="#2563eb"/>
+<text class="text-title" x="495" y="183">💬 IM驱动(4)</text>
+<text class="text-small" x="495" y="201">钉钉·飞书·企业微信·微信</text>
+
+<!-- Card 3: Media Drivers -->
+<rect class="box" x="680" y="165" width="180" height="55" fill="#dbeafe" stroke="#2563eb"/>
+<text class="text-title" x="695" y="183">📰 媒体发布(5)</text>
+<text class="text-small" x="695" y="201">头条·公众号·微博·小红书·知乎</text>
+
+<!-- Card 4: Payment Drivers -->
+<rect class="box" x="480" y="228" width="180" height="55" fill="#dbeafe" stroke="#2563eb"/>
+<text class="text-title" x="495" y="246">💳 支付驱动(3)</text>
+<text class="text-small" x="495" y="264">支付宝·微信支付·银联</text>
+
+<!-- Card 5: Org/VFS/BPM -->
+<rect class="box" x="680" y="228" width="180" height="55" fill="#dbeafe" stroke="#2563eb"/>
+<text class="text-title" x="695" y="246">🏢 组织/文件/BPM(17)</text>
+<text class="text-small" x="695" y="264">钉钉/飞书/微信/LDAP + VFS + BPM</text>
+
+<!-- Card 6: System Core -->
+<rect class="box" x="480" y="291" width="380" height="65" fill="#f0f9ff" stroke="#0ea5e9"/>
+<text class="text-title" x="495" y="309">⚙️ 系统核心服务（重点）</text>
+<text class="text-small" x="495" y="327">skill-auth 认证 · skill-config 配置 · skill-workflow 工作流</text>
+<text class="text-small" x="495" y="342">skill-rag RAG检索 · skill-knowledge 知识管理 · skill-messaging 消息</text>
+
+<!-- Bottom: Capabilities Grid -->
+<text class="text-title" x="30" y="340">能力层详细分类</text>
+
+<rect class="box" x="30" y="355" width="130" height="80" fill="#dcfce7" stroke="#f59e0b"/>
+<text class="text-title" x="95" y="375" text-anchor="middle">通信(4)</text>
+<text class="text-small" x="45" y="395">Email IM MQTT</text>
+<text class="text-small" x="45" y="410">群组 通知 消息</text>
+<text class="text-small" x="45" y="425">IM</text>
+
+<rect class="box" x="175" y="355" width="130" height="80" fill="#fce7f3" stroke="#ec4899"/>
+<text class="text-title" x="240" y="375" text-anchor="middle">监控(5)</text>
+<text class="text-small" x="190" y="395">Health Monitor</text>
+<text class="text-small" x="190" y="410">网络 远程终端</text>
+
+<rect class="box" x="320" y="355" width="130" height="80" fill="#d1fae5" stroke="#10b981"/>
+<text class="text-title" x="385" y="375" text-anchor="middle">基础设施(6)</text>
+<text class="text-small" x="330" y="395">K8s 托管 故障转移</text>
+<text class="text-small" x="330" y="410">负载均衡 OpenWrt</text>
+
+<rect class="box" x="465" y="355" width="130" height="80" fill="#ede9fe" stroke:#8b5cf6"/>
+<text class="text-title" x="530" y="375" text-anchor="middle">调度/搜索(4)</text>
+<text class="text-small" x="475" y="395">Quartz Task</text>
+<text class="text-small" x="475" y="410">Search Elastic</text>
+
+<rect class="box" x="610" y="355" width="130" height="80" fill="#fee2e2" stroke="#ef4444"/>
+<text class="text-title" x="675" y="375" text-anchor="middle">认证/LLM(5)</text>
+<text class="text-small" x="620" y="395">UserAuth LLM</text>
+<text class="text-small" x="620" y="410">Config Manager</text>
+
+<rect class="box" x="750" y="355" width="110" height="80" fill="#cffafe" stroke="#14b8a6"/>
+<text class="text-title" x="805" y="375" text-anchor="middle">场景(1)</text>
+<text class="text-small" x="765" y="395">Scenes</text>
+<text class="text-small" x="765" y="410">管理器</text>
+
+<!-- Scenes Layer -->
+<text class="text-title" x="30" y="450">场景层（16个业务场景）</text>
+<rect class="box" x="30" y="462" width="120" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="90" y="482" text-anchor="middle">日报生成</text>
+<text class="text" x="90" y="500" text-anchor="middle" style="font-size:9px;">daily-report</text>
+
+<rect class="box" x="160" y="462" width="120" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="220" y="482" text-anchor="middle">会议纪要</text>
+<text class="text" x="220" y="500" text-anchor="middle" style="font-size:9px;">meeting-minutes</text>
+
+<rect class="box" x="290" y="462" width="120" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="350" y="482" text-anchor="middle">审批表单</text>
+<text class="text" x="350" y="500" text-anchor="middle" style="font-size:9px;">approval-form</text>
+
+<rect class="box" x="420" y="462" width="120" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="480" y="482" text-anchor="middle">知识问答</text>
+<text class="text" x="480" y="500" text-anchor="middle" style="font-size:9px;">knowledge-qa</text>
+
+<rect class="box" x="550" y="462" width="140" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="620" y="482" text-anchor="middle">入职助手</text>
+<text class="text" x="620" y="500" text-anchor="middle" style="font-size:9px;">onboarding-assistant</text>
+
+<rect class="box" x="700" y="462" width="160" height="50" fill="#fef3c7" stroke="#d97706"/>
+<text class="text" x="780" y="482" text-anchor="middle">更多场景...</text>
+<text class="text" x="780" y="500" text-anchor="middle" style="font-size:9px;">协作/文档/招聘等11个</text>
+
+<!-- Tools Layer -->
+<text class="text-title" x="30" y="530">工具层（10个辅助工具）</text>
+<rect class="box" x="30" y="542" width="100" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="80" y="562" text-anchor="middle">CLI工具</text>
+<rect class="box" x="140" y="542" width="100" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="190" y="562" text-anchor="middle">日历</text>
+<rect class="box" x="250" y="542" width="110" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="305" y="562" text-anchor="middle">文档处理</text>
+<rect class="box" x="370" y="542" width="100" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="420" y="562" text-anchor="middle">技能市场</text>
+<rect class="box" x="480" y="542" width="100" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="530" y="562" text-anchor="middle">消息推送</text>
+<rect class="box" x="590" y="542" width="100" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="640" y="562" text-anchor="middle">报表</text>
+<rect class="box" x="700" y="542" width="80" height="30" fill="#f1f5f9" stroke="#94a3b8"/>
+<text class="text" x="740" y="562" text-anchor="middle">分享</text>
+</svg>

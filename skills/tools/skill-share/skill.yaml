@@ -1,0 +1,64 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-share
+  name: Skill Share Service
+  version: "3.0.1"
+  description: 技能分享服务，支持技能共享、接收、版本管理等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/tools/skill-share
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - share
+    - skill
+    - exchange
+    - marketplace
+
+spec:
+  skillForm: TOOL
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - SHARING
+    - COLLABORATION
+
+  ownership: platform
+
+  capability:
+    category: tool
+    code: SKILL_SHARE
+    operations: [share, receive, version]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.share.SkillShareApplication
+
+  providedInterfaces:
+    - id: net.ooder.scene.provider.SkillShareProvider
+      version: "1.0"
+      description: "技能分享提供商接口"
+
+  capabilities:
+    - id: share
+      name: 技能分享
+      description: 分享技能给其他用户
+      category: share
+    - id: receive
+      name: 技能接收
+      description: 接收其他用户分享的技能
+      category: share
+    - id: version
+      name: 版本管理
+      description: 管理分享技能的版本
+      category: share
+
+  config:
+    optional:
+      - name: SHARE_STORAGE_PATH
+        type: string
+        default: ./data/share
+        description: 分享存储路径

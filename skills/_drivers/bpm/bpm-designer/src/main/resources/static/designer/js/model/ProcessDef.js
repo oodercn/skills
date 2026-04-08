@@ -32,12 +32,35 @@ class ProcessDef {
         this.extendedAttributes = data?.extendedAttributes || {};
         this.agentConfig = data?.agentConfig || null;
         this.sceneConfig = data?.sceneConfig || null;
+        
+        this.activitySets = data?.activitySets || [];
+        this.subProcessRefs = data?.subProcessRefs || [];
+        
         this.createdTime = data?.createdTime || new Date().toISOString();
         this.updatedTime = data?.updatedTime || new Date().toISOString();
     }
 
     _generateId() {
         return 'proc_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+    }
+    
+    addActivity(activity) {
+        this.activities.push(activity);
+        this._updateTime();
+    }
+    
+    addActivitySet(activitySet) {
+        this.activitySets.push(activitySet);
+        this._updateTime();
+    }
+    
+    getActivitySet(activitySetId) {
+        return this.activitySets.find(as => as.id === activitySetId);
+    }
+    
+    addSubProcessRef(ref) {
+        this.subProcessRefs.push(ref);
+        this._updateTime();
     }
 
     addActivity(activity) {
@@ -71,11 +94,12 @@ class ProcessDef {
 
     toJSON() {
         const activities = this.activities.map(a => {
-            if (a.position === 'START' || a.position === 'END' || a.activityType === 'START' || a.activityType === 'END') {
+            if (a.activityType === 'START' || a.activityType === 'END') {
                 return {
                     activityDefId: a.activityDefId,
-                    name: a.name || (a.position === 'START' || a.activityType === 'START' ? '开始' : '结束'),
-                    position: a.position || (a.activityType === 'START' ? 'START' : 'END'),
+                    name: a.name || (a.activityType === 'START' ? '开始' : '结束'),
+                    position: a.activityType,
+                    activityType: a.activityType,
                     positionCoord: a.positionCoord
                 };
             }

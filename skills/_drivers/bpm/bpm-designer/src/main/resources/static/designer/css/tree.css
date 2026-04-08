@@ -82,17 +82,17 @@
 }
 
 .d-tree-status.status-released {
-    background: rgba(16, 185, 129, 0.2);
+    background: color-mix(in srgb, var(--emerald) 20%, transparent);
     color: var(--emerald) !important;
 }
 
 .d-tree-status.status-draft {
-    background: rgba(245, 158, 11, 0.2);
+    background: color-mix(in srgb, var(--amber) 20%, transparent);
     color: var(--amber) !important;
 }
 
 .d-tree-status.status-test {
-    background: rgba(99, 102, 241, 0.2);
+    background: color-mix(in srgb, var(--indigo) 20%, transparent);
     color: var(--indigo) !important;
 }
 

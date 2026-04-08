@@ -1,0 +1,121 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-spi-messaging
+  name: Skill SPI Messaging
+  version: "3.0.1"
+  description: 统一消息服务SPI模块，定义跨平台消息服务的标准接口，支持WebSocket、IM、会话管理等
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_base/skill-spi-messaging
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - spi
+    - messaging
+    - websocket
+    - im
+    - chat
+    - session
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: INFRASTRUCTURE
+  sceneType: AUTO
+  purposes:
+    - INFRASTRUCTURE
+    - MESSAGING
+    - INTEGRATION
+  
+  ownership: platform
+  
+  capability:
+    category: messaging
+    code: SPI_MESSAGING
+    operations: [send-message, stream-message, session-manage, websocket]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: none
+    mainClass: N/A
+
+  providedInterfaces:
+    - id: net.ooder.spi.messaging.UnifiedMessagingService
+      version: "1.0"
+      description: "统一消息服务接口"
+    - id: net.ooder.spi.messaging.UnifiedSessionService
+      version: "1.0"
+      description: "统一会话服务接口"
+    - id: net.ooder.spi.messaging.UnifiedWebSocketService
+      version: "1.0"
+      description: "统一WebSocket服务接口"
+    - id: net.ooder.spi.messaging.MessageStreamHandler
+      version: "1.0"
+      description: "消息流处理器接口"
+
+  capabilities:
+    - id: send-message
+      name: 发送消息
+      description: 发送统一消息，支持多种消息类型
+      category: messaging
+    - id: stream-message
+      name: 流式消息
+      description: 支持流式消息发送和处理
+      category: messaging
+    - id: session-manage
+      name: 会话管理
+      description: 创建、查询、管理会话
+      category: messaging
+    - id: websocket
+      name: WebSocket服务
+      description: WebSocket连接和令牌管理
+      category: messaging
+
+  dataModels:
+    - name: UnifiedMessage
+      description: 统一消息模型
+    - name: UnifiedSession
+      description: 统一会话模型
+    - name: SendMessageRequest
+      description: 发送消息请求
+    - name: CreateSessionRequest
+      description: 创建会话请求
+    - name: MessageType
+      description: 消息类型枚举
+    - name: SessionType
+      description: 会话类型枚举
+    - name: ConversationType
+      description: 对话类型枚举
+    - name: MessageStatus
+      description: 消息状态枚举
+    - name: Participant
+      description: 参与者模型
+    - name: WsToken
+      description: WebSocket令牌
+
+  exports:
+    packages:
+      - net.ooder.spi.messaging
+      - net.ooder.spi.messaging.model
+
+  dependencies:
+    - id: ooder-spi-core
+      version: ">=3.0.1"
+
+  notes: |
+    统一消息服务SPI模块，提供跨平台消息服务接口。
+    
+    核心服务:
+    - UnifiedMessagingService: 统一消息服务
+    - UnifiedSessionService: 统一会话服务
+    - UnifiedWebSocketService: 统一WebSocket服务
+    
+    支持的消息类型:
+    - TEXT: 文本消息
+    - IMAGE: 图片消息
+    - FILE: 文件消息
+    - AUDIO: 音频消息
+    - VIDEO: 视频消息
+    - CARD: 卡片消息
+    - ACTION: 动作消息

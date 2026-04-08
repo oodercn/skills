@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-failover-manager
   name: Failover Manager
-  version: "3.0.2"
+  version: "3.0.1"
   description: Skill for managing failover and circuit breaker patterns
   author: Ooder Team
   icon: ri-refresh-line
@@ -23,17 +23,16 @@ spec:
   capabilities:
     - id: failover
       name: Failover
-      description: 故障转移
+      description: 鏁呴殰杞Щ
       category: infrastructure
       autoBind: true
     - id: circuit-breaker
       name: Circuit Breaker
-      description: 熔断器
-      category: infrastructure
+      description: 鐔旀柇鍣?      category: infrastructure
       autoBind: true
     - id: health-monitoring
       name: Health Monitoring
-      description: 健康监控
+      description: 鍋ュ悍鐩戞帶
       category: infrastructure
       autoBind: false
       
@@ -48,11 +47,10 @@ spec:
       failureThreshold:
         type: integer
         default: 5
-        title: 故障阈值
-      recoveryTimeout:
+        title: 鏁呴殰闃堝€?      recoveryTimeout:
         type: integer
         default: 30000
-        title: 恢复超时(ms)
+        title: 鎭㈠瓒呮椂(ms)
         
   estimatedResources:
     cpu: "100m"

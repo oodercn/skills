@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-scheduler-quartz
-  name: Quartz调度服务
-  version: 0.7.3
-  description: Quartz调度服务，提供定时任务调度、执行管理
-  author: ooder Team
+  name: Quartz璋冨害鏈嶅姟
+  version: "3.0.1"
+  description: Quartz璋冨害鏈嶅姟锛屾彁渚涘畾鏃朵换鍔¤皟搴︺€佹墽琛岀鐞?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -53,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,34 +130,34 @@ spec:
   providedInterfaces:
     - id: scheduler-service
       version: "1.0"
-      description: "调度服务接口"
+      description: "璋冨害鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: schedule
-      name: 任务调度
-      description: 调度定时任务
+      name: 浠诲姟璋冨害
+      description: 璋冨害瀹氭椂浠诲姟
       category: service
     - id: execute
-      name: 任务执行
-      description: 执行任务
+      name: 浠诲姟鎵ц
+      description: 鎵ц浠诲姟
       category: service
     - id: manage
-      name: 任务管理
-      description: 管理任务
+      name: 浠诲姟绠＄悊
+      description: 绠＄悊浠诲姟
       category: service
   
   endpoints:
     - path: /api/scheduler/jobs
       method: POST
-      description: 创建任务
+      description: 鍒涘缓浠诲姟
       capability: schedule
     - path: /api/scheduler/jobs/{name}/trigger
       method: POST
-      description: 触发任务
+      description: 瑙﹀彂浠诲姟
       capability: execute
     - path: /api/scheduler/jobs
       method: GET
-      description: 获取任务列表
+      description: 鑾峰彇浠诲姟鍒楄〃
       capability: manage
   
   config:
@@ -166,11 +165,10 @@ spec:
       - name: THREAD_POOL_SIZE
         type: integer
         default: 10
-        description: 线程池大小
-      - name: JOB_STORE
+        description: 绾跨▼姹犲ぇ灏?      - name: JOB_STORE
         type: string
         default: "memory"
-        description: 任务存储类型
+        description: 浠诲姟瀛樺偍绫诲瀷
   
   resources:
     cpu: "100m"
@@ -185,7 +183,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

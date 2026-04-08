@@ -1,0 +1,119 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-template
+  name: 场景模板服务
+  version: 1.0.0
+  description: 提供场景模板管理、部署、依赖安装等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: SCENE
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2C
+    category: SYS
+    code: SYS_TEMPLATE
+    operations: [list, get, deploy, install, check]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  dependencies:
+    - skillId: skill-scene
+      version: ">=1.0.0"
+      required: true
+    - skillId: skill-discovery
+      version: ">=1.0.0"
+      required: true
+    - skillId: skill-install
+      version: ">=1.0.0"
+      required: true
+  
+  endpoints:
+    - path: /api/v1/templates
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: listTemplates
+      description: 获取模板列表
+      capability: list
+    - path: /api/v1/templates/{templateId}
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: getTemplate
+      description: 获取模板详情
+      capability: get
+    - path: /api/v1/templates/{templateId}/deploy
+      method: POST
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: deployTemplate
+      description: 部署模板
+      capability: deploy
+    - path: /api/v1/templates/{templateId}/deploy/stream
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: deployTemplateWithProgress
+      description: SSE方式部署模板
+      capability: deploy
+    - path: /api/v1/templates/{templateId}/install
+      method: POST
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: installTemplate
+      description: 安装模板依赖
+      capability: install
+    - path: /api/v1/templates/{templateId}/dependencies/health
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: checkDependenciesHealth
+      description: 检查依赖健康状态
+      capability: check
+    - path: /api/v1/templates/{templateId}/dependencies/missing
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: getMissingDependencies
+      description: 获取缺失的依赖
+      capability: check
+    - path: /api/v1/templates/{templateId}/dependencies/auto-install
+      method: POST
+      controllerClass: net.ooder.skill.template.controller.SceneTemplateController
+      methodName: autoInstallDependencies
+      description: 自动安装依赖
+      capability: install
+    - path: /api/v1/fused-templates
+      method: GET
+      controllerClass: net.ooder.skill.template.controller.FusionTemplateController
+      methodName: list
+      description: 获取融合模板列表
+      capability: list
+    - path: /api/v1/fused-templates/fuse
+      method: POST
+      controllerClass: net.ooder.skill.template.controller.FusionTemplateController
+      methodName: fuse
+      description: 融合模板
+      capability: deploy
+    - path: /api/v1/fused-templates/preview
+      method: POST
+      controllerClass: net.ooder.skill.template.controller.FusionTemplateController
+      methodName: preview
+      description: 预览融合结果
+      capability: get
+  
+  config:
+    optional:
+      - name: TEMPLATE_PATH
+        type: string
+        default: "./templates"
+        description: 模板文件路径
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

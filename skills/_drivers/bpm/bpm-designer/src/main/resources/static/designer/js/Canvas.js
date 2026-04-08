@@ -1,7 +1,8 @@
 class Canvas {
-    constructor(container, store) {
+    constructor(container, store, app = null) {
         this.container = container;
         this.store = store;
+        this.app = app;
         this.nodes = new Map();
         this.edges = new Map();
         this.scale = 1;
@@ -198,11 +199,42 @@ class Canvas {
             }
         });
         
-        if (this.selectedNodes.size === 1) {
+        this.edges.forEach((edgeData, id) => {
+            const edgeEl = this.edgeGroup.querySelector(`[data-edge-id="${id}"]`);
+            if (edgeEl) {
+                const path = edgeEl.querySelector('path');
+                if (path) {
+                    const bbox = path.getBBox();
+                    const edgeLeft = bbox.x;
+                    const edgeTop = bbox.y;
+                    const edgeRight = bbox.x + bbox.width;
+                    const edgeBottom = bbox.y + bbox.height;
+                    
+                    if (edgeLeft < right && edgeRight > left && edgeTop < bottom && edgeBottom > top) {
+                        edgeEl.classList.add('d-edge-selected');
+                        if (!this.selectedEdges) this.selectedEdges = new Set();
+                        this.selectedEdges.add(id);
+                    }
+                }
+            }
+        });
+        
+        const totalSelected = this.selectedNodes.size + (this.selectedEdges?.size || 0);
+        
+        if (this.selectedNodes.size === 1 && totalSelected === 1) {
             const id = Array.from(this.selectedNodes)[0];
             this.store.selectActivity(id);
-        } else if (this.selectedNodes.size > 1) {
-            this.store.emit('nodes:multi-select', Array.from(this.selectedNodes));
+        } else if (this.selectedEdges?.size === 1 && this.selectedNodes.size === 0) {
+            const id = Array.from(this.selectedEdges)[0];
+            const edge = this.edges.get(id);
+            if (edge) {
+                this.store.selectRoute(id);
+            }
+        } else if (totalSelected > 1) {
+            this.store.emit('elements:multi-select', {
+                nodes: Array.from(this.selectedNodes),
+                edges: Array.from(this.selectedEdges || [])
+            });
         }
     }
 
@@ -396,6 +428,14 @@ class Canvas {
                     node.classList.add('d-node-selected');
                 }
                 
+                if (this.selectedNodes.size === 1) {
+                    this.store.selectActivity(activity.activityDefId);
+                } else if (this.selectedNodes.size === 0) {
+                    this.store.selectActivity(null);
+                } else {
+                    this.store.emit('nodes:multi-select', Array.from(this.selectedNodes));
+                }
+                
                 this._startDragNode(e, node, activity);
             }
         });
@@ -423,7 +463,42 @@ class Canvas {
                 { label: '属性', icon: 'setting', action: () => this.store.selectActivity(activity.activityDefId) }
             ];
             
-            ContextMenu.show(e.clientX, e.clientY, items);
+            if (activity.implementation === 'IMPL_SUBFLOW' || activity.activityType === 'SUBPROCESS') {
+                items.push({ divider: true });
+                items.push({ label: '进入子流程', icon: 'subprocess', action: () => this._openSubprocess(activity) });
+            }
+            
+            if (activity.implementation === 'IMPL_OUTFLOW') {
+                items.push({ divider: true });
+                items.push({ label: '进入外部流程', icon: 'outflow', action: () => this._openOutflow(activity) });
+            }
+            
+            if (activity.activityCategory === 'AGENT') {
+                items.push({ divider: true });
+                items.push({ label: '配置Agent', icon: 'robot', action: () => this.store.selectActivity(activity.activityDefId) });
+            }
+            
+            if (activity.activityCategory === 'SCENE') {
+                items.push({ divider: true });
+                items.push({ label: '配置场景', icon: 'scene', action: () => this.store.selectActivity(activity.activityDefId) });
+            }
+            
+            window.ContextMenu.show(e.clientX, e.clientY, items);
+        });
+        
+        node.addEventListener('dblclick', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            console.log('[Canvas] Node double click:', activity.activityDefId, activity.implementation, activity.activityType);
+            
+            if (activity.implementation === 'IMPL_SUBFLOW' || activity.activityType === 'SUBPROCESS') {
+                this._openSubprocess(activity);
+            } else if (activity.implementation === 'IMPL_OUTFLOW') {
+                this._openOutflow(activity);
+            } else {
+                this._editNode(activity);
+            }
         });
     }
 
@@ -434,6 +509,54 @@ class Canvas {
     _deleteNode(activityDefId) {
         this.store.removeActivity(activityDefId);
         this.removeNode(activityDefId);
+    }
+
+    _openSubprocess(activity) {
+        console.log('[Canvas] Opening subprocess for activity:', activity.activityDefId);
+        
+        const subFlowConfig = activity.subFlow || {};
+        const processDefId = subFlowConfig.processDefId;
+        
+        if (!processDefId) {
+            const newProcessDef = {
+                processDefId: 'sub_' + Date.now(),
+                name: activity.name + ' - 子流程',
+                description: '子流程: ' + activity.name,
+                activities: [],
+                routes: []
+            };
+            
+            this.store.emit('subprocess:open', {
+                activityId: activity.activityDefId,
+                processDef: newProcessDef,
+                parentTabId: this.app.tabManager.activeTabId
+            });
+        } else {
+            this.store.emit('subprocess:open-existing', {
+                activityId: activity.activityDefId,
+                processDefId: processDefId,
+                version: subFlowConfig.version,
+                parentTabId: this.app.tabManager.activeTabId
+            });
+        }
+    }
+
+    _openOutflow(activity) {
+        console.log('[Canvas] Opening outflow for activity:', activity.activityDefId);
+        
+        const outFlowConfig = activity.outFlow || {};
+        const processDefId = outFlowConfig.processDefId;
+        
+        if (!processDefId) {
+            this.app._toast('请先配置外部流程ID', 'warning');
+            this.store.selectActivity(activity.activityDefId);
+        } else {
+            this.store.emit('outflow:open', {
+                activityId: activity.activityDefId,
+                processDefId: processDefId,
+                parentTabId: this.app.tabManager.activeTabId
+            });
+        }
     }
 
     _startDragNode(e, node, activity) {
@@ -932,17 +1055,11 @@ class Canvas {
             processDef.activities = [];
         }
         
-        const hasStart = processDef.activities.some(a => 
-            a.position === 'START' || a.activityType === 'START' || a.position === 'POSITION_START'
-        );
-        const hasEnd = processDef.activities.some(a => 
-            a.position === 'END' || a.activityType === 'END' || a.position === 'POSITION_END'
-        );
+        const hasStart = processDef.activities.some(a => a.activityType === 'START');
+        const hasEnd = processDef.activities.some(a => a.activityType === 'END');
         
         const normalActivities = processDef.activities.filter(a => 
-            a.position !== 'START' && a.position !== 'END' && 
-            a.activityType !== 'START' && a.activityType !== 'END' &&
-            a.position !== 'POSITION_START' && a.position !== 'POSITION_END'
+            a.activityType !== 'START' && a.activityType !== 'END'
         );
         
         if (!hasStart && normalActivities.length > 0) {

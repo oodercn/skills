@@ -1,0 +1,21 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-driver-config
+  name: Driver Config
+  version: 1.0.0
+  description: Driver Config Skill - Driver configuration management for LLM and other drivers
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.driver.config.DriverConfigAutoConfiguration
+  dependencies:
+    - skill-common
+
+  apis:
+    - /api/v1/config/driver-configs
+    - /api/v1/drivers
+
+  config:
+    ooder.driver-config.enabled: true

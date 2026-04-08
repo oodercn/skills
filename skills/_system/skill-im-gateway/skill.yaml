@@ -1,0 +1,118 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-gateway
+  name: IM网关服务
+  version: 1.0.0
+  description: 提供IM消息网关、多渠道消息投递、RAG增强等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills
+  keywords:
+    - im
+    - gateway
+    - message
+    - mqtt
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2B
+    category: SYS
+    code: SYS_IM_GATEWAY
+    operations: [send, receive, enhance, health]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: message-gateway
+      version: "1.0"
+      description: "消息网关接口"
+    - id: mqtt-channel-adapter
+      version: "1.0"
+      description: "MQTT通道适配器接口"
+    - id: rag-enhancer
+      version: "1.0"
+      description: "RAG增强器接口"
+  
+  capabilities:
+    - id: message-gateway
+      name: 消息网关
+      description: 统一消息网关，支持多渠道消息投递
+      category: gateway
+    - id: mqtt-channel
+      name: MQTT通道
+      description: MQTT协议通道适配
+      category: channel
+    - id: rag-enhance
+      name: RAG增强
+      description: 检索增强生成功能
+      category: ai
+    - id: webhook
+      name: Webhook支持
+      description: Webhook回调支持
+      category: integration
+  
+  endpoints:
+    - path: /api/v1/im-gateway/send
+      method: POST
+      controllerClass: net.ooder.skill.im.gateway.WebhookController
+      methodName: sendMessage
+      description: 发送消息
+      capability: message-gateway
+    - path: /api/v1/im-gateway/health
+      method: GET
+      controllerClass: net.ooder.skill.im.gateway.WebhookController
+      methodName: health
+      description: 健康检查
+      capability: message-gateway
+    - path: /webhook/callback
+      method: POST
+      controllerClass: net.ooder.skill.im.gateway.WebhookController
+      methodName: handleCallback
+      description: Webhook回调
+      capability: webhook
+  
+  config:
+    optional:
+      - name: MQTT_BROKER_URL
+        type: string
+        default: "tcp://localhost:1883"
+        description: MQTT代理地址
+      - name: MQTT_CLIENT_ID
+        type: string
+        default: "ooder-im-gateway"
+        description: MQTT客户端ID
+      - name: RAG_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用RAG增强
+  
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "50Mi"

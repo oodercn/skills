@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 600" width="900px" height="600px">
+<defs>
+    <style>
+        .bg { fill: #fafafa; }
+        .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 6; }
+        .box-alt { fill: #dbeafe; stroke: #1e40af; stroke-width: 2; rx: 6; }
+        .box-highlight { fill: #fef3c7; stroke: #d97706; stroke-width: 2; rx: 6; }
+        .title-box { fill: #2563eb; stroke: none; rx: 4; }
+        .arrow { fill: none; stroke: #64748b; stroke-width: 1.5; marker-end: url(#arrowhead); }
+        .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 11px; fill: #334155; }
+        .text-title { font-size: 13px; font-weight: bold; fill: #1e40af; }
+        .text-header { font-size: 16px; font-weight: bold; fill: #ffffff; }
+        .text-file { font-family: "Consolas", monospace; font-size: 10px; fill: #64748b; }
+        .text-label { font-size: 10px; fill: #64748b; }
+    </style>
+    <marker id="arrowhead" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto">
+        <polygon points="0 0, 8 3, 0 6" fill="#64748b"/>
+    </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+
+<rect class="title-box" x="20" y="10" width="860" height="36" rx="4"/>
+<text class="text-header" x="450" y="34" text-anchor="middle">场景分类与文件结构详解</text>
+
+<!-- Three Categories Header -->
+<text class="text-title" x="30" y="62">OoderAgent 技能的三种形态</text>
+
+<!-- Category 1: Skill Scenes (skills/scenes/) -->
+<rect class="box-highlight" x="20" y="75" width="280" height="240" fill="#fffbeb" stroke="#f59e0b"/>
+<text class="text-title" x="160" y="96" text-anchor="middle">📦 类型一：技能场景 (Skill Scenes)</text>
+<text class="text-label" x="30" y="116">路径: skills/scenes/{scene-name}/</text>
+<text class="text-label" x="30" y="132">数量: 16 个预置场景</text>
+<line x1="30" y1="142" x2="290" y2="142" stroke="#f59e0b" stroke-dasharray="3,2"/>
+
+<text class="text" x="35" y="158">典型示例: daily-report</text>
+<rect class="box" x="35" y="166" width="250" height="16" fill="#fef3c7" rx="3"/>
+<text class="text-file" x="43" y="178">├── skill.yaml          (元数据+依赖)</text>
+<rect class="box" x="35" y="184" width="250" height="16" fill="#fef3c7" rx="3"/>
+<text class="text-file" x="43" y="196">├── README.md           (使用说明)</text>
+<rect class="box" x="35" y="202" width="250" height="16" fill="#fef3c7" rx="3"/>
+<text class="text-file" x="43" y="214">├── src/main/java/     (Java源码)</text>
+<rect class="box" x="35" y="220" width="250" height="16" fill="#fef3c7" rx="3"/>
+<text class="text-file" x="51" y="232">├── pom.xml            (Maven构建)</text>
+<rect class="box" x="35" y="238" width="250" height="16" fill="#fef3c7" rx="3"/>
+<text class="text-file" x="51" y="250">└── resources/         (配置/模板)</text>
+<text class="text" x="35" y="275" style="font-size:10px;color:#b45309;">特点: 可独立运行，依赖 _business/_system 层</text>
+<text class="text" x="35" y="292" style="font-size:10px;color:#b45309;">用途: 开箱即用的业务解决方案</text>
+
+<!-- Category 2: Independent Scenes (独立场景) -->
+<rect class="box-alt" x="310" y="75" width="280" height="240" fill="#f0f9ff" stroke="#0ea5e9"/>
+<text class="text-title" x="450" y="96" text-anchor="middle">🎯 类型二：独立场景 (Independent)</text>
+<text class="text-label" x="320" y="116">路径: skills/capabilities/ 或 _drivers/</text>
+<text class="text-label" x="320" y="132">数量: 61 个可独立部署模块</text>
+<line x1="320" y1="142" x2="580" y2="142" stroke="#0ea5e9" stroke-dasharray="3,2"/>
+
+<text class="text" x="325" y="158">典型示例: skill-im-dingding (IM驱动)</text>
+<rect class="box" x="325" y="166" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="333" y="178">├── skill.yaml          (完整spec定义)</text>
+<rect class="box" x="325" y="184" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="333" y="196">├── README.md           (API文档+示例)</text>
+<rect class="box" x="325" y="202" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="333" y="214">├── src/main/java/     (完整Spring Boot应用)</text>
+<rect class="box" x="325" y="218" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="341" y="230">├── controller/        (REST API)</text>
+<rect class="box" x="325" y="236" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="341" y="248">├── service/           (业务逻辑)</text>
+<rect class="box" x="325" y="254" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="333" y="266">├── pom.xml            (含parent依赖)</text>
+<rect class="box" x="325" y="272" width="255" height="16" fill="#dbeafe" rx="3"/>
+<text class="text-file" x="341" y="284">└── application.yml    (端口/数据库配置)</text>
+<text class="text" x="325" y="305" style="font-size:10px;color:#0369a1;">特点: 自包含完整应用，可单独启动</text>
+<text class="text" x="325" y="322" style="font-size:10px;color:#0369a1;">用途: 外部系统集成点（IM/支付/媒体等）</text>
+
+<!-- Category 3: Internal Capabilities -->
+<rect class="box" x="600" y="75" width="280" height="240" fill="#f5f3ff" stroke="#8b5cf6"/>
+<text class="text-title" x="740" y="96" text-anchor="middle">⚙️ 类型三：内部能力 (Internal)</text>
+<text class="text-label" x="610" y="116">路径: skills/_base/ + _system/ + _business/</text>
+<text class="text-label" x="610" y="132">数量: 47 个基础设施模块</text>
+<line x1="610" y1="142" x2="870" y2="142" stroke="#8b5cf6" stroke-dasharray="3,2"/>
+
+<text class="text" x="615" y="158">典型示例: ooder-spi-core (SPI核心)</text>
+<rect class="box" x="615" y="166" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="623" y="178">├── skill.yaml          (SPI接口声明)</text>
+<rect class="box" x="615" y="184" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="623" y="196">├── README.md           (接口设计文档)</text>
+<rect class="box" x="615" y="202" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="623" y="214">├── src/main/java/     (纯接口定义)</text>
+<rect class="box" x="615" y="218" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="631" y="230">├── spi/im/             (IM接口)</text>
+<rect class="box" x="615" y="236" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="631" y="248">├── spi/rag/            (RAG接口)</text>
+<rect class="box" x="615" y="254" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="631" y="266">├── spi/workflow/       (工作流接口)</text>
+<rect class="box" x="615" y="272" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="623" y="284">├── pom.xml            (仅接口依赖)</text>
+<rect class="box" x="615" y="290" width="255" height="16" fill="#ede9fe" rx="3"/>
+<text class="text-file" x="631" y="302">└── META-INF/services/ (SPI注册文件)</text>
+<text class="text" x="615" y="320" style="font-size:10px;color:#6d28d9;">特点: 无启动类，纯接口+模型定义</text>
+<text class="text" x="615" y="337" style="font-size:10px;color:#6d28d9;">用途: 被其他 skill 依赖，不直接暴露API</text>
+
+<!-- Bottom: Relationship Diagram -->
+<rect class="box" x="20" y="330" width="860" height="255" fill="#f8fafc" stroke="#475569"/>
+<text class="text-title" x="450" y="350" text-anchor="middle">三种类型的依赖关系与加载方式</text>
+
+<!-- Dependency arrows -->
+<text class="text-title" x="40" y="375">依赖关系:</text>
+<text class="text" x="40" y="395">scenes → _business → _system → _base(SPI)</text>
+<text class="text" x="40" y="415">_drivers → _base(SPI) [可选依赖 _system]</text>
+<text class="text" x="40" y="435">capabilities → _base(SPI) [可选依赖 _system]</text>
+
+<text class="text-title" x="450" y="375">加载方式:</text>
+<text class="text" x="450" y="395">场景型: mvn spring-boot:run (独立进程或嵌入主应用)</text>
+<text class="text" x="450" y="415">独立型: mvn spring-boot:run (独立端口，REST暴露)</text>
+<text class="text" x="450" y="435">内部型: 被依赖打包进 consumer 的 classpath</text>
+
+<text class="text-title" x="720" y="375">生命周期:</text>
+<text class="text" x="720" y="395">场景型: 用户直接触发</text>
+<text class="text" x="720" y="415">独立型: 自动注册到服务发现</text>
+<text class="text" x="720" y="435">内部型: ClassLoader 加载时激活</text>
+
+<!-- Summary Table -->
+<line x1="30" y1="455" x2="870" y2="455" stroke="#cbd5e1"/>
+<text class="text-title" x="40" y="475">类型</text><text class="text-title" x="140" y="475">skill.yaml</text><text class="text-title" x="270" y="475">可独立运行</text><text class="text-title" x="400" y="475">暴露 REST API</text><text class="text-title" x="540" y="475">被依赖消费</text><text class="text-title" x="680" y="475">数量</text>
+<text class="text" x="40" y="495">场景型</text><text class="text" x="140" y="495">✅</text><text class="text" x="270" y="495">✅</text><text class="text" x="400" y="495">可选</text><text class="text" x="540" y="495">否</text><text class="text" x="680" y="495">16</text>
+<text class="text" x="40" y="515">独立型</text><text class="text" x="140" y="515">✅</text><text class="text" x="270" y="515">✅</text><text class="text" x="400" y="515">✅</text><text class="text" x="540" y="515">可选</text><text class="text" x="680" y="515">61</text>
+<text class="text" x="40" y="535">内部型</text><text class="text" x="140" y="535">✅</text><text class="text" x="270" y="535">❌</text><text class="text" x="400" y="535">❌</text><text class="text" x="540" y="535">✅</text><text class="text" x="680" y="535">47</text>
+<line x1="30" y1="545" x2="870" y2="545" stroke="#cbd5e1"/>
+<text class="text" x="450" y="568" text-anchor="middle" style="color:#059669;font-weight:bold;">总计: 124 个可发现 skill (排除 scenes 中嵌套的子模块)</text>
+</svg>

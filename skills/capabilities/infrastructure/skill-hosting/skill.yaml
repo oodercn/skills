@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-hosting
   name: Hosting Service
-  version: "3.0.2"
+  version: "3.0.1"
   description: Hosting Service Skill for Ooder Agent Platform
   author: Ooder Team
   icon: ri-server-line
@@ -23,17 +23,17 @@ spec:
   capabilities:
     - id: service-hosting
       name: Service Hosting
-      description: 服务托管
+      description: 鏈嶅姟鎵樼
       category: infrastructure
       autoBind: true
     - id: process-management
       name: Process Management
-      description: 进程管理
+      description: 杩涚▼绠＄悊
       category: infrastructure
       autoBind: true
     - id: auto-restart
       name: Auto Restart
-      description: 自动重启
+      description: 鑷姩閲嶅惎
       category: infrastructure
       autoBind: false
       
@@ -48,11 +48,11 @@ spec:
       autoStart:
         type: boolean
         default: true
-        title: 自动启动
+        title: 鑷姩鍚姩
       restartPolicy:
         type: string
         default: "on-failure"
-        title: 重启策略
+        title: 閲嶅惎绛栫暐
         
   estimatedResources:
     cpu: "100m"

@@ -1,12 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-market
-  name: 技能市场服务
-  version: 0.7.3
-  description: 技能市场服务，提供技能发布、搜索、安装、更新能力
-  author: ooder Team
+  name: 鎶€鑳藉競鍦烘湇鍔?  version: "3.0.1"
+  description: 鎶€鑳藉競鍦烘湇鍔★紝鎻愪緵鎶€鑳藉彂甯冦€佹悳绱€佸畨瑁呫€佹洿鏂拌兘鍔?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -54,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -87,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -98,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,59 +129,48 @@ spec:
     - id: skill-capability
       version: ">=1.0.0"
       required: true
-      description: "能力服务依赖"
+      description: "鑳藉姏鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: market-service
       version: "1.0"
-      description: "市场服务接口"
+      description: "甯傚満鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: publish
-      name: 技能发布
-      description: 发布技能到市场
+      name: 鎶€鑳藉彂甯?      description: 鍙戝竷鎶€鑳藉埌甯傚満
       category: service
     - id: search
-      name: 技能搜索
-      description: 搜索市场技能
-      category: service
+      name: 鎶€鑳芥悳绱?      description: 鎼滅储甯傚満鎶€鑳?      category: service
     - id: install
-      name: 技能安装
-      description: 安装技能
-      category: service
+      name: 鎶€鑳藉畨瑁?      description: 瀹夎鎶€鑳?      category: service
     - id: update
-      name: 技能更新
-      description: 更新技能
-      category: service
+      name: 鎶€鑳芥洿鏂?      description: 鏇存柊鎶€鑳?      category: service
   
   endpoints:
     - path: /api/market/skills
       method: POST
-      description: 发布技能
-      capability: publish
+      description: 鍙戝竷鎶€鑳?      capability: publish
     - path: /api/market/skills
       method: GET
-      description: 搜索技能
-      capability: search
+      description: 鎼滅储鎶€鑳?      capability: search
     - path: /api/market/skills/{id}/install
       method: POST
-      description: 安装技能
-      capability: install
+      description: 瀹夎鎶€鑳?      capability: install
     - path: /api/market/skills/{id}/update
       method: POST
-      description: 更新技能
-      capability: update
+      description: 鏇存柊鎶€鑳?      capability: update
   
   config:
     optional:
       - name: MARKET_URL
         type: string
         default: "https://market.ooder.net"
-        description: 市场地址
+        description: 甯傚満鍦板潃
       - name: CACHE_TTL
         type: integer
         default: 3600
-        description: 缓存时间(秒)
+        description: 缂撳瓨鏃堕棿(绉?
   
   resources:
     cpu: "50m"
@@ -198,7 +185,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

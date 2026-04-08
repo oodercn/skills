@@ -1,0 +1,89 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-spi-llm
+  name: Skill SPI LLM
+  version: "3.0.1"
+  description: LLM SPI接口模块，定义大语言模型相关的SPI接口，支持多种LLM提供商的统一接入
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_base/skill-spi-llm
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - spi
+    - llm
+    - ai
+    - interface
+    - openai
+    - deepseek
+    - qianwen
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: INFRASTRUCTURE
+  sceneType: AUTO
+  purposes:
+    - INFRASTRUCTURE
+    - AI
+    - INTEGRATION
+  
+  ownership: platform
+  
+  capability:
+    category: llm
+    code: SPI_LLM
+    operations: [chat, completion, embedding, function-calling]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: none
+    mainClass: N/A
+
+  providedInterfaces:
+    - id: net.ooder.spi.llm.LlmService
+      version: "1.0"
+      description: "LLM服务统一接口"
+    - id: net.ooder.scene.skill.LlmProvider
+      version: "1.0"
+      description: "LLM提供商接口"
+
+  capabilities:
+    - id: chat
+      name: 对话能力
+      description: 支持多轮对话和上下文管理
+      category: llm
+    - id: completion
+      name: 文本补全
+      description: 支持文本补全生成
+      category: llm
+    - id: embedding
+      name: 向量嵌入
+      description: 支持文本向量嵌入
+      category: llm
+    - id: function-calling
+      name: 函数调用
+      description: 支持LLM函数调用能力
+      category: llm
+
+  exports:
+    packages:
+      - net.ooder.spi.llm
+      - net.ooder.spi.llm.model
+
+  dependencies:
+    - id: ooder-spi-core
+      version: ">=3.0.1"
+
+  notes: |
+    LLM SPI接口模块，定义统一的LLM服务接口。
+    支持的LLM提供商:
+    - OpenAI
+    - DeepSeek
+    - 千问(Qianwen)
+    - 火山引擎(Volcengine)
+    - Ollama
+    - 百度文心
+    
+    实现类通过 META-INF/services/net.ooder.scene.skill.LlmProvider 注册

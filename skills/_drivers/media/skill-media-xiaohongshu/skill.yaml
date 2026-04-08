@@ -1,0 +1,63 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-xiaohongshu
+  name: Xiaohongshu Media Service
+  version: "3.0.1"
+  description: 小红书内容发布服务，支持笔记发布、数据分析等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/media/skill-media-xiaohongshu
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - xiaohongshu
+    - media
+    - publish
+    - note
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - CONTENT_PUBLISH
+    - MEDIA
+
+  ownership: platform
+
+  capability:
+    category: media
+    code: MEDIA_XIAOHONGSHU
+    operations: [publish, analyze]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.media.xiaohongshu.XiaohongshuMediaProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.media.MediaPublishProvider
+      version: "1.0"
+      description: "媒体发布提供商接口"
+
+  capabilities:
+    - id: publish
+      name: 笔记发布
+      description: 发布小红书笔记
+      category: media
+    - id: analyze
+      name: 数据分析
+      description: 获取笔记数据分析
+      category: media
+
+  config:
+    required:
+      - name: XIAOHONGSHU_APP_ID
+        type: string
+        description: 小红书应用ID
+      - name: XIAOHONGSHU_APP_SECRET
+        type: string
+        secret: true
+        description: 小红书应用Secret

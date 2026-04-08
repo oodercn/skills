@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-notify
-  name: 通知服务
-  version: 0.7.3
-  description: 通知服务，支持多渠道通知推送
-  author: ooder Team
+  name: 閫氱煡鏈嶅姟
+  version: "3.0.1"
+  description: 閫氱煡鏈嶅姟锛屾敮鎸佸娓犻亾閫氱煡鎺ㄩ€?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -53,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,39 +130,37 @@ spec:
     - id: skill-msg
       version: ">=0.7.0"
       required: true
-      description: "消息服务依赖"
+      description: "娑堟伅鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: notify-service
       version: "1.0"
-      description: "通知服务接口"
+      description: "閫氱煡鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: push
-      name: 推送通知
-      description: 推送通知到用户
-      category: service
+      name: 鎺ㄩ€侀€氱煡
+      description: 鎺ㄩ€侀€氱煡鍒扮敤鎴?      category: service
     - id: broadcast
-      name: 广播通知
-      description: 广播通知到所有用户
-      category: service
+      name: 骞挎挱閫氱煡
+      description: 骞挎挱閫氱煡鍒版墍鏈夌敤鎴?      category: service
     - id: schedule
-      name: 定时通知
-      description: 定时发送通知
+      name: 瀹氭椂閫氱煡
+      description: 瀹氭椂鍙戦€侀€氱煡
       category: service
   
   endpoints:
     - path: /api/notify/push
       method: POST
-      description: 推送通知
+      description: 鎺ㄩ€侀€氱煡
       capability: push
     - path: /api/notify/broadcast
       method: POST
-      description: 广播通知
+      description: 骞挎挱閫氱煡
       capability: broadcast
     - path: /api/notify/schedule
       method: POST
-      description: 定时通知
+      description: 瀹氭椂閫氱煡
       capability: schedule
   
   config:
@@ -171,15 +168,15 @@ spec:
       - name: CHANNELS
         type: string
         default: "email,sms,push"
-        description: 支持的通知渠道
+        description: 鏀寔鐨勯€氱煡娓犻亾
       - name: RETRY_COUNT
         type: integer
         default: 3
-        description: 重试次数
+        description: 閲嶈瘯娆℃暟
       - name: RETRY_DELAY
         type: integer
         default: 60
-        description: 重试延迟(秒)
+        description: 閲嶈瘯寤惰繜(绉?
   
   resources:
     cpu: "50m"
@@ -194,7 +191,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-k8s
   name: Kubernetes Management
-  version: "3.0.2"
+  version: "3.0.1"
   description: Kubernetes Cluster Management Service for Ooder Agent Platform
   author: Ooder Team
   icon: ri-kubernetes-line
@@ -23,22 +23,22 @@ spec:
   capabilities:
     - id: cluster-management
       name: Cluster Management
-      description: 集群管理
+      description: 闆嗙兢绠＄悊
       category: infrastructure
       autoBind: true
     - id: deployment-management
       name: Deployment Management
-      description: 部署管理
+      description: 閮ㄧ讲绠＄悊
       category: infrastructure
       autoBind: true
     - id: pod-monitoring
       name: Pod Monitoring
-      description: Pod监控
+      description: Pod鐩戞帶
       category: infrastructure
       autoBind: false
     - id: service-discovery
       name: Service Discovery
-      description: 服务发现
+      description: 鏈嶅姟鍙戠幇
       category: infrastructure
       autoBind: false
       
@@ -52,11 +52,11 @@ spec:
     properties:
       kubeconfig:
         type: string
-        title: Kubeconfig路径
+        title: Kubeconfig璺緞
         default: ""
       namespace:
         type: string
-        title: 默认命名空间
+        title: 榛樿鍛藉悕绌洪棿
         default: "default"
         
   estimatedResources:

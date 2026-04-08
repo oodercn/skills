@@ -1,0 +1,182 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-messaging
+  name: 统一消息服务
+  version: 1.0.0
+  description: 提供统一的消息发送、会话管理、WebSocket令牌管理等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x40
+    category: SYS
+    code: SYS_MESSAGING
+    operations: [session, message, reaction, action, websocket]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  dependencies: []
+
+  capabilities:
+    - id: session
+      name: 会话管理
+      description: 会话创建、查询、删除
+      category: messaging
+    - id: message
+      name: 消息服务
+      description: 消息发送、查询、标记已读
+      category: messaging
+    - id: reaction
+      name: 消息反应
+      description: 消息表情反应
+      category: messaging
+    - id: action
+      name: 消息动作
+      description: 消息交互动作
+      category: messaging
+    - id: websocket
+      name: WebSocket
+      description: WebSocket令牌管理
+      category: messaging
+
+  endpoints:
+    - path: /api/v2/messaging/sessions
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: createSession
+      parameterTypes:
+        - net.ooder.spi.messaging.model.CreateSessionRequest
+      description: 创建会话
+      capability: session
+    - path: /api/v2/messaging/sessions/{sessionId}
+      method: GET
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: getSession
+      parameterTypes:
+        - java.lang.String
+      description: 获取会话
+      capability: session
+    - path: /api/v2/messaging/sessions
+      method: GET
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: listSessions
+      description: 列出会话
+      capability: session
+    - path: /api/v2/messaging/sessions/{sessionId}
+      method: DELETE
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: deleteSession
+      parameterTypes:
+        - java.lang.String
+      description: 删除会话
+      capability: session
+    - path: /api/v2/messaging/messages
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: sendMessage
+      parameterTypes:
+        - net.ooder.spi.messaging.model.SendMessageRequest
+      description: 发送消息
+      capability: message
+    - path: /api/v2/messaging/conversations/{conversationId}/messages
+      method: GET
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: getMessages
+      parameterTypes:
+        - java.lang.String
+      description: 获取消息列表
+      capability: message
+    - path: /api/v2/messaging/messages/{messageId}/read
+      method: PUT
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: markAsRead
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+      description: 标记消息已读
+      capability: message
+    - path: /api/v2/messaging/messages/{messageId}/reactions
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: addReaction
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+      description: 添加消息反应
+      capability: reaction
+    - path: /api/v2/messaging/messages/{messageId}/reactions
+      method: DELETE
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: removeReaction
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+      description: 移除消息反应
+      capability: reaction
+    - path: /api/v2/messaging/messages/{messageId}/actions
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: executeAction
+      parameterTypes:
+        - java.lang.String
+        - java.lang.String
+        - java.lang.String
+        - java.util.Map
+      description: 执行消息动作
+      capability: action
+    - path: /api/v2/messaging/ws/token
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: generateWsToken
+      parameterTypes:
+        - java.util.Map
+      description: 生成WebSocket令牌
+      capability: websocket
+    - path: /api/v2/messaging/ws/token/refresh
+      method: POST
+      controllerClass: net.ooder.skill.messaging.controller.UnifiedMessagingController
+      methodName: refreshWsToken
+      parameterTypes:
+        - java.util.Map
+      description: 刷新WebSocket令牌
+      capability: websocket
+
+  config:
+    optional:
+      - name: MESSAGING_STORAGE_TYPE
+        type: string
+        default: "memory"
+        description: 存储类型
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "20Mi"

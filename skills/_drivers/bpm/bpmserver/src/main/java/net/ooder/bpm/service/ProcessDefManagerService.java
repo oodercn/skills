@@ -346,12 +346,21 @@ public class ProcessDefManagerService {
                     if (positionCoord != null) {
                         try {
                             String positionCoordJson = mapper.writeValueAsString(positionCoord);
-                            DbAttributeDef attrDef = new DbAttributeDef();
-                            attrDef.setId(java.util.UUID.randomUUID().toString());
-                            attrDef.setName("positionCoord");
-                            attrDef.setValue(positionCoordJson);
-                            attrDef.setType("WORKFLOW");
-                            activity.setAttribute(null, attrDef);
+                            
+                            DbAttributeDef workflowAttr = new DbAttributeDef();
+                            workflowAttr.setId(java.util.UUID.randomUUID().toString());
+                            workflowAttr.setName("WORKFLOW");
+                            workflowAttr.setType("WORKFLOW");
+                            activity.setAttribute(null, workflowAttr);
+                            
+                            DbAttributeDef posCoordAttr = new DbAttributeDef();
+                            posCoordAttr.setId(java.util.UUID.randomUUID().toString());
+                            posCoordAttr.setName("positionCoord");
+                            posCoordAttr.setValue(positionCoordJson);
+                            posCoordAttr.setType("WORKFLOW");
+                            activity.setAttribute("WORKFLOW", posCoordAttr);
+                            
+                            log.debug("Saved positionCoord for activity {}: {}", activity.getActivityDefId(), positionCoordJson);
                         } catch (Exception e) {
                             log.warn("Failed to set positionCoord: {}", e.getMessage());
                         }

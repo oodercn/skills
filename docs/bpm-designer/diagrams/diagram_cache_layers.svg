@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 340" width="700px" height="340px">
+<defs>
+    <style>
+        .bg { fill: #fafafa; }
+        .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 8; }
+        .box-alt { fill: #dbeafe; stroke: #1e40af; stroke-width: 2; rx: 8; }
+        .box-highlight { fill: #fef3c7; stroke: #d97706; stroke-width: 2; rx: 8; }
+        .box-success { fill: #dcfce7; stroke: #16a34a; stroke-width: 2; rx: 8; }
+        .title-box { fill: #2563eb; stroke: none; rx: 4; }
+        .arrow { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+        .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; fill: #334155; }
+        .text-title { font-size: 15px; font-weight: bold; fill: #1e40af; }
+        .text-header { font-size: 16px; font-weight: bold; fill: #ffffff; }
+        .text-small { font-size: 11px; fill: #64748b; }
+        .text-step { font-size: 12px; font-weight: bold; fill: #2563eb; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+
+<rect class="title-box" x="20" y="15" width="660" height="35" rx="4"/>
+<text class="text-header" x="350" y="38" text-anchor="middle">缓存层次设计</text>
+
+<rect class="box-highlight" x="100" y="80" width="500" height="70"/>
+<text class="text-title" x="350" y="105" text-anchor="middle">L1: 本地内存缓存</text>
+<text class="text-small" x="350" y="130" text-anchor="middle">热点数据 | TTL=5min | 命中率>90% | 延迟<1ms</text>
+
+<line class="arrow" x1="350" y1="150" x2="350" y2="170"/>
+
+<rect class="box-alt" x="100" y="170" width="500" height="70"/>
+<text class="text-title" x="350" y="195" text-anchor="middle">L2: Redis缓存</text>
+<text class="text-small" x="350" y="220" text-anchor="middle">推导结果 | TTL=30min | 分布式共享 | 延迟<10ms</text>
+
+<line class="arrow" x1="350" y1="240" x2="350" y2="260"/>
+
+<rect class="box" x="100" y="260" width="500" height="70"/>
+<text class="text-title" x="350" y="285" text-anchor="middle">L3: 数据库持久化</text>
+<text class="text-small" x="350" y="310" text-anchor="middle">历史记录 | 永久存储 | 审计追溯 | 延迟<100ms</text>
+
+<rect class="box-success" x="620" y="130" width="60" height="150"/>
+<text class="text" x="650" y="200" text-anchor="middle" font-weight="bold">缓存</text>
+<text class="text" x="650" y="220" text-anchor="middle" font-weight="bold">命中</text>
+<text class="text-small" x="650" y="250" text-anchor="middle">直接</text>
+<text class="text-small" x="650" y="270" text-anchor="middle">返回</text>
+
+<line class="arrow" x1="600" y1="205" x2="620" y2="205"/>
+<line class="arrow" x1="620" y1="280" x2="600" y2="280"/>
+</svg>

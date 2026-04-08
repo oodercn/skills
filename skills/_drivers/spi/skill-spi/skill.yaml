@@ -1,0 +1,33 @@
+﻿apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-spi
+  name: Skill SPI鎺ュ彛瀹氫箟
+  version: "3.0.1"
+  description: Skill鏈嶅姟鎻愪緵鑰呮帴鍙?SPI)瀹氫箟锛屽寘鍚獿LM鏈嶅姟鎺ュ彛鍜岀粍缁囨湇鍔℃帴鍙?  author: Ooder Team
+  icon: ri-plug-line
+
+spec:
+  skillForm: DRIVER
+  
+  capabilities:
+    - id: llm-service-interface
+      name: LLM鏈嶅姟鎺ュ彛
+      description: 澶ц瑷€妯″瀷鏈嶅姟鎺ュ彛瀹氫箟
+      category: llm
+      autoBind: false
+    - id: org-service-interface
+      name: 缁勭粐鏈嶅姟鎺ュ彛
+      description: 缁勭粐鍜岀敤鎴锋湇鍔℃帴鍙ｅ畾涔?      category: org
+      autoBind: false
+      
+  dependencies: []
+  
+  configSchema:
+    type: object
+    properties: {}
+        
+  estimatedResources:
+    cpu: "10m"
+    memory: "16Mi"

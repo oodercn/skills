@@ -1,0 +1,69 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-ldap
+  name: LDAP Organization Service
+  version: "3.0.1"
+  description: LDAP组织架构驱动，支持用户同步、组织架构同步、认证集成
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/org/skill-org-ldap
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - ldap
+    - org
+    - organization
+    - sync
+    - authentication
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - ORGANIZATION
+    - AUTHENTICATION
+
+  ownership: platform
+
+  capability:
+    category: org
+    code: ORG_LDAP
+    operations: [sync-users, sync-orgs, authenticate]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.org.ldap.LdapOrgApplication
+
+  capabilities:
+    - id: sync-users
+      name: 用户同步
+      description: 从LDAP同步用户信息
+      category: org
+    - id: sync-orgs
+      name: 组织同步
+      description: 从LDAP同步组织架构
+      category: org
+    - id: authenticate
+      name: LDAP认证
+      description: 通过LDAP进行用户认证
+      category: auth
+
+  config:
+    required:
+      - name: LDAP_URL
+        type: string
+        description: LDAP服务器地址
+      - name: LDAP_BASE_DN
+        type: string
+        description: 基础DN
+      - name: LDAP_BIND_DN
+        type: string
+        description: 绑定DN
+      - name: LDAP_BIND_PASSWORD
+        type: string
+        secret: true
+        description: 绑定密码

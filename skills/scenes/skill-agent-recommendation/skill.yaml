@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-agent-recommendation
   name: Agent Recommendation
-  version: "3.0.2"
+  version: "3.0.1"
   description: Intelligent agent recommendation based on context and history
   author: Ooder Team
   icon: ri-user-star-line
@@ -23,17 +23,16 @@ spec:
   capabilities:
     - id: agent-recommendation
       name: Agent Recommendation
-      description: 智能Agent推荐
+      description: 鏅鸿兘Agent鎺ㄨ崘
       category: ai
       autoBind: true
     - id: context-analysis
       name: Context Analysis
-      description: 上下文分析
-      category: ai
+      description: 涓婁笅鏂囧垎鏋?      category: ai
       autoBind: false
     - id: history-learning
       name: History Learning
-      description: 历史学习
+      description: 鍘嗗彶瀛︿範
       category: ai
       autoBind: false
       

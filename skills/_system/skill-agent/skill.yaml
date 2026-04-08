@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-agent
   name: Agent管理服务
-  version: 1.0.0
+  version: "3.0.1"
   description: 提供Agent注册、监控、拓扑管理、聊天、会话管理等完整功能
   author: ooder Team
   type: system-service
@@ -47,7 +47,7 @@ spec:
 
   dependencies:
     - skillId: skill-llm-base
-      version: "1.0.0"
+      version: ">=3.0.1"
       required: false
       description: "LLM基础服务，用于Agent LLM功能"
 

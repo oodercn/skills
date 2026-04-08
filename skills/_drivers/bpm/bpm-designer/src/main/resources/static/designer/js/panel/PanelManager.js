@@ -8,6 +8,7 @@ class PanelManager {
     }
 
     render(type, data) {
+        console.log('[PanelManager] render called:', type, data);
         this.currentType = type;
         this.currentData = data;
         this.currentTab = 'basic';
@@ -15,17 +16,22 @@ class PanelManager {
         let schema;
         if (type === 'activity' && data) {
             schema = PanelSchema.getActivitySchema(data);
+            console.log('[PanelManager] Activity schema:', schema);
         } else {
             schema = PanelSchema[type];
+            console.log('[PanelManager] Schema from PanelSchema:', schema);
         }
         
         if (!schema) {
+            console.log('[PanelManager] No schema found, showing empty message');
             this.container.innerHTML = '<div class="d-empty">请选择元素</div>';
             return;
         }
 
+        console.log('[PanelManager] Rendering tabs and content...');
         this._renderTabs(schema.tabs);
         this._renderContent(schema.fields[this.currentTab], data);
+        console.log('[PanelManager] Render complete');
     }
 
     _renderTabs(tabs) {

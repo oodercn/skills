@@ -1,0 +1,71 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-payment-unionpay
+  name: UnionPay Payment Service
+  version: "3.0.1"
+  description: 银联支付服务，支持支付、退款、查询、对账等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/payment/skill-payment-unionpay
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - unionpay
+    - payment
+    - pay
+    - refund
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - PAYMENT
+    - FINANCE
+
+  ownership: platform
+
+  capability:
+    category: payment
+    code: PAYMENT_UNIONPAY
+    operations: [pay, query, refund, reconcile]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.payment.unionpay.UnionpayProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.payment.PaymentProvider
+      version: "1.0"
+      description: "支付提供商接口"
+
+  capabilities:
+    - id: pay
+      name: 支付下单
+      description: 创建银联支付订单
+      category: payment
+    - id: query
+      name: 订单查询
+      description: 查询支付状态
+      category: payment
+    - id: refund
+      name: 退款处理
+      description: 处理退款请求
+      category: payment
+    - id: reconcile
+      name: 对账功能
+      description: 下载对账单
+      category: payment
+
+  config:
+    required:
+      - name: UNIONPAY_MERCHANT_ID
+        type: string
+        description: 银联商户号
+      - name: UNIONPAY_PRIVATE_KEY
+        type: string
+        secret: true
+        description: 商户私钥

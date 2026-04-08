@@ -1,0 +1,33 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-support
+  name: Support
+  version: 1.0.0
+  description: Support request management skill
+  author: ooder
+
+spec:
+  skillForm: PROVIDER
+
+  capability:
+    category: sys
+    code: SYS_SUPPORT
+    operations: [list, create, update, resolve]
+
+  entryPoint: net.ooder.skill.support.SupportAutoConfiguration
+
+  endpoints:
+    - path: /api/v1/support/requests
+      method: GET
+      controllerClass: net.ooder.skill.support.controller.SupportController
+      methodName: listRequests
+      description: 获取支持请求列表
+      capability: support
+    - path: /api/v1/support/requests
+      method: POST
+      controllerClass: net.ooder.skill.support.controller.SupportController
+      methodName: createRequest
+      description: 创建支持请求
+      capability: support

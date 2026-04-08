@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-im
-  name: 即时通讯服务
-  version: 0.7.3
-  description: 即时通讯服务，支持实时消息、群聊、在线状态
-  author: ooder Team
+  name: 鍗虫椂閫氳鏈嶅姟
+  version: "3.0.1"
+  description: 鍗虫椂閫氳鏈嶅姟锛屾敮鎸佸疄鏃舵秷鎭€佺兢鑱娿€佸湪绾跨姸鎬?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -53,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,47 +130,41 @@ spec:
     - id: skill-msg
       version: ">=0.7.0"
       required: true
-      description: "消息服务依赖"
+      description: "娑堟伅鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: im-service
       version: "1.0"
-      description: "即时通讯接口"
+      description: "鍗虫椂閫氳鎺ュ彛"
   
   capabilities:
     - id: send
-      name: 发送消息
-      description: 发送即时消息
-      category: service
+      name: 鍙戦€佹秷鎭?      description: 鍙戦€佸嵆鏃舵秷鎭?      category: service
     - id: receive
-      name: 接收消息
-      description: 接收即时消息
+      name: 鎺ユ敹娑堟伅
+      description: 鎺ユ敹鍗虫椂娑堟伅
       category: service
     - id: presence
-      name: 在线状态
-      description: 管理在线状态
-      category: service
+      name: 鍦ㄧ嚎鐘舵€?      description: 绠＄悊鍦ㄧ嚎鐘舵€?      category: service
     - id: group
-      name: 群聊
-      description: 群组聊天
+      name: 缇よ亰
+      description: 缇ょ粍鑱婂ぉ
       category: service
   
   endpoints:
     - path: /api/im/send
       method: POST
-      description: 发送消息
-      capability: send
+      description: 鍙戦€佹秷鎭?      capability: send
     - path: /api/im/presence
       method: PUT
-      description: 更新状态
-      capability: presence
+      description: 鏇存柊鐘舵€?      capability: presence
     - path: /api/im/groups
       method: GET
-      description: 获取群组
+      description: 鑾峰彇缇ょ粍
       capability: group
     - path: /ws/im
       method: GET
-      description: WebSocket连接
+      description: WebSocket杩炴帴
       capability: receive
   
   config:
@@ -179,15 +172,15 @@ spec:
       - name: WS_PORT
         type: integer
         default: 8080
-        description: WebSocket端口
+        description: WebSocket绔彛
       - name: MAX_CONNECTIONS
         type: integer
         default: 1000
-        description: 最大连接数
+        description: 鏈€澶ц繛鎺ユ暟
       - name: HEARTBEAT_INTERVAL
         type: integer
         default: 30
-        description: 心跳间隔(秒)
+        description: 蹇冭烦闂撮殧(绉?
   
   resources:
     cpu: "100m"
@@ -200,7 +193,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

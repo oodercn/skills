@@ -9,10 +9,33 @@ spring:
   web:
     resources:
       static-locations: classpath:/static/designer/
+      cache:
+        period: 0
+      chain:
+        cache: false
+  thymeleaf:
+    cache: false
 
 bpm:
   server:
     url: http://127.0.0.1:8084/bpm
+
+llm:
+  enabled: true
+  provider: aliyun
+  model: qwen-plus
+  api-key: sk-f403a6a32efd4b00b75ee4874eec3b6b
+  api-endpoint: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
+  temperature: 0.7
+  max-tokens: 4096
+  timeout: 60000
+  max-retries: 3
+
+cache:
+  enabled: true
+  default-ttl: 30m
+  max-size: 1000
+  cleanup-interval: 5m
 
 logging:
   level:

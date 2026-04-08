@@ -149,6 +149,76 @@ const EnumMapping = {
     },
 
     /**
+     * 活动类型映射
+     * 需求规格: TASK/SERVICE/SCRIPT/START/END/XOR_GATEWAY/AND_GATEWAY/OR_GATEWAY/SUBPROCESS/LLM_TASK
+     * 后端实现: TASK/SERVICE/SCRIPT/START/END/XOR_GATEWAY/AND_GATEWAY/OR_GATEWAY/SUBPROCESS/LLM_TASK
+     */
+    ActivityType: {
+        toBackend: {
+            'TASK': 'TASK',
+            'SERVICE': 'SERVICE',
+            'SCRIPT': 'SCRIPT',
+            'START': 'START',
+            'END': 'END',
+            'XOR_GATEWAY': 'XOR_GATEWAY',
+            'AND_GATEWAY': 'AND_GATEWAY',
+            'OR_GATEWAY': 'OR_GATEWAY',
+            'SUBPROCESS': 'SUBPROCESS',
+            'LLM_TASK': 'LLM_TASK'
+        },
+        toFrontend: {
+            'TASK': 'TASK',
+            'SERVICE': 'SERVICE',
+            'SCRIPT': 'SCRIPT',
+            'START': 'START',
+            'END': 'END',
+            'XOR_GATEWAY': 'XOR_GATEWAY',
+            'AND_GATEWAY': 'AND_GATEWAY',
+            'OR_GATEWAY': 'OR_GATEWAY',
+            'SUBPROCESS': 'SUBPROCESS',
+            'LLM_TASK': 'LLM_TASK'
+        }
+    },
+
+    /**
+     * 活动分类映射
+     * 需求规格: HUMAN/AGENT/SCENE
+     * 后端实现: HUMAN/AGENT/SCENE
+     */
+    ActivityCategory: {
+        toBackend: {
+            'HUMAN': 'HUMAN',
+            'AGENT': 'AGENT',
+            'SCENE': 'SCENE'
+        },
+        toFrontend: {
+            'HUMAN': 'HUMAN',
+            'AGENT': 'AGENT',
+            'SCENE': 'SCENE'
+        }
+    },
+
+    /**
+     * 活动位置类型映射
+     * 需求规格: START/NORMAL/END/VIRTUAL_LAST_DEF
+     * 后端实现: POSITION_START/POSITION_NORMAL/POSITION_END/VIRTUAL_LAST_DEF
+     */
+    ActivityDefPosition: {
+        toBackend: {
+            'START': 'POSITION_START',
+            'NORMAL': 'POSITION_NORMAL',
+            'END': 'POSITION_END',
+            'VIRTUAL_LAST_DEF': 'VIRTUAL_LAST_DEF'
+        },
+        toFrontend: {
+            'POSITION_START': 'START',
+            'POSITION_NORMAL': 'NORMAL',
+            'POSITION_END': 'END',
+            'VIRTUAL_LAST_DEF': 'VIRTUAL_LAST_DEF'
+        }
+    },
+
+    /**
      * 特送范围类型映射
      * 需求规格: DEFAULT/ALL/PERFORMERS
      * 后端实现: DEFAULT/ALL/PERFORMERS
@@ -407,8 +477,15 @@ const ProcessDefEnumFields = {
  */
 const ActivityDefEnumFields = {
     position: 'ActivityDefPosition',
+    implementation: 'ActivityDefImpl',
     join: 'ActivityDefJoin',
-    split: 'ActivityDefSplit'
+    split: 'ActivityDefSplit',
+    performType: 'ActivityDefPerformtype',
+    performSequence: 'ActivityDefPerformSequence',
+    deadlineOperation: 'ActivityDefDeadLineOperation',
+    routeBackMethod: 'ActivityDefRouteBackMethod',
+    specialSendScope: 'ActivityDefSpecialSendScope',
+    rightGroup: 'RightGroupEnums'
 };
 
 // 导出

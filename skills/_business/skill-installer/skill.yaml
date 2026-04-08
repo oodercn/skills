@@ -1,0 +1,21 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-installer
+  name: Installer
+  version: 1.0.0
+  description: Installer Skill - Role installer status tracking service
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.installer.InstallerAutoConfiguration
+  dependencies:
+    - skill-common
+
+  apis:
+    - /api/v1/installer/status
+    - /api/v1/installer/status/{loop}
+
+  config:
+    ooder.installer.enabled: true

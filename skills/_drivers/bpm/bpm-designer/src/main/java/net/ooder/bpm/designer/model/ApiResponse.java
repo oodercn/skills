@@ -25,6 +25,10 @@ public class ApiResponse<T> {
         response.message = message;
         return response;
     }
+    
+    public static <T> ApiResponse<T> error(String message) {
+        return error(500, message);
+    }
 
     public int getCode() { return code; }
     public void setCode(int code) { this.code = code; }

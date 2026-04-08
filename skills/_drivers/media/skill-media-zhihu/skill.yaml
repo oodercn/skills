@@ -1,0 +1,68 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-zhihu
+  name: Zhihu Media Service
+  version: "3.0.1"
+  description: 知乎内容发布服务，支持文章发布、回答发布、专栏管理等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/media/skill-media-zhihu
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - zhihu
+    - media
+    - publish
+    - article
+    - answer
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - CONTENT_PUBLISH
+    - MEDIA
+
+  ownership: platform
+
+  capability:
+    category: media
+    code: MEDIA_ZHIHU
+    operations: [publish-article, publish-answer, column]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.media.zhihu.ZhihuMediaProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.media.MediaPublishProvider
+      version: "1.0"
+      description: "媒体发布提供商接口"
+
+  capabilities:
+    - id: publish-article
+      name: 文章发布
+      description: 发布知乎文章
+      category: media
+    - id: publish-answer
+      name: 回答发布
+      description: 发布知乎回答
+      category: media
+    - id: column
+      name: 专栏管理
+      description: 管理知乎专栏
+      category: media
+
+  config:
+    required:
+      - name: ZHIHU_APP_ID
+        type: string
+        description: 知乎应用ID
+      - name: ZHIHU_APP_SECRET
+        type: string
+        secret: true
+        description: 知乎应用Secret

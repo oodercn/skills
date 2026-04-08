@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-group
-  name: 群组服务
-  version: 0.7.3
-  description: 群组服务，支持群组管理、成员管理、权限控制
+  name: 缇ょ粍鏈嶅姟
+  version: "3.0.1"
+  description: 缇ょ粍鏈嶅姟锛屾敮鎸佺兢缁勭鐞嗐€佹垚鍛樼鐞嗐€佹潈闄愭帶鍒?
   author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
@@ -54,29 +54,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -87,7 +87,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -98,7 +98,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -132,47 +132,47 @@ spec:
     - id: skill-org-base
       version: ">=1.0.0"
       required: true
-      description: "组织服务依赖"
+      description: "缁勭粐鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: group-service
       version: "1.0"
-      description: "群组服务接口"
+      description: "缇ょ粍鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: create
-      name: 创建群组
-      description: 创建新群组
+      name: 鍒涘缓缇ょ粍
+      description: 鍒涘缓鏂扮兢缁?
       category: service
     - id: delete
-      name: 删除群组
-      description: 删除群组
+      name: 鍒犻櫎缇ょ粍
+      description: 鍒犻櫎缇ょ粍
       category: service
     - id: member
-      name: 成员管理
-      description: 管理群组成员
+      name: 鎴愬憳绠＄悊
+      description: 绠＄悊缇ょ粍鎴愬憳
       category: service
     - id: permission
-      name: 权限控制
-      description: 管理群组权限
+      name: 鏉冮檺鎺у埗
+      description: 绠＄悊缇ょ粍鏉冮檺
       category: service
   
   endpoints:
     - path: /api/groups
       method: POST
-      description: 创建群组
+      description: 鍒涘缓缇ょ粍
       capability: create
     - path: /api/groups/{id}
       method: DELETE
-      description: 删除群组
+      description: 鍒犻櫎缇ょ粍
       capability: delete
     - path: /api/groups/{id}/members
       method: GET
-      description: 获取成员
+      description: 鑾峰彇鎴愬憳
       capability: member
     - path: /api/groups/{id}/permissions
       method: PUT
-      description: 设置权限
+      description: 璁剧疆鏉冮檺
       capability: permission
   
   config:
@@ -180,11 +180,11 @@ spec:
       - name: MAX_GROUP_SIZE
         type: integer
         default: 500
-        description: 最大群组人数
+        description: 鏈€澶х兢缁勪汉鏁?
       - name: DEFAULT_ROLE
         type: string
         default: "member"
-        description: 默认角色
+        description: 榛樿瑙掕壊
   
   resources:
     cpu: "50m"

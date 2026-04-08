@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-user-auth
-  name: 用户认证服务
-  version: 2.3
-  description: 用户认证服务 - 支持多种认证方式(密码/Token/OAuth)、会话管理、Token刷新
+  name: 鐢ㄦ埛璁よ瘉鏈嶅姟
+  version: "3.0.1"
+  description: 鐢ㄦ埛璁よ瘉鏈嶅姟 - 鏀寔澶氱璁よ瘉鏂瑰紡(瀵嗙爜/Token/OAuth)銆佷細璇濈鐞嗐€乀oken鍒锋柊
   author: ooder Team
   type: system-service
   license: Apache-2.0
@@ -76,29 +76,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟锟?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷锟?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL琛ㄨ揪锟?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～锟?
           parameters:
             type: object
             properties:
@@ -109,7 +109,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -120,7 +120,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇锟?
           parameters:
             type: object
             properties:
@@ -137,32 +137,32 @@ spec:
   providedInterfaces:
     - id: user-authentication
       version: "1.0"
-      description: "用户认证接口"
+      description: "鐢ㄦ埛璁よ瘉鎺ュ彛"
     - id: token-management
       version: "1.0"
-      description: "Token管理接口"
+      description: "Token绠＄悊鎺ュ彛"
   
   capabilities:
     - id: user-auth
-      name: 用户认证
-      description: 用户认证登录
+      name: 鐢ㄦ埛璁よ瘉
+      description: 鐢ㄦ埛璁よ瘉鐧诲綍
       category: authentication
     - id: token-validate
-      name: Token验证
-      description: Token验证
+      name: Token楠岃瘉
+      description: Token楠岃瘉
       category: authentication
     - id: token-refresh
-      name: Token刷新
-      description: Token刷新
+      name: Token鍒锋柊
+      description: Token鍒锋柊
       category: authentication
     - id: session-manage
-      name: 会话管理
-      description: 会话管理
+      name: 浼氳瘽绠＄悊
+      description: 浼氳瘽绠＄悊
       category: session
   
   scenes:
     - name: auth
-      description: 认证场景
+      description: 璁よ瘉鍦烘櫙
       capabilities:
         - user-auth
         - token-validate
@@ -176,52 +176,52 @@ spec:
       - name: AUTH_TOKEN_EXPIRE
         type: integer
         default: 3600
-        description: Token过期时间(�?
+        description: Token杩囨湡鏃堕棿(锟?
       - name: AUTH_REFRESH_ENABLED
         type: boolean
         default: true
-        description: 是否启用Token刷新
+        description: 鏄惁鍚敤Token鍒锋柊
       - name: AUTH_REFRESH_EXPIRE
         type: integer
         default: 604800
-        description: Refresh Token过期时间(�?
+        description: Refresh Token杩囨湡鏃堕棿(锟?
       - name: AUTH_MAX_SESSIONS
         type: integer
         default: 5
-        description: 最大会话数
+        description: 鏈€澶т細璇濇暟
   
   endpoints:
     - path: /api/auth/login
       method: POST
-      description: 用户登录
+      description: 鐢ㄦ埛鐧诲綍
       capability: user-auth
     - path: /api/auth/logout
       method: POST
-      description: 用户登出
+      description: 鐢ㄦ埛鐧诲嚭
       capability: user-auth
     - path: /api/auth/validate
       method: POST
-      description: 验证Token
+      description: 楠岃瘉Token
       capability: token-validate
     - path: /api/auth/refresh
       method: POST
-      description: 刷新Token
+      description: 鍒锋柊Token
       capability: token-refresh
     - path: /api/session/info
       method: GET
-      description: 获取会话信息
+      description: 鑾峰彇浼氳瘽淇℃伅
       capability: session-manage
     - path: /api/session/list
       method: GET
-      description: 获取会话列表
+      description: 鑾峰彇浼氳瘽鍒楄〃
       capability: session-manage
     - path: /api/session/{sessionId}
       method: DELETE
-      description: 终止会话
+      description: 缁堟浼氳瘽
       capability: session-manage
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 鍋ュ悍妫€锟?
   
   resources:
     cpu: "200m"

@@ -1,0 +1,87 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-wechat
+  name: WeChat Media Service
+  version: "3.0.1"
+  description: 微信公众号内容发布服务，支持图文发布、素材管理、用户分析等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/media/skill-media-wechat
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - wechat
+    - media
+    - publish
+    - article
+    - weixin
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - CONTENT_PUBLISH
+    - MEDIA
+
+  ownership: platform
+
+  capability:
+    category: media
+    code: MEDIA_WECHAT
+    operations: [publish, material, user-analysis]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.media.wechat.WechatMediaProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.media.MediaPublishProvider
+      version: "1.0"
+      description: "媒体发布提供商接口"
+
+  capabilities:
+    - id: publish
+      name: 图文发布
+      description: 发布图文消息到微信公众号
+      category: media
+    - id: material
+      name: 素材管理
+      description: 管理公众号素材库
+      category: media
+    - id: user-analysis
+      name: 用户分析
+      description: 获取用户分析数据
+      category: media
+
+  config:
+    required:
+      - name: WECHAT_APP_ID
+        type: string
+        description: 微信公众号AppID
+      - name: WECHAT_APP_SECRET
+        type: string
+        secret: true
+        description: 微信公众号AppSecret
+    optional:
+      - name: wechat.api.endpoint
+        type: string
+        default: https://api.weixin.qq.com
+        description: 微信API端点
+
+  endpoints:
+    - path: /api/media/wechat/articles
+      method: POST
+      description: 发布图文消息
+      capability: publish
+    - path: /api/media/wechat/materials
+      method: POST
+      description: 上传素材
+      capability: material
+    - path: /api/media/wechat/users/analysis
+      method: GET
+      description: 获取用户分析
+      capability: user-analysis

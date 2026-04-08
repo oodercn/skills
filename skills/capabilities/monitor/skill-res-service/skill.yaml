@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-res-service
-  name: 资源管理服务
-  version: 0.7.3
-  description: 资源管理服务，提供CPU、内存、磁盘监控
-  author: ooder Team
+  name: 璧勬簮绠＄悊鏈嶅姟
+  version: "3.0.1"
+  description: 璧勬簮绠＄悊鏈嶅姟锛屾彁渚汣PU銆佸唴瀛樸€佺鐩樼洃鎺?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -54,29 +53,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -87,7 +86,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -98,7 +97,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,47 +130,45 @@ spec:
     - id: skill-monitor
       version: ">=0.7.0"
       required: true
-      description: "监控服务依赖"
+      description: "鐩戞帶鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: resource-service
       version: "1.0"
-      description: "资源服务接口"
+      description: "璧勬簮鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: cpu
-      name: CPU监控
-      description: CPU使用率监控
-      category: service
+      name: CPU鐩戞帶
+      description: CPU浣跨敤鐜囩洃鎺?      category: service
     - id: memory
-      name: 内存监控
-      description: 内存使用监控
+      name: 鍐呭瓨鐩戞帶
+      description: 鍐呭瓨浣跨敤鐩戞帶
       category: service
     - id: disk
-      name: 磁盘监控
-      description: 磁盘使用监控
+      name: 纾佺洏鐩戞帶
+      description: 纾佺洏浣跨敤鐩戞帶
       category: service
     - id: network
-      name: 网络监控
-      description: 网络流量监控
+      name: 缃戠粶鐩戞帶
+      description: 缃戠粶娴侀噺鐩戞帶
       category: service
   
   endpoints:
     - path: /api/resources/cpu
       method: GET
-      description: CPU使用率
-      capability: cpu
+      description: CPU浣跨敤鐜?      capability: cpu
     - path: /api/resources/memory
       method: GET
-      description: 内存使用
+      description: 鍐呭瓨浣跨敤
       capability: memory
     - path: /api/resources/disk
       method: GET
-      description: 磁盘使用
+      description: 纾佺洏浣跨敤
       capability: disk
     - path: /api/resources/network
       method: GET
-      description: 网络流量
+      description: 缃戠粶娴侀噺
       capability: network
   
   config:
@@ -179,11 +176,11 @@ spec:
       - name: COLLECT_INTERVAL
         type: integer
         default: 10
-        description: 采集间隔(秒)
+        description: 閲囬泦闂撮殧(绉?
       - name: HISTORY_DAYS
         type: integer
         default: 7
-        description: 历史保留天数
+        description: 鍘嗗彶淇濈暀澶╂暟
   
   resources:
     cpu: "50m"

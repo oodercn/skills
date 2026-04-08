@@ -1,0 +1,93 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-payment-wechat
+  name: WeChat Pay Service
+  version: "3.0.1"
+  description: 微信支付服务，支持支付、退款、查询、对账等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/payment/skill-payment-wechat
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - wechat
+    - payment
+    - pay
+    - refund
+    - weixin
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - PAYMENT
+    - FINANCE
+
+  ownership: platform
+
+  capability:
+    category: payment
+    code: PAYMENT_WECHAT
+    operations: [pay, query, refund, reconcile]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.payment.wechat.WechatPayProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.payment.PaymentProvider
+      version: "1.0"
+      description: "支付提供商接口"
+
+  capabilities:
+    - id: pay
+      name: 支付下单
+      description: 创建微信支付订单
+      category: payment
+    - id: query
+      name: 订单查询
+      description: 查询支付状态
+      category: payment
+    - id: refund
+      name: 退款处理
+      description: 处理退款请求
+      category: payment
+    - id: reconcile
+      name: 对账功能
+      description: 下载对账单
+      category: payment
+
+  config:
+    required:
+      - name: WECHAT_PAY_APP_ID
+        type: string
+        description: 微信支付AppID
+      - name: WECHAT_PAY_MCH_ID
+        type: string
+        description: 微信支付商户号
+      - name: WECHAT_PAY_API_KEY
+        type: string
+        secret: true
+        description: 微信支付API密钥
+    optional:
+      - name: wechat.pay.notify.url
+        type: string
+        description: 支付回调地址
+
+  endpoints:
+    - path: /api/payment/wechat/pay
+      method: POST
+      description: 创建微信支付订单
+      capability: pay
+    - path: /api/payment/wechat/query
+      method: GET
+      description: 查询支付状态
+      capability: query
+    - path: /api/payment/wechat/refund
+      method: POST
+      description: 发起退款
+      capability: refund

@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-cmd-service
-  name: 命令监控服务
-  version: 0.7.3
-  description: 命令监控服务，提供命令执行、输出监控、状态管理
-  author: ooder Team
+  name: 鍛戒护鐩戞帶鏈嶅姟
+  version: "3.0.1"
+  description: 鍛戒护鐩戞帶鏈嶅姟锛屾彁渚涘懡浠ゆ墽琛屻€佽緭鍑虹洃鎺с€佺姸鎬佺鐞?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -53,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -131,56 +130,51 @@ spec:
     - id: skill-monitor
       version: ">=0.7.0"
       required: true
-      description: "监控服务依赖"
+      description: "鐩戞帶鏈嶅姟渚濊禆"
   
   providedInterfaces:
     - id: command-service
       version: "1.0"
-      description: "命令服务接口"
+      description: "鍛戒护鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: execute
-      name: 命令执行
-      description: 执行系统命令
+      name: 鍛戒护鎵ц
+      description: 鎵ц绯荤粺鍛戒护
       category: service
     - id: monitor
-      name: 输出监控
-      description: 监控命令输出
+      name: 杈撳嚭鐩戞帶
+      description: 鐩戞帶鍛戒护杈撳嚭
       category: service
     - id: status
-      name: 状态管理
-      description: 管理命令状态
-      category: service
+      name: 鐘舵€佺鐞?      description: 绠＄悊鍛戒护鐘舵€?      category: service
   
   endpoints:
     - path: /api/commands
       method: POST
-      description: 执行命令
+      description: 鎵ц鍛戒护
       capability: execute
     - path: /api/commands/{id}/output
       method: GET
-      description: 获取输出
+      description: 鑾峰彇杈撳嚭
       capability: monitor
     - path: /api/commands/{id}/status
       method: GET
-      description: 获取状态
-      capability: status
+      description: 鑾峰彇鐘舵€?      capability: status
   
   config:
     optional:
       - name: COMMAND_TIMEOUT
         type: integer
         default: 300
-        description: 命令超时(秒)
+        description: 鍛戒护瓒呮椂(绉?
       - name: MAX_OUTPUT_SIZE
         type: integer
         default: 1048576
-        description: 最大输出大小
-      - name: ALLOWED_COMMANDS
+        description: 鏈€澶ц緭鍑哄ぇ灏?      - name: ALLOWED_COMMANDS
         type: string
         default: "*"
-        description: 允许的命令列表
-  
+        description: 鍏佽鐨勫懡浠ゅ垪琛?  
   resources:
     cpu: "50m"
     memory: "64Mi"

@@ -1,0 +1,69 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-report
+  name: Report Service
+  version: "3.0.1"
+  description: 报表服务，支持报表生成、导出、模板管理等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/tools/skill-report
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - report
+    - export
+    - template
+    - pdf
+    - excel
+
+spec:
+  skillForm: TOOL
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - REPORTING
+    - DOCUMENT
+
+  ownership: platform
+
+  capability:
+    category: tool
+    code: REPORT_SERVICE
+    operations: [generate, export, template]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.report.ReportApiImpl
+
+  providedInterfaces:
+    - id: net.ooder.skill.report.ReportProvider
+      version: "1.0"
+      description: "报表提供商接口"
+
+  capabilities:
+    - id: generate
+      name: 报表生成
+      description: 根据模板生成报表
+      category: report
+    - id: export
+      name: 报表导出
+      description: 导出报表为PDF/Excel等格式
+      category: report
+    - id: template
+      name: 模板管理
+      description: 管理报表模板
+      category: report
+
+  config:
+    optional:
+      - name: REPORT_TEMPLATE_PATH
+        type: string
+        default: ./templates/report
+        description: 报表模板路径
+      - name: REPORT_OUTPUT_PATH
+        type: string
+        default: ./output/report
+        description: 报表输出路径

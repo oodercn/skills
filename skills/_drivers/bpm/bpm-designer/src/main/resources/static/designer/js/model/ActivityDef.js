@@ -4,20 +4,16 @@ class ActivityDef {
         this.name = data?.name || '新活动';
         this.description = data?.description || '';
         
-        const position = data?.position || 'NORMAL';
-        const activityType = data?.activityType;
+        this.activityType = data?.activityType || 'TASK';
         
-        if (position === 'START' || position === 'POSITION_START' || activityType === 'START') {
+        if (this.activityType === 'START') {
             this.position = 'START';
-            this.activityType = 'START';
             this.name = data?.name || '开始';
-        } else if (position === 'END' || position === 'POSITION_END' || activityType === 'END') {
+        } else if (this.activityType === 'END') {
             this.position = 'END';
-            this.activityType = 'END';
             this.name = data?.name || '结束';
         } else {
-            this.position = 'NORMAL';
-            this.activityType = activityType || 'TASK';
+            this.position = data?.position || 'NORMAL';
         }
         
         this.activityCategory = data?.activityCategory || 'HUMAN';
@@ -67,8 +63,7 @@ class ActivityDef {
     }
 
     isStartOrEnd() {
-        return this.position === 'START' || this.position === 'END' || 
-               this.activityType === 'START' || this.activityType === 'END';
+        return this.activityType === 'START' || this.activityType === 'END';
     }
 
     toJSON() {

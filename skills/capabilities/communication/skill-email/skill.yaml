@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-email
-  name: 邮件服务
-  version: 0.7.3
-  description: 邮件服务，支持邮件发送、接收、模板管理
-  author: ooder Team
+  name: 閭欢鏈嶅姟
+  version: "3.0.1"
+  description: 閭欢鏈嶅姟锛屾敮鎸侀偖浠跺彂閫併€佹帴鏀躲€佹ā鏉跨鐞?  author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
   keywords:
@@ -53,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -132,59 +131,55 @@ spec:
   providedInterfaces:
     - id: email-service
       version: "1.0"
-      description: "邮件服务接口"
+      description: "閭欢鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: send
-      name: 邮件发送
-      description: 发送邮件
-      category: service
+      name: 閭欢鍙戦€?      description: 鍙戦€侀偖浠?      category: service
     - id: receive
-      name: 邮件接收
-      description: 接收邮件
+      name: 閭欢鎺ユ敹
+      description: 鎺ユ敹閭欢
       category: service
     - id: template
-      name: 模板管理
-      description: 邮件模板管理
+      name: 妯℃澘绠＄悊
+      description: 閭欢妯℃澘绠＄悊
       category: service
   
   endpoints:
     - path: /api/email/send
       method: POST
-      description: 发送邮件
-      capability: send
+      description: 鍙戦€侀偖浠?      capability: send
     - path: /api/email/templates
       method: GET
-      description: 获取模板列表
+      description: 鑾峰彇妯℃澘鍒楄〃
       capability: template
     - path: /api/email/templates
       method: POST
-      description: 创建模板
+      description: 鍒涘缓妯℃澘
       capability: template
   
   config:
     required:
       - name: SMTP_HOST
         type: string
-        description: SMTP服务器地址
+        description: SMTP鏈嶅姟鍣ㄥ湴鍧€
       - name: SMTP_PORT
         type: integer
-        description: SMTP端口
+        description: SMTP绔彛
       - name: SMTP_USERNAME
         type: string
-        description: SMTP用户名
-      - name: SMTP_PASSWORD
+        description: SMTP鐢ㄦ埛鍚?      - name: SMTP_PASSWORD
         type: string
-        description: SMTP密码
+        description: SMTP瀵嗙爜
     optional:
       - name: SMTP_AUTH
         type: boolean
         default: true
-        description: 启用认证
+        description: 鍚敤璁よ瘉
       - name: SMTP_TLS
         type: boolean
         default: true
-        description: 启用TLS
+        description: 鍚敤TLS
   
   resources:
     cpu: "50m"
@@ -199,7 +194,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

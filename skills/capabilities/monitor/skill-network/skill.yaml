@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-network
   name: Network Management Skill
-  version: 0.7.3
-  description: 网络管理技能，提供网络配置、IP管理、设备扫描等功能
+  version: "3.0.1"
+  description: 缃戠粶绠＄悊鎶€鑳斤紝鎻愪緵缃戠粶閰嶇疆銆両P绠＄悊銆佽澶囨壂鎻忕瓑鍔熻兘
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-network
@@ -53,29 +53,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟锟?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷锟?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL琛ㄨ揪锟?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～锟?
           parameters:
             type: object
             properties:
@@ -86,7 +86,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +97,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇锟?
           parameters:
             type: object
             properties:
@@ -114,20 +114,20 @@ spec:
   capabilities:
     - id: network-config
       name: Network Configuration
-      description: 管理网络设置，包括DNS、DHCP、WiFi
+      description: 绠＄悊缃戠粶璁剧疆锛屽寘鎷珼NS銆丏HCP銆乄iFi
       category: network
     - id: ip-management
       name: IP Address Management
-      description: 管理IP地址和黑名单
+      description: 绠＄悊IP鍦板潃鍜岄粦鍚嶅崟
       category: network
     - id: device-scanning
       name: Network Device Scanning
-      description: 扫描和发现网络设�?
+      description: 鎵弿鍜屽彂鐜扮綉缁滆锟?
       category: network
   
   scenes:
     - name: network
-      description: 网络管理场景
+      description: 缃戠粶绠＄悊鍦烘櫙
       capabilities:
         - network-config
         - ip-management
@@ -140,60 +140,60 @@ spec:
       - name: NETWORK_SCAN_INTERVAL
         type: number
         default: 300000
-        description: 网络扫描间隔（毫秒）
+        description: 缃戠粶鎵弿闂撮殧锛堟绉掞級
       - name: DHCP_LEASE_FILE
         type: string
         default: /var/lib/dhcp/dhcpd.leases
-        description: DHCP租约文件路径
+        description: DHCP绉熺害鏂囦欢璺緞
       - name: ARP_CACHE_FILE
         type: string
         default: /proc/net/arp
-        description: ARP缓存文件路径
+        description: ARP缂撳瓨鏂囦欢璺緞
   
   endpoints:
     - path: /api/network/settings
       method: GET
-      description: 获取所有网络设�?
+      description: 鑾峰彇鎵€鏈夌綉缁滆锟?
       capability: network-config
     - path: /api/network/settings/{type}
       method: GET
-      description: 按类型获取网络设�?
+      description: 鎸夌被鍨嬭幏鍙栫綉缁滆锟?
       capability: network-config
     - path: /api/network/settings/{type}
       method: PUT
-      description: 更新网络设置
+      description: 鏇存柊缃戠粶璁剧疆
       capability: network-config
     - path: /api/network/ips
       method: GET
-      description: 获取IP地址列表
+      description: 鑾峰彇IP鍦板潃鍒楄〃
       capability: ip-management
     - path: /api/network/ips
       method: POST
-      description: 添加静态IP地址
+      description: 娣诲姞闈欐€両P鍦板潃
       capability: ip-management
     - path: /api/network/ips/{id}
       method: DELETE
-      description: 删除IP地址
+      description: 鍒犻櫎IP鍦板潃
       capability: ip-management
     - path: /api/network/blacklist
       method: GET
-      description: 获取IP黑名�?
+      description: 鑾峰彇IP榛戝悕锟?
       capability: ip-management
     - path: /api/network/blacklist
       method: POST
-      description: 添加IP到黑名单
+      description: 娣诲姞IP鍒伴粦鍚嶅崟
       capability: ip-management
     - path: /api/network/blacklist/{id}
       method: DELETE
-      description: 从黑名单移除IP
+      description: 浠庨粦鍚嶅崟绉婚櫎IP
       capability: ip-management
     - path: /api/network/devices
       method: GET
-      description: 获取网络设备
+      description: 鑾峰彇缃戠粶璁惧
       capability: device-scanning
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 鍋ュ悍妫€锟?
   
   resources:
     cpu: "200m"

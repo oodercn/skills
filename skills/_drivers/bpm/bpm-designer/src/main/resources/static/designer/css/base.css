@@ -39,7 +39,7 @@ html, body {
 }
 
 .d-btn-primary {
-    color: #fff;
+    color: var(--bg-card);
     background: var(--primary);
     border-color: var(--primary);
 }

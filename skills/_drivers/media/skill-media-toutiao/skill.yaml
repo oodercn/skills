@@ -1,0 +1,94 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-media-toutiao
+  name: Toutiao Media Service
+  version: "3.0.1"
+  description: 头条内容发布服务，支持文章发布、更新、删除、统计等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/media/skill-media-toutiao
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - toutiao
+    - media
+    - publish
+    - article
+
+spec:
+  skillForm: DRIVER
+  skillCategory: SERVICE
+  sceneType: TRIGGER
+  purposes:
+    - CONTENT_PUBLISH
+    - MEDIA
+
+  ownership: platform
+
+  capability:
+    category: media
+    code: MEDIA_TOUTIAO
+    operations: [publish, update, delete, stats]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.media.toutiao.ToutiaoMediaProvider
+
+  providedInterfaces:
+    - id: net.ooder.skill.media.MediaPublishProvider
+      version: "1.0"
+      description: "媒体发布提供商接口"
+
+  capabilities:
+    - id: publish
+      name: 文章发布
+      description: 发布文章到今日头条
+      category: media
+    - id: update
+      name: 文章更新
+      description: 更新已发布文章
+      category: media
+    - id: delete
+      name: 文章删除
+      description: 删除已发布文章
+      category: media
+    - id: stats
+      name: 数据统计
+      description: 获取文章阅读、点赞、评论等数据
+      category: media
+
+  config:
+    required:
+      - name: TOUTIAO_APP_ID
+        type: string
+        description: 头条应用ID
+      - name: TOUTIAO_APP_SECRET
+        type: string
+        secret: true
+        description: 头条应用密钥
+    optional:
+      - name: toutiao.api.endpoint
+        type: string
+        default: https://open.toutiao.com
+        description: 头条API端点
+
+  endpoints:
+    - path: /api/media/toutiao/articles
+      method: POST
+      description: 发布文章
+      capability: publish
+    - path: /api/media/toutiao/articles/{id}
+      method: PUT
+      description: 更新文章
+      capability: update
+    - path: /api/media/toutiao/articles/{id}
+      method: DELETE
+      description: 删除文章
+      capability: delete
+    - path: /api/media/toutiao/articles/{id}/stats
+      method: GET
+      description: 获取文章统计
+      capability: stats

@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: bpmserver
-  name: BPM流程引擎服务
-  version: "1.0.0"
-  description: BPM工作流引擎服务，提供流程定义、流程实例、任务管理等功能
+  name: BPM娴佺▼寮曟搸鏈嶅姟
+  version: "3.0.1"
+  description: BPM宸ヤ綔娴佸紩鎿庢湇鍔★紝鎻愪緵娴佺▼瀹氫箟銆佹祦绋嬪疄渚嬨€佷换鍔＄鐞嗙瓑鍔熻兘
   author: Ooder Team
   icon: ri-git-branch-line
 
@@ -23,28 +23,28 @@ spec:
   
   capabilities:
     - id: process-definition
-      name: 流程定义
-      description: 流程定义管理
+      name: 娴佺▼瀹氫箟
+      description: 娴佺▼瀹氫箟绠＄悊
       category: bpm
       autoBind: true
     - id: process-instance
-      name: 流程实例
-      description: 流程实例管理
+      name: 娴佺▼瀹炰緥
+      description: 娴佺▼瀹炰緥绠＄悊
       category: bpm
       autoBind: true
     - id: task-management
-      name: 任务管理
-      description: 用户任务管理
+      name: 浠诲姟绠＄悊
+      description: 鐢ㄦ埛浠诲姟绠＄悊
       category: bpm
       autoBind: true
     - id: route-management
-      name: 路由管理
-      description: 流程路由管理
+      name: 璺敱绠＄悊
+      description: 娴佺▼璺敱绠＄悊
       category: bpm
       autoBind: false
     - id: activity-execution
-      name: 活动执行
-      description: 流程活动执行
+      name: 娲诲姩鎵ц
+      description: 娴佺▼娲诲姩鎵ц
       category: bpm
       autoBind: false
       
@@ -58,33 +58,32 @@ spec:
     properties:
       dataSource:
         type: string
-        title: 数据源类型
-        default: "sqlite"
+        title: 鏁版嵁婧愮被鍨?        default: "sqlite"
       storagePath:
         type: string
-        title: 存储路径
+        title: 瀛樺偍璺緞
         default: "./data/bpm"
         
   endpoints:
     - path: /bpm/api/processdef/list
       method: GET
-      description: 获取流程定义列表
+      description: 鑾峰彇娴佺▼瀹氫箟鍒楄〃
       capability: process-definition
     - path: /bpm/api/processdef/{id}
       method: GET
-      description: 获取流程定义详情
+      description: 鑾峰彇娴佺▼瀹氫箟璇︽儏
       capability: process-definition
     - path: /bpm/api/processinst/start
       method: POST
-      description: 启动流程实例
+      description: 鍚姩娴佺▼瀹炰緥
       capability: process-instance
     - path: /bpm/api/task/list
       method: GET
-      description: 获取任务列表
+      description: 鑾峰彇浠诲姟鍒楄〃
       capability: task-management
     - path: /bpm/api/task/complete
       method: POST
-      description: 完成任务
+      description: 瀹屾垚浠诲姟
       capability: task-management
         
   estimatedResources:

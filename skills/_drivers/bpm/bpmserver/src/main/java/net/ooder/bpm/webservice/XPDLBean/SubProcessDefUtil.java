@@ -13,10 +13,10 @@ public class SubProcessDefUtil {
 
     private static final String SubFlow = "SubFlow";
     private static final String OutFlow = "OutFlow";
-    private static final String BolckFlow = "Block";
+    private static final String BlockFlow = "Block";
 
     public List<String> getActivitySetsXPDL(String versionId) throws BPMException {
-	return this.getSubPorcessXPDL(versionId, BolckFlow);
+        return this.getSubPorcessXPDL(versionId, BlockFlow);
     }
 
     public List<String> getSubPorcessXPDL(String versionId) throws BPMException {

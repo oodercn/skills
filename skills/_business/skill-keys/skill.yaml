@@ -1,0 +1,23 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-keys
+  name: Keys
+  version: 1.0.0
+  description: Keys Skill - API Key management service
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.keys.KeysAutoConfiguration
+  dependencies:
+    - skill-common
+
+  apis:
+    - /api/v1/keys
+    - /api/v1/keys/my
+    - /api/v1/keys/{keyId}/rotate
+    - /api/v1/keys/{keyId}/revoke
+
+  config:
+    ooder.keys.enabled: true

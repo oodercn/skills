@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 650" width="900px" height="650px">
+<defs>
+    <style>
+        .bg { fill: #fafafa; }
+        .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 8; }
+        .box-alt { fill: #dbeafe; stroke: #1e40af; stroke-width: 2; rx: 8; }
+        .box-highlight { fill: #fef3c7; stroke: #d97706; stroke-width: 2; rx: 8; }
+        .title-box { fill: #2563eb; stroke: none; rx: 4; }
+        .arrow { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+        .arrow-green { fill: none; stroke: #059669; stroke-width: 2; marker-end: url(#arrowhead-green); }
+        .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 12px; fill: #334155; }
+        .text-title { font-size: 14px; font-weight: bold; fill: #1e40af; }
+        .text-header { font-size: 16px; font-weight: bold; fill: #ffffff; }
+        .text-scenario { font-size: 13px; font-weight: bold; fill: #059669; }
+        .text-skill { font-size: 11px; fill: #475569; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+    <marker id="arrowhead-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#059669"/>
+    </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+
+<rect class="title-box" x="20" y="10" width="860" height="38" rx="4"/>
+<text class="text-header" x="450" y="36" text-anchor="middle">用户场景 → 技能组合推导图</text>
+
+<!-- Scenario 1: Intelligent Customer Service -->
+<rect class="box-highlight" x="20" y="62" width="420" height="145" fill="#fffbeb" stroke="#f59e0b"/>
+<text class="text-scenario" x="230" y="85" text-anchor="middle">🎯 场景一：智能客服系统</text>
+<text class="text" x="35" y="108">用户需求：自动回答客户问题，支持多渠道接入，知识库检索增强</text>
+<line x1="35" y1="118" x2="430" y2="118" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="35" y="138">所需技能组合：</text>
+<rect class="box-alt" x="35" y="148" width="105" height="22" rx="4"/><text class="text-skill" x="87" y="163" text-anchor="middle">IM驱动(钉钉)</text>
+<rect class="box-alt" x="150" y="148" width="105" height="22" rx="4"/><text class="text-skill" x="202" y="163" text-anchor="middle">LLM(DeepSeek)</text>
+<rect class="box-alt" x="265" y="148" width="105" height="22" rx="4"/><text class="text-skill" x="317" y="163" text-anchor="middle">RAG检索</text>
+<rect class="box-alt" x="35" y="178" width="115" height="22" rx="4"/><text class="text-skill" x="92" y="193" text-anchor="middle">知识管理(skill-knowledge)</text>
+<rect class="box-alt" x="160" y="178" width="135" height="22" rx="4"/><text class="text-skill" x="227" y="193" text-anchor="middle">消息统一(messaging)</text>
+
+<!-- Scenario 2: Daily Report Auto-gen -->
+<rect class="box-highlight" x="460" y="62" width="420" height="145" fill="#ecfdf5" stroke="#059669"/>
+<text class="text-scenario" x="670" y="85" text-anchor="middle">📋 场景二：日报自动生成</text>
+<text class="text" x="475" y="108">用户需求：自动汇总工作内容，AI生成日报，多格式输出</text>
+<line x1="475" y1="118" x2="870" y2="118" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="475" y="138">所需技能组合：</text>
+<rect class="box-alt" x="475" y="148" width="125" height="22" rx="4"/><text class="text-skill" x="537" y="163" text-anchor="middle">LLM(通义千问)</text>
+<rect class="box-alt" x="610" y="148" width="125" height="22" rx="4"/><text class="text-skill" x="672" y="163" text-anchor="middle">场景(daily-report)</text>
+<rect class="box-alt" x="475" y="178" width="125" height="22" rx="4"/><text class="text-skill" x="537" y="193" text-anchor="middle">模板引擎</text>
+<rect class="box-alt" x="610" y="178" width="125" height="22" rx="4"/><text class="text-skill" x="672" y="193" text-anchor="middle">通知(notification)</text>
+
+<!-- Scenario 3: Workflow Approval -->
+<rect class="box-highlight" x="20" y="220" width="420" height="145" fill="#fdf2f8" stroke="#ec4899"/>
+<text class="text-scenario" x="230" y="243" text-anchor="middle">✅ 场景三：流程审批自动化</text>
+<text class="text" x="35" y="266">用户需求：审批流程自动化，多级审批，移动端处理，状态追踪</text>
+<line x1="35" y1="276" x2="430" y2="276" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="35" y="296">所需技能组合：</text>
+<rect class="box-alt" x="35" y="306" width="125" height="22" rx="4"/><text class="text-skill" x="97" y="321" text-anchor="middle">BPM工作流</text>
+<rect class="box-alt" x="170" y="306" width="125" height="22" rx="4"/><text class="text-skill" x="232" y="321" text-anchor="middle">组织架构(org)</text>
+<rect class="box-alt" x="305" y="306" width="125" height="22" rx="4"/><text class="text-skill" x="367" y="321" text-anchor="middle">IM通知推送</text>
+<rect class="box-alt" x="35" y="336" width="125" height="22" rx="4"/><text class="text-skill" x="97" y="351" text-anchor="middle">场景(approval-form)</text>
+<rect class="box-alt" x="170" y="336" width="170" height="22" rx="4"/><text class="text-skill" x="255" y="351" text-anchor="middle">表单引擎+规则引擎</text>
+
+<!-- Scenario 4: Multi-platform Publishing -->
+<rect class="box-highlight" x="460" y="220" width="420" height="145" fill="#eff6ff" stroke="#0ea5e9"/>
+<text class="text-scenario" x="670" y="243" text-anchor="middle">📰 场景四：多平台一键发布</text>
+<text class="text" x="475" y="266">用户需求：一篇文章同时发布到头条、公众号、微博、知乎、小红书</text>
+<line x1="475" y1="276" x2="870" y2="276" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="475" y="296">所需技能组合：</text>
+<rect class="box-alt" x="475" y="306" width="125" height="22" rx="4"/><text class="text-skill" x="537" y="321" text-anchor="middle">LLM内容生成</text>
+<rect class="box-alt" x="610" y="306" width="125" height="22" rx="4"/><text class="text-skill" x="672" y="321" text-anchor="middle">媒体驱动×5</text>
+<rect class="box-alt" x="475" y="336" width="185" height="22" rx="4"/><text class="text-skill" x="567" y="351" text-anchor="middle">统一发布接口(media-provider)</text>
+
+<!-- Scenario 5: Knowledge Q&A -->
+<rect class="box-highlight" x="20" y="378" width="420" height="130" fill="#f5f3ff" stroke="#8b5cf6"/>
+<text class="text-scenario" x="230" y="400" text-anchor="middle">🔍 场景五：企业知识问答</text>
+<text class="text" x="35" y="423">用户需求：基于企业内部文档的智能问答，支持语义搜索和溯源</text>
+<line x1="35" y1="433" x2="430" y2="433" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="35" y="453">所需技能组合：</text>
+<rect class="box-alt" x="35" y="463" width="105" height="22" rx="4"/><text class="text-skill" x="87" y="478" text-anchor="middle">RAG增强</text>
+<rect class="box-alt" x="150" y="463" width="105" height="22" rx="4"/><text class="text-skill" x="202" y="478" text-anchor="middle">向量搜索</text>
+<rect class="box-alt" x="265" y="463" width="105" height="22" rx="4"/><text class="text-skill" x="317" y="478" text-anchor="middle">LLM推理</text>
+<rect class="box-alt" x="35" y="493" width="145" height="22" rx="4"/><text class="text-skill" x="107" y="508" text-anchor="middle">场景(knowledge-qa)</text>
+
+<!-- Scenario 6: Onboarding Assistant -->
+<rect class="box-highlight" x="460" y="378" width="420" height="130" fill="#fefce8" stroke="#eab308"/>
+<text class="text-scenario" x="670" y="400" text-anchor="middle">👋 场景六：新员工入职助手</text>
+<text class="text" x="475" y="423">用户需求：新员工引导、制度问答、环境配置、任务指引</text>
+<line x1="475" y1="433" x2="870" y2="433" stroke="#e5e7eb" stroke-dasharray="3,3"/>
+<text class="text-title" x="475" y="453">所需技能组合：</text>
+<rect class="box-alt" x="475" y="463" width="145" height="22" rx="4"/><text class="text-skill" x="547" y="478" text-anchor="middle">知识库(knowledge)</text>
+<rect class="box-alt" x="630" y="463" width="125" height="22" rx="4"/><text class="text-skill" x="692" y="478" text-anchor="middle">LLM对话</text>
+<rect class="box-alt" x="475" y="493" width="195" height="22" rx="4"/><text class="text-skill" x="572" y="508" text-anchor="middle">场景(onboarding-assistant)</text>
+
+<!-- Bottom: Skill Combination Principle -->
+<rect class="box" x="20" y="523" width="860" height="112" fill="#f8fafc" stroke="#475569" stroke-dasharray="5,3"/>
+<text class="text-title" x="450" y="545" text-anchor="middle">🧩 技能组合原理</text>
+<text class="text" x="40" y="570">• <tspan font-weight="bold">基础能力层</tspan>（_base SPI + capabilities）：提供原子能力接口，如 IM发送、LLM调用、RAG检索、文件存储</text>
+<text class="text" x="40" y="590">• <tspan font-weight="bold">驱动适配层</tspan>（_drivers）：将外部平台抽象为统一接口，如钉钉IM→ImDeliveryDriver，DeepSeek→LlmProvider</text>
+<text class="text" x="40" y="610">• <tspan font-weight="bold">场景编排层</tspan>（scenes + _business）：将原子能力组合为业务流程，如 客服=IM+LLM+RAG+Knowledge</text>
+<text class="text" x="40" y="630" style="font-size:11px;color:#059669;font-weight:bold;">→ 企业只需选择场景 skill，底层依赖由 ApexOS 自动解析并注入，实现「声明式组装」</text>
+</svg>

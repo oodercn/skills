@@ -4,14 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPM Designer</title>
-    <link rel="stylesheet" href="css/var.css?v=1775564000">
-    <link rel="stylesheet" href="css/base.css?v=1775564000">
-    <link rel="stylesheet" href="css/main.css?v=1775564000">
-    <link rel="stylesheet" href="css/panel.css?v=1775564000">
-    <link rel="stylesheet" href="css/palette.css?v=1775564000">
-    <link rel="stylesheet" href="css/node.css?v=1775564000">
-    <link rel="stylesheet" href="css/tree.css?v=1775564000">
-    <link rel="stylesheet" href="css/chat.css?v=1775564000">
+    <link rel="stylesheet" href="css/var.css?v=1775620000">
+    <link rel="stylesheet" href="css/base.css?v=1775620000">
+    <link rel="stylesheet" href="css/main.css?v=1775620000">
+    <link rel="stylesheet" href="css/panel.css?v=1775620000">
+    <link rel="stylesheet" href="css/palette.css?v=1775620000">
+    <link rel="stylesheet" href="css/node.css?v=1775620000">
+    <link rel="stylesheet" href="css/tree.css?v=1775620000">
+    <link rel="stylesheet" href="css/chat.css?v=1775620000">
     <script src="lib/icon/icons.js"></script>
 </head>
 <body>
@@ -192,24 +192,37 @@
     
     <div class="d-toast" id="toast"></div>
     
-    <script src="js/model/ProcessDef.js?v=1775564000"></script>
-    <script src="js/model/ActivityDef.js?v=1775564000"></script>
-    <script src="js/model/RouteDef.js?v=1775564000"></script>
-    <script src="js/model/AgentDef.js?v=1775564000"></script>
-    <script src="js/model/SceneDef.js?v=1775564000"></script>
-    <script src="js/sdk/Api.js?v=1775564000"></script>
-    <script src="js/sdk/Store.js?v=1775564000"></script>
-    <script src="js/sdk/Theme.js?v=1775564000"></script>
-    <script src="js/sdk/PanelSchema.js?v=1775564000"></script>
-    <script src="js/panel/PanelManager.js?v=1775564000"></script>
-    <script src="js/ContextMenu.js?v=1775564000"></script>
-    <script src="js/Tree.js?v=1775564000"></script>
-    <script src="js/Elements.js?v=1775564000"></script>
-    <script src="js/Canvas.js?v=1775564000"></script>
-    <script src="js/Chat.js?v=1775564000"></script>
-    <script src="js/Toolbar.js?v=1775564000"></script>
-    <script src="js/TabManager.js?v=1775564000"></script>
-    <script src="js/App.js?v=1775564000"></script>
+    <script src="js/model/ProcessDef.js?v=1775620000"></script>
+    <script src="js/model/ActivityDef.js?v=1775620000"></script>
+    <script src="js/model/RouteDef.js?v=1775620000"></script>
+    <script src="js/model/AgentDef.js?v=1775620000"></script>
+    <script src="js/model/SceneDef.js?v=1775620000"></script>
+    <script src="js/sdk/Api.js?v=1775620000"></script>
+    <script src="js/sdk/Store.js?v=1775620000"></script>
+    <script src="js/sdk/Theme.js?v=1775620000"></script>
+    <script src="js/sdk/PanelSchema.js?v=1775620000"></script>
+    <script src="js/panel/schemas/ProcessPanelSchema.js?v=1775620000"></script>
+    <script src="js/panel/schemas/ActivityPanelSchema.js?v=1775620000"></script>
+    <script src="js/panel/schemas/RoutePanelSchema.js?v=1775620000"></script>
+    <script src="js/panel/PanelPlugin.js?v=1775620000"></script>
+    <script src="js/panel/PanelManager.js?v=1775620000"></script>
+    <script src="js/panel/plugins/ProcessPanelPlugin.js?v=1775620000"></script>
+    <script src="js/panel/plugins/ActivityPanelPlugin.js?v=1775620000"></script>
+    <script src="js/panel/plugins/RoutePanelPlugin.js?v=1775620000"></script>
+    <script src="js/panel/PanelManagerNew.js?v=1775620000"></script>
+    <script src="js/panel/BasicPanel.js?v=1775620000"></script>
+    <script src="js/panel/TimingPanel.js?v=1775620000"></script>
+    <script src="js/panel/AgentPanel.js?v=1775620000"></script>
+    <script src="js/panel/ScenePanel.js?v=1775620000"></script>
+    <script src="js/panel/RoutePanel.js?v=1775620000"></script>
+    <script src="js/ContextMenu.js?v=1775620000"></script>
+    <script src="js/Tree.js?v=1775620000"></script>
+    <script src="js/Elements.js?v=1775620000"></script>
+    <script src="js/Canvas.js?v=1775620000"></script>
+    <script src="js/Chat.js?v=1775620000"></script>
+    <script src="js/Toolbar.js?v=1775620000"></script>
+    <script src="js/TabManager.js?v=1775620000"></script>
+    <script src="js/App.js?v=1775620000"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             window.app = new App();

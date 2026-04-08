@@ -1,0 +1,21 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-install-scene
+  name: Install Scene
+  version: 1.0.0
+  description: Install Scene Skill - Scene installation workflow management
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.install.scene.InstallSceneAutoConfiguration
+  dependencies: []
+
+  apis:
+    - /api/v1/install-scene/steps
+    - /api/v1/install-scene/skills
+    - /api/v1/install-scene/start
+
+  config:
+    ooder.install-scene.enabled: true

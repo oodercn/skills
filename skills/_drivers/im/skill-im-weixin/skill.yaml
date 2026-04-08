@@ -1,0 +1,71 @@
+﻿apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-im-weixin
+  name: 寰俊IM椹卞姩
+  version: "3.0.1"
+  description: 寰俊IM娑堟伅椹卞姩锛屾敮鎸佹秷鎭彂閫併€佹帴鏀躲€佷簨浠惰闃?  author: Ooder Team
+  icon: ri-wechat-line
+
+spec:
+  skillForm: DRIVER
+  
+  capabilities:
+    - id: send-message
+      name: 鍙戦€佹秷鎭?      description: 鍙戦€佸井淇℃秷鎭?      category: im
+      autoBind: true
+    - id: receive-message
+      name: 鎺ユ敹娑堟伅
+      description: 鎺ユ敹寰俊娑堟伅鍥炶皟
+      category: im
+      autoBind: true
+    - id: send-markdown
+      name: Markdown娑堟伅
+      description: 鍙戦€丮arkdown鏍煎紡娑堟伅
+      category: im
+      autoBind: false
+    - id: send-template
+      name: 妯℃澘娑堟伅
+      description: 鍙戦€佹ā鏉挎秷鎭?      category: im
+      autoBind: false
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=2.3.1"
+      required: true
+    - skillId: skill-org
+      version: ">=1.0.0"
+      required: false
+      
+  configSchema:
+    type: object
+    properties:
+      appId:
+        type: string
+        title: AppID
+        required: true
+        secret: true
+      appSecret:
+        type: string
+        title: AppSecret
+        required: true
+        secret: true
+      token:
+        type: string
+        title: Token
+        required: false
+        secret: true
+      encodingAESKey:
+        type: string
+        title: EncodingAESKey
+        required: false
+        secret: true
+      callbackUrl:
+        type: string
+        title: 鍥炶皟URL
+        required: false
+        
+  estimatedResources:
+    cpu: "50m"
+    memory: "64Mi"

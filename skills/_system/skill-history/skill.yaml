@@ -1,0 +1,106 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-history
+  name: 历史记录服务
+  version: 1.0.0
+  description: 提供执行历史记录、统计分析、重新执行等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2F
+    category: SYS
+    code: SYS_HISTORY
+    operations: [read, export, rerun]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: history-service
+      version: "1.0"
+      description: "历史记录服务接口"
+  
+  capabilities:
+    - id: history-query
+      name: 历史查询
+      description: 执行历史记录查询
+      category: history
+    - id: history-stats
+      name: 统计分析
+      description: 执行统计分析
+      category: history
+    - id: history-rerun
+      name: 重新执行
+      description: 重新执行历史任务
+      category: history
+  
+  endpoints:
+    - path: /api/v1/my/history/scenes
+      method: GET
+      controllerClass: net.ooder.skill.history.controller.HistoryController
+      methodName: listMyHistory
+      description: 获取我的执行历史
+      capability: history-query
+    - path: /api/v1/my/history/{executionId}
+      method: GET
+      controllerClass: net.ooder.skill.history.controller.HistoryController
+      methodName: getExecutionDetail
+      description: 获取执行详情
+      capability: history-query
+    - path: /api/v1/my/history/statistics
+      method: GET
+      controllerClass: net.ooder.skill.history.controller.HistoryController
+      methodName: getStatistics
+      description: 获取统计数据
+      capability: history-stats
+    - path: /api/v1/my/history/{sceneGroupId}/rerun
+      method: POST
+      controllerClass: net.ooder.skill.history.controller.HistoryController
+      methodName: rerunScene
+      description: 重新执行场景
+      capability: history-rerun
+    - path: /api/v1/my/history/export
+      method: GET
+      controllerClass: net.ooder.skill.history.controller.HistoryController
+      methodName: exportHistory
+      description: 导出历史记录
+      capability: history-query
+  
+  config:
+    optional:
+      - name: HISTORY_PAGE_SIZE
+        type: integer
+        default: 20
+        description: 默认分页大小
+  
+  resources:
+    cpu: "30m"
+    memory: "64Mi"
+    storage: "50Mi"

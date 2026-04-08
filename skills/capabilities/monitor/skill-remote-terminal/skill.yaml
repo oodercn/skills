@@ -1,0 +1,84 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-remote-terminal
+  name: Remote Terminal Service
+  version: "3.0.1"
+  description: 远程终端服务，支持SSH连接、命令执行、文件传输等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/capabilities/monitor/skill-remote-terminal
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - terminal
+    - ssh
+    - remote
+    - shell
+    - command
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - INFRASTRUCTURE
+    - MONITORING
+
+  ownership: platform
+
+  capability:
+    category: monitor
+    code: REMOTE_TERMINAL
+    operations: [connect, execute, transfer]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.terminal.RemoteTerminalSkillApplication
+
+  capabilities:
+    - id: connect
+      name: SSH连接
+      description: 建立SSH连接
+      category: terminal
+    - id: execute
+      name: 命令执行
+      description: 执行远程命令
+      category: terminal
+    - id: transfer
+      name: 文件传输
+      description: 上传下载文件
+      category: terminal
+
+  config:
+    required:
+      - name: TERMINAL_DEFAULT_HOST
+        type: string
+        description: 默认主机地址
+      - name: TERMINAL_DEFAULT_PORT
+        type: integer
+        default: 22
+        description: 默认SSH端口
+      - name: TERMINAL_DEFAULT_USER
+        type: string
+        description: 默认用户名
+      - name: TERMINAL_DEFAULT_PASSWORD
+        type: string
+        secret: true
+        description: 默认密码
+
+  endpoints:
+    - path: /api/terminal/connect
+      method: POST
+      description: 建立SSH连接
+      capability: connect
+    - path: /api/terminal/execute
+      method: POST
+      description: 执行命令
+      capability: execute
+    - path: /api/terminal/transfer
+      method: POST
+      description: 文件传输
+      capability: transfer

@@ -1,0 +1,12 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-setup
+  name: Setup
+  version: 1.0.0
+  description: System setup and plugin installation skill
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.setup.SetupAutoConfiguration

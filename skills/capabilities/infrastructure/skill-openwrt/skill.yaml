@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-openwrt
   name: OpenWrt Router Driver
-  version: 0.7.3
-  description: OpenWrt路由器驱动，提供路由器连接、配置管理和命令执行功能
+  version: "3.0.1"
+  description: OpenWrt璺敱鍣ㄩ┍鍔紝鎻愪緵璺敱鍣ㄨ繛鎺ャ€侀厤缃鐞嗗拰鍛戒护鎵ц鍔熻兘
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-openwrt
@@ -52,29 +52,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟锟?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷锟?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL琛ㄨ揪锟?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～锟?
           parameters:
             type: object
             properties:
@@ -85,7 +85,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -96,7 +96,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇锟?
           parameters:
             type: object
             properties:
@@ -113,28 +113,28 @@ spec:
   capabilities:
     - id: router-connection
       name: Router Connection
-      description: 通过SSH/HTTP连接OpenWrt路由�?
+      description: 閫氳繃SSH/HTTP杩炴帴OpenWrt璺敱锟?
       category: connection
     - id: uci-config
       name: UCI Configuration
-      description: 管理UCI配置
+      description: 绠＄悊UCI閰嶇疆
       category: configuration
     - id: command-execution
       name: Command Execution
-      description: 在路由器上执行命�?
+      description: 鍦ㄨ矾鐢卞櫒涓婃墽琛屽懡锟?
       category: execution
     - id: wifi-management
       name: WiFi Management
-      description: 管理WiFi设置
+      description: 绠＄悊WiFi璁剧疆
       category: network
     - id: dhcp-management
       name: DHCP Management
-      description: 管理DHCP设置
+      description: 绠＄悊DHCP璁剧疆
       category: network
   
   scenes:
     - name: openwrt
-      description: OpenWrt管理场景
+      description: OpenWrt绠＄悊鍦烘櫙
       capabilities:
         - router-connection
         - uci-config
@@ -149,76 +149,76 @@ spec:
       - name: CONNECTION_TIMEOUT
         type: number
         default: 30000
-        description: 连接超时时间（毫秒）
+        description: 杩炴帴瓒呮椂鏃堕棿锛堟绉掞級
       - name: SSH_PORT
         type: number
         default: 22
-        description: SSH端口
+        description: SSH绔彛
       - name: HTTP_PORT
         type: number
         default: 80
-        description: HTTP端口
+        description: HTTP绔彛
   
   endpoints:
     - path: /api/openwrt/connect
       method: POST
-      description: 连接路由�?
+      description: 杩炴帴璺敱锟?
       capability: router-connection
     - path: /api/openwrt/disconnect
       method: POST
-      description: 断开路由器连�?
+      description: 鏂紑璺敱鍣ㄨ繛锟?
       capability: router-connection
     - path: /api/openwrt/status
       method: GET
-      description: 获取连接状�?
+      description: 鑾峰彇杩炴帴鐘讹拷?
       capability: router-connection
     - path: /api/openwrt/info
       method: GET
-      description: 获取路由器信�?
+      description: 鑾峰彇璺敱鍣ㄤ俊锟?
       capability: router-connection
     - path: /api/openwrt/uci/get
       method: GET
-      description: 获取UCI配置
+      description: 鑾峰彇UCI閰嶇疆
       capability: uci-config
     - path: /api/openwrt/uci/set
       method: POST
-      description: 设置UCI配置
+      description: 璁剧疆UCI閰嶇疆
       capability: uci-config
     - path: /api/openwrt/uci/commit
       method: POST
-      description: 提交UCI更改
+      description: 鎻愪氦UCI鏇存敼
       capability: uci-config
     - path: /api/openwrt/command
       method: POST
-      description: 执行命令
+      description: 鎵ц鍛戒护
       capability: command-execution
     - path: /api/openwrt/wifi/list
       method: GET
-      description: 列出WiFi网络
+      description: 鍒楀嚭WiFi缃戠粶
       capability: wifi-management
     - path: /api/openwrt/wifi/update
       method: POST
-      description: 更新WiFi配置
+      description: 鏇存柊WiFi閰嶇疆
       capability: wifi-management
     - path: /api/openwrt/wifi/scan
       method: POST
-      description: 扫描WiFi网络
+      description: 鎵弿WiFi缃戠粶
       capability: wifi-management
     - path: /api/openwrt/dhcp/leases
       method: GET
-      description: 获取DHCP租约
+      description: 鑾峰彇DHCP绉熺害
       capability: dhcp-management
     - path: /api/openwrt/packages
       method: GET
-      description: 列出软件�?
+      description: 鍒楀嚭杞欢锟?
       capability: command-execution
     - path: /api/openwrt/reboot
       method: POST
-      description: 重启路由�?
+      description: 閲嶅惎璺敱锟?
       capability: command-execution
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 鍋ュ悍妫€锟?
   
   resources:
     cpu: "200m"

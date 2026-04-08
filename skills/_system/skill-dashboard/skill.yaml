@@ -1,0 +1,100 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-dashboard
+  name: 仪表盘服务
+  version: 1.0.0
+  description: 提供系统统计、执行统计、市场统计等仪表盘数据服务
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2C
+    category: SYS
+    code: SYS_DASHBOARD
+    operations: [read, stats]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: dashboard-service
+      version: "1.0"
+      description: "仪表盘数据服务接口"
+  
+  capabilities:
+    - id: system-stats
+      name: 系统统计
+      description: 系统运行状态统计
+      category: dashboard
+    - id: execution-stats
+      name: 执行统计
+      description: 任务执行情况统计
+      category: dashboard
+    - id: market-stats
+      name: 市场统计
+      description: 技能市场统计数据
+      category: dashboard
+  
+  endpoints:
+    - path: /api/v1/dashboard/stats
+      method: POST
+      controllerClass: net.ooder.skill.dashboard.controller.DashboardController
+      methodName: getStats
+      description: 获取仪表盘统计数据
+      capability: system-stats
+    - path: /api/v1/dashboard/execution-stats
+      method: POST
+      controllerClass: net.ooder.skill.dashboard.controller.DashboardController
+      methodName: getExecutionStats
+      description: 获取执行统计
+      capability: execution-stats
+    - path: /api/v1/dashboard/market-stats
+      method: POST
+      controllerClass: net.ooder.skill.dashboard.controller.DashboardController
+      methodName: getMarketStats
+      description: 获取市场统计
+      capability: market-stats
+    - path: /api/v1/dashboard/system-stats
+      method: POST
+      controllerClass: net.ooder.skill.dashboard.controller.DashboardController
+      methodName: getSystemStats
+      description: 获取系统统计
+      capability: system-stats
+  
+  config:
+    optional:
+      - name: STATS_CACHE_TTL
+        type: integer
+        default: 60
+        description: 统计数据缓存时间(秒)
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "10Mi"

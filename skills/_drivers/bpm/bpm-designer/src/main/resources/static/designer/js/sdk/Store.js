@@ -34,8 +34,14 @@ class Store {
     }
 
     selectActivity(activityId) {
+        console.log('[Store] selectActivity called with id:', activityId);
+        console.log('[Store] current process:', this.process ? 'exists' : 'null');
+        console.log('[Store] activities count:', this.process?.activities?.length || 0);
+        if (this.process && this.process.activities) {
+            console.log('[Store] activity ids:', this.process.activities.map(a => a.activityDefId));
+        }
         this.currentActivity = this.getActivity(activityId);
-        console.log('[Store] selectActivity:', activityId, '->', this.currentActivity);
+        console.log('[Store] selectActivity result:', activityId, '->', this.currentActivity ? this.currentActivity.name : 'null');
         this._emit('activity:select', this.currentActivity);
     }
 
@@ -53,10 +59,14 @@ class Store {
     }
 
     addActivity(activityDef) {
-        if (!this.process) return;
+        if (!this.process) {
+            console.log('[Store] No process exists, creating new process...');
+            this.process = new ProcessDef({});
+        }
         this.process.addActivity(activityDef);
         this._saveHistory();
         this.dirty = true;
+        console.log('[Store] Activity added:', activityDef.activityDefId, 'total activities:', this.process.activities.length);
         this._emit('activity:add', activityDef);
     }
 
@@ -72,7 +82,10 @@ class Store {
     }
 
     addRoute(routeDef) {
-        if (!this.process) return;
+        if (!this.process) {
+            console.log('[Store] No process exists, creating new process...');
+            this.process = new ProcessDef({});
+        }
         this.process.addRoute(routeDef);
         this._saveHistory();
         this.dirty = true;
@@ -85,6 +98,18 @@ class Store {
         this._saveHistory();
         this.dirty = true;
         this._emit('route:remove', routeId);
+    }
+
+    getRoute(routeId) {
+        if (!this.process || !routeId) return null;
+        return this.process.routes?.find(r => r.routeDefId === routeId);
+    }
+
+    selectRoute(routeId) {
+        console.log('[Store] selectRoute called with id:', routeId);
+        this.currentRoute = this.getRoute(routeId);
+        console.log('[Store] selectRoute result:', routeId, '->', this.currentRoute ? this.currentRoute.name : 'null');
+        this._emit('route:select', this.currentRoute);
     }
 
     _saveHistory() {

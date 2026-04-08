@@ -1,0 +1,108 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-notification
+  name: 通知服务
+  version: 1.0.0
+  description: 提供系统通知、消息推送、消息管理等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2D
+    category: SYS
+    code: SYS_NOTIFICATION
+    operations: [create, read, update, delete, send]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+    
+  dependencies: []
+  
+  providedInterfaces:
+    - id: notification-service
+      version: "1.0"
+      description: "通知服务接口"
+  
+  capabilities:
+    - id: notification-manage
+      name: 通知管理
+      description: 通知的增删改查
+      category: notification
+    - id: message-send
+      name: 消息发送
+      description: 多渠道消息发送
+      category: notification
+  
+  endpoints:
+    - path: /api/v1/notifications
+      method: GET
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: getNotifications
+      description: 获取通知列表
+      capability: notification-manage
+    - path: /api/v1/notifications/unread-count
+      method: GET
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: getUnreadCount
+      description: 获取未读数量
+      capability: notification-manage
+    - path: /api/v1/notifications/{notificationId}/read
+      method: POST
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: markAsRead
+      description: 标记已读
+      capability: notification-manage
+    - path: /api/v1/notifications/read-all
+      method: POST
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: markAllAsRead
+      description: 全部标记已读
+      capability: notification-manage
+    - path: /api/v1/notifications/channels
+      method: GET
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: getAvailableChannels
+      description: 获取可用渠道
+      capability: message-send
+    - path: /api/v1/notifications/send
+      method: POST
+      controllerClass: net.ooder.skill.notification.controller.NotificationController
+      methodName: sendMessage
+      description: 发送消息
+      capability: message-send
+  
+  config:
+    optional:
+      - name: MSG_PUSH_BASE_URL
+        type: string
+        default: "http://localhost:8081"
+        description: 消息推送服务地址
+  
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "50Mi"

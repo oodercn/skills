@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-command-shortcut
   name: Command Shortcut
-  version: "3.0.2"
+  version: "3.0.1"
   description: Manages command shortcuts, aliases, and quick actions
   author: Ooder Team
   icon: ri-terminal-box-line
@@ -22,18 +22,17 @@ spec:
   capabilities:
     - id: shortcut-management
       name: Shortcut Management
-      description: 快捷命令管理
+      description: 蹇嵎鍛戒护绠＄悊
       category: tools
       autoBind: true
     - id: alias-management
       name: Alias Management
-      description: 命令别名管理
+      description: 鍛戒护鍒悕绠＄悊
       category: tools
       autoBind: false
     - id: quick-actions
       name: Quick Actions
-      description: 快速操作
-      category: tools
+      description: 蹇€熸搷浣?      category: tools
       autoBind: false
       
   dependencies:

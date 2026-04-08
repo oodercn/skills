@@ -118,21 +118,29 @@ class App {
     }
 
     _initCanvas() {
-        this.canvas = new Canvas(document.getElementById('canvas'), this.store);
+        this.canvas = new Canvas(document.getElementById('canvas'), this.store, this);
     }
 
     _initPanel() {
-        this.panelManager = new PanelManager(document.getElementById('panel'), this.store);
+        console.log('[App] Initializing panel with new plugin system...');
+        const panelEl = document.getElementById('panel');
+        console.log('[App] Panel element:', panelEl);
+        
+        // 使用新的插件架构面板管理器
+        this.panelManager = new PanelManagerNew(panelEl, this.store);
+        console.log('[App] PanelManagerNew initialized');
 
         this.store.on('activity:select', (activity) => {
+            console.log('[App] activity:select event received:', activity);
             if (activity) {
+                console.log('[App] Rendering activity panel with new plugin...');
                 this.panelManager.render('activity', activity);
-                document.getElementById('panelTitle').textContent = activity.name || '活动属性';
-                this._showPanel();
+                console.log('[App] Activity panel rendered');
             }
         });
 
         this.store.on('route:select', (route) => {
+            console.log('[App] route:select event received:', route);
             if (route) {
                 const fromActivity = this.store.getActivity(route.from);
                 const toActivity = this.store.getActivity(route.to);
@@ -144,15 +152,17 @@ class App {
                 };
                 
                 this.panelManager.render('route', routeData);
-                document.getElementById('panelTitle').textContent = '路由属性';
-                this._showPanel();
+                console.log('[App] Route panel rendered');
             }
         });
 
         this.store.on('process:change', (process) => {
             if (process) {
                 this.panelManager.render('process', process);
-                document.getElementById('panelTitle').textContent = process.name || '流程属性';
+                const panelTitle = document.getElementById('panelTitle');
+                if (panelTitle) {
+                    panelTitle.textContent = process.name || '流程属性';
+                }
             }
         });
 
@@ -359,11 +369,85 @@ class App {
                 this.canvas.selectNode(activityId);
             }
         });
+
+        this.store.on('subprocess:open', (data) => {
+            console.log('[App] Opening subprocess:', data);
+            this.tabManager.openTab(data.processDef, {
+                tabType: 'subprocess',
+                tabId: 'sub_' + data.activityId,
+                parentTabId: data.parentTabId
+            });
+        });
+
+        this.store.on('subprocess:open-existing', async (data) => {
+            console.log('[App] Opening existing subprocess:', data);
+            try {
+                const response = await this.api.getProcess(data.processDefId, data.version);
+                if (response && response.data) {
+                    this.tabManager.openTab(response.data, {
+                        tabType: 'subprocess',
+                        tabId: 'sub_' + data.activityId,
+                        parentTabId: data.parentTabId
+                    });
+                }
+            } catch (error) {
+                console.error('[App] Failed to load subprocess:', error);
+                this._toast('加载子流程失败: ' + error.message, 'error');
+            }
+        });
+
+        this.store.on('outflow:open', async (data) => {
+            console.log('[App] Opening outflow:', data);
+            try {
+                const response = await this.api.getProcess(data.processDefId);
+                if (response && response.data) {
+                    this.tabManager.openTab(response.data, {
+                        tabType: 'outflow',
+                        tabId: 'out_' + data.activityId,
+                        parentTabId: data.parentTabId
+                    });
+                }
+            } catch (error) {
+                console.error('[App] Failed to load outflow:', error);
+                this._toast('加载外部流程失败: ' + error.message, 'error');
+            }
+        });
     }
 
     _loadProcessToCanvas(processData) {
         console.log('[App] Loading process to canvas:', processData);
         this.tabManager.openTab(processData);
+    }
+
+    _loadProcessContent(processData) {
+        console.log('[App] Loading process content to canvas:', processData);
+        console.log('[App] processData.activities:', processData.activities);
+        console.log('[App] processData.routes:', processData.routes);
+        
+        try {
+            const process = new ProcessDef(processData);
+            console.log('[App] Process created:', process);
+            console.log('[App] process.activities:', process.activities);
+            console.log('[App] process.routes:', process.routes);
+            console.log('[App] process.activities length:', process.activities?.length);
+            
+            if (process.activities && process.activities.length > 0) {
+                process.activities.forEach((act, i) => {
+                    console.log(`[App] Activity ${i}:`, act.activityDefId, act.name, 'positionCoord:', act.positionCoord);
+                });
+            }
+            
+            console.log('[App] Calling store.setProcess...');
+            this.store.setProcess(process);
+            console.log('[App] Calling canvas.loadProcess...');
+            this.canvas.loadProcess(process);
+            console.log('[App] canvas.loadProcess completed');
+            
+            document.getElementById('processName').textContent = process.name;
+        } catch (error) {
+            console.error('[App] Error in _loadProcessContent:', error);
+            this._toast('加载流程失败: ' + error.message, 'error');
+        }
     }
 
     loadProcessToCanvas(processData) {

@@ -1,11 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-msg
-  name: 消息服务
-  version: 0.7.3
-  description: 消息服务，支持消息队列、订阅发布能力
+  name: 娑堟伅鏈嶅姟
+  version: "3.0.1"
+  description: 娑堟伅鏈嶅姟锛屾敮鎸佹秷鎭槦鍒椼€佽闃呭彂甯冭兘鍔?
   author: ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills
@@ -53,29 +53,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方法"
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操作"
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达式"
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填写"
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
@@ -86,7 +86,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -97,7 +97,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使用"
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
@@ -132,34 +132,34 @@ spec:
   providedInterfaces:
     - id: message-service
       version: "1.0"
-      description: "消息服务接口"
+      description: "娑堟伅鏈嶅姟鎺ュ彛"
   
   capabilities:
     - id: publish
-      name: 消息发布
-      description: 发布消息到队列
+      name: 娑堟伅鍙戝竷
+      description: 鍙戝竷娑堟伅鍒伴槦鍒?
       category: service
     - id: subscribe
-      name: 消息订阅
-      description: 订阅消息队列
+      name: 娑堟伅璁㈤槄
+      description: 璁㈤槄娑堟伅闃熷垪
       category: service
     - id: queue
-      name: 队列管理
-      description: 管理消息队列
+      name: 闃熷垪绠＄悊
+      description: 绠＄悊娑堟伅闃熷垪
       category: service
   
   endpoints:
     - path: /api/msg/publish
       method: POST
-      description: 发布消息
+      description: 鍙戝竷娑堟伅
       capability: publish
     - path: /api/msg/subscribe
       method: POST
-      description: 订阅消息
+      description: 璁㈤槄娑堟伅
       capability: subscribe
     - path: /api/msg/queues
       method: GET
-      description: 获取队列列表
+      description: 鑾峰彇闃熷垪鍒楄〃
       capability: queue
   
   config:
@@ -167,15 +167,15 @@ spec:
       - name: MSG_TYPE
         type: string
         default: "memory"
-        description: 消息类型 (memory/redis/kafka)
+        description: 娑堟伅绫诲瀷 (memory/redis/kafka)
       - name: MAX_QUEUE_SIZE
         type: integer
         default: 10000
-        description: 最大队列大小
+        description: 鏈€澶ч槦鍒楀ぇ灏?
       - name: MSG_TTL
         type: integer
         default: 86400
-        description: 消息过期时间(秒)
+        description: 娑堟伅杩囨湡鏃堕棿(绉?
   
   resources:
     cpu: "100m"
@@ -190,7 +190,7 @@ spec:
   knowledge:
     documents:
       - id: overview
-        name: 功能概述
+        name: 鍔熻兘姒傝堪
         path: README.md
         type: guide
         language: zh

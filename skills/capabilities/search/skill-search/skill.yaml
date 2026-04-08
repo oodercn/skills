@@ -1,0 +1,89 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-search
+  name: Search Service
+  version: "3.0.1"
+  description: 搜索服务，支持全文检索、聚合分析、索引管理等功能
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/capabilities/search/skill-search
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - search
+    - elasticsearch
+    - fulltext
+    - index
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - INFRASTRUCTURE
+    - SEARCH
+
+  ownership: platform
+
+  capability:
+    category: search
+    code: SEARCH_SERVICE
+    operations: [search, index, aggregate]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skill.search.SearchApiImpl
+
+  providedInterfaces:
+    - id: net.ooder.skill.search.SearchProvider
+      version: "1.0"
+      description: "搜索提供商接口"
+
+  capabilities:
+    - id: search
+      name: 全文检索
+      description: 执行全文检索查询
+      category: search
+    - id: index
+      name: 索引管理
+      description: 创建和管理索引
+      category: search
+    - id: aggregate
+      name: 聚合分析
+      description: 执行聚合分析
+      category: search
+
+  config:
+    required:
+      - name: ELASTICSEARCH_HOST
+        type: string
+        description: Elasticsearch主机地址
+      - name: ELASTICSEARCH_PORT
+        type: integer
+        default: 9200
+        description: Elasticsearch端口
+    optional:
+      - name: ELASTICSEARCH_USERNAME
+        type: string
+        description: Elasticsearch用户名
+      - name: ELASTICSEARCH_PASSWORD
+        type: string
+        secret: true
+        description: Elasticsearch密码
+
+  endpoints:
+    - path: /api/search/query
+      method: POST
+      description: 执行搜索查询
+      capability: search
+    - path: /api/search/index
+      method: POST
+      description: 创建索引
+      capability: index
+    - path: /api/search/aggregate
+      method: POST
+      description: 执行聚合分析
+      capability: aggregate

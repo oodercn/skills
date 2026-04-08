@@ -24,6 +24,7 @@ public class ProcessDef {
     private String modifierId;
     private String modifierName;
     private String modifyTime;
+    private String updatedTime;
     private String mark = "GLOBAL";
     private String lock = "NO_LOCK";
     private Boolean autoSave = false;
@@ -140,4 +141,13 @@ public class ProcessDef {
     
     public String getCreatedTime() { return createdTime; }
     public void setCreatedTime(String createdTime) { this.createdTime = createdTime; }
+    
+    public String getUpdatedTime() { return updatedTime; }
+    public void setUpdatedTime(String updatedTime) { this.updatedTime = updatedTime; }
+    
+    public String getCategory() { return classification; }
+    public void setCategory(String category) { this.classification = category; }
+    
+    public String getStatus() { return publicationStatus; }
+    public void setStatus(String status) { this.publicationStatus = status; }
 }

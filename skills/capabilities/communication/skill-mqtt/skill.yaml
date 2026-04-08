@@ -1,12 +1,11 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: Skill
 
 metadata:
   id: skill-mqtt
   name: MQTT Service
-  version: 0.7.3
-  description: MQTT服务技能 - 提供轻量级MQTT Broker能力和多提供商支持
-  author: Ooder Team
+  version: "3.0.1"
+  description: MQTT鏈嶅姟鎶€鑳?- 鎻愪緵杞婚噺绾QTT Broker鑳藉姏鍜屽鎻愪緵鍟嗘敮鎸?  author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/skill-mqtt
   repository: https://gitee.com/ooderCN/skills.git
@@ -72,29 +71,29 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟锟?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷锟?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL琛ㄨ揪锟?
               context:
                 type: object
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～锟?
           parameters:
             type: object
             properties:
@@ -105,7 +104,7 @@ spec:
                 items:
                   type: object
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
@@ -116,7 +115,7 @@ spec:
                 items:
                   type: object
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇锟?
           parameters:
             type: object
             properties:
@@ -133,38 +132,38 @@ spec:
   capabilities:
     - id: mqtt-broker
       name: MQTT Broker
-      description: MQTT代理服务
+      description: MQTT浠ｇ悊鏈嶅姟
       category: messaging
     - id: mqtt-publish
       name: MQTT Publish
-      description: 消息发布
+      description: 娑堟伅鍙戝竷
       category: messaging
     - id: mqtt-subscribe
       name: MQTT Subscribe
-      description: 消息订阅
+      description: 娑堟伅璁㈤槄
       category: messaging
     - id: mqtt-p2p
       name: MQTT P2P
-      description: 点对点消�?
+      description: 鐐瑰鐐规秷锟?
       category: messaging
     - id: mqtt-topic
       name: MQTT Topic
-      description: 主题管理
+      description: 涓婚绠＄悊
       category: messaging
     - id: mqtt-command
       name: MQTT Command
-      description: 命令执行
+      description: 鍛戒护鎵ц
       category: messaging
   
   scenes:
     - name: mqtt-messaging
-      description: MQTT消息场景
+      description: MQTT娑堟伅鍦烘櫙
       capabilities:
         - mqtt-broker
         - mqtt-publish
         - mqtt-subscribe
     - name: iot-device
-      description: IoT设备场景
+      description: IoT璁惧鍦烘櫙
       capabilities:
         - mqtt-p2p
         - mqtt-topic
@@ -177,40 +176,40 @@ spec:
       - name: MQTT_PORT
         type: number
         default: 1883
-        description: MQTT服务端口
+        description: MQTT鏈嶅姟绔彛
       - name: MQTT_WS_PORT
         type: number
         default: 8083
-        description: WebSocket端口
+        description: WebSocket绔彛
       - name: MQTT_MAX_CONNECTIONS
         type: number
         default: 10000
-        description: 最大连接数
+        description: 鏈€澶ц繛鎺ユ暟
       - name: MQTT_ALLOW_ANONYMOUS
         type: boolean
         default: false
-        description: 是否允许匿名连接
+        description: 鏄惁鍏佽鍖垮悕杩炴帴
   
   endpoints:
     - path: /api/mqtt/publish
       method: POST
-      description: 发布消息
+      description: 鍙戝竷娑堟伅
       capability: mqtt-publish
     - path: /api/mqtt/subscribe
       method: POST
-      description: 订阅主题
+      description: 璁㈤槄涓婚
       capability: mqtt-subscribe
     - path: /api/mqtt/topics
       method: GET
-      description: 获取主题列表
+      description: 鑾峰彇涓婚鍒楄〃
       capability: mqtt-topic
     - path: /api/mqtt/command
       method: POST
-      description: 执行命令
+      description: 鎵ц鍛戒护
       capability: mqtt-command
     - path: /api/health
       method: GET
-      description: 健康检�?
+      description: 鍋ュ悍妫€锟?
   
   resources:
     cpu: "200m"

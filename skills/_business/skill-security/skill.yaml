@@ -1,0 +1,22 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-security
+  name: Security
+  version: 1.0.0
+  description: Security Skill - Security configuration and policy management
+  author: ooder
+
+spec:
+  entryPoint: net.ooder.skill.security.SecurityAutoConfiguration
+  dependencies: []
+
+  apis:
+    - /api/v1/security/config
+    - /api/v1/security/policies
+    - /api/v1/security/policies/{policyId}
+    - /api/v1/security/stats
+
+  config:
+    ooder.security.enabled: true

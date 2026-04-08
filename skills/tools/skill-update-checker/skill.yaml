@@ -1,0 +1,67 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-update-checker
+  name: Update Checker Service
+  version: "3.0.1"
+  description: 更新检查服务，自动检测技能和系统更新，发送更新通知
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/tools/skill-update-checker
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - update
+    - checker
+    - notification
+    - version
+
+spec:
+  skillForm: TOOL
+  skillCategory: SERVICE
+  sceneType: AUTO
+  purposes:
+    - MAINTENANCE
+    - NOTIFICATION
+
+  ownership: platform
+
+  capability:
+    category: tool
+    code: UPDATE_CHECKER
+    operations: [check, notify, auto-update]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+    mainClass: net.ooder.skills.update.UpdateCheckerSkill
+
+  capabilities:
+    - id: check
+      name: 更新检查
+      description: 检查技能和系统更新
+      category: update
+    - id: notify
+      name: 更新通知
+      description: 发送更新通知
+      category: update
+    - id: auto-update
+      name: 自动更新
+      description: 自动安装更新
+      category: update
+
+  config:
+    optional:
+      - name: UPDATE_CHECK_INTERVAL
+        type: integer
+        default: 86400
+        description: 更新检查间隔(秒)
+      - name: UPDATE_SERVER_URL
+        type: string
+        default: https://api.ooder.net/updates
+        description: 更新服务器地址
+      - name: AUTO_UPDATE_ENABLED
+        type: boolean
+        default: false
+        description: 是否启用自动更新

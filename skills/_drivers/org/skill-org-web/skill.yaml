@@ -1,0 +1,49 @@
+﻿apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-org-web
+  name: 缁勭粐绠＄悊椹卞姩
+  version: "3.0.1"
+  description: 缁勭粐绠＄悊Web閫傞厤鍣紝鎻愪緵鐢ㄦ埛銆侀儴闂ㄧ鐞嗗姛鑳?  author: Ooder Team
+  icon: ri-team-line
+
+spec:
+  skillForm: DRIVER
+  
+  capabilities:
+    - id: user-management
+      name: 鐢ㄦ埛绠＄悊
+      description: 鐢ㄦ埛澧炲垹鏀规煡
+      category: org
+      autoBind: true
+    - id: department-management
+      name: 閮ㄩ棬绠＄悊
+      description: 閮ㄩ棬澧炲垹鏀规煡
+      category: org
+      autoBind: true
+    - id: role-management
+      name: 瑙掕壊绠＄悊
+      description: 瑙掕壊鏌ヨ
+      category: org
+      autoBind: true
+      
+  dependencies:
+    - skillId: skill-common
+      version: ">=2.3.1"
+      required: true
+      
+  configSchema:
+    type: object
+    properties:
+      storageType:
+        type: string
+        default: "memory"
+        title: 瀛樺偍绫诲瀷
+      autoInit:
+        type: boolean
+        default: true
+        title: 鑷姩鍒濆鍖栭粯璁ゆ暟鎹?        
+  estimatedResources:
+    cpu: "25m"
+    memory: "32Mi"

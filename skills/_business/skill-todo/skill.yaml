@@ -1,0 +1,65 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-todo
+  name: Todo Skill
+  version: 1.0.0
+  description: Todo Skill - Task and todo management service for scene workbench
+  author: ooder Team
+  type: business-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: business-skill
+
+  ownership: tenant
+
+  capability:
+    address: 0x41
+    category: BIZ
+    code: BIZ_TODO
+    operations: [create, update, delete, query, assign]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=1.0.0"
+      required: false
+
+  endpoints:
+    - path: /api/v1/my/todos
+      method: GET
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: listMyTodos
+      description: 获取我的待办列表
+      capability: query
+    - path: /api/v1/my/todos/pending
+      method: GET
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: listPendingTodos
+      description: 获取待处理的待办
+      capability: query
+    - path: /api/v1/my/todos/count
+      method: GET
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: countByType
+      description: 获取待办数量
+      capability: query
+
+  config:
+    optional:
+      - name: TODO_CACHE_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用待办缓存
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

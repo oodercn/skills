@@ -1,0 +1,126 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-key
+  name: 密钥管理服务
+  version: 1.0.0
+  description: 提供密钥生成、验证、访问控制等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: DRIVER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x2E
+    category: SYS
+    code: SYS_KEY
+    operations: [create, validate, rotate, revoke, access]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  dependencies: []
+  
+  endpoints:
+    - path: /api/v1/keys
+      method: GET
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: listKeys
+      description: 获取密钥列表
+      capability: create
+    - path: /api/v1/keys/{keyId}
+      method: GET
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: getKey
+      description: 获取密钥详情
+      capability: create
+    - path: /api/v1/keys
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: createKey
+      description: 创建密钥
+      capability: create
+    - path: /api/v1/keys/{keyId}/rotate
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: rotateKey
+      description: 轮换密钥
+      capability: rotate
+    - path: /api/v1/keys/{keyId}/revoke
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: revokeKey
+      description: 吊销密钥
+      capability: revoke
+    - path: /api/v1/keys/{keyId}/validate
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: validateKey
+      description: 验证密钥
+      capability: validate
+    - path: /api/v1/keys/{keyId}/access
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: accessResource
+      description: 访问资源
+      capability: access
+    - path: /api/v1/keys/by-user/{userId}
+      method: GET
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: getKeysByUser
+      description: 获取用户密钥
+      capability: create
+    - path: /api/v1/keys/by-scene/{sceneGroupId}
+      method: GET
+      controllerClass: net.ooder.skill.key.controller.KeyManagementController
+      methodName: getKeysByScene
+      description: 获取场景密钥
+      capability: create
+    - path: /api/v1/key-rules
+      method: GET
+      controllerClass: net.ooder.skill.key.controller.KeyRuleController
+      methodName: listRules
+      description: 获取密钥规则列表
+      capability: create
+    - path: /api/v1/key-rules
+      method: POST
+      controllerClass: net.ooder.skill.key.controller.KeyRuleController
+      methodName: createRule
+      description: 创建密钥规则
+      capability: create
+    - path: /api/v1/key-rules/{ruleId}
+      method: PUT
+      controllerClass: net.ooder.skill.key.controller.KeyRuleController
+      methodName: updateRule
+      description: 更新密钥规则
+      capability: create
+    - path: /api/v1/key-rules/{ruleId}
+      method: DELETE
+      controllerClass: net.ooder.skill.key.controller.KeyRuleController
+      methodName: deleteRule
+      description: 删除密钥规则
+      capability: revoke
+  
+  config:
+    optional:
+      - name: KEY_EXPIRE_DAYS
+        type: integer
+        default: 30
+        description: 密钥默认过期天数
+      - name: MAX_KEYS_PER_USER
+        type: integer
+        default: 10
+        description: 每用户最大密钥数
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

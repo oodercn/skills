@@ -4,10 +4,11 @@ class Chat {
         this.store = store;
         this.api = api;
         this.messages = [];
-        this.collapsed = false;
+        this.collapsed = container ? container.classList.contains('collapsed') : true;
         this.sessionId = 'bpm-designer-session';
         this.llmApiUrl = '/api/v1/chat';
         this._init();
+        console.log('[Chat] initialized, collapsed:', this.collapsed);
     }
 
     _init() {
@@ -42,7 +43,15 @@ class Chat {
 
     toggle() {
         this.collapsed = !this.collapsed;
-        this.container.classList.toggle('collapsed', this.collapsed);
+        console.log('[Chat] toggle, collapsed:', this.collapsed);
+        
+        if (this.container) {
+            if (this.collapsed) {
+                this.container.classList.add('collapsed');
+            } else {
+                this.container.classList.remove('collapsed');
+            }
+        }
         
         const btn = document.getElementById('btnChatToggle');
         if (btn) {

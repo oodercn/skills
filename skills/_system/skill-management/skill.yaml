@@ -1,10 +1,10 @@
-apiVersion: skill.ooder.net/v1
+﻿apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
   id: skill-management
   name: Skill Management
-  version: "3.0.2"
+  version: "3.0.1"
   description: Skill Management Module - Unified skill registration, lifecycle, and marketplace management
   author: Ooder Team
   icon: ri-apps-line
@@ -23,28 +23,23 @@ spec:
   capabilities:
     - id: skill-registration
       name: Skill Registration
-      description: 技能注册管理
-      category: management
+      description: 鎶€鑳芥敞鍐岀鐞?      category: management
       autoBind: true
     - id: skill-lifecycle
       name: Skill Lifecycle
-      description: 技能生命周期管理
-      category: management
+      description: 鎶€鑳界敓鍛藉懆鏈熺鐞?      category: management
       autoBind: true
     - id: skill-marketplace
       name: Skill Marketplace
-      description: 技能市场
-      category: management
+      description: 鎶€鑳藉競鍦?      category: management
       autoBind: false
     - id: skill-execution
       name: Skill Execution
-      description: 技能执行
-      category: management
+      description: 鎶€鑳芥墽琛?      category: management
       autoBind: true
     - id: skill-rating
       name: Skill Rating
-      description: 技能评分
-      category: management
+      description: 鎶€鑳借瘎鍒?      category: management
       autoBind: false
       
   dependencies:
@@ -58,16 +53,15 @@ spec:
       maxConcurrentExecutions:
         type: integer
         default: 10
-        title: 最大并发执行数
+        title: 鏈€澶у苟鍙戞墽琛屾暟
       defaultTimeout:
         type: integer
         default: 30000
-        title: 默认超时时间(ms)
+        title: 榛樿瓒呮椂鏃堕棿(ms)
       enableMarketplace:
         type: boolean
         default: true
-        title: 启用技能市场
-        
+        title: 鍚敤鎶€鑳藉競鍦?        
   endpoints:
     - path: /api/skill/list
       method: GET

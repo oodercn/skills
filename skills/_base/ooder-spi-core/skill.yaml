@@ -1,0 +1,93 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: ooder-spi-core
+  name: Ooder SPI Core
+  version: "3.0.1"
+  description: OoderOS 统一SPI核心接口模块，定义跨模块的标准接口和数据模型，包括IM/RAG/Workflow等核心SPI接口
+  author: Ooder Team
+  license: Apache-2.0
+  homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_base/ooder-spi-core
+  repository: https://gitee.com/ooderCN/skills.git
+  keywords:
+    - spi
+    - core
+    - interface
+    - im
+    - rag
+    - workflow
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: INFRASTRUCTURE
+  sceneType: AUTO
+  purposes:
+    - INFRASTRUCTURE
+    - INTEGRATION
+  
+  ownership: platform
+  
+  capability:
+    category: spi
+    code: SPI_CORE
+    operations: [im-delivery, rag-enhance, workflow-execute]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: none
+    mainClass: N/A
+
+  providedInterfaces:
+    - id: net.ooder.spi.im.ImDeliveryDriver
+      version: "1.0"
+      description: "IM消息投递驱动接口"
+    - id: net.ooder.spi.im.ImService
+      version: "1.0"
+      description: "IM服务基础接口"
+    - id: net.ooder.spi.rag.RagEnhanceDriver
+      version: "1.0"
+      description: "RAG检索增强驱动接口"
+    - id: net.ooder.spi.workflow.WorkflowDriver
+      version: "1.0"
+      description: "工作流驱动接口"
+    - id: net.ooder.spi.facade.SpiServices
+      version: "1.0"
+      description: "SPI门面服务"
+
+  capabilities:
+    - id: im-delivery
+      name: IM消息投递
+      description: IM消息投递驱动接口，支持异步发送、广播、入站消息处理
+      category: messaging
+    - id: rag-enhance
+      name: RAG检索增强
+      description: RAG检索增强驱动接口，支持知识库检索和提示词增强
+      category: ai
+    - id: workflow-execute
+      name: 工作流执行
+      description: 工作流驱动接口，支持流程启动、任务路由、任务结束
+      category: workflow
+
+  exports:
+    packages:
+      - net.ooder.spi.core
+      - net.ooder.spi.facade
+      - net.ooder.spi.im
+      - net.ooder.spi.im.model
+      - net.ooder.spi.im.handler
+      - net.ooder.spi.rag
+      - net.ooder.spi.rag.model
+      - net.ooder.spi.workflow
+
+  dependencies: []
+
+  notes: |
+    核心SPI接口模块，不包含具体实现。
+    实现类应通过 META-INF/services 机制注册。
+    
+    主要接口:
+    - ImDeliveryDriver: IM消息投递驱动
+    - RagEnhanceDriver: RAG检索增强驱动
+    - WorkflowDriver: 工作流驱动
