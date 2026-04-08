@@ -1,0 +1,55 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 700 400" width="700" height="400">
+  <defs>
+    <linearGradient id="bgGrad2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a1a2e;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#16213e;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="sceneLayer" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#667eea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#764ba2;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="driverLayer" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#a8edea;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#fed6e3;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="baseLayer" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" style="stop-color:#43e97b;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#38f9d7;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow2" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="2" dy="3" stdDeviation="3" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <rect width="700" height="400" fill="url(#bgGrad2)" rx="10"/>
+  
+  <text x="350" y="30" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="18" font-weight="bold">技能组合三层架构</text>
+  
+  <g filter="url(#shadow2)">
+    <rect x="50" y="50" width="600" height="80" rx="8" fill="url(#sceneLayer)"/>
+    <text x="350" y="80" text-anchor="middle" fill="#fff" font-family="Arial, sans-serif" font-size="16" font-weight="bold">场景编排层 (scenes)</text>
+    <text x="350" y="105" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="Arial, sans-serif" font-size="13">将原子能力组合为业务流程</text>
+    <text x="350" y="122" text-anchor="middle" fill="rgba(255,255,255,0.7)" font-family="Arial, sans-serif" font-size="11">例: 客服 = IM + LLM + RAG + Knowledge</text>
+  </g>
+  
+  <polygon points="350,130 345,145 355,145" fill="#fff"/>
+  
+  <g filter="url(#shadow2)">
+    <rect x="50" y="150" width="600" height="80" rx="8" fill="url(#driverLayer)"/>
+    <text x="350" y="180" text-anchor="middle" fill="#1a1a2e" font-family="Arial, sans-serif" font-size="16" font-weight="bold">驱动适配层 (_drivers)</text>
+    <text x="350" y="205" text-anchor="middle" fill="#1a1a2e" font-family="Arial, sans-serif" font-size="13">将外部平台抽象为统一接口</text>
+    <text x="350" y="222" text-anchor="middle" fill="rgba(0,0,0,0.6)" font-family="Arial, sans-serif" font-size="11">例: 钉钉IM → ImDeliveryDriver</text>
+  </g>
+  
+  <polygon points="350,230 345,245 355,245" fill="#fff"/>
+  
+  <g filter="url(#shadow2)">
+    <rect x="50" y="250" width="600" height="80" rx="8" fill="url(#baseLayer)"/>
+    <text x="350" y="280" text-anchor="middle" fill="#1a1a2e" font-family="Arial, sans-serif" font-size="16" font-weight="bold">基础能力层 (_base SPI + capabilities)</text>
+    <text x="350" y="305" text-anchor="middle" fill="#1a1a2e" font-family="Arial, sans-serif" font-size="13">提供原子能力接口</text>
+    <text x="350" y="322" text-anchor="middle" fill="rgba(0,0,0,0.6)" font-family="Arial, sans-serif" font-size="11">例: IM发送 · LLM调用 · RAG检索 · 文件存储</text>
+  </g>
+  
+  <rect x="50" y="350" width="600" height="35" rx="6" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.2)" stroke-width="1"/>
+  <text x="350" y="373" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="Arial, sans-serif" font-size="12">→ 企业只需选择场景 skill，底层依赖由 ApexOS 自动解析注入</text>
+</svg>
