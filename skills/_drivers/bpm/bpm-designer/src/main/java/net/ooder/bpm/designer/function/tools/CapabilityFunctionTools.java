@@ -1,5 +1,7 @@
 package net.ooder.bpm.designer.function.tools;
 
+import net.ooder.bpm.designer.datasource.DataSourceAdapter;
+import net.ooder.bpm.designer.datasource.config.DataSourceConfig;
 import net.ooder.bpm.designer.function.DesignerFunctionDefinition;
 import net.ooder.bpm.designer.function.DesignerFunctionRegistry;
 import org.slf4j.Logger;
@@ -16,8 +18,19 @@ public class CapabilityFunctionTools {
     
     private static final Logger log = LoggerFactory.getLogger(CapabilityFunctionTools.class);
     
+    private final DesignerFunctionRegistry functionRegistry;
+    private final DataSourceAdapter dataSourceAdapter;
+    private final DataSourceConfig dataSourceConfig;
+    
     @Autowired
-    private DesignerFunctionRegistry functionRegistry;
+    public CapabilityFunctionTools(
+            DesignerFunctionRegistry functionRegistry,
+            DataSourceAdapter dataSourceAdapter,
+            DataSourceConfig dataSourceConfig) {
+        this.functionRegistry = functionRegistry;
+        this.dataSourceAdapter = dataSourceAdapter;
+        this.dataSourceConfig = dataSourceConfig;
+    }
     
     @PostConstruct
     public void init() {
@@ -91,53 +104,52 @@ public class CapabilityFunctionTools {
     private Object handleListCapabilities(Map<String, Object> args) {
         String category = (String) args.get("category");
         String status = (String) args.get("status");
+        String tenantId = "default";
         
-        List<Map<String, Object>> capabilities = buildMockCapabilities(category, status);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> capabilities = dataSourceAdapter.listCapabilities(tenantId);
+            return wrapResult(capabilities);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", capabilities,
-            "count", capabilities.size()
-        );
+        return buildMockCapabilities(category, status);
     }
     
     private Object handleSearchCapabilities(Map<String, Object> args) {
         String query = (String) args.get("query");
         String category = (String) args.get("category");
         Integer limit = args.get("limit") != null ? ((Number) args.get("limit")).intValue() : 10;
+        String tenantId = "default";
         
-        List<Map<String, Object>> capabilities = buildMockSearchCapabilities(query, category, limit);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> capabilities = dataSourceAdapter.searchCapabilities(tenantId, query, category);
+            return wrapResult(capabilities);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", capabilities,
-            "query", query,
-            "count", capabilities.size()
-        );
+        return buildMockSearchCapabilities(query, category, limit);
     }
     
     private Object handleGetCapabilityDetail(Map<String, Object> args) {
         String capId = (String) args.get("capId");
+        String tenantId = "default";
         
-        Map<String, Object> capability = buildMockCapabilityDetail(capId);
+        if (dataSourceConfig.isUseRealData()) {
+            Map<String, Object> capability = dataSourceAdapter.getCapabilityDetail(tenantId, capId);
+            return wrapResult(capability);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", capability
-        );
+        return buildMockCapabilityDetail(capId);
     }
     
     private Object handleGetCapabilitySkills(Map<String, Object> args) {
         String capId = (String) args.get("capId");
+        String tenantId = "default";
         
-        List<Map<String, Object>> skills = buildMockCapabilitySkills(capId);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> skills = dataSourceAdapter.getCapabilitySkills(tenantId, capId);
+            return wrapResult(skills);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", skills,
-            "capId", capId,
-            "count", skills.size()
-        );
+        return buildMockCapabilitySkills(capId);
     }
     
     private Object handleMatchCapabilityByActivity(Map<String, Object> args) {
@@ -145,73 +157,48 @@ public class CapabilityFunctionTools {
         String activityType = (String) args.get("activityType");
         @SuppressWarnings("unchecked")
         Map<String, Object> context = (Map<String, Object>) args.get("context");
+        String tenantId = "default";
         
-        List<Map<String, Object>> matches = buildMockCapabilityMatches(activityDesc, activityType);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> matches = dataSourceAdapter.matchCapabilityByActivity(tenantId, activityDesc);
+            return wrapResult(matches);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", matches,
-            "activityDesc", activityDesc,
-            "activityType", activityType,
-            "count", matches.size()
-        );
+        return buildMockCapabilityMatches(activityDesc, activityType);
     }
     
     private Object handleGetCapabilityProviders(Map<String, Object> args) {
         String capId = (String) args.get("capId");
+        String tenantId = "default";
         
-        List<Map<String, Object>> providers = buildMockCapabilityProviders(capId);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> providers = dataSourceAdapter.getCapabilityProviders(tenantId, capId);
+            return wrapResult(providers);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", providers,
-            "capId", capId,
-            "count", providers.size()
-        );
+        return buildMockCapabilityProviders(capId);
     }
     
     private Object handleListCapabilityCategories(Map<String, Object> args) {
-        List<Map<String, Object>> categories = new ArrayList<>();
+        String tenantId = "default";
         
-        categories.add(Map.of(
-            "categoryId", "HR",
-            "categoryName", "人力资源",
-            "description", "招聘、培训、绩效等HR相关能力",
-            "capabilityCount", 15
-        ));
-        categories.add(Map.of(
-            "categoryId", "TECH",
-            "categoryName", "技术开发",
-            "description", "开发、测试、运维等技术能力",
-            "capabilityCount", 25
-        ));
-        categories.add(Map.of(
-            "categoryId", "FIN",
-            "categoryName", "财务管理",
-            "description", "预算、报销、审批等财务能力",
-            "capabilityCount", 10
-        ));
-        categories.add(Map.of(
-            "categoryId", "ADMIN",
-            "categoryName", "行政管理",
-            "description", "会议、日程、文档等行政能力",
-            "capabilityCount", 12
-        ));
-        categories.add(Map.of(
-            "categoryId", "AI",
-            "categoryName", "AI智能",
-            "description", "NLP、图像识别、推荐等AI能力",
-            "capabilityCount", 8
-        ));
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> categories = dataSourceAdapter.listCapabilityCategories(tenantId);
+            return wrapResult(categories);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", categories,
-            "count", categories.size()
-        );
+        return buildMockCategories();
     }
     
-    private List<Map<String, Object>> buildMockCapabilities(String category, String status) {
+    private Map<String, Object> wrapResult(Object data) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", data);
+        result.put("source", "real");
+        return result;
+    }
+    
+    private Object buildMockCapabilities(String category, String status) {
         List<Map<String, Object>> capabilities = new ArrayList<>();
         
         capabilities.add(Map.of(
@@ -280,26 +267,47 @@ public class CapabilityFunctionTools {
         ));
         
         if (category != null) {
-            return capabilities.stream()
+            capabilities = capabilities.stream()
                 .filter(c -> category.equalsIgnoreCase((String) c.get("category")))
                 .collect(Collectors.toList());
         }
         
-        if (status != null) {
-            return capabilities.stream()
-                .filter(c -> status.equalsIgnoreCase((String) c.get("status")))
-                .collect(Collectors.toList());
-        }
-        
-        return capabilities;
+        return Map.of(
+            "success", true,
+            "data", capabilities,
+            "count", capabilities.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSearchCapabilities(String query, String category, int limit) {
-        List<Map<String, Object>> allCapabilities = buildMockCapabilities(null, null);
+    private Object buildMockSearchCapabilities(String query, String category, int limit) {
+        List<Map<String, Object>> allCapabilities = new ArrayList<>();
+        
+        allCapabilities.add(Map.of(
+            "capId", "resume_screening",
+            "capName", "简历筛选",
+            "description", "自动筛选候选人简历，评估匹配度",
+            "category", "HR",
+            "status", "ACTIVE"
+        ));
+        allCapabilities.add(Map.of(
+            "capId", "interview_schedule",
+            "capName", "面试安排",
+            "description", "安排面试时间和地点，发送通知",
+            "category", "HR",
+            "status", "ACTIVE"
+        ));
+        allCapabilities.add(Map.of(
+            "capId", "calendar_schedule",
+            "capName", "日程安排",
+            "description", "管理日程，安排会议和提醒",
+            "category", "ADMIN",
+            "status", "ACTIVE"
+        ));
         
         String lowerQuery = query.toLowerCase();
         
-        return allCapabilities.stream()
+        List<Map<String, Object>> results = allCapabilities.stream()
             .filter(c -> {
                 String name = ((String) c.get("capName")).toLowerCase();
                 String desc = ((String) c.get("description")).toLowerCase();
@@ -313,9 +321,17 @@ public class CapabilityFunctionTools {
                 return result;
             })
             .collect(Collectors.toList());
+        
+        return Map.of(
+            "success", true,
+            "data", results,
+            "query", query,
+            "count", results.size(),
+            "source", "mock"
+        );
     }
     
-    private Map<String, Object> buildMockCapabilityDetail(String capId) {
+    private Object buildMockCapabilityDetail(String capId) {
         Map<String, Map<String, Object>> details = new HashMap<>();
         
         details.put("resume_screening", Map.of(
@@ -364,37 +380,18 @@ public class CapabilityFunctionTools {
             "permissions", List.of("hr:interview:create", "hr:interview:notify")
         ));
         
-        details.put("calendar_schedule", Map.of(
-            "capId", "calendar_schedule",
-            "capName", "日程安排",
-            "description", "管理日程，安排会议和提醒",
-            "category", "ADMIN",
-            "status", "ACTIVE",
-            "providerType", "SKILL",
-            "parameters", List.of(
-                Map.of("name", "title", "type", "string", "description", "日程标题", "required", true),
-                Map.of("name", "startTime", "type", "string", "description", "开始时间", "required", true),
-                Map.of("name", "endTime", "type", "string", "description", "结束时间", "required", true),
-                Map.of("name", "participants", "type", "array", "description", "参与人", "required", false)
-            ),
-            "returns", Map.of(
-                "type", "object",
-                "properties", Map.of(
-                    "eventId", "事件ID",
-                    "status", "状态"
-                )
-            ),
-            "permissions", List.of("calendar:create", "calendar:read")
-        ));
-        
-        return details.getOrDefault(capId, Map.of(
-            "capId", capId,
-            "capName", "未知能力",
-            "status", "NOT_FOUND"
-        ));
+        return Map.of(
+            "success", true,
+            "data", details.getOrDefault(capId, Map.of(
+                "capId", capId,
+                "capName", "未知能力",
+                "status", "NOT_FOUND"
+            )),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockCapabilitySkills(String capId) {
+    private Object buildMockCapabilitySkills(String capId) {
         List<Map<String, Object>> skills = new ArrayList<>();
         
         skills.add(Map.of(
@@ -410,10 +407,16 @@ public class CapabilityFunctionTools {
             "status", "ACTIVE"
         ));
         
-        return skills;
+        return Map.of(
+            "success", true,
+            "data", skills,
+            "capId", capId,
+            "count", skills.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockCapabilityMatches(String activityDesc, String activityType) {
+    private Object buildMockCapabilityMatches(String activityDesc, String activityType) {
         List<Map<String, Object>> matches = new ArrayList<>();
         
         String lowerDesc = activityDesc.toLowerCase();
@@ -482,31 +485,6 @@ public class CapabilityFunctionTools {
             ));
         }
         
-        if (lowerDesc.contains("日程") || lowerDesc.contains("会议")) {
-            matches.add(Map.of(
-                "capId", "calendar_schedule",
-                "capName", "日程安排",
-                "matchScore", 0.95,
-                "matchReason", "活动涉及日程管理",
-                "bindingConfig", Map.of(
-                    "priority", 1,
-                    "connectorType", "SDK",
-                    "autoTrigger", true
-                )
-            ));
-            matches.add(Map.of(
-                "capId", "meeting_arrange",
-                "capName", "会议管理",
-                "matchScore", 0.90,
-                "matchReason", "活动涉及会议安排",
-                "bindingConfig", Map.of(
-                    "priority", 2,
-                    "connectorType", "SDK",
-                    "autoTrigger", false
-                )
-            ));
-        }
-        
         if (matches.isEmpty()) {
             matches.add(Map.of(
                 "capId", "notification_send",
@@ -521,10 +499,17 @@ public class CapabilityFunctionTools {
             ));
         }
         
-        return matches;
+        return Map.of(
+            "success", true,
+            "data", matches,
+            "activityDesc", activityDesc,
+            "activityType", activityType,
+            "count", matches.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockCapabilityProviders(String capId) {
+    private Object buildMockCapabilityProviders(String capId) {
         List<Map<String, Object>> providers = new ArrayList<>();
         
         providers.add(Map.of(
@@ -545,6 +530,54 @@ public class CapabilityFunctionTools {
             "priority", 2
         ));
         
-        return providers;
+        return Map.of(
+            "success", true,
+            "data", providers,
+            "capId", capId,
+            "count", providers.size(),
+            "source", "mock"
+        );
+    }
+    
+    private Object buildMockCategories() {
+        List<Map<String, Object>> categories = new ArrayList<>();
+        
+        categories.add(Map.of(
+            "categoryId", "HR",
+            "categoryName", "人力资源",
+            "description", "招聘、培训、绩效等HR相关能力",
+            "capabilityCount", 15
+        ));
+        categories.add(Map.of(
+            "categoryId", "TECH",
+            "categoryName", "技术开发",
+            "description", "开发、测试、运维等技术能力",
+            "capabilityCount", 25
+        ));
+        categories.add(Map.of(
+            "categoryId", "FIN",
+            "categoryName", "财务管理",
+            "description", "预算、报销、审批等财务能力",
+            "capabilityCount", 10
+        ));
+        categories.add(Map.of(
+            "categoryId", "ADMIN",
+            "categoryName", "行政管理",
+            "description", "会议、日程、文档等行政能力",
+            "capabilityCount", 12
+        ));
+        categories.add(Map.of(
+            "categoryId", "AI",
+            "categoryName", "AI智能",
+            "description", "NLP、图像识别、推荐等AI能力",
+            "capabilityCount", 8
+        ));
+        
+        return Map.of(
+            "success", true,
+            "data", categories,
+            "count", categories.size(),
+            "source", "mock"
+        );
     }
 }

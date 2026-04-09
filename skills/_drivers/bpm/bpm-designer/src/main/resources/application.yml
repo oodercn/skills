@@ -24,6 +24,7 @@ llm:
   enabled: true
   provider: aliyun
   model: qwen-plus
+  prompt-file: prompts/full-derivation.yaml
   api-key: sk-f403a6a32efd4b00b75ee4874eec3b6b
   api-endpoint: https://dashscope.aliyuncs.com/compatible-mode/v1/chat/completions
   temperature: 0.7
@@ -31,13 +32,34 @@ llm:
   timeout: 60000
   max-retries: 3
 
+datasource:
+  bpm:
+    use-real-data: false
+    bpm-server-url: http://127.0.0.1:8084/bpm
+    capability-service-url: http://127.0.0.1:8085/capability
+    form-service-url: http://127.0.0.1:8086/form
+    scene-service-url: http://127.0.0.1:8087/scene
+    connection-timeout: 5000
+    read-timeout: 30000
+
 cache:
   enabled: true
-  default-ttl: 30m
-  max-size: 1000
-  cleanup-interval: 5m
+  default-ttl: 30
 
 logging:
   level:
-    net.ooder.bpm: DEBUG
-    org.springframework: INFO
+    net.ooder.bpm.designer: DEBUG
+    net.ooder.bpm.designer.llm: DEBUG
+    net.ooder.bpm.designer.function: DEBUG
+    net.ooder.bpm.designer.datasource: DEBUG
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,metrics
+  endpoint:
+    health:
+      show-details: always
+  server:
+    port: 8089

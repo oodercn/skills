@@ -1744,52 +1744,62 @@ public class IOTRightEngine implements RightEngine, Serializable {
         return false;
     }
 
-    private synchronized Object executeExpression(EIAttributeDef formulaAtt, Map<RightCtx, Object> ctx) throws BPMException {
-        ExpressionParser parser = JDSExpressionParserManager.getExpressionParser(ctx);
-        addCurrentActivityInst(parser, ctx);
-        addCurrentProcessInst(parser, ctx);
-        String selectedId = formulaAtt.getValue();
-        // 取得公式
-        DbParticipantSelect selected;
+    private final java.util.concurrent.locks.ReentrantLock expressionLock = new java.util.concurrent.locks.ReentrantLock();
+
+    private Object executeExpression(EIAttributeDef formulaAtt, Map<RightCtx, Object> ctx) throws BPMException {
+        expressionLock.lock();
         try {
-            selected = participantMgr.loadByKey(selectedId);
-        } catch (SQLException e) {
-            throw new BPMException("load participant " + selectedId + " failed", e);
-        }
-        if (selected == null) {
-            return new ArrayList();
-        }
-        String expression = selected.getFormula();
-        // 取得参数以及参数的值
-        EIAttributeDef parameterAtt = (EIAttributeDef) formulaAtt.getChild(formulaAtt.getValue());
-        if (parameterAtt != null && parameterAtt.getName() != null && !parameterAtt.getName().equals("") && parameterAtt.getValue() != null && !parameterAtt.getValue().equals("")) {
-            StringTokenizer stParameter = new StringTokenizer(parameterAtt.getValue(), ";");
-            while (stParameter.hasMoreTokens()) {
-                String parameterString = stParameter.nextToken();
-                int _index = parameterString.indexOf("=");
-                if (_index == -1) {
-                    continue;
-                }
-                String parameterName = parameterString.substring(0, _index);
-                String parameterValue = parameterString.substring(_index + 1, parameterString.length());
-                if (ctx.containsKey(parameterName)) {
-                    parser.addVariableAsObject(parameterName, ctx.get(parameterName));
-                } else {
-                    parser.addVariableAsObject(parameterName, parameterValue);
+            ExpressionParser parser = JDSExpressionParserManager.getExpressionParser(ctx);
+            addCurrentActivityInst(parser, ctx);
+            addCurrentProcessInst(parser, ctx);
+            String selectedId = formulaAtt.getValue();
+            DbParticipantSelect selected;
+            try {
+                selected = participantMgr.loadByKey(selectedId);
+            } catch (SQLException e) {
+                throw new BPMException("load participant " + selectedId + " failed", e);
+            }
+            if (selected == null) {
+                return new ArrayList();
+            }
+            String expression = selected.getFormula();
+            if (expression == null || expression.trim().isEmpty()) {
+                return new ArrayList();
+            }
+            EIAttributeDef parameterAtt = (EIAttributeDef) formulaAtt.getChild(formulaAtt.getValue());
+            if (parameterAtt != null && parameterAtt.getName() != null && !parameterAtt.getName().equals("") && parameterAtt.getValue() != null && !parameterAtt.getValue().equals("")) {
+                StringTokenizer stParameter = new StringTokenizer(parameterAtt.getValue(), ";");
+                while (stParameter.hasMoreTokens()) {
+                    String parameterString = stParameter.nextToken();
+                    int _index = parameterString.indexOf("=");
+                    if (_index == -1) {
+                        continue;
+                    }
+                    String parameterName = parameterString.substring(0, _index).trim();
+                    String parameterValue = parameterString.substring(_index + 1).trim();
+                    if (parameterName.isEmpty()) {
+                        continue;
+                    }
+                    if (ctx.containsKey(parameterName)) {
+                        parser.addVariableAsObject(parameterName, ctx.get(parameterName));
+                    } else {
+                        parser.addVariableAsObject(parameterName, parameterValue);
+                    }
                 }
             }
-        }
-        // 执行公式
-        boolean result = parser.parseExpression(expression);
-        if (result == false) {
-            log.warn("expression parse error: " + parser.getErrorInfo());
-            return null;
-        } else {
-            Object o = parser.getValueAsObject();
-            if (parser.hasError() == true) {
-                log.error(parser.getErrorInfo());
+            boolean result = parser.parseExpression(expression);
+            if (result == false) {
+                log.warn("expression parse error: " + parser.getErrorInfo());
+                return null;
+            } else {
+                Object o = parser.getValueAsObject();
+                if (parser.hasError() == true) {
+                    log.error(parser.getErrorInfo());
+                }
+                return o;
             }
-            return o;
+        } finally {
+            expressionLock.unlock();
         }
     }
 

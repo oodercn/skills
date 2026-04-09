@@ -223,8 +223,10 @@ public class AgentServiceImpl implements AgentService {
             .map(this::convertToNode)
             .collect(Collectors.toList());
         
+        List<AgentTopologyDTO.AgentEdge> edges = buildTopologyEdges(new ArrayList<>(agentStore.values()));
+        
         topology.setNodes(nodes);
-        topology.setEdges(new ArrayList<>());
+        topology.setEdges(edges);
         topology.setTimestamp(System.currentTimeMillis());
         
         return topology;
@@ -240,16 +242,74 @@ public class AgentServiceImpl implements AgentService {
         return node;
     }
 
+    private List<AgentTopologyDTO.AgentEdge> buildTopologyEdges(List<AgentDTO> agents) {
+        List<AgentTopologyDTO.AgentEdge> edges = new ArrayList<>();
+        Map<String, List<AgentDTO>> byScene = agents.stream()
+            .filter(a -> a.getSceneGroupId() != null && !a.getSceneGroupId().isEmpty())
+            .collect(Collectors.groupingBy(AgentDTO::getSceneGroupId));
+
+        for (Map.Entry<String, List<AgentDTO>> entry : byScene.entrySet()) {
+            List<AgentDTO> sceneAgents = entry.getValue();
+            for (int i = 0; i < sceneAgents.size(); i++) {
+                for (int j = i + 1; j < sceneAgents.size(); j++) {
+                    AgentDTO a1 = sceneAgents.get(i);
+                    AgentDTO a2 = sceneAgents.get(j);
+                    AgentTopologyDTO.AgentEdge edge = new AgentTopologyDTO.AgentEdge();
+                    edge.setId(a1.getAgentId() + "-" + a2.getAgentId());
+                    edge.setSource(a1.getAgentId());
+                    edge.setTarget(a2.getAgentId());
+                    edge.setType("COLLABORATION");
+                    edge.setLabel("scene:" + entry.getKey());
+                    edge.setAnimated(true);
+                    edges.add(edge);
+                }
+            }
+        }
+
+        Map<String, List<AgentDTO>> byCluster = agents.stream()
+            .filter(a -> a.getClusterId() != null && !a.getClusterId().isEmpty())
+            .collect(Collectors.groupingBy(AgentDTO::getClusterId));
+
+        for (Map.Entry<String, List<AgentDTO>> entry : byCluster.entrySet()) {
+            List<AgentDTO> clusterAgents = entry.getValue();
+            for (int i = 0; i < clusterAgents.size(); i++) {
+                for (int j = i + 1; j < clusterAgents.size(); j++) {
+                    AgentDTO a1 = clusterAgents.get(i);
+                    AgentDTO a2 = clusterAgents.get(j);
+                    String edgeId = a1.getAgentId() + "-" + a2.getAgentId() + "-cluster";
+                    boolean exists = edges.stream().anyMatch(e -> 
+                        (e.getSource().equals(a1.getAgentId()) && e.getTarget().equals(a2.getAgentId())) ||
+                        (e.getSource().equals(a2.getAgentId()) && e.getTarget().equals(a1.getAgentId())));
+                    if (!exists) {
+                        AgentTopologyDTO.AgentEdge edge = new AgentTopologyDTO.AgentEdge();
+                        edge.setId(edgeId);
+                        edge.setSource(a1.getAgentId());
+                        edge.setTarget(a2.getAgentId());
+                        edge.setType("CLUSTER");
+                        edge.setLabel("cluster:" + entry.getKey());
+                        edge.setAnimated(false);
+                        edges.add(edge);
+                    }
+                }
+            }
+        }
+
+        return edges;
+    }
+
     @Override
     public AgentTopologyDTO getTopologyByCluster(String clusterId) {
         AgentTopologyDTO topology = new AgentTopologyDTO();
         
-        List<AgentTopologyDTO.AgentNode> nodes = listByCluster(clusterId).stream()
+        List<AgentDTO> clusterAgents = listByCluster(clusterId);
+        List<AgentTopologyDTO.AgentNode> nodes = clusterAgents.stream()
             .map(this::convertToNode)
             .collect(Collectors.toList());
         
+        List<AgentTopologyDTO.AgentEdge> edges = buildTopologyEdges(clusterAgents);
+        
         topology.setNodes(nodes);
-        topology.setEdges(new ArrayList<>());
+        topology.setEdges(edges);
         topology.setTimestamp(System.currentTimeMillis());
         
         return topology;

@@ -1,5 +1,7 @@
 package net.ooder.bpm.designer.function.tools;
 
+import net.ooder.bpm.designer.datasource.DataSourceAdapter;
+import net.ooder.bpm.designer.datasource.config.DataSourceConfig;
 import net.ooder.bpm.designer.function.DesignerFunctionDefinition;
 import net.ooder.bpm.designer.function.DesignerFunctionRegistry;
 import org.slf4j.Logger;
@@ -16,8 +18,19 @@ public class SceneFunctionTools {
     
     private static final Logger log = LoggerFactory.getLogger(SceneFunctionTools.class);
     
+    private final DesignerFunctionRegistry functionRegistry;
+    private final DataSourceAdapter dataSourceAdapter;
+    private final DataSourceConfig dataSourceConfig;
+    
     @Autowired
-    private DesignerFunctionRegistry functionRegistry;
+    public SceneFunctionTools(
+            DesignerFunctionRegistry functionRegistry,
+            DataSourceAdapter dataSourceAdapter,
+            DataSourceConfig dataSourceConfig) {
+        this.functionRegistry = functionRegistry;
+        this.dataSourceAdapter = dataSourceAdapter;
+        this.dataSourceConfig = dataSourceConfig;
+    }
     
     @PostConstruct
     public void init() {
@@ -81,80 +94,86 @@ public class SceneFunctionTools {
     private Object handleListSceneTemplates(Map<String, Object> args) {
         String category = (String) args.get("category");
         String status = (String) args.get("status");
+        String tenantId = "default";
         
-        List<Map<String, Object>> templates = buildMockSceneTemplates(category, status);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> templates = dataSourceAdapter.listSceneTemplates(tenantId, category);
+            return wrapResult(templates);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", templates,
-            "count", templates.size()
-        );
+        return buildMockSceneTemplates(category, status);
     }
     
     private Object handleGetSceneTemplate(Map<String, Object> args) {
         String templateId = (String) args.get("templateId");
+        String tenantId = "default";
         
-        Map<String, Object> template = buildMockSceneTemplateDetail(templateId);
+        if (dataSourceConfig.isUseRealData()) {
+            Map<String, Object> template = dataSourceAdapter.getSceneTemplate(tenantId, templateId);
+            return wrapResult(template);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", template
-        );
+        return buildMockSceneTemplateDetail(templateId);
     }
     
     private Object handleGetSceneCapabilities(Map<String, Object> args) {
         String sceneGroupId = (String) args.get("sceneGroupId");
+        String tenantId = "default";
         
-        List<Map<String, Object>> capabilities = buildMockSceneCapabilities(sceneGroupId);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> capabilities = dataSourceAdapter.getSceneCapabilities(tenantId, sceneGroupId);
+            return wrapResult(capabilities);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", capabilities,
-            "sceneGroupId", sceneGroupId,
-            "count", capabilities.size()
-        );
+        return buildMockSceneCapabilities(sceneGroupId);
     }
     
     private Object handleListSceneGroups(Map<String, Object> args) {
         String status = (String) args.get("status");
+        String tenantId = "default";
         
-        List<Map<String, Object>> groups = buildMockSceneGroups(status);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> groups = dataSourceAdapter.listSceneGroups(tenantId);
+            return wrapResult(groups);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", groups,
-            "count", groups.size()
-        );
+        return buildMockSceneGroups(status);
     }
     
     private Object handleGetSceneParticipants(Map<String, Object> args) {
         String sceneGroupId = (String) args.get("sceneGroupId");
+        String tenantId = "default";
         
-        List<Map<String, Object>> participants = buildMockSceneParticipants(sceneGroupId);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> participants = dataSourceAdapter.getSceneParticipants(tenantId, sceneGroupId);
+            return wrapResult(participants);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", participants,
-            "sceneGroupId", sceneGroupId,
-            "count", participants.size()
-        );
+        return buildMockSceneParticipants(sceneGroupId);
     }
     
-    private Object handleMatchSceneByActivity(Map<String, Object> args) {
-        String activityDesc = (String) args.get("activityDesc");
-        String activityType = (String) args.get("activityType");
+    private Object handleListSceneTemplates(Map<String, Object> args) {
+        String category = (String) args.get("category");
+        String status = (String) args.get("status");
+        String tenantId = "default";
         
-        List<Map<String, Object>> matches = buildMockSceneMatches(activityDesc);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> templates = dataSourceAdapter.listSceneTemplates(tenantId);
+            return wrapResult(templates);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", matches,
-            "activityDesc", activityDesc,
-            "count", matches.size()
-        );
+        return buildMockSceneTemplates(category, status);
     }
     
-    private List<Map<String, Object>> buildMockSceneTemplates(String category, String status) {
+    private Map<String, Object> wrapResult(Object data) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", data);
+        result.put("source", "real");
+        return result;
+    }
+    
+    private Object buildMockSceneTemplates(String category, String status) {
         List<Map<String, Object>> templates = new ArrayList<>();
         
         templates.add(Map.of(
@@ -195,21 +214,20 @@ public class SceneFunctionTools {
         ));
         
         if (category != null) {
-            return templates.stream()
+            templates = templates.stream()
                 .filter(t -> category.equalsIgnoreCase((String) t.get("category")))
                 .collect(Collectors.toList());
         }
         
-        if (status != null) {
-            return templates.stream()
-                .filter(t -> status.equalsIgnoreCase((String) t.get("status")))
-                .collect(Collectors.toList());
-        }
-        
-        return templates;
+        return Map.of(
+            "success", true,
+            "data", templates,
+            "count", templates.size(),
+            "source", "mock"
+        );
     }
     
-    private Map<String, Object> buildMockSceneTemplateDetail(String templateId) {
+    private Object buildMockSceneTemplateDetail(String templateId) {
         Map<String, Map<String, Object>> details = new HashMap<>();
         
         details.put("scene-tpl-001", Map.of(
@@ -239,14 +257,18 @@ public class SceneFunctionTools {
             )
         ));
         
-        return details.getOrDefault(templateId, Map.of(
-            "templateId", templateId,
-            "templateName", "未知模板",
-            "status", "NOT_FOUND"
-        ));
+        return Map.of(
+            "success", true,
+            "data", details.getOrDefault(templateId, Map.of(
+                "templateId", templateId,
+                "templateName", "未知模板",
+                "status", "NOT_FOUND"
+            )),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSceneCapabilities(String sceneGroupId) {
+    private Object buildMockSceneCapabilities(String sceneGroupId) {
         List<Map<String, Object>> capabilities = new ArrayList<>();
         
         capabilities.add(Map.of(
@@ -271,10 +293,16 @@ public class SceneFunctionTools {
             "required", false
         ));
         
-        return capabilities;
+        return Map.of(
+            "success", true,
+            "data", capabilities,
+            "sceneGroupId", sceneGroupId,
+            "count", capabilities.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSceneGroups(String status) {
+    private Object buildMockSceneGroups(String status) {
         List<Map<String, Object>> groups = new ArrayList<>();
         
         groups.add(Map.of(
@@ -297,21 +325,26 @@ public class SceneFunctionTools {
         ));
         
         if (status != null) {
-            return groups.stream()
+            groups = groups.stream()
                 .filter(g -> status.equalsIgnoreCase((String) g.get("status")))
                 .collect(Collectors.toList());
         }
         
-        return groups;
+        return Map.of(
+            "success", true,
+            "data", groups,
+            "count", groups.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSceneParticipants(String sceneGroupId) {
+    private Object buildMockSceneParticipants(String sceneGroupId) {
         List<Map<String, Object>> participants = new ArrayList<>();
         
         participants.add(Map.of(
             "participantId", "part-001",
             "participantType", "USER",
-            "participantId", "user-001",
+            "userId", "user-001",
             "participantName", "张三",
             "role", "HR专员",
             "status", "ACTIVE"
@@ -319,16 +352,22 @@ public class SceneFunctionTools {
         participants.add(Map.of(
             "participantId", "part-002",
             "participantType", "USER",
-            "participantId", "user-003",
+            "userId", "user-003",
             "participantName", "王五",
             "role", "HR经理",
             "status", "ACTIVE"
         ));
         
-        return participants;
+        return Map.of(
+            "success", true,
+            "data", participants,
+            "sceneGroupId", sceneGroupId,
+            "count", participants.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSceneMatches(String activityDesc) {
+    private Object buildMockSceneMatches(String activityDesc) {
         List<Map<String, Object>> matches = new ArrayList<>();
         
         String lowerDesc = activityDesc.toLowerCase();
@@ -373,6 +412,12 @@ public class SceneFunctionTools {
             ));
         }
         
-        return matches;
+        return Map.of(
+            "success", true,
+            "data", matches,
+            "activityDesc", activityDesc,
+            "count", matches.size(),
+            "source", "mock"
+        );
     }
 }

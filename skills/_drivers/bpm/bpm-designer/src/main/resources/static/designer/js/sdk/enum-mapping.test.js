@@ -34,6 +34,46 @@ const testCases = {
     ActivityDefPosition: {
         frontend: ['POSITION_NORMAL', 'POSITION_START', 'POSITION_END', 'VIRTUAL_LAST_DEF'],
         backend: ['NORMAL', 'START', 'END', 'VIRTUAL_LAST_DEF']
+    },
+    ActivityDefImpl: {
+        frontend: ['IMPL_NO', 'IMPL_TOOL', 'IMPL_SUBFLOW', 'IMPL_OUTFLOW', 'IMPL_DEVICE', 'IMPL_EVENT', 'IMPL_SERVICE', 'IMPL_AGENT', 'IMPL_ROUTE', 'IMPL_BLOCK'],
+        backend: ['NO', 'TOOL', 'SUBFLOW', 'OUTFLOW', 'DEVICE', 'EVENT', 'SERVICE', 'AGENT', 'ROUTE', 'BLOCK']
+    },
+    ActivityType: {
+        frontend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK'],
+        backend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK']
+    },
+    ActivityCategory: {
+        frontend: ['HUMAN', 'AGENT', 'SCENE'],
+        backend: ['HUMAN', 'AGENT', 'SCENE']
+    },
+    ActivityDefSpecialSendScope: {
+        frontend: ['ALL', 'SAME_DEPT', 'SPECIFIED'],
+        backend: ['ALL', 'SAME_DEPT', 'SPECIFIED']
+    },
+    ActivityDefRouteBackMethod: {
+        frontend: ['PREVIOUS', 'SPECIFIED', 'START'],
+        backend: ['PREVIOUS', 'SPECIFIED', 'START']
+    },
+    ActivityDefPerformtype: {
+        frontend: ['SINGLE', 'MULTIPLE', 'JOINTSIGN', 'SENDER'],
+        backend: ['SINGLE', 'MULTIPLE', 'JOINTSIGN', 'SENDER']
+    },
+    ActivityDefPerformSequence: {
+        frontend: ['SEQUENTIAL', 'PARALLEL'],
+        backend: ['SEQUENTIAL', 'PARALLEL']
+    },
+    ActivityDefDeadLineOperation: {
+        frontend: ['NONE', 'AUTO_COMPLETE', 'AUTO_ABORT', 'NOTIFY'],
+        backend: ['NONE', 'AUTO_COMPLETE', 'AUTO_ABORT', 'NOTIFY']
+    },
+    DurationUnit: {
+        frontend: ['MINUTES', 'HOURS', 'DAYS'],
+        backend: ['MINUTES', 'HOURS', 'DAYS']
+    },
+    RightGroupEnums: {
+        frontend: ['PERFORMER', 'SPONSOR', 'READER', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYREADER', 'NORIGHT', 'NULL'],
+        backend: ['PERFORMER', 'SPONSOR', 'READER', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYREADER', 'NORIGHT', 'NULL']
     }
 };
 

@@ -91,11 +91,11 @@ const PanelSchema = {
     },
 
     getActivitySchema: function(activity) {
-        if (!activity || !activity.impl) {
+        if (!activity || !activity.implementation) {
             return null;
         }
 
-        const impl = activity.impl;
+        const impl = activity.implementation;
         let schema = {
             tabs: [
                 { id: 'basic', name: '基本信息', icon: 'info' },
@@ -128,7 +128,7 @@ const PanelSchema = {
             { name: 'activityId', type: 'text', label: '活动ID', required: true, readonly: true },
             { name: 'name', type: 'text', label: '活动名称', required: true },
             { name: 'description', type: 'textarea', label: '描述' },
-            { name: 'impl', type: 'select', label: '实现类型', options: [
+            { name: 'implementation', type: 'select', label: '实现类型', options: [
                 { value: 'IMPL_NO', label: '无实现（手动活动）' },
                 { value: 'IMPL_TOOL', label: '工具' },
                 { value: 'IMPL_SUBFLOW', label: '子流程' },

@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -176,9 +176,6 @@
         <module>skills/tools/skill-report</module>
         <module>skills/tools/skill-share</module>
         <module>skills/tools/skill-update-checker</module>
-        
-        <!-- Hot Plug Support -->
-        <module>skill-hotplug-starter</module>
     </modules>
 
     <dependencyManagement>
@@ -248,12 +245,6 @@
             <dependency>
                 <groupId>net.ooder</groupId>
                 <artifactId>skills-bpm-demo</artifactId>
-                <version>${project.version}</version>
-            </dependency>
-            
-            <dependency>
-                <groupId>net.ooder</groupId>
-                <artifactId>skill-hotplug-starter</artifactId>
                 <version>${project.version}</version>
             </dependency>
             

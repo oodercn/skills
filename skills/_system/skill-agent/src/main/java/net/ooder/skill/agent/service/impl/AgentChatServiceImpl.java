@@ -11,6 +11,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import net.ooder.skill.agent.repository.ChatContextRepository;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
@@ -24,6 +25,11 @@ public class AgentChatServiceImpl implements AgentChatService {
     private UnifiedInterfaceAdapter unifiedAdapter;
 
     private Map<String, List<AgentChatMessageDTO>> messageStore = new ConcurrentHashMap<>();
+    @Autowired
+    private ChatContextRepository contextRepository;
+
+    private static final int MAX_CONTEXT_MESSAGES = 50;
+
     private Map<String, SceneChatContextDTO> contextStore = new ConcurrentHashMap<>();
     private Map<String, Set<String>> readStatus = new ConcurrentHashMap<>();
 
@@ -33,14 +39,16 @@ public class AgentChatServiceImpl implements AgentChatService {
         
         SceneChatContextDTO context = contextStore.get(sceneGroupId);
         if (context == null) {
+            context = contextRepository.findBySceneGroupId(sceneGroupId).orElse(null);
+        }
+        if (context == null) {
             context = new SceneChatContextDTO();
             context.setSceneGroupId(sceneGroupId);
             context.setSceneGroupName("Scene " + sceneGroupId);
             context.setParticipants(new ArrayList<>());
             context.setAgents(new ArrayList<>());
-            contextStore.put(sceneGroupId, context);
         }
-        
+        contextStore.put(sceneGroupId, context);
         context.setCurrentUserId(userId);
         return context;
     }
@@ -102,7 +110,17 @@ public class AgentChatServiceImpl implements AgentChatService {
             message.setPriority(5);
         }
         
-        messageStore.computeIfAbsent(sceneGroupId, k -> new ArrayList<>()).add(message);
+        List<AgentChatMessageDTO> messages = messageStore.computeIfAbsent(sceneGroupId, k -> new ArrayList<>());
+        messages.add(message);
+        
+        if (messages.size() > MAX_CONTEXT_MESSAGES) {
+            messages.subList(0, messages.size() - MAX_CONTEXT_MESSAGES).clear();
+        }
+        
+        SceneChatContextDTO context = contextStore.get(sceneGroupId);
+        if (context != null) {
+            contextRepository.save(context);
+        }
         
         return messageId;
     }

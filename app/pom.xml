@@ -1,4 +1,4 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
@@ -21,7 +21,6 @@
     <modules>
         <module>skill-common</module>
         <module>skill-org-base</module>
-        <module>skill-hotplug-starter</module>
     </modules>
 
     <properties>
@@ -96,7 +95,7 @@
             <dependency>
                 <groupId>org.yaml</groupId>
                 <artifactId>snakeyaml</artifactId>
-                <version>2.2.0</version>
+                <version>2.2</version>
             </dependency>
             <dependency>
                 <groupId>org.projectlombok</groupId>

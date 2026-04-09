@@ -1,5 +1,7 @@
 package net.ooder.bpm.designer.function.tools;
 
+import net.ooder.bpm.designer.datasource.DataSourceAdapter;
+import net.ooder.bpm.designer.datasource.config.DataSourceConfig;
 import net.ooder.bpm.designer.function.DesignerFunctionDefinition;
 import net.ooder.bpm.designer.function.DesignerFunctionRegistry;
 import org.slf4j.Logger;
@@ -16,8 +18,19 @@ public class FormFunctionTools {
     
     private static final Logger log = LoggerFactory.getLogger(FormFunctionTools.class);
     
+    private final DesignerFunctionRegistry functionRegistry;
+    private final DataSourceAdapter dataSourceAdapter;
+    private final DataSourceConfig dataSourceConfig;
+    
     @Autowired
-    private DesignerFunctionRegistry functionRegistry;
+    public FormFunctionTools(
+            DesignerFunctionRegistry functionRegistry,
+            DataSourceAdapter dataSourceAdapter,
+            DataSourceConfig dataSourceConfig) {
+        this.functionRegistry = functionRegistry;
+        this.dataSourceAdapter = dataSourceAdapter;
+        this.dataSourceConfig = dataSourceConfig;
+    }
     
     @PostConstruct
     public void init() {
@@ -94,40 +107,40 @@ public class FormFunctionTools {
     private Object handleListForms(Map<String, Object> args) {
         String category = (String) args.get("category");
         String status = (String) args.get("status");
+        String tenantId = "default";
         
-        List<Map<String, Object>> forms = buildMockForms(category, status);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> forms = dataSourceAdapter.listForms(tenantId, category);
+            return wrapResult(forms);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", forms,
-            "count", forms.size()
-        );
+        return buildMockForms(category, status);
     }
     
     private Object handleSearchForms(Map<String, Object> args) {
         String query = (String) args.get("query");
         String category = (String) args.get("category");
         Integer limit = args.get("limit") != null ? ((Number) args.get("limit")).intValue() : 10;
+        String tenantId = "default";
         
-        List<Map<String, Object>> forms = buildMockSearchForms(query, category, limit);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> forms = dataSourceAdapter.searchForms(tenantId, query, category);
+            return wrapResult(forms);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", forms,
-            "query", query,
-            "count", forms.size()
-        );
+        return buildMockSearchForms(query, category, limit);
     }
     
     private Object handleGetFormSchema(Map<String, Object> args) {
         String formId = (String) args.get("formId");
+        String tenantId = "default";
         
-        Map<String, Object> schema = buildMockFormSchema(formId);
+        if (dataSourceConfig.isUseRealData()) {
+            Map<String, Object> schema = dataSourceAdapter.getFormSchema(tenantId, formId);
+            return wrapResult(schema);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", schema
-        );
+        return buildMockFormSchema(formId);
     }
     
     private Object handleMatchFormByActivity(Map<String, Object> args) {
@@ -135,82 +148,64 @@ public class FormFunctionTools {
         String activityType = (String) args.get("activityType");
         @SuppressWarnings("unchecked")
         List<String> requiredFields = (List<String>) args.get("requiredFields");
+        String tenantId = "default";
         
-        List<Map<String, Object>> matches = buildMockFormMatches(activityDesc, requiredFields);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> matches = dataSourceAdapter.matchFormByActivity(tenantId, activityDesc, activityType);
+            return wrapResult(matches);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", matches,
-            "activityDesc", activityDesc,
-            "count", matches.size()
-        );
+        return buildMockFormMatches(activityDesc, requiredFields);
     }
     
     private Object handleGenerateFormSchema(Map<String, Object> args) {
         String activityDesc = (String) args.get("activityDesc");
         String formName = (String) args.get("formName");
         String category = (String) args.get("category");
+        String tenantId = "default";
         
-        Map<String, Object> schema = buildMockGeneratedSchema(activityDesc, formName, category);
+        if (dataSourceConfig.isUseRealData()) {
+            Map<String, Object> schema = dataSourceAdapter.generateFormSchema(tenantId, activityDesc);
+            return wrapResult(schema);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", schema,
-            "generated", true
-        );
+        return buildMockGeneratedSchema(activityDesc, formName, category);
     }
     
     private Object handleGetFormFieldMappings(Map<String, Object> args) {
         String formId = (String) args.get("formId");
         @SuppressWarnings("unchecked")
         List<String> requiredFields = (List<String>) args.get("requiredFields");
+        String tenantId = "default";
         
-        List<Map<String, Object>> mappings = buildMockFieldMappings(formId, requiredFields);
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> mappings = dataSourceAdapter.getFormFieldMappings(tenantId, formId, requiredFields);
+            return wrapResult(mappings);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", mappings,
-            "formId", formId,
-            "coverage", calculateCoverage(mappings)
-        );
+        return buildMockFieldMappings(formId, requiredFields);
     }
     
     private Object handleListFormCategories(Map<String, Object> args) {
-        List<Map<String, Object>> categories = new ArrayList<>();
+        String tenantId = "default";
         
-        categories.add(Map.of(
-            "categoryId", "HR",
-            "categoryName", "人力资源",
-            "description", "招聘、入职、离职等HR相关表单",
-            "formCount", 12
-        ));
-        categories.add(Map.of(
-            "categoryId", "FIN",
-            "categoryName", "财务管理",
-            "description", "报销、预算、审批等财务表单",
-            "formCount", 8
-        ));
-        categories.add(Map.of(
-            "categoryId", "ADMIN",
-            "categoryName", "行政管理",
-            "description", "请假、出差、会议等行政表单",
-            "formCount", 15
-        ));
-        categories.add(Map.of(
-            "categoryId", "TECH",
-            "categoryName", "技术开发",
-            "description", "需求、测试、发布等技术表单",
-            "formCount", 10
-        ));
+        if (dataSourceConfig.isUseRealData()) {
+            List<Map<String, Object>> categories = dataSourceAdapter.listFormCategories(tenantId);
+            return wrapResult(categories);
+        }
         
-        return Map.of(
-            "success", true,
-            "data", categories,
-            "count", categories.size()
-        );
+        return buildMockCategories();
     }
     
-    private List<Map<String, Object>> buildMockForms(String category, String status) {
+    private Map<String, Object> wrapResult(Object data) {
+        Map<String, Object> result = new HashMap<>();
+        result.put("success", true);
+        result.put("data", data);
+        result.put("source", "real");
+        return result;
+    }
+    
+    private Object buildMockForms(String category, String status) {
         List<Map<String, Object>> forms = new ArrayList<>();
         
         forms.add(Map.of(
@@ -278,26 +273,47 @@ public class FormFunctionTools {
         ));
         
         if (category != null) {
-            return forms.stream()
+            forms = forms.stream()
                 .filter(f -> category.equalsIgnoreCase((String) f.get("category")))
                 .collect(Collectors.toList());
         }
         
-        if (status != null) {
-            return forms.stream()
-                .filter(f -> status.equalsIgnoreCase((String) f.get("status")))
-                .collect(Collectors.toList());
-        }
-        
-        return forms;
+        return Map.of(
+            "success", true,
+            "data", forms,
+            "count", forms.size(),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockSearchForms(String query, String category, int limit) {
-        List<Map<String, Object>> allForms = buildMockForms(null, null);
+    private Object buildMockSearchForms(String query, String category, int limit) {
+        List<Map<String, Object>> allForms = new ArrayList<>();
+        
+        allForms.add(Map.of(
+            "formId", "form-001",
+            "formName", "简历评估表",
+            "description", "候选人简历评估表单",
+            "category", "HR",
+            "status", "PUBLISHED"
+        ));
+        allForms.add(Map.of(
+            "formId", "form-002",
+            "formName", "面试评价表",
+            "description", "面试官填写面试评价",
+            "category", "HR",
+            "status", "PUBLISHED"
+        ));
+        allForms.add(Map.of(
+            "formId", "form-003",
+            "formName", "入职登记表",
+            "description", "新员工入职信息登记",
+            "category", "HR",
+            "status", "PUBLISHED"
+        ));
         
         String lowerQuery = query.toLowerCase();
         
-        return allForms.stream()
+        List<Map<String, Object>> results = allForms.stream()
             .filter(f -> {
                 String name = ((String) f.get("formName")).toLowerCase();
                 String desc = ((String) f.get("description")).toLowerCase();
@@ -311,9 +327,17 @@ public class FormFunctionTools {
                 return result;
             })
             .collect(Collectors.toList());
+        
+        return Map.of(
+            "success", true,
+            "data", results,
+            "query", query,
+            "count", results.size(),
+            "source", "mock"
+        );
     }
     
-    private Map<String, Object> buildMockFormSchema(String formId) {
+    private Object buildMockFormSchema(String formId) {
         Map<String, Map<String, Object>> schemas = new HashMap<>();
         
         schemas.put("form-001", Map.of(
@@ -386,14 +410,18 @@ public class FormFunctionTools {
             )
         ));
         
-        return schemas.getOrDefault(formId, Map.of(
-            "formId", formId,
-            "formName", "未知表单",
-            "status", "NOT_FOUND"
-        ));
+        return Map.of(
+            "success", true,
+            "data", schemas.getOrDefault(formId, Map.of(
+                "formId", formId,
+                "formName", "未知表单",
+                "status", "NOT_FOUND"
+            )),
+            "source", "mock"
+        );
     }
     
-    private List<Map<String, Object>> buildMockFormMatches(String activityDesc, List<String> requiredFields) {
+    private Object buildMockFormMatches(String activityDesc, List<String> requiredFields) {
         List<Map<String, Object>> matches = new ArrayList<>();
         
         String lowerDesc = activityDesc.toLowerCase();
@@ -468,10 +496,16 @@ public class FormFunctionTools {
             ));
         }
         
-        return matches;
+        return Map.of(
+            "success", true,
+            "data", matches,
+            "activityDesc", activityDesc,
+            "count", matches.size(),
+            "source", "mock"
+        );
     }
     
-    private Map<String, Object> buildMockGeneratedSchema(String activityDesc, String formName, String category) {
+    private Object buildMockGeneratedSchema(String activityDesc, String formName, String category) {
         String lowerDesc = activityDesc.toLowerCase();
         
         List<Map<String, Object>> fields = new ArrayList<>();
@@ -496,17 +530,22 @@ public class FormFunctionTools {
         }
         
         return Map.of(
-            "formId", "form-generated-" + System.currentTimeMillis(),
-            "formName", formName != null ? formName : "自动生成表单",
-            "description", "根据活动描述自动生成: " + activityDesc,
-            "category", category != null ? category : "AUTO",
-            "fields", fields,
+            "success", true,
+            "data", Map.of(
+                "formId", "form-generated-" + System.currentTimeMillis(),
+                "formName", formName != null ? formName : "自动生成表单",
+                "description", "根据活动描述自动生成: " + activityDesc,
+                "category", category != null ? category : "AUTO",
+                "fields", fields,
+                "generated", true,
+                "generationReason", "根据活动描述智能生成表单Schema"
+            ),
             "generated", true,
-            "generationReason", "根据活动描述智能生成表单Schema"
+            "source", "mock"
         );
     }
     
-    private List<Map<String, Object>> buildMockFieldMappings(String formId, List<String> requiredFields) {
+    private Object buildMockFieldMappings(String formId, List<String> requiredFields) {
         List<Map<String, Object>> mappings = new ArrayList<>();
         
         if (requiredFields != null) {
@@ -520,17 +559,54 @@ public class FormFunctionTools {
             }
         }
         
-        return mappings;
+        double coverage = mappings.isEmpty() ? 0.0 : 
+            mappings.stream()
+                .mapToDouble(m -> ((Number) m.get("mappingScore")).doubleValue())
+                .average()
+                .orElse(0.0);
+        
+        return Map.of(
+            "success", true,
+            "data", mappings,
+            "formId", formId,
+            "coverage", coverage,
+            "source", "mock"
+        );
     }
     
-    private double calculateCoverage(List<Map<String, Object>> mappings) {
-        if (mappings == null || mappings.isEmpty()) {
-            return 0.0;
-        }
+    private Object buildMockCategories() {
+        List<Map<String, Object>> categories = new ArrayList<>();
         
-        return mappings.stream()
-            .mapToDouble(m -> ((Number) m.get("mappingScore")).doubleValue())
-            .average()
-            .orElse(0.0);
+        categories.add(Map.of(
+            "categoryId", "HR",
+            "categoryName", "人力资源",
+            "description", "招聘、入职、离职等HR相关表单",
+            "formCount", 12
+        ));
+        categories.add(Map.of(
+            "categoryId", "FIN",
+            "categoryName", "财务管理",
+            "description", "报销、预算、审批等财务表单",
+            "formCount", 8
+        ));
+        categories.add(Map.of(
+            "categoryId", "ADMIN",
+            "categoryName", "行政管理",
+            "description", "请假、出差、会议等行政表单",
+            "formCount", 15
+        ));
+        categories.add(Map.of(
+            "categoryId", "TECH",
+            "categoryName", "技术开发",
+            "description", "需求、测试、发布等技术表单",
+            "formCount", 10
+        ));
+        
+        return Map.of(
+            "success", true,
+            "data", categories,
+            "count", categories.size(),
+            "source", "mock"
+        );
     }
 }

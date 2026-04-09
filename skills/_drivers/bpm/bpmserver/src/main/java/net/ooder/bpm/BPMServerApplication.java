@@ -22,6 +22,7 @@ public class BPMServerApplication {
             props.setProperty("JDSHome", jdsHome);
             props.setProperty("jds.home", jdsHome);
             props.setProperty("jds.config-name", "bpmserver");
+            props.setProperty("configName", "bpmserver");
             props.setProperty("server.url", "http://127.0.0.1:8083/bpm");
             props.setProperty("server.port", "8083");
             props.setProperty("cluster.enabled", "false");
@@ -31,9 +32,15 @@ public class BPMServerApplication {
             props.setProperty("user.system-code", "bpm");
             props.setProperty("user.offline", "true");
             
+            CommonConfig.initForTest(props);
             JDSConfig.initForTest(props);
             CommonConfig.initForTest(props);
-            JDSServer.setMockMode(true);
+            
+            try {
+                JDSServer.setMockMode(true);
+            } catch (NullPointerException e) {
+                System.err.println("JDSServer.setMockMode failed (non-critical): " + e.getMessage());
+            }
             
             System.out.println("JDSConfig initialized for BPM Server");
         } catch (Exception e) {

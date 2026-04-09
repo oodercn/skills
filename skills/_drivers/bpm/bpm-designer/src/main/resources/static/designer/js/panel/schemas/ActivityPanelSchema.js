@@ -135,6 +135,11 @@ const ActivityPanelSchema = {
                 { value: 'TASK', label: '用户任务' },
                 { value: 'SERVICE', label: '服务任务' },
                 { value: 'SCRIPT', label: '脚本任务' },
+                { value: 'START', label: '开始节点' },
+                { value: 'END', label: '结束节点' },
+                { value: 'XOR_GATEWAY', label: '排他网关' },
+                { value: 'AND_GATEWAY', label: '并行网关' },
+                { value: 'OR_GATEWAY', label: '包容网关' },
                 { value: 'SUBPROCESS', label: '子流程' },
                 { value: 'LLM_TASK', label: 'LLM任务' }
             ]},
@@ -149,7 +154,12 @@ const ActivityPanelSchema = {
                 { value: 'IMPL_TOOL', label: '工具' },
                 { value: 'IMPL_SUBFLOW', label: '子流程' },
                 { value: 'IMPL_OUTFLOW', label: '外部流程' },
-                { value: 'IMPL_SERVICE', label: '服务' }
+                { value: 'IMPL_DEVICE', label: '设备' },
+                { value: 'IMPL_EVENT', label: '事件' },
+                { value: 'IMPL_SERVICE', label: '服务' },
+                { value: 'IMPL_AGENT', label: 'Agent' },
+                { value: 'IMPL_ROUTE', label: '路由' },
+                { value: 'IMPL_BLOCK', label: '块活动' }
             ]},
             { name: 'position', type: 'select', label: '活动位置', options: [
                 { value: 'NORMAL', label: '正常位置' },

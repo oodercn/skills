@@ -67,7 +67,6 @@ E:\github\ooder-skills\
 │
 ├── app/                           # 应用模块
 │   ├── skill-common/              # 公共依赖
-│   ├── skill-hotplug-starter/     # 热插拔启动器
 │   └── skill-org-base/            # 组织基础
 │
 ├── templates/                     # 技能模板

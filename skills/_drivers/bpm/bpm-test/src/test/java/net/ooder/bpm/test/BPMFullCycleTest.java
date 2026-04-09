@@ -68,14 +68,13 @@ class BPMFullCycleTest {
         assertNotNull(result, "流程定义结果不应为空");
         System.out.println("流程定义获取结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("流程定义ID: " + data.get("processDefId"));
-            System.out.println("流程定义名称: " + data.get("name"));
-            System.out.println("系统代码: " + data.get("systemCode"));
-            
-            assertEquals(TEST_PROCESS_DEF_ID, data.get("processDefId"), "流程定义ID应匹配");
-        }
+        assertNotNull(result.getData(), "流程定义数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("流程定义ID: " + data.get("processDefId"));
+        System.out.println("流程定义名称: " + data.get("name"));
+        System.out.println("系统代码: " + data.get("systemCode"));
+        
+        assertEquals(TEST_PROCESS_DEF_ID, data.get("processDefId"), "流程定义ID应匹配");
         
         System.out.println("流程定义获取测试通过\n");
     }
@@ -92,11 +91,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "活动定义结果不应为空");
         System.out.println("活动定义获取结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("活动定义ID: " + data.get("activityDefId"));
-            System.out.println("活动定义名称: " + data.get("name"));
-        }
+        assertNotNull(result.getData(), "活动定义数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("活动定义ID: " + data.get("activityDefId"));
+        System.out.println("活动定义名称: " + data.get("name"));
         
         System.out.println("活动定义获取测试通过\n");
     }
@@ -113,13 +111,12 @@ class BPMFullCycleTest {
         assertNotNull(result, "路由定义结果不应为空");
         System.out.println("路由定义获取结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("路由定义ID: " + data.get("routeDefId"));
-            System.out.println("路由定义名称: " + data.get("name"));
-            System.out.println("起始活动: " + data.get("fromActivityDefId"));
-            System.out.println("目标活动: " + data.get("toActivityDefId"));
-        }
+        assertNotNull(result.getData(), "路由定义数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("路由定义ID: " + data.get("routeDefId"));
+        System.out.println("路由定义名称: " + data.get("name"));
+        System.out.println("起始活动: " + data.get("fromActivityDefId"));
+        System.out.println("目标活动: " + data.get("toActivityDefId"));
         
         System.out.println("路由定义获取测试通过\n");
     }
@@ -135,15 +132,14 @@ class BPMFullCycleTest {
         assertNotNull(result, "创建流程实例结果不应为空");
         System.out.println("创建流程实例结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            createdActivityInstId = (String) data.get("activityInstId");
-            System.out.println("创建的活动实例ID: " + createdActivityInstId);
-            System.out.println("活动定义ID: " + data.get("activityDefId"));
-            System.out.println("流程实例ID: " + data.get("processInstId"));
-            
-            assertNotNull(createdActivityInstId, "活动实例ID不应为空");
-        }
+        assertNotNull(result.getData(), "创建流程实例数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        createdActivityInstId = (String) data.get("activityInstId");
+        System.out.println("创建的活动实例ID: " + createdActivityInstId);
+        System.out.println("活动定义ID: " + data.get("activityDefId"));
+        System.out.println("流程实例ID: " + data.get("processInstId"));
+        
+        assertNotNull(createdActivityInstId, "活动实例ID不应为空");
         
         System.out.println("创建流程实例测试通过\n");
     }
@@ -160,13 +156,12 @@ class BPMFullCycleTest {
         assertNotNull(result, "流程实例结果不应为空");
         System.out.println("流程实例获取结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("流程实例ID: " + data.get("processInstId"));
-            System.out.println("流程实例名称: " + data.get("name"));
-            System.out.println("流程定义ID: " + data.get("processDefId"));
-            System.out.println("流程状态: " + data.get("state"));
-        }
+        assertNotNull(result.getData(), "流程实例数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("流程实例ID: " + data.get("processInstId"));
+        System.out.println("流程实例名称: " + data.get("name"));
+        System.out.println("流程定义ID: " + data.get("processDefId"));
+        System.out.println("流程状态: " + data.get("state"));
         
         System.out.println("获取流程实例测试通过\n");
     }
@@ -183,17 +178,16 @@ class BPMFullCycleTest {
         assertNotNull(result, "活动实例结果不应为空");
         System.out.println("活动实例获取结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("活动实例ID: " + data.get("activityInstId"));
-            System.out.println("活动实例名称: " + data.get("name"));
-            System.out.println("活动状态: " + data.get("state"));
-            System.out.println("是否可以办理: " + data.get("canPerform"));
-            System.out.println("是否可以签收: " + data.get("canSignReceive"));
-            System.out.println("是否可以退回: " + data.get("canRouteBack"));
-            
-            assertEquals(activityInstId, data.get("activityInstId"), "活动实例ID应匹配");
-        }
+        assertNotNull(result.getData(), "活动实例数据不应为null");
+        data = (Map<String, Object>) result.getData();
+        System.out.println("活动实例ID: " + data.get("activityInstId"));
+        System.out.println("活动实例名称: " + data.get("name"));
+        System.out.println("活动状态: " + data.get("state"));
+        System.out.println("是否可以办理: " + data.get("canPerform"));
+        System.out.println("是否可以签收: " + data.get("canSignReceive"));
+        System.out.println("是否可以退回: " + data.get("canRouteBack"));
+        
+        assertEquals(activityInstId, data.get("activityInstId"), "活动实例ID应匹配");
         
         System.out.println("获取活动实例测试通过\n");
     }
@@ -210,11 +204,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "签收结果不应为空");
         System.out.println("签收结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("签收状态: " + data.get("mainCode"));
-            System.out.println("签收消息: " + data.get("message"));
-        }
+        assertNotNull(result.getData(), "签收数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("签收状态: " + data.get("mainCode"));
+        System.out.println("签收消息: " + data.get("message"));
         
         System.out.println("签收活动测试通过\n");
     }
@@ -231,11 +224,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "完成任务结果不应为空");
         System.out.println("完成任务结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("完成状态: " + data.get("mainCode"));
-            System.out.println("完成消息: " + data.get("message"));
-        }
+        assertNotNull(result.getData(), "完成任务数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("完成状态: " + data.get("mainCode"));
+        System.out.println("完成消息: " + data.get("message"));
         
         System.out.println("完成任务测试通过\n");
     }
@@ -252,11 +244,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "完成流程实例结果不应为空");
         System.out.println("完成流程实例结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("完成状态: " + data.get("mainCode"));
-            System.out.println("完成消息: " + data.get("message"));
-        }
+        assertNotNull(result.getData(), "完成流程实例数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("完成状态: " + data.get("mainCode"));
+        System.out.println("完成消息: " + data.get("message"));
         
         System.out.println("完成流程实例测试通过\n");
     }
@@ -273,11 +264,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "中止流程实例结果不应为空");
         System.out.println("中止流程实例结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("中止状态: " + data.get("mainCode"));
-            System.out.println("中止消息: " + data.get("message"));
-        }
+        assertNotNull(result.getData(), "中止流程实例数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("中止状态: " + data.get("mainCode"));
+        System.out.println("中止消息: " + data.get("message"));
         
         System.out.println("中止流程实例测试通过\n");
     }
@@ -296,11 +286,10 @@ class BPMFullCycleTest {
         assertNotNull(result, "退回结果不应为空");
         System.out.println("退回结果: " + result);
         
-        if (result.getData() != null) {
-            Map<String, Object> data = (Map<String, Object>) result.getData();
-            System.out.println("退回状态: " + data.get("mainCode"));
-            System.out.println("退回消息: " + data.get("message"));
-        }
+        assertNotNull(result.getData(), "退回数据不应为null");
+        Map<String, Object> data = (Map<String, Object>) result.getData();
+        System.out.println("退回状态: " + data.get("mainCode"));
+        System.out.println("退回消息: " + data.get("message"));
         
         System.out.println("退回操作测试通过\n");
     }
