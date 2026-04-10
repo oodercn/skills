@@ -123,24 +123,55 @@ class FormPanelPlugin extends PanelPlugin {
     _onFieldChange(e) {
         const fieldName = e.target.name;
         let fieldValue = e.target.value;
-        
+
         // 处理复选框
         if (e.target.type === 'checkbox') {
             fieldValue = e.target.checked;
         }
-        
-        console.log(`[PanelPlugin] Field changed: ${fieldName} = ${fieldValue}`);
-        
-        // 更新当前数据
-        if (this.currentData) {
-            this.currentData[fieldName] = fieldValue;
-            
-            // 触发联动更新
-            this._triggerCascadeUpdate(fieldName, fieldValue);
-            
-            // 通知store更新
-            this._notifyStoreUpdate();
+
+        // 处理数字输入
+        if (e.target.type === 'number' && fieldValue !== '') {
+            fieldValue = Number(fieldValue);
         }
+
+        console.log(`[PanelPlugin] Field changed: ${fieldName} = ${fieldValue}`);
+
+        // 更新当前数据（带变化检测）
+        if (this.currentData) {
+            const oldValue = this.currentData[fieldName];
+
+            // 深比较，避免重复更新
+            if (!this._deepEqual(oldValue, fieldValue)) {
+                this.currentData[fieldName] = fieldValue;
+                console.log(`[PanelPlugin] Value actually changed: ${fieldName} from ${oldValue} to ${fieldValue}`);
+
+                // 触发联动更新
+                this._triggerCascadeUpdate(fieldName, fieldValue);
+
+                // 通知store更新
+                this._notifyStoreUpdate();
+            } else {
+                console.log(`[PanelPlugin] Value unchanged, skipping update: ${fieldName}`);
+            }
+        }
+    }
+
+    /**
+     * 深度比较两个值是否相等
+     */
+    _deepEqual(a, b) {
+        if (a === b) return true;
+        if (a == null || b == null) return false;
+        if (typeof a !== typeof b) return false;
+
+        if (typeof a === 'object') {
+            const keysA = Object.keys(a);
+            const keysB = Object.keys(b);
+            if (keysA.length !== keysB.length) return false;
+            return keysA.every(key => this._deepEqual(a[key], b[key]));
+        }
+
+        return false;
     }
 
     /**

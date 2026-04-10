@@ -222,20 +222,19 @@ class Store {
         try {
             console.log('[Store] Auto-saving process...');
             const processData = this.process.toJSON();
-            
+
             // 调试：打印第一个活动的坐标
             if (processData.activities && processData.activities.length > 0) {
                 const firstAct = processData.activities[0];
                 console.log('[Store] First activity positionCoord:', firstAct.positionCoord);
             }
-            
+
             const requestBody = JSON.stringify(processData);
             console.log('[Store] Request body length:', requestBody.length);
             console.log('[Store] Request body preview:', requestBody.substring(0, 500));
-            
-            await this.api.saveProcess(processData);
-            this.dirty = false;
-            this._emit('dirty:change', false);
+
+            await this._saveWithRetry(processData);
+            // 自动保存成功后不清除dirty状态，只触发事件
             this._emit('auto-save', { success: true });
             console.log('[Store] Auto-save completed');
         } catch (error) {
@@ -245,10 +244,49 @@ class Store {
     }
 
     /**
-     * 手动保存
+     * 手动保存 - 会清除dirty状态
      */
     async save() {
-        return this._autoSave();
+        if (!this.api || !this.process) {
+            throw new Error('No api or process');
+        }
+
+        console.log('[Store] Manual saving process...');
+        const processData = this.process.toJSON();
+        await this._saveWithRetry(processData);
+
+        // 手动保存成功后清除dirty状态
+        this.dirty = false;
+        this._emit('dirty:change', false);
+        console.log('[Store] Manual save completed');
+    }
+
+    /**
+     * 带重试的保存逻辑
+     */
+    async _saveWithRetry(processData, maxRetries = 3) {
+        let lastError = null;
+
+        for (let attempt = 1; attempt <= maxRetries; attempt++) {
+            try {
+                console.log(`[Store] Save attempt ${attempt}/${maxRetries}`);
+                await this.api.saveProcess(processData);
+                return; // 保存成功
+            } catch (error) {
+                lastError = error;
+                console.error(`[Store] Save attempt ${attempt} failed:`, error.message);
+
+                if (attempt < maxRetries) {
+                    // 等待后重试（指数退避）
+                    const delay = Math.pow(2, attempt - 1) * 1000;
+                    console.log(`[Store] Retrying in ${delay}ms...`);
+                    await new Promise(resolve => setTimeout(resolve, delay));
+                }
+            }
+        }
+
+        // 所有重试都失败
+        throw new Error(`Save failed after ${maxRetries} attempts: ${lastError?.message}`);
     }
 
     on(event, callback) {

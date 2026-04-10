@@ -334,8 +334,9 @@ public class DesignerService {
             Object yVal = coord.get("y");
             System.out.println("[DesignerService] Coord values - x: " + xVal + " (type: " + (xVal != null ? xVal.getClass().getName() : "null") + 
                 "), y: " + yVal + " (type: " + (yVal != null ? yVal.getClass().getName() : "null") + ")");
-            coordDTO.setX(((Number) xVal).intValue());
-            coordDTO.setY(((Number) yVal).intValue());
+            // 使用doubleValue()保留小数部分
+            coordDTO.setX(((Number) xVal).doubleValue());
+            coordDTO.setY(((Number) yVal).doubleValue());
             dto.setPositionCoord(coordDTO);
             System.out.println("[DesignerService] Set PositionCoordDTO: " + coordDTO);
         } else {

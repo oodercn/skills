@@ -5,38 +5,39 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 坐标DTO - 同时支持FastJSON2和Jackson
+ * 使用Double类型支持浮点数坐标
  */
 public class PositionCoordDTO {
 
     @JSONField(name = "x")
     @JsonProperty("x")
-    private Integer x;
+    private Double x;
 
     @JSONField(name = "y")
     @JsonProperty("y")
-    private Integer y;
-    
+    private Double y;
+
     public PositionCoordDTO() {
     }
-    
-    public PositionCoordDTO(Integer x, Integer y) {
+
+    public PositionCoordDTO(Double x, Double y) {
         this.x = x;
         this.y = y;
     }
-    
-    public Integer getX() {
+
+    public Double getX() {
         return x;
     }
-    
-    public void setX(Integer x) {
+
+    public void setX(Double x) {
         this.x = x;
     }
-    
-    public Integer getY() {
+
+    public Double getY() {
         return y;
     }
-    
-    public void setY(Integer y) {
+
+    public void setY(Double y) {
         this.y = y;
     }
     
