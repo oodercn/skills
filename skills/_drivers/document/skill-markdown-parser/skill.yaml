@@ -1,0 +1,26 @@
+skill:
+  id: skill-markdown-parser
+  name: Markdown/文本解析器
+  version: 1.0.0
+  category: document
+  form: DRIVER
+  description: 提供 Markdown 和纯文本文件解析支持，通过 SPI 接口提供文档解析能力
+  author: ooder team
+  tags:
+    - document
+    - markdown
+    - text
+    - parser
+    - spi
+
+config:
+  parser:
+    max-file-size: 10485760
+    encoding: UTF-8
+    extract-metadata: true
+
+provides:
+  spi:
+    - net.ooder.spi.document.DocumentParser
+
+dependencies: []

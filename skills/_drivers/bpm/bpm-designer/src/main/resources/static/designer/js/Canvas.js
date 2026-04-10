@@ -53,23 +53,101 @@ class Canvas {
 
     /**
      * 更新节点显示
+     * 支持更新：名称、位置、类型、实现方式等所有属性
      */
     _updateNodeDisplay(activityDef) {
         if (!activityDef || !activityDef.activityDefId) return;
 
         const nodeData = this.nodes.get(activityDef.activityDefId);
-        if (nodeData && nodeData.element) {
-            const nodeEl = nodeData.element;
+        if (!nodeData || !nodeData.element) return;
+
+        const nodeEl = nodeData.element;
+        const oldActivity = nodeData.activity;
+
+        console.log('[Canvas] Updating node display:', activityDef.activityDefId, 'changes:', Object.keys(activityDef));
+
+        // 1. 更新名称
+        if (activityDef.name !== undefined) {
             const nameEl = nodeEl.querySelector('.d-node-name');
-            if (nameEl && activityDef.name !== undefined) {
+            if (nameEl) {
                 nameEl.textContent = activityDef.name;
                 console.log('[Canvas] Updated node name:', activityDef.name);
             }
 
             const titleEl = nodeEl.querySelector('.d-node-title');
-            if (titleEl && activityDef.name !== undefined) {
+            if (titleEl) {
                 titleEl.textContent = activityDef.name;
             }
+        }
+
+        // 2. 更新位置（如果坐标变化）
+        if (activityDef.positionCoord !== undefined) {
+            const posX = parseFloat(activityDef.positionCoord?.x) || 0;
+            const posY = parseFloat(activityDef.positionCoord?.y) || 0;
+            nodeEl.style.left = (posX * this.scale + this.offsetX) + 'px';
+            nodeEl.style.top = (posY * this.scale + this.offsetY) + 'px';
+            console.log('[Canvas] Updated node position:', posX, posY);
+        }
+
+        // 3. 更新活动类型（影响样式和图标）
+        if (activityDef.activityType !== undefined && oldActivity.activityType !== activityDef.activityType) {
+            // 移除旧的类型类
+            const oldTypeClass = this._getTypeClass(oldActivity.activityType);
+            const oldFillClass = this._getFillClass(oldActivity.activityType);
+            nodeEl.classList.remove(oldTypeClass, oldFillClass);
+
+            // 添加新的类型类
+            const newTypeClass = this._getTypeClass(activityDef.activityType);
+            const newFillClass = this._getFillClass(activityDef.activityType);
+            nodeEl.classList.add(newTypeClass, newFillClass);
+
+            // 更新图标
+            const iconEl = nodeEl.querySelector('.d-node-icon');
+            if (iconEl) {
+                iconEl.innerHTML = this._getIconSvg(activityDef.activityType);
+            }
+
+            // 更新大小
+            const wasSmall = this._isSmallNode(oldActivity.activityType);
+            const isSmall = this._isSmallNode(activityDef.activityType);
+            if (wasSmall !== isSmall) {
+                if (isSmall) {
+                    nodeEl.style.width = '';
+                    nodeEl.style.height = '';
+                    // 隐藏名称
+                    const nameEl = nodeEl.querySelector('.d-node-name');
+                    if (nameEl) nameEl.remove();
+                } else {
+                    nodeEl.style.width = this.nodeWidth + 'px';
+                    nodeEl.style.height = this.nodeHeight + 'px';
+                    // 添加名称
+                    const contentEl = nodeEl.querySelector('.d-node-content');
+                    if (contentEl && !nodeEl.querySelector('.d-node-name')) {
+                        const nameSpan = document.createElement('span');
+                        nameSpan.className = 'd-node-name';
+                        nameSpan.textContent = activityDef.name || oldActivity.name || '';
+                        contentEl.appendChild(nameSpan);
+                    }
+                }
+            }
+
+            // 更新 dataset
+            nodeEl.dataset.activityType = activityDef.activityType;
+            console.log('[Canvas] Updated node type:', activityDef.activityType);
+        }
+
+        // 4. 更新实现方式（可能影响节点外观）
+        if (activityDef.implementation !== undefined && oldActivity.implementation !== activityDef.implementation) {
+            // 可以在这里添加实现方式特定的样式更新
+            console.log('[Canvas] Updated node implementation:', activityDef.implementation);
+        }
+
+        // 5. 更新 dataset 中的活动数据引用
+        nodeData.activity = { ...oldActivity, ...activityDef };
+
+        // 6. 更新连线（如果位置变化）
+        if (activityDef.positionCoord !== undefined) {
+            this._updateEdges();
         }
     }
 

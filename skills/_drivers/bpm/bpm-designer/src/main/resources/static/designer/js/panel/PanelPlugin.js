@@ -55,26 +55,39 @@ class PanelPlugin {
 
 /**
  * 基础表单面板插件
- * 提供通用的表单渲染功能，支持自动保存和联动更新
+ * 提供通用的表单渲染功能，支持手动确认更新，避免频繁重绘
  */
 class FormPanelPlugin extends PanelPlugin {
     constructor(name, icon, schema) {
         super(name, icon);
         this.schema = schema;
         this.currentData = null;
+        this.originalData = null; // 原始数据副本
         this.store = window.store; // 全局store引用
         this._changeTimeout = null;
+        this._pendingChanges = new Map(); // 待确认的变更
     }
 
     render(data) {
-        this.currentData = data;
+        this.currentData = JSON.parse(JSON.stringify(data)); // 深拷贝
+        this.originalData = JSON.parse(JSON.stringify(data)); // 保存原始数据
+        this._pendingChanges.clear();
         if (!this.container) return;
 
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-panel-form-wrapper';
+
         const form = this._createForm();
+        wrapper.appendChild(form);
+
+        // 添加确认按钮区域
+        const buttonArea = this._createButtonArea();
+        wrapper.appendChild(buttonArea);
+
         this.container.innerHTML = '';
-        this.container.appendChild(form);
-        
-        // 绑定输入变化事件
+        this.container.appendChild(wrapper);
+
+        // 绑定输入变化事件（不再自动更新，只记录变更）
         this._bindInputEvents(form);
     }
 
@@ -95,6 +108,100 @@ class FormPanelPlugin extends PanelPlugin {
         });
 
         return form;
+    }
+
+    /**
+     * 创建按钮区域（确认、取消、重置）
+     */
+    _createButtonArea() {
+        const buttonArea = document.createElement('div');
+        buttonArea.className = 'd-panel-button-area';
+        buttonArea.style.cssText = `
+            position: sticky;
+            bottom: 0;
+            background: var(--panel-bg, #fff);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color, #e0e0e0);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            z-index: 10;
+        `;
+
+        // 确认按钮
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'd-btn d-btn-primary';
+        confirmBtn.innerHTML = '✓ 确认';
+        confirmBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        `;
+        confirmBtn.addEventListener('click', () => this._onConfirm());
+        confirmBtn.addEventListener('mouseenter', () => {
+            confirmBtn.style.background = '#40a9ff';
+        });
+        confirmBtn.addEventListener('mouseleave', () => {
+            confirmBtn.style.background = '#1890ff';
+        });
+
+        // 取消按钮
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'd-btn';
+        cancelBtn.innerHTML = '✕ 取消';
+        cancelBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        `;
+        cancelBtn.addEventListener('click', () => this._onCancel());
+        cancelBtn.addEventListener('mouseenter', () => {
+            cancelBtn.style.background = '#e8e8e8';
+        });
+        cancelBtn.addEventListener('mouseleave', () => {
+            cancelBtn.style.background = '#f5f5f5';
+        });
+
+        // 重置按钮
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'd-btn';
+        resetBtn.innerHTML = '↺ 重置';
+        resetBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s;
+        `;
+        resetBtn.addEventListener('click', () => this._onReset());
+        resetBtn.addEventListener('mouseenter', () => {
+            resetBtn.style.background = '#e8e8e8';
+        });
+        resetBtn.addEventListener('mouseleave', () => {
+            resetBtn.style.background = '#f5f5f5';
+        });
+
+        buttonArea.appendChild(resetBtn);
+        buttonArea.appendChild(cancelBtn);
+        buttonArea.appendChild(confirmBtn);
+
+        return buttonArea;
     }
 
     _bindInputEvents(form) {
@@ -136,24 +243,142 @@ class FormPanelPlugin extends PanelPlugin {
 
         console.log(`[PanelPlugin] Field changed: ${fieldName} = ${fieldValue}`);
 
-        // 更新当前数据（带变化检测）
+        // 只记录到待变更列表，不立即更新
         if (this.currentData) {
-            const oldValue = this.currentData[fieldName];
+            const originalValue = this.originalData[fieldName];
 
-            // 深比较，避免重复更新
-            if (!this._deepEqual(oldValue, fieldValue)) {
+            // 深比较，只有真正变化才记录
+            if (!this._deepEqual(originalValue, fieldValue)) {
+                this._pendingChanges.set(fieldName, fieldValue);
                 this.currentData[fieldName] = fieldValue;
-                console.log(`[PanelPlugin] Value actually changed: ${fieldName} from ${oldValue} to ${fieldValue}`);
-
-                // 触发联动更新
-                this._triggerCascadeUpdate(fieldName, fieldValue);
-
-                // 通知store更新
-                this._notifyStoreUpdate();
+                console.log(`[PanelPlugin] Change recorded: ${fieldName} from ${originalValue} to ${fieldValue}`);
+                this._updateButtonState();
             } else {
-                console.log(`[PanelPlugin] Value unchanged, skipping update: ${fieldName}`);
+                // 如果改回原始值，从待变更列表移除
+                this._pendingChanges.delete(fieldName);
+                this.currentData[fieldName] = fieldValue;
+                console.log(`[PanelPlugin] Change reverted to original: ${fieldName}`);
+                this._updateButtonState();
             }
         }
+    }
+
+    /**
+     * 更新按钮状态（根据是否有待确认的变更）
+     */
+    _updateButtonState() {
+        const buttonArea = this.container?.querySelector('.d-panel-button-area');
+        if (!buttonArea) return;
+
+        const confirmBtn = buttonArea.querySelector('.d-btn-primary');
+        if (confirmBtn) {
+            const hasChanges = this._pendingChanges.size > 0;
+            confirmBtn.disabled = !hasChanges;
+            confirmBtn.style.opacity = hasChanges ? '1' : '0.5';
+            confirmBtn.style.cursor = hasChanges ? 'pointer' : 'not-allowed';
+            console.log(`[PanelPlugin] Button state updated: hasChanges=${hasChanges}, pending=${this._pendingChanges.size}`);
+        }
+    }
+
+    /**
+     * 确认按钮点击处理
+     */
+    _onConfirm() {
+        if (this._pendingChanges.size === 0) {
+            console.log('[PanelPlugin] No changes to confirm');
+            return;
+        }
+
+        console.log(`[PanelPlugin] Confirming ${this._pendingChanges.size} changes:`, Array.from(this._pendingChanges.keys()));
+
+        // 应用所有变更
+        this._pendingChanges.forEach((value, key) => {
+            // 触发联动更新
+            this._triggerCascadeUpdate(key, value);
+        });
+
+        // 通知store更新（一次性更新所有变更）
+        this._notifyStoreUpdate();
+
+        // 清空待变更列表
+        this._pendingChanges.clear();
+
+        // 更新原始数据为当前数据
+        this.originalData = JSON.parse(JSON.stringify(this.currentData));
+
+        // 更新按钮状态
+        this._updateButtonState();
+
+        console.log('[PanelPlugin] Changes confirmed and applied');
+    }
+
+    /**
+     * 取消按钮点击处理
+     */
+    _onCancel() {
+        if (this._pendingChanges.size === 0) {
+            console.log('[PanelPlugin] No changes to cancel');
+            return;
+        }
+
+        console.log(`[PanelPlugin] Canceling ${this._pendingChanges.size} changes`);
+
+        // 恢复所有变更的字段为原始值
+        this._pendingChanges.forEach((value, key) => {
+            const originalValue = this.originalData[key];
+            this.currentData[key] = originalValue;
+
+            // 更新UI显示
+            const input = this.container?.querySelector(`[name="${key}"]`);
+            if (input) {
+                if (input.type === 'checkbox') {
+                    input.checked = originalValue;
+                } else {
+                    input.value = originalValue !== undefined && originalValue !== null ? originalValue : '';
+                }
+            }
+        });
+
+        // 清空待变更列表
+        this._pendingChanges.clear();
+
+        // 更新按钮状态
+        this._updateButtonState();
+
+        console.log('[PanelPlugin] Changes canceled, values restored');
+    }
+
+    /**
+     * 重置按钮点击处理
+     */
+    _onReset() {
+        console.log('[PanelPlugin] Resetting all fields to original values');
+
+        // 恢复所有字段为原始值
+        this.currentData = JSON.parse(JSON.stringify(this.originalData));
+        this._pendingChanges.clear();
+
+        // 重新渲染表单
+        const form = this.container?.querySelector('.d-panel-form');
+        if (form) {
+            // 更新所有输入框的值
+            const inputs = form.querySelectorAll('input, textarea, select');
+            inputs.forEach(input => {
+                const fieldName = input.name;
+                const originalValue = this.originalData[fieldName];
+
+                if (input.type === 'checkbox') {
+                    input.checked = originalValue;
+                } else {
+                    input.value = originalValue !== undefined && originalValue !== null ? originalValue : '';
+                }
+            });
+        }
+
+        // 更新按钮状态
+        this._updateButtonState();
+
+        console.log('[PanelPlugin] All fields reset');
     }
 
     /**

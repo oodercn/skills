@@ -1,0 +1,30 @@
+skill:
+  id: skill-local-vector-store
+  name: 本地向量存储
+  version: 1.0.0
+  category: vector
+  form: DRIVER
+  description: 提供基于 SQLite 的本地向量存储支持，通过 SPI 接口提供向量存储和检索能力
+  author: ooder team
+  tags:
+    - vector
+    - storage
+    - sqlite
+    - local
+    - spi
+
+config:
+  vector:
+    data-dir: ${user.home}/.apexos/data
+    database-name: vectors
+    default-dimension: 1536
+    metric-type: cosine
+    pool:
+      max-size: 5
+      min-idle: 1
+
+provides:
+  spi:
+    - net.ooder.spi.vector.VectorStoreProvider
+
+dependencies: []

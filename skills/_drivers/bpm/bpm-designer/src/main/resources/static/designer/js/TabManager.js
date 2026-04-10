@@ -107,9 +107,10 @@ class TabManager {
 
     activateTab(tabId) {
         if (!this.tabs.has(tabId)) return;
-        
+
         if (this.activeTabId && this.activeTabId !== tabId) {
             this._saveCurrentTabData();
+            this._autoSaveBeforeSwitch();
         }
 
         this.container.querySelectorAll('.d-tab').forEach(el => {
@@ -127,33 +128,64 @@ class TabManager {
         document.getElementById('processName').textContent = tab.name;
     }
 
+    /**
+     * Tab切换时自动保存到服务器
+     * 当当前Tab失去焦点时，如果有脏数据则自动保存
+     */
+    async _autoSaveBeforeSwitch() {
+        if (!this.activeTabId) return;
+
+        const currentTab = this.tabs.get(this.activeTabId);
+        if (!currentTab) return;
+
+        const store = this.app.store;
+        if (!store || !store.isDirty()) {
+            console.log('[TabManager] No dirty data, skip auto-save on tab switch');
+            return;
+        }
+
+        try {
+            console.log('[TabManager] Auto-saving before tab switch:', this.activeTabId);
+            await store.save();
+            currentTab.isDirty = false;
+            this.setTabDirty(this.activeTabId, false);
+            console.log('[TabManager] Auto-save on tab switch completed');
+        } catch (error) {
+            console.error('[TabManager] Auto-save on tab switch failed:', error);
+        }
+    }
+
     async closeTab(tabId) {
         const tab = this.tabs.get(tabId);
         if (!tab) return;
 
-        // 如果子流程有未保存的更改，先自动保存
-        if (tab.isDirty && tab.tabType === 'subprocess') {
+        // 先保存当前Tab数据
+        if (this.activeTabId === tabId) {
+            this._saveCurrentTabData();
+        }
+
+        // 如果有脏数据，自动保存到服务器
+        const store = this.app.store;
+        if (store && store.isDirty()) {
             try {
-                console.log('[TabManager] Auto-saving subprocess before close:', tabId);
-                // 先保存当前标签页数据
-                if (this.activeTabId === tabId) {
-                    this._saveCurrentTabData();
-                }
-                // 保存子流程前，先保存主流程
-                await this._saveParentProcess(tab);
-                // 保存子流程
-                await this.app.api.saveProcess(tab.processDef);
+                console.log('[TabManager] Auto-saving before close tab:', tabId);
+                await store.save();
                 tab.isDirty = false;
-                console.log('[TabManager] Auto-saved subprocess successfully');
+                console.log('[TabManager] Auto-save before close completed');
             } catch (error) {
-                console.error('[TabManager] Auto-save subprocess failed:', error);
-                if (!confirm(`子流程 "${tab.name}" 自动保存失败，确定要关闭吗？`)) {
+                console.error('[TabManager] Auto-save before close failed:', error);
+                if (!confirm(`流程 "${tab.name}" 自动保存失败，确定要关闭吗？`)) {
                     return;
                 }
             }
-        } else if (tab.isDirty) {
-            if (!confirm(`流程 "${tab.name}" 有未保存的更改，确定要关闭吗？`)) {
-                return;
+        }
+
+        // 如果子流程，保存父流程
+        if (tab.tabType === 'subprocess' && tab.parentTabId) {
+            try {
+                await this._saveParentProcess(tab);
+            } catch (error) {
+                console.error('[TabManager] Save parent process failed:', error);
             }
         }
 

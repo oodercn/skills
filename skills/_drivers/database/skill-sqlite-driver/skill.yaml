@@ -1,0 +1,30 @@
+skill:
+  id: skill-sqlite-driver
+  name: SQLite 数据库驱动
+  version: 1.0.0
+  category: database
+  form: DRIVER
+  description: 提供 SQLite 数据库支持，通过 SPI 接口提供数据源能力
+  author: ooder team
+  tags:
+    - database
+    - sqlite
+    - driver
+    - spi
+
+config:
+  sqlite:
+    data-dir: ${user.home}/.apexos/data
+    database-name: apexos
+    pool:
+      max-size: 5
+      min-idle: 1
+      connection-timeout: 30000
+      idle-timeout: 600000
+      max-lifetime: 1800000
+
+provides:
+  spi:
+    - net.ooder.spi.database.DataSourceProvider
+
+dependencies: []
