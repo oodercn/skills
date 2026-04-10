@@ -90,7 +90,7 @@ public class FormFunctionTools {
             .description("获取表单字段与活动需求的映射关系")
             .category(DesignerFunctionDefinition.FunctionCategory.FORM)
             .addParameter("formId", "string", "表单ID", true)
-            .addParameter("requiredFields", "array", "需要的字段列表", true)
+            .addParameter("activityDesc", "string", "活动描述", true)
             .handler(this::handleGetFormFieldMappings)
             .build());
         
@@ -110,7 +110,7 @@ public class FormFunctionTools {
         String tenantId = "default";
         
         if (dataSourceConfig.isUseRealData()) {
-            List<Map<String, Object>> forms = dataSourceAdapter.listForms(tenantId, category);
+            List<Map<String, Object>> forms = dataSourceAdapter.listForms(tenantId);
             return wrapResult(forms);
         }
         
@@ -151,7 +151,7 @@ public class FormFunctionTools {
         String tenantId = "default";
         
         if (dataSourceConfig.isUseRealData()) {
-            List<Map<String, Object>> matches = dataSourceAdapter.matchFormByActivity(tenantId, activityDesc, activityType);
+            List<Map<String, Object>> matches = dataSourceAdapter.matchFormByActivity(tenantId, activityDesc);
             return wrapResult(matches);
         }
         
@@ -174,16 +174,15 @@ public class FormFunctionTools {
     
     private Object handleGetFormFieldMappings(Map<String, Object> args) {
         String formId = (String) args.get("formId");
-        @SuppressWarnings("unchecked")
-        List<String> requiredFields = (List<String>) args.get("requiredFields");
+        String activityDesc = (String) args.get("activityDesc");
         String tenantId = "default";
         
         if (dataSourceConfig.isUseRealData()) {
-            List<Map<String, Object>> mappings = dataSourceAdapter.getFormFieldMappings(tenantId, formId, requiredFields);
+            List<Map<String, Object>> mappings = dataSourceAdapter.getFormFieldMappings(tenantId, formId, activityDesc);
             return wrapResult(mappings);
         }
         
-        return buildMockFieldMappings(formId, requiredFields);
+        return buildMockFieldMappings(formId, activityDesc);
     }
     
     private Object handleListFormCategories(Map<String, Object> args) {
@@ -545,17 +544,21 @@ public class FormFunctionTools {
         );
     }
     
-    private Object buildMockFieldMappings(String formId, List<String> requiredFields) {
+    private Object buildMockFieldMappings(String formId, String activityDesc) {
         List<Map<String, Object>> mappings = new ArrayList<>();
         
-        if (requiredFields != null) {
-            for (String field : requiredFields) {
-                mappings.add(Map.of(
-                    "requiredField", field,
-                    "formField", field.toLowerCase().replace(" ", "_"),
-                    "mappingScore", 0.85 + Math.random() * 0.15,
-                    "autoMapped", true
-                ));
+        if (activityDesc != null && !activityDesc.isEmpty()) {
+            String[] fields = activityDesc.split("[,，、]");
+            for (String field : fields) {
+                field = field.trim();
+                if (!field.isEmpty()) {
+                    mappings.add(Map.of(
+                        "requiredField", field,
+                        "formField", field.toLowerCase().replace(" ", "_"),
+                        "mappingScore", 0.85 + Math.random() * 0.15,
+                        "autoMapped", true
+                    ));
+                }
             }
         }
         

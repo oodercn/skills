@@ -238,20 +238,23 @@ public class ProcessDefManagerService {
         map.put("durationUnit", activityDef.getDurationUnit());
         map.put("canRouteBack", activityDef.getCanRouteBack());
         
-        log.debug("Loading attributes for activity: {}", activityDef.getActivityDefId());
+        log.info("[LOAD] Loading attributes for activity: {}", activityDef.getActivityDefId());
         
         EIAttributeDef workflowAttr = activityDef.getAttribute("WORKFLOW");
-        log.debug("WORKFLOW attribute: {}", workflowAttr);
+        log.info("[LOAD] WORKFLOW attribute: {}", workflowAttr);
         
         String positionCoord = activityDef.getAttributeValue("WORKFLOW.positionCoord");
-        log.debug("positionCoord value: {}", positionCoord);
+        log.info("[LOAD] positionCoord raw value: {}", positionCoord);
         if (positionCoord != null && !positionCoord.isEmpty()) {
             try {
                 Map<String, Object> positionCoordMap = mapper.readValue(positionCoord, Map.class);
+                log.info("[LOAD] Parsed positionCoord for activity {}: {}", activityDef.getActivityDefId(), positionCoordMap);
                 map.put("positionCoord", positionCoordMap);
             } catch (Exception e) {
-                log.warn("Failed to parse positionCoord for activity {}: {}", activityDef.getActivityDefId(), e.getMessage());
+                log.error("[LOAD] Failed to parse positionCoord for activity {}: {}", activityDef.getActivityDefId(), e.getMessage(), e);
             }
+        } else {
+            log.warn("[LOAD] No positionCoord found for activity {}", activityDef.getActivityDefId());
         }
         
         return map;
@@ -275,6 +278,8 @@ public class ProcessDefManagerService {
 
     @org.springframework.transaction.annotation.Transactional
     public Map<String, Object> saveProcessDef(Map<String, Object> processData) {
+        log.info("[SAVE] ========== saveProcessDef called ==========");
+        log.info("[SAVE] processData keys: {}", processData.keySet());
         try {
             String processDefId = (String) processData.get("processDefId");
             String name = (String) processData.get("name");
@@ -343,15 +348,18 @@ public class ProcessDefManagerService {
                     activity.setCanRouteBack("N");
                     
                     Map<String, Object> positionCoord = (Map<String, Object>) activityData.get("positionCoord");
+                    log.info("[SAVE] Activity {} received positionCoord: {}", activity.getActivityDefId(), positionCoord);
                     if (positionCoord != null) {
                         try {
                             String positionCoordJson = mapper.writeValueAsString(positionCoord);
+                            log.info("[SAVE] Activity {} positionCoord JSON: {}", activity.getActivityDefId(), positionCoordJson);
                             
                             DbAttributeDef workflowAttr = new DbAttributeDef();
                             workflowAttr.setId(java.util.UUID.randomUUID().toString());
                             workflowAttr.setName("WORKFLOW");
                             workflowAttr.setType("WORKFLOW");
                             activity.setAttribute(null, workflowAttr);
+                            log.info("[SAVE] Activity {} set WORKFLOW attribute", activity.getActivityDefId());
                             
                             DbAttributeDef posCoordAttr = new DbAttributeDef();
                             posCoordAttr.setId(java.util.UUID.randomUUID().toString());
@@ -359,11 +367,12 @@ public class ProcessDefManagerService {
                             posCoordAttr.setValue(positionCoordJson);
                             posCoordAttr.setType("WORKFLOW");
                             activity.setAttribute("WORKFLOW", posCoordAttr);
-                            
-                            log.debug("Saved positionCoord for activity {}: {}", activity.getActivityDefId(), positionCoordJson);
+                            log.info("[SAVE] Activity {} set positionCoord attribute: {}", activity.getActivityDefId(), positionCoordJson);
                         } catch (Exception e) {
-                            log.warn("Failed to set positionCoord: {}", e.getMessage());
+                            log.error("[SAVE] Failed to set positionCoord for activity {}: {}", activity.getActivityDefId(), e.getMessage(), e);
                         }
+                    } else {
+                        log.warn("[SAVE] Activity {} has no positionCoord!", activity.getActivityDefId());
                     }
                     
                     activityDefManager.save(activity);

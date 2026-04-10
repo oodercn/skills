@@ -10,6 +10,13 @@ class Store {
         this.historyIndex = -1;
         this.maxHistory = 50;
         this.listeners = new Map();
+        this.api = null;
+        this._autoSaveTimer = null;
+        this._autoSaveDelay = 1000; // 1秒后自动保存
+    }
+
+    setApi(api) {
+        this.api = api;
     }
 
     setProcess(processDef) {
@@ -55,6 +62,7 @@ class Store {
             this._saveHistory();
             this.dirty = true;
             this._emit('activity:update', activityDef);
+            this._triggerAutoSave();
         }
     }
 
@@ -68,6 +76,7 @@ class Store {
         this.dirty = true;
         console.log('[Store] Activity added:', activityDef.activityDefId, 'total activities:', this.process.activities.length);
         this._emit('activity:add', activityDef);
+        this._triggerAutoSave();
     }
 
     removeActivity(activityId) {
@@ -79,6 +88,7 @@ class Store {
         this._saveHistory();
         this.dirty = true;
         this._emit('activity:remove', activityId);
+        this._triggerAutoSave();
     }
 
     addRoute(routeDef) {
@@ -90,6 +100,7 @@ class Store {
         this._saveHistory();
         this.dirty = true;
         this._emit('route:add', routeDef);
+        this._triggerAutoSave();
     }
 
     removeRoute(routeId) {
@@ -98,6 +109,7 @@ class Store {
         this._saveHistory();
         this.dirty = true;
         this._emit('route:remove', routeId);
+        this._triggerAutoSave();
     }
 
     getRoute(routeId) {
@@ -110,6 +122,28 @@ class Store {
         this.currentRoute = this.getRoute(routeId);
         console.log('[Store] selectRoute result:', routeId, '->', this.currentRoute ? this.currentRoute.name : 'null');
         this._emit('route:select', this.currentRoute);
+    }
+
+    updateRoute(routeDef) {
+        if (!this.process) return;
+        const index = this.process.routes?.findIndex(
+            r => r.routeDefId === routeDef.routeDefId
+        );
+        if (index >= 0) {
+            this.process.routes[index] = routeDef;
+            this._saveHistory();
+            this.dirty = true;
+            this._emit('route:update', routeDef);
+            this._triggerAutoSave();
+        }
+    }
+
+    updateProcess(processDef) {
+        this.process = processDef;
+        this._saveHistory();
+        this.dirty = true;
+        this._emit('process:update', processDef);
+        this._triggerAutoSave();
     }
 
     _saveHistory() {
@@ -132,6 +166,7 @@ class Store {
             this.process = new ProcessDef(JSON.parse(snapshot));
             this.dirty = true;
             this._emit('process:change', this.process);
+            this._triggerAutoSave();
         }
     }
 
@@ -142,6 +177,7 @@ class Store {
             this.process = new ProcessDef(JSON.parse(snapshot));
             this.dirty = true;
             this._emit('process:change', this.process);
+            this._triggerAutoSave();
         }
     }
 
@@ -160,6 +196,59 @@ class Store {
 
     isDirty() {
         return this.dirty;
+    }
+
+    /**
+     * 触发自动保存（防抖）
+     */
+    _triggerAutoSave() {
+        if (this._autoSaveTimer) {
+            clearTimeout(this._autoSaveTimer);
+        }
+        this._autoSaveTimer = setTimeout(() => {
+            this._autoSave();
+        }, this._autoSaveDelay);
+    }
+
+    /**
+     * 自动保存到服务端
+     */
+    async _autoSave() {
+        if (!this.api || !this.process) {
+            console.log('[Store] Auto-save skipped: no api or process');
+            return;
+        }
+
+        try {
+            console.log('[Store] Auto-saving process...');
+            const processData = this.process.toJSON();
+            
+            // 调试：打印第一个活动的坐标
+            if (processData.activities && processData.activities.length > 0) {
+                const firstAct = processData.activities[0];
+                console.log('[Store] First activity positionCoord:', firstAct.positionCoord);
+            }
+            
+            const requestBody = JSON.stringify(processData);
+            console.log('[Store] Request body length:', requestBody.length);
+            console.log('[Store] Request body preview:', requestBody.substring(0, 500));
+            
+            await this.api.saveProcess(processData);
+            this.dirty = false;
+            this._emit('dirty:change', false);
+            this._emit('auto-save', { success: true });
+            console.log('[Store] Auto-save completed');
+        } catch (error) {
+            console.error('[Store] Auto-save failed:', error);
+            this._emit('auto-save', { success: false, error: error.message });
+        }
+    }
+
+    /**
+     * 手动保存
+     */
+    async save() {
+        return this._autoSave();
     }
 
     on(event, callback) {

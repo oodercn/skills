@@ -6,6 +6,8 @@ server:
 spring:
   application:
     name: bpm-designer
+  mvc:
+    static-path-pattern: /static/**
   web:
     resources:
       static-locations: classpath:/static/designer/
@@ -15,10 +17,11 @@ spring:
         cache: false
   thymeleaf:
     cache: false
+    check-template-location: false
 
 bpm:
   server:
-    url: http://127.0.0.1:8084/bpm
+    url: http://127.0.0.1:8082/bpm
 
 llm:
   enabled: true
@@ -35,7 +38,7 @@ llm:
 datasource:
   bpm:
     use-real-data: false
-    bpm-server-url: http://127.0.0.1:8084/bpm
+    bpm-server-url: http://127.0.0.1:8082
     capability-service-url: http://127.0.0.1:8085/capability
     form-service-url: http://127.0.0.1:8086/form
     scene-service-url: http://127.0.0.1:8087/scene

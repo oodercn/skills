@@ -1,0 +1,1 @@
+{"processDefId":"simple-test-001","name":"简单测试","description":"测试","classification":"测试","systemCode":"bpm","accessLevel":"PUBLIC","activities":[{"activityDefId":"act-1","name":"活动1","position":"NORMAL"}],"routes":[]}

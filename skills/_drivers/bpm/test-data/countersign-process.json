@@ -1,0 +1,289 @@
+{
+  "_description": "会签流程 - 合同审批",
+  "_version": "1.0",
+  "_purpose": "测试并行会签和汇聚节点的JSON转换和存储",
+  
+  "processDef": {
+    "processDefId": "proc_contract_001",
+    "name": "合同审批流程",
+    "description": "合同审批流程，包含并行会签（法务、财务、业务）",
+    "classification": "业务流程",
+    "systemCode": "CONTRACT",
+    "accessLevel": "PUBLIC"
+  },
+  
+  "activeVersion": {
+    "processDefVersionId": "ver_contract_001_v1",
+    "processDefId": "proc_contract_001",
+    "version": 1,
+    "state": "RELEASED",
+    "createTime": "2026-04-09T10:00:00Z",
+    "creatorName": "系统管理员"
+  },
+  
+  "startNode": {
+    "participantId": "Participant_Business",
+    "firstActivityId": "act_submit_contract",
+    "x": 100,
+    "y": 300,
+    "routing": "NO_ROUTING"
+  },
+  
+  "endNodes": [
+    {
+      "participantId": "Participant_Business",
+      "lastActivityId": "act_archive_contract",
+      "x": 1200,
+      "y": 300,
+      "routing": "NO_ROUTING"
+    }
+  ],
+  
+  "listeners": [
+    {
+      "id": "listener_countersign_start",
+      "name": "会签开始监听",
+      "event": "ACTIVITY_START",
+      "realizeClass": "com.ooder.bpm.listener.CountersignStartListener"
+    }
+  ],
+  
+  "rightGroups": [
+    {
+      "id": "rg_business",
+      "name": "业务组",
+      "code": "BUSINESS",
+      "order": 1,
+      "defaultGroup": true
+    },
+    {
+      "id": "rg_legal",
+      "name": "法务组",
+      "code": "LEGAL",
+      "order": 2,
+      "defaultGroup": false
+    },
+    {
+      "id": "rg_finance",
+      "name": "财务组",
+      "code": "FINANCE",
+      "order": 3,
+      "defaultGroup": false
+    }
+  ],
+  
+  "activities": [
+    {
+      "activityDefId": "act_submit_contract",
+      "name": "提交合同",
+      "description": "业务人员提交合同申请",
+      "position": "NORMAL",
+      "positionCoord": { "x": 200, "y": 300 },
+      "participantId": "Participant_Business",
+      "activityType": "TASK",
+      "implementation": "No",
+      "join": "XOR",
+      "split": "AND",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "performerSelectedId": "business_staff"
+      }
+    },
+    {
+      "activityDefId": "act_legal_review",
+      "name": "法务审核",
+      "description": "法务部门审核合同条款",
+      "position": "NORMAL",
+      "positionCoord": { "x": 450, "y": 150 },
+      "participantId": "Participant_Legal",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 72,
+      "durationUnit": "H",
+      "join": "AND",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "canInsteadSign": "YES",
+        "performerSelectedId": "legal_staff",
+        "movePerformerTo": "rg_legal"
+      }
+    },
+    {
+      "activityDefId": "act_finance_review",
+      "name": "财务审核",
+      "description": "财务部门审核合同金额",
+      "position": "NORMAL",
+      "positionCoord": { "x": 450, "y": 300 },
+      "participantId": "Participant_Finance",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 48,
+      "durationUnit": "H",
+      "join": "AND",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "canInsteadSign": "YES",
+        "performerSelectedId": "finance_staff",
+        "movePerformerTo": "rg_finance"
+      }
+    },
+    {
+      "activityDefId": "act_business_review",
+      "name": "业务审核",
+      "description": "业务部门审核合同内容",
+      "position": "NORMAL",
+      "positionCoord": { "x": 450, "y": 450 },
+      "participantId": "Participant_Business",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 24,
+      "durationUnit": "H",
+      "join": "AND",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "performerSelectedId": "business_manager",
+        "movePerformerTo": "rg_business"
+      }
+    },
+    {
+      "activityDefId": "act_countersign_merge",
+      "name": "会签汇总",
+      "description": "汇总各部门会签意见",
+      "position": "NORMAL",
+      "positionCoord": { "x": 700, "y": 300 },
+      "participantId": "Participant_System",
+      "activityType": "SERVICE",
+      "implementation": "Service",
+      "join": "AND",
+      "split": "XOR",
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "/api/contract/merge",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON"
+      }
+    },
+    {
+      "activityDefId": "act_final_approval",
+      "name": "最终审批",
+      "description": "总经理最终审批",
+      "position": "NORMAL",
+      "positionCoord": { "x": 900, "y": 300 },
+      "participantId": "Participant_Manager",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 24,
+      "durationUnit": "H",
+      "canRouteBack": "YES",
+      "routeBackMethod": "SPECIFIED",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "performerSelectedId": "general_manager"
+      }
+    },
+    {
+      "activityDefId": "act_archive_contract",
+      "name": "合同归档",
+      "description": "合同归档保存",
+      "position": "NORMAL",
+      "positionCoord": { "x": 1200, "y": 300 },
+      "participantId": "Participant_System",
+      "activityType": "SERVICE",
+      "implementation": "Service",
+      "join": "XOR",
+      "split": "XOR",
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "/api/contract/archive",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON"
+      }
+    }
+  ],
+  
+  "routes": [
+    {
+      "routeDefId": "route_to_parallel",
+      "name": "启动并行会签",
+      "fromActivityDefId": "act_submit_contract",
+      "toActivityDefId": "act_legal_review",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_to_finance",
+      "name": "到财务",
+      "fromActivityDefId": "act_submit_contract",
+      "toActivityDefId": "act_finance_review",
+      "routeOrder": 2,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_to_business",
+      "name": "到业务",
+      "fromActivityDefId": "act_submit_contract",
+      "toActivityDefId": "act_business_review",
+      "routeOrder": 3,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_legal_to_merge",
+      "name": "法务到汇总",
+      "fromActivityDefId": "act_legal_review",
+      "toActivityDefId": "act_countersign_merge",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_finance_to_merge",
+      "name": "财务到汇总",
+      "fromActivityDefId": "act_finance_review",
+      "toActivityDefId": "act_countersign_merge",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_business_to_merge",
+      "name": "业务到汇总",
+      "fromActivityDefId": "act_business_review",
+      "toActivityDefId": "act_countersign_merge",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_to_final",
+      "name": "到最终审批",
+      "fromActivityDefId": "act_countersign_merge",
+      "toActivityDefId": "act_final_approval",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE"
+    },
+    {
+      "routeDefId": "route_to_archive",
+      "name": "到归档",
+      "fromActivityDefId": "act_final_approval",
+      "toActivityDefId": "act_archive_contract",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "${approved == true}",
+      "routeConditionType": "CONDITION"
+    }
+  ]
+}

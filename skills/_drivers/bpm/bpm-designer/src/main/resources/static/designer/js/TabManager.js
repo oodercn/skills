@@ -127,11 +127,31 @@ class TabManager {
         document.getElementById('processName').textContent = tab.name;
     }
 
-    closeTab(tabId) {
+    async closeTab(tabId) {
         const tab = this.tabs.get(tabId);
         if (!tab) return;
 
-        if (tab.isDirty) {
+        // 如果子流程有未保存的更改，先自动保存
+        if (tab.isDirty && tab.tabType === 'subprocess') {
+            try {
+                console.log('[TabManager] Auto-saving subprocess before close:', tabId);
+                // 先保存当前标签页数据
+                if (this.activeTabId === tabId) {
+                    this._saveCurrentTabData();
+                }
+                // 保存子流程前，先保存主流程
+                await this._saveParentProcess(tab);
+                // 保存子流程
+                await this.app.api.saveProcess(tab.processDef);
+                tab.isDirty = false;
+                console.log('[TabManager] Auto-saved subprocess successfully');
+            } catch (error) {
+                console.error('[TabManager] Auto-save subprocess failed:', error);
+                if (!confirm(`子流程 "${tab.name}" 自动保存失败，确定要关闭吗？`)) {
+                    return;
+                }
+            }
+        } else if (tab.isDirty) {
             if (!confirm(`流程 "${tab.name}" 有未保存的更改，确定要关闭吗？`)) {
                 return;
             }
@@ -149,6 +169,58 @@ class TabManager {
                 this.app.createNewProcess();
             }
         }
+    }
+
+    /**
+     * 保存父流程（主流程）并更新子流程配置引用
+     */
+    async _saveParentProcess(tab) {
+        if (!tab.parentTabId) return;
+        
+        const parentTab = this.tabs.get(tab.parentTabId);
+        if (!parentTab) return;
+        
+        // 更新主流程活动中子流程的 processDefId 引用
+        this._updateParentActivitySubFlow(tab, parentTab);
+        
+        // 如果父流程有未保存的更改，先保存父流程
+        if (parentTab.isDirty) {
+            console.log('[TabManager] Saving parent process before subprocess:', tab.parentTabId);
+            await this.app.api.saveProcess(parentTab.processDef);
+            parentTab.isDirty = false;
+            console.log('[TabManager] Saved parent process successfully');
+        }
+    }
+    
+    /**
+     * 更新父流程活动中子流程的 processDefId 引用
+     */
+    _updateParentActivitySubFlow(subTab, parentTab) {
+        // 从子流程标签页ID中提取活动ID (sub_activityId)
+        const activityId = subTab.id.replace('sub_', '');
+        const subProcessDefId = subTab.processDef.processDefId;
+        
+        // 在父流程中查找对应的活动
+        const parentProcess = parentTab.processDef;
+        if (!parentProcess.activities) return;
+        
+        const activity = parentProcess.activities.find(a => a.activityDefId === activityId);
+        if (!activity) return;
+        
+        // 确保 subFlow 对象存在
+        if (!activity.subFlow) {
+            activity.subFlow = {};
+        }
+        
+        // 更新子流程ID引用
+        const oldProcessDefId = activity.subFlow.processDefId;
+        activity.subFlow.processDefId = subProcessDefId;
+        
+        console.log('[TabManager] Updated activity subFlow.processDefId:', activityId, 
+                    'from:', oldProcessDefId, 'to:', subProcessDefId);
+        
+        // 标记父流程为已修改
+        parentTab.isDirty = true;
     }
 
     updateTabName(tabId, name) {

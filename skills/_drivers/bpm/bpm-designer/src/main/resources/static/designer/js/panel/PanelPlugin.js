@@ -55,13 +55,15 @@ class PanelPlugin {
 
 /**
  * 基础表单面板插件
- * 提供通用的表单渲染功能
+ * 提供通用的表单渲染功能，支持自动保存和联动更新
  */
 class FormPanelPlugin extends PanelPlugin {
     constructor(name, icon, schema) {
         super(name, icon);
         this.schema = schema;
         this.currentData = null;
+        this.store = window.store; // 全局store引用
+        this._changeTimeout = null;
     }
 
     render(data) {
@@ -71,6 +73,9 @@ class FormPanelPlugin extends PanelPlugin {
         const form = this._createForm();
         this.container.innerHTML = '';
         this.container.appendChild(form);
+        
+        // 绑定输入变化事件
+        this._bindInputEvents(form);
     }
 
     _createForm() {
@@ -90,6 +95,89 @@ class FormPanelPlugin extends PanelPlugin {
         });
 
         return form;
+    }
+
+    _bindInputEvents(form) {
+        // 监听所有输入元素的变化
+        const inputs = form.querySelectorAll('input, textarea, select');
+        inputs.forEach(input => {
+            input.addEventListener('change', (e) => this._onFieldChange(e));
+            input.addEventListener('blur', (e) => this._onFieldChange(e));
+            // 文本输入使用防抖
+            if (input.type === 'text' || input.tagName === 'TEXTAREA') {
+                input.addEventListener('input', (e) => this._onFieldInput(e));
+            }
+        });
+    }
+
+    _onFieldInput(e) {
+        // 防抖处理，避免频繁更新
+        if (this._changeTimeout) {
+            clearTimeout(this._changeTimeout);
+        }
+        this._changeTimeout = setTimeout(() => {
+            this._onFieldChange(e);
+        }, 500);
+    }
+
+    _onFieldChange(e) {
+        const fieldName = e.target.name;
+        let fieldValue = e.target.value;
+        
+        // 处理复选框
+        if (e.target.type === 'checkbox') {
+            fieldValue = e.target.checked;
+        }
+        
+        console.log(`[PanelPlugin] Field changed: ${fieldName} = ${fieldValue}`);
+        
+        // 更新当前数据
+        if (this.currentData) {
+            this.currentData[fieldName] = fieldValue;
+            
+            // 触发联动更新
+            this._triggerCascadeUpdate(fieldName, fieldValue);
+            
+            // 通知store更新
+            this._notifyStoreUpdate();
+        }
+    }
+
+    /**
+     * 触发联动更新
+     * 当某些字段变化时，更新相关的其他字段或UI
+     */
+    _triggerCascadeUpdate(fieldName, fieldValue) {
+        // 如果修改的是活动名称，更新面板标题
+        if (fieldName === 'name' && this.currentData) {
+            // 更新面板标题
+            const panelTitle = document.querySelector('#panelTitle');
+            if (panelTitle) {
+                panelTitle.textContent = fieldValue || '活动属性';
+            }
+        }
+    }
+
+    /**
+     * 通知store更新数据
+     */
+    _notifyStoreUpdate() {
+        if (!this.store || !this.currentData) return;
+        
+        // 根据数据类型决定如何更新store
+        if (this.currentData.activityDefId) {
+            // 更新活动
+            this.store.updateActivity(this.currentData);
+            console.log('[PanelPlugin] Store activity updated:', this.currentData.activityDefId);
+        } else if (this.currentData.routeDefId) {
+            // 更新路由
+            this.store.updateRoute(this.currentData);
+            console.log('[PanelPlugin] Store route updated:', this.currentData.routeDefId);
+        } else if (this.currentData.processDefId) {
+            // 更新流程
+            this.store.updateProcess(this.currentData);
+            console.log('[PanelPlugin] Store process updated:', this.currentData.processDefId);
+        }
     }
 
     _createField(field) {

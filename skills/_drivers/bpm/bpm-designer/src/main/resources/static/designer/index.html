@@ -206,6 +206,7 @@
     <script src="js/panel/schemas/RoutePanelSchema.js?v=1775620000"></script>
     <script src="js/panel/PanelPlugin.js?v=1775620000"></script>
     <script src="js/panel/PanelManager.js?v=1775620000"></script>
+    <script src="js/panel/plugins/AdvancedPanelPlugin.js?v=1775620000"></script>
     <script src="js/panel/plugins/ProcessPanelPlugin.js?v=1775620000"></script>
     <script src="js/panel/plugins/ActivityPanelPlugin.js?v=1775620000"></script>
     <script src="js/panel/plugins/RoutePanelPlugin.js?v=1775620000"></script>
@@ -216,6 +217,25 @@
     <script src="js/panel/ScenePanel.js?v=1775620000"></script>
     <script src="js/panel/RoutePanel.js?v=1775620000"></script>
     <script src="js/ContextMenu.js?v=1775620000"></script>
+    <script>
+        // 检查 ContextMenu 是否已定义
+        if (typeof ContextMenu === 'undefined') {
+            console.error('[Index] ContextMenu is not defined after loading ContextMenu.js');
+            // 创建一个简单的备用实现
+            window.ContextMenu = {
+                show: function(x, y, items) {
+                    console.warn('[ContextMenu] Fallback show called');
+                    // 简单的 alert 实现
+                    if (items && items.length > 0) {
+                        const labels = items.map(i => i.label).join(', ');
+                        console.log('Menu items:', labels);
+                    }
+                }
+            };
+        } else {
+            console.log('[Index] ContextMenu loaded successfully');
+        }
+    </script>
     <script src="js/Tree.js?v=1775620000"></script>
     <script src="js/Elements.js?v=1775620000"></script>
     <script src="js/Canvas.js?v=1775620000"></script>

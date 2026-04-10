@@ -97,7 +97,7 @@ public class SceneFunctionTools {
         String tenantId = "default";
         
         if (dataSourceConfig.isUseRealData()) {
-            List<Map<String, Object>> templates = dataSourceAdapter.listSceneTemplates(tenantId, category);
+            List<Map<String, Object>> templates = dataSourceAdapter.listSceneTemplates(tenantId);
             return wrapResult(templates);
         }
         
@@ -152,17 +152,16 @@ public class SceneFunctionTools {
         return buildMockSceneParticipants(sceneGroupId);
     }
     
-    private Object handleListSceneTemplates(Map<String, Object> args) {
-        String category = (String) args.get("category");
-        String status = (String) args.get("status");
+    private Object handleMatchSceneByActivity(Map<String, Object> args) {
+        String activityDesc = (String) args.get("activityDesc");
         String tenantId = "default";
         
         if (dataSourceConfig.isUseRealData()) {
-            List<Map<String, Object>> templates = dataSourceAdapter.listSceneTemplates(tenantId);
-            return wrapResult(templates);
+            List<Map<String, Object>> matches = dataSourceAdapter.matchSceneByActivity(tenantId, activityDesc);
+            return wrapResult(matches);
         }
         
-        return buildMockSceneTemplates(category, status);
+        return buildMockSceneMatches(activityDesc);
     }
     
     private Map<String, Object> wrapResult(Object data) {

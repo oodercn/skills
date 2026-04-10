@@ -21,6 +21,7 @@ class App {
         this.theme = ThemeFactory.get();
         this.store = new Store();
         this.api = ApiFactory.create({ baseUrl: '/api/bpm' });
+        this.store.setApi(this.api);
 
         this._initSidebar();
         this._initCanvas();
@@ -125,6 +126,10 @@ class App {
         console.log('[App] Initializing panel with new plugin system...');
         const panelEl = document.getElementById('panel');
         console.log('[App] Panel element:', panelEl);
+        
+        // 设置全局store引用，供PanelPlugin使用
+        window.store = this.store;
+        console.log('[App] window.store set');
         
         // 使用新的插件架构面板管理器
         this.panelManager = new PanelManagerNew(panelEl, this.store);
@@ -483,29 +488,53 @@ class App {
     }
 
     _deleteSelected() {
-        if (this.canvas.selectedNodes.size > 0) {
+        let deleted = false;
+        
+        // 删除选中的节点
+        if (this.canvas.selectedNodes && this.canvas.selectedNodes.size > 0) {
             const selectedIds = Array.from(this.canvas.selectedNodes);
             selectedIds.forEach(id => {
                 this.store.removeActivity(id);
                 this.canvas.removeNode(id);
             });
             this.canvas.selectedNodes.clear();
+            deleted = true;
+        }
+        
+        // 删除选中的路由
+        if (this.canvas.selectedEdges && this.canvas.selectedEdges.size > 0) {
+            const selectedEdgeIds = Array.from(this.canvas.selectedEdges);
+            selectedEdgeIds.forEach(id => {
+                this.store.removeRoute(id);
+                this.canvas.removeEdge(id);
+            });
+            this.canvas.selectedEdges.clear();
+            deleted = true;
+        }
+        
+        // 如果没有选中任何元素，但当前有活动被选中，删除当前活动
+        if (!deleted && this.store.currentActivity) {
+            const activity = this.store.currentActivity;
+            this.store.removeActivity(activity.activityDefId);
+            this.canvas.removeNode(activity.activityDefId);
+            deleted = true;
+        }
+        
+        // 如果没有选中任何元素，但当前有路由被选中，删除当前路由
+        if (!deleted && this.store.currentRoute) {
+            const route = this.store.currentRoute;
+            this.store.removeRoute(route.routeDefId);
+            this.canvas.removeEdge(route.routeDefId);
+            deleted = true;
+        }
+        
+        if (deleted) {
             document.getElementById('panelContent').innerHTML = `
                 <div class="d-empty">
                     <p>请选择元素查看属性</p>
                 </div>
             `;
-        } else {
-            const activity = this.store.currentActivity;
-            if (activity) {
-                this.store.removeActivity(activity.activityDefId);
-                this.canvas.removeNode(activity.activityDefId);
-                document.getElementById('panelContent').innerHTML = `
-                    <div class="d-empty">
-                        <p>请选择元素查看属性</p>
-                    </div>
-                `;
-            }
+            this._toast('删除成功', 'success');
         }
     }
 

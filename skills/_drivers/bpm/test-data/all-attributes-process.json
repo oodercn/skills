@@ -1,0 +1,305 @@
+{
+  "_description": "全属性测试流程 - 包含所有扩展属性的完整测试",
+  "_version": "1.0",
+  "_purpose": "测试所有扩展属性的JSON转换和存储",
+  
+  "processDef": {
+    "processDefId": "proc_all_attrs_001",
+    "name": "全属性测试流程",
+    "description": "包含所有扩展属性的完整测试流程",
+    "classification": "测试流程",
+    "systemCode": "TEST",
+    "accessLevel": "PUBLIC"
+  },
+  
+  "activeVersion": {
+    "processDefVersionId": "ver_all_attrs_001_v1",
+    "processDefId": "proc_all_attrs_001",
+    "version": 1,
+    "state": "DRAFT",
+    "createTime": "2026-04-09T10:00:00Z",
+    "activeTime": "2026-04-09T10:00:00Z",
+    "freezeTime": "2026-12-31T23:59:59Z",
+    "creatorName": "测试人员",
+    "modifierId": "test_user",
+    "modifierName": "测试人员",
+    "modifyTime": "2026-04-09T12:00:00Z",
+    "limit": 30,
+    "durationUnit": "D"
+  },
+  
+  "startNode": {
+    "participantId": "Participant_Start",
+    "firstActivityId": "act_start",
+    "x": 50,
+    "y": 200,
+    "routing": "NO_ROUTING"
+  },
+  
+  "endNodes": [
+    {
+      "participantId": "Participant_End",
+      "lastActivityId": "act_end",
+      "x": 1400,
+      "y": 200,
+      "routing": "NO_ROUTING"
+    }
+  ],
+  
+  "listeners": [
+    {
+      "id": "listener_001",
+      "name": "流程启动监听",
+      "event": "PROCESS_START",
+      "realizeClass": "com.ooder.bpm.listener.TestProcessStartListener"
+    },
+    {
+      "id": "listener_002",
+      "name": "流程结束监听",
+      "event": "PROCESS_END",
+      "realizeClass": "com.ooder.bpm.listener.TestProcessEndListener"
+    },
+    {
+      "id": "listener_003",
+      "name": "活动启动监听",
+      "event": "ACTIVITY_START",
+      "realizeClass": "com.ooder.bpm.listener.TestActivityStartListener"
+    },
+    {
+      "id": "listener_004",
+      "name": "活动结束监听",
+      "event": "ACTIVITY_END",
+      "realizeClass": "com.ooder.bpm.listener.TestActivityEndListener"
+    },
+    {
+      "id": "listener_005",
+      "name": "路由执行监听",
+      "event": "ROUTE_TAKE",
+      "realizeClass": "com.ooder.bpm.listener.TestRouteTakeListener"
+    },
+    {
+      "id": "listener_006",
+      "name": "任务分配监听",
+      "event": "ASSIGNMENT",
+      "realizeClass": "com.ooder.bpm.listener.TestAssignmentListener"
+    }
+  ],
+  
+  "rightGroups": [
+    {
+      "id": "rg_001",
+      "name": "默认组",
+      "code": "DEFAULT",
+      "order": 1,
+      "defaultGroup": true
+    },
+    {
+      "id": "rg_002",
+      "name": "审批组",
+      "code": "APPROVAL",
+      "order": 2,
+      "defaultGroup": false
+    },
+    {
+      "id": "rg_003",
+      "name": "会签组",
+      "code": "COUNTERSIGN",
+      "order": 3,
+      "defaultGroup": false
+    },
+    {
+      "id": "rg_004",
+      "name": "知会组",
+      "code": "NOTIFY",
+      "order": 4,
+      "defaultGroup": false
+    }
+  ],
+  
+  "activities": [
+    {
+      "activityDefId": "act_start",
+      "name": "开始",
+      "description": "流程开始节点",
+      "position": "START",
+      "positionCoord": { "x": 50, "y": 200 },
+      "participantId": "Participant_Start",
+      "activityType": "START",
+      "implementation": "No",
+      "join": "XOR",
+      "split": "XOR"
+    },
+    {
+      "activityDefId": "act_all_attrs",
+      "name": "全属性活动",
+      "description": "包含所有属性的测试活动",
+      "position": "NORMAL",
+      "positionCoord": { "x": 300, "y": 200 },
+      "participantId": "Participant_Main",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 48,
+      "alertTime": 24,
+      "durationUnit": "H",
+      "deadLineOperation": "NOTIFY",
+      "canRouteBack": "YES",
+      "routeBackMethod": "PREV",
+      "canSpecialSend": "YES",
+      "specialScope": "ALL",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "JOINTSIGN",
+        "performSequence": "MEANWHILE",
+        "specialSendScope": "ALL",
+        "canInsteadSign": "YES",
+        "canTakeBack": "YES",
+        "canReSend": "YES",
+        "insteadSignSelected": "user_substitute_001",
+        "performerSelectedId": "user_performer_001",
+        "readerSelectedId": "user_reader_001",
+        "movePerformerTo": "rg_002",
+        "moveSponsorTo": "rg_001",
+        "moveReaderTo": "rg_004",
+        "surrogateId": "user_surrogate_001",
+        "surrogateName": "代理人姓名"
+      },
+      "FORM": {
+        "formId": "form_test_001",
+        "formName": "测试表单",
+        "formType": "CUSTOM",
+        "formUrl": "/forms/test/form001.html"
+      }
+    },
+    {
+      "activityDefId": "act_service",
+      "name": "服务活动",
+      "description": "包含服务属性的测试活动",
+      "position": "NORMAL",
+      "positionCoord": { "x": 600, "y": 200 },
+      "participantId": "Participant_System",
+      "activityType": "SERVICE",
+      "implementation": "Service",
+      "join": "XOR",
+      "split": "XOR",
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "https://api.example.com/test",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON",
+        "httpServiceParams": "{\"param1\":\"value1\",\"param2\":\"value2\"}",
+        "serviceSelectedId": "svc_test_001"
+      }
+    },
+    {
+      "activityDefId": "act_and_join",
+      "name": "AND汇聚",
+      "description": "AND汇聚节点",
+      "position": "NORMAL",
+      "positionCoord": { "x": 900, "y": 200 },
+      "participantId": "Participant_Main",
+      "activityType": "TASK",
+      "implementation": "No",
+      "join": "AND",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST"
+      }
+    },
+    {
+      "activityDefId": "act_or_split",
+      "name": "OR分支",
+      "description": "OR分支节点",
+      "position": "NORMAL",
+      "positionCoord": { "x": 1150, "y": 200 },
+      "participantId": "Participant_Main",
+      "activityType": "TASK",
+      "implementation": "No",
+      "join": "XOR",
+      "split": "OR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST"
+      }
+    },
+    {
+      "activityDefId": "act_end",
+      "name": "结束",
+      "description": "流程结束节点",
+      "position": "END",
+      "positionCoord": { "x": 1400, "y": 200 },
+      "participantId": "Participant_End",
+      "activityType": "END",
+      "implementation": "No",
+      "join": "XOR",
+      "split": "XOR"
+    }
+  ],
+  
+  "routes": [
+    {
+      "routeDefId": "route_start_to_main",
+      "name": "开始到主活动",
+      "fromActivityDefId": "act_start",
+      "toActivityDefId": "act_all_attrs",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_main_to_service",
+      "name": "主活动到服务",
+      "fromActivityDefId": "act_all_attrs",
+      "toActivityDefId": "act_service",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "${condition1 == true}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_service_to_join",
+      "name": "服务到汇聚",
+      "fromActivityDefId": "act_service",
+      "toActivityDefId": "act_and_join",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_main_to_join",
+      "name": "主活动到汇聚",
+      "fromActivityDefId": "act_all_attrs",
+      "toActivityDefId": "act_and_join",
+      "routeOrder": 2,
+      "routeDirection": "FORWARD",
+      "routeCondition": "${condition1 == false}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_join_to_split",
+      "name": "汇聚到分支",
+      "fromActivityDefId": "act_and_join",
+      "toActivityDefId": "act_or_split",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_split_to_end",
+      "name": "分支到结束",
+      "fromActivityDefId": "act_or_split",
+      "toActivityDefId": "act_end",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    }
+  ]
+}

@@ -19,7 +19,76 @@ class Tree {
         this.selectedNode = null;
         this.render();
         this._bindEvents();
+        this._bindStoreEvents();
         this._loadProcessTree();
+    }
+
+    /**
+     * 绑定Store事件监听
+     */
+    _bindStoreEvents() {
+        // 监听活动更新事件，更新树节点显示
+        this.store.on('activity:update', (activityDef) => {
+            console.log('[Tree] Activity updated:', activityDef);
+            this._updateActivityNode(activityDef);
+        });
+
+        // 监听路由更新事件
+        this.store.on('route:update', (routeDef) => {
+            console.log('[Tree] Route updated:', routeDef);
+            this._updateRouteNode(routeDef);
+        });
+    }
+
+    /**
+     * 更新活动节点显示
+     */
+    _updateActivityNode(activityDef) {
+        if (!activityDef || !activityDef.activityDefId) return;
+
+        // 查找并更新活动节点
+        const nodeId = 'act-' + activityDef.activityDefId;
+        const nodeEl = this.container.querySelector(`[data-id="${nodeId}"]`);
+        if (nodeEl) {
+            const nameEl = nodeEl.querySelector('.d-tree-node-name');
+            if (nameEl && activityDef.name) {
+                nameEl.textContent = activityDef.name;
+                console.log('[Tree] Updated activity node name:', activityDef.name);
+            }
+        }
+
+        // 同时更新树数据
+        const updateNodeInData = (nodes) => {
+            for (const node of nodes) {
+                if (node.activityDefId === activityDef.activityDefId) {
+                    node.name = activityDef.name;
+                    return true;
+                }
+                if (node.children) {
+                    if (updateNodeInData(node.children)) return true;
+                }
+            }
+            return false;
+        };
+        updateNodeInData([this.data]);
+    }
+
+    /**
+     * 更新路由节点显示
+     */
+    _updateRouteNode(routeDef) {
+        if (!routeDef || !routeDef.routeDefId) return;
+
+        // 查找并更新路由节点
+        const nodeId = 'route-' + routeDef.routeDefId;
+        const nodeEl = this.container.querySelector(`[data-id="${nodeId}"]`);
+        if (nodeEl) {
+            const nameEl = nodeEl.querySelector('.d-tree-node-name');
+            if (nameEl && routeDef.name) {
+                nameEl.textContent = routeDef.name;
+                console.log('[Tree] Updated route node name:', routeDef.name);
+            }
+        }
     }
 
     async _loadProcessTree() {
@@ -410,7 +479,11 @@ class Tree {
 
         if (items.length > 0) {
             console.log('[Tree] Calling ContextMenu.show');
-            ContextMenu.show(x, y, items);
+            if (typeof ContextMenu !== 'undefined' && ContextMenu.show) {
+                ContextMenu.show(x, y, items);
+            } else {
+                console.error('[Tree] ContextMenu is not defined or show method is missing');
+            }
         } else {
             console.log('[Tree] No items for nodeType:', nodeType);
         }

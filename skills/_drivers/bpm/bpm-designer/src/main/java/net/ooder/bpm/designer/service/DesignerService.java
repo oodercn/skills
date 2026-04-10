@@ -1,6 +1,15 @@
 package net.ooder.bpm.designer.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.TypeReference;
+import net.ooder.bpm.designer.dto.ActivityDTO;
+import net.ooder.bpm.designer.dto.PositionCoordDTO;
+import net.ooder.bpm.designer.dto.ProcessDTO;
+import net.ooder.bpm.designer.dto.RouteDTO;
+import net.ooder.bpm.designer.dto.enums.ActivityCategory;
+import net.ooder.bpm.designer.dto.enums.ActivityPosition;
+import net.ooder.bpm.designer.dto.enums.ActivityType;
+import net.ooder.bpm.designer.dto.sub.*;
 import net.ooder.bpm.designer.model.ActivityDef;
 import net.ooder.bpm.designer.model.ProcessDef;
 import net.ooder.bpm.designer.model.RouteDef;
@@ -10,8 +19,11 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 设计器服务 - 使用FastJSON和DTO进行前后端数据交互
+ * 所有数据直接从服务端获取，不缓存
+ */
 @Service
 public class DesignerService {
 
@@ -19,108 +31,199 @@ public class DesignerService {
     private String bpmServerUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();
-    private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private final Map<String, ProcessDef> localCache = new ConcurrentHashMap<>();
-
+    /**
+     * 获取流程定义 - 直接从服务端获取
+     */
     public ProcessDef getProcess(String processId, String version) {
         try {
             String url = bpmServerUrl + "/api/processdef/" + processId;
             System.out.println("[DesignerService] Fetching process from: " + url);
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map<String, Object> body = response.getBody();
-                System.out.println("[DesignerService] Response: " + body);
-                if (body.get("data") != null) {
-                    Map<String, Object> data = (Map<String, Object>) body.get("data");
-                    return parseBpmServerProcessData(data);
+                String body = response.getBody();
+                System.out.println("[DesignerService] Response body: " + body);
+                
+                Map<String, Object> result = JSON.parseObject(body, new TypeReference<Map<String, Object>>() {});
+                
+                if (result.get("data") != null) {
+                    String dataJson = JSON.toJSONString(result.get("data"));
+                    System.out.println("[DesignerService] Data JSON: " + dataJson);
+                    
+                    ProcessDTO processDTO = JSON.parseObject(dataJson, ProcessDTO.class);
+                    System.out.println("[DesignerService] Parsed ProcessDTO: " + processDTO);
+                    
+                    ProcessDef process = convertToProcessDef(processDTO);
+                    System.out.println("[DesignerService] Converted ProcessDef with " + 
+                        process.getActivities().size() + " activities");
+                    
+                    return process;
                 }
             }
         } catch (Exception e) {
-            System.out.println("[DesignerService] Failed to get process from bpmserver: " + e.getMessage());
+            System.err.println("[DesignerService] Failed to get process from bpmserver: " + e.getMessage());
             e.printStackTrace();
-            return localCache.get(processId);
+            throw new RuntimeException("Failed to get process: " + processId, e);
         }
         throw new RuntimeException("Process not found: " + processId);
     }
 
-    private ProcessDef parseBpmServerProcessData(Map<String, Object> data) {
+    /**
+     * 将ProcessDTO转换为ProcessDef Model
+     */
+    private ProcessDef convertToProcessDef(ProcessDTO dto) {
         ProcessDef process = new ProcessDef();
-        process.setProcessDefId((String) data.get("processDefId"));
-        process.setName((String) data.get("name"));
-        process.setDescription((String) data.get("description"));
-        process.setCategory((String) data.get("category"));
-        process.setAccessLevel((String) data.get("accessLevel"));
-        process.setStatus((String) data.get("status"));
-        if (data.get("version") != null) {
-            process.setVersion(((Number) data.get("version")).intValue());
+        process.setProcessDefId(dto.getProcessDefId());
+        process.setName(dto.getName());
+        process.setDescription(dto.getDescription());
+        process.setSystemCode(dto.getSystemCode());
+        process.setVersion(dto.getVersion());
+        process.setStatus(dto.getPublicationStatus());
+        process.setClassification(dto.getClassification());
+        process.setAccessLevel(dto.getAccessLevel());
+        process.setLimit(dto.getLimit());
+        process.setDurationUnit(dto.getDurationUnit());
+        process.setActiveTime(dto.getActiveTime());
+        process.setFreezeTime(dto.getFreezeTime());
+        process.setCreatorId(dto.getCreatorId());
+        process.setCreatorName(dto.getCreatorName());
+        process.setCreatedTime(dto.getCreatedTime());
+        process.setModifierId(dto.getModifierId());
+        process.setModifierName(dto.getModifierName());
+        process.setModifyTime(dto.getModifyTime());
+        process.setUpdatedTime(dto.getUpdatedTime());
+        process.setMark(dto.getMark());
+        process.setLock(dto.getLock());
+        process.setAutoSave(dto.getAutoSave());
+        process.setNoSqlType(dto.getNoSqlType());
+        process.setTableNames(dto.getTableNames());
+        process.setModuleNames(dto.getModuleNames());
+        process.setListeners(dto.getListeners());
+        process.setFormulas(dto.getFormulas());
+        process.setParameters(dto.getParameters());
+        process.setExtendedAttributes(dto.getExtendedAttributes());
+        
+        if (dto.getAgentConfig() != null) {
+            process.setAgentConfig(convertAgentConfigToMap(dto.getAgentConfig()));
         }
         
-        List<Map<String, Object>> activities = (List<Map<String, Object>>) data.get("activities");
-        if (activities != null) {
-            for (Map<String, Object> a : activities) {
-                ActivityDef activity = new ActivityDef();
-                activity.setActivityDefId((String) a.get("activityDefId"));
-                activity.setName((String) a.get("name"));
-                activity.setDescription((String) a.get("description"));
-                activity.setPosition((String) a.get("position"));
-                activity.setActivityType((String) a.get("activityType"));
-                activity.setActivityCategory((String) a.get("activityCategory"));
-                activity.setImplementation((String) a.get("implementation"));
-                
-                Map<String, Object> posCoord = (Map<String, Object>) a.get("positionCoord");
-                if (posCoord != null) {
-                    activity.setPositionCoord(posCoord);
-                } else {
-                    Map<String, Object> defaultCoord = new HashMap<>();
-                    defaultCoord.put("x", 100 + process.getActivities().size() * 150);
-                    defaultCoord.put("y", 100);
-                    activity.setPositionCoord(defaultCoord);
-                }
-                
+        if (dto.getSceneConfig() != null) {
+            process.setSceneConfig(convertSceneConfigToMap(dto.getSceneConfig()));
+        }
+        
+        if (dto.getActivities() != null) {
+            for (ActivityDTO activityDTO : dto.getActivities()) {
+                ActivityDef activity = convertToActivityDef(activityDTO);
                 process.getActivities().add(activity);
             }
         }
         
-        List<Map<String, Object>> routes = (List<Map<String, Object>>) data.get("routes");
-        if (routes != null) {
-            for (Map<String, Object> r : routes) {
-                RouteDef route = new RouteDef();
-                route.setRouteDefId((String) r.get("routeDefId"));
-                route.setName((String) r.get("name"));
-                route.setFrom((String) r.get("from"));
-                route.setTo((String) r.get("to"));
-                route.setCondition((String) r.get("condition"));
-                route.setRouteDirection((String) r.get("routeDirection"));
+        if (dto.getRoutes() != null) {
+            for (RouteDTO routeDTO : dto.getRoutes()) {
+                RouteDef route = convertToRouteDef(routeDTO);
                 process.getRoutes().add(route);
             }
         }
         
-        localCache.put(process.getProcessDefId(), process);
         return process;
     }
 
-    public List<ProcessDef> getProcessList(String category, String status, int page, int size) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process?category=" + (category != null ? category : "") 
-                + "&status=" + (status != null ? status : "") 
-                + "&page=" + page + "&size=" + size;
-            ResponseEntity<List> response = restTemplate.getForEntity(url, List.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                List<ProcessDef> result = new ArrayList<>();
-                for (Object item : response.getBody()) {
-                    if (item instanceof Map) {
-                        result.add(mapToProcessDef((Map) item));
-                    }
-                }
-                return result;
-            }
-        } catch (Exception e) {
-            return new ArrayList<>(localCache.values());
+    /**
+     * 将ActivityDTO转换为ActivityDef Model
+     */
+    private ActivityDef convertToActivityDef(ActivityDTO dto) {
+        ActivityDef activity = new ActivityDef();
+        activity.setActivityDefId(dto.getActivityDefId());
+        activity.setName(dto.getName());
+        activity.setDescription(dto.getDescription());
+        activity.setPosition(dto.getPosition() != null ? dto.getPosition().getCode() : "NORMAL");
+        activity.setActivityType(dto.getActivityType() != null ? dto.getActivityType().getCode() : "TASK");
+        activity.setActivityCategory(dto.getActivityCategory() != null ? dto.getActivityCategory().getCode() : "HUMAN");
+        activity.setImplementation(dto.getImplementation());
+        activity.setExecClass(dto.getExecClass());
+        activity.setExtendedAttributes(dto.getExtendedAttributes());
+        
+        PositionCoordDTO coordDTO = dto.getPositionCoord();
+        System.out.println("[DesignerService] Activity " + dto.getActivityDefId() + 
+            " received PositionCoordDTO: " + coordDTO);
+        
+        if (coordDTO != null && coordDTO.getX() != null && coordDTO.getY() != null) {
+            Map<String, Object> coord = new HashMap<>();
+            coord.put("x", coordDTO.getX());
+            coord.put("y", coordDTO.getY());
+            activity.setPositionCoord(coord);
+            System.out.println("[DesignerService] Activity " + dto.getActivityDefId() + 
+                " using received coord: " + coord);
+        } else {
+            Map<String, Object> defaultCoord = new HashMap<>();
+            defaultCoord.put("x", 100);
+            defaultCoord.put("y", 100);
+            activity.setPositionCoord(defaultCoord);
+            System.err.println("[DesignerService] Activity " + dto.getActivityDefId() + 
+                " using DEFAULT coord: " + defaultCoord + " (received was: " + coordDTO + ")");
         }
-        return new ArrayList<>();
+        
+        if (dto.getTiming() != null) {
+            activity.setTiming(convertTimingToMap(dto.getTiming()));
+        }
+        
+        if (dto.getRouting() != null) {
+            activity.setRouting(convertRoutingToMap(dto.getRouting()));
+        }
+        
+        if (dto.getRight() != null) {
+            activity.setRight(convertRightToMap(dto.getRight()));
+        }
+        
+        if (dto.getSubFlow() != null) {
+            activity.setSubFlow(convertSubFlowToMap(dto.getSubFlow()));
+        }
+        
+        if (dto.getDevice() != null) {
+            activity.setDevice(convertDeviceToMap(dto.getDevice()));
+        }
+        
+        if (dto.getService() != null) {
+            activity.setService(convertServiceToMap(dto.getService()));
+        }
+        
+        if (dto.getEvent() != null) {
+            activity.setEvent(convertEventToMap(dto.getEvent()));
+        }
+        
+        if (dto.getAgentConfig() != null) {
+            activity.setAgentConfig(convertAgentConfigToMap(dto.getAgentConfig()));
+        }
+        
+        if (dto.getSceneConfig() != null) {
+            activity.setSceneConfig(convertSceneConfigToMap(dto.getSceneConfig()));
+        }
+        
+        return activity;
     }
 
+    /**
+     * 将RouteDTO转换为RouteDef Model
+     */
+    private RouteDef convertToRouteDef(RouteDTO dto) {
+        RouteDef route = new RouteDef();
+        route.setRouteDefId(dto.getRouteDefId());
+        route.setName(dto.getName());
+        route.setDescription(dto.getDescription());
+        route.setFrom(dto.getFromActivityId());
+        route.setTo(dto.getToActivityId());
+        route.setRouteOrder(dto.getRouteOrder());
+        route.setRouteDirection(dto.getRouteDirection());
+        route.setRouteConditionType(dto.getRouteConditionType());
+        route.setCondition(dto.getCondition());
+        route.setExtendedAttributes(dto.getExtendedAttributes());
+        return route;
+    }
+
+    /**
+     * 保存流程定义 - 直接保存到服务端
+     */
     public ProcessDef saveProcess(ProcessDef processDef) {
         try {
             String url = bpmServerUrl + "/api/processdef/save";
@@ -129,209 +232,496 @@ public class DesignerService {
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             
-            Map<String, Object> processData = processDefToMap(processDef);
-            HttpEntity<Map> request = new HttpEntity<>(processData, headers);
+            ProcessDTO processDTO = convertToProcessDTO(processDef);
+            String requestBody = JSON.toJSONString(processDTO);
+            System.out.println("[DesignerService] Request body: " + requestBody);
             
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
+            HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
+            
+            ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map<String, Object> body = response.getBody();
+                String body = response.getBody();
                 System.out.println("[DesignerService] Save response: " + body);
-                if (body.get("data") != null) {
-                    Map<String, Object> data = (Map<String, Object>) body.get("data");
-                    return parseBpmServerProcessData(data);
+                
+                Map<String, Object> result = JSON.parseObject(body, new TypeReference<Map<String, Object>>() {});
+                if (result.get("data") != null) {
+                    String dataJson = JSON.toJSONString(result.get("data"));
+                    ProcessDTO savedDTO = JSON.parseObject(dataJson, ProcessDTO.class);
+                    return convertToProcessDef(savedDTO);
                 }
             }
         } catch (Exception e) {
-            System.out.println("[DesignerService] Failed to save process to bpmserver: " + e.getMessage());
+            System.err.println("[DesignerService] Failed to save process to bpmserver: " + e.getMessage());
             e.printStackTrace();
+            throw new RuntimeException("Failed to save process", e);
         }
-        
-        localCache.put(processDef.getProcessDefId(), processDef);
-        System.out.println("[DesignerService] Saved process to local cache: " + processDef.getProcessDefId());
-        return processDef;
+        throw new RuntimeException("Failed to save process");
     }
 
+    /**
+     * 将ProcessDef Model转换为ProcessDTO
+     */
+    private ProcessDTO convertToProcessDTO(ProcessDef processDef) {
+        ProcessDTO dto = new ProcessDTO();
+        dto.setProcessDefId(processDef.getProcessDefId());
+        dto.setName(processDef.getName());
+        dto.setDescription(processDef.getDescription());
+        dto.setSystemCode(processDef.getSystemCode());
+        dto.setVersion(processDef.getVersion());
+        dto.setPublicationStatus(processDef.getStatus());
+        dto.setClassification(processDef.getClassification());
+        dto.setAccessLevel(processDef.getAccessLevel());
+        dto.setLimit(processDef.getLimit());
+        dto.setDurationUnit(processDef.getDurationUnit());
+        dto.setActiveTime(processDef.getActiveTime());
+        dto.setFreezeTime(processDef.getFreezeTime());
+        dto.setCreatorId(processDef.getCreatorId());
+        dto.setCreatorName(processDef.getCreatorName());
+        dto.setCreatedTime(processDef.getCreatedTime());
+        dto.setModifierId(processDef.getModifierId());
+        dto.setModifierName(processDef.getModifierName());
+        dto.setModifyTime(processDef.getModifyTime());
+        dto.setUpdatedTime(processDef.getUpdatedTime());
+        dto.setMark(processDef.getMark());
+        dto.setLock(processDef.getLock());
+        dto.setAutoSave(processDef.getAutoSave());
+        dto.setNoSqlType(processDef.getNoSqlType());
+        dto.setTableNames(processDef.getTableNames());
+        dto.setModuleNames(processDef.getModuleNames());
+        dto.setListeners(processDef.getListeners());
+        dto.setFormulas(processDef.getFormulas());
+        dto.setParameters(processDef.getParameters());
+        dto.setExtendedAttributes(processDef.getExtendedAttributes());
+        
+        List<ActivityDTO> activityDTOs = new ArrayList<>();
+        for (ActivityDef activity : processDef.getActivities()) {
+            ActivityDTO activityDTO = convertToActivityDTO(activity);
+            activityDTOs.add(activityDTO);
+        }
+        dto.setActivities(activityDTOs);
+        
+        List<RouteDTO> routeDTOs = new ArrayList<>();
+        for (RouteDef route : processDef.getRoutes()) {
+            RouteDTO routeDTO = convertToRouteDTO(route);
+            routeDTOs.add(routeDTO);
+        }
+        dto.setRoutes(routeDTOs);
+        
+        return dto;
+    }
+
+    /**
+     * 将ActivityDef Model转换为ActivityDTO
+     */
+    private ActivityDTO convertToActivityDTO(ActivityDef activity) {
+        ActivityDTO dto = new ActivityDTO();
+        dto.setActivityDefId(activity.getActivityDefId());
+        dto.setName(activity.getName());
+        dto.setDescription(activity.getDescription());
+        dto.setPosition(ActivityPosition.fromCode(activity.getPosition()));
+        dto.setActivityType(ActivityType.fromCode(activity.getActivityType()));
+        dto.setActivityCategory(ActivityCategory.fromCode(activity.getActivityCategory()));
+        dto.setImplementation(activity.getImplementation());
+        dto.setExecClass(activity.getExecClass());
+        dto.setExtendedAttributes(activity.getExtendedAttributes());
+        
+        Map<String, Object> coord = activity.getPositionCoord();
+        System.out.println("[DesignerService] Converting Activity " + activity.getActivityDefId() + 
+            " positionCoord: " + coord);
+        if (coord != null && coord.get("x") != null && coord.get("y") != null) {
+            PositionCoordDTO coordDTO = new PositionCoordDTO();
+            Object xVal = coord.get("x");
+            Object yVal = coord.get("y");
+            System.out.println("[DesignerService] Coord values - x: " + xVal + " (type: " + (xVal != null ? xVal.getClass().getName() : "null") + 
+                "), y: " + yVal + " (type: " + (yVal != null ? yVal.getClass().getName() : "null") + ")");
+            coordDTO.setX(((Number) xVal).intValue());
+            coordDTO.setY(((Number) yVal).intValue());
+            dto.setPositionCoord(coordDTO);
+            System.out.println("[DesignerService] Set PositionCoordDTO: " + coordDTO);
+        } else {
+            System.out.println("[DesignerService] Warning: positionCoord is null or missing x/y values");
+        }
+        
+        if (activity.getTiming() != null) {
+            dto.setTiming(convertMapToTiming(activity.getTiming()));
+        }
+        
+        if (activity.getRouting() != null) {
+            dto.setRouting(convertMapToRouting(activity.getRouting()));
+        }
+        
+        if (activity.getRight() != null) {
+            dto.setRight(convertMapToRight(activity.getRight()));
+        }
+        
+        if (activity.getSubFlow() != null) {
+            dto.setSubFlow(convertMapToSubFlow(activity.getSubFlow()));
+        }
+        
+        if (activity.getDevice() != null) {
+            dto.setDevice(convertMapToDevice(activity.getDevice()));
+        }
+        
+        if (activity.getService() != null) {
+            dto.setService(convertMapToService(activity.getService()));
+        }
+        
+        if (activity.getEvent() != null) {
+            dto.setEvent(convertMapToEvent(activity.getEvent()));
+        }
+        
+        if (activity.getAgentConfig() != null) {
+            dto.setAgentConfig(convertMapToAgentConfig(activity.getAgentConfig()));
+        }
+        
+        if (activity.getSceneConfig() != null) {
+            dto.setSceneConfig(convertMapToSceneConfig(activity.getSceneConfig()));
+        }
+        
+        return dto;
+    }
+
+    /**
+     * 将RouteDef Model转换为RouteDTO
+     */
+    private RouteDTO convertToRouteDTO(RouteDef route) {
+        RouteDTO dto = new RouteDTO();
+        dto.setRouteDefId(route.getRouteDefId());
+        dto.setName(route.getName());
+        dto.setDescription(route.getDescription());
+        dto.setFromActivityId(route.getFrom());
+        dto.setToActivityId(route.getTo());
+        dto.setRouteOrder(route.getRouteOrder());
+        dto.setRouteDirection(route.getRouteDirection());
+        dto.setRouteConditionType(route.getRouteConditionType());
+        dto.setCondition(route.getCondition());
+        dto.setExtendedAttributes(route.getExtendedAttributes());
+        return dto;
+    }
+
+    // ==================== DTO与Map转换工具方法 ====================
+
+    private Map<String, Object> convertTimingToMap(TimingDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getLimitTime() != null) map.put("limitTime", dto.getLimitTime());
+        if (dto.getAlertTime() != null) map.put("alertTime", dto.getAlertTime());
+        if (dto.getDurationUnit() != null) map.put("durationUnit", dto.getDurationUnit());
+        if (dto.getStartTime() != null) map.put("startTime", dto.getStartTime());
+        if (dto.getEndTime() != null) map.put("endTime", dto.getEndTime());
+        if (dto.getRemindType() != null) map.put("remindType", dto.getRemindType());
+        if (dto.getRemindInterval() != null) map.put("remindInterval", dto.getRemindInterval());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private TimingDTO convertMapToTiming(Map<String, Object> map) {
+        TimingDTO dto = new TimingDTO();
+        if (map.get("limitTime") != null) dto.setLimitTime(((Number) map.get("limitTime")).intValue());
+        if (map.get("alertTime") != null) dto.setAlertTime(((Number) map.get("alertTime")).intValue());
+        if (map.get("durationUnit") != null) dto.setDurationUnit((String) map.get("durationUnit"));
+        if (map.get("startTime") != null) dto.setStartTime((String) map.get("startTime"));
+        if (map.get("endTime") != null) dto.setEndTime((String) map.get("endTime"));
+        if (map.get("remindType") != null) dto.setRemindType((String) map.get("remindType"));
+        if (map.get("remindInterval") != null) dto.setRemindInterval(((Number) map.get("remindInterval")).intValue());
+        return dto;
+    }
+
+    private Map<String, Object> convertRoutingToMap(RoutingDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getJoin() != null) map.put("join", dto.getJoin());
+        if (dto.getSplit() != null) map.put("split", dto.getSplit());
+        if (dto.getCanRouteBack() != null) map.put("canRouteBack", dto.getCanRouteBack());
+        if (dto.getRouteBackMethod() != null) map.put("routeBackMethod", dto.getRouteBackMethod());
+        if (dto.getCanSpecialSend() != null) map.put("canSpecialSend", dto.getCanSpecialSend());
+        if (dto.getSpecialScope() != null) map.put("specialScope", dto.getSpecialScope());
+        if (dto.getDefaultRoute() != null) map.put("defaultRoute", dto.getDefaultRoute());
+        if (dto.getParallelMode() != null) map.put("parallelMode", dto.getParallelMode());
+        if (dto.getMergeCondition() != null) map.put("mergeCondition", dto.getMergeCondition());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private RoutingDTO convertMapToRouting(Map<String, Object> map) {
+        RoutingDTO dto = new RoutingDTO();
+        if (map.get("join") != null) dto.setJoin((String) map.get("join"));
+        if (map.get("split") != null) dto.setSplit((String) map.get("split"));
+        if (map.get("canRouteBack") != null) dto.setCanRouteBack((String) map.get("canRouteBack"));
+        if (map.get("routeBackMethod") != null) dto.setRouteBackMethod((String) map.get("routeBackMethod"));
+        if (map.get("canSpecialSend") != null) dto.setCanSpecialSend((String) map.get("canSpecialSend"));
+        if (map.get("specialScope") != null) dto.setSpecialScope((String) map.get("specialScope"));
+        if (map.get("defaultRoute") != null) dto.setDefaultRoute((String) map.get("defaultRoute"));
+        if (map.get("parallelMode") != null) dto.setParallelMode((String) map.get("parallelMode"));
+        if (map.get("mergeCondition") != null) dto.setMergeCondition((String) map.get("mergeCondition"));
+        return dto;
+    }
+
+    private Map<String, Object> convertRightToMap(RightDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getMoveSponsorTo() != null) map.put("moveSponsorTo", dto.getMoveSponsorTo());
+        if (dto.getPerformer() != null) map.put("performer", dto.getPerformer());
+        if (dto.getPerformerType() != null) map.put("performerType", dto.getPerformerType());
+        if (dto.getParticipationType() != null) map.put("participationType", dto.getParticipationType());
+        if (dto.getParticipationScope() != null) map.put("participationScope", dto.getParticipationScope());
+        if (dto.getParticipationScopeValue() != null) map.put("participationScopeValue", dto.getParticipationScopeValue());
+        if (dto.getCandidateUsers() != null) map.put("candidateUsers", dto.getCandidateUsers());
+        if (dto.getCandidateGroups() != null) map.put("candidateGroups", dto.getCandidateGroups());
+        if (dto.getCandidateRoles() != null) map.put("candidateRoles", dto.getCandidateRoles());
+        if (dto.getAssignee() != null) map.put("assignee", dto.getAssignee());
+        if (dto.getOwner() != null) map.put("owner", dto.getOwner());
+        if (dto.getReassignable() != null) map.put("reassignable", dto.getReassignable());
+        if (dto.getDelegatable() != null) map.put("delegatable", dto.getDelegatable());
+        if (dto.getTransferable() != null) map.put("transferable", dto.getTransferable());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private RightDTO convertMapToRight(Map<String, Object> map) {
+        RightDTO dto = new RightDTO();
+        if (map.get("moveSponsorTo") != null) dto.setMoveSponsorTo((String) map.get("moveSponsorTo"));
+        if (map.get("performer") != null) dto.setPerformer((String) map.get("performer"));
+        if (map.get("performerType") != null) dto.setPerformerType((String) map.get("performerType"));
+        if (map.get("participationType") != null) dto.setParticipationType((String) map.get("participationType"));
+        if (map.get("participationScope") != null) dto.setParticipationScope((String) map.get("participationScope"));
+        if (map.get("participationScopeValue") != null) dto.setParticipationScopeValue((String) map.get("participationScopeValue"));
+        if (map.get("candidateUsers") != null) dto.setCandidateUsers((List<String>) map.get("candidateUsers"));
+        if (map.get("candidateGroups") != null) dto.setCandidateGroups((List<String>) map.get("candidateGroups"));
+        if (map.get("candidateRoles") != null) dto.setCandidateRoles((List<String>) map.get("candidateRoles"));
+        if (map.get("assignee") != null) dto.setAssignee((String) map.get("assignee"));
+        if (map.get("owner") != null) dto.setOwner((String) map.get("owner"));
+        if (map.get("reassignable") != null) dto.setReassignable((Boolean) map.get("reassignable"));
+        if (map.get("delegatable") != null) dto.setDelegatable((Boolean) map.get("delegatable"));
+        if (map.get("transferable") != null) dto.setTransferable((Boolean) map.get("transferable"));
+        return dto;
+    }
+
+    private Map<String, Object> convertSubFlowToMap(SubFlowDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getSubProcessDefId() != null) map.put("subProcessDefId", dto.getSubProcessDefId());
+        if (dto.getSubProcessName() != null) map.put("subProcessName", dto.getSubProcessName());
+        if (dto.getSubProcessVersion() != null) map.put("subProcessVersion", dto.getSubProcessVersion());
+        if (dto.getExecutionMode() != null) map.put("executionMode", dto.getExecutionMode());
+        if (dto.getWaitForCompletion() != null) map.put("waitForCompletion", dto.getWaitForCompletion());
+        if (dto.getDataMapping() != null) map.put("dataMapping", dto.getDataMapping());
+        if (dto.getParameterMapping() != null) map.put("parameterMapping", dto.getParameterMapping());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private SubFlowDTO convertMapToSubFlow(Map<String, Object> map) {
+        SubFlowDTO dto = new SubFlowDTO();
+        if (map.get("subProcessDefId") != null) dto.setSubProcessDefId((String) map.get("subProcessDefId"));
+        if (map.get("subProcessName") != null) dto.setSubProcessName((String) map.get("subProcessName"));
+        if (map.get("subProcessVersion") != null) dto.setSubProcessVersion((String) map.get("subProcessVersion"));
+        if (map.get("executionMode") != null) dto.setExecutionMode((String) map.get("executionMode"));
+        if (map.get("waitForCompletion") != null) dto.setWaitForCompletion((Boolean) map.get("waitForCompletion"));
+        if (map.get("dataMapping") != null) dto.setDataMapping((Map<String, Object>) map.get("dataMapping"));
+        if (map.get("parameterMapping") != null) dto.setParameterMapping((Map<String, Object>) map.get("parameterMapping"));
+        return dto;
+    }
+
+    private Map<String, Object> convertDeviceToMap(DeviceDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getDeviceId() != null) map.put("deviceId", dto.getDeviceId());
+        if (dto.getDeviceName() != null) map.put("deviceName", dto.getDeviceName());
+        if (dto.getDeviceType() != null) map.put("deviceType", dto.getDeviceType());
+        if (dto.getDeviceModel() != null) map.put("deviceModel", dto.getDeviceModel());
+        if (dto.getConnectionString() != null) map.put("connectionString", dto.getConnectionString());
+        if (dto.getProtocol() != null) map.put("protocol", dto.getProtocol());
+        if (dto.getParameters() != null) map.put("parameters", dto.getParameters());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private DeviceDTO convertMapToDevice(Map<String, Object> map) {
+        DeviceDTO dto = new DeviceDTO();
+        if (map.get("deviceId") != null) dto.setDeviceId((String) map.get("deviceId"));
+        if (map.get("deviceName") != null) dto.setDeviceName((String) map.get("deviceName"));
+        if (map.get("deviceType") != null) dto.setDeviceType((String) map.get("deviceType"));
+        if (map.get("deviceModel") != null) dto.setDeviceModel((String) map.get("deviceModel"));
+        if (map.get("connectionString") != null) dto.setConnectionString((String) map.get("connectionString"));
+        if (map.get("protocol") != null) dto.setProtocol((String) map.get("protocol"));
+        if (map.get("parameters") != null) dto.setParameters((Map<String, Object>) map.get("parameters"));
+        return dto;
+    }
+
+    private Map<String, Object> convertServiceToMap(ServiceDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getServiceId() != null) map.put("serviceId", dto.getServiceId());
+        if (dto.getServiceName() != null) map.put("serviceName", dto.getServiceName());
+        if (dto.getServiceType() != null) map.put("serviceType", dto.getServiceType());
+        if (dto.getServiceUrl() != null) map.put("serviceUrl", dto.getServiceUrl());
+        if (dto.getServiceMethod() != null) map.put("serviceMethod", dto.getServiceMethod());
+        if (dto.getServiceProtocol() != null) map.put("serviceProtocol", dto.getServiceProtocol());
+        if (dto.getInputParameters() != null) map.put("inputParameters", dto.getInputParameters());
+        if (dto.getOutputParameters() != null) map.put("outputParameters", dto.getOutputParameters());
+        if (dto.getHeaders() != null) map.put("headers", dto.getHeaders());
+        if (dto.getTimeout() != null) map.put("timeout", dto.getTimeout());
+        if (dto.getRetryCount() != null) map.put("retryCount", dto.getRetryCount());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private ServiceDTO convertMapToService(Map<String, Object> map) {
+        ServiceDTO dto = new ServiceDTO();
+        if (map.get("serviceId") != null) dto.setServiceId((String) map.get("serviceId"));
+        if (map.get("serviceName") != null) dto.setServiceName((String) map.get("serviceName"));
+        if (map.get("serviceType") != null) dto.setServiceType((String) map.get("serviceType"));
+        if (map.get("serviceUrl") != null) dto.setServiceUrl((String) map.get("serviceUrl"));
+        if (map.get("serviceMethod") != null) dto.setServiceMethod((String) map.get("serviceMethod"));
+        if (map.get("serviceProtocol") != null) dto.setServiceProtocol((String) map.get("serviceProtocol"));
+        if (map.get("inputParameters") != null) dto.setInputParameters((Map<String, Object>) map.get("inputParameters"));
+        if (map.get("outputParameters") != null) dto.setOutputParameters((Map<String, Object>) map.get("outputParameters"));
+        if (map.get("headers") != null) dto.setHeaders((Map<String, String>) map.get("headers"));
+        if (map.get("timeout") != null) dto.setTimeout(((Number) map.get("timeout")).intValue());
+        if (map.get("retryCount") != null) dto.setRetryCount(((Number) map.get("retryCount")).intValue());
+        return dto;
+    }
+
+    private Map<String, Object> convertEventToMap(EventDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getEventId() != null) map.put("eventId", dto.getEventId());
+        if (dto.getEventName() != null) map.put("eventName", dto.getEventName());
+        if (dto.getEventType() != null) map.put("eventType", dto.getEventType());
+        if (dto.getEventTrigger() != null) map.put("eventTrigger", dto.getEventTrigger());
+        if (dto.getTriggerCondition() != null) map.put("triggerCondition", dto.getTriggerCondition());
+        if (dto.getEventAction() != null) map.put("eventAction", dto.getEventAction());
+        if (dto.getActionParameters() != null) map.put("actionParameters", dto.getActionParameters());
+        if (dto.getListenerClass() != null) map.put("listenerClass", dto.getListenerClass());
+        if (dto.getListenerExpression() != null) map.put("listenerExpression", dto.getListenerExpression());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private EventDTO convertMapToEvent(Map<String, Object> map) {
+        EventDTO dto = new EventDTO();
+        if (map.get("eventId") != null) dto.setEventId((String) map.get("eventId"));
+        if (map.get("eventName") != null) dto.setEventName((String) map.get("eventName"));
+        if (map.get("eventType") != null) dto.setEventType((String) map.get("eventType"));
+        if (map.get("eventTrigger") != null) dto.setEventTrigger((String) map.get("eventTrigger"));
+        if (map.get("triggerCondition") != null) dto.setTriggerCondition((String) map.get("triggerCondition"));
+        if (map.get("eventAction") != null) dto.setEventAction((String) map.get("eventAction"));
+        if (map.get("actionParameters") != null) dto.setActionParameters((Map<String, Object>) map.get("actionParameters"));
+        if (map.get("listenerClass") != null) dto.setListenerClass((String) map.get("listenerClass"));
+        if (map.get("listenerExpression") != null) dto.setListenerExpression((String) map.get("listenerExpression"));
+        return dto;
+    }
+
+    private Map<String, Object> convertAgentConfigToMap(AgentConfigDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getAgentId() != null) map.put("agentId", dto.getAgentId());
+        if (dto.getAgentName() != null) map.put("agentName", dto.getAgentName());
+        if (dto.getAgentType() != null) map.put("agentType", dto.getAgentType());
+        if (dto.getModelName() != null) map.put("modelName", dto.getModelName());
+        if (dto.getSystemPrompt() != null) map.put("systemPrompt", dto.getSystemPrompt());
+        if (dto.getTemperature() != null) map.put("temperature", dto.getTemperature());
+        if (dto.getMaxTokens() != null) map.put("maxTokens", dto.getMaxTokens());
+        if (dto.getTools() != null) map.put("tools", dto.getTools());
+        if (dto.getCapabilities() != null) map.put("capabilities", dto.getCapabilities());
+        if (dto.getInputSchema() != null) map.put("inputSchema", dto.getInputSchema());
+        if (dto.getOutputSchema() != null) map.put("outputSchema", dto.getOutputSchema());
+        if (dto.getMemoryEnabled() != null) map.put("memoryEnabled", dto.getMemoryEnabled());
+        if (dto.getContextWindow() != null) map.put("contextWindow", dto.getContextWindow());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private AgentConfigDTO convertMapToAgentConfig(Map<String, Object> map) {
+        AgentConfigDTO dto = new AgentConfigDTO();
+        if (map.get("agentId") != null) dto.setAgentId((String) map.get("agentId"));
+        if (map.get("agentName") != null) dto.setAgentName((String) map.get("agentName"));
+        if (map.get("agentType") != null) dto.setAgentType((String) map.get("agentType"));
+        if (map.get("modelName") != null) dto.setModelName((String) map.get("modelName"));
+        if (map.get("systemPrompt") != null) dto.setSystemPrompt((String) map.get("systemPrompt"));
+        if (map.get("temperature") != null) dto.setTemperature(((Number) map.get("temperature")).doubleValue());
+        if (map.get("maxTokens") != null) dto.setMaxTokens(((Number) map.get("maxTokens")).intValue());
+        if (map.get("tools") != null) dto.setTools((List<String>) map.get("tools"));
+        if (map.get("capabilities") != null) dto.setCapabilities((List<String>) map.get("capabilities"));
+        if (map.get("inputSchema") != null) dto.setInputSchema((Map<String, Object>) map.get("inputSchema"));
+        if (map.get("outputSchema") != null) dto.setOutputSchema((Map<String, Object>) map.get("outputSchema"));
+        if (map.get("memoryEnabled") != null) dto.setMemoryEnabled((Boolean) map.get("memoryEnabled"));
+        if (map.get("contextWindow") != null) dto.setContextWindow(((Number) map.get("contextWindow")).intValue());
+        return dto;
+    }
+
+    private Map<String, Object> convertSceneConfigToMap(SceneConfigDTO dto) {
+        Map<String, Object> map = new HashMap<>();
+        if (dto.getSceneId() != null) map.put("sceneId", dto.getSceneId());
+        if (dto.getSceneName() != null) map.put("sceneName", dto.getSceneName());
+        if (dto.getSceneType() != null) map.put("sceneType", dto.getSceneType());
+        if (dto.getSceneCategory() != null) map.put("sceneCategory", dto.getSceneCategory());
+        if (dto.getTriggerEvents() != null) map.put("triggerEvents", dto.getTriggerEvents());
+        if (dto.getEntryConditions() != null) map.put("entryConditions", dto.getEntryConditions());
+        if (dto.getExitConditions() != null) map.put("exitConditions", dto.getExitConditions());
+        if (dto.getSceneData() != null) map.put("sceneData", dto.getSceneData());
+        if (dto.getSceneRules() != null) map.put("sceneRules", dto.getSceneRules());
+        if (dto.getSceneState() != null) map.put("sceneState", dto.getSceneState());
+        if (dto.getPriority() != null) map.put("priority", dto.getPriority());
+        if (dto.getValidityPeriod() != null) map.put("validityPeriod", dto.getValidityPeriod());
+        if (dto.getExtendedAttributes() != null) map.putAll(dto.getExtendedAttributes());
+        return map;
+    }
+
+    private SceneConfigDTO convertMapToSceneConfig(Map<String, Object> map) {
+        SceneConfigDTO dto = new SceneConfigDTO();
+        if (map.get("sceneId") != null) dto.setSceneId((String) map.get("sceneId"));
+        if (map.get("sceneName") != null) dto.setSceneName((String) map.get("sceneName"));
+        if (map.get("sceneType") != null) dto.setSceneType((String) map.get("sceneType"));
+        if (map.get("sceneCategory") != null) dto.setSceneCategory((String) map.get("sceneCategory"));
+        if (map.get("triggerEvents") != null) dto.setTriggerEvents((List<String>) map.get("triggerEvents"));
+        if (map.get("entryConditions") != null) dto.setEntryConditions((List<String>) map.get("entryConditions"));
+        if (map.get("exitConditions") != null) dto.setExitConditions((List<String>) map.get("exitConditions"));
+        if (map.get("sceneData") != null) dto.setSceneData((Map<String, Object>) map.get("sceneData"));
+        if (map.get("sceneRules") != null) dto.setSceneRules((List<Map<String, Object>>) map.get("sceneRules"));
+        if (map.get("sceneState") != null) dto.setSceneState((String) map.get("sceneState"));
+        if (map.get("priority") != null) dto.setPriority(((Number) map.get("priority")).intValue());
+        if (map.get("validityPeriod") != null) dto.setValidityPeriod((Map<String, String>) map.get("validityPeriod"));
+        return dto;
+    }
+
+    /**
+     * 获取流程列表 - 从服务端获取
+     */
+    public List<ProcessDef> getProcessList(String category, String status, int page, int size) {
+        try {
+            String url = bpmServerUrl + "/api/processdef/list";
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                Map<String, Object> result = JSON.parseObject(response.getBody(), new TypeReference<Map<String, Object>>() {});
+                if (result.get("data") != null) {
+                    List<ProcessDTO> processDTOs = JSON.parseArray(JSON.toJSONString(result.get("data")), ProcessDTO.class);
+                    List<ProcessDef> processes = new ArrayList<>();
+                    for (ProcessDTO dto : processDTOs) {
+                        processes.add(convertToProcessDef(dto));
+                    }
+                    return processes;
+                }
+            }
+        } catch (Exception e) {
+            System.err.println("[DesignerService] Failed to get process list: " + e.getMessage());
+        }
+        return new ArrayList<>();
+    }
+
+    /**
+     * 删除流程 - 直接删除服务端数据
+     */
     public void deleteProcess(String processId) {
         try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId;
+            String url = bpmServerUrl + "/api/processdef/" + processId;
             restTemplate.delete(url);
+            System.out.println("[DesignerService] Process deleted from server: " + processId);
         } catch (Exception e) {
+            System.err.println("[DesignerService] Failed to delete process: " + e.getMessage());
+            throw new RuntimeException("Failed to delete process", e);
         }
-        localCache.remove(processId);
     }
 
     public String exportYaml(String processId) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/export/yaml";
-            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
-            return response.getBody();
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                return processToYaml(process);
-            }
-        }
         return "";
     }
 
     public ProcessDef importYaml(String yaml) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/import/yaml";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            Map<String, String> body = new HashMap<>();
-            body.put("yaml", yaml);
-            HttpEntity<Map> request = new HttpEntity<>(body, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                return mapToProcessDef(response.getBody());
-            }
-        } catch (Exception e) {
-            return yamlToProcess(yaml);
-        }
-        throw new RuntimeException("Failed to import YAML");
-    }
-
-    public ProcessDef addActivity(String processId, Map<String, Object> activityDef) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/activity";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map> request = new HttpEntity<>(activityDef, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                process.getActivities().add(mapToActivity(activityDef));
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to add activity");
-    }
-
-    public ProcessDef updateActivity(String processId, String activityId, Map<String, Object> activityDef) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/activity/" + activityId;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map> request = new HttpEntity<>(activityDef, headers);
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.PUT, request, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                for (int i = 0; i < process.getActivities().size(); i++) {
-                    if (process.getActivities().get(i).getActivityDefId().equals(activityId)) {
-                        ActivityDef activity = mapToActivity(activityDef);
-                        activity.setActivityDefId(activityId);
-                        process.getActivities().set(i, activity);
-                        break;
-                    }
-                }
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to update activity");
-    }
-
-    public ProcessDef removeActivity(String processId, String activityId) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/activity/" + activityId;
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                process.getActivities().removeIf(a -> a.getActivityDefId().equals(activityId));
-                process.getRoutes().removeIf(r -> 
-                    r.getFrom().equals(activityId) || r.getTo().equals(activityId));
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to remove activity");
-    }
-
-    public ProcessDef addRoute(String processId, Map<String, Object> routeDef) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/route";
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map> request = new HttpEntity<>(routeDef, headers);
-            ResponseEntity<Map> response = restTemplate.postForEntity(url, request, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                process.getRoutes().add(mapToRoute(routeDef));
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to add route");
-    }
-
-    public ProcessDef updateRoute(String processId, String routeId, Map<String, Object> routeDef) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/route/" + routeId;
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            HttpEntity<Map> request = new HttpEntity<>(routeDef, headers);
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.PUT, request, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                for (int i = 0; i < process.getRoutes().size(); i++) {
-                    if (process.getRoutes().get(i).getRouteDefId().equals(routeId)) {
-                        RouteDef route = mapToRoute(routeDef);
-                        route.setRouteDefId(routeId);
-                        process.getRoutes().set(i, route);
-                        break;
-                    }
-                }
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to update route");
-    }
-
-    public ProcessDef removeRoute(String processId, String routeId) {
-        try {
-            String url = bpmServerUrl + "/api/bpm/process/" + processId + "/route/" + routeId;
-            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.DELETE, null, Map.class);
-            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                ProcessDef process = mapToProcessDef(response.getBody());
-                localCache.put(processId, process);
-                return process;
-            }
-        } catch (Exception e) {
-            ProcessDef process = localCache.get(processId);
-            if (process != null) {
-                process.getRoutes().removeIf(r -> r.getRouteDefId().equals(routeId));
-                return process;
-            }
-        }
-        throw new RuntimeException("Failed to remove route");
+        return null;
     }
 
     public List<String> getCapabilities() {
@@ -341,439 +731,212 @@ public class DesignerService {
         );
     }
 
+    // ==================== Controller需要的附加方法 ====================
+
+    /**
+     * 获取流程树结构 - 从服务端获取
+     */
     public List<Map<String, Object>> getProcessTree() {
+        List<Map<String, Object>> tree = new ArrayList<>();
         try {
             String url = bpmServerUrl + "/api/processdef/list";
-            System.out.println("[DesignerService] Fetching process list from: " + url);
-            ResponseEntity<Map> response = restTemplate.getForEntity(url, Map.class);
+            ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
-                Map<String, Object> body = response.getBody();
-                System.out.println("[DesignerService] Response: " + body);
-                if (body.get("data") != null) {
-                    List<Map<String, Object>> processes = (List<Map<String, Object>>) body.get("data");
-                    List<Map<String, Object>> tree = new ArrayList<>();
-                    for (Map<String, Object> p : processes) {
+                Map<String, Object> result = JSON.parseObject(response.getBody(), new TypeReference<Map<String, Object>>() {});
+                if (result.get("data") != null) {
+                    List<Map<String, Object>> processList = (List<Map<String, Object>>) result.get("data");
+                    for (Map<String, Object> process : processList) {
                         Map<String, Object> node = new HashMap<>();
-                        node.put("id", p.get("PROCESSDEF_ID") != null ? p.get("PROCESSDEF_ID") : p.get("processDefId"));
-                        node.put("name", p.get("DEFNAME") != null ? p.get("DEFNAME") : p.get("name"));
+                        node.put("id", process.get("processDefId"));
+                        node.put("name", process.get("name"));
                         node.put("type", "process");
-                        node.put("status", p.get("STATUS") != null ? p.get("STATUS") : p.get("status"));
+                        node.put("status", process.get("publicationStatus"));
+                        node.put("version", process.get("version"));
                         tree.add(node);
                     }
-                    return tree;
                 }
             }
         } catch (Exception e) {
-            System.out.println("[DesignerService] Failed to get process list from bpmserver: " + e.getMessage());
-            e.printStackTrace();
+            System.err.println("[DesignerService] Failed to get process tree from server: " + e.getMessage());
         }
-        
-        List<Map<String, Object>> tree = new ArrayList<>();
-        for (ProcessDef process : localCache.values()) {
-            Map<String, Object> node = new HashMap<>();
-            node.put("id", process.getProcessDefId());
-            node.put("name", process.getName());
-            node.put("type", "process");
-            node.put("status", process.getStatus());
-            node.put("version", process.getVersion());
-            tree.add(node);
-        }
-        
         return tree;
     }
 
+    /**
+     * 添加活动到流程 - 直接保存到服务端
+     */
+    public ProcessDef addActivity(String processId, Map<String, Object> activityDef) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        ActivityDef activity = new ActivityDef();
+        activity.setActivityDefId((String) activityDef.get("activityDefId"));
+        activity.setName((String) activityDef.get("name"));
+        activity.setDescription((String) activityDef.get("description"));
+        
+        Map<String, Object> positionCoord = (Map<String, Object>) activityDef.get("positionCoord");
+        if (positionCoord != null) {
+            activity.setPositionCoord(positionCoord);
+        }
+        
+        process.getActivities().add(activity);
+        return saveProcess(process);
+    }
+
+    /**
+     * 更新流程中的活动 - 直接保存到服务端
+     */
+    public ProcessDef updateActivity(String processId, String activityId, Map<String, Object> activityDef) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        ActivityDef existingActivity = null;
+        for (ActivityDef activity : process.getActivities()) {
+            if (activity.getActivityDefId().equals(activityId)) {
+                existingActivity = activity;
+                break;
+            }
+        }
+        
+        if (existingActivity == null) {
+            throw new RuntimeException("Activity not found: " + activityId);
+        }
+        
+        if (activityDef.get("name") != null) {
+            existingActivity.setName((String) activityDef.get("name"));
+        }
+        if (activityDef.get("description") != null) {
+            existingActivity.setDescription((String) activityDef.get("description"));
+        }
+        if (activityDef.get("positionCoord") != null) {
+            existingActivity.setPositionCoord((Map<String, Object>) activityDef.get("positionCoord"));
+        }
+        
+        return saveProcess(process);
+    }
+
+    /**
+     * 从流程中移除活动 - 直接保存到服务端
+     */
+    public ProcessDef removeActivity(String processId, String activityId) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        process.getActivities().removeIf(activity -> activity.getActivityDefId().equals(activityId));
+        return saveProcess(process);
+    }
+
+    /**
+     * 添加路由到流程 - 直接保存到服务端
+     */
+    public ProcessDef addRoute(String processId, Map<String, Object> routeDef) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        RouteDef route = new RouteDef();
+        route.setRouteDefId((String) routeDef.get("routeDefId"));
+        route.setName((String) routeDef.get("name"));
+        route.setFrom((String) routeDef.get("fromActivityId"));
+        route.setTo((String) routeDef.get("toActivityId"));
+        route.setCondition((String) routeDef.get("condition"));
+        
+        process.getRoutes().add(route);
+        return saveProcess(process);
+    }
+
+    /**
+     * 更新流程中的路由 - 直接保存到服务端
+     */
+    public ProcessDef updateRoute(String processId, String routeId, Map<String, Object> routeDef) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        RouteDef existingRoute = null;
+        for (RouteDef route : process.getRoutes()) {
+            if (route.getRouteDefId().equals(routeId)) {
+                existingRoute = route;
+                break;
+            }
+        }
+        
+        if (existingRoute == null) {
+            throw new RuntimeException("Route not found: " + routeId);
+        }
+        
+        if (routeDef.get("name") != null) {
+            existingRoute.setName((String) routeDef.get("name"));
+        }
+        if (routeDef.get("fromActivityId") != null) {
+            existingRoute.setFrom((String) routeDef.get("fromActivityId"));
+        }
+        if (routeDef.get("toActivityId") != null) {
+            existingRoute.setTo((String) routeDef.get("toActivityId"));
+        }
+        if (routeDef.get("condition") != null) {
+            existingRoute.setCondition((String) routeDef.get("condition"));
+        }
+        
+        return saveProcess(process);
+    }
+
+    /**
+     * 从流程中移除路由 - 直接保存到服务端
+     */
+    public ProcessDef removeRoute(String processId, String routeId) {
+        ProcessDef process = getProcess(processId, null);
+        if (process == null) {
+            throw new RuntimeException("Process not found: " + processId);
+        }
+        
+        process.getRoutes().removeIf(route -> route.getRouteDefId().equals(routeId));
+        return saveProcess(process);
+    }
+
+    /**
+     * 获取枚举选项
+     */
     public List<Map<String, String>> getEnumOptions(String enumType) {
         List<Map<String, String>> options = new ArrayList<>();
+        
         switch (enumType) {
-            case "accessLevel":
-                options.add(createOption("Public", "独立启动"));
-                options.add(createOption("Private", "子流程"));
-                options.add(createOption("Block", "流程块"));
+            case "ActivityPosition":
+                for (ActivityPosition pos : ActivityPosition.values()) {
+                    Map<String, String> option = new HashMap<>();
+                    option.put("value", pos.getCode());
+                    option.put("label", pos.getLabel());
+                    options.add(option);
+                }
                 break;
-            case "publicationStatus":
-                options.add(createOption("UNDER_REVISION", "修订中"));
-                options.add(createOption("RELEASED", "已发布"));
-                options.add(createOption("UNDER_TEST", "测试中"));
+            case "ActivityType":
+                for (ActivityType type : ActivityType.values()) {
+                    Map<String, String> option = new HashMap<>();
+                    option.put("value", type.getCode());
+                    option.put("label", type.getLabel());
+                    options.add(option);
+                }
                 break;
-            case "position":
-                options.add(createOption("START", "起始活动"));
-                options.add(createOption("NORMAL", "普通活动"));
-                options.add(createOption("END", "结束活动"));
+            case "ActivityCategory":
+                for (ActivityCategory cat : ActivityCategory.values()) {
+                    Map<String, String> option = new HashMap<>();
+                    option.put("value", cat.getCode());
+                    option.put("label", cat.getLabel());
+                    options.add(option);
+                }
                 break;
-            case "category":
-                options.add(createOption("HUMAN", "人工活动"));
-                options.add(createOption("AGENT", "Agent活动"));
-                options.add(createOption("SCENE", "场景活动"));
-                break;
-            case "implementation":
-                options.add(createOption("IMPL_NO", "手动活动"));
-                options.add(createOption("IMPL_TOOL", "自动活动"));
-                options.add(createOption("IMPL_SUBFLOW", "子流程活动"));
-                options.add(createOption("IMPL_OUTFLOW", "跳转流程活动"));
-                options.add(createOption("IMPL_DEVICE", "设备活动"));
-                options.add(createOption("IMPL_EVENT", "事件活动"));
-                options.add(createOption("IMPL_SERVICE", "服务活动"));
-                break;
-            case "durationUnit":
-                options.add(createOption("Y", "年"));
-                options.add(createOption("M", "月"));
-                options.add(createOption("D", "日"));
-                options.add(createOption("H", "时"));
-                options.add(createOption("m", "分"));
-                options.add(createOption("s", "秒"));
-                options.add(createOption("W", "工作日"));
-                break;
-            case "deadlineOperation":
-                options.add(createOption("DEFAULT", "默认处理"));
-                options.add(createOption("DELAY", "延期办理"));
-                options.add(createOption("TAKEBACK", "自动收回"));
-                options.add(createOption("SURROGATE", "代办人自动接收"));
-                break;
-            case "join":
-                options.add(createOption("DEFAULT", "默认"));
-                options.add(createOption("AND", "AND 合并"));
-                options.add(createOption("XOR", "XOR 合并"));
-                break;
-            case "split":
-                options.add(createOption("DEFAULT", "默认"));
-                options.add(createOption("AND", "AND 并行"));
-                options.add(createOption("XOR", "XOR 并行"));
-                break;
-            case "performType":
-                options.add(createOption("SINGLE", "单人办理"));
-                options.add(createOption("MULTIPLE", "多人办理"));
-                options.add(createOption("JOINTSIGN", "会签办理"));
-                options.add(createOption("NEEDNOTSELECT", "无需选择"));
-                options.add(createOption("NOSELECT", "不需要选择"));
-                break;
-            case "performSequence":
-                options.add(createOption("FIRST", "抢占办理"));
-                options.add(createOption("SEQUENCE", "顺序办理"));
-                options.add(createOption("MEANWHILE", "同时办理"));
-                options.add(createOption("AUTOSIGN", "自动签收"));
-                break;
-            case "agentType":
-                options.add(createOption("LLM", "大语言模型"));
-                options.add(createOption("TASK", "任务执行"));
-                options.add(createOption("EVENT", "事件触发"));
-                options.add(createOption("HYBRID", "混合模式"));
-                options.add(createOption("COORDINATOR", "协调器"));
-                options.add(createOption("TOOL", "工具调用"));
-                break;
-            case "scheduleStrategy":
-                options.add(createOption("SEQUENTIAL", "顺序执行"));
-                options.add(createOption("PARALLEL", "并行执行"));
-                options.add(createOption("CONDITIONAL", "条件执行"));
-                options.add(createOption("ROUND_ROBIN", "轮询执行"));
-                options.add(createOption("PRIORITY", "优先级执行"));
-                break;
-            case "collaborationMode":
-                options.add(createOption("SOLO", "独立模式"));
-                options.add(createOption("HIERARCHICAL", "层级模式"));
-                options.add(createOption("PEER", "对等模式"));
-                options.add(createOption("DEBATE", "辩论模式"));
-                options.add(createOption("VOTING", "投票模式"));
+            default:
                 break;
         }
+        
         return options;
-    }
-
-    private Map<String, String> createOption(String value, String label) {
-        Map<String, String> option = new HashMap<>();
-        option.put("value", value);
-        option.put("label", label);
-        return option;
-    }
-
-    private ProcessDef mapToProcessDef(Map<String, Object> map) {
-        ProcessDef process = new ProcessDef();
-        process.setProcessDefId((String) map.get("processDefId"));
-        process.setName((String) map.get("name"));
-        process.setDescription((String) map.get("description"));
-        process.setCategory((String) map.get("category"));
-        process.setAccessLevel((String) map.get("accessLevel"));
-        process.setStatus((String) map.get("status"));
-        if (map.get("version") != null) {
-            process.setVersion(((Number) map.get("version")).intValue());
-        }
-        
-        if (map.get("activities") != null) {
-            List<Map<String, Object>> activities = (List<Map<String, Object>>) map.get("activities");
-            for (Map<String, Object> a : activities) {
-                process.getActivities().add(mapToActivity(a));
-            }
-        }
-        
-        if (map.get("routes") != null) {
-            List<Map<String, Object>> routes = (List<Map<String, Object>>) map.get("routes");
-            for (Map<String, Object> r : routes) {
-                process.getRoutes().add(mapToRoute(r));
-            }
-        }
-        
-        return process;
-    }
-
-    private Map<String, Object> processDefToMap(ProcessDef process) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("processDefId", process.getProcessDefId());
-        map.put("name", process.getName());
-        map.put("description", process.getDescription());
-        map.put("category", process.getCategory());
-        map.put("accessLevel", process.getAccessLevel());
-        map.put("status", process.getStatus());
-        map.put("version", process.getVersion());
-        
-        List<Map<String, Object>> activities = new ArrayList<>();
-        for (ActivityDef a : process.getActivities()) {
-            activities.add(activityToMap(a));
-        }
-        map.put("activities", activities);
-        
-        List<Map<String, Object>> routes = new ArrayList<>();
-        for (RouteDef r : process.getRoutes()) {
-            routes.add(routeToMap(r));
-        }
-        map.put("routes", routes);
-        
-        return map;
-    }
-
-    private ActivityDef mapToActivity(Map<String, Object> map) {
-        ActivityDef activity = new ActivityDef();
-        activity.setActivityDefId((String) map.get("activityDefId"));
-        activity.setName((String) map.get("name"));
-        activity.setDescription((String) map.get("description"));
-        activity.setPosition((String) map.getOrDefault("position", "NORMAL"));
-        activity.setActivityType((String) map.get("activityType"));
-        activity.setActivityCategory((String) map.get("activityCategory"));
-        activity.setImplementation((String) map.get("implementation"));
-        activity.setExecClass((String) map.get("execClass"));
-        
-        if (map.get("positionCoord") != null) {
-            activity.setPositionCoord((Map<String, Object>) map.get("positionCoord"));
-        }
-        if (map.get("timing") != null) {
-            activity.setTiming((Map<String, Object>) map.get("timing"));
-        }
-        if (map.get("routing") != null) {
-            activity.setRouting((Map<String, Object>) map.get("routing"));
-        }
-        if (map.get("right") != null) {
-            activity.setRight((Map<String, Object>) map.get("right"));
-        }
-        if (map.get("subFlow") != null) {
-            activity.setSubFlow((Map<String, Object>) map.get("subFlow"));
-        }
-        if (map.get("device") != null) {
-            activity.setDevice((Map<String, Object>) map.get("device"));
-        }
-        if (map.get("service") != null) {
-            activity.setService((Map<String, Object>) map.get("service"));
-        }
-        if (map.get("event") != null) {
-            activity.setEvent((Map<String, Object>) map.get("event"));
-        }
-        if (map.get("agentConfig") != null) {
-            activity.setAgentConfig((Map<String, Object>) map.get("agentConfig"));
-        }
-        if (map.get("sceneConfig") != null) {
-            activity.setSceneConfig((Map<String, Object>) map.get("sceneConfig"));
-        }
-        
-        return activity;
-    }
-
-    private Map<String, Object> activityToMap(ActivityDef activity) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("activityDefId", activity.getActivityDefId());
-        map.put("name", activity.getName());
-        map.put("description", activity.getDescription());
-        map.put("position", activity.getPosition());
-        map.put("activityType", activity.getActivityType());
-        map.put("activityCategory", activity.getActivityCategory());
-        map.put("implementation", activity.getImplementation());
-        map.put("execClass", activity.getExecClass());
-        map.put("positionCoord", activity.getPositionCoord());
-        map.put("timing", activity.getTiming());
-        map.put("routing", activity.getRouting());
-        map.put("right", activity.getRight());
-        map.put("subFlow", activity.getSubFlow());
-        map.put("device", activity.getDevice());
-        map.put("service", activity.getService());
-        map.put("event", activity.getEvent());
-        map.put("agentConfig", activity.getAgentConfig());
-        map.put("sceneConfig", activity.getSceneConfig());
-        return map;
-    }
-
-    private RouteDef mapToRoute(Map<String, Object> map) {
-        RouteDef route = new RouteDef();
-        route.setRouteDefId((String) map.get("routeDefId"));
-        route.setName((String) map.get("name"));
-        route.setFrom((String) map.get("from"));
-        route.setTo((String) map.get("to"));
-        route.setCondition((String) map.get("condition"));
-        route.setRouteDirection((String) map.get("routeDirection"));
-        route.setRouteConditionType((String) map.get("routeConditionType"));
-        return route;
-    }
-
-    private Map<String, Object> routeToMap(RouteDef route) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("routeDefId", route.getRouteDefId());
-        map.put("name", route.getName());
-        map.put("from", route.getFrom());
-        map.put("to", route.getTo());
-        map.put("condition", route.getCondition());
-        map.put("routeDirection", route.getRouteDirection());
-        map.put("routeConditionType", route.getRouteConditionType());
-        return map;
-    }
-
-    private String processToYaml(ProcessDef process) {
-        StringBuilder sb = new StringBuilder();
-        sb.append("apiVersion: bpm.ooder.net/v1\n");
-        sb.append("kind: ProcessDef\n");
-        sb.append("metadata:\n");
-        sb.append("  id: ").append(process.getProcessDefId()).append("\n");
-        sb.append("  name: ").append(escapeYaml(process.getName())).append("\n");
-        sb.append("  description: ").append(escapeYaml(process.getDescription())).append("\n");
-        sb.append("  classification: ").append(process.getCategory() != null ? process.getCategory() : "").append("\n");
-        sb.append("spec:\n");
-        sb.append("  accessLevel: ").append(process.getAccessLevel()).append("\n");
-        sb.append("  version:\n");
-        sb.append("    version: ").append(process.getVersion()).append("\n");
-        sb.append("    publicationStatus: ").append(process.getStatus()).append("\n");
-        sb.append("\n  activities:\n");
-        for (ActivityDef a : process.getActivities()) {
-            sb.append("    - id: ").append(a.getActivityDefId()).append("\n");
-            sb.append("      name: ").append(escapeYaml(a.getName())).append("\n");
-            sb.append("      position: ").append(a.getPosition()).append("\n");
-            sb.append("      category: ").append(a.getActivityCategory()).append("\n");
-            sb.append("      implementation: ").append(a.getImplementation()).append("\n");
-            if (a.getPositionCoord() != null && !a.getPositionCoord().isEmpty()) {
-                sb.append("      positionCoord:\n");
-                sb.append("        x: ").append(a.getPositionCoord().get("x")).append("\n");
-                sb.append("        y: ").append(a.getPositionCoord().get("y")).append("\n");
-            }
-        }
-        sb.append("\n  routes:\n");
-        for (RouteDef r : process.getRoutes()) {
-            sb.append("    - id: ").append(r.getRouteDefId()).append("\n");
-            sb.append("      name: ").append(escapeYaml(r.getName())).append("\n");
-            sb.append("      connection:\n");
-            sb.append("        from: ").append(r.getFrom()).append("\n");
-            sb.append("        to: ").append(r.getTo()).append("\n");
-            if (r.getCondition() != null) {
-                sb.append("      condition:\n");
-                sb.append("        routeCondition: ").append(escapeYaml(r.getCondition())).append("\n");
-            }
-        }
-        return sb.toString();
-    }
-
-    private String escapeYaml(String value) {
-        if (value == null) return "";
-        if (value.contains(":") || value.contains("#") || value.contains("\n")) {
-            return "\"" + value.replace("\"", "\\\"") + "\"";
-        }
-        return value;
-    }
-
-    private ProcessDef yamlToProcess(String yaml) {
-        ProcessDef process = new ProcessDef();
-        String[] lines = yaml.split("\n");
-        String currentSection = "";
-        ActivityDef currentActivity = null;
-        RouteDef currentRoute = null;
-        
-        for (String line : lines) {
-            String trimmed = line.trim();
-            if (trimmed.isEmpty() || trimmed.startsWith("#")) continue;
-            
-            if (trimmed.equals("metadata:")) {
-                currentSection = "metadata";
-                continue;
-            } else if (trimmed.equals("spec:")) {
-                currentSection = "spec";
-                continue;
-            } else if (trimmed.equals("activities:")) {
-                currentSection = "activities";
-                continue;
-            } else if (trimmed.equals("routes:")) {
-                currentSection = "routes";
-                continue;
-            }
-            
-            if (currentSection.equals("metadata")) {
-                if (trimmed.startsWith("id:")) {
-                    process.setProcessDefId(trimmed.substring(3).trim());
-                } else if (trimmed.startsWith("name:")) {
-                    process.setName(trimmed.substring(5).trim());
-                } else if (trimmed.startsWith("description:")) {
-                    process.setDescription(trimmed.substring(12).trim());
-                } else if (trimmed.startsWith("classification:")) {
-                    process.setCategory(trimmed.substring(14).trim());
-                }
-            } else if (currentSection.equals("spec")) {
-                if (trimmed.startsWith("accessLevel:")) {
-                    process.setAccessLevel(trimmed.substring(12).trim());
-                } else if (trimmed.startsWith("version:")) {
-                    process.setVersion(Integer.parseInt(trimmed.substring(8).trim()));
-                } else if (trimmed.startsWith("publicationStatus:")) {
-                    process.setStatus(trimmed.substring(18).trim());
-                }
-            } else if (currentSection.equals("activities")) {
-                if (trimmed.startsWith("- id:")) {
-                    if (currentActivity != null) {
-                        process.getActivities().add(currentActivity);
-                    }
-                    currentActivity = new ActivityDef();
-                    currentActivity.setActivityDefId(trimmed.substring(5).trim());
-                } else if (currentActivity != null) {
-                    if (trimmed.startsWith("name:")) {
-                        currentActivity.setName(trimmed.substring(5).trim());
-                    } else if (trimmed.startsWith("position:")) {
-                        currentActivity.setPosition(trimmed.substring(9).trim());
-                    } else if (trimmed.startsWith("category:")) {
-                        currentActivity.setActivityCategory(trimmed.substring(9).trim());
-                    } else if (trimmed.startsWith("implementation:")) {
-                        currentActivity.setImplementation(trimmed.substring(15).trim());
-                    } else if (trimmed.startsWith("x:")) {
-                        currentActivity.getPositionCoord().put("x", Integer.parseInt(trimmed.substring(2).trim()));
-                    } else if (trimmed.startsWith("y:")) {
-                        currentActivity.getPositionCoord().put("y", Integer.parseInt(trimmed.substring(2).trim()));
-                    }
-                }
-            } else if (currentSection.equals("routes")) {
-                if (trimmed.startsWith("- id:")) {
-                    if (currentRoute != null) {
-                        process.getRoutes().add(currentRoute);
-                    }
-                    currentRoute = new RouteDef();
-                    currentRoute.setRouteDefId(trimmed.substring(5).trim());
-                } else if (currentRoute != null) {
-                    if (trimmed.startsWith("name:")) {
-                        currentRoute.setName(trimmed.substring(5).trim());
-                    } else if (trimmed.startsWith("from:")) {
-                        currentRoute.setFrom(trimmed.substring(5).trim());
-                    } else if (trimmed.startsWith("to:")) {
-                        currentRoute.setTo(trimmed.substring(3).trim());
-                    } else if (trimmed.startsWith("routeCondition:")) {
-                        currentRoute.setCondition(trimmed.substring(15).trim());
-                    }
-                }
-            }
-        }
-        
-        if (currentActivity != null) {
-            process.getActivities().add(currentActivity);
-        }
-        if (currentRoute != null) {
-            process.getRoutes().add(currentRoute);
-        }
-        
-        return process;
     }
 }

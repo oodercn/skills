@@ -34,14 +34,17 @@ import net.ooder.bpm.engine.database.DbProcessDefManager;
  */
 public abstract class EIProcessDefManager {
 
-	private static EIProcessDefManager singleton = new DbProcessDefManager();
+	private static EIProcessDefManager singleton;
 
 	/**
 	 * Get the EIProcessDefManager singleton
-	 * 
+	 *
 	 * @return EIProcessDefManager
 	 */
 	synchronized public static EIProcessDefManager getInstance() {
+		if (singleton == null) {
+			singleton = new DbProcessDefManager();
+		}
 		return singleton;
 	}
 

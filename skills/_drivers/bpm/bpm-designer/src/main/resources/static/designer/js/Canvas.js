@@ -30,7 +30,63 @@ class Canvas {
     _init() {
         this._createSvgLayer();
         this._bindEvents();
+        this._bindStoreEvents();
         this._drawGrid();
+    }
+
+    /**
+     * 绑定Store事件监听
+     */
+    _bindStoreEvents() {
+        // 监听活动更新事件，更新画布上的节点显示
+        this.store.on('activity:update', (activityDef) => {
+            console.log('[Canvas] Activity updated:', activityDef);
+            this._updateNodeDisplay(activityDef);
+        });
+
+        // 监听路由更新事件
+        this.store.on('route:update', (routeDef) => {
+            console.log('[Canvas] Route updated:', routeDef);
+            this._updateEdgeDisplay(routeDef);
+        });
+    }
+
+    /**
+     * 更新节点显示
+     */
+    _updateNodeDisplay(activityDef) {
+        if (!activityDef || !activityDef.activityDefId) return;
+
+        const nodeData = this.nodes.get(activityDef.activityDefId);
+        if (nodeData && nodeData.element) {
+            const nodeEl = nodeData.element;
+            const nameEl = nodeEl.querySelector('.d-node-name');
+            if (nameEl && activityDef.name !== undefined) {
+                nameEl.textContent = activityDef.name;
+                console.log('[Canvas] Updated node name:', activityDef.name);
+            }
+
+            const titleEl = nodeEl.querySelector('.d-node-title');
+            if (titleEl && activityDef.name !== undefined) {
+                titleEl.textContent = activityDef.name;
+            }
+        }
+    }
+
+    /**
+     * 更新连线显示
+     */
+    _updateEdgeDisplay(routeDef) {
+        if (!routeDef || !routeDef.routeDefId) return;
+
+        const edgeEl = this.edges.get(routeDef.routeDefId);
+        if (edgeEl && edgeEl.label) {
+            // 更新连线标签
+            if (routeDef.name !== undefined) {
+                edgeEl.label.textContent = routeDef.name;
+                console.log('[Canvas] Updated edge label:', routeDef.name);
+            }
+        }
     }
 
     _createSvgLayer() {
@@ -107,6 +163,21 @@ class Canvas {
             const delta = e.deltaY > 0 ? -0.1 : 0.1;
             this._zoom(delta, e.clientX, e.clientY);
         });
+
+    }
+
+    /**
+     * 获取当前选中的节点ID列表
+     */
+    getSelectedNodeIds() {
+        return Array.from(this.selectedNodes || []);
+    }
+
+    /**
+     * 获取当前选中的路由ID列表
+     */
+    getSelectedEdgeIds() {
+        return Array.from(this.selectedEdges || []);
     }
 
     _startSelection(e) {
@@ -483,7 +554,11 @@ class Canvas {
                 items.push({ label: '配置场景', icon: 'scene', action: () => this.store.selectActivity(activity.activityDefId) });
             }
             
-            window.ContextMenu.show(e.clientX, e.clientY, items);
+            if (typeof window.ContextMenu !== 'undefined' && window.ContextMenu.show) {
+                window.ContextMenu.show(e.clientX, e.clientY, items);
+            } else {
+                console.error('[Canvas] ContextMenu is not defined or show method is missing');
+            }
         });
         
         node.addEventListener('dblclick', (e) => {
@@ -516,6 +591,14 @@ class Canvas {
         
         const subFlowConfig = activity.subFlow || {};
         const processDefId = subFlowConfig.processDefId;
+        
+        // 首先检查子流程标签页是否已经存在
+        const subTabId = 'sub_' + activity.activityDefId;
+        if (this.app.tabManager.tabs.has(subTabId)) {
+            console.log('[Canvas] Subprocess tab already exists, activating:', subTabId);
+            this.app.tabManager.activateTab(subTabId);
+            return;
+        }
         
         if (!processDefId) {
             const newProcessDef = {
@@ -616,12 +699,14 @@ class Canvas {
         const onMouseUp = () => {
             this.isDragging = false;
             this.dragNode = null;
-            dragNodes.forEach(({ element }) => {
+            dragNodes.forEach(({ element, activity: act }) => {
                 element.classList.remove('d-node-dragging');
+                // 保存坐标变化到store
+                this.store.updateActivity(act);
+                console.log('[Canvas] Activity position saved:', act.activityDefId, act.positionCoord);
             });
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
-            this.store.setDirty(true);
         };
 
         document.addEventListener('mousemove', onMouseMove);
@@ -1135,6 +1220,21 @@ class Canvas {
         edgesToRemove.forEach(id => this.edges.delete(id));
         
         this._renderEdges();
+    }
+
+    removeEdge(routeId) {
+        const edgeData = this.edges.get(routeId);
+        if (edgeData) {
+            const edgeEl = this.edgeGroup.querySelector(`[data-edge-id="${routeId}"]`);
+            if (edgeEl) {
+                edgeEl.remove();
+            }
+            this.edges.delete(routeId);
+        }
+        
+        if (this.selectedEdges) {
+            this.selectedEdges.delete(routeId);
+        }
     }
 
     clear() {

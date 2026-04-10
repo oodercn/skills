@@ -1,0 +1,299 @@
+{
+  "_description": "简单审批流程 - 请假审批",
+  "_version": "1.0",
+  "_purpose": "测试基本审批流程的JSON转换和存储",
+  
+  "processDef": {
+    "processDefId": "proc_leave_001",
+    "name": "请假审批流程",
+    "description": "员工请假审批流程，包含填写申请、部门经理审批、HR审批",
+    "classification": "人事流程",
+    "systemCode": "HR",
+    "accessLevel": "PUBLIC"
+  },
+  
+  "activeVersion": {
+    "processDefVersionId": "ver_leave_001_v1",
+    "processDefId": "proc_leave_001",
+    "version": 1,
+    "state": "RELEASED",
+    "createTime": "2026-04-09T10:00:00Z",
+    "activeTime": "2026-04-09T10:00:00Z",
+    "creatorName": "系统管理员",
+    "modifierId": "admin",
+    "modifierName": "系统管理员",
+    "modifyTime": "2026-04-09T10:00:00Z"
+  },
+  
+  "startNode": {
+    "participantId": "Participant_Employee",
+    "firstActivityId": "act_fill_form",
+    "x": 100,
+    "y": 300,
+    "routing": "NO_ROUTING"
+  },
+  
+  "endNodes": [
+    {
+      "participantId": "Participant_Employee",
+      "lastActivityId": "act_notify",
+      "x": 1000,
+      "y": 300,
+      "routing": "NO_ROUTING"
+    }
+  ],
+  
+  "listeners": [
+    {
+      "id": "listener_process_start",
+      "name": "流程启动监听",
+      "event": "PROCESS_START",
+      "realizeClass": "com.ooder.bpm.listener.ProcessStartLogger"
+    },
+    {
+      "id": "listener_process_end",
+      "name": "流程结束监听",
+      "event": "PROCESS_END",
+      "realizeClass": "com.ooder.bpm.listener.ProcessEndLogger"
+    }
+  ],
+  
+  "rightGroups": [
+    {
+      "id": "rg_employee",
+      "name": "员工组",
+      "code": "EMPLOYEE",
+      "order": 1,
+      "defaultGroup": true
+    },
+    {
+      "id": "rg_manager",
+      "name": "经理组",
+      "code": "MANAGER",
+      "order": 2,
+      "defaultGroup": false
+    },
+    {
+      "id": "rg_hr",
+      "name": "HR组",
+      "code": "HR",
+      "order": 3,
+      "defaultGroup": false
+    }
+  ],
+  
+  "activities": [
+    {
+      "activityDefId": "act_fill_form",
+      "name": "填写请假单",
+      "description": "员工填写请假申请信息",
+      "position": "NORMAL",
+      "positionCoord": {
+        "x": 250,
+        "y": 300
+      },
+      "participantId": "Participant_Employee",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 24,
+      "durationUnit": "H",
+      "canRouteBack": "NO",
+      "canSpecialSend": "NO",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "canInsteadSign": "NO",
+        "canTakeBack": "YES",
+        "canReSend": "NO",
+        "performerSelectedId": "current_user"
+      },
+      "FORM": {
+        "formId": "form_leave_application",
+        "formName": "请假申请表",
+        "formType": "CUSTOM",
+        "formUrl": "/forms/leave/apply.html"
+      }
+    },
+    {
+      "activityDefId": "act_dept_approval",
+      "name": "部门经理审批",
+      "description": "部门经理审批请假申请",
+      "position": "NORMAL",
+      "positionCoord": {
+        "x": 450,
+        "y": 300
+      },
+      "participantId": "Participant_Manager",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 48,
+      "alertTime": 24,
+      "durationUnit": "H",
+      "deadLineOperation": "NOTIFY",
+      "canRouteBack": "YES",
+      "routeBackMethod": "PREV",
+      "canSpecialSend": "YES",
+      "specialScope": "ALL",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "canInsteadSign": "YES",
+        "canTakeBack": "YES",
+        "canReSend": "YES",
+        "performerSelectedId": "dept_manager",
+        "movePerformerTo": "rg_manager"
+      },
+      "FORM": {
+        "formId": "form_leave_approval",
+        "formName": "请假审批表",
+        "formType": "CUSTOM",
+        "formUrl": "/forms/leave/approve.html"
+      }
+    },
+    {
+      "activityDefId": "act_hr_approval",
+      "name": "HR审批",
+      "description": "HR部门审批请假申请",
+      "position": "NORMAL",
+      "positionCoord": {
+        "x": 650,
+        "y": 300
+      },
+      "participantId": "Participant_HR",
+      "activityType": "TASK",
+      "implementation": "No",
+      "limitTime": 24,
+      "durationUnit": "H",
+      "canRouteBack": "YES",
+      "routeBackMethod": "SPECIFIED",
+      "canSpecialSend": "YES",
+      "specialScope": "SAME_GROUP",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "SINGLE",
+        "performSequence": "FIRST",
+        "canInsteadSign": "NO",
+        "canTakeBack": "YES",
+        "canReSend": "NO",
+        "performerSelectedId": "hr_staff",
+        "movePerformerTo": "rg_hr"
+      }
+    },
+    {
+      "activityDefId": "act_archive",
+      "name": "归档",
+      "description": "请假申请归档",
+      "position": "NORMAL",
+      "positionCoord": {
+        "x": 850,
+        "y": 300
+      },
+      "participantId": "Participant_System",
+      "activityType": "SERVICE",
+      "implementation": "Service",
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "/api/leave/archive",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON",
+        "httpServiceParams": "{}",
+        "serviceSelectedId": "svc_archive"
+      }
+    },
+    {
+      "activityDefId": "act_notify",
+      "name": "通知结果",
+      "description": "通知员工审批结果",
+      "position": "NORMAL",
+      "positionCoord": {
+        "x": 1000,
+        "y": 300
+      },
+      "participantId": "Participant_System",
+      "activityType": "SERVICE",
+      "implementation": "Service",
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "/api/notify/email",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON",
+        "httpServiceParams": "{\"template\":\"leave_result\"}",
+        "serviceSelectedId": "svc_notify"
+      }
+    }
+  ],
+  
+  "routes": [
+    {
+      "routeDefId": "route_submit",
+      "name": "提交申请",
+      "fromActivityDefId": "act_fill_form",
+      "toActivityDefId": "act_dept_approval",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_dept_approve",
+      "name": "经理批准",
+      "fromActivityDefId": "act_dept_approval",
+      "toActivityDefId": "act_hr_approval",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "${approved == true}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_dept_reject",
+      "name": "经理驳回",
+      "fromActivityDefId": "act_dept_approval",
+      "toActivityDefId": "act_fill_form",
+      "routeOrder": 2,
+      "routeDirection": "BACKWARD",
+      "routeCondition": "${approved == false}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_hr_approve",
+      "name": "HR批准",
+      "fromActivityDefId": "act_hr_approval",
+      "toActivityDefId": "act_archive",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "${approved == true}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_hr_reject",
+      "name": "HR驳回",
+      "fromActivityDefId": "act_hr_approval",
+      "toActivityDefId": "act_fill_form",
+      "routeOrder": 2,
+      "routeDirection": "BACKWARD",
+      "routeCondition": "${approved == false}",
+      "routeConditionType": "CONDITION",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route_to_notify",
+      "name": "通知",
+      "fromActivityDefId": "act_archive",
+      "toActivityDefId": "act_notify",
+      "routeOrder": 1,
+      "routeDirection": "FORWARD",
+      "routeCondition": "",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    }
+  ]
+}

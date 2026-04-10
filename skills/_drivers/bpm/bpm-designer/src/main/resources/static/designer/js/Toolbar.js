@@ -45,6 +45,10 @@ class Toolbar {
             this._showExportModal();
         });
 
+        this.container.querySelector('#btnDelete')?.addEventListener('click', () => {
+            this._deleteSelected();
+        });
+
         this.store.on('dirty:change', (dirty) => {
             const saveBtn = this.container.querySelector('#btnSave');
             if (saveBtn) {
@@ -160,6 +164,34 @@ class Toolbar {
         setTimeout(() => {
             toast.classList.remove('show');
         }, 3000);
+    }
+
+    _deleteSelected() {
+        if (window.app?.canvas) {
+            const canvas = window.app.canvas;
+            
+            // 删除选中的节点
+            if (canvas.selectedNodes && canvas.selectedNodes.size > 0) {
+                canvas.selectedNodes.forEach(activityDefId => {
+                    this.store.removeActivity(activityDefId);
+                    canvas.removeNode(activityDefId);
+                });
+                canvas.selectedNodes.clear();
+            }
+            
+            // 删除选中的路由
+            if (canvas.selectedEdges && canvas.selectedEdges.size > 0) {
+                canvas.selectedEdges.forEach(routeDefId => {
+                    this.store.removeRoute(routeDefId);
+                    canvas.removeEdge(routeDefId);
+                });
+                canvas.selectedEdges.clear();
+            }
+            
+            // 清除选择状态
+            canvas._deselectAll();
+            this._toast('已删除选中的元素', 'success');
+        }
     }
 }
 

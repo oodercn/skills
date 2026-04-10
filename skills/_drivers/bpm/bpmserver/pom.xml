@@ -68,25 +68,25 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-bpm-web</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-common-client</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-config-spring</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-org-web</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
@@ -125,6 +125,7 @@
                         <server.home>.</server.home>
                         <application.home>.</application.home>
                     </systemPropertyVariables>
+                    <jvmArguments>-Dfile.encoding=UTF-8</jvmArguments>
                 </configuration>
             </plugin>
 

@@ -1,0 +1,119 @@
+{
+  "processDefId": "test-proc-001",
+  "name": "测试流程-修复验证",
+  "description": "验证修复后JSON转换功能",
+  "classification": "办公流程",
+  "systemCode": "bpm",
+  "accessLevel": "PUBLIC",
+  "startNode": {
+    "participantId": "participant-start",
+    "firstActivityId": "act-start",
+    "positionCoord": { "x": 100, "y": 100 },
+    "routing": "NO_ROUTING"
+  },
+  "endNodes": [
+    {
+      "participantId": "participant-end-1",
+      "lastActivityId": "act-end-1",
+      "positionCoord": { "x": 500, "y": 100 },
+      "routing": "NO_ROUTING"
+    }
+  ],
+  "listeners": [
+    {
+      "id": "listener-1",
+      "name": "流程启动监听器",
+      "event": "PROCESS_START",
+      "realizeClass": "com.example.ProcessStartListener"
+    }
+  ],
+  "rightGroups": [
+    {
+      "id": "rg-1",
+      "name": "默认权限组",
+      "code": "DEFAULT",
+      "order": 1,
+      "defaultGroup": true
+    }
+  ],
+  "activities": [
+    {
+      "activityDefId": "act-start",
+      "name": "开始",
+      "description": "流程开始节点",
+      "position": "START",
+      "positionCoord": { "x": 100, "y": 100 },
+      "participantId": "participant-start"
+    },
+    {
+      "activityDefId": "act-approval",
+      "name": "审批节点",
+      "description": "审批活动",
+      "position": "NORMAL",
+      "positionCoord": { "x": 300, "y": 100 },
+      "participantId": "participant-approval",
+      "limitTime": 24,
+      "alertTime": 12,
+      "durationUnit": "H",
+      "canRouteBack": "Y",
+      "routeBackMethod": "PREV",
+      "canSpecialSend": "N",
+      "join": "XOR",
+      "split": "XOR",
+      "RIGHT": {
+        "performType": "ANY",
+        "performSequence": "PARALLEL",
+        "specialSendScope": "NONE",
+        "canInsteadSign": "Y",
+        "canTakeBack": "Y",
+        "canReSend": "N",
+        "insteadSignSelected": "admin",
+        "performerSelectedId": "user1,user2",
+        "readerSelectedId": "user3"
+      },
+      "FORM": {
+        "formId": "form-001",
+        "formName": "审批表单",
+        "formType": "INTERNAL",
+        "formUrl": "/forms/approval.html"
+      },
+      "SERVICE": {
+        "httpMethod": "POST",
+        "httpUrl": "http://api.example.com/approval",
+        "httpRequestType": "JSON",
+        "httpResponseType": "JSON",
+        "serviceSelectedId": "service-001"
+      }
+    },
+    {
+      "activityDefId": "act-end-1",
+      "name": "结束",
+      "description": "流程结束节点",
+      "position": "END",
+      "positionCoord": { "x": 500, "y": 100 },
+      "participantId": "participant-end-1"
+    }
+  ],
+  "routes": [
+    {
+      "routeDefId": "route-1",
+      "name": "开始到审批",
+      "fromActivityDefId": "act-start",
+      "toActivityDefId": "act-approval",
+      "routeDirection": "FORWARD",
+      "routeCondition": "",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    },
+    {
+      "routeDefId": "route-2",
+      "name": "审批到结束",
+      "fromActivityDefId": "act-approval",
+      "toActivityDefId": "act-end-1",
+      "routeDirection": "FORWARD",
+      "routeCondition": "",
+      "routeConditionType": "OTHERWISE",
+      "routing": "NO_ROUTING"
+    }
+  ]
+}

@@ -50,30 +50,24 @@ const ActivityPanelSchema = {
     _getHumanSchema(activity, impl) {
         const tabs = [
             { id: 'basic', name: '基本信息', icon: 'info' },
-            { id: 'timing', name: '时限配置', icon: 'clock' },
-            { id: 'flow', name: '流程控制', icon: 'route' },
-            { id: 'performer', name: '办理配置', icon: 'user' },
-            { id: 'permission', name: '权限设置', icon: 'lock' },
-            { id: 'extended', name: '扩展属性', icon: 'settings' }
+            { id: 'performer', name: '办理设置', icon: 'user' },
+            { id: 'permission', name: '权限设置', icon: 'lock' }
         ];
         
         if (impl === 'IMPL_SUBFLOW' || impl === 'IMPL_OUTFLOW') {
-            tabs.splice(2, 0, { id: 'subprocess', name: '子流程', icon: 'subprocess' });
+            tabs.splice(1, 0, { id: 'subprocess', name: '子流程', icon: 'subprocess' });
         } else if (impl === 'IMPL_SERVICE') {
-            tabs.splice(2, 0, { id: 'service', name: '服务配置', icon: 'service' });
+            tabs.splice(1, 0, { id: 'service', name: '服务配置', icon: 'service' });
         } else if (impl === 'IMPL_TOOL') {
-            tabs.splice(2, 0, { id: 'tool', name: '工具配置', icon: 'tool' });
+            tabs.splice(1, 0, { id: 'tool', name: '工具配置', icon: 'tool' });
         }
         
         return {
             tabs,
             fields: {
                 basic: this._getBasicFields(activity, impl),
-                timing: this._getTimingFields(activity),
-                flow: this._getFlowControlFields(activity),
-                performer: this._getPerformerFields(activity),
-                permission: this._getPermissionFields(activity),
-                extended: this._getExtendedFields(activity),
+                performer: this._getPerformerFieldsMerged(activity),
+                permission: this._getPermissionFieldsMerged(activity),
                 ...(impl === 'IMPL_SUBFLOW' || impl === 'IMPL_OUTFLOW' ? { subprocess: this._getSubprocessFields(activity) } : {}),
                 ...(impl === 'IMPL_SERVICE' ? { service: this._getServiceFields(activity) } : {}),
                 ...(impl === 'IMPL_TOOL' ? { tool: this._getToolFields(activity) } : {})
@@ -208,6 +202,84 @@ const ActivityPanelSchema = {
                 { value: 'SPLIT_AND', label: '与分支', description: '所有输出路由并行执行' },
                 { value: 'SPLIT_XOR', label: '异或分支', description: '根据条件选择一条路由执行' }
             ]}
+        ];
+    },
+    
+    _getPerformerFieldsMerged(activity) {
+        return [
+            { type: 'section', title: '办理人设置' },
+            { name: 'performerType', type: 'select', label: '办理人类型', options: [
+                { value: 'HUMAN', label: '人工' },
+                { value: 'SYSTEM', label: '系统' },
+                { value: 'AGENT', label: '代理' }
+            ]},
+            { name: 'performerId', type: 'text', label: '办理人ID' },
+            { name: 'performerName', type: 'text', label: '办理人名称' },
+            { type: 'section', title: '办理方式' },
+            { name: 'performType', type: 'select', label: '办理类型', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'SINGLE', label: '单人办理' },
+                { value: 'MULTIPLE', label: '多人办理' },
+                { value: 'JOINTSIGN', label: '会签' }
+            ]},
+            { name: 'performSequence', type: 'select', label: '办理顺序', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'FIRST', label: '第一人办理' },
+                { value: 'SEQUENCE', label: '顺序办理' },
+                { value: 'MEANWHILE', label: '同时办理' }
+            ]},
+            { type: 'section', title: '时限设置' },
+            { name: 'limit', type: 'number', label: '时限', min: 0 },
+            { name: 'durationUnit', type: 'select', label: '时长单位', options: [
+                { value: 'D', label: '天' },
+                { value: 'H', label: '小时' },
+                { value: 'M', label: '分钟' }
+            ]},
+            { name: 'deadlineOperation', type: 'select', label: '到期处理', options: [
+                { value: 'DEFAULT', label: '默认处理' },
+                { value: 'DELAY', label: '延期处理' },
+                { value: 'TAKEBACK', label: '收回处理' }
+            ]},
+            { type: 'section', title: '流程控制' },
+            { name: 'join', type: 'select', label: '汇聚类型', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'JOIN_AND', label: '与汇聚' },
+                { value: 'JOIN_XOR', label: '异或汇聚' }
+            ]},
+            { name: 'split', type: 'select', label: '分支类型', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'SPLIT_AND', label: '与分支' },
+                { value: 'SPLIT_XOR', label: '异或分支' }
+            ]},
+            { type: 'section', title: '退回配置' },
+            { name: 'canRouteBack', type: 'checkbox', label: '允许退回' },
+            { name: 'routeBackMethod', type: 'select', label: '退回路径', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'LAST', label: '上一环节' },
+                { value: 'ANY', label: '任意环节' }
+            ]},
+            { name: 'canSpecialSend', type: 'checkbox', label: '允许特送' }
+        ];
+    },
+    
+    _getPermissionFieldsMerged(activity) {
+        return [
+            { type: 'section', title: '操作权限' },
+            { name: 'priority', type: 'number', label: '优先级', min: 0, max: 100 },
+            { name: 'skipable', type: 'checkbox', label: '可跳过' },
+            { name: 'allowDelegate', type: 'checkbox', label: '允许委托' },
+            { name: 'allowTransfer', type: 'checkbox', label: '允许转办' },
+            { name: 'canInsteadSign', type: 'checkbox', label: '允许代签' },
+            { name: 'canTakeBack', type: 'checkbox', label: '允许收回' },
+            { type: 'section', title: '权限组配置' },
+            { name: 'rightGroup', type: 'select', label: '权限组', options: [
+                { value: 'PERFORMER', label: '办理人' },
+                { value: 'SPONSOR', label: '发起人' },
+                { value: 'READER', label: '阅办人' },
+                { value: 'NORIGHT', label: '无权限' }
+            ]},
+            { type: 'section', title: '扩展属性' },
+            { name: 'extendedAttributes', type: 'keyvalue', label: '扩展属性', addText: '添加属性' }
         ];
     },
     
