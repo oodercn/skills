@@ -155,6 +155,25 @@ class PanelInitializer {
             applicable: (activity) => activity && activity.activityType === 'SERVICE'
         }, 60);
 
+        // 高级属性面板
+        if (typeof AdvancedPanelPlugin !== 'undefined') {
+            const advancedPlugin = new AdvancedPanelPlugin();
+            register('activity-advanced', {
+                id: 'activity-advanced',
+                name: '高级属性',
+                render: (container, activity) => {
+                    advancedPlugin.setContainer(container);
+                    advancedPlugin.render(activity);
+                },
+                getData: () => advancedPlugin.getData(),
+                dataConfig: {
+                    dataKey: 'advanced',
+                    storageFormat: 'json'
+                },
+                applicable: (activity) => activity && activity.activityDefId
+            }, 70);
+        }
+
         console.log('活动面板插件注册完成');
     }
 
@@ -350,7 +369,8 @@ class PanelInitializer {
                     'activity-flow',
                     'activity-right',
                     'activity-form',
-                    'activity-service'
+                    'activity-service',
+                    'activity-advanced'
                 ],
                 'route': [
                     'route-basic',
@@ -368,7 +388,8 @@ class PanelInitializer {
                 'activity-flow',
                 'activity-right',
                 'activity-form',
-                'activity-service'
+                'activity-service',
+                'activity-advanced'
             ]
         };
 

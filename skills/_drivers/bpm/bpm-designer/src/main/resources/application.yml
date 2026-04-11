@@ -7,7 +7,7 @@ spring:
   application:
     name: bpm-designer
   mvc:
-    static-path-pattern: /static/**
+    static-path-pattern: /**
   web:
     resources:
       static-locations: classpath:/static/
@@ -21,7 +21,7 @@ spring:
 
 bpm:
   server:
-    url: http://127.0.0.1:8082/bpm
+    url: http://127.0.0.1:8084/bpm
 
 llm:
   enabled: true
@@ -38,7 +38,7 @@ llm:
 datasource:
   bpm:
     use-real-data: false
-    bpm-server-url: http://127.0.0.1:8082
+    bpm-server-url: http://127.0.0.1:8084
     capability-service-url: http://127.0.0.1:8085/capability
     form-service-url: http://127.0.0.1:8086/form
     scene-service-url: http://127.0.0.1:8087/scene
