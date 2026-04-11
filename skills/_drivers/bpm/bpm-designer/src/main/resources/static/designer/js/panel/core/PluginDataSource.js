@@ -15,23 +15,14 @@
 class PluginDataSource {
     constructor(options = {}) {
         this.options = {
-            // 后端API基础路径
-            baseUrl: '/api/bpm',
-            
-            // 请求超时时间
+            baseUrl: '/bpm/api/dictionary',
+            bpmBaseUrl: '/bpm/api/processdef',
             timeout: 30000,
-            
-            // 是否启用缓存
             enableCache: true,
-            
-            // 缓存过期时间(毫秒)
-            cacheExpire: 5 * 60 * 1000, // 5分钟
-            
-            // 请求头
+            cacheExpire: 5 * 60 * 1000,
             headers: {
                 'Content-Type': 'application/json'
             },
-            
             ...options
         };
         
@@ -60,9 +51,9 @@ class PluginDataSource {
         const cacheKey = `org_${parentId || 'root'}_${sysId || 'default'}`;
         
         return this._fetchWithCache(cacheKey, async () => {
-            const response = await this._request('/org/list', {
+            const response = await this._request('/org/tree', {
                 method: 'GET',
-                params: { parentId, sysId, lazy }
+                params: { parentId, lazy }
             });
             return this._normalizeOrgData(response.data);
         });
@@ -117,7 +108,7 @@ class PluginDataSource {
      * 对应Swing: FormulaService.validate()
      */
     async validateExpression(expression, context = {}) {
-        const response = await this._request('/formula/validate', {
+        const response = await this._request('/expression/validate', {
             method: 'POST',
             data: { expression, context }
         });
@@ -131,9 +122,9 @@ class PluginDataSource {
         const cacheKey = `expr_vars_${contextType}`;
         
         return this._fetchWithCache(cacheKey, async () => {
-            const response = await this._request('/formula/variables', {
+            const response = await this._request('/expression/variables', {
                 method: 'GET',
-                params: { contextType }
+                params: { processDefId: contextType }
             });
             return response.data;
         });
@@ -146,9 +137,8 @@ class PluginDataSource {
         const cacheKey = `expr_templates_${type}`;
         
         return this._fetchWithCache(cacheKey, async () => {
-            const response = await this._request('/formula/templates', {
-                method: 'GET',
-                params: { type }
+            const response = await this._request('/expression/templates', {
+                method: 'GET'
             });
             return response.data;
         });
@@ -161,7 +151,7 @@ class PluginDataSource {
         const cacheKey = `listeners_${type}`;
         
         return this._fetchWithCache(cacheKey, async () => {
-            const response = await this._request('/listener/configs', {
+            const response = await this._request('/listener/list', {
                 method: 'GET',
                 params: { type }
             });

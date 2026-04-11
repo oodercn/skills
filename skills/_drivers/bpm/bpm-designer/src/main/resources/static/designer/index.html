@@ -4,15 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BPM Designer</title>
-    <link rel="stylesheet" href="css/var.css?v=1775620000">
-    <link rel="stylesheet" href="css/base.css?v=1775620000">
-    <link rel="stylesheet" href="css/main.css?v=1775620000">
-    <link rel="stylesheet" href="css/panel.css?v=1775620000">
-    <link rel="stylesheet" href="css/palette.css?v=1775620000">
-    <link rel="stylesheet" href="css/node.css?v=1775620000">
-    <link rel="stylesheet" href="css/tree.css?v=1775620000">
-    <link rel="stylesheet" href="css/chat.css?v=1775620000">
-    <script src="lib/icon/icons.js"></script>
+    <link rel="stylesheet" href="/static/designer/css/var.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/base.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/main.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/panel.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/palette.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/node.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/tree.css?v=1775620000">
+    <link rel="stylesheet" href="/static/designer/css/chat.css?v=1775620000">
+    <script src="/static/designer/lib/icon/icons.js"></script>
 </head>
 <body>
     <div id="app" class="d-app">
@@ -192,40 +192,43 @@
     
     <div class="d-toast" id="toast"></div>
     
-    <script src="js/model/ProcessDef.js?v=1775620000"></script>
-    <script src="js/model/ActivityDef.js?v=1775620000"></script>
-    <script src="js/model/RouteDef.js?v=1775620000"></script>
-    <script src="js/model/AgentDef.js?v=1775620000"></script>
-    <script src="js/model/SceneDef.js?v=1775620000"></script>
-    <script src="js/sdk/Api.js?v=1775620000"></script>
-    <script src="js/sdk/Store.js?v=1775620000"></script>
-    <script src="js/sdk/Theme.js?v=1775620000"></script>
-    <script src="js/sdk/PanelSchema.js?v=1775620000"></script>
-    <script src="js/panel/schemas/ProcessPanelSchema.js?v=1775620000"></script>
-    <script src="js/panel/schemas/ActivityPanelSchema.js?v=1775620000"></script>
-    <script src="js/panel/schemas/RoutePanelSchema.js?v=1775620000"></script>
-    <script src="js/panel/PanelPlugin.js?v=1775620000"></script>
-    <script src="js/panel/PanelManager.js?v=1775620000"></script>
-    <script src="js/panel/plugins/AdvancedPanelPlugin.js?v=1775620000"></script>
-    <script src="js/panel/plugins/ProcessPanelPlugin.js?v=1775620000"></script>
-    <script src="js/panel/plugins/ActivityPanelPlugin.js?v=1775620000"></script>
-    <script src="js/panel/plugins/RoutePanelPlugin.js?v=1775620000"></script>
-    <script src="js/panel/PanelManagerNew.js?v=1775620000"></script>
-    <script src="js/panel/BasicPanel.js?v=1775620000"></script>
-    <script src="js/panel/TimingPanel.js?v=1775620000"></script>
-    <script src="js/panel/AgentPanel.js?v=1775620000"></script>
-    <script src="js/panel/ScenePanel.js?v=1775620000"></script>
-    <script src="js/panel/RoutePanel.js?v=1775620000"></script>
-    <script src="js/ContextMenu.js?v=1775620000"></script>
+    <script src="/static/designer/js/model/ProcessDef.js?v=1775620000"></script>
+    <script src="/static/designer/js/model/ActivityDef.js?v=1775620000"></script>
+    <script src="/static/designer/js/model/RouteDef.js?v=1775620000"></script>
+    <script src="/static/designer/js/model/AgentDef.js?v=1775620000"></script>
+    <script src="/static/designer/js/model/SceneDef.js?v=1775620000"></script>
+    <script src="/static/designer/js/sdk/Api.js?v=1775620000"></script>
+    <script src="/static/designer/js/sdk/Store.js?v=1775620000"></script>
+    <script src="/static/designer/js/sdk/Theme.js?v=1775620000"></script>
+    <script src="/static/designer/js/sdk/PanelSchema.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/schemas/ProcessPanelSchema.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/schemas/ActivityPanelSchema.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/schemas/RoutePanelSchema.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/PanelPlugin.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/PanelManager.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/core/PanelPluginManager.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/core/PluginDataSource.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/core/PluginDataAdapter.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/PluginEnvironment.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/components/ExternalDictionaryPanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/plugins/AdvancedPanelPlugin.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/plugins/ProcessPanelPlugin.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/plugins/ActivityPanelPlugin.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/plugins/RoutePanelPlugin.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/PanelInitializer.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/PanelManagerNew.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/BasicPanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/TimingPanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/AgentPanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/ScenePanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/panel/RoutePanel.js?v=1775620000"></script>
+    <script src="/static/designer/js/ContextMenu.js?v=1775620000"></script>
     <script>
-        // 检查 ContextMenu 是否已定义
         if (typeof ContextMenu === 'undefined') {
             console.error('[Index] ContextMenu is not defined after loading ContextMenu.js');
-            // 创建一个简单的备用实现
             window.ContextMenu = {
                 show: function(x, y, items) {
                     console.warn('[ContextMenu] Fallback show called');
-                    // 简单的 alert 实现
                     if (items && items.length > 0) {
                         const labels = items.map(i => i.label).join(', ');
                         console.log('Menu items:', labels);
@@ -236,13 +239,13 @@
             console.log('[Index] ContextMenu loaded successfully');
         }
     </script>
-    <script src="js/Tree.js?v=1775620000"></script>
-    <script src="js/Elements.js?v=1775620000"></script>
-    <script src="js/Canvas.js?v=1775620000"></script>
-    <script src="js/Chat.js?v=1775620000"></script>
-    <script src="js/Toolbar.js?v=1775620000"></script>
-    <script src="js/TabManager.js?v=1775620000"></script>
-    <script src="js/App.js?v=1775620000"></script>
+    <script src="/static/designer/js/Tree.js?v=1775620000"></script>
+    <script src="/static/designer/js/Elements.js?v=1775620000"></script>
+    <script src="/static/designer/js/Canvas.js?v=1775620000"></script>
+    <script src="/static/designer/js/Chat.js?v=1775620000"></script>
+    <script src="/static/designer/js/Toolbar.js?v=1775620000"></script>
+    <script src="/static/designer/js/TabManager.js?v=1775620000"></script>
+    <script src="/static/designer/js/App.js?v=1775620000"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             window.app = new App();

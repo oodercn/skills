@@ -811,3 +811,158 @@ class ExternalDictionaryPanel {
 if (typeof module !== 'undefined' && module.exports) {
     module.exports = ExternalDictionaryPanel;
 }
+
+/**
+ * ExternalDictionaryPlugins - 外部字典面板插件集合
+ * 
+ * 包含：
+ * - ExpressionPanelPlugin: 表达式编辑器
+ * - PerformerSelectionPanelPlugin: 办理人选择器
+ * - DepartmentSelectionPanelPlugin: 部门选择器
+ */
+const ExternalDictionaryPlugins = {
+    ExpressionPanelPlugin: {
+        name: '表达式编辑器',
+        icon: 'formula',
+        render(container, options = {}) {
+            const panel = new ExternalDictionaryPanel({
+                title: '表达式管理',
+                icon: 'formula',
+                dictionary: {
+                    type: 'expression',
+                    lazyLoad: false
+                },
+                selection: {
+                    mode: 'single',
+                    allowEmpty: true
+                },
+                display: {
+                    showTree: false,
+                    showSearch: true,
+                    columns: [
+                        { field: 'name', title: '名称', width: '150px' },
+                        { field: 'expression', title: '表达式', width: '200px' },
+                        { field: 'description', title: '说明' }
+                    ]
+                },
+                onConfirm: (items) => {
+                    if (options.onConfirm && items.length > 0) {
+                        options.onConfirm(items[0]);
+                    }
+                },
+                onCancel: options.onCancel
+            });
+            panel.render(container);
+            return panel;
+        }
+    },
+
+    PerformerSelectionPanelPlugin: {
+        name: '办理人选择器',
+        icon: 'person',
+        render(container, options = {}) {
+            const panel = new ExternalDictionaryPanel({
+                title: '选择办理人',
+                icon: 'person',
+                dictionary: {
+                    type: 'person',
+                    lazyLoad: false
+                },
+                selection: {
+                    mode: options.multiSelect ? 'multiple' : 'single',
+                    maxCount: options.maxCount || 0,
+                    allowEmpty: false
+                },
+                display: {
+                    showTree: true,
+                    showSearch: true
+                },
+                fieldMapping: {
+                    id: 'id',
+                    code: 'code',
+                    name: 'name',
+                    parentId: 'orgId'
+                },
+                onConfirm: (items) => {
+                    if (options.onConfirm) {
+                        options.onConfirm(items);
+                    }
+                },
+                onCancel: options.onCancel
+            });
+            panel.render(container);
+            return panel;
+        }
+    },
+
+    DepartmentSelectionPanelPlugin: {
+        name: '部门选择器',
+        icon: 'folder',
+        render(container, options = {}) {
+            const panel = new ExternalDictionaryPanel({
+                title: '选择部门',
+                icon: 'folder',
+                dictionary: {
+                    type: 'department',
+                    lazyLoad: true
+                },
+                selection: {
+                    mode: options.multiSelect ? 'multiple' : 'single',
+                    maxCount: options.maxCount || 0,
+                    allowEmpty: false
+                },
+                display: {
+                    showTree: true,
+                    showSearch: true
+                },
+                onConfirm: (items) => {
+                    if (options.onConfirm) {
+                        options.onConfirm(items);
+                    }
+                },
+                onCancel: options.onCancel
+            });
+            panel.render(container);
+            return panel;
+        }
+    },
+
+    RoleSelectionPanelPlugin: {
+        name: '角色选择器',
+        icon: 'role',
+        render(container, options = {}) {
+            const panel = new ExternalDictionaryPanel({
+                title: '选择角色',
+                icon: 'role',
+                dictionary: {
+                    type: 'role',
+                    lazyLoad: false
+                },
+                selection: {
+                    mode: options.multiSelect ? 'multiple' : 'single',
+                    maxCount: options.maxCount || 0,
+                    allowEmpty: false
+                },
+                display: {
+                    showTree: false,
+                    showSearch: true,
+                    columns: [
+                        { field: 'name', title: '角色名称', width: '150px' },
+                        { field: 'code', title: '角色编码', width: '100px' },
+                        { field: 'description', title: '描述' }
+                    ]
+                },
+                onConfirm: (items) => {
+                    if (options.onConfirm) {
+                        options.onConfirm(items);
+                    }
+                },
+                onCancel: options.onCancel
+            });
+            panel.render(container);
+            return panel;
+        }
+    }
+};
+
+window.ExternalDictionaryPlugins = ExternalDictionaryPlugins;

@@ -6,8 +6,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @Controller
 public class IndexController {
 
-    @GetMapping("/designer")
+    @GetMapping({"/", "/designer", "/designer/"})
     public String index() {
-        return "forward:/designer/index.html";
+        return "forward:/static/designer/index.html";
     }
 }
