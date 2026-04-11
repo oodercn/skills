@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 490" width="800px" height="490px">
+<defs>
+    <style>
+        .bg { fill: #fafafa; }
+        .box { fill: #ffffff; stroke: #2563eb; stroke-width: 2; rx: 8; }
+        .box-alt { fill: #dbeafe; stroke: #1e40af; stroke-width: 2; rx: 8; }
+        .title-box { fill: #2563eb; stroke: none; rx: 4; }
+        .arrow { fill: none; stroke: #64748b; stroke-width: 2; marker-end: url(#arrowhead); }
+        .text { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; font-size: 13px; fill: #334155; }
+        .text-title { font-size: 15px; font-weight: bold; fill: #1e40af; }
+        .text-header { font-size: 16px; font-weight: bold; fill: #ffffff; }
+        .text-small { font-size: 11px; fill: #64748b; }
+    </style>
+    <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+        <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
+    </marker>
+</defs>
+<rect class="bg" width="100%" height="100%"/>
+<rect class="title-box" x="20" y="15" width="760" height="35" rx="4"/>
+<text class="text-header" x="400" y="38" text-anchor="middle">技术栈架构图</text>
+
+<rect class="box" x="30" y="70" width="230" height="120"/>
+<text class="text-title" x="145" y="95" text-anchor="middle">前端展示层</text>
+<text class="text" x="50" y="120">• Canvas</text>
+<text class="text" x="50" y="140">• Panel</text>
+<text class="text" x="50" y="160">• Palette</text>
+
+<rect class="box" x="285" y="70" width="230" height="120"/>
+<text class="text-title" x="400" y="95" text-anchor="middle">业务逻辑层</text>
+<text class="text" x="305" y="120">• Store</text>
+<text class="text" x="305" y="140">• Adapter</text>
+<text class="text" x="305" y="160">• Plugin</text>
+
+<rect class="box" x="540" y="70" width="230" height="120"/>
+<text class="text-title" x="655" y="95" text-anchor="middle">数据持久层</text>
+<text class="text" x="560" y="120">• REST API</text>
+<text class="text" x="560" y="140">• XPDL</text>
+<text class="text" x="560" y="160">• Database</text>
+
+<line class="arrow" x1="145" y1="190" x2="145" y2="220"/>
+<line class="arrow" x1="400" y1="190" x2="400" y2="220"/>
+<line class="arrow" x1="655" y1="190" x2="655" y2="220"/>
+
+<line class="arrow" x1="260" y1="230" x2="285" y2="230"/>
+<line class="arrow" x1="515" y1="230" x2="540" y2="230"/>
+
+<rect class="box-alt" x="285" y="220" width="230" height="60"/>
+<text class="text-title" x="400" y="245" text-anchor="middle">LLM Agent 驱动层</text>
+<text class="text-small" x="400" y="265" text-anchor="middle">AI 辅助流程设计与优化</text>
+
+<rect class="box" x="30" y="310" width="740" height="150"/>
+<text class="text-title" x="400" y="335" text-anchor="middle">核心技术组件</text>
+
+<rect class="box-alt" x="50" y="350" width="150" height="90"/>
+<text class="text-title" x="125" y="375" text-anchor="middle">前端框架</text>
+<text class="text" x="125" y="400" text-anchor="middle">原生 JavaScript</text>
+<text class="text-small" x="125" y="420" text-anchor="middle">ES6+ 轻量高性能</text>
+
+<rect class="box-alt" x="220" y="350" width="150" height="90"/>
+<text class="text-title" x="295" y="375" text-anchor="middle">图形引擎</text>
+<text class="text" x="295" y="400" text-anchor="middle">Canvas 2D</text>
+<text class="text-small" x="295" y="420" text-anchor="middle">流程图绘制</text>
+
+<rect class="box-alt" x="390" y="350" width="150" height="90"/>
+<text class="text-title" x="465" y="375" text-anchor="middle">数据管理</text>
+<text class="text" x="465" y="400" text-anchor="middle">Store 模式</text>
+<text class="text-small" x="465" y="420" text-anchor="middle">单向数据流</text>
+
+<rect class="box-alt" x="560" y="350" width="150" height="90"/>
+<text class="text-title" x="635" y="375" text-anchor="middle">后端服务</text>
+<text class="text" x="635" y="400" text-anchor="middle">Spring Boot</text>
+<text class="text-small" x="635" y="420" text-anchor="middle">XPDL 引擎</text>
+</svg>

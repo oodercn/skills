@@ -9,7 +9,8 @@ public class WebMvcConfig implements WebMvcConfigurer {
 
     @Override
     public void addViewControllers(ViewControllerRegistry registry) {
-        // 根路径重定向到设计器页面
-        registry.addViewController("/").setViewName("forward:/static/index.html");
+        registry.addViewController("/").setViewName("forward:/static/designer/index.html");
+        registry.addViewController("/designer").setViewName("forward:/static/designer/index.html");
+        registry.addViewController("/designer/").setViewName("forward:/static/designer/index.html");
     }
 }

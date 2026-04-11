@@ -13,6 +13,8 @@ import net.ooder.bpm.designer.dto.sub.*;
 import net.ooder.bpm.designer.model.ActivityDef;
 import net.ooder.bpm.designer.model.ProcessDef;
 import net.ooder.bpm.designer.model.RouteDef;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -27,6 +29,8 @@ import java.util.*;
 @Service
 public class DesignerService {
 
+    private static final Logger log = LoggerFactory.getLogger(DesignerService.class);
+
     @Value("${bpm.server.url:http://localhost:8080}")
     private String bpmServerUrl;
 
@@ -38,32 +42,30 @@ public class DesignerService {
     public ProcessDef getProcess(String processId, String version) {
         try {
             String url = bpmServerUrl + "/api/processdef/" + processId;
-            System.out.println("[DesignerService] Fetching process from: " + url);
+            log.debug("Fetching process from: {}", url);
             
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 String body = response.getBody();
-                System.out.println("[DesignerService] Response body: " + body);
+                log.debug("Response body: {}", body);
                 
                 Map<String, Object> result = JSON.parseObject(body, new TypeReference<Map<String, Object>>() {});
                 
                 if (result.get("data") != null) {
                     String dataJson = JSON.toJSONString(result.get("data"));
-                    System.out.println("[DesignerService] Data JSON: " + dataJson);
+                    log.debug("Data JSON: {}", dataJson);
                     
                     ProcessDTO processDTO = JSON.parseObject(dataJson, ProcessDTO.class);
-                    System.out.println("[DesignerService] Parsed ProcessDTO: " + processDTO);
+                    log.debug("Parsed ProcessDTO: {}", processDTO);
                     
                     ProcessDef process = convertToProcessDef(processDTO);
-                    System.out.println("[DesignerService] Converted ProcessDef with " + 
-                        process.getActivities().size() + " activities");
+                    log.debug("Converted ProcessDef with {} activities", process.getActivities().size());
                     
                     return process;
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DesignerService] Failed to get process from bpmserver: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to get process from bpmserver: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to get process: " + processId, e);
         }
         throw new RuntimeException("Process not found: " + processId);
@@ -145,23 +147,20 @@ public class DesignerService {
         activity.setExtendedAttributes(dto.getExtendedAttributes());
         
         PositionCoordDTO coordDTO = dto.getPositionCoord();
-        System.out.println("[DesignerService] Activity " + dto.getActivityDefId() + 
-            " received PositionCoordDTO: " + coordDTO);
+        log.debug("Activity {} received PositionCoordDTO: {}", dto.getActivityDefId(), coordDTO);
         
         if (coordDTO != null && coordDTO.getX() != null && coordDTO.getY() != null) {
             Map<String, Object> coord = new HashMap<>();
             coord.put("x", coordDTO.getX());
             coord.put("y", coordDTO.getY());
             activity.setPositionCoord(coord);
-            System.out.println("[DesignerService] Activity " + dto.getActivityDefId() + 
-                " using received coord: " + coord);
+            log.debug("Activity {} using received coord: {}", dto.getActivityDefId(), coord);
         } else {
             Map<String, Object> defaultCoord = new HashMap<>();
             defaultCoord.put("x", 100);
             defaultCoord.put("y", 100);
             activity.setPositionCoord(defaultCoord);
-            System.err.println("[DesignerService] Activity " + dto.getActivityDefId() + 
-                " using DEFAULT coord: " + defaultCoord + " (received was: " + coordDTO + ")");
+            log.warn("Activity {} using DEFAULT coord: {} (received was: {})", dto.getActivityDefId(), defaultCoord, coordDTO);
         }
         
         if (dto.getTiming() != null) {
@@ -227,21 +226,21 @@ public class DesignerService {
     public ProcessDef saveProcess(ProcessDef processDef) {
         try {
             String url = bpmServerUrl + "/api/processdef/save";
-            System.out.println("[DesignerService] Saving process to: " + url);
+            log.debug("Saving process to: {}", url);
             
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             
             ProcessDTO processDTO = convertToProcessDTO(processDef);
             String requestBody = JSON.toJSONString(processDTO);
-            System.out.println("[DesignerService] Request body: " + requestBody);
+            log.debug("Request body: {}", requestBody);
             
             HttpEntity<String> request = new HttpEntity<>(requestBody, headers);
             
             ResponseEntity<String> response = restTemplate.postForEntity(url, request, String.class);
             if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
                 String body = response.getBody();
-                System.out.println("[DesignerService] Save response: " + body);
+                log.debug("Save response: {}", body);
                 
                 Map<String, Object> result = JSON.parseObject(body, new TypeReference<Map<String, Object>>() {});
                 if (result.get("data") != null) {
@@ -251,8 +250,7 @@ public class DesignerService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DesignerService] Failed to save process to bpmserver: " + e.getMessage());
-            e.printStackTrace();
+            log.error("Failed to save process to bpmserver: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to save process", e);
         }
         throw new RuntimeException("Failed to save process");
@@ -326,21 +324,20 @@ public class DesignerService {
         dto.setExtendedAttributes(activity.getExtendedAttributes());
         
         Map<String, Object> coord = activity.getPositionCoord();
-        System.out.println("[DesignerService] Converting Activity " + activity.getActivityDefId() + 
-            " positionCoord: " + coord);
+        log.debug("Converting Activity {} positionCoord: {}", activity.getActivityDefId(), coord);
         if (coord != null && coord.get("x") != null && coord.get("y") != null) {
             PositionCoordDTO coordDTO = new PositionCoordDTO();
             Object xVal = coord.get("x");
             Object yVal = coord.get("y");
-            System.out.println("[DesignerService] Coord values - x: " + xVal + " (type: " + (xVal != null ? xVal.getClass().getName() : "null") + 
-                "), y: " + yVal + " (type: " + (yVal != null ? yVal.getClass().getName() : "null") + ")");
-            // 使用doubleValue()保留小数部分
+            log.debug("Coord values - x: {} (type: {}), y: {} (type: {})", 
+                xVal, xVal != null ? xVal.getClass().getName() : "null",
+                yVal, yVal != null ? yVal.getClass().getName() : "null");
             coordDTO.setX(((Number) xVal).doubleValue());
             coordDTO.setY(((Number) yVal).doubleValue());
             dto.setPositionCoord(coordDTO);
-            System.out.println("[DesignerService] Set PositionCoordDTO: " + coordDTO);
+            log.debug("Set PositionCoordDTO: {}", coordDTO);
         } else {
-            System.out.println("[DesignerService] Warning: positionCoord is null or missing x/y values");
+            log.warn("positionCoord is null or missing x/y values");
         }
         
         if (activity.getTiming() != null) {
@@ -698,7 +695,7 @@ public class DesignerService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DesignerService] Failed to get process list: " + e.getMessage());
+            log.error("Failed to get process list: {}", e.getMessage());
         }
         return new ArrayList<>();
     }
@@ -710,9 +707,9 @@ public class DesignerService {
         try {
             String url = bpmServerUrl + "/api/processdef/" + processId;
             restTemplate.delete(url);
-            System.out.println("[DesignerService] Process deleted from server: " + processId);
+            log.debug("Process deleted from server: {}", processId);
         } catch (Exception e) {
-            System.err.println("[DesignerService] Failed to delete process: " + e.getMessage());
+            log.error("Failed to delete process: {}", e.getMessage(), e);
             throw new RuntimeException("Failed to delete process", e);
         }
     }
@@ -758,7 +755,7 @@ public class DesignerService {
                 }
             }
         } catch (Exception e) {
-            System.err.println("[DesignerService] Failed to get process tree from server: " + e.getMessage());
+            log.error("Failed to get process tree from server: {}", e.getMessage());
         }
         return tree;
     }
