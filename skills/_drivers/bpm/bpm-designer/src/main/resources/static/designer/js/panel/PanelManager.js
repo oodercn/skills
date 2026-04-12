@@ -4,13 +4,18 @@ class PanelManager {
         this.store = store;
         this.currentType = null;
         this.currentData = null;
+        this.originalData = null;
         this.currentTab = 'basic';
+        this.pendingChanges = new Map();
+        this._changeTimeout = null;
     }
 
     render(type, data) {
         console.log('[PanelManager] render called:', type, data);
         this.currentType = type;
-        this.currentData = data;
+        this.currentData = JSON.parse(JSON.stringify(data));
+        this.originalData = JSON.parse(JSON.stringify(data));
+        this.pendingChanges.clear();
         this.currentTab = 'basic';
         
         let schema;
@@ -48,23 +53,44 @@ class PanelManager {
 
         tabsContainer.querySelectorAll('.d-tab').forEach(tab => {
             tab.addEventListener('click', () => {
-                this.currentTab = tab.dataset.tab;
-                tabsContainer.querySelectorAll('.d-tab').forEach(t => {
-                    t.classList.toggle('active', t.dataset.tab === this.currentTab);
-                });
-                
-                let schema;
-                if (this.currentType === 'activity' && this.currentData) {
-                    schema = PanelSchema.getActivitySchema(this.currentData);
+                if (this.pendingChanges.size > 0) {
+                    this._confirmAndSwitchTab(tab.dataset.tab);
                 } else {
-                    schema = PanelSchema[this.currentType];
-                }
-                
-                if (schema) {
-                    this._renderContent(schema.fields[this.currentTab], this.currentData);
+                    this._switchTab(tab.dataset.tab);
                 }
             });
         });
+    }
+
+    _confirmAndSwitchTab(newTab) {
+        const confirmed = confirm('当前有未保存的更改，是否保存？');
+        if (confirmed) {
+            this._onConfirm();
+        } else {
+            this._onCancel();
+        }
+        this._switchTab(newTab);
+    }
+
+    _switchTab(tabId) {
+        this.currentTab = tabId;
+        const tabsContainer = this.container.querySelector('#panelTabs');
+        if (tabsContainer) {
+            tabsContainer.querySelectorAll('.d-tab').forEach(t => {
+                t.classList.toggle('active', t.dataset.tab === this.currentTab);
+            });
+        }
+        
+        let schema;
+        if (this.currentType === 'activity' && this.currentData) {
+            schema = PanelSchema.getActivitySchema(this.currentData);
+        } else {
+            schema = PanelSchema[this.currentType];
+        }
+        
+        if (schema) {
+            this._renderContent(schema.fields[this.currentTab], this.currentData);
+        }
     }
 
     _renderContent(fields, data) {
@@ -76,8 +102,183 @@ class PanelManager {
             return;
         }
 
-        contentContainer.innerHTML = fields.map(field => this._renderField(field, data)).join('');
-        this._bindFieldEvents(contentContainer, data);
+        const wrapper = document.createElement('div');
+        wrapper.className = 'd-panel-content-wrapper';
+        wrapper.style.cssText = 'display: flex; flex-direction: column; height: 100%;';
+        
+        const formContainer = document.createElement('div');
+        formContainer.className = 'd-panel-form-container';
+        formContainer.style.cssText = 'flex: 1; overflow-y: auto; padding: 16px;';
+        formContainer.innerHTML = fields.map(field => this._renderField(field, data)).join('');
+        
+        const buttonArea = this._createButtonArea();
+        
+        wrapper.appendChild(formContainer);
+        wrapper.appendChild(buttonArea);
+        
+        contentContainer.innerHTML = '';
+        contentContainer.appendChild(wrapper);
+        
+        this._bindFieldEvents(formContainer, data);
+    }
+
+    _createButtonArea() {
+        const buttonArea = document.createElement('div');
+        buttonArea.className = 'd-panel-button-area';
+        buttonArea.style.cssText = `
+            position: sticky;
+            bottom: 0;
+            background: var(--panel-bg, #fff);
+            padding: 12px 16px;
+            border-top: 1px solid var(--border-color, #e0e0e0);
+            display: flex;
+            gap: 8px;
+            justify-content: flex-end;
+            z-index: 10;
+        `;
+
+        const resetBtn = document.createElement('button');
+        resetBtn.type = 'button';
+        resetBtn.className = 'd-btn';
+        resetBtn.innerHTML = '↺ 重置';
+        resetBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        `;
+        resetBtn.addEventListener('click', () => this._onReset());
+
+        const cancelBtn = document.createElement('button');
+        cancelBtn.type = 'button';
+        cancelBtn.className = 'd-btn';
+        cancelBtn.innerHTML = '✕ 取消';
+        cancelBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #f5f5f5;
+            color: #666;
+            border: 1px solid #d9d9d9;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+        `;
+        cancelBtn.addEventListener('click', () => this._onCancel());
+
+        const confirmBtn = document.createElement('button');
+        confirmBtn.type = 'button';
+        confirmBtn.className = 'd-btn d-btn-primary';
+        confirmBtn.id = 'panelConfirmBtn';
+        confirmBtn.innerHTML = '✓ 确认';
+        confirmBtn.style.cssText = `
+            padding: 6px 16px;
+            background: #1890ff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 13px;
+            opacity: 0.5;
+        `;
+        confirmBtn.disabled = true;
+        confirmBtn.addEventListener('click', () => this._onConfirm());
+
+        buttonArea.appendChild(resetBtn);
+        buttonArea.appendChild(cancelBtn);
+        buttonArea.appendChild(confirmBtn);
+
+        return buttonArea;
+    }
+
+    _updateButtonState() {
+        const confirmBtn = this.container.querySelector('#panelConfirmBtn');
+        if (confirmBtn) {
+            const hasChanges = this.pendingChanges.size > 0;
+            confirmBtn.disabled = !hasChanges;
+            confirmBtn.style.opacity = hasChanges ? '1' : '0.5';
+            confirmBtn.style.cursor = hasChanges ? 'pointer' : 'not-allowed';
+        }
+    }
+
+    _onConfirm() {
+        if (this.pendingChanges.size === 0) {
+            console.log('[PanelManager] No changes to confirm');
+            return;
+        }
+
+        console.log(`[PanelManager] Confirming ${this.pendingChanges.size} changes`);
+        
+        this._applyChanges();
+        this.pendingChanges.clear();
+        this.originalData = JSON.parse(JSON.stringify(this.currentData));
+        this._updateButtonState();
+        
+        console.log('[PanelManager] Changes confirmed and applied');
+    }
+
+    _onCancel() {
+        if (this.pendingChanges.size === 0) {
+            console.log('[PanelManager] No changes to cancel');
+            return;
+        }
+
+        console.log(`[PanelManager] Canceling ${this.pendingChanges.size} changes`);
+        
+        this.pendingChanges.forEach((value, key) => {
+            const originalValue = this._getValue(key, this.originalData);
+            this._setValue(key, originalValue, this.currentData);
+            
+            const input = this.container.querySelector(`[name="${key}"]`);
+            if (input) {
+                if (input.type === 'checkbox') {
+                    input.checked = originalValue;
+                } else {
+                    input.value = originalValue !== undefined && originalValue !== null ? originalValue : '';
+                }
+            }
+        });
+        
+        this.pendingChanges.clear();
+        this._updateButtonState();
+        
+        console.log('[PanelManager] Changes canceled');
+    }
+
+    _onReset() {
+        console.log('[PanelManager] Resetting all fields');
+        
+        this.currentData = JSON.parse(JSON.stringify(this.originalData));
+        this.pendingChanges.clear();
+        
+        let schema;
+        if (this.currentType === 'activity' && this.currentData) {
+            schema = PanelSchema.getActivitySchema(this.currentData);
+        } else {
+            schema = PanelSchema[this.currentType];
+        }
+        
+        if (schema) {
+            this._renderContent(schema.fields[this.currentTab], this.currentData);
+        }
+        
+        this._updateButtonState();
+        
+        console.log('[PanelManager] All fields reset');
+    }
+
+    _applyChanges() {
+        if (this.currentType === 'activity' && this.store) {
+            this.store.updateActivity(this.currentData);
+            console.log('[PanelManager] Activity updated:', this.currentData.activityDefId);
+        } else if (this.currentType === 'process' && this.store) {
+            this.store.updateProcess(this.currentData);
+            console.log('[PanelManager] Process updated:', this.currentData.processDefId);
+        } else if (this.currentType === 'route' && this.store) {
+            this.store.updateRoute(this.currentData);
+            console.log('[PanelManager] Route updated:', this.currentData.routeDefId);
+        }
     }
 
     _renderField(field, data) {
@@ -260,7 +461,7 @@ class PanelManager {
             const name = el.name || el.dataset.field;
             if (!name) return;
 
-            el.addEventListener('change', () => {
+            el.addEventListener('change', (e) => {
                 let value;
                 if (el.type === 'checkbox') {
                     value = el.checked;
@@ -270,36 +471,46 @@ class PanelManager {
                     value = el.value;
                 }
                 
-                this._setValue(name, value, data);
-                this._onDataChange(data);
+                this._onFieldChange(name, value);
             });
 
-            el.addEventListener('input', () => {
-                if (el.type === 'number') {
-                    this._setValue(name, parseFloat(el.value) || 0, data);
-                } else {
-                    this._setValue(name, el.value, data);
+            el.addEventListener('input', (e) => {
+                if (this._changeTimeout) {
+                    clearTimeout(this._changeTimeout);
                 }
+                this._changeTimeout = setTimeout(() => {
+                    let value;
+                    if (el.type === 'number') {
+                        value = parseFloat(el.value) || 0;
+                    } else {
+                        value = el.value;
+                    }
+                    this._onFieldChange(name, value);
+                }, 500);
             });
         });
 
         container.querySelectorAll('.d-btn-add').forEach(btn => {
             btn.addEventListener('click', () => {
                 const listName = btn.dataset.listName;
-                const list = this._getValue(listName, data) || [];
+                const list = this._getValue(listName, this.currentData) || [];
                 list.push({});
-                this._setValue(listName, list, data);
-                this.render(this.currentType, data);
+                this._setValue(listName, list, this.currentData);
+                this.pendingChanges.set(listName, list);
+                this._updateButtonState();
+                this.render(this.currentType, this.currentData);
             });
         });
 
         container.querySelectorAll('.d-btn-add-kv').forEach(btn => {
             btn.addEventListener('click', () => {
                 const kvName = btn.dataset.kvName;
-                const kv = this._getValue(kvName, data) || {};
+                const kv = this._getValue(kvName, this.currentData) || {};
                 kv['new_key'] = '';
-                this._setValue(kvName, kv, data);
-                this.render(this.currentType, data);
+                this._setValue(kvName, kv, this.currentData);
+                this.pendingChanges.set(kvName, kv);
+                this._updateButtonState();
+                this.render(this.currentType, this.currentData);
             });
         });
 
@@ -308,9 +519,42 @@ class PanelManager {
                 const item = btn.closest('.d-list-item, .d-kv-item');
                 if (item) {
                     item.remove();
+                    this.pendingChanges.set('_list_modified', true);
+                    this._updateButtonState();
                 }
             });
         });
+    }
+
+    _onFieldChange(fieldName, fieldValue) {
+        const originalValue = this._getValue(fieldName, this.originalData);
+        
+        if (!this._deepEqual(originalValue, fieldValue)) {
+            this.pendingChanges.set(fieldName, fieldValue);
+            this._setValue(fieldName, fieldValue, this.currentData);
+            console.log(`[PanelManager] Change recorded: ${fieldName} from ${originalValue} to ${fieldValue}`);
+        } else {
+            this.pendingChanges.delete(fieldName);
+            this._setValue(fieldName, fieldValue, this.currentData);
+            console.log(`[PanelManager] Change reverted to original: ${fieldName}`);
+        }
+        
+        this._updateButtonState();
+    }
+
+    _deepEqual(a, b) {
+        if (a === b) return true;
+        if (a == null || b == null) return false;
+        if (typeof a !== typeof b) return false;
+
+        if (typeof a === 'object') {
+            const keysA = Object.keys(a);
+            const keysB = Object.keys(b);
+            if (keysA.length !== keysB.length) return false;
+            return keysA.every(key => this._deepEqual(a[key], b[key]));
+        }
+
+        return false;
     }
 
     _onDataChange(data) {

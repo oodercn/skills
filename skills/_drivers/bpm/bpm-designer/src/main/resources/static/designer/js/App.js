@@ -131,6 +131,29 @@ class App {
         window.store = this.store;
         console.log('[App] window.store set');
         
+        // 初始化插件环境
+        if (typeof PluginEnvironment !== 'undefined') {
+            window.pluginEnvironment = new PluginEnvironment({
+                store: this.store,
+                api: this.api
+            });
+            console.log('[App] PluginEnvironment initialized');
+        }
+        
+        // 初始化面板插件管理器
+        if (typeof PanelPluginManager !== 'undefined') {
+            window.panelPluginManager = new PanelPluginManager({
+                environment: window.pluginEnvironment
+            });
+            console.log('[App] PanelPluginManager initialized');
+        }
+        
+        // 初始化面板插件
+        if (typeof PanelInitializer !== 'undefined' && window.panelPluginManager) {
+            PanelInitializer.init(window.panelPluginManager);
+            console.log('[App] PanelInitializer completed');
+        }
+        
         // 使用新的插件架构面板管理器
         this.panelManager = new PanelManagerNew(panelEl, this.store);
         console.log('[App] PanelManagerNew initialized');
