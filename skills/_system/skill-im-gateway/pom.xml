@@ -84,7 +84,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-spi-core</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <!-- Test Dependencies -->
