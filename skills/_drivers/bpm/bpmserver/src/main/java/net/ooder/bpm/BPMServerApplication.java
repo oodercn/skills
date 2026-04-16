@@ -7,12 +7,8 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @SpringBootApplication
 public class BPMServerApplication {
 
-    // 在类加载时就触发EarlyJDSConfigInitializer的静态初始化
-    static {
-        EarlyJDSConfigInitializer.init();
-    }
-
     public static void main(String[] args) {
+        EarlyJDSConfigInitializer.init();
         SpringApplication.run(BPMServerApplication.class, args);
     }
 }

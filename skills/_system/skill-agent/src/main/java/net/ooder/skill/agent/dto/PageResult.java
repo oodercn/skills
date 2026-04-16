@@ -18,6 +18,10 @@ public class PageResult<T> {
         this.pageSize = pageSize;
     }
 
+    public static <T> PageResult<T> of(List<T> list, long total, int pageNum, int pageSize) {
+        return new PageResult<>(list, total, pageNum, pageSize);
+    }
+
     public List<T> getList() { return list; }
     public void setList(List<T> list) { this.list = list; }
     public long getTotal() { return total; }

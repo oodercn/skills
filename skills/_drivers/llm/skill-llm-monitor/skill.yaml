@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-llm-monitor
   name: LLM监控服务
-  version: "3.0.1"
+  version: 1.0.0
   description: 提供LLM调用统计、日志查询、性能监控等功能
   author: ooder Team
   type: system-service
@@ -12,17 +12,12 @@ metadata:
 
 spec:
   skillForm: DRIVER
-  skillCategory: LLM
-  sceneType: AUTO
-  purposes:
-    - MONITORING
-    - TEAM
   type: system-skill
   
   ownership: platform
   
   capability:
-    address: 0x2D
+    address: 0x3F
     category: LLM
     code: LLM_MONITOR
     operations: [stats, logs, monitor, ranking]

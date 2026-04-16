@@ -1,25 +1,22 @@
 package net.ooder.skill.scenes.dto;
 
+import java.util.Map;
+
 public class SceneLlmConfigDTO {
-    private String providerId;
-    private String modelId;
+    private String provider;
+    private String model;
     private Double temperature;
     private Integer maxTokens;
-    private String systemPrompt;
+    private Map<String, Object> extendedConfig;
 
-    public SceneLlmConfigDTO() {
-        this.temperature = 0.7;
-        this.maxTokens = 4096;
-    }
-
-    public String getProviderId() { return providerId; }
-    public void setProviderId(String providerId) { this.providerId = providerId; }
-    public String getModelId() { return modelId; }
-    public void setModelId(String modelId) { this.modelId = modelId; }
+    public String getProvider() { return provider; }
+    public void setProvider(String provider) { this.provider = provider; }
+    public String getModel() { return model; }
+    public void setModel(String model) { this.model = model; }
     public Double getTemperature() { return temperature; }
     public void setTemperature(Double temperature) { this.temperature = temperature; }
     public Integer getMaxTokens() { return maxTokens; }
     public void setMaxTokens(Integer maxTokens) { this.maxTokens = maxTokens; }
-    public String getSystemPrompt() { return systemPrompt; }
-    public void setSystemPrompt(String systemPrompt) { this.systemPrompt = systemPrompt; }
+    public Map<String, Object> getExtendedConfig() { return extendedConfig; }
+    public void setExtendedConfig(Map<String, Object> extendedConfig) { this.extendedConfig = extendedConfig; }
 }

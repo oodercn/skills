@@ -4,6 +4,7 @@ import net.ooder.skill.agent.dto.AgentAlertConfigDTO;
 import net.ooder.skill.agent.dto.AgentBatchOperationDTO;
 import net.ooder.skill.agent.dto.AgentDTO;
 import net.ooder.skill.agent.dto.AgentMetricsDTO;
+import net.ooder.skill.agent.dto.AgentStatsDTO;
 import net.ooder.skill.agent.dto.AgentTopologyDTO;
 import net.ooder.skill.agent.dto.PageResult;
 
@@ -40,7 +41,7 @@ public interface AgentService {
     
     boolean updateAgentConfig(String agentId, Map<String, Object> config);
     
-    Map<String, Object> getOverallStats();
+    AgentStatsDTO getOverallStats();
     
     Map<String, Object> getClusterStats(String clusterId);
     

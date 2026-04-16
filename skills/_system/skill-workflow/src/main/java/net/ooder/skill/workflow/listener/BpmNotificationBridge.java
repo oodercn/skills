@@ -1,161 +1,57 @@
 package net.ooder.skill.workflow.listener;
 
-import net.ooder.skill.notification.dto.NotificationDTO;
-import net.ooder.skill.notification.service.NotificationService;
-import net.ooder.skill.tenant.context.TenantContext;
+import net.ooder.skill.workflow.event.WorkflowEvent;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
-import jakarta.annotation.PostConstruct;
-
+/**
+ * BPM 通知桥接器 - 通过事件监听解耦对 notification 服务的直接依赖
+ * 
+ * 解耦说明：
+ * 1. 不再直接依赖 skill-notification 的 NotificationService
+ * 2. 改为监听 WorkflowEvent 事件
+ * 3. 由 notification 服务自行订阅 WorkflowEvent 并处理
+ * 4. 如果 notification 服务不存在，事件会被忽略，不影响工作流核心功能
+ */
 @Component
-@ConditionalOnClass(NotificationService.class)
-@ConditionalOnBean(NotificationService.class)
+@ConditionalOnProperty(name = "bpm.notification.bridge.enabled", havingValue = "true", matchIfMissing = true)
 public class BpmNotificationBridge {
 
     private static final Logger log = LoggerFactory.getLogger(BpmNotificationBridge.class);
 
-    @Autowired(required = false)
-    private BpmEventListener bpmEventListener;
+    @EventListener
+    public void onWorkflowEvent(WorkflowEvent event) {
+        log.debug("[BpmNotificationBridge] Received workflow event: type={}, targetId={}, userId={}",
+                event.getEventType(), event.getTargetId(), event.getUserId());
 
-    @Autowired(required = false)
-    private NotificationService notificationService;
+        // 注意：这里不再直接调用 notificationService
+        // 而是由 skill-notification 模块自行订阅 WorkflowEvent 并处理
+        // 这样可以完全解耦 skill-workflow 对 skill-notification 的依赖
 
-    @PostConstruct
-    public void init() {
-        if (bpmEventListener == null || notificationService == null) {
-            log.info("[BpmNotificationBridge] Skipped - BpmEventListener or NotificationService not available");
-            return;
+        switch (event.getEventType()) {
+            case TASK_ARRIVED:
+                log.info("[BpmNotificationBridge] Task arrived event received for activityInstId={}, userId={}",
+                        event.getTargetId(), event.getUserId());
+                // 旧代码：notificationService.addNotification(userId, notification);
+                // 新方式：由 notification 服务监听此事件并处理
+                break;
+            case TASK_COMPLETED:
+                log.info("[BpmNotificationBridge] Task completed event received for activityInstId={}, userId={}",
+                        event.getTargetId(), event.getUserId());
+                break;
+            case PROCESS_STARTED:
+                log.info("[BpmNotificationBridge] Process started event received for processInstId={}, userId={}",
+                        event.getTargetId(), event.getUserId());
+                break;
+            case PROCESS_COMPLETED:
+                log.info("[BpmNotificationBridge] Process completed event received for processInstId={}, userId={}",
+                        event.getTargetId(), event.getUserId());
+                break;
+            default:
+                log.debug("[BpmNotificationBridge] Unhandled event type: {}", event.getEventType());
         }
-
-        bpmEventListener.onTaskArrived(this::onTaskArrived);
-        bpmEventListener.onTaskCompleted(this::onTaskCompleted);
-        bpmEventListener.onProcessStart(this::onProcessStart);
-        bpmEventListener.onProcessComplete(this::onProcessComplete);
-
-        log.info("[BpmNotificationBridge] Initialized - BPM events will generate notifications");
-    }
-
-    private void onTaskArrived(BpmEventListener.BpmEventPayload payload) {
-        try {
-            String userId = resolveTargetUser(payload);
-            if (userId == null) return;
-
-            NotificationDTO notification = new NotificationDTO();
-            notification.setNotificationId("bpm-notify-" + System.currentTimeMillis());
-            notification.setType("bpm-task");
-            notification.setTitle("新待办任务");
-            notification.setContent("您有一个新的工作流待办需要处理: " + payload.getTargetId());
-            notification.setSender("workflow-engine");
-            notification.setSenderName("工作流引擎");
-            notification.setTimestamp(System.currentTimeMillis());
-            notification.setRead(false);
-            notification.setActionType("link");
-            notification.setActionUrl("/bpm/todo?activityInstId=" + payload.getTargetId());
-            notification.setPriority("normal");
-
-            notificationService.addNotification(userId, notification);
-            log.info("[BpmNotificationBridge] Task arrived notification sent to userId={}, activityInstId={}",
-                userId, payload.getTargetId());
-        } catch (Exception e) {
-            log.warn("[BpmNotificationBridge] Failed to send task-arrived notification: {}", e.getMessage());
-        }
-    }
-
-    private void onTaskCompleted(BpmEventListener.BpmEventPayload payload) {
-        try {
-            String userId = resolveTargetUser(payload);
-            if (userId == null) return;
-
-            NotificationDTO notification = new NotificationDTO();
-            notification.setNotificationId("bpm-notify-" + System.currentTimeMillis());
-            notification.setType("bpm-completed");
-            notification.setTitle("任务已完成");
-            notification.setContent("工作流任务已处理完成: " + payload.getTargetId());
-            notification.setSender("workflow-engine");
-            notification.setSenderName("工作流引擎");
-            notification.setTimestamp(System.currentTimeMillis());
-            notification.setRead(false);
-            notification.setPriority("low");
-
-            notificationService.addNotification(userId, notification);
-            log.info("[BpmNotificationBridge] Task completed notification sent to userId={}", userId);
-        } catch (Exception e) {
-            log.warn("[BpmNotificationBridge] Failed to send task-completed notification: {}", e.getMessage());
-        }
-    }
-
-    private void onProcessStart(BpmEventListener.BpmEventPayload payload) {
-        try {
-            String userId = TenantContext.getUserId();
-            if (userId == null) userId = "default-user";
-
-            NotificationDTO notification = new NotificationDTO();
-            notification.setNotificationId("bpm-notify-" + System.currentTimeMillis());
-            notification.setType("bpm-process");
-            notification.setTitle("流程已启动");
-            notification.setContent("新的流程实例已创建: " + payload.getTargetId());
-            notification.setSender("workflow-engine");
-            notification.setSenderName("工作流引擎");
-            notification.setTimestamp(System.currentTimeMillis());
-            notification.setRead(false);
-            notification.setActionType("link");
-            notification.setActionUrl("/bpm/process/" + payload.getTargetId());
-            notification.setPriority("normal");
-
-            notificationService.addNotification(userId, notification);
-            log.info("[BpmNotificationBridge] Process start notification sent to userId={}, processInstId={}",
-                userId, payload.getTargetId());
-        } catch (Exception e) {
-            log.warn("[BpmNotificationBridge] Failed to send process-start notification: {}", e.getMessage());
-        }
-    }
-
-    private void onProcessComplete(BpmEventListener.BpmEventPayload payload) {
-        try {
-            String userId = TenantContext.getUserId();
-            if (userId == null) userId = "default-user";
-
-            NotificationDTO notification = new NotificationDTO();
-            notification.setNotificationId("bpm-notify-" + System.currentTimeMillis());
-            notification.setType("bpm-process-complete");
-            notification.setTitle("流程已完成");
-            notification.setContent("流程实例已完成: " + payload.getTargetId());
-            notification.setSender("workflow-engine");
-            notification.setSenderName("工作流引擎");
-            notification.setTimestamp(System.currentTimeMillis());
-            notification.setRead(false);
-            notification.setPriority("low");
-
-            notificationService.addNotification(userId, notification);
-            log.info("[BpmNotificationBridge] Process complete notification sent to userId={}", userId);
-        } catch (Exception e) {
-            log.warn("[BpmNotificationBridge] Failed to send process-complete notification: {}", e.getMessage());
-        }
-    }
-
-    private String resolveTargetUser(BpmEventListener.BpmEventPayload payload) {
-        String userId = TenantContext.getUserId();
-        if (userId != null && !userId.isEmpty()) return userId;
-
-        if (payload.getRawEvent() != null) {
-            try {
-                Object performerObj = invokeMethod(payload.getRawEvent(), "getPerformer");
-                if (performerObj != null) return performerObj.toString();
-                Object userObj = invokeMethod(payload.getRawEvent(), "getUserID");
-                if (userObj != null) return userObj.toString();
-            } catch (Exception ignored) {}
-        }
-
-        return null;
-    }
-
-    private Object invokeMethod(Object target, String methodName) throws Exception {
-        java.lang.reflect.Method method = target.getClass().getMethod(methodName);
-        return method.invoke(target);
     }
 }

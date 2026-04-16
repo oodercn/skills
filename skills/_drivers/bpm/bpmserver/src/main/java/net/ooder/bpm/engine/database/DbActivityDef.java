@@ -1169,8 +1169,7 @@ public class DbActivityDef implements EIActivityDef, Cacheable, Serializable {
      */
     public EIAttributeDef getAttribute(String name) {
         if (name != null) {
-            //name = name.toUpperCase();
-            name = name;
+            name = name.toUpperCase();
         }
         if (attributeIdMap == null && attributeTopMap == null) {
             attributeIdMap = new HashMap();
@@ -1254,7 +1253,27 @@ public class DbActivityDef implements EIActivityDef, Cacheable, Serializable {
             }
         }
 
-        return new ArrayList(attributeIdMap.values());
+        // 修复：同时返回顶层属性和子属性
+        // 顶层属性（如WORKFLOW）存储在attributeTopMap中
+        // 子属性（如positionCoord）存储在attributeIdMap中
+        // 保存时需要先保存顶层属性，再保存子属性（因为子属性有parentId引用）
+        List result = new ArrayList();
+        
+        // 先添加顶层属性
+        if (attributeTopMap != null) {
+            for (Object att : attributeTopMap.values()) {
+                result.add(att);
+            }
+        }
+        
+        // 再添加子属性
+        if (attributeIdMap != null) {
+            for (Object att : attributeIdMap.values()) {
+                result.add(att);
+            }
+        }
+        
+        return result;
     }
 
     public void clearAttribute() {
@@ -1318,14 +1337,10 @@ public class DbActivityDef implements EIActivityDef, Cacheable, Serializable {
             parentAtt.addChild(attDef); // change the new attribute definition!
             attributeIdMap.put(attDef.getId(), attDef);
         } else {
-            // top level add to top map
-            // EIAttributeDef oldAtt = (EIAttributeDef)
-            // attributeTopMap.get(attDef.getName());
-            // if(oldAtt != null) { //exist same name attribute in this tree
-            // attributeIdMap.remove(oldAtt.getId()); //remove it from all
-            // attribute map
-            // }
+            // top level add to top map AND attributeIdMap
+            // 修复：顶层属性也需要添加到attributeIdMap，否则saveAttribute不会保存它
             attributeTopMap.put(attDef.getName().toUpperCase(), attDef);
+            attributeIdMap.put(attDef.getId(), attDef);
         }
 
         _isAttributeModified = true;

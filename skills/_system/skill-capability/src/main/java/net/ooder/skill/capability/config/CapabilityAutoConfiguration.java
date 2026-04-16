@@ -8,4 +8,5 @@ import org.springframework.context.annotation.Configuration;
 @ComponentScan(basePackages = "net.ooder.skill.capability")
 @ConditionalOnProperty(name = "skill.capability.enabled", havingValue = "true", matchIfMissing = true)
 public class CapabilityAutoConfiguration {
+
 }

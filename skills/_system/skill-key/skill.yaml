@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x2E
+    address: 0x43
     category: SYS
     code: SYS_KEY
     operations: [create, validate, rotate, revoke, access]

@@ -1,0 +1,113 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-share
+  name: 鑳藉姏鍒嗕韩鏈嶅姟
+  version: 3.0.5
+  description: 鎻愪緵鑳藉姏鍒嗕韩銆佸娲俱€佹帴鏀跺姛鑳斤紝鏁村悎 SE SDK 鐨?ShareService 鍜?TodoService
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  ownership: platform
+
+  capability:
+    address: 0x3A
+    category: SYSTEM
+    code: SYS_SHARE
+    operations: [share, delegate, receive, accept, reject]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=3.0.5"
+      required: true
+    - skillId: scene-engine
+      version: ">=3.0.3"
+      required: true
+
+  config:
+    shareDir: ./.ooder/shared
+    delegatedDir: ./.ooder/delegated
+    receivedDir: ./.ooder/received
+    shareCodeLength: 8
+    defaultExpiresDays: 7
+
+  routes:
+    - path: /api/v1/capability/share
+      method: POST
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: shareCapability
+      description: 鍒嗕韩鑳藉姏缁欏叾浠栫敤鎴?    
+    - path: /api/v1/capability/delegate
+      method: POST
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: delegateCapability
+      description: 濮旀淳鑳藉姏缁欏叾浠栫敤鎴?    
+    - path: /api/v1/capability/shared
+      method: GET
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: getSharedCapabilities
+      description: 鑾峰彇鎴戝垎浜殑鑳藉姏鍒楄〃
+    
+    - path: /api/v1/capability/delegated
+      method: GET
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: getDelegatedCapabilities
+      description: 鑾峰彇鎴戝娲剧殑鑳藉姏鍒楄〃
+    
+    - path: /api/v1/capability/received
+      method: GET
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: getReceivedCapabilities
+      description: 鑾峰彇鎴戞敹鍒扮殑鑳藉姏鍒楄〃
+    
+    - path: /api/v1/capability/share/{shareId}
+      method: GET
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: getShareDetail
+      description: 鑾峰彇鍒嗕韩璇︽儏
+    
+    - path: /api/v1/capability/share/{shareId}
+      method: DELETE
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: cancelShare
+      description: 鍙栨秷鍒嗕韩
+    
+    - path: /api/v1/capability/share/code/{shareCode}
+      method: GET
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: getShareByCode
+      description: 閫氳繃鍒嗕韩鐮佽幏鍙栧垎浜鎯?    
+    - path: /api/v1/capability/share/validate
+      method: POST
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: validateShare
+      description: 楠岃瘉鍒嗕韩鐮?
+    - path: /api/v1/capability/received/{shareId}/accept
+      method: POST
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: acceptShare
+      description: 鎺ュ彈鍒嗕韩
+    
+    - path: /api/v1/capability/received/{shareId}/reject
+      method: POST
+      controllerClass: net.ooder.skill.share.controller.CapabilityShareController
+      methodName: rejectShare
+      description: 鎷掔粷鍒嗕韩
+
+  permissions:
+    - name: capability:share
+      description: 鍒嗕韩鑳藉姏
+    - name: capability:delegate
+      description: 濮旀淳鑳藉姏
+    - name: capability:receive
+      description: 鎺ユ敹鑳藉姏

@@ -1,8 +1,11 @@
 package net.ooder.skill.capability.controller;
 
+import net.ooder.skill.capability.dto.BindingStatusDTO;
+import net.ooder.skill.capability.dto.BindingStatusUpdateRequest;
 import net.ooder.skill.capability.dto.CapabilityDTO;
 import net.ooder.skill.capability.dto.CapabilityStatsDTO;
 import net.ooder.skill.capability.dto.CapabilityRankDTO;
+import net.ooder.skill.capability.dto.CapabilityTypeDTO;
 import net.ooder.skill.capability.dto.LogEntryDTO;
 import net.ooder.skill.capability.dto.ScoreDistributionDTO;
 import net.ooder.skill.capability.dto.CategoryDistributionDTO;
@@ -227,33 +230,33 @@ public class CapabilityController {
     }
 
     @GetMapping("/scene/capabilities/types")
-    public ResultModel<List<Map<String, Object>>> listCapabilityTypes() {
+    public ResultModel<List<CapabilityTypeDTO>> listCapabilityTypes() {
         log.info("[CapabilityController] List capability types");
         
-        List<Map<String, Object>> types = new ArrayList<>();
+        List<CapabilityTypeDTO> types = new ArrayList<>();
         
-        Map<String, Object> type1 = new HashMap<>();
-        type1.put("code", "skill");
-        type1.put("name", "技能");
-        type1.put("description", "技能类型能力");
+        CapabilityTypeDTO type1 = new CapabilityTypeDTO();
+        type1.setCode("skill");
+        type1.setName("技能");
+        type1.setDescription("技能类型能力");
         types.add(type1);
         
-        Map<String, Object> type2 = new HashMap<>();
-        type2.put("code", "agent");
-        type2.put("name", "Agent");
-        type2.put("description", "Agent类型能力");
+        CapabilityTypeDTO type2 = new CapabilityTypeDTO();
+        type2.setCode("agent");
+        type2.setName("Agent");
+        type2.setDescription("Agent类型能力");
         types.add(type2);
         
-        Map<String, Object> type3 = new HashMap<>();
-        type3.put("code", "workflow");
-        type3.put("name", "工作流");
-        type3.put("description", "工作流类型能力");
+        CapabilityTypeDTO type3 = new CapabilityTypeDTO();
+        type3.setCode("workflow");
+        type3.setName("工作流");
+        type3.setDescription("工作流类型能力");
         types.add(type3);
         
-        Map<String, Object> type4 = new HashMap<>();
-        type4.put("code", "integration");
-        type4.put("name", "集成");
-        type4.put("description", "集成类型能力");
+        CapabilityTypeDTO type4 = new CapabilityTypeDTO();
+        type4.setCode("integration");
+        type4.setName("集成");
+        type4.setDescription("集成类型能力");
         types.add(type4);
         
         return ResultModel.success(types);
@@ -273,15 +276,36 @@ public class CapabilityController {
     }
 
     @PostMapping("/scene/capabilities/bindings/{bindingId}/status")
-    public ResultModel<Map<String, Object>> updateBindingStatus(
+    public ResultModel<BindingStatusDTO> updateBindingStatus(
             @PathVariable String bindingId,
-            @RequestBody Map<String, Object> request) {
+            @RequestBody BindingStatusUpdateRequest request) {
         log.info("[CapabilityController] Update binding status: {}, request: {}", bindingId, request);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("bindingId", bindingId);
-        result.put("status", request.getOrDefault("status", "active"));
-        result.put("updateTime", new Date().toString());
+        BindingStatusDTO result = new BindingStatusDTO();
+        result.setBindingId(bindingId);
+        result.setStatus(request.getStatus() != null ? request.getStatus() : "active");
+        result.setUpdateTime(java.time.LocalDateTime.now());
+        
+        return ResultModel.success(result);
+    }
+
+    @GetMapping("/scene/capabilities/logs")
+    public ResultModel<PageResult<LogEntryDTO>> getSceneCapabilityLogs(
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "10") int pageSize) {
+        log.info("[CapabilityController] Get scene capability logs - pageNum: {}, pageSize: {}", pageNum, pageSize);
+        
+        List<LogEntryDTO> logs = new ArrayList<>();
+        
+        if (statsService != null) {
+            logs = statsService.getRecentLogs(pageSize);
+        }
+        
+        PageResult<LogEntryDTO> result = new PageResult<>();
+        result.setList(logs);
+        result.setTotal(logs.size());
+        result.setPageNum(pageNum);
+        result.setPageSize(pageSize);
         
         return ResultModel.success(result);
     }

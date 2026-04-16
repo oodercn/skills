@@ -1,17 +1,20 @@
 package net.ooder.skill.scenes.dto;
 
 public class KnowledgeBindingDTO {
-    private String knowledgeBaseId;
-    private String name;
-    private String type;
-    private String status;
+    private String kbId;
+    private String kbName;
+    private String layer;
+    private Integer priority;
+    private long bindTime;
 
-    public String getKnowledgeBaseId() { return knowledgeBaseId; }
-    public void setKnowledgeBaseId(String knowledgeBaseId) { this.knowledgeBaseId = knowledgeBaseId; }
-    public String getName() { return name; }
-    public void setName(String name) { this.name = name; }
-    public String getType() { return type; }
-    public void setType(String type) { this.type = type; }
-    public String getStatus() { return status; }
-    public void setStatus(String status) { this.status = status; }
+    public String getKbId() { return kbId; }
+    public void setKbId(String kbId) { this.kbId = kbId; }
+    public String getKbName() { return kbName; }
+    public void setKbName(String kbName) { this.kbName = kbName; }
+    public String getLayer() { return layer; }
+    public void setLayer(String layer) { this.layer = layer; }
+    public Integer getPriority() { return priority; }
+    public void setPriority(Integer priority) { this.priority = priority; }
+    public long getBindTime() { return bindTime; }
+    public void setBindTime(long bindTime) { this.bindTime = bindTime; }
 }

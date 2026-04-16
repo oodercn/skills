@@ -1,30 +1,66 @@
-skill:
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
   id: skill-local-vector-store
   name: 本地向量存储
-  version: 1.0.0
-  category: vector
-  form: DRIVER
-  description: 提供基于 SQLite 的本地向量存储支持，通过 SPI 接口提供向量存储和检索能力
-  author: ooder team
-  tags:
-    - vector
-    - storage
-    - sqlite
-    - local
-    - spi
+  version: "1.0.0"
+  description: 提供基于SQLite的本地向量存储支持，通过SPI接口提供向量存储和检索能力
+  author: ooder Team
+  type: driver-service
+  license: Apache-2.0
 
-config:
-  vector:
-    data-dir: ${user.home}/.apexos/data
-    database-name: vectors
-    default-dimension: 1536
-    metric-type: cosine
-    pool:
-      max-size: 5
-      min-idle: 1
+spec:
+  skillForm: DRIVER
+  skillCategory: VECTOR
+  sceneType: AUTO
+  purposes:
+    - TEAM
 
-provides:
-  spi:
-    - net.ooder.spi.vector.VectorStoreProvider
+  ownership: platform
 
-dependencies: []
+  capability:
+    address: 0x49
+    category: VECTOR
+    code: DRV_LOCAL_VECTOR
+    operations: [store, search, delete]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  providedInterfaces:
+    - id: vector-store-provider
+      version: "1.0"
+      description: "向量存储提供者SPI接口"
+
+  capabilities:
+    - id: local-vector-store
+      name: 本地向量存储
+      description: 基于SQLite的向量存储和检索
+      category: vector
+
+  config:
+    optional:
+      - name: VECTOR_DATA_DIR
+        type: string
+        default: "${user.home}/.apexos/data"
+        description: 向量数据目录
+      - name: VECTOR_DATABASE_NAME
+        type: string
+        default: "vectors"
+        description: 向量数据库名称
+      - name: VECTOR_DEFAULT_DIMENSION
+        type: integer
+        default: 1536
+        description: 默认向量维度
+      - name: VECTOR_METRIC_TYPE
+        type: string
+        default: "cosine"
+        description: 距离度量类型
+
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "200Mi"

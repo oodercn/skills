@@ -7,6 +7,8 @@ import net.ooder.skill.agent.llm.FunctionCall;
 import net.ooder.skill.agent.llm.FunctionResult;
 import net.ooder.skill.agent.function.FunctionCallingService;
 import net.ooder.skill.agent.service.AgentLLMService;
+import net.ooder.spi.rag.RagEnhanceDriver;
+import net.ooder.spi.rag.model.RagKnowledgeConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +27,9 @@ public class AgentLLMServiceImpl implements AgentLLMService {
 
     @Autowired
     private FunctionCallingService functionCallingService;
+
+    @Autowired(required = false)
+    private RagEnhanceDriver ragEnhanceDriver;
 
     private Map<String, Map<String, Object>> agentLLMConfigs = new ConcurrentHashMap<>();
     private Map<String, String> agentSystemPrompts = new ConcurrentHashMap<>();
@@ -191,16 +196,67 @@ public class AgentLLMServiceImpl implements AgentLLMService {
     @Override
     public LLMResponse processWithRAG(String agentId, String query, List<String> knowledgeBaseIds) {
         log.info("[processWithRAG] Agent: {}, Knowledge bases: {}", agentId, knowledgeBaseIds);
-        
+
+        if (ragEnhanceDriver == null || !ragEnhanceDriver.isAvailable() ||
+                knowledgeBaseIds == null || knowledgeBaseIds.isEmpty()) {
+            log.debug("[processWithRAG] RAG not available for agent: {}, using plain LLM", agentId);
+            return chatPlain(agentId, query);
+        }
+
+        try {
+            String enhancedPrompt = ragEnhanceDriver.enhancePrompt(query, null, knowledgeBaseIds);
+            log.info("[processWithRAG] RAG enhanced prompt length: {} chars (original: {})",
+                    enhancedPrompt.length(), query.length());
+
+            RagKnowledgeConfig knowledgeConfig =
+                ragEnhanceDriver.buildKnowledgeConfig(null, query);
+
+            LLMRequest request = new LLMRequest();
+            request.setAgentId(agentId);
+            request.setMessage(enhancedPrompt);
+
+            String systemPrompt = agentSystemPrompts.get(agentId);
+            if (systemPrompt != null) {
+                request.setSystemPrompt(systemPrompt);
+            } else if (knowledgeConfig.systemPromptTemplate() != null && !knowledgeConfig.systemPromptTemplate().isEmpty()) {
+                request.setSystemPrompt(knowledgeConfig.systemPromptTemplate());
+            }
+
+            Map<String, Object> config = agentLLMConfigs.get(agentId);
+            if (config != null) {
+                request.setConfig(config);
+            }
+            config.put("useRAG", true);
+            config.put("knowledgeContext", knowledgeConfig.knowledgeContext());
+            config.put("knowledgeBaseIds", knowledgeBaseIds);
+
+            return llmService.chat(request);
+        } catch (Exception e) {
+            log.warn("[processWithRAG] RAG processing failed for agent {}: {}, falling back to plain",
+                    agentId, e.getMessage());
+            return chatPlain(agentId, query);
+        }
+    }
+
+    private LLMResponse chatPlain(String agentId, String message) {
         LLMRequest request = new LLMRequest();
         request.setAgentId(agentId);
-        request.setMessage(query);
-        
+        request.setMessage(message);
+
         Map<String, Object> config = new HashMap<>();
-        config.put("useRAG", true);
-        config.put("knowledgeBaseIds", knowledgeBaseIds);
+        config.put("useRAG", false);
+        config.put("knowledgeBaseIds", new ArrayList<>());
         request.setConfig(config);
-        
+
+        String systemPrompt = agentSystemPrompts.get(agentId);
+        if (systemPrompt != null) {
+            request.setSystemPrompt(systemPrompt);
+        }
+        Map<String, Object> existingConfig = agentLLMConfigs.get(agentId);
+        if (existingConfig != null) {
+            config.putAll(existingConfig);
+        }
+
         return llmService.chat(request);
     }
 

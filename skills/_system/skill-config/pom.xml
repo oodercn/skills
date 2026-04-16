@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-config</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-config</name>
@@ -42,7 +42,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
         

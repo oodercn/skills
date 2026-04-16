@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-notification</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-notification</name>
@@ -42,8 +42,17 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
+        </dependency>
+
+        <!-- 解耦后的依赖：通过事件机制监听 workflow 事件 -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-workflow</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
     </dependencies>
 

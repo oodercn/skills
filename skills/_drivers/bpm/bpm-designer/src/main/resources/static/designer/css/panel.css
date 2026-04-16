@@ -1,10 +1,16 @@
+/* ========================================
+   右侧属性面板样式 - 简洁现代设计
+   ======================================== */
+
 .d-panel {
-    width: 320px;
-    min-width: 280px;
-    display: flex;
+    width: 340px;
+    min-width: 300px;
+    display: none;
     flex-direction: column;
     background: var(--bg-card);
     border-left: 1px solid var(--border);
+    height: 100%;
+    overflow: hidden;
 }
 
 .d-panel-header {
@@ -14,88 +20,849 @@
     padding: 12px 16px;
     border-bottom: 1px solid var(--border);
     flex-shrink: 0;
+    background: var(--bg-card);
 }
 
 .d-panel-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.d-panel-title-icon {
+    width: 20px;
+    height: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    color: var(--primary);
+    font-size: 11px;
 }
 
 .d-panel-actions {
     display: flex;
-    gap: 4px;
+    gap: 2px;
 }
 
-.d-panel-tabs {
-    display: flex;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    flex-shrink: 0;
-    scrollbar-width: none;
-}
-
-.d-panel-tabs::-webkit-scrollbar {
-    display: none;
-}
-
-.d-tab,
-.d-panel-tab {
+.d-panel-actions .d-btn {
+    width: 26px;
+    height: 26px;
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 10px 12px;
-    font-size: 12px;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    font-size: 13px;
+    padding: 0;
+}
+
+.d-panel-actions .d-btn:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+}
+
+.d-panel-actions .d-btn.active {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* 一级分类Tabs */
+.d-panel-tabs {
+    display: flex;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.d-category-tab {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    padding: 10px 8px 8px;
+    font-size: 11px;
     font-weight: 500;
     color: var(--text-muted);
     background: transparent;
     border: none;
     border-bottom: 2px solid transparent;
     cursor: pointer;
-    white-space: nowrap;
-    transition: all 0.15s ease;
+    transition: var(--transition);
 }
 
-.d-tab:hover,
-.d-panel-tab:hover {
+.d-category-tab:hover {
     color: var(--text-secondary);
+    background: var(--bg-hover);
 }
 
-.d-tab.active,
-.d-panel-tab.active {
+.d-category-tab.active {
     color: var(--primary);
     border-bottom-color: var(--primary);
 }
 
-.d-tab i,
-.d-panel-tab i {
-    font-size: 14px;
+.d-category-tab-icon {
+    font-size: 15px;
+    line-height: 1;
 }
 
-.d-tab-icon,
-.d-panel-tab-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    width: 16px;
-    height: 16px;
+.d-category-tab-label {
+    font-size: 10px;
+    letter-spacing: 0.3px;
 }
 
-.d-tab-icon svg,
-.d-panel-tab-icon svg {
-    width: 100%;
-    height: 100%;
-    fill: currentColor;
+.d-category-tab.disabled {
+    opacity: 0.35;
+    pointer-events: none;
 }
 
+/* 面板内容区 - 关键布局 */
 .d-panel-content {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
+    display: flex;
+    flex-direction: column;
+}
+
+.d-panel-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.d-panel-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.d-panel-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+.d-panel-content::-webkit-scrollbar-thumb:hover {
+    background: var(--text-muted);
+}
+
+/* 分类内容区 */
+.d-category-content {
+    display: none;
+    padding: 10px;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.d-category-content.active {
+    display: flex;
+    flex-direction: column;
+}
+
+.d-category-content::-webkit-scrollbar {
+    width: 5px;
+}
+
+.d-category-content::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.d-category-content::-webkit-scrollbar-thumb {
+    background: var(--border);
+    border-radius: 3px;
+}
+
+/* 抽屉组件 */
+.d-drawer {
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    margin-bottom: 6px;
+    overflow: hidden;
+    background: var(--bg);
+    transition: border-color 0.2s ease;
+}
+
+.d-drawer:hover {
+    border-color: color-mix(in srgb, var(--primary) 40%, var(--border));
+}
+
+.d-drawer.expanded {
+    background: var(--bg-card);
+    border-color: var(--primary);
+}
+
+.d-drawer-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    cursor: pointer;
+    transition: background 0.15s ease;
+    user-select: none;
+}
+
+.d-drawer-header:hover {
+    background: var(--bg-hover);
+}
+
+.d-drawer.expanded .d-drawer-header {
+    background: var(--primary-light);
+}
+
+.d-drawer-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.d-drawer-icon {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    color: var(--text-muted);
+}
+
+.d-drawer.expanded .d-drawer-icon {
+    color: var(--primary);
+}
+
+.d-drawer-toggle {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-muted);
+    transition: transform 0.2s ease;
+    font-size: 9px;
+}
+
+.d-drawer.expanded .d-drawer-toggle {
+    transform: rotate(90deg);
+    color: var(--primary);
+}
+
+.d-drawer-content {
+    display: none;
+    padding: 10px 12px 12px;
+    border-top: 1px solid var(--border);
+}
+
+.d-drawer.expanded .d-drawer-content {
+    display: block;
+}
+
+.d-drawer-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+/* 表单样式 */
+.d-panel-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+}
+
+.d-form-section {
+    margin-bottom: 14px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid var(--border);
+}
+
+.d-form-section:last-child {
+    margin-bottom: 0;
+    padding-bottom: 0;
+    border-bottom: none;
+}
+
+.d-form-section h4 {
+    font-size: 10px;
+    font-weight: 600;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 10px 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.d-form-section h4::before {
+    content: '';
+    width: 3px;
+    height: 10px;
+    background: var(--primary);
+    border-radius: 2px;
+}
+
+.d-form-field {
+    margin-bottom: 10px;
+}
+
+.d-form-field:last-child {
+    margin-bottom: 0;
+}
+
+.d-form-field label {
+    display: block;
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+}
+
+.d-form-field input[type="text"],
+.d-form-field input[type="number"],
+.d-form-field select,
+.d-form-field textarea {
+    width: 100%;
+    padding: 7px 10px;
+    font-size: 12px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+.d-form-field input:focus,
+.d-form-field select:focus,
+.d-form-field textarea:focus {
+    outline: none;
+    border-color: var(--primary);
+    box-shadow: 0 0 0 2px var(--primary-light);
+}
+
+.d-form-field input[readonly] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    background: var(--bg);
+}
+
+.d-form-field select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 8px center;
+    padding-right: 28px;
+}
+
+.d-form-field textarea {
+    resize: vertical;
+    min-height: 50px;
+    line-height: 1.5;
+}
+
+.d-form-field-checkbox {
+    margin-bottom: 8px;
+}
+
+.d-form-field-checkbox label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    margin-bottom: 0;
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+
+.d-form-field-checkbox input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* 按钮样式 */
+.d-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    padding: 7px 12px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: inherit;
+    white-space: nowrap;
+}
+
+.d-btn:hover {
+    background: var(--bg-hover);
+    border-color: var(--text-muted);
+    color: var(--text);
+}
+
+.d-btn-primary {
+    background: var(--primary);
+    border-color: var(--primary);
+    color: white;
+}
+
+.d-btn-primary:hover {
+    background: var(--primary-dark);
+    border-color: var(--primary-dark);
+}
+
+.d-btn-secondary {
+    background: transparent;
+    border-color: var(--border);
+    color: var(--text-secondary);
+}
+
+.d-btn-secondary:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+}
+
+.d-btn-sm {
+    padding: 5px 10px;
+    font-size: 11px;
+}
+
+.d-btn-icon {
+    width: 28px;
+    height: 28px;
+    padding: 0;
+}
+
+/* 办理人选择器 */
+.d-performer-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    padding: 8px;
+    min-height: 38px;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    margin-bottom: 8px;
+}
+
+.d-tag-performer {
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    padding: 3px 7px;
+    background: var(--primary-light);
+    color: var(--primary);
+    border-radius: var(--radius-sm);
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.d-btn-remove-performer {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--primary);
+    cursor: pointer;
+    font-size: 12px;
+    line-height: 1;
+    padding: 0;
+    margin-left: 2px;
+    border-radius: 2px;
+    transition: var(--transition);
+}
+
+.d-btn-remove-performer:hover {
+    background: var(--danger);
+    color: white;
+}
+
+.d-performer-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.d-performer-actions .d-btn {
+    flex: 1;
+    min-width: 70px;
+    justify-content: center;
+}
+
+.d-empty-text {
+    color: var(--text-muted);
+    font-size: 11px;
+    font-style: italic;
+    text-align: center;
+    width: 100%;
+    padding: 4px 0;
+}
+
+/* 标签 */
+.d-tag {
+    display: inline-flex;
+    align-items: center;
+    padding: 2px 7px;
+    font-size: 10px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    background: var(--bg-input);
+    border-radius: 10px;
+}
+
+.d-tag-primary {
+    color: var(--primary);
+    background: var(--primary-light);
+}
+
+/* 空状态 */
+.d-empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+    min-height: 200px;
+    color: var(--text-muted);
+    text-align: center;
+    padding: 20px;
+}
+
+.d-empty-icon {
+    font-size: 28px;
+    margin-bottom: 10px;
+    opacity: 0.3;
+}
+
+.d-empty p {
+    font-size: 12px;
+    margin: 0;
+}
+
+/* 模态框 */
+.d-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 1000;
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.d-modal-visible {
+    display: flex;
+}
+
+.d-modal-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(2px);
+}
+
+.d-modal-content {
+    position: relative;
+    background: var(--bg-card);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-lg);
+    width: 90%;
+    max-width: 560px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+}
+
+.d-modal-lg {
+    max-width: 720px;
+}
+
+.d-modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+}
+
+.d-modal-header h3 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.d-modal-close {
+    width: 28px;
+    height: 28px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 18px;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+}
+
+.d-modal-close:hover {
+    background: var(--bg-hover);
+    color: var(--text);
+}
+
+.d-modal-body {
+    flex: 1;
+    overflow: auto;
+    padding: 14px 18px;
+}
+
+/* 监听器列表 */
+.d-listeners-container {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.d-listener-item {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 8px;
+}
+
+.d-listener-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+    gap: 8px;
+}
+
+.d-listener-header select {
+    flex: 1;
+    padding: 5px 8px;
+    font-size: 11px;
+    color: var(--text);
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    appearance: none;
+    cursor: pointer;
+}
+
+/* 外部字典面板 */
+.external-dictionary-panel {
+    display: flex;
+    flex-direction: column;
+    height: 360px;
+}
+
+.external-dictionary-panel .panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+
+.external-dictionary-panel .panel-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.external-dictionary-panel .selection-count {
+    font-size: 11px;
+    color: var(--text-muted);
+    background: var(--bg-input);
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.external-dictionary-panel .panel-body {
+    flex: 1;
+    display: flex;
+    overflow: hidden;
+    gap: 10px;
+}
+
+.external-dictionary-panel .dictionary-pane {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.external-dictionary-panel .search-box {
+    display: flex;
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    gap: 6px;
+    background: var(--bg);
+}
+
+.external-dictionary-panel .search-box input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    background: var(--bg-input);
+    color: var(--text);
+    font-size: 12px;
+}
+
+.external-dictionary-panel .dictionary-view {
+    flex: 1;
+    overflow: auto;
+    padding: 6px;
+}
+
+.external-dictionary-panel .dictionary-tree {
+    display: flex;
+    flex-direction: column;
+    gap: 1px;
+}
+
+.external-dictionary-panel .tree-node {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 8px;
+    cursor: pointer;
+    border-radius: var(--radius-sm);
+    transition: var(--transition);
+    font-size: 12px;
+}
+
+.external-dictionary-panel .tree-node:hover {
+    background: var(--bg-hover);
+}
+
+.external-dictionary-panel .tree-node.selected {
+    background: var(--primary-light);
+    color: var(--primary);
+}
+
+.external-dictionary-panel .tree-expander {
+    width: 14px;
+    height: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 10px;
+    color: var(--text-muted);
+}
+
+.external-dictionary-panel .tree-label {
+    flex: 1;
+}
+
+.external-dictionary-panel .selection-pane {
+    width: 150px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+}
+
+.external-dictionary-panel .selection-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    font-size: 11px;
+    font-weight: 600;
+    background: var(--bg);
+}
+
+.external-dictionary-panel .selection-list {
+    flex: 1;
+    overflow: auto;
+    padding: 6px;
+}
+
+.external-dictionary-panel .selection-chip {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 5px 7px;
+    background: var(--primary-light);
+    border-radius: var(--radius-sm);
+    margin-bottom: 4px;
+    font-size: 11px;
+    color: var(--primary);
+}
+
+.external-dictionary-panel .selection-chip .btn-remove {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 14px;
+    padding: 0;
+    line-height: 1;
+}
+
+.external-dictionary-panel .selection-chip .btn-remove:hover {
+    color: var(--danger);
+}
+
+.external-dictionary-panel .panel-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 8px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border);
+    margin-top: 10px;
+}
+
+.external-dictionary-panel .empty-tip {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 11px;
     padding: 16px;
 }
 
+/* 旧版兼容 */
 .d-panel-page {
     display: none;
 }
@@ -105,7 +872,7 @@
 }
 
 .d-section {
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 
 .d-section-title {
@@ -114,67 +881,21 @@
     color: var(--text-muted);
     text-transform: uppercase;
     letter-spacing: 0.5px;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
     border-bottom: 1px solid var(--border);
 }
 
 .d-section-content {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 10px;
 }
 
 .d-tag-group {
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
-}
-
-.d-tag {
-    display: inline-flex;
-    align-items: center;
-    padding: 4px 10px;
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    background: var(--bg-input);
-    border-radius: 12px;
-}
-
-.d-tag-primary {
-    color: var(--primary);
-    background: color-mix(in srgb, var(--primary) 10%, transparent);
-}
-
-.d-tag-success {
-    color: var(--success);
-    background: color-mix(in srgb, var(--success) 10%, transparent);
-}
-
-.d-tag-danger {
-    color: var(--danger);
-    background: color-mix(in srgb, var(--danger) 10%, transparent);
-}
-
-.d-empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 200px;
-    color: var(--text-muted);
-    text-align: center;
-}
-
-.d-empty i {
-    font-size: 32px;
-    margin-bottom: 12px;
-    opacity: 0.3;
-}
-
-.d-empty p {
-    font-size: 13px;
+    gap: 6px;
 }
 
 .d-panel-pin {
@@ -185,30 +906,12 @@
     color: var(--primary);
 }
 
-.d-panel-tabs-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
-
-.d-panel-tabs-header {
-    display: flex;
-    padding: 0 12px;
-    border-bottom: 1px solid var(--border);
-    overflow-x: auto;
-    flex-shrink: 0;
-    scrollbar-width: none;
-}
-
-.d-panel-tabs-header::-webkit-scrollbar {
-    display: none;
-}
-
-.d-panel-tab-btn {
+.d-tab,
+.d-panel-tab {
     display: flex;
     align-items: center;
-    gap: 4px;
-    padding: 10px 12px;
+    gap: 5px;
+    padding: 9px 12px;
     font-size: 12px;
     font-weight: 500;
     color: var(--text-muted);
@@ -217,111 +920,18 @@
     border-bottom: 2px solid transparent;
     cursor: pointer;
     white-space: nowrap;
-    transition: all 0.15s ease;
+    transition: var(--transition);
+    flex-shrink: 0;
 }
 
-.d-panel-tab-btn:hover {
+.d-tab:hover,
+.d-panel-tab:hover {
     color: var(--text-secondary);
+    background: var(--bg-hover);
 }
 
-.d-panel-tab-btn.active {
+.d-tab.active,
+.d-panel-tab.active {
     color: var(--primary);
     border-bottom-color: var(--primary);
-}
-
-.d-panel-tabs-content {
-    flex: 1;
-    overflow-y: auto;
-    overflow-x: hidden;
-}
-
-.d-panel-tab-panel {
-    display: none;
-    padding: 16px;
-}
-
-.d-panel-tab-panel.active {
-    display: block;
-}
-
-.d-form-section {
-    margin-bottom: 16px;
-    padding-bottom: 12px;
-    border-bottom: 1px solid var(--border);
-}
-
-.d-form-section h4 {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
-    margin: 0 0 12px 0;
-}
-
-.d-form-field {
-    margin-bottom: 12px;
-}
-
-.d-form-field label {
-    display: block;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    margin-bottom: 6px;
-}
-
-.d-form-field input[type="text"],
-.d-form-field input[type="number"],
-.d-form-field select,
-.d-form-field textarea {
-    width: 100%;
-    padding: 8px 10px;
-    font-size: 13px;
-    color: var(--text);
-    background: var(--bg-input);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    transition: all 0.15s ease;
-}
-
-.d-form-field input:focus,
-.d-form-field select:focus,
-.d-form-field textarea:focus {
-    outline: none;
-    border-color: var(--primary);
-    box-shadow: 0 0 0 3px color-mix(in srgb, var(--primary) 15%, transparent);
-}
-
-.d-form-field input[readonly],
-.d-form-field select[disabled] {
-    opacity: 0.6;
-    cursor: not-allowed;
-}
-
-.d-form-field-checkbox {
-    display: flex;
-    align-items: center;
-}
-
-.d-form-field-checkbox label {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    cursor: pointer;
-}
-
-.d-form-field-checkbox input[type="checkbox"] {
-    width: 16px;
-    height: 16px;
-    accent-color: var(--primary);
-}
-
-.d-form-field select {
-    cursor: pointer;
-}
-
-.d-form-field textarea {
-    resize: vertical;
-    min-height: 60px;
 }

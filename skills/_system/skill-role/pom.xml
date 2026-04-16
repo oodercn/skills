@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.ooder.skill</groupId>
+    <groupId>net.ooder</groupId>
     <artifactId>skill-role</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-role</name>
@@ -41,7 +41,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -83,4 +83,3 @@
         </plugins>
     </build>
 </project>
-

@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>从零开始的 SPAC 编程构建 BPM 设计器实战 - ooderAgent 实战系列</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+            --warning-bg: #fef3c7;
+            --success-bg: #d1fae5;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.2rem;
+            opacity: 0.95;
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Navigation */
+        .nav {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .nav a {
+            color: var(--primary-color);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+        }
+
+        .nav a:hover {
+            color: var(--secondary-color);
+        }
+
+        /* Content */
+        .content {
+            padding: 40px;
+        }
+
+        .section {
+            margin-bottom: 60px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+            font-weight: 700;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+            font-weight: 600;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+            font-weight: 600;
+        }
+
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        /* Code blocks */
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        code {
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--bg-color);
+        }
+
+        /* Blockquote */
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 20px;
+            margin: 25px 0;
+            color: var(--text-color);
+            font-style: italic;
+            background: var(--highlight-bg);
+            padding: 20px;
+            border-radius: 0 8px 8px 0;
+        }
+
+        /* SVG Diagrams */
+        .svg-diagram {
+            margin: 25px 0;
+            text-align: center;
+        }
+
+        .svg-diagram img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        /* Screenshot placeholder */
+        .screenshot-placeholder {
+            margin: 25px 0;
+            padding: 60px 40px;
+            background: var(--code-bg);
+            border: 2px dashed var(--border-color);
+            border-radius: 8px;
+            text-align: center;
+            color: var(--text-color);
+            font-size: 1.1rem;
+        }
+
+        .screenshot-placeholder .icon {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        /* Lists */
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        /* Highlight box */
+        .highlight-box {
+            background: var(--highlight-bg);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .warning-box {
+            background: var(--warning-bg);
+            border: 1px solid #d97706;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .success-box {
+            background: var(--success-bg);
+            border: 1px solid #059669;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        /* Footer */
+        .footer {
+            background: var(--text-color);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            margin-top: 60px;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            h3 {
+                font-size: 1.2rem;
+            }
+
+            .nav {
+                padding: 15px 20px;
+            }
+
+            .nav ul {
+                gap: 10px;
+            }
+
+            pre {
+                padding: 15px;
+                font-size: 0.85rem;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+
+            th, td {
+                padding: 10px;
+            }
+        }
+
+        /* Print styles */
+        @media print {
+            .nav {
+                display: none;
+            }
+
+            .container {
+                box-shadow: none;
+            }
+
+            pre {
+                page-break-inside: avoid;
+            }
+
+            h2, h3 {
+                page-break-after: avoid;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <div class="header">
+            <h1>从零开始的 SPAC 编程构建 BPM 设计器实战</h1>
+            <div class="subtitle">
+                <p><strong>ooderAgent 耗时 4 个月完成整体架构（95% AI 代码率），BPM 设计器重构耗时 1 周（100% AI 代码率）。这不是教程，而是 ooder 团队真实的技能架构升级记录。</strong></p>
+            </div>
+        </div>
+
+        <!-- Navigation -->
+        <div class="nav">
+            <ul>
+                <li><a href="#section1">1. 缘起：为什么需要重构？</a></li>
+                <li><a href="#section2">2. 对话：架构如何设计？</a></li>
+                <li><a href="#section3">3. 实战：NLP 插件如何构建？</a></li>
+                <li><a href="#section4">4. 难点：插件迁移的挑战</a></li>
+                <li><a href="#section5">5. 成果：1 周的奇迹</a></li>
+            </ul>
+        </div>
+
+        <!-- Content -->
+        <div class="content">
+
+            <!-- 摘要 -->
+            <div class="section">
+                <h2>摘要</h2>
+                <p>ooderAgent 项目历时 4 个月完成整体架构构建，AI 代码接管率达到 95% 以上。作为 ooderAgent 技能架构的核心组件，BPM 设计器需要在 1 周内完成从传统 Swing 应用到 H5 Web 应用的完全重构，AI 代码接管率 100%。</p>
+                <p>本次重构的核心驱动力是 ooderAgent 的技能架构需求：设计器必须支持 skills 能力架构，融合 LLM 能力，支持 NLP 模式流程建模。原来的 BPD（流程定义工具）已经是一个成熟的产品，拥有完善的交互设计、多达 100+ 的插件（包括高级插件、动态插件支持）。</p>
+                <p>本文记录了如何在 1 周内完成这个看似不可能的任务，重点分享了大量插件的动态迁移、NLP 插件的全新构建等核心挑战与解决方案。所有代码采用 MIT 开源，底层支撑包通过 Maven 中央仓库统一发布。</p>
+            </div>
+
+            <!-- 第 1 节：缘起 -->
+            <div class="section" id="section1">
+                <h2>1. 缘起：为什么需要重构？</h2>
+                
+                <h3>ooderAgent 的技能架构需求</h3>
+                <p>ooderAgent 是一个从底层协议开始从零构建的 AI 原生平台。在 4 个月的开发周期中，我们建立了一套完整的 skills 能力架构：</p>
+                
+                <div class="svg-diagram">
+                    <img src="diagrams/skill_architecture.svg" alt="ooderAgent 技能架构图"/>
+                </div>
+                
+                <pre><code>ooderAgent 技能架构
+├── _base/          # 基础层
+├── _system/        # 系统层（30+ 技能）
+├── _drivers/       # 驱动层（BPM、VFS、LLM 等）
+├── _business/      # 业务层
+├── capabilities/   # 能力层
+└── scenes/         # 场景层</code></pre>
+
+                <p><strong>重构的核心原因</strong>：</p>
+                <ol>
+                    <li><strong>技能架构要求</strong>：BPM 设计器必须作为 skill-bpm 融入 ooderAgent 生态</li>
+                    <li><strong>LLM 能力融合</strong>：需要原生支持 LLM 能力，而非外挂式集成</li>
+                    <li><strong>NLP 模式流程建模</strong>：支持自然语言创建、修改、优化流程</li>
+                    <li><strong>动态插件支持</strong>：继承原有 100+ 插件的能力，支持热插拔</li>
+                </ol>
+
+                <h3>原有 BPD 的成熟度</h3>
+                <p>原来的 BPD（流程定义工具）可不是什么 demo：</p>
+                <ul>
+                    <li>✅ 完善的交互设计</li>
+                    <li>✅ 100+ 个插件（基础插件、高级插件、动态插件）</li>
+                    <li>✅ 成熟的 XPDL 解析和序列化能力</li>
+                    <li>✅ 完整的流程版本管理</li>
+                    <li>✅ 权限控制机制</li>
+                    <li>✅ 时限配置、表单配置、服务配置等高级功能</li>
+                </ul>
+
+                <div class="warning-box">
+                    <strong>挑战</strong>：不是从零开始，而是在成熟产品基础上的架构升级。
+                </div>
+
+                <h3>我们的目标</h3>
+                <p>很简单但也很困难：</p>
+                <ol>
+                    <li><strong>1 周时间</strong>：完成从 Swing 到 H5 的完全重构</li>
+                    <li><strong>100% AI 代码率</strong>：完全由 AI 生成代码</li>
+                    <li><strong>技能架构兼容</strong>：完美融入 ooderAgent 生态</li>
+                    <li><strong>NLP 插件全新构建</strong>：基于 llm-chat 的流程 NLP 插件（不是在 IDE 里使用，而是全新构建）</li>
+                </ol>
+            </div>
+
+            <!-- 第 2 节：对话 -->
+            <div class="section" id="section2">
+                <h2>2. 对话：架构如何设计？</h2>
+                
+                <h3>第一次对话</h3>
+                <p>项目启动第一天，我在 trae sole 里输入了问题：</p>
+                
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <div><strong>界面截图预留位置</strong></div>
+                    <div>trae sole 对话界面 - 第一次架构设计讨论</div>
+                </div>
+
+                <blockquote>
+                    <p>👤 <strong>我</strong>：ooderAgent 需要 BPM 设计器支持 skills 架构，融合 LLM 能力，<br>
+                    支持 NLP 模式流程建模。原有 BPD 有 100+ 插件，如何设计架构？</p>
+                </blockquote>
+
+                <blockquote>
+                    <p>🤖 <strong>trae sole</strong>：建议采用 skills 架构 + 插件化设计：</p>
+                    <ol>
+                        <li>技能层：作为 skill-bpm 融入 ooderAgent 生态</li>
+                        <li>前端层：H5 + Canvas + 插件化面板</li>
+                        <li>核心层：保留 XPDL 能力，新增 SPAC 标准</li>
+                        <li>NLP 层：基于 llm-chat 构建流程 NLP 插件</li>
+                        <li>插件层：迁移原有 100+ 插件，支持动态加载</li>
+                    </ol>
+                    <p><strong>关键点</strong>：</p>
+                    <ul>
+                        <li>使用 SPAC 模式让 AI 理解业务</li>
+                        <li>NLP 插件独立于 IDE，基于 llm-chat 构建</li>
+                        <li>动态插件迁移是最大挑战</li>
+                    </ul>
+                </blockquote>
+
+                <h3>技术栈选型</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>层级</th>
+                            <th>技术</th>
+                            <th>为什么选它</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>技能框架</td>
+                            <td>ooderAgent skills</td>
+                            <td>融入生态，支持动态加载</td>
+                        </tr>
+                        <tr>
+                            <td>前端框架</td>
+                            <td>原生 JavaScript (ES6+)</td>
+                            <td>轻量、高性能、无框架依赖</td>
+                        </tr>
+                        <tr>
+                            <td>图形引擎</td>
+                            <td>Canvas 2D</td>
+                            <td>流程图绘制，性能优异</td>
+                        </tr>
+                        <tr>
+                            <td>数据管理</td>
+                            <td>Store 模式</td>
+                            <td>单向数据流，状态清晰</td>
+                        </tr>
+                        <tr>
+                            <td>数据适配</td>
+                            <td>Adapter 模式</td>
+                            <td>XPDL <-> SPAC 转换</td>
+                        </tr>
+                        <tr>
+                            <td>插件系统</td>
+                            <td>Plugin 架构</td>
+                            <td>继承原有 100+ 插件</td>
+                        </tr>
+                        <tr>
+                            <td>NLP 能力</td>
+                            <td>skill-llm-chat</td>
+                            <td>基于 llm-chat 构建 NLP 插件</td>
+                        </tr>
+                        <tr>
+                            <td>后端服务</td>
+                            <td>Java Spring Boot</td>
+                            <td>兼容现有 BPM 引擎</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="highlight-box">
+                    <strong>100% 的代码由 AI 生成</strong>，这个技术栈功不可没。
+                </div>
+
+                <h3>1 周迁移计划</h3>
+                <pre><code>Day 1：架构搭建 + 核心模型
+├── 创建 skill-bpm 项目结构
+├── 实现 ProcessDef、ActivityDef、RouteDef 核心模型
+└── 建立 SPAC 标准定义
+
+Day 2-3：插件迁移（最艰难的部分）
+├── 迁移基础插件（20+ 个）
+├── 迁移高级插件（30+ 个）
+└── 迁移动态插件（50+ 个）
+
+Day 4：NLP 插件构建
+├── 基于 llm-chat 构建流程 NLP 插件
+├── 实现自然语言创建流程
+└── 实现自然语言修改流程
+
+Day 5：集成测试 + 优化
+├── 功能测试
+├── 性能优化
+└── 文档编写</code></pre>
+            </div>
+
+            <!-- 第 3 节：NLP 插件实战 -->
+            <div class="section" id="section3">
+                <h2>3. 实战：NLP 插件如何构建？</h2>
+                
+                <p>这是本次重构的重头戏，也是最大的创新点。</p>
+
+                <h3>NLP 插件的定位</h3>
+                <div class="warning-box">
+                    <strong>重要</strong>：这个 NLP 插件不是在 IDE 里使用，而是全新构建基于 ooderAgent llm-chat 的流程专用插件。
+                </div>
+
+                <div class="svg-diagram">
+                    <img src="diagrams/llm_agent_architecture.svg" alt="LLM Agent 架构图"/>
+                </div>
+
+                <h3>基于 llm-chat 的架构</h3>
+                <pre><code>class BPMNLPPlugin {
+    constructor(llmChatService) {
+        this.llmChat = llmChatService;
+        this.contextBuilder = new BPMContextBuilder();
+        this.actionExecutor = new BPMActionExecutor();
+    }
+
+    // 处理自然语言请求
+    async handleNaturalLanguage(message, context) {
+        // 构建 BPM 专用上下文
+        const bpmContext = this.contextBuilder.build({
+            processId: context.processId,
+            activityId: context.activityId,
+            currentUser: context.currentUser,
+            capabilities: ['BPM_NLP']
+        });
+        
+        // 调用 llm-chat
+        const response = await this.llmChat.chat({
+            message: message,
+            context: bpmContext,
+            skillId: 'skill-bpm',
+            actions: [
+                'create_process',
+                'create_activity',
+                'update_activity',
+                'delete_activity',
+                'create_route',
+                'update_route',
+                'validate_process'
+            ]
+        });
+
+        // 执行动作
+        return await this.actionExecutor.execute(response.actions);
+    }
+}</code></pre>
+
+                <h3>上下文构建策略</h3>
+                <p>NLP 插件的核心是让 LLM 理解 BPM 的专业术语和流程结构：</p>
+                <pre><code>class BPMContextBuilder {
+    build(options) {
+        return {
+            // 流程上下文
+            process: {
+                id: options.processId,
+                name: options.processName,
+                type: 'BPMN2.0',
+                version: options.version || 1
+            },
+
+            // 活动上下文
+            activities: options.activities?.map(a => ({
+                id: a.activityId,
+                name: a.name,
+                type: a.activityType,
+                category: a.category,
+                position: a.position,
+                properties: a.properties
+            })),
+
+            // 路由上下文
+            routes: options.routes?.map(r => ({
+                id: r.routeId,
+                from: r.from,
+                to: r.to,
+                condition: r.condition,
+                type: r.routeType
+            })),
+
+            // 能力上下文
+            capabilities: {
+                type: 'BPM_NLP',
+                supported: [
+                    '流程创建',
+                    '活动管理',
+                    '路由配置',
+                    '权限设置',
+                    '时限配置',
+                    '表单配置',
+                    '服务集成',
+                    '流程验证'
+                ]
+            },
+
+            // 用户上下文
+            user: {
+                id: options.currentUser,
+                role: options.userRole,
+                permissions: options.permissions
+            }
+        };
+    }
+}</code></pre>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <div><strong>界面截图预留位置</strong></div>
+                    <div>NLP 插件对话界面 - 自然语言创建流程</div>
+                </div>
+
+                <h3>实战对话示例</h3>
+                
+                <h4>示例 1：自然语言创建流程</h4>
+                <blockquote>
+                    <p>👤 <strong>用户</strong>：创建一个请假审批流程</p>
+                    <p>🤖 <strong>NLP 插件</strong>：好的，已为您创建请假审批流程：</p>
+                    <p><strong>【流程结构】</strong><br>
+                    开始 → 提交申请 → 部门经理审批 → HR 备案 → 结束</p>
+                    <p><strong>【已配置插件】</strong><br>
+                    ✓ 表单插件：请假申请表单<br>
+                    ✓ Agent 插件：审批 Agent（支持 EMAIL、NOTIFICATION）<br>
+                    ✓ 时限插件：24 小时内处理<br>
+                    ✓ 权限插件：部门经理审批权限<br>
+                    ✓ 服务插件：HR 系统对接</p>
+                    <p>流程已创建，请查看设计器。</p>
+                </blockquote>
+
+                <h4>示例 2：自然语言修改流程</h4>
+                <blockquote>
+                    <p>👤 <strong>用户</strong>：如果请假超过 3 天，需要总经理审批</p>
+                    <p>🤖 <strong>NLP 插件</strong>：已为您添加总经理审批环节：</p>
+                    <p><strong>【修改内容】</strong><br>
+                    1. 添加活动：总经理审批<br>
+                    2. 添加路由条件：<br>
+                    &nbsp;&nbsp;- 部门经理审批 → 总经理审批：${leaveDays > 3}<br>
+                    &nbsp;&nbsp;- 部门经理审批 → HR 备案：${leaveDays <= 3}<br>
+                    3. 配置总经理审批插件：<br>
+                    &nbsp;&nbsp;✓ Agent 插件：高级审批 Agent<br>
+                    &nbsp;&nbsp;✓ 权限插件：总经理角色权限<br>
+                    &nbsp;&nbsp;✓ 通知插件：邮件 + 短信通知</p>
+                    <p><strong>【新流程结构】</strong><br>
+                    开始 → 提交申请 → 部门经理审批<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;├─(>3 天)→ 总经理审批 ─┐<br>
+                    &nbsp;&nbsp;&nbsp;&nbsp;└─(≤3 天)→ HR 备案 ──┘→ 结束</p>
+                    <p>修改已完成，请查看设计器。</p>
+                </blockquote>
+            </div>
+
+            <!-- 第 4 节：插件迁移挑战 -->
+            <div class="section" id="section4">
+                <h2>4. 难点：插件迁移的挑战</h2>
+                
+                <h3>挑战 1:100+ 插件的动态迁移</h3>
+                <p><strong>问题</strong>：原有 BPD 有 100+ 个插件，包括基础插件、高级插件、动态插件，如何快速迁移？</p>
+                <p><strong>解决</strong>：分类迁移 + 自动化生成。</p>
+
+                <div class="svg-diagram">
+                    <img src="diagrams/migration_strategy.svg" alt="插件迁移策略图"/>
+                </div>
+
+                <pre><code>插件分类迁移策略：
+
+基础插件（20+ 个）
+├── 基本信息插件
+├── 时限配置插件
+├── 权限配置插件
+└── 表单配置插件
+迁移方式：AI 自动生成，人工验证
+
+高级插件（30+ 个）
+├── 服务集成插件
+├── 监听器插件
+├── 公式配置插件
+└── 组织机构插件
+迁移方式：保留核心逻辑，重构 UI
+
+动态插件（50+ 个）
+├── 自定义字段插件
+├── 业务规则插件
+├── 第三方集成插件
+└── 行业专用插件
+迁移方式：提供标准接口，插件开发者自行迁移</code></pre>
+
+                <h3>挑战 2：动态插件的运行时加载</h3>
+                <p><strong>问题</strong>：动态插件需要在运行时加载，如何保证加载顺序和依赖管理？</p>
+                <p><strong>解决</strong>：插件注册表 + 依赖注入。</p>
+                <pre><code>class PluginRegistry {
+    constructor() {
+        this.plugins = new Map();
+        this.dependencies = new Map();
+    }
+
+    // 注册插件
+    register(pluginId, pluginClass, dependencies = []) {
+        this.plugins.set(pluginId, pluginClass);
+        this.dependencies.set(pluginId, dependencies);
+    }
+
+    // 加载插件（支持依赖解析）
+    async load(pluginId) {
+        const deps = this.dependencies.get(pluginId) || [];
+
+        // 先加载依赖
+        for (const depId of deps) {
+            if (!this.plugins.has(depId)) {
+                throw new Error(`Missing dependency: ${depId}`);
+            }
+        }
+        
+        const pluginClass = this.plugins.get(pluginId);
+        const plugin = new pluginClass();
+
+        // 注入依赖
+        for (const depId of deps) {
+            const depPlugin = await this.load(depId);
+            plugin[depId] = depPlugin;
+        }
+
+        return plugin;
+    }
+}</code></pre>
+
+                <h3>挑战 3:NLP 插件与传统插件的协同</h3>
+                <p><strong>问题</strong>：NLP 插件如何与传统插件协同工作？</p>
+                <p><strong>解决</strong>：统一的插件接口 + 事件总线。</p>
+                <pre><code>class PluginEventBus {
+    constructor() {
+        this.listeners = new Map();
+    }
+
+    // 订阅事件
+    subscribe(eventType, callback) {
+        if (!this.listeners.has(eventType)) {
+            this.listeners.set(eventType, []);
+        }
+        this.listeners.get(eventType).push(callback);
+    }
+
+    // 发布事件
+    async publish(eventType, data) {
+        const callbacks = this.listeners.get(eventType) || [];
+
+        for (const callback of callbacks) {
+            await callback(data);
+        }
+    }
+}</code></pre>
+
+                <div class="svg-diagram">
+                    <img src="diagrams/plugin_architecture.svg" alt="插件架构图"/>
+                </div>
+
+                <h3>挑战 4：性能优化</h3>
+                <p><strong>问题</strong>：100+ 插件同时加载，如何保证性能？</p>
+                <p><strong>解决</strong>：懒加载 + 虚拟 DOM。</p>
+                <pre><code>// 懒加载策略
+class LazyPluginLoader {
+    constructor() {
+        this.loadedPlugins = new Map();
+        this.loadingPromises = new Map();
+    }
+
+    async load(pluginId, pluginFactory) {
+        // 已加载的插件直接返回
+        if (this.loadedPlugins.has(pluginId)) {
+            return this.loadedPlugins.get(pluginId);
+        }
+
+        // 正在加载的插件等待完成
+        if (this.loadingPromises.has(pluginId)) {
+            return this.loadingPromises.get(pluginId);
+        }
+
+        // 开始加载
+        const promise = (async () => {
+            const plugin = await pluginFactory();
+            this.loadedPlugins.set(pluginId, plugin);
+            this.loadingPromises.delete(pluginId);
+            return plugin;
+        })();
+
+        this.loadingPromises.set(pluginId, promise);
+        return promise;
+    }
+}
+
+// 虚拟 DOM 优化渲染
+class VirtualDOMRenderer {
+    constructor(container) {
+        this.container = container;
+        this.vdom = null;
+    }
+
+    render(plugins) {
+        const newVdom = this.createVdom(plugins);
+
+        if (!this.vdom) {
+            // 首次渲染
+            this.container.innerHTML = this.toHTML(newVdom);
+        } else {
+            // 差异更新
+            const patches = this.diff(this.vdom, newVdom);
+            this.patch(this.container, patches);
+        }
+
+        this.vdom = newVdom;
+    }
+
+    createVdom(plugins) {
+        return {
+            tag: 'div',
+            children: plugins.map(p => ({
+                tag: 'div',
+                props: { className: p.className },
+                children: [p.content]
+            }))
+        };
+    }
+}</code></pre>
+            </div>
+
+            <!-- 第 5 节：成果 -->
+            <div class="section" id="section5">
+                <h2>5. 成果：1 周的奇迹</h2>
+                
+                <h3>1 周的成绩单</h3>
+                <div class="success-box">
+                    <ul>
+                        <li><strong>开发周期</strong>：1 周（7 天）</li>
+                        <li><strong>AI 代码接管率</strong>：100%</li>
+                        <li><strong>迁移插件数量</strong>：100+ 个
+                            <ul>
+                                <li>基础插件：20+ 个</li>
+                                <li>高级插件：30+ 个</li>
+                                <li>动态插件：50+ 个</li>
+                            </ul>
+                        </li>
+                        <li><strong>NLP 插件</strong>：1 个（基于 llm-chat 全新构建）</li>
+                        <li><strong>代码行数</strong>：约 15,000 行</li>
+                        <li><strong>技能兼容</strong>：完美融入 ooderAgent 生态</li>
+                    </ul>
+                </div>
+
+                <h3>核心成果</h3>
+                <ol>
+                    <li><strong>技能架构兼容</strong>：作为 skill-bpm 完美融入 ooderAgent 生态</li>
+                    <li><strong>插件系统迁移</strong>：100+ 插件全部迁移完成，支持动态加载</li>
+                    <li><strong>NLP 插件构建</strong>：基于 llm-chat 全新构建流程 NLP 插件</li>
+                    <li><strong>LLM 能力融合</strong>：原生支持 LLM 能力，而非外挂式集成</li>
+                    <li><strong>性能优化</strong>：懒加载 + 虚拟 DOM，保证 100+ 插件流畅运行</li>
+                </ol>
+
+                <h3>技术亮点</h3>
+                <ol>
+                    <li><strong>SPAC 模式</strong>：让 AI 理解 BPM 业务逻辑的标准模式</li>
+                    <li><strong>动态插件架构</strong>：支持运行时加载和热插拔</li>
+                    <li><strong>NLP 插件</strong>：基于 llm-chat 的流程专用 NLP 插件</li>
+                    <li><strong>事件总线</strong>：NLP 插件与传统插件的协同机制</li>
+                    <li><strong>性能优化</strong>：懒加载 + 虚拟 DOM，保证流畅体验</li>
+                </ol>
+
+                <div class="screenshot-placeholder">
+                    <div class="icon">📸</div>
+                    <div><strong>界面截图预留位置</strong></div>
+                    <div>最终 BPM 设计器界面 - 100+ 插件全部加载</div>
+                </div>
+
+                <h3>开源承诺</h3>
+                <p>所有代码采用 <strong>MIT 开源协议</strong>：</p>
+                <ul>
+                    <li>商业友好：企业可以自由使用</li>
+                    <li>社区共建：欢迎所有开发者参与</li>
+                    <li>透明可信：所有实现细节公开可见</li>
+                </ul>
+
+                <p>所有底层支撑包已统一发布至 <strong>Maven 中央仓库</strong>，搜索 <code>net.ooder</code> 即可引入使用。</p>
+            </div>
+
+            <!-- 写在最后 -->
+            <div class="section">
+                <h2>写在最后</h2>
+                
+                <p>1 周，100+ 插件迁移，100% AI 代码率，NLP 插件全新构建。</p>
+                <p>这看起来不可能的任务，我们完成了。靠的不是加班，而是：</p>
+                <ol>
+                    <li><strong>正确的架构</strong>：skills 架构 + 插件化设计</li>
+                    <li><strong>AI 的加持</strong>：100% AI 代码生成</li>
+                    <li><strong>经验的积累</strong>：ooderAgent 4 个月的技术沉淀</li>
+                    <li><strong>团队的协作</strong>：人类架构师 + AI 编码者的默契配合</li>
+                </ol>
+
+                <p>BPM 设计器的重构只是 ooderAgent 技能架构的一个缩影。在 ooderAgent 的生态中，还有更多这样的技能在不断生长。</p>
+
+                <div class="highlight-box">
+                    <p>这不是结束，而是开始。</p>
+                    <p>欢迎加入这场变革。</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <p><strong>项目地址</strong>：<a href="https://github.com/ooder/ooder-skills" target="_blank">GitHub - ooder-skills</a></p>
+            <p><strong>开源协议</strong>：MIT</p>
+            <p><strong>Maven 中央仓库</strong>：搜索 <code>net.ooder</code></p>
+            <p><strong>技术交流</strong>：欢迎提交 Issue 和 Pull Request</p>
+            <hr style="margin: 30px 0; border: none; border-top: 1px solid rgba(255,255,255,0.2);"/>
+            <p style="font-style: italic;">"The best way to predict the future is to create it."</p>
+            <p style="font-style: italic;">"预测未来的最好方式，就是创造未来。"</p>
+            <p style="margin-top: 30px; font-size: 0.9rem; opacity: 0.8;">作者：ooder 团队 | 时间：2024 年 | 地点：中国</p>
+        </div>
+    </div>
+</body>
+</html>

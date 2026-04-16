@@ -2,6 +2,7 @@ package net.ooder.skill.agent.controller;
 
 import net.ooder.skill.agent.dto.AgentAlertDTO;
 import net.ooder.skill.agent.dto.AgentDTO;
+import net.ooder.skill.agent.dto.AgentStatsDTO;
 import net.ooder.skill.agent.dto.AgentStatusDTO;
 import net.ooder.skill.agent.dto.AgentTopologyDTO;
 import net.ooder.skill.agent.model.ResultModel;
@@ -26,16 +27,17 @@ public class AgentController {
 
     private final Map<String, AgentDTO> agentStore = new HashMap<>();
 
+    @jakarta.annotation.PostConstruct
+    public void init() {
+        AgentDTO agent1 = AgentConverter.createDefaultAgent(
+            "agent-001", "Default Agent", "assistant", "active");
+        agentStore.put("agent-001", agent1);
+        log.info("[AgentController] Initialized with default agent: agent-001");
+    }
+
     @GetMapping("/list")
     public ResultModel<List<AgentDTO>> listAgents() {
         log.info("[AgentController] List agents");
-        
-        if (agentStore.isEmpty()) {
-            AgentDTO agent1 = AgentConverter.createDefaultAgent(
-                "agent-001", "Default Agent", "assistant", "active");
-            agentStore.put("agent-001", agent1);
-        }
-        
         return ResultModel.success(new ArrayList<>(agentStore.values()));
     }
 
@@ -77,9 +79,9 @@ public class AgentController {
     }
 
     @GetMapping("/stats")
-    public ResultModel<Map<String, Object>> getStats() {
+    public ResultModel<AgentStatsDTO> getStats() {
         log.info("[AgentController] Get overall stats");
-        Map<String, Object> stats = agentService.getOverallStats();
+        AgentStatsDTO stats = agentService.getOverallStats();
         return ResultModel.success(stats);
     }
 

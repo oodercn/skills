@@ -41,14 +41,8 @@ class Store {
     }
 
     selectActivity(activityId) {
-        console.log('[Store] selectActivity called with id:', activityId);
-        console.log('[Store] current process:', this.process ? 'exists' : 'null');
-        console.log('[Store] activities count:', this.process?.activities?.length || 0);
-        if (this.process && this.process.activities) {
-            console.log('[Store] activity ids:', this.process.activities.map(a => a.activityDefId));
-        }
+        this.currentRoute = null;
         this.currentActivity = this.getActivity(activityId);
-        console.log('[Store] selectActivity result:', activityId, '->', this.currentActivity ? this.currentActivity.name : 'null');
         this._emit('activity:select', this.currentActivity);
     }
 
@@ -58,10 +52,19 @@ class Store {
             a => a.activityDefId === activityDef.activityDefId
         );
         if (index >= 0) {
-            this.process.activities[index] = activityDef;
+            const existing = this.process.activities[index];
+            if (existing && typeof existing === 'object' && existing !== activityDef) {
+                Object.keys(activityDef).forEach(key => {
+                    if (activityDef[key] !== undefined) {
+                        existing[key] = activityDef[key];
+                    }
+                });
+            } else {
+                this.process.activities[index] = activityDef;
+            }
             this._saveHistory();
             this.dirty = true;
-            this._emit('activity:update', activityDef);
+            this._emit('activity:update', this.process.activities[index]);
             this._triggerAutoSave();
         }
     }
@@ -106,6 +109,9 @@ class Store {
     removeRoute(routeId) {
         if (!this.process) return;
         this.process.removeRoute(routeId);
+        if (this.currentRoute?.routeDefId === routeId) {
+            this.currentRoute = null;
+        }
         this._saveHistory();
         this.dirty = true;
         this._emit('route:remove', routeId);
@@ -118,9 +124,8 @@ class Store {
     }
 
     selectRoute(routeId) {
-        console.log('[Store] selectRoute called with id:', routeId);
+        this.currentActivity = null;
         this.currentRoute = this.getRoute(routeId);
-        console.log('[Store] selectRoute result:', routeId, '->', this.currentRoute ? this.currentRoute.name : 'null');
         this._emit('route:select', this.currentRoute);
     }
 
@@ -221,17 +226,27 @@ class Store {
 
         try {
             console.log('[Store] Auto-saving process...');
+            console.log('[Store] Process activities count:', this.process.activities?.length);
+            
+            // 调试：打印所有活动的坐标
+            if (this.process.activities && this.process.activities.length > 0) {
+                this.process.activities.forEach((act, i) => {
+                    console.log(`[Store] Activity ${i}: id=${act.activityDefId}, name=${act.name}, positionCoord=`, act.positionCoord);
+                });
+            }
+            
             const processData = this.process.toJSON();
-
-            // 调试：打印第一个活动的坐标
+            
+            // 调试：打印序列化后的活动坐标
             if (processData.activities && processData.activities.length > 0) {
-                const firstAct = processData.activities[0];
-                console.log('[Store] First activity positionCoord:', firstAct.positionCoord);
+                processData.activities.forEach((act, i) => {
+                    console.log(`[Store] Serialized Activity ${i}: id=${act.activityDefId}, positionCoord=`, act.positionCoord);
+                });
             }
 
             const requestBody = JSON.stringify(processData);
             console.log('[Store] Request body length:', requestBody.length);
-            console.log('[Store] Request body preview:', requestBody.substring(0, 500));
+            console.log('[Store] Request body preview:', requestBody.substring(0, 1000));
 
             await this._saveWithRetry(processData);
             // 自动保存成功后不清除dirty状态，只触发事件

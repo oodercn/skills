@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.scenes.config.ScenesAutoConfiguration
+﻿net.ooder.skill.scenes.ScenesAutoConfiguration
+net.ooder.skill.scenes.config.PersistentSceneGroupConfig

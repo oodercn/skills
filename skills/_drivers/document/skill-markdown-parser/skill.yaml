@@ -1,26 +1,70 @@
-skill:
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
   id: skill-markdown-parser
   name: Markdown/文本解析器
-  version: 1.0.0
-  category: document
-  form: DRIVER
-  description: 提供 Markdown 和纯文本文件解析支持，通过 SPI 接口提供文档解析能力
-  author: ooder team
-  tags:
-    - document
-    - markdown
-    - text
-    - parser
-    - spi
+  version: "1.0.0"
+  description: 提供Markdown和纯文本文件解析支持，通过SPI接口提供文档解析能力
+  author: ooder Team
+  type: driver-service
+  license: Apache-2.0
 
-config:
-  parser:
-    max-file-size: 10485760
-    encoding: UTF-8
-    extract-metadata: true
+spec:
+  skillForm: DRIVER
+  skillCategory: DOCUMENT
+  sceneType: AUTO
+  purposes:
+    - TEAM
 
-provides:
-  spi:
-    - net.ooder.spi.document.DocumentParser
+  ownership: platform
 
-dependencies: []
+  capability:
+    address: 0x61
+    category: DOCUMENT
+    code: DRV_MARKDOWN_PARSER
+    operations: [parse, extract]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  providedInterfaces:
+    - id: document-parser
+      version: "1.0"
+      description: "文档解析SPI接口"
+
+  capabilities:
+    - id: markdown-parse
+      name: Markdown解析
+      description: Markdown文件解析
+      category: document
+    - id: text-parse
+      name: 文本解析
+      description: 纯文本文件解析
+      category: document
+    - id: metadata-extract
+      name: 元数据提取
+      description: 文档元数据提取
+      category: document
+
+  config:
+    optional:
+      - name: PARSER_MAX_FILE_SIZE
+        type: integer
+        default: 10485760
+        description: 最大文件大小
+      - name: PARSER_ENCODING
+        type: string
+        default: "UTF-8"
+        description: 文件编码
+      - name: PARSER_EXTRACT_METADATA
+        type: boolean
+        default: true
+        description: 是否提取元数据
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

@@ -13,7 +13,7 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/knowledge")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class KnowledgeController {
 
     private static final Logger log = LoggerFactory.getLogger(KnowledgeController.class);

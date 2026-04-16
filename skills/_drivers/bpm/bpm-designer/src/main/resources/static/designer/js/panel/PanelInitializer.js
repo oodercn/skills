@@ -5,13 +5,13 @@
  * 整合PluginEnvironment，提供完整的插件生命周期管理
  * 
  * 包括：
- * - 活动(Activity)面板插件
+ * - 活动(Activity)面板插件 - 按活动分类(HUMAN/AGENT/SCENE)条件展示
  * - 流程(Process)面板插件
  * - 路由(Route)面板插件
  * - 外部字典面板插件
  * 
  * @author AI Assistant
- * @version 2.0
+ * @version 3.0
  */
 
 class PanelInitializer {
@@ -32,21 +32,15 @@ class PanelInitializer {
 
         console.log('开始初始化面板插件...');
 
-        // 确保插件环境已初始化
         if (this.environment && !this.environment.initialized) {
             await this.environment.initialize();
         }
 
-        // 注册活动面板插件
         this._registerActivityPanels();
-
-        // 注册流程面板插件
+        this._registerAgentPanels();
+        this._registerScenePanels();
         this._registerProcessPanels();
-
-        // 注册外部字典面板插件
         this._registerExternalDictionaryPanels();
-
-        // 更新配置
         this._updateConfig();
 
         this.initialized = true;
@@ -56,7 +50,7 @@ class PanelInitializer {
     }
 
     /**
-     * 注册活动面板插件
+     * 注册活动面板插件 - 人工活动(HUMAN)
      */
     _registerActivityPanels() {
         if (typeof ActivityPanelPlugins === 'undefined') {
@@ -73,7 +67,6 @@ class PanelInitializer {
             ServicePanelPlugin
         } = ActivityPanelPlugins;
 
-        // 使用环境注册插件，自动注入数据源和适配器
         const register = (id, plugin, priority) => {
             if (this.environment) {
                 this.environment.registerPlugin(id, plugin, priority);
@@ -82,7 +75,6 @@ class PanelInitializer {
             }
         };
 
-        // 基本信息面板
         register('activity-basic', {
             ...BasicPanelPlugin,
             id: 'activity-basic',
@@ -93,7 +85,6 @@ class PanelInitializer {
             applicable: (activity) => activity && activity.activityDefId
         }, 10);
 
-        // 时限配置面板
         register('activity-timing', {
             ...TimingPanelPlugin,
             id: 'activity-timing',
@@ -101,10 +92,10 @@ class PanelInitializer {
                 dataKey: 'timing',
                 storageFormat: 'json'
             },
-            applicable: (activity) => activity && activity.activityDefId
+            applicable: (activity) => activity && activity.activityDefId && 
+                ['HUMAN', 'AGENT'].includes(activity.activityCategory)
         }, 20);
 
-        // 流程控制面板
         register('activity-flow', {
             ...FlowControlPanelPlugin,
             id: 'activity-flow',
@@ -112,10 +103,10 @@ class PanelInitializer {
                 dataKey: 'flow',
                 storageFormat: 'json'
             },
-            applicable: (activity) => activity && activity.activityDefId
+            applicable: (activity) => activity && activity.activityDefId && 
+                activity.activityCategory === 'HUMAN'
         }, 30);
 
-        // 权限配置面板 - 需要远程数据
         register('activity-right', {
             ...RightPanelPlugin,
             id: 'activity-right',
@@ -126,10 +117,10 @@ class PanelInitializer {
                 remoteType: 'person',
                 adapterType: 'performers'
             },
-            applicable: (activity) => activity && activity.activityDefId
+            applicable: (activity) => activity && activity.activityDefId && 
+                activity.activityCategory === 'HUMAN'
         }, 40);
 
-        // 表单配置面板 - 需要远程数据
         register('activity-form', {
             ...FormPanelPlugin,
             id: 'activity-form',
@@ -139,10 +130,10 @@ class PanelInitializer {
                 needRemoteData: true,
                 remoteType: 'form'
             },
-            applicable: (activity) => activity && activity.activityDefId
+            applicable: (activity) => activity && activity.activityDefId && 
+                activity.activityCategory === 'HUMAN'
         }, 50);
 
-        // 服务配置面板 - 需要远程数据
         register('activity-service', {
             ...ServicePanelPlugin,
             id: 'activity-service',
@@ -155,7 +146,6 @@ class PanelInitializer {
             applicable: (activity) => activity && activity.activityType === 'SERVICE'
         }, 60);
 
-        // 高级属性面板
         if (typeof AdvancedPanelPlugin !== 'undefined') {
             const advancedPlugin = new AdvancedPanelPlugin();
             register('activity-advanced', {
@@ -174,7 +164,144 @@ class PanelInitializer {
             }, 70);
         }
 
-        console.log('活动面板插件注册完成');
+        console.log('人工活动面板插件注册完成');
+    }
+
+    /**
+     * 注册Agent活动面板插件
+     */
+    _registerAgentPanels() {
+        if (typeof AgentPanelPlugins === 'undefined') {
+            console.warn('AgentPanelPlugins 未加载');
+            return;
+        }
+
+        const {
+            AgentBasicPanelPlugin,
+            LLMPanelPlugin,
+            AgentToolsPanelPlugin
+        } = AgentPanelPlugins;
+
+        const register = (id, plugin, priority) => {
+            if (this.environment) {
+                this.environment.registerPlugin(id, plugin, priority);
+            } else if (this.manager) {
+                this.manager.register(id, plugin, priority);
+            }
+        };
+
+        register('agent-basic', {
+            ...AgentBasicPanelPlugin,
+            id: 'agent-basic',
+            dataConfig: {
+                dataKey: 'agentConfig',
+                storageFormat: 'json',
+                needRemoteData: true,
+                remoteType: 'agentList'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'AGENT'
+        }, 20);
+
+        register('agent-llm', {
+            ...LLMPanelPlugin,
+            id: 'agent-llm',
+            dataConfig: {
+                dataKey: 'llmConfig',
+                storageFormat: 'json',
+                needRemoteData: true,
+                remoteType: 'llmProviders'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'AGENT'
+        }, 30);
+
+        register('agent-tools', {
+            ...AgentToolsPanelPlugin,
+            id: 'agent-tools',
+            dataConfig: {
+                dataKey: 'toolsConfig',
+                storageFormat: 'json',
+                needRemoteData: true,
+                remoteType: 'agentCapabilities'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'AGENT'
+        }, 40);
+
+        if (typeof AgentPanelPlugins._loadRemoteData === 'function') {
+            AgentPanelPlugins._loadRemoteData().then(() => {
+                console.log('Agent面板远程数据加载完成');
+            }).catch(err => {
+                console.warn('Agent面板远程数据加载失败，使用默认值', err);
+            });
+        }
+
+        console.log('Agent活动面板插件注册完成');
+    }
+
+    /**
+     * 注册Scene活动面板插件
+     */
+    _registerScenePanels() {
+        if (typeof ScenePanelPlugins === 'undefined') {
+            console.warn('ScenePanelPlugins 未加载');
+            return;
+        }
+
+        const {
+            SceneBasicPanelPlugin,
+            SceneEnginePanelPlugin,
+            SceneParamsPanelPlugin,
+            SceneCapabilityPanelPlugin
+        } = ScenePanelPlugins;
+
+        const register = (id, plugin, priority) => {
+            if (this.environment) {
+                this.environment.registerPlugin(id, plugin, priority);
+            } else if (this.manager) {
+                this.manager.register(id, plugin, priority);
+            }
+        };
+
+        register('scene-basic', {
+            ...SceneBasicPanelPlugin,
+            id: 'scene-basic',
+            dataConfig: {
+                dataKey: 'sceneConfig',
+                storageFormat: 'json'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'SCENE'
+        }, 20);
+
+        register('scene-engine', {
+            ...SceneEnginePanelPlugin,
+            id: 'scene-engine',
+            dataConfig: {
+                dataKey: 'engineConfig',
+                storageFormat: 'json'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'SCENE'
+        }, 30);
+
+        register('scene-params', {
+            ...SceneParamsPanelPlugin,
+            id: 'scene-params',
+            dataConfig: {
+                dataKey: 'paramsConfig',
+                storageFormat: 'json'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'SCENE'
+        }, 40);
+
+        register('scene-capability', {
+            ...SceneCapabilityPanelPlugin,
+            id: 'scene-capability',
+            dataConfig: {
+                dataKey: 'capabilityConfig',
+                storageFormat: 'json'
+            },
+            applicable: (activity) => activity && activity.activityCategory === 'SCENE'
+        }, 50);
+
+        console.log('Scene活动面板插件注册完成');
     }
 
     /**
@@ -204,7 +331,6 @@ class PanelInitializer {
             }
         };
 
-        // 流程基本信息面板
         register('process-basic', {
             ...ProcessBasicPanelPlugin,
             id: 'process-basic',
@@ -215,7 +341,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 10);
 
-        // 开始节点配置面板
         register('process-startNode', {
             ...StartNodePanelPlugin,
             id: 'process-startNode',
@@ -227,7 +352,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 20);
 
-        // 结束节点配置面板
         register('process-endNodes', {
             ...EndNodesPanelPlugin,
             id: 'process-endNodes',
@@ -239,7 +363,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 30);
 
-        // 监听器配置面板 - 使用XML存储
         register('process-listeners', {
             ...ListenersPanelPlugin,
             id: 'process-listeners',
@@ -251,7 +374,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 40);
 
-        // 流程权限组面板 - 使用XML存储
         register('process-rightGroups', {
             ...RightGroupsPanelPlugin,
             id: 'process-rightGroups',
@@ -263,7 +385,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 50);
 
-        // 流程变量面板
         register('process-variables', {
             ...ProcessVariablesPanelPlugin,
             id: 'process-variables',
@@ -274,7 +395,6 @@ class PanelInitializer {
             applicable: (process) => process && process.processDefId
         }, 60);
 
-        // 流程定时配置面板
         register('process-timing', {
             ...ProcessTimingPanelPlugin,
             id: 'process-timing',
@@ -311,7 +431,6 @@ class PanelInitializer {
             }
         };
 
-        // 表达式编辑器 - 需要远程数据
         register('dialog-expression', {
             ...ExpressionPanelPlugin,
             id: 'dialog-expression',
@@ -322,7 +441,6 @@ class PanelInitializer {
             }
         }, 10);
 
-        // 办理人选择器 - 需要远程数据
         register('dialog-performer', {
             ...PerformerSelectionPanelPlugin,
             id: 'dialog-performer',
@@ -333,7 +451,6 @@ class PanelInitializer {
             }
         }, 20);
 
-        // 部门选择器 - 需要远程数据
         register('dialog-department', {
             ...DepartmentSelectionPanelPlugin,
             id: 'dialog-department',
@@ -352,7 +469,6 @@ class PanelInitializer {
      */
     _updateConfig() {
         const config = {
-            // 更新面板分组配置
             groups: {
                 'process': [
                     'process-basic',
@@ -372,13 +488,29 @@ class PanelInitializer {
                     'activity-service',
                     'activity-advanced'
                 ],
+                'activity-agent': [
+                    'activity-basic',
+                    'agent-basic',
+                    'agent-llm',
+                    'agent-tools',
+                    'activity-timing',
+                    'activity-advanced'
+                ],
+                'activity-scene': [
+                    'activity-basic',
+                    'scene-basic',
+                    'scene-engine',
+                    'scene-params',
+                    'scene-capability',
+                    'activity-timing',
+                    'activity-advanced'
+                ],
                 'route': [
                     'route-basic',
                     'route-condition'
                 ]
             },
             
-            // 面板顺序配置
             defaultOrder: [
                 'process-basic',
                 'process-startNode',
@@ -389,7 +521,14 @@ class PanelInitializer {
                 'activity-right',
                 'activity-form',
                 'activity-service',
-                'activity-advanced'
+                'activity-advanced',
+                'agent-basic',
+                'agent-llm',
+                'agent-tools',
+                'scene-basic',
+                'scene-engine',
+                'scene-params',
+                'scene-capability'
             ]
         };
 
@@ -401,30 +540,37 @@ class PanelInitializer {
     }
 
     /**
-     * 获取面板管理器
+     * 根据活动类型获取面板分组
      */
+    getActivityGroup(activity) {
+        if (!activity) return 'activity';
+        
+        const category = activity.activityCategory || 'HUMAN';
+        
+        switch (category) {
+            case 'AGENT':
+                return 'activity-agent';
+            case 'SCENE':
+                return 'activity-scene';
+            default:
+                return 'activity';
+        }
+    }
+
     getManager() {
         return this.manager;
     }
 
-    /**
-     * 获取插件环境
-     */
     getEnvironment() {
         return this.environment;
     }
 
-    /**
-     * 检查是否已初始化
-     */
     isInitialized() {
         return this.initialized;
     }
 
     /**
      * 渲染流程面板
-     * @param {HTMLElement} container - 容器
-     * @param {Object} process - 流程对象
      */
     renderProcessPanels(container, process) {
         if (this.environment) {
@@ -435,26 +581,17 @@ class PanelInitializer {
     }
 
     /**
-     * 渲染活动面板
-     * @param {HTMLElement} container - 容器
-     * @param {Object} activity - 活动对象
+     * 渲染活动面板 - 根据活动类型自动选择分组
      */
     renderActivityPanels(container, activity) {
+        const group = this.getActivityGroup(activity);
+        
         if (this.environment) {
-            return this.environment.renderForModel(container, activity, 'activity');
+            return this.environment.renderForModel(container, activity, group);
         } else if (this.manager) {
-            return this.manager.renderForModel(container, activity, 'activity');
+            return this.manager.renderForModel(container, activity, group);
         }
     }
 }
 
-// 创建全局实例
 window.PanelInitializer = PanelInitializer;
-window.panelInitializer = new PanelInitializer();
-
-// 页面加载完成后自动初始化
-document.addEventListener('DOMContentLoaded', async () => {
-    if (window.panelInitializer) {
-        await window.panelInitializer.initialize();
-    }
-});

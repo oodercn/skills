@@ -4,8 +4,8 @@ kind: Skill
 metadata:
   id: skill-im-feishu
   name: Feishu IM Service
-  version: 3.0.1
-  description: 飞书IM服务，提供消息发送、文档创建、日程管理等功能
+  version: 3.0.5
+  description: 椋炰功IM鏈嶅姟锛屾彁渚涙秷鎭彂閫併€佹枃妗ｅ垱寤恒€佹棩绋嬬鐞嗙瓑鍔熻兘
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-feishu
@@ -52,83 +52,83 @@ spec:
       enabled: true
       tools:
         - name: send_message
-          description: "发送飞书消息"
+          description: "鍙戦€侀涔︽秷鎭?
           parameters:
             type: object
             properties:
               receiver:
                 type: string
                 enum: [user, group]
-                description: "接收者类型"
+                description: "鎺ユ敹鑰呯被鍨?
               receiverId:
                 type: string
-                description: "接收者ID"
+                description: "鎺ユ敹鑰匢D"
               msgType:
                 type: string
                 enum: [text, post, interactive]
                 default: text
-                description: "消息类型"
+                description: "娑堟伅绫诲瀷"
               content:
                 type: string
-                description: "消息内容"
+                description: "娑堟伅鍐呭"
         - name: send_interactive_card
-          description: "发送飞书交互卡片"
+          description: "鍙戦€侀涔︿氦浜掑崱鐗?
           parameters:
             type: object
             properties:
               userId:
                 type: string
-                description: "用户ID"
+                description: "鐢ㄦ埛ID"
               title:
                 type: string
-                description: "卡片标题"
+                description: "鍗＄墖鏍囬"
               elements:
                 type: array
-                description: "卡片元素"
+                description: "鍗＄墖鍏冪礌"
 
   capabilities:
     - id: send-message
       name: Send Message
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       category: messaging
     - id: send-post
       name: Send Post
-      description: 发送富文本消息
+      description: 鍙戦€佸瘜鏂囨湰娑堟伅
       category: messaging
     - id: send-interactive
       name: Send Interactive Card
-      description: 发送交互卡片
+      description: 鍙戦€佷氦浜掑崱鐗?
       category: messaging
 
   config:
     required:
       - name: FEISHU_APP_ID
         type: string
-        description: 飞书应用ID
+        description: 椋炰功搴旂敤ID
       - name: FEISHU_APP_SECRET
         type: string
         secret: true
-        description: 飞书应用Secret
+        description: 椋炰功搴旂敤Secret
     optional:
       - name: feishu.api.endpoint
         type: string
         default: https://open.feishu.cn/open-apis
-        description: 飞书API端点
+        description: 椋炰功API绔偣
 
   endpoints:
     - path: /api/v1/im/feishu/send
       method: POST
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       capability: send-message
     - path: /api/v1/im/feishu/send/user
       method: POST
-      description: 发送给用户
+      description: 鍙戦€佺粰鐢ㄦ埛
       capability: send-message
     - path: /api/v1/im/feishu/send/post
       method: POST
-      description: 发送富文本消息
+      description: 鍙戦€佸瘜鏂囨湰娑堟伅
       capability: send-post
     - path: /api/v1/im/feishu/send/interactive
       method: POST
-      description: 发送交互卡片
+      description: 鍙戦€佷氦浜掑崱鐗?
       capability: send-interactive

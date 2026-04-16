@@ -3,9 +3,6 @@ package net.ooder.spi.database;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 数据库配置
- */
 public class DatabaseConfig {
     
     private String databaseType;

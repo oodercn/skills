@@ -4,20 +4,25 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.ooder.skill</groupId>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/>
+    </parent>
+
+    <groupId>net.ooder</groupId>
     <artifactId>skill-menu</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-menu</name>
-    <description>菜单权限服务</description>
+    <description>Menu Management Skill with JPA Storage Driver</description>
 
     <properties>
-        <java.version>21</java.version>
-        <maven.compiler.source>21</maven.compiler.source>
-        <maven.compiler.target>21</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring-boot.version>3.4.4</spring-boot.version>
+        <java.version>21</java.version>
     </properties>
 
     <dependencyManagement>
@@ -38,16 +43,29 @@
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>provided</scope>
         </dependency>
+        
         <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
         </dependency>
+        
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.49.1.0</version>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.30</version>
+            <optional>true</optional>
+            <scope>provided</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skills-framework</artifactId>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
     </dependencies>
@@ -83,4 +101,3 @@
         </plugins>
     </build>
 </project>
-

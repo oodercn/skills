@@ -14,7 +14,7 @@
     
     <groupId>net.ooder</groupId>
     <artifactId>skill-messaging</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <name>Skill Messaging</name>
     <description>Unified messaging service for IM and LLM integration</description>
     
@@ -28,14 +28,8 @@
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>skill-spi-messaging</artifactId>
-            <version>3.0.2</version>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>skill-spi-llm</artifactId>
-            <version>3.0.2</version>
+            <artifactId>ooder-spi-core</artifactId>
+            <version>3.0.5</version>
         </dependency>
         
         <dependency>

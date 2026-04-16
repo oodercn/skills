@@ -1,0 +1,46 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-health
+  name: 健康检查服务
+  version: "3.0.2"
+  description: 提供系统健康检查、服务状态监控等功能
+  author: ooder Team
+  type: capability-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: MONITOR
+  sceneType: AUTO
+  purposes:
+    - TEAM
+
+  ownership: platform
+
+  capability:
+    address: 0x4C
+    category: MONITOR
+    code: CAP_HEALTH
+    operations: [check, status, report]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  capabilities:
+    - id: health-check
+      name: 健康检查
+      description: 系统健康检查
+      category: monitor
+    - id: service-status
+      name: 服务状态
+      description: 服务状态监控
+      category: monitor
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

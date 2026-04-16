@@ -4,26 +4,14 @@ kind: Skill
 metadata:
   id: skill-tenant
   name: 多租户管理服务
-  version: "3.0.1"
+  version: 1.0.0
   description: 提供企业级多租户管理能力，包括租户CRUD、数据隔离、配额管理、成员管理等核心功能
   author: ooder Team
   type: system-service
   license: Apache-2.0
-  homepage: https://gitee.com/ooderCN/skills
-  keywords:
-    - tenant
-    - multi-tenant
-    - saas
-    - isolation
-    - quota
 
 spec:
   skillForm: PROVIDER
-  skillCategory: SERVICE
-  sceneType: AUTO
-  purposes:
-    - TEAM
-    - PERSISTENT
   type: system-skill
 
   ownership: platform
@@ -38,19 +26,6 @@ spec:
     language: java
     javaVersion: "21"
     framework: spring-boot
-
-  supportedSceneTypes:
-    - all
-
-  dynamicSceneTypes: true
-
-  autoStart:
-    enabled: true
-    delay: 0s
-
-  autoJoin:
-    enabled: true
-    matchSceneTypes: true
 
   dependencies: []
 

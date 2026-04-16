@@ -1,6 +1,9 @@
 package net.ooder.skill.tenant.config;
 
-import net.ooder.skill.tenant.interceptor.TenantInterceptor;
+import net.ooder.skill.tenant.repository.TenantMemberRepository;
+import net.ooder.skill.tenant.repository.TenantRepository;
+import net.ooder.skill.tenant.service.TenantService;
+import net.ooder.skill.tenant.service.impl.TenantServiceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -14,8 +17,6 @@ import org.springframework.orm.jpa.JpaTransactionManager;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import javax.sql.DataSource;
 import java.util.Properties;
@@ -24,12 +25,18 @@ import java.util.Properties;
 @ComponentScan(basePackages = "net.ooder.skill.tenant")
 @EnableJpaRepositories(basePackages = "net.ooder.skill.tenant.repository")
 @ConditionalOnProperty(name = "skill.tenant.enabled", havingValue = "true", matchIfMissing = true)
-public class TenantAutoConfiguration implements WebMvcConfigurer {
+public class TenantAutoConfiguration {
 
     private static final Logger log = LoggerFactory.getLogger(TenantAutoConfiguration.class);
 
     public TenantAutoConfiguration() {
         log.info("[TenantAutoConfiguration] Initializing multi-tenant skill module with JPA persistence");
+    }
+
+    @Bean
+    public TenantService tenantService(TenantRepository tenantRepository, TenantMemberRepository memberRepository) {
+        log.info("[TenantAutoConfiguration] Creating TenantService bean");
+        return new TenantServiceImpl(tenantRepository, memberRepository);
     }
 
     @Bean
@@ -92,23 +99,5 @@ public class TenantAutoConfiguration implements WebMvcConfigurer {
         JpaTransactionManager transactionManager = new JpaTransactionManager();
         transactionManager.setEntityManagerFactory(entityManagerFactory.getObject());
         return transactionManager;
-    }
-
-    private final TenantInterceptor tenantInterceptor;
-
-    public TenantAutoConfiguration(TenantInterceptor tenantInterceptor) {
-        this.tenantInterceptor = tenantInterceptor;
-    }
-
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(tenantInterceptor)
-                .addPathPatterns("/api/**")
-                .excludePathPatterns(
-                        "/api/v1/auth/**",
-                        "/api/v1/tenants",
-                        "/api/v1/health"
-                );
-        log.info("[TenantAutoConfiguration] Registered TenantInterceptor for /api/**");
     }
 }

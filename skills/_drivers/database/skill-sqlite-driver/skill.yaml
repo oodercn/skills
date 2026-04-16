@@ -1,30 +1,66 @@
-skill:
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
   id: skill-sqlite-driver
-  name: SQLite 数据库驱动
-  version: 1.0.0
-  category: database
-  form: DRIVER
-  description: 提供 SQLite 数据库支持，通过 SPI 接口提供数据源能力
-  author: ooder team
-  tags:
-    - database
-    - sqlite
-    - driver
-    - spi
+  name: SQLite数据库驱动
+  version: "1.0.0"
+  description: 提供SQLite数据库支持，通过SPI接口提供数据源能力
+  author: ooder Team
+  type: driver-service
+  license: Apache-2.0
 
-config:
-  sqlite:
-    data-dir: ${user.home}/.apexos/data
-    database-name: apexos
-    pool:
-      max-size: 5
-      min-idle: 1
-      connection-timeout: 30000
-      idle-timeout: 600000
-      max-lifetime: 1800000
+spec:
+  skillForm: DRIVER
+  skillCategory: DATABASE
+  sceneType: AUTO
+  purposes:
+    - TEAM
 
-provides:
-  spi:
-    - net.ooder.spi.database.DataSourceProvider
+  ownership: platform
 
-dependencies: []
+  capability:
+    address: 0x60
+    category: DATABASE
+    code: DRV_SQLITE
+    operations: [connect, query, execute]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  providedInterfaces:
+    - id: datasource-provider
+      version: "1.0"
+      description: "数据源提供者SPI接口"
+
+  capabilities:
+    - id: sqlite-datasource
+      name: SQLite数据源
+      description: SQLite数据库连接和查询
+      category: database
+
+  config:
+    optional:
+      - name: SQLITE_DATA_DIR
+        type: string
+        default: "${user.home}/.apexos/data"
+        description: SQLite数据目录
+      - name: SQLITE_DATABASE_NAME
+        type: string
+        default: "apexos"
+        description: 数据库名称
+      - name: SQLITE_POOL_MAX_SIZE
+        type: integer
+        default: 5
+        description: 连接池最大连接数
+      - name: SQLITE_POOL_MIN_IDLE
+        type: integer
+        default: 1
+        description: 连接池最小空闲连接数
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "100Mi"

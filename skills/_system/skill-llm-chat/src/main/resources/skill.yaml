@@ -3,9 +3,9 @@ kind: Skill
 
 metadata:
   id: skill-llm-chat
-  name: LLM聊天助手
-  version: 3.0.1
-  description: LLM聊天助手 - 内置知识资料库功能，支持多轮对话和知识检索
+  name: LLM鑱婂ぉ鍔╂墜
+  version: 3.0.5
+  description: LLM鑱婂ぉ鍔╂墜 - 鍐呯疆鐭ヨ瘑璧勬枡搴撳姛鑳斤紝鏀寔澶氳疆瀵硅瘽鍜岀煡璇嗘绱?
   author: ooder Team
   license: Apache-2.0
   type: service-skill
@@ -14,19 +14,25 @@ spec:
   skillForm: PROVIDER
   type: service-skill
   
-  capability:
-    category: llm
-  
   ownership: platform
   
+  capability:
+    category: llm
+    code: LLM_CHAT
+    operations: [chat, stream, function-calling, knowledge-base]
+
   runtime:
     language: java
     javaVersion: "8"
     framework: spring-boot
   
   dependencies:
-    - skill-common
-    - skill-llm
+    - skillId: skill-common
+      version: ">=1.0.0"
+      required: false
+    - skillId: skill-llm-base
+      version: ">=1.0.0"
+      required: false
 
   llmConfig:
     required: true
@@ -48,65 +54,65 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "查询当前技能的能力和使用方�?
+          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "能力名称"
+                description: "鑳藉姏鍚嶇О"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "通过MVEL表达式执行后台操�?
+          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL表达�?
+                description: "MVEL琛ㄨ揪寮?
               context:
                 type: object
-                description: "执行上下�?
+                description: "鎵ц涓婁笅鏂?
         - name: generate_ui_form
-          description: "生成UI表单供用户填�?
+          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
           parameters:
             type: object
             properties:
               formType:
                 type: string
-                description: "表单类型"
+                description: "琛ㄥ崟绫诲瀷"
               fields:
                 type: array
                 items:
                   type: object
-                description: "表单字段定义"
+                description: "琛ㄥ崟瀛楁瀹氫箟"
         - name: execute_batch_operation
-          description: "执行批量操作"
+          description: "鎵ц鎵归噺鎿嶄綔"
           parameters:
             type: object
             properties:
               operation:
                 type: string
-                description: "操作类型"
+                description: "鎿嶄綔绫诲瀷"
               items:
                 type: array
                 items:
                   type: object
-                description: "操作项列�?
+                description: "鎿嶄綔椤瑰垪琛?
         - name: convert_to_javascript
-          description: "转换为JavaScript代码供用户使�?
+          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
           parameters:
             type: object
             properties:
               action:
                 type: string
-                description: "要执行的动作"
+                description: "瑕佹墽琛岀殑鍔ㄤ綔"
               parameters:
                 type: object
-                description: "动作参数"
+                description: "鍔ㄤ綔鍙傛暟"
       toolChoice: auto
     embedding:
       required: true
@@ -118,18 +124,18 @@ spec:
 
   capabilities:
     - id: llm-chat
-      name: LLM聊天
-      description: 支持多轮对话的LLM聊天功能
+      name: LLM鑱婂ぉ
+      description: 鏀寔澶氳疆瀵硅瘽鐨凩LM鑱婂ぉ鍔熻兘
       category: ai
       
     - id: knowledge-base
-      name: 知识资料�?
-      description: 内置知识资料库，支持文档上传和知识检�?
+      name: 鐭ヨ瘑璧勬枡搴?
+      description: 鍐呯疆鐭ヨ瘑璧勬枡搴擄紝鏀寔鏂囨。涓婁紶鍜岀煡璇嗘绱?
       category: knowledge
       
     - id: rag-retrieval
-      name: RAG检�?
-      description: 基于知识库的检索增强生�?
+      name: RAG妫€绱?
+      description: 鍩轰簬鐭ヨ瘑搴撶殑妫€绱㈠寮虹敓鎴?
       category: ai
   
   routes:
@@ -253,8 +259,79 @@ spec:
       controller: net.ooder.skill.chat.controller.SkillsContextController
       methodName: buildSystemPrompt
       produces: application/json
-  
+
+    - path: /api/v1/llm/chat
+      method: POST
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: chat
+      produces: application/json
+
+    - path: /api/v1/llm/chat/stream
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: chatStream
+      produces: text/event-stream
+
+    - path: /api/v1/llm/chat/stream
+      method: POST
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: chatStreamPost
+      produces: text/event-stream
+
+    - path: /api/v1/llm/chat/providers
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: getProviders
+      produces: application/json
+
+    - path: /api/v1/llm/chat/models
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: getModels
+      produces: application/json
+
+    - path: /api/v1/llm/chat/models/set
+      method: POST
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: setModel
+      produces: application/json
+
+    - path: /api/v1/llm/chat/sessions
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: getSessions
+      produces: application/json
+
+    - path: /api/v1/llm/chat/sessions/{sessionId}
+      method: DELETE
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: deleteSession
+      produces: application/json
+
+    - path: /api/v1/llm/chat/sessions/{sessionId}/history
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: getSessionHistory
+      produces: application/json
+
+    - path: /api/v1/llm/chat/health
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: health
+      produces: application/json
+
+    - path: /api/v1/llm/chat/model/{providerId}/{modelId}
+      method: GET
+      controller: net.ooder.skill.llm.chat.controller.LlmChatController
+      methodName: getModelDetail
+      produces: application/json
+
   services:
+    - name: llmServiceProvider
+      interface: net.ooder.skill.llm.chat.service.LLMServiceProvider
+      implementation: net.ooder.skill.llm.chat.service.LLMService
+      singleton: true
+
     - name: chatService
       interface: net.ooder.skill.chat.service.ChatService
       implementation: net.ooder.skill.chat.service.impl.ChatServiceImpl

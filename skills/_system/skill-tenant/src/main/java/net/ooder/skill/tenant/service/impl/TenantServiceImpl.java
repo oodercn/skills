@@ -97,6 +97,7 @@ public class TenantServiceImpl implements TenantService {
         Tenant tenant = getTenant(tenantId);
         tenant.setStatus("DELETED");
         tenantRepository.save(tenant);
+        memberRepository.deleteByTenantIdAndUserId(tenantId, null);
         memberRepository.findByTenantIdAndStatus(tenantId, "ACTIVE")
                 .forEach(m -> { m.setStatus("LEFT"); memberRepository.save(m); });
     }

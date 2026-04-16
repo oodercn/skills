@@ -1,0 +1,50 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-monitor
+  name: 监控服务
+  version: "3.0.2"
+  description: 提供系统监控、性能指标采集、告警等功能
+  author: ooder Team
+  type: capability-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: MONITOR
+  sceneType: AUTO
+  purposes:
+    - TEAM
+
+  ownership: platform
+
+  capability:
+    address: 0x4D
+    category: MONITOR
+    code: CAP_MONITOR
+    operations: [monitor, metrics, alert]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  capabilities:
+    - id: system-monitor
+      name: 系统监控
+      description: 系统运行监控
+      category: monitor
+    - id: metrics-collection
+      name: 指标采集
+      description: 性能指标采集
+      category: monitor
+    - id: alert
+      name: 告警
+      description: 告警通知
+      category: monitor
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

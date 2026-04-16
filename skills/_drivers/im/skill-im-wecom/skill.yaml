@@ -4,8 +4,8 @@ kind: Skill
 metadata:
   id: skill-im-wecom
   name: WeCom IM Service
-  version: 3.0.1
-  description: 企业微信IM服务，提供消息发送、应用消息等功能
+  version: 3.0.5
+  description: 浼佷笟寰俊IM鏈嶅姟锛屾彁渚涙秷鎭彂閫併€佸簲鐢ㄦ秷鎭瓑鍔熻兘
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-wecom
@@ -50,68 +50,68 @@ spec:
       enabled: true
       tools:
         - name: send_message
-          description: "发送企业微信消息"
+          description: "鍙戦€佷紒涓氬井淇℃秷鎭?
           parameters:
             type: object
             properties:
               receiver:
                 type: string
                 enum: [user, party]
-                description: "接收者类型"
+                description: "鎺ユ敹鑰呯被鍨?
               receiverId:
                 type: string
-                description: "接收者ID"
+                description: "鎺ユ敹鑰匢D"
               msgType:
                 type: string
                 enum: [text, markdown, news]
                 default: text
-                description: "消息类型"
+                description: "娑堟伅绫诲瀷"
               content:
                 type: string
-                description: "消息内容"
+                description: "娑堟伅鍐呭"
 
   capabilities:
     - id: send-message
       name: Send Message
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       category: messaging
     - id: send-text
       name: Send Text
-      description: 发送文本消息
+      description: 鍙戦€佹枃鏈秷鎭?
       category: messaging
     - id: send-markdown
       name: Send Markdown
-      description: 发送Markdown消息
+      description: 鍙戦€丮arkdown娑堟伅
       category: messaging
 
   config:
     required:
       - name: WECOM_CORP_ID
         type: string
-        description: 企业微信CorpId
+        description: 浼佷笟寰俊CorpId
       - name: WECOM_AGENT_ID
         type: string
-        description: 企业微信AgentId
+        description: 浼佷笟寰俊AgentId
       - name: WECOM_AGENT_SECRET
         type: string
         secret: true
-        description: 企业微信AgentSecret
+        description: 浼佷笟寰俊AgentSecret
     optional:
       - name: wecom.api.endpoint
         type: string
         default: https://qyapi.weixin.qq.com
-        description: 企业微信API端点
+        description: 浼佷笟寰俊API绔偣
 
   endpoints:
     - path: /api/v1/im/wecom/send
       method: POST
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       capability: send-message
     - path: /api/v1/im/wecom/send/user
       method: POST
-      description: 发送给用户
+      description: 鍙戦€佺粰鐢ㄦ埛
       capability: send-text
     - path: /api/v1/im/wecom/send/markdown
       method: POST
-      description: 发送Markdown消息
+      description: 鍙戦€丮arkdown娑堟伅
       capability: send-markdown

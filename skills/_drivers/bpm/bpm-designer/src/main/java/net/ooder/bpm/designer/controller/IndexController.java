@@ -8,6 +8,6 @@ public class IndexController {
 
     @GetMapping({"/", "/designer", "/designer/"})
     public String index() {
-        return "forward:/static/designer/index.html";
+        return "forward:/designer/index.html";
     }
 }

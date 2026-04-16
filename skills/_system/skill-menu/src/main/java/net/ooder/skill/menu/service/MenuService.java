@@ -1,27 +1,23 @@
 package net.ooder.skill.menu.service;
 
+import net.ooder.skill.menu.dto.MenuDTO;
 import java.util.List;
-import net.ooder.skill.menu.dto.*;
 
 public interface MenuService {
     
-    MenuItemDTO create(MenuItemDTO menu);
+    MenuDTO createMenu(MenuDTO menuDTO);
     
-    MenuItemDTO update(MenuItemDTO menu);
+    MenuDTO updateMenu(String menuId, MenuDTO menuDTO);
     
-    void delete(String menuId);
+    void deleteMenu(String menuId);
     
-    MenuItemDTO findById(String menuId);
+    MenuDTO getMenu(String menuId);
     
-    List<MenuItemDTO> findAll();
+    List<MenuDTO> getAllMenus();
     
-    List<MenuItemDTO> getMenuTree();
+    List<MenuDTO> getMenuTree();
     
-    void move(String menuId, String newParentId, int newSort);
+    List<MenuDTO> getMenusByCategory(String category);
     
-    List<MenuItemDTO> findByRoleId(String roleId);
-    
-    List<MenuItemDTO> findByUserId(String userId);
-    
-    void setRoleMenus(String roleId, List<String> menuIds);
+    void initializeDefaultMenus();
 }

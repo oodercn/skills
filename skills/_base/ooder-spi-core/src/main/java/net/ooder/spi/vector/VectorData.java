@@ -3,9 +3,6 @@ package net.ooder.spi.vector;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 向量数据
- */
 public class VectorData {
     
     private String id;

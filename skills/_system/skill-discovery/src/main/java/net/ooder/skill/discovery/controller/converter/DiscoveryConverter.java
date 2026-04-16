@@ -3,7 +3,6 @@ package net.ooder.skill.discovery.controller.converter;
 import net.ooder.skill.discovery.dto.discovery.CapabilityDTO;
 import net.ooder.skill.discovery.model.CapabilityCategory;
 import net.ooder.skills.api.InstalledSkill;
-import net.ooder.skills.api.SkillForm;
 import net.ooder.skills.api.SkillPackage;
 
 import org.slf4j.Logger;
@@ -25,49 +24,50 @@ public final class DiscoveryConverter {
 
     private static final Logger log = LoggerFactory.getLogger(DiscoveryConverter.class);
 
-    private DiscoveryConverter() {
+    private static final Map<String, String> SKILL_FORM_ALIAS_MAP = new LinkedHashMap<>();
+    
+    static {
+        SKILL_FORM_ALIAS_MAP.put("scene-skill", "SCENE");
+        SKILL_FORM_ALIAS_MAP.put("scene", "SCENE");
+        SKILL_FORM_ALIAS_MAP.put("provider-skill", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("provider", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("service-skill", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("service", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("enterprise-skill", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("infrastructure-skill", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("system-core", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("nexus-ui", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("ui", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("driver", "DRIVER");
+        SKILL_FORM_ALIAS_MAP.put("driver-skill", "DRIVER");
+        SKILL_FORM_ALIAS_MAP.put("integration", "INTEGRATION");
+        SKILL_FORM_ALIAS_MAP.put("integration-skill", "INTEGRATION");
+        SKILL_FORM_ALIAS_MAP.put("standalone", "PROVIDER");
+        SKILL_FORM_ALIAS_MAP.put("skill", "PROVIDER");
     }
 
-    private static SkillForm mapToSkillForm(String formValue) {
-        if (formValue == null || formValue.trim().isEmpty()) {
+    private DiscoveryConverter() {
+    }
+    
+    private static String normalizeSkillForm(String rawForm) {
+        if (rawForm == null || rawForm.isEmpty()) {
             return null;
         }
-        
-        String normalized = formValue.toUpperCase().trim();
-        
-        try {
-            return SkillForm.valueOf(normalized);
-        } catch (IllegalArgumentException e) {
+        String upperForm = rawForm.toUpperCase();
+        if (upperForm.equals("SCENE") || upperForm.equals("PROVIDER") || 
+            upperForm.equals("DRIVER") || upperForm.equals("INTEGRATION")) {
+            return upperForm;
         }
-        
-        switch (normalized) {
-            case "SCENE-SKILL":
-            case "SCENE_SKILL":
-            case "SCENE-SK":
-            case "SCENE_SK":
-                return SkillForm.SCENE;
-            case "PROVIDER-SKILL":
-            case "PROVIDER_SKILL":
-            case "PROVIDER-SK":
-            case "PROVIDER_SK":
-            case "SERVICE-SKILL":
-            case "SERVICE_SKILL":
-                return SkillForm.PROVIDER;
-            case "DRIVER-SKILL":
-            case "DRIVER_SKILL":
-            case "DRIVER-SK":
-            case "DRIVER_SK":
-            case "ENTERPRISE-SKILL":
-            case "ENTERPRISE_SKILL":
-            case "ADAPTER-SKILL":
-            case "ADAPTER_SKILL":
-            case "CONNECTOR-SKILL":
-            case "CONNECTOR_SKILL":
-                return SkillForm.DRIVER;
-            default:
-                log.warn("Unknown skillForm value: {}, defaulting to PROVIDER", formValue);
-                return SkillForm.PROVIDER;
+        if (upperForm.equals("STANDALONE")) {
+            return "PROVIDER";
         }
+        String normalized = SKILL_FORM_ALIAS_MAP.get(rawForm.toLowerCase());
+        if (normalized != null) {
+            log.debug("[normalizeSkillForm] Mapped '{}' to '{}'", rawForm, normalized);
+            return normalized;
+        }
+        log.debug("[normalizeSkillForm] Unknown skillForm '{}', defaulting to PROVIDER", rawForm);
+        return "PROVIDER";
     }
 
     /**
@@ -83,19 +83,7 @@ public final class DiscoveryConverter {
             return null;
         }
 
-        // 调试日志：检查 SDK 返回的原始数据
         String skillId = pkg.getSkillId();
-        if (skillId != null && skillId.contains("approval")) {
-            log.info("[DEBUG] skill-approval-form found, checking raw data:");
-            log.info("[DEBUG]   getSkillId() = {}", skillId);
-            log.info("[DEBUG]   getCategory() = {}", pkg.getCategory());
-            log.info("[DEBUG]   getForm() = {}", pkg.getForm());
-            log.info("[DEBUG]   getMetadata() = {}", pkg.getMetadata());
-            if (pkg.getMetadata() != null) {
-                log.info("[DEBUG]   metadata.getCategory() = {}", pkg.getMetadata().get("category"));
-                log.info("[DEBUG]   metadata.getForm() = {}", pkg.getMetadata().get("form"));
-            }
-        }
 
         CapabilityDTO dto = new CapabilityDTO();
         dto.setId(skillId);
@@ -104,48 +92,31 @@ public final class DiscoveryConverter {
         dto.setSkillId(skillId);
         dto.setSource(pkg.getSource());
         
-        // SDK 3.0.1+ 自动推断 category，如果 metadata.category 为空则从 skillId 推断
         String category = pkg.getCategory();
+        if (category == null || category.isEmpty()) {
+            category = inferCategoryFromSkillId(skillId);
+        }
         dto.setCategory(category);
         
-        // 映射到标准分类代码
         if (category != null) {
             CapabilityCategory mappedCategory = CapabilityCategory.fromCode(category);
             dto.setBusinessCategory(mappedCategory.getCode());
             dto.setCapabilityCategory(mappedCategory.getCode());
         }
 
-        // SDK 3.0.1+ 自动推断 skillForm，如果 spec.skillForm 为空则从 skillId 推断
-        // 添加兼容性映射：支持 scene-skill, provider-skill, driver-skill, enterprise-skill 等旧格式
-        SkillForm form = pkg.getForm();
-        String skillForm;
-        if (form != null) {
-            skillForm = form.name();
-        } else {
-            // 尝试从 metadata.type 获取旧格式的类型值
-            Map<String, Object> metadata = pkg.getMetadata();
-            if (metadata != null) {
-                Object typeValue = metadata.get("type");
-                if (typeValue != null) {
-                    SkillForm mappedForm = mapToSkillForm(typeValue.toString());
-                    skillForm = mappedForm != null ? mappedForm.name() : null;
-                    if (skillForm != null) {
-                        log.debug("Mapped skillForm from metadata.type: {} -> {}", typeValue, skillForm);
-                    }
-                } else {
-                    skillForm = null;
-                }
-            } else {
-                skillForm = null;
+        String rawSkillForm = pkg.getForm() != null ? pkg.getForm().name() : null;
+        if (rawSkillForm == null && pkg.getMetadata() != null) {
+            Object formObj = pkg.getMetadata().get("form");
+            if (formObj != null) {
+                rawSkillForm = formObj.toString();
             }
+        }
+        String skillForm = normalizeSkillForm(rawSkillForm);
+        if (skillForm == null) {
+            skillForm = inferSkillFormFromSkillId(skillId);
         }
         dto.setSkillForm(skillForm);
         
-        if (skillId != null && skillId.contains("approval")) {
-            log.info("[DEBUG] skill-approval-form final values: category={}, skillForm={}", category, skillForm);
-        }
-        
-        // 根据 skillForm 设置 sceneCapability 和 type
         boolean isScene = "SCENE".equals(skillForm);
         dto.setSceneCapability(isScene);
         dto.setType(isScene ? "SCENE" : "SKILL");
@@ -156,6 +127,51 @@ public final class DiscoveryConverter {
         convertCapabilities(pkg.getCapabilities(), dto);
 
         return dto;
+    }
+    
+    private static String inferCategoryFromSkillId(String skillId) {
+        if (skillId == null) return null;
+        String lower = skillId.toLowerCase();
+        if (lower.contains("llm") || lower.contains("chat") || lower.contains("qianwen") || 
+            lower.contains("deepseek") || lower.contains("baidu") || lower.contains("zhipu")) {
+            return "llm";
+        }
+        if (lower.contains("knowledge") || lower.contains("qa")) {
+            return "knowledge";
+        }
+        if (lower.contains("org") || lower.contains("dingding") || lower.contains("feishu") || 
+            lower.contains("user") || lower.contains("tenant") || lower.contains("auth")) {
+            return "org";
+        }
+        if (lower.contains("msg") || lower.contains("message") || lower.contains("notify")) {
+            return "msg";
+        }
+        if (lower.contains("vfs") || lower.contains("storage") || lower.contains("file")) {
+            return "vfs";
+        }
+        if (lower.contains("ui") || lower.contains("dashboard") || lower.contains("console")) {
+            return "ui";
+        }
+        if (lower.contains("sys") || lower.contains("config") || lower.contains("management")) {
+            return "sys";
+        }
+        if (lower.contains("biz") || lower.contains("approval") || lower.contains("recruitment") ||
+            lower.contains("calendar") || lower.contains("procedure")) {
+            return "biz";
+        }
+        return "util";
+    }
+    
+    private static String inferSkillFormFromSkillId(String skillId) {
+        if (skillId == null) return "PROVIDER";
+        String lower = skillId.toLowerCase();
+        if (lower.contains("-scene") || lower.startsWith("scene-") || lower.contains("-form")) {
+            return "SCENE";
+        }
+        if (lower.contains("-driver") || lower.startsWith("driver-")) {
+            return "DRIVER";
+        }
+        return "PROVIDER";
     }
 
     /**

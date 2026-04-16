@@ -28,14 +28,14 @@ public class DictController {
 
     @GetMapping
     public ResultModel<List<DictDTO>> getAllDicts() {
-        log.info("[DictController] getAllDicts");
+        log.info("[getAllDicts] Getting all dicts");
         List<DictDTO> dicts = getDictService().getAllDicts();
         return ResultModel.success(dicts);
     }
 
     @GetMapping("/{code}")
     public ResultModel<DictDTO> getDict(@PathVariable String code) {
-        log.info("[DictController] getDict: {}", code);
+        log.info("[getDict] code: {}", code);
         DictDTO dict = getDictService().getDict(code);
         if (dict == null) {
             return ResultModel.error(404, "字典不存在: " + code);
@@ -45,7 +45,7 @@ public class DictController {
 
     @GetMapping("/{code}/items")
     public ResultModel<List<DictItemDTO>> getDictItems(@PathVariable String code) {
-        log.info("[DictController] getDictItems: {}", code);
+        log.info("[getDictItems] code: {}", code);
         List<DictItemDTO> items = getDictService().getDictItems(code);
         return ResultModel.success(items);
     }
@@ -54,7 +54,7 @@ public class DictController {
     public ResultModel<DictItemDTO> getDictItem(
             @PathVariable String code,
             @PathVariable String itemCode) {
-        log.info("[DictController] getDictItem: {}/{}", code, itemCode);
+        log.info("[getDictItem] code: {}, itemCode: {}", code, itemCode);
         DictItemDTO item = getDictService().getDictItem(code, itemCode);
         if (item == null) {
             return ResultModel.error(404, "字典项不存在: " + code + "/" + itemCode);
@@ -66,14 +66,14 @@ public class DictController {
     public ResultModel<String> getDictItemName(
             @PathVariable String code,
             @PathVariable String itemCode) {
-        log.info("[DictController] getDictItemName: {}/{}", code, itemCode);
+        log.info("[getDictItemName] code: {}, itemCode: {}", code, itemCode);
         String name = getDictService().getDictItemName(code, itemCode);
         return ResultModel.success(name);
     }
 
     @PostMapping("/refresh")
     public ResultModel<String> refreshCache() {
-        log.info("[DictController] refreshCache");
+        log.info("[refreshCache] Refreshing dict cache");
         getDictService().refreshCache();
         return ResultModel.success("字典缓存已刷新");
     }

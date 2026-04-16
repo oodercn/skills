@@ -250,6 +250,121 @@ class PluginDataSource {
         });
     }
 
+    // ==================== Agent 数据获取方法 ====================
+
+    async getAgentList(params = {}) {
+        const cacheKey = `agent_list_${JSON.stringify(params)}`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/list', {
+                method: 'GET',
+                params
+            });
+            const list = Array.isArray(response.data) ? response.data : (response.data?.list || []);
+            return list.map(a => this._normalizeAgentData(a));
+        });
+    }
+
+    async getAgent(agentId) {
+        const cacheKey = `agent_${agentId}`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request(`/agent/${agentId}`, {
+                method: 'GET'
+            });
+            return this._normalizeAgentData(response.data);
+        });
+    }
+
+    async getAgentStatus(agentId) {
+        const cacheKey = `agent_status_${agentId}`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request(`/agent/${agentId}/status`, {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentStats() {
+        const cacheKey = `agent_stats`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/stats', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentTopology() {
+        const cacheKey = `agent_topology`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/topology', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentAlerts() {
+        const cacheKey = `agent_alerts`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/alerts', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentTypes() {
+        const cacheKey = `agent_types`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/types', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentRoles(params = {}) {
+        const cacheKey = `agent_roles_${JSON.stringify(params)}`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/roles', {
+                method: 'GET',
+                params
+            });
+            return response.data;
+        });
+    }
+
+    async getLlmProviders() {
+        const cacheKey = `llm_providers`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/llm-providers', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
+    async getAgentCapabilities() {
+        const cacheKey = `agent_capabilities`;
+
+        return this._fetchWithCache(cacheKey, async () => {
+            const response = await this._request('/agent/capabilities', {
+                method: 'GET'
+            });
+            return response.data;
+        });
+    }
+
     // ==================== 数据转换方法 ====================
 
     /**
@@ -294,7 +409,35 @@ class PluginDataSource {
             type: 'person',
             icon: 'user',
             leaf: true,
-            // 原始数据保留
+            _raw: data
+        };
+    }
+
+    _normalizeAgentData(data) {
+        if (!data) return null;
+
+        return {
+            id: data.agentId || data.id,
+            agentId: data.agentId,
+            agentName: data.agentName,
+            agentType: data.agentType,
+            status: data.status,
+            clusterId: data.clusterId,
+            capabilities: data.capabilities || [],
+            tags: data.tags || {},
+            metrics: data.metrics || {},
+            description: data.description,
+            role: data.role,
+            llmConfigId: data.llmConfigId,
+            supportedModels: data.supportedModels || [],
+            extendedConfig: data.extendedConfig || {},
+            enabled: data.enabled,
+            healthStatus: data.healthStatus,
+            maxConcurrency: data.maxConcurrency,
+            currentLoad: data.currentLoad,
+            type: 'agent',
+            icon: 'agent',
+            leaf: true,
             _raw: data
         };
     }

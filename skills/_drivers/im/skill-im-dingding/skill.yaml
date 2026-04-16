@@ -4,8 +4,8 @@ kind: Skill
 metadata:
   id: skill-im-dingding
   name: DingTalk IM Service
-  version: 3.0.1
-  description: 钉钉IM服务，提供消息发送、DING消息、日程管理、待办同步等功能
+  version: 3.0.5
+  description: 閽夐拤IM鏈嶅姟锛屾彁渚涙秷鎭彂閫併€丏ING娑堟伅銆佹棩绋嬬鐞嗐€佸緟鍔炲悓姝ョ瓑鍔熻兘
   author: Ooder Team
   license: Apache-2.0
   homepage: https://gitee.com/ooderCN/skills/tree/main/skills/_drivers/im/skill-im-dingding
@@ -53,103 +53,103 @@ spec:
       enabled: true
       tools:
         - name: send_message
-          description: "发送钉钉消息"
+          description: "鍙戦€侀拤閽夋秷鎭?
           parameters:
             type: object
             properties:
               receiver:
                 type: string
                 enum: [user, group]
-                description: "接收者类型"
+                description: "鎺ユ敹鑰呯被鍨?
               receiverId:
                 type: string
-                description: "接收者ID"
+                description: "鎺ユ敹鑰匢D"
               msgType:
                 type: string
                 enum: [text, markdown, action_card]
                 default: text
-                description: "消息类型"
+                description: "娑堟伅绫诲瀷"
               title:
                 type: string
-                description: "消息标题"
+                description: "娑堟伅鏍囬"
               content:
                 type: string
-                description: "消息内容"
+                description: "娑堟伅鍐呭"
         - name: send_ding
-          description: "发送钉钉DING消息（高优先级提醒）"
+          description: "鍙戦€侀拤閽塂ING娑堟伅锛堥珮浼樺厛绾ф彁閱掞級"
           parameters:
             type: object
             properties:
               userId:
                 type: string
-                description: "用户ID"
+                description: "鐢ㄦ埛ID"
               title:
                 type: string
-                description: "消息标题"
+                description: "娑堟伅鏍囬"
               content:
                 type: string
-                description: "消息内容"
+                description: "娑堟伅鍐呭"
               reminderType:
                 type: integer
                 enum: [1, 2]
                 default: 1
-                description: "提醒类型：1-应用内，2-短信"
+                description: "鎻愰啋绫诲瀷锛?-搴旂敤鍐咃紝2-鐭俊"
 
   capabilities:
     - id: send-message
       name: Send Message
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       category: messaging
     - id: send-ding
       name: Send DING
-      description: 发送DING消息
+      description: 鍙戦€丏ING娑堟伅
       category: notification
     - id: send-markdown
       name: Send Markdown
-      description: 发送Markdown消息
+      description: 鍙戦€丮arkdown娑堟伅
       category: messaging
     - id: send-action-card
       name: Send Action Card
-      description: 发送交互卡片
+      description: 鍙戦€佷氦浜掑崱鐗?
       category: messaging
 
   config:
     required:
       - name: DINGTALK_APP_KEY
         type: string
-        description: 钉钉应用Key
+        description: 閽夐拤搴旂敤Key
       - name: DINGTALK_APP_SECRET
         type: string
         secret: true
-        description: 钉钉应用Secret
+        description: 閽夐拤搴旂敤Secret
     optional:
       - name: dingtalk.api.endpoint
         type: string
         default: https://oapi.dingtalk.com
-        description: 钉钉API端点
+        description: 閽夐拤API绔偣
 
   endpoints:
     - path: /api/v1/im/dingding/send
       method: POST
-      description: 发送消息
+      description: 鍙戦€佹秷鎭?
       capability: send-message
     - path: /api/v1/im/dingding/ding
       method: POST
-      description: 发送DING消息
+      description: 鍙戦€丏ING娑堟伅
       capability: send-ding
     - path: /api/v1/im/dingding/send/user
       method: POST
-      description: 发送消息给用户
+      description: 鍙戦€佹秷鎭粰鐢ㄦ埛
       capability: send-message
     - path: /api/v1/im/dingding/send/group
       method: POST
-      description: 发送消息给群组
+      description: 鍙戦€佹秷鎭粰缇ょ粍
       capability: send-message
     - path: /api/v1/im/dingding/send/markdown
       method: POST
-      description: 发送Markdown消息
+      description: 鍙戦€丮arkdown娑堟伅
       capability: send-markdown
     - path: /api/v1/im/dingding/send/action-card
       method: POST
-      description: 发送交互卡片
+      description: 鍙戦€佷氦浜掑崱鐗?
       capability: send-action-card

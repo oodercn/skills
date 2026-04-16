@@ -15,11 +15,11 @@ import java.util.Map;
  * Skills Context Controller
  * Skills 上下文控制器
  * 
- * 提供 AI 助手上下文注册和管理的 API 端点
+ * 提供 AI 助手上下文注册和管理�?API 端点
  */
 @RestController
 @RequestMapping("/api/v1/context")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class SkillsContextController {
 
     private static final Logger log = LoggerFactory.getLogger(SkillsContextController.class);
@@ -91,8 +91,7 @@ public class SkillsContextController {
     }
 
     /**
-     * 更新页面状态
-     */
+     * 更新页面状�?     */
     @PostMapping("/page-state")
     public ResultModel<Boolean> updatePageState(@RequestBody Map<String, Object> request) {
         String sessionId = (String) request.get("sessionId");

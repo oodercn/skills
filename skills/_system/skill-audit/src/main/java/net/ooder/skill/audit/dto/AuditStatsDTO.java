@@ -1,10 +1,9 @@
 package net.ooder.skill.audit.dto;
 
-import java.util.List;
 import java.util.Map;
 
 public class AuditStatsDTO {
-
+    
     private long totalEvents;
     private long successEvents;
     private long failedEvents;
@@ -14,7 +13,7 @@ public class AuditStatsDTO {
     private Map<String, Long> eventsByType;
     private Map<String, Long> eventsByUser;
     private Map<String, Long> eventsByResource;
-    private List<DailyStats> dailyTrend;
+    private long avgResponseTime;
 
     public long getTotalEvents() { return totalEvents; }
     public void setTotalEvents(long totalEvents) { this.totalEvents = totalEvents; }
@@ -34,15 +33,6 @@ public class AuditStatsDTO {
     public void setEventsByUser(Map<String, Long> eventsByUser) { this.eventsByUser = eventsByUser; }
     public Map<String, Long> getEventsByResource() { return eventsByResource; }
     public void setEventsByResource(Map<String, Long> eventsByResource) { this.eventsByResource = eventsByResource; }
-    public List<DailyStats> getDailyTrend() { return dailyTrend; }
-    public void setDailyTrend(List<DailyStats> dailyTrend) { this.dailyTrend = dailyTrend; }
-
-    public static class DailyStats {
-        private String date;
-        private long count;
-        public String getDate() { return date; }
-        public void setDate(String date) { this.date = date; }
-        public long getCount() { return count; }
-        public void setCount(long count) { this.count = count; }
-    }
+    public long getAvgResponseTime() { return avgResponseTime; }
+    public void setAvgResponseTime(long avgResponseTime) { this.avgResponseTime = avgResponseTime; }
 }

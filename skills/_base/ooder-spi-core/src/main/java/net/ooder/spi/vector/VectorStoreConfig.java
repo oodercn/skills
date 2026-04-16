@@ -3,9 +3,6 @@ package net.ooder.spi.vector;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 向量存储配置
- */
 public class VectorStoreConfig {
     
     private String providerType;

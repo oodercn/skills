@@ -107,13 +107,19 @@ public class ProcessDefManagerService {
     public List<Map<String, Object>> getActivityDefsByVersion(String versionId) {
         try {
             List<EIActivityDef> activities = activityDefManager.loadByProcessDefVersionId(versionId);
+            log.info("[DEBUG] getActivityDefsByVersion: versionId=" + versionId + ", activities.size()=" + activities.size());
             List<Map<String, Object>> result = new ArrayList<>();
+            int index = 0;
             for (EIActivityDef activity : activities) {
+                log.info("[DEBUG] Processing activity " + index + ": id=" + activity.getActivityDefId() 
+                    + ", name=" + activity.getName() + ", position=" + activity.getPosition());
                 result.add(convertActivityDef(activity));
+                index++;
             }
+            log.info("[DEBUG] Returning " + result.size() + " activities");
             return result;
         } catch (BPMException e) {
-            log.error("Failed to get activity defs by version: {}", e.getMessage());
+            log.error("Failed to get activity defs by version: " + e.getMessage());
             return new ArrayList<>();
         }
     }
@@ -354,6 +360,10 @@ public class ProcessDefManagerService {
                             String positionCoordJson = mapper.writeValueAsString(positionCoord);
                             log.info("[SAVE] Activity {} positionCoord JSON: {}", activity.getActivityDefId(), positionCoordJson);
                             
+                            // 先清除可能存在的旧属性，确保干净状态
+                            ((DbActivityDef) activity).clearAttribute();
+                            log.info("[SAVE] Activity {} cleared existing attributes", activity.getActivityDefId());
+                            
                             DbAttributeDef workflowAttr = new DbAttributeDef();
                             workflowAttr.setId(java.util.UUID.randomUUID().toString());
                             workflowAttr.setName("WORKFLOW");
@@ -368,6 +378,10 @@ public class ProcessDefManagerService {
                             posCoordAttr.setType("WORKFLOW");
                             activity.setAttribute("WORKFLOW", posCoordAttr);
                             log.info("[SAVE] Activity {} set positionCoord attribute: {}", activity.getActivityDefId(), positionCoordJson);
+                            
+                            // 验证属性是否正确设置
+                            List<EIAttributeDef> allAttrs = activity.getAllAttribute();
+                            log.info("[SAVE] Activity {} has {} attributes after setting", activity.getActivityDefId(), allAttrs.size());
                         } catch (Exception e) {
                             log.error("[SAVE] Failed to set positionCoord for activity {}: {}", activity.getActivityDefId(), e.getMessage(), e);
                         }
@@ -376,6 +390,14 @@ public class ProcessDefManagerService {
                     }
                     
                     activityDefManager.save(activity);
+                    log.info("[SAVE] Activity {} saved successfully", activity.getActivityDefId());
+                    
+                    // 验证保存后的属性
+                    EIActivityDef savedActivity = activityDefManager.loadByKey(activity.getActivityDefId());
+                    if (savedActivity != null) {
+                        String savedCoord = savedActivity.getAttributeValue("WORKFLOW.positionCoord");
+                        log.info("[SAVE] Verified - Activity {} positionCoord after save: {}", activity.getActivityDefId(), savedCoord);
+                    }
                 }
             }
             

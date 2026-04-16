@@ -5,7 +5,7 @@ metadata:
   id: skill-dict
   name: 字典管理服务
   version: 1.0.0
-  description: 提供系统字典、枚举管理、字典缓存、字典项查询等核心能力
+  description: 提供数据字典管理、字典项查询等功能
   author: ooder Team
   type: system-service
   license: Apache-2.0
@@ -13,122 +13,92 @@ metadata:
 spec:
   skillForm: PROVIDER
   type: system-skill
-
+  
   ownership: platform
-
+  
   capability:
-    address: 0x05
+    address: 0x2E
     category: SYS
     code: SYS_DICT
-    operations: [get, list, items, refresh, sync]
-
+    operations: [read, refresh]
+  
   runtime:
     language: java
     javaVersion: "21"
     framework: spring-boot
-
+  
   supportedSceneTypes:
     - all
-
+    
   dynamicSceneTypes: true
-
+  
   autoStart:
     enabled: true
     delay: 0s
-
+    
   autoJoin:
     enabled: true
     matchSceneTypes: true
-
+    
   dependencies: []
-
+  
   providedInterfaces:
     - id: dict-service
       version: "1.0"
-      description: "字典管理服务接口"
-
+      description: "字典服务接口"
+  
   capabilities:
-    - id: get
-      name: 获取字典
-      description: 根据字典代码获取字典详情
+    - id: dict-query
+      name: 字典查询
+      description: 字典和字典项查询
       category: dict
-    - id: list
-      name: 字典列表
-      description: 获取所有字典列表
-      category: dict
-    - id: items
-      name: 字典项列表
-      description: 获取字典下的所有字典项
-      category: dict
-    - id: refresh
-      name: 刷新缓存
-      description: 刷新字典缓存
-      category: dict
-    - id: sync
-      name: 同步字典
-      description: 同步枚举类到字典
-      category: dict
-
+  
   endpoints:
     - path: /api/v1/dicts
       method: GET
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: getAllDicts
       description: 获取所有字典
-      capability: list
+      capability: dict-query
     - path: /api/v1/dicts/{code}
       method: GET
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: getDict
-      parameterTypes:
-        - java.lang.String
       description: 获取字典详情
-      capability: get
+      capability: dict-query
     - path: /api/v1/dicts/{code}/items
       method: GET
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: getDictItems
-      parameterTypes:
-        - java.lang.String
       description: 获取字典项列表
-      capability: items
+      capability: dict-query
     - path: /api/v1/dicts/{code}/items/{itemCode}
       method: GET
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: getDictItem
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-      description: 获取单个字典项
-      capability: items
+      description: 获取字典项详情
+      capability: dict-query
     - path: /api/v1/dicts/{code}/items/{itemCode}/name
       method: GET
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: getDictItemName
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
       description: 获取字典项名称
-      capability: items
+      capability: dict-query
     - path: /api/v1/dicts/refresh
       method: POST
       controllerClass: net.ooder.skill.dict.controller.DictController
       methodName: refreshCache
       description: 刷新字典缓存
-      capability: refresh
-
+      capability: dict-query
+  
   config:
     optional:
-      - name: DICT_CACHE_ENABLED
-        type: boolean
-        default: "true"
-        description: 是否启用字典缓存
       - name: DICT_CACHE_TTL
         type: integer
-        default: "3600"
-        description: 字典缓存过期时间(秒)
-
+        default: 3600
+        description: 字典缓存时间(秒)
+  
   resources:
-    cpu: "50m"
-    memory: "128Mi"
+    cpu: "30m"
+    memory: "64Mi"
     storage: "10Mi"

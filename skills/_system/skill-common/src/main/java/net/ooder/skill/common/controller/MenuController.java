@@ -48,7 +48,7 @@ public class MenuController {
 
     @GetMapping
     public ResultModel<List<Map<String, Object>>> getCurrentUserMenu(
-            @RequestParam(required = false) String role,
+            @RequestParam(value = "role", required = false) String role,
             jakarta.servlet.http.HttpServletRequest request) {
         
         String roleType = role;

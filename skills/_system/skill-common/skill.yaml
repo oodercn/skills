@@ -29,7 +29,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x01
+    address: 0x36
     category: sys
     code: SYS_COMMON
     operations: [auth, org, config, storage]

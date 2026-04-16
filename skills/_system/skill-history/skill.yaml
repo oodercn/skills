@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x2F
+    address: 0x3B
     category: SYS
     code: SYS_HISTORY
     operations: [read, export, rerun]

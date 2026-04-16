@@ -20,16 +20,20 @@ public class LlmMonitorController {
     private LlmMonitorService monitorService;
 
     @GetMapping("/stats")
-    public ResultModel<Map<String, Object>> getStats(
+    public ResultModel<LlmMonitorStatsDTO> getStats(
             @RequestParam(required = false) String timeRange,
             @RequestParam(required = false) String providerId) {
         log.info("[getStats] timeRange: {}, providerId: {}", timeRange, providerId);
         
         if (monitorService == null) {
-            return ResultModel.success(new HashMap<>());
+            return ResultModel.success(new LlmMonitorStatsDTO());
         }
         
-        Map<String, Object> stats = monitorService.getStats(timeRange, providerId);
+        Map<String, Object> rawStats = monitorService.getStats(timeRange, providerId);
+        LlmMonitorStatsDTO stats = new LlmMonitorStatsDTO();
+        if (rawStats != null) {
+            stats.setDetails(rawStats);
+        }
         return ResultModel.success(stats);
     }
     
@@ -78,18 +82,41 @@ public class LlmMonitorController {
         return ResultModel.success(result);
     }
     
+    @GetMapping("/sessions")
+    public ResultModel<List<LlmSessionDTO>> getSessions(
+            @RequestParam(required = false) String providerId,
+            @RequestParam(defaultValue = "1") int pageNum,
+            @RequestParam(defaultValue = "20") int pageSize) {
+        log.info("[getSessions] providerId: {}, pageNum: {}, pageSize: {}", providerId, pageNum, pageSize);
+        
+        List<LlmSessionDTO> sessions = new ArrayList<>();
+        return ResultModel.success(sessions);
+    }
+    
+    @GetMapping("/logs/session/{sessionId}")
+    public ResultModel<List<LlmCallLogDTO>> getSessionLogs(@PathVariable String sessionId) {
+        log.info("[getSessionLogs] sessionId: {}", sessionId);
+        
+        List<LlmCallLogDTO> logs = new ArrayList<>();
+        return ResultModel.success(logs);
+    }
+    
     @GetMapping("/engine/status")
-    public ResultModel<Map<String, Object>> getEngineStatus() {
+    public ResultModel<EngineStatusDTO> getEngineStatus() {
         log.info("[getEngineStatus] request start");
         
-        Map<String, Object> status = new HashMap<>();
+        EngineStatusDTO status = new EngineStatusDTO();
         
         if (monitorService != null) {
-            status = monitorService.getEngineStatus();
+            Map<String, Object> rawStatus = monitorService.getEngineStatus();
+            status.setSdkAvailable(Boolean.TRUE.equals(rawStatus.get("sdkAvailable")));
+            status.setMonitorEnabled(Boolean.TRUE.equals(rawStatus.get("monitorEnabled")));
+            status.setDataSource(rawStatus.get("dataSource") != null ? rawStatus.get("dataSource").toString() : "available");
+            status.setExtensions(rawStatus);
         } else {
-            status.put("sdkAvailable", false);
-            status.put("monitorEnabled", false);
-            status.put("dataSource", "unavailable");
+            status.setSdkAvailable(false);
+            status.setMonitorEnabled(false);
+            status.setDataSource("unavailable");
         }
         
         return ResultModel.success(status);

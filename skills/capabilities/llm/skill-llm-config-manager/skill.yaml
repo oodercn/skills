@@ -1,0 +1,50 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-llm-config-manager
+  name: LLM配置管理器
+  version: "3.0.2"
+  description: LLM配置管理 - 多级配置、加密存储、配置解析
+  author: ooder Team
+  type: capability-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  skillCategory: LLM
+  sceneType: AUTO
+  purposes:
+    - TEAM
+
+  ownership: platform
+
+  capability:
+    address: 0x4B
+    category: LLM
+    code: CAP_LLM_CONFIG_MGR
+    operations: [manage, encrypt, parse]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  capabilities:
+    - id: llm-config-management
+      name: LLM配置管理
+      description: 多级配置管理
+      category: llm
+    - id: config-encryption
+      name: 配置加密
+      description: 配置加密存储
+      category: security
+    - id: config-parse
+      name: 配置解析
+      description: 配置文件解析
+      category: llm
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

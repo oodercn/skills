@@ -35,6 +35,16 @@ public class AgentChatMessageDTO {
     private boolean requiresAction;
     private List<MessageAction> availableActions;
 
+    private String tenantId;
+    private Map<String, Object> metadata;
+    private String senderId;
+    private String sender;
+    private String senderType;
+    private String receiverId;
+    private String receiverName;
+
+    private List<Attachment> attachments;
+
     public AgentChatMessageDTO() {
         this.payload = new HashMap<>();
         this.ccParticipants = new ArrayList<>();
@@ -103,6 +113,30 @@ public class AgentChatMessageDTO {
     
     public List<MessageAction> getAvailableActions() { return availableActions; }
     public void setAvailableActions(List<MessageAction> availableActions) { this.availableActions = availableActions; }
+
+    public String getTenantId() { return tenantId; }
+    public void setTenantId(String tenantId) { this.tenantId = tenantId; }
+
+    public Map<String, Object> getMetadata() { return metadata; }
+    public void setMetadata(Map<String, Object> metadata) { this.metadata = metadata; }
+
+    public String getSenderId() { return senderId; }
+    public void setSenderId(String senderId) { this.senderId = senderId; }
+
+    public String getSender() { return sender; }
+    public void setSender(String sender) { this.sender = sender; }
+
+    public String getSenderType() { return senderType; }
+    public void setSenderType(String senderType) { this.senderType = senderType; }
+
+    public String getReceiverId() { return receiverId; }
+    public void setReceiverId(String receiverId) { this.receiverId = receiverId; }
+
+    public String getReceiverName() { return receiverName; }
+    public void setReceiverName(String receiverName) { this.receiverName = receiverName; }
+
+    public List<Attachment> getAttachments() { return attachments; }
+    public void setAttachments(List<Attachment> attachments) { this.attachments = attachments; }
 
     public void addPayload(String key, Object value) {
         if (payload == null) {
@@ -211,5 +245,36 @@ public class AgentChatMessageDTO {
         
         public Map<String, Object> getActionConfig() { return actionConfig; }
         public void setActionConfig(Map<String, Object> actionConfig) { this.actionConfig = actionConfig; }
+    }
+
+    public static class Attachment {
+        private String id;
+        private String name;
+        private String type;
+        private String url;
+        private long size;
+
+        public Attachment() {}
+
+        public Attachment(String name, String type, String url) {
+            this.name = name;
+            this.type = type;
+            this.url = url;
+        }
+
+        public String getId() { return id; }
+        public void setId(String id) { this.id = id; }
+
+        public String getName() { return name; }
+        public void setName(String name) { this.name = name; }
+
+        public String getType() { return type; }
+        public void setType(String type) { this.type = type; }
+
+        public String getUrl() { return url; }
+        public void setUrl(String url) { this.url = url; }
+
+        public long getSize() { return size; }
+        public void setSize(long size) { this.size = size; }
     }
 }

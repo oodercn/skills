@@ -1,24 +1,16 @@
 apiVersion: skill.ooder.net/v1
-kind: SkillPackage
+kind: Skill
 
 metadata:
   id: skill-llm-deepseek
   name: DeepSeek LLM Provider
-  version: "3.0.1"
+  version: "1.0.0"
   description: DeepSeek LLM Provider，支持deepseek-chat、deepseek-coder、deepseek-reasoner等模型
   author: Ooder Team
   icon: ri-robot-line
 
 spec:
-  skillForm: PROVIDER
-  skillCategory: LLM
-  sceneType: AUTO
-  purposes:
-    - AI_INTEGRATION
-    - TEAM
-  
-  capability:
-    category: llm
+  skillForm: DRIVER
   
   capabilities:
     - id: chat-completion
@@ -48,8 +40,8 @@ spec:
       autoBind: false
       
   dependencies:
-    - skillId: llm-sdk
-      version: ">=3.0.1"
+    - skillId: skill-common
+      version: ">=2.3.1"
       required: true
       
   configSchema:

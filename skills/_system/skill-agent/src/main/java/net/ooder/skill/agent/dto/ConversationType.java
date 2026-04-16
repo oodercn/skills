@@ -1,7 +1,7 @@
 package net.ooder.skill.agent.dto;
 
-import net.ooder.skill.common.dict.Dict;
-import net.ooder.skill.common.dict.DictItem;
+import net.ooder.skill.dict.dto.Dict;
+import net.ooder.skill.dict.dto.DictItem;
 
 @Dict(code = "conversation_type", name = "对话类型", description = "Agent-Chat对话类型")
 public enum ConversationType implements DictItem {

@@ -5,60 +5,30 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.ooder</groupId>
-        <artifactId>ooder-skills</artifactId>
-        <version>3.0.2</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/>
     </parent>
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-protocol</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-protocol</name>
     <description>Protocol Management Skill for Ooder Agent Platform - SDK 2.3 Migrated</description>
 
+    <properties>
+        <java.version>21</java.version>
+        <ooder.sdk.version>3.0.2</ooder.sdk.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>skill-management</artifactId>
-            <version>${project.version}</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder.skill</groupId>
-            <artifactId>skill-agent</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder.skill</groupId>
-            <artifactId>skill-scene</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder.skill</groupId>
-            <artifactId>skill-capability</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>skill-group</artifactId>
-            <version>${project.version}</version>
+            <version>${ooder.sdk.version}</version>
             <scope>provided</scope>
         </dependency>
         
@@ -83,19 +53,16 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-maven-plugin</artifactId>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.13.0</version>
                 <configuration>
-                    <excludes>
-                        <exclude>
-                            <groupId>org.projectlombok</groupId>
-                            <artifactId>lombok</artifactId>
-                        </exclude>
-                    </excludes>
+                    <source>21</source>
+                    <target>21</target>
+                    <encoding>UTF-8</encoding>
                 </configuration>
             </plugin>
         </plugins>
     </build>
 </project>
-
 

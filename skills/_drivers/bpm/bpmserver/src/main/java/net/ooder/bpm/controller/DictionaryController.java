@@ -300,6 +300,116 @@ public class DictionaryController {
         }
     }
 
+    @GetMapping("/agent/list")
+    public ResponseEntity<Map<String, Object>> getAgentList(
+            @RequestParam(required = false) String agentType,
+            @RequestParam(required = false) String status) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> agents = getMockAgents(agentType, status);
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", agents);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get agent list", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/agent/{agentId}")
+    public ResponseEntity<Map<String, Object>> getAgentById(@PathVariable String agentId) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            Map<String, Object> agent = findAgentById(agentId);
+            if (agent == null) {
+                response.put("code", 404);
+                response.put("message", "Agent不存在: " + agentId);
+                return ResponseEntity.status(404).body(response);
+            }
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", agent);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get agent by id", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/agent/types")
+    public ResponseEntity<Map<String, Object>> getAgentTypes() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> types = getMockAgentTypes();
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", types);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get agent types", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/agent/roles")
+    public ResponseEntity<Map<String, Object>> getAgentRoles(
+            @RequestParam(required = false) String agentType) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> roles = getMockAgentRoles(agentType);
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", roles);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get agent roles", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/agent/llm-providers")
+    public ResponseEntity<Map<String, Object>> getLlmProviders() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> providers = getMockLlmProviders();
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", providers);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get LLM providers", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @GetMapping("/agent/capabilities")
+    public ResponseEntity<Map<String, Object>> getAgentCapabilities() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> capabilities = getMockAgentCapabilities();
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", capabilities);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get agent capabilities", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
     private List<Map<String, Object>> getMockOrganizations(String parentId) {
         List<Map<String, Object>> allOrgs = new ArrayList<>();
         
@@ -577,5 +687,149 @@ public class DictionaryController {
         service.put("className", className);
         service.put("description", description);
         return service;
+    }
+
+    private List<Map<String, Object>> getMockAgents(String agentType, String status) {
+        List<Map<String, Object>> allAgents = new ArrayList<>();
+
+        allAgents.add(createAgent("agent-001", "智能审批助手", "LLM_AGENT", "active",
+            "assistant", "自动审批流程中的智能决策助手", List.of("chat", "approval", "document_analysis")));
+        allAgents.add(createAgent("agent-002", "数据分析Agent", "LLM_AGENT", "active",
+            "analyst", "数据查询与分析Agent", List.of("chat", "data_query", "chart_generation")));
+        allAgents.add(createAgent("agent-003", "规则引擎Agent", "RULE_AGENT", "active",
+            "rule_engine", "基于规则的业务处理Agent", List.of("rule_execution", "validation")));
+        allAgents.add(createAgent("agent-004", "协调调度Agent", "SUPER_AGENT", "active",
+            "coordinator", "多Agent协调与任务调度", List.of("task_delegation", "coordination", "monitoring")));
+        allAgents.add(createAgent("agent-005", "文档处理Agent", "WORKER", "inactive",
+            "worker", "文档格式转换与处理", List.of("document_conversion", "ocr", "formatting")));
+        allAgents.add(createAgent("agent-006", "混合决策Agent", "HYBRID_AGENT", "active",
+            "hybrid", "结合规则与LLM的混合决策Agent", List.of("chat", "rule_execution", "approval")));
+
+        return allAgents.stream()
+            .filter(a -> agentType == null || agentType.isEmpty() || agentType.equals(a.get("agentType")))
+            .filter(a -> status == null || status.isEmpty() || status.equals(a.get("status")))
+            .toList();
+    }
+
+    private Map<String, Object> createAgent(String agentId, String agentName, String agentType,
+            String status, String role, String description, List<String> capabilities) {
+        Map<String, Object> agent = new LinkedHashMap<>();
+        agent.put("agentId", agentId);
+        agent.put("agentName", agentName);
+        agent.put("agentType", agentType);
+        agent.put("status", status);
+        agent.put("role", role);
+        agent.put("description", description);
+        agent.put("capabilities", capabilities);
+        agent.put("enabled", "active".equals(status));
+        agent.put("healthStatus", "active".equals(status) ? "healthy" : "offline");
+        agent.put("clusterId", "cluster-default");
+        agent.put("maxConcurrency", 10);
+        agent.put("currentLoad", 0);
+        return agent;
+    }
+
+    private Map<String, Object> findAgentById(String agentId) {
+        return getMockAgents(null, null).stream()
+            .filter(a -> agentId.equals(a.get("agentId")))
+            .findFirst()
+            .orElse(null);
+    }
+
+    private List<Map<String, Object>> getMockAgentTypes() {
+        List<Map<String, Object>> types = new ArrayList<>();
+        types.add(Map.of("value", "LLM_AGENT", "label", "LLM Agent"));
+        types.add(Map.of("value", "RULE_AGENT", "label", "规则Agent"));
+        types.add(Map.of("value", "HYBRID_AGENT", "label", "混合Agent"));
+        types.add(Map.of("value", "WORKER", "label", "Worker Agent"));
+        types.add(Map.of("value", "SUPER_AGENT", "label", "Super Agent"));
+        types.add(Map.of("value", "DEVICE", "label", "设备Agent"));
+        types.add(Map.of("value", "SENSOR", "label", "传感器Agent"));
+        return types;
+    }
+
+    private List<Map<String, Object>> getMockAgentRoles(String agentType) {
+        List<Map<String, Object>> roles = new ArrayList<>();
+        roles.add(Map.of("value", "assistant", "label", "通用助手", "agentType", "LLM_AGENT"));
+        roles.add(Map.of("value", "analyst", "label", "数据分析师", "agentType", "LLM_AGENT"));
+        roles.add(Map.of("value", "rule_engine", "label", "规则引擎", "agentType", "RULE_AGENT"));
+        roles.add(Map.of("value", "coordinator", "label", "协调调度", "agentType", "SUPER_AGENT"));
+        roles.add(Map.of("value", "worker", "label", "任务执行", "agentType", "WORKER"));
+        roles.add(Map.of("value", "hybrid", "label", "混合决策", "agentType", "HYBRID_AGENT"));
+
+        if (agentType != null && !agentType.isEmpty()) {
+            return roles.stream()
+                .filter(r -> agentType.equals(r.get("agentType")))
+                .toList();
+        }
+        return roles;
+    }
+
+    private List<Map<String, Object>> getMockLlmProviders() {
+        List<Map<String, Object>> providers = new ArrayList<>();
+
+        Map<String, Object> openai = new LinkedHashMap<>();
+        openai.put("value", "openai");
+        openai.put("label", "OpenAI");
+        openai.put("models", List.of(
+            Map.of("value", "gpt-4", "label", "GPT-4"),
+            Map.of("value", "gpt-4-turbo", "label", "GPT-4 Turbo"),
+            Map.of("value", "gpt-4o", "label", "GPT-4o"),
+            Map.of("value", "gpt-3.5-turbo", "label", "GPT-3.5 Turbo"),
+            Map.of("value", "o1-preview", "label", "o1 Preview")
+        ));
+        providers.add(openai);
+
+        Map<String, Object> anthropic = new LinkedHashMap<>();
+        anthropic.put("value", "anthropic");
+        anthropic.put("label", "Anthropic");
+        anthropic.put("models", List.of(
+            Map.of("value", "claude-3-opus", "label", "Claude 3 Opus"),
+            Map.of("value", "claude-3-sonnet", "label", "Claude 3 Sonnet"),
+            Map.of("value", "claude-3-haiku", "label", "Claude 3 Haiku")
+        ));
+        providers.add(anthropic);
+
+        Map<String, Object> zhipu = new LinkedHashMap<>();
+        zhipu.put("value", "zhipu");
+        zhipu.put("label", "智谱AI");
+        zhipu.put("models", List.of(
+            Map.of("value", "glm-4", "label", "GLM-4"),
+            Map.of("value", "glm-4-flash", "label", "GLM-4 Flash"),
+            Map.of("value", "glm-3-turbo", "label", "GLM-3 Turbo")
+        ));
+        providers.add(zhipu);
+
+        Map<String, Object> local = new LinkedHashMap<>();
+        local.put("value", "local");
+        local.put("label", "本地模型");
+        local.put("models", List.of(
+            Map.of("value", "llama-3", "label", "LLaMA 3"),
+            Map.of("value", "qwen-2", "label", "Qwen 2"),
+            Map.of("value", "mistral-7b", "label", "Mistral 7B")
+        ));
+        providers.add(local);
+
+        return providers;
+    }
+
+    private List<Map<String, Object>> getMockAgentCapabilities() {
+        List<Map<String, Object>> capabilities = new ArrayList<>();
+        capabilities.add(Map.of("value", "chat", "label", "对话交互"));
+        capabilities.add(Map.of("value", "approval", "label", "审批决策"));
+        capabilities.add(Map.of("value", "document_analysis", "label", "文档分析"));
+        capabilities.add(Map.of("value", "data_query", "label", "数据查询"));
+        capabilities.add(Map.of("value", "chart_generation", "label", "图表生成"));
+        capabilities.add(Map.of("value", "rule_execution", "label", "规则执行"));
+        capabilities.add(Map.of("value", "validation", "label", "数据验证"));
+        capabilities.add(Map.of("value", "task_delegation", "label", "任务委托"));
+        capabilities.add(Map.of("value", "coordination", "label", "协调调度"));
+        capabilities.add(Map.of("value", "monitoring", "label", "监控告警"));
+        capabilities.add(Map.of("value", "document_conversion", "label", "文档转换"));
+        capabilities.add(Map.of("value", "ocr", "label", "OCR识别"));
+        capabilities.add(Map.of("value", "formatting", "label", "格式处理"));
+        capabilities.add(Map.of("value", "function_calling", "label", "函数调用"));
+        capabilities.add(Map.of("value", "rag", "label", "知识检索(RAG)"));
+        return capabilities;
     }
 }

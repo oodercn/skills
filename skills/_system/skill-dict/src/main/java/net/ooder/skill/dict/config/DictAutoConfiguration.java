@@ -1,8 +1,9 @@
 package net.ooder.skill.dict.config;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import net.ooder.skill.dict.service.*;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
@@ -11,9 +12,9 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnProperty(name = "skill.dict.enabled", havingValue = "true", matchIfMissing = true)
 public class DictAutoConfiguration {
 
-    private static final Logger log = LoggerFactory.getLogger(DictAutoConfiguration.class);
-
-    public DictAutoConfiguration() {
-        log.info("[DictAutoConfiguration] Initializing dict skill module");
+    @Bean
+    @ConditionalOnMissingBean(DictService.class)
+    public DictService dictService() {
+        return new DictService();
     }
 }

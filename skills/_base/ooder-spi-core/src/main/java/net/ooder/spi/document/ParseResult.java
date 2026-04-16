@@ -1,43 +1,34 @@
 package net.ooder.spi.document;
 
-import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 文档解析结果
- */
 public class ParseResult {
     
-    private String text;
+    private String content;
     private String title;
     private String author;
-    private Integer pageCount;
-    private Long fileSize;
-    private String language;
-    private Map<String, Object> metadata = new HashMap<>();
-    private boolean success;
-    private String errorMessage;
+    private int pageCount;
+    private long fileSize;
+    private String mimeType;
+    private Map<String, Object> metadata;
     
-    public static ParseResult success(String text) {
-        ParseResult result = new ParseResult();
-        result.setSuccess(true);
-        result.setText(text);
-        return result;
+    public ParseResult() {
     }
     
-    public static ParseResult failure(String errorMessage) {
-        ParseResult result = new ParseResult();
-        result.setSuccess(false);
-        result.setErrorMessage(errorMessage);
-        return result;
+    public ParseResult(String content) {
+        this.content = content;
     }
     
-    public String getText() {
-        return text;
+    public static ParseResult of(String content) {
+        return new ParseResult(content);
     }
     
-    public void setText(String text) {
-        this.text = text;
+    public String getContent() {
+        return content;
+    }
+    
+    public void setContent(String content) {
+        this.content = content;
     }
     
     public String getTitle() {
@@ -56,28 +47,28 @@ public class ParseResult {
         this.author = author;
     }
     
-    public Integer getPageCount() {
+    public int getPageCount() {
         return pageCount;
     }
     
-    public void setPageCount(Integer pageCount) {
+    public void setPageCount(int pageCount) {
         this.pageCount = pageCount;
     }
     
-    public Long getFileSize() {
+    public long getFileSize() {
         return fileSize;
     }
     
-    public void setFileSize(Long fileSize) {
+    public void setFileSize(long fileSize) {
         this.fileSize = fileSize;
     }
     
-    public String getLanguage() {
-        return language;
+    public String getMimeType() {
+        return mimeType;
     }
     
-    public void setLanguage(String language) {
-        this.language = language;
+    public void setMimeType(String mimeType) {
+        this.mimeType = mimeType;
     }
     
     public Map<String, Object> getMetadata() {
@@ -86,26 +77,5 @@ public class ParseResult {
     
     public void setMetadata(Map<String, Object> metadata) {
         this.metadata = metadata;
-    }
-    
-    public boolean isSuccess() {
-        return success;
-    }
-    
-    public void setSuccess(boolean success) {
-        this.success = success;
-    }
-    
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-    
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
-    
-    public ParseResult addMetadata(String key, Object value) {
-        this.metadata.put(key, value);
-        return this;
     }
 }

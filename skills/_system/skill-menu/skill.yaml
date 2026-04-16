@@ -3,9 +3,9 @@ kind: Skill
 
 metadata:
   id: skill-menu
-  name: 菜单权限服务
-  version: 1.0.0
-  description: 提供菜单配置、角色菜单、用户菜单等功能
+  name: 鑿滃崟鏉冮檺鏈嶅姟
+  version: 3.0.5
+  description: 鎻愪緵鑿滃崟閰嶇疆銆佽鑹茶彍鍗曘€佺敤鎴疯彍鍗曠瓑鍔熻兘 - 鍖呭惈JPA瀛樺偍椹卞姩
   author: ooder Team
   type: system-service
   license: Apache-2.0
@@ -15,6 +15,35 @@ spec:
   type: system-skill
 
   ownership: platform
+
+  storage:
+    driver: jpa
+    type: sqlite
+    persistenceUnit: menu
+    autoCreate: true
+    config:
+      hibernate:
+        ddl-auto: update
+      datasource:
+        url: jdbc:sqlite:./data/menu.db
+    description: JPA + SQLite 瀛樺偍椹卞姩锛岀敤浜庢寔涔呭寲鑿滃崟鏁版嵁
+
+  drivers:
+    - id: jpa
+      name: JPA瀛樺偍椹卞姩
+      type: storage
+      description: 鍩轰簬Spring Data JPA + Hibernate鐨凷QLite瀛樺偍椹卞姩
+      required: true
+      version: ">=3.0.0"
+      dependencies:
+        - spring-boot-starter-data-jpa
+        - sqlite-jdbc
+        - hibernate-community-dialect
+    - id: json
+      name: JSON鏂囦欢瀛樺偍椹卞姩
+      type: storage
+      description: 鍩轰簬JSON鏂囦欢鐨勮交閲忕骇瀛樺偍椹卞姩锛堝紑鍙戜腑锛?      required: false
+      version: ">=3.0.0"
 
   capability:
     address: 0x31
@@ -28,208 +57,44 @@ spec:
     framework: spring-boot
 
   dependencies:
-    - skillId: skill-role
-      version: ">=1.0.0"
-      required: false
+    - skillId: skill-common
+      version: ">=3.0.0"
+      required: true
+    - skillId: skills-framework
+      version: ">=3.0.0"
+      required: true
 
   endpoints:
-    # MenuController 端点
     - path: /api/v1/menus
       method: GET
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: listMenus
-      description: 获取菜单列表
+      description: 鑾峰彇鑿滃崟鍒楄〃
       capability: query
     - path: /api/v1/menus/tree
       method: GET
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: getMenuTree
-      description: 获取菜单树
-      capability: query
+      description: 鑾峰彇鑿滃崟鏍?      capability: query
     - path: /api/v1/menus/{menuId}
       method: GET
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: getMenu
-      parameterTypes:
-        - java.lang.String
-      description: 获取菜单详情
+      description: 鑾峰彇鑿滃崟璇︽儏
       capability: query
     - path: /api/v1/menus
       method: POST
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: createMenu
-      parameterTypes:
-        - net.ooder.skill.menu.dto.MenuItemDTO
-      description: 创建菜单
+      description: 鍒涘缓鑿滃崟
       capability: create
     - path: /api/v1/menus/{menuId}
       method: PUT
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: updateMenu
-      parameterTypes:
-        - java.lang.String
-        - net.ooder.skill.menu.dto.MenuItemDTO
-      description: 更新菜单
+      description: 鏇存柊鑿滃崟
       capability: update
     - path: /api/v1/menus/{menuId}
       method: DELETE
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: deleteMenu
-      parameterTypes:
-        - java.lang.String
-      description: 删除菜单
+      description: 鍒犻櫎鑿滃崟
       capability: delete
-    - path: /api/v1/menus/{menuId}/move
-      method: POST
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: moveMenu
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-        - int
-      description: 移动菜单
-      capability: update
-    - path: /api/v1/roles/{roleId}/menus
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: getRoleMenus
-      parameterTypes:
-        - java.lang.String
-      description: 获取角色菜单
-      capability: query
-    - path: /api/v1/roles/{roleId}/menus
-      method: PUT
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: setRoleMenus
-      parameterTypes:
-        - java.lang.String
-        - java.util.List
-      description: 设置角色菜单
-      capability: assign
-    - path: /api/v1/users/{userId}/menus
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.MenuController
-      methodName: getUserMenus
-      parameterTypes:
-        - java.lang.String
-      description: 获取用户菜单
-      capability: query
-    # SceneMenuController 端点
-    - path: /api/v1/scene-menu/config
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: getMenuConfig
-      description: 获取场景菜单配置
-      capability: query
-    - path: /api/v1/scene-menu/library
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: getMenuLibrary
-      description: 获取场景菜单库
-      capability: query
-    - path: /api/v1/scene-menu/roles/{roleId}/menu-tree
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: getRoleMenuTree
-      parameterTypes:
-        - java.lang.String
-      description: 获取角色菜单树
-      capability: query
-    - path: /api/v1/scene-menu/roles/{roleId}/menus
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: getRoleMenus
-      parameterTypes:
-        - java.lang.String
-      description: 获取角色菜单列表
-      capability: query
-    - path: /api/v1/scene-menu/roles/{roleId}/menus
-      method: PUT
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: setRoleMenus
-      parameterTypes:
-        - java.lang.String
-        - java.util.List
-      description: 设置角色菜单
-      capability: assign
-    - path: /api/v1/scene-menu/roles/{roleId}/menus/{parentId}/children
-      method: POST
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: addChildMenu
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-        - net.ooder.skill.menu.dto.MenuItemDTO
-      description: 添加子菜单
-      capability: create
-    - path: /api/v1/scene-menu/roles/{roleId}/menus/{menuId}
-      method: PUT
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: updateMenu
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-        - net.ooder.skill.menu.dto.MenuItemDTO
-      description: 更新菜单
-      capability: update
-    - path: /api/v1/scene-menu/roles/{roleId}/menus/{menuId}/tree
-      method: DELETE
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: deleteMenuTree
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-      description: 删除菜单树
-      capability: delete
-    - path: /api/v1/scene-menu/roles/{roleId}/menus/{menuId}/move
-      method: PUT
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: moveMenu
-      parameterTypes:
-        - java.lang.String
-        - java.lang.String
-        - java.lang.String
-        - int
-      description: 移动菜单
-      capability: update
-    - path: /api/v1/scene-menu/users/{userId}/menus
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: getUserMenus
-      parameterTypes:
-        - java.lang.String
-      description: 获取用户菜单
-      capability: query
-    - path: /api/v1/scene-menu/users/{userId}/menus
-      method: PUT
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: setUserMenus
-      parameterTypes:
-        - java.lang.String
-        - java.util.List
-      description: 设置用户菜单
-      capability: assign
-    - path: /api/v1/scene-menu/export
-      method: GET
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: exportConfig
-      description: 导出配置
-      capability: query
-    - path: /api/v1/scene-menu/import
-      method: POST
-      controllerClass: net.ooder.skill.menu.controller.SceneMenuController
-      methodName: importConfig
-      parameterTypes:
-        - java.lang.String
-      description: 导入配置
-      capability: create
 
   config:
     optional:
       - name: MENU_CACHE_ENABLED
         type: boolean
         default: true
-        description: 是否启用菜单缓存
+        description: 鏄惁鍚敤鑿滃崟缂撳瓨
 
   resources:
     cpu: "50m"

@@ -1,75 +1,30 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
+<?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>net.ooder</groupId>
-        <artifactId>ooder-skills</artifactId>
-        <version>3.0.2</version>
-        <relativePath>../../pom.xml</relativePath>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.4</version>
+        <relativePath/>
     </parent>
 
+    <groupId>net.ooder</groupId>
     <artifactId>skill-scenes</artifactId>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-scenes</name>
-    <description>场景管理服务 - 提供场景CRUD、场景组管理、参与者管理、能力绑定、知识库绑定等核心功能</description>
-    <url>https://github.com/ooderCN/ooder-skills</url>
-
-    <organization>
-        <name>ooder</name>
-        <url>https://ooder.cn</url>
-    </organization>
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>https://www.opensource.org/licenses/mit-license.php</url>
-            <distribution>repo</distribution>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>IhyTdX</name>
-            <email>18683731@qq.com</email>
-            <organization>ooder</organization>
-            <organizationUrl>https://ooder.cn</organizationUrl>
-            <roles>
-                <role>Developer</role>
-            </roles>
-            <timezone>+8</timezone>
-        </developer>
-    </developers>
-
-    <scm>
-        <url>https://github.com/ooderCN/ooder-skills</url>
-        <connection>scm:git:https://github.com/ooderCN/ooder-skills.git</connection>
-        <developerConnection>scm:git:https://github.com/ooderCN/ooder-skills.git</developerConnection>
-        <tag>v3.0.2</tag>
-    </scm>
+    <description>Scenes Skill for Ooder - Scene management service</description>
 
     <properties>
-        <agent-sdk.version>3.0.2</agent-sdk.version>
-        <scene-engine.version>3.0.2</scene-engine.version>
-        <spring-boot.version>3.2.5</spring-boot.version>
+        <spring-boot.version>3.4.4</spring-boot.version>
         <maven.compiler.source>21</maven.compiler.source>
         <maven.compiler.target>21</maven.compiler.target>
+        <maven.test.skip>true</maven.test.skip>
     </properties>
-
-    <dependencyManagement>
-        <dependencies>
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>${spring-boot.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>
 
     <dependencies>
         <dependency>
@@ -77,25 +32,13 @@
             <artifactId>spring-boot-starter</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
-        
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>scene-engine</artifactId>
-            <version>${scene-engine.version}</version>
-        </dependency>
-      
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>agent-sdk-core</artifactId>
-            <version>${agent-sdk.version}</version>
-        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-autoconfigure</artifactId>
             <version>${spring-boot.version}</version>
         </dependency>
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
@@ -104,10 +47,15 @@
         </dependency>
 
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-data-jpa</artifactId>
-            <version>${spring-boot.version}</version>
-            <scope>provided</scope>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>2.0.16</version>
+        </dependency>
+
+        <dependency>
+            <groupId>jakarta.validation</groupId>
+            <artifactId>jakarta.validation-api</artifactId>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
@@ -115,27 +63,74 @@
             <artifactId>jackson-databind</artifactId>
             <version>2.17.0</version>
         </dependency>
-    </dependencies>
 
-    <distributionManagement>
-        <repository>
-            <id>central</id>
-            <url>https://central.sonatype.com/api/v1/publisher/deployments/upload/</url>
-        </repository>
-        <snapshotRepository>
-            <id>central</id>
-            <url>https://central.sonatype.com/api/v1/publisher/deployments/upload/</url>
-        </snapshotRepository>
-    </distributionManagement>
+        <!-- JPA and SQLite Database -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <version>${spring-boot.version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+            <version>3.44.1.0</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.hibernate.orm</groupId>
+            <artifactId>hibernate-community-dialects</artifactId>
+            <version>6.4.1.Final</version>
+        </dependency>
+
+        <!-- Scene Engine 3.0.1 -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>scene-engine</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <!-- Skill Common 3.0.1 (SPI Interfaces) -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-common</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <!-- Skill Dict -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-dict</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <version>${spring-boot.version}</version>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <version>2.2.224</version>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
 
     <build>
         <resources>
             <resource>
-                <directory>src/main/resources</directory>
+                <directory>.</directory>
+                <includes>
+                    <include>skill.yaml</include>
+                </includes>
             </resource>
             <resource>
-                <directory>.</directory>
-                <includes><include>skill.yaml</include></includes>
+                <directory>src/main/resources</directory>
             </resource>
         </resources>
         <plugins>
@@ -147,74 +142,8 @@
                     <source>21</source>
                     <target>21</target>
                     <encoding>UTF-8</encoding>
-                    <release>21</release>
-                    <parameters>true</parameters>
                 </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-source-plugin</artifactId>
-                <version>3.3.1</version>
-                <executions>
-                    <execution>
-                        <id>attach-sources</id>
-                        <goals>
-                            <goal>jar-no-fork</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-javadoc-plugin</artifactId>
-                <version>3.6.3</version>
-                <configuration>
-                    <source>21</source>
-                    <additionalJOption>-Xdoclint:none</additionalJOption>
-                    <failOnError>false</failOnError>
-                    <charset>UTF-8</charset>
-                    <encoding>UTF-8</encoding>
-                    <docencoding>UTF-8</docencoding>
-                </configuration>
-                <executions>
-                    <execution>
-                        <id>attach-javadocs</id>
-                        <goals>
-                            <goal>jar</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.sonatype.central</groupId>
-                <artifactId>central-publishing-maven-plugin</artifactId>
-                <version>0.4.0</version>
-                <extensions>true</extensions>
-                <configuration>
-                    <publishingServerId>central</publishingServerId>
-                    <tokenAuth>true</tokenAuth>
-                </configuration>
-            </plugin>
-            
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-gpg-plugin</artifactId>
-                <version>3.2.4</version>
-                <executions>
-                    <execution>
-                        <id>sign-artifacts</id>
-                        <phase>verify</phase>
-                        <goals>
-                            <goal>sign</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
 </project>
-
-

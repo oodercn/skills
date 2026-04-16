@@ -51,8 +51,8 @@ public class ChatSessionController {
 
     @GetMapping("/sessions")
     public ResultModel<List<ChatSession>> listSessions(
-            @RequestParam(required = false) String userId,
-            @RequestParam(required = false, defaultValue = "20") int limit) {
+            @RequestParam(value = "userId", required = false) String userId,
+            @RequestParam(value = "limit", required = false, defaultValue = "20") int limit) {
         
         List<ChatSession> result = new ArrayList<>();
         for (ChatSession session : sessions.values()) {

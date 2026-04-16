@@ -1,42 +1,31 @@
 package net.ooder.skill.scenes.model;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+
 public class ResultModel<T> {
 
     private int code;
     private String status;
     private String message;
     private T data;
-    private long timestamp;
+    private String timestamp;
+    private String requestId;
 
     public ResultModel() {
-        this.timestamp = System.currentTimeMillis();
+        this.code = CODE_SUCCESS;
         this.status = "success";
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+        this.requestId = generateRequestId();
     }
 
-    public static <T> ResultModel<T> success(T data) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(200);
-        r.setStatus("success");
-        r.setMessage("success");
-        r.setData(data);
-        return r;
-    }
-
-    public static <T> ResultModel<T> success(T data, String message) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(200);
-        r.setStatus("success");
-        r.setMessage(message);
-        r.setData(data);
-        return r;
-    }
-
-    public static <T> ResultModel<T> error(String message) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(500);
-        r.setStatus("error");
-        r.setMessage(message);
-        return r;
+    public ResultModel(int code, String message, T data, boolean success, String requestId) {
+        this.code = code;
+        this.status = success ? "success" : "error";
+        this.message = message;
+        this.data = data;
+        this.requestId = requestId;
+        this.timestamp = LocalDateTime.now().format(DateTimeFormatter.ISO_LOCAL_DATE_TIME);
     }
 
     public int getCode() { return code; }
@@ -47,6 +36,32 @@ public class ResultModel<T> {
     public void setMessage(String message) { this.message = message; }
     public T getData() { return data; }
     public void setData(T data) { this.data = data; }
-    public long getTimestamp() { return timestamp; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public String getTimestamp() { return timestamp; }
+    public void setTimestamp(String timestamp) { this.timestamp = timestamp; }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
+
+    public static final int CODE_SUCCESS = 200;
+    public static final int CODE_NOT_FOUND = 404;
+    public static final int CODE_INTERNAL_SERVER_ERROR = 500;
+
+    public static <T> ResultModel<T> success(T data) {
+        return new ResultModel<>(CODE_SUCCESS, "操作成功", data, true, generateRequestId());
+    }
+
+    public static <T> ResultModel<T> success() {
+        return new ResultModel<>(CODE_SUCCESS, "操作成功", null, true, generateRequestId());
+    }
+
+    public static <T> ResultModel<T> error(String message) {
+        return new ResultModel<>(CODE_INTERNAL_SERVER_ERROR, message, null, false, generateRequestId());
+    }
+
+    public static <T> ResultModel<T> notFound(String message) {
+        return new ResultModel<>(CODE_NOT_FOUND, message, null, false, generateRequestId());
+    }
+
+    private static String generateRequestId() {
+        return "REQ_" + System.currentTimeMillis() + "_" + (int)(Math.random() * 10000);
+    }
 }

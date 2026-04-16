@@ -1,6 +1,7 @@
 package net.ooder.skill.management.controller;
 
 import net.ooder.skill.management.SkillManager;
+import net.ooder.skill.management.dto.*;
 import net.ooder.skill.management.market.SkillListing;
 import net.ooder.skill.management.market.SkillMarketManager;
 import net.ooder.skill.management.market.SkillReview;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/skill")
@@ -26,7 +28,7 @@ public class SkillController {
     }
 
     @GetMapping("/list")
-    public Map<String, Object> listSkills(
+    public SkillListResultDTO listSkills(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") int page,
@@ -51,140 +53,140 @@ public class SkillController {
         
         List<SkillDefinition> pagedSkills = skills.subList(start, end);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", pagedSkills);
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
+        SkillListResultDTO result = new SkillListResultDTO();
+        result.setStatus("success");
+        result.setData(pagedSkills);
+        result.setTotal(total);
+        result.setPage(page);
+        result.setSize(size);
         return result;
     }
 
     @GetMapping("/{skillId}")
-    public Map<String, Object> getSkill(@PathVariable String skillId) {
+    public SkillResultDTO getSkill(@PathVariable String skillId) {
         SkillDefinition skill = skillManager.getSkill(skillId);
         
-        Map<String, Object> result = new HashMap<>();
+        SkillResultDTO result = new SkillResultDTO();
         if (skill != null) {
-            result.put("status", "success");
-            result.put("data", skill);
+            result.setStatus("success");
+            result.setData(skill);
         } else {
-            result.put("status", "error");
-            result.put("message", "Skill not found: " + skillId);
+            result.setStatus("error");
+            result.setMessage("Skill not found: " + skillId);
         }
         return result;
     }
 
     @PostMapping("/add")
-    public Map<String, Object> addSkill(@RequestBody SkillDefinition skill) {
-        Map<String, Object> result = new HashMap<>();
+    public SkillResultDTO addSkill(@RequestBody SkillDefinition skill) {
+        SkillResultDTO result = new SkillResultDTO();
         try {
             SkillDefinition added = skillManager.addSkill(skill);
-            result.put("status", "success");
-            result.put("data", added);
-            result.put("message", "Skill added successfully");
+            result.setStatus("success");
+            result.setData(added);
+            result.setMessage("Skill added successfully");
         } catch (Exception e) {
-            result.put("status", "error");
-            result.put("message", e.getMessage());
+            result.setStatus("error");
+            result.setMessage(e.getMessage());
         }
         return result;
     }
 
     @PutMapping("/update")
-    public Map<String, Object> updateSkill(@RequestBody SkillDefinition skill) {
-        Map<String, Object> result = new HashMap<>();
+    public SkillResultDTO updateSkill(@RequestBody SkillDefinition skill) {
+        SkillResultDTO result = new SkillResultDTO();
         try {
             SkillDefinition updated = skillManager.updateSkill(skill);
-            result.put("status", "success");
-            result.put("data", updated);
-            result.put("message", "Skill updated successfully");
+            result.setStatus("success");
+            result.setData(updated);
+            result.setMessage("Skill updated successfully");
         } catch (Exception e) {
-            result.put("status", "error");
-            result.put("message", e.getMessage());
+            result.setStatus("error");
+            result.setMessage(e.getMessage());
         }
         return result;
     }
 
     @DeleteMapping("/{skillId}")
-    public Map<String, Object> deleteSkill(@PathVariable String skillId) {
-        Map<String, Object> result = new HashMap<>();
+    public SkillResultDTO deleteSkill(@PathVariable String skillId) {
+        SkillResultDTO result = new SkillResultDTO();
         boolean deleted = skillManager.deleteSkill(skillId);
         if (deleted) {
-            result.put("status", "success");
-            result.put("message", "Skill deleted successfully");
+            result.setStatus("success");
+            result.setMessage("Skill deleted successfully");
         } else {
-            result.put("status", "error");
-            result.put("message", "Skill not found: " + skillId);
+            result.setStatus("error");
+            result.setMessage("Skill not found: " + skillId);
         }
         return result;
     }
 
     @PostMapping("/{skillId}/start")
-    public Map<String, Object> startSkill(@PathVariable String skillId) {
-        Map<String, Object> result = new HashMap<>();
+    public SkillResultDTO startSkill(@PathVariable String skillId) {
+        SkillResultDTO result = new SkillResultDTO();
         boolean started = skillManager.startSkill(skillId);
         if (started) {
-            result.put("status", "success");
-            result.put("message", "Skill started successfully");
+            result.setStatus("success");
+            result.setMessage("Skill started successfully");
         } else {
-            result.put("status", "error");
-            result.put("message", "Failed to start skill: " + skillId);
+            result.setStatus("error");
+            result.setMessage("Failed to start skill: " + skillId);
         }
         return result;
     }
 
     @PostMapping("/{skillId}/stop")
-    public Map<String, Object> stopSkill(@PathVariable String skillId) {
-        Map<String, Object> result = new HashMap<>();
+    public SkillResultDTO stopSkill(@PathVariable String skillId) {
+        SkillResultDTO result = new SkillResultDTO();
         boolean stopped = skillManager.stopSkill(skillId);
         if (stopped) {
-            result.put("status", "success");
-            result.put("message", "Skill stopped successfully");
+            result.setStatus("success");
+            result.setMessage("Skill stopped successfully");
         } else {
-            result.put("status", "error");
-            result.put("message", "Failed to stop skill: " + skillId);
+            result.setStatus("error");
+            result.setMessage("Failed to stop skill: " + skillId);
         }
         return result;
     }
 
     @PostMapping("/{skillId}/execute")
-    public Map<String, Object> executeSkill(
+    public SkillExecuteResultDTO executeSkill(
             @PathVariable String skillId,
-            @RequestBody(required = false) Map<String, Object> params) {
+            @RequestBody(required = false) SkillExecuteRequest request) {
         
-        Map<String, Object> result = new HashMap<>();
+        SkillExecuteResultDTO result = new SkillExecuteResultDTO();
         try {
             SkillContext context = SkillContext.create();
-            if (params != null) {
-                context.params(params);
+            if (request != null && request.getParams() != null) {
+                context.params(request.getParams());
             }
             
             SkillResult skillResult = skillManager.executeSkill(skillId, context);
-            result.put("status", skillResult.isSuccess() ? "success" : "error");
-            result.put("data", skillResult.getData());
-            result.put("message", skillResult.getMessage());
-            result.put("executionTime", skillResult.getExecutionTime());
+            result.setStatus(skillResult.isSuccess() ? "success" : "error");
+            result.setData(skillResult.getData());
+            result.setMessage(skillResult.getMessage());
+            result.setExecutionTime(skillResult.getExecutionTime());
         } catch (Exception e) {
-            result.put("status", "error");
-            result.put("message", e.getMessage());
+            result.setStatus("error");
+            result.setMessage(e.getMessage());
         }
         return result;
     }
 
     @GetMapping("/categories")
-    public Map<String, Object> getCategories() {
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", skillManager.getSkillsByCategory(null)
+    public SkillResultDTO getCategories() {
+        SkillResultDTO result = new SkillResultDTO();
+        result.setStatus("success");
+        result.setData(skillManager.getSkillsByCategory(null)
             .stream()
             .map(SkillDefinition::getCategory)
             .distinct()
-            .collect(java.util.stream.Collectors.toList()));
+            .collect(Collectors.toList()));
         return result;
     }
 
     @GetMapping("/market/list")
-    public Map<String, Object> listMarketSkills(
+    public SkillListResultDTO listMarketSkills(
             @RequestParam(required = false) String category,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false, defaultValue = "1") int page,
@@ -206,96 +208,96 @@ public class SkillController {
         
         List<SkillListing> pagedSkills = skills.subList(start, end);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", pagedSkills);
-        result.put("total", total);
-        result.put("page", page);
-        result.put("size", size);
+        SkillListResultDTO result = new SkillListResultDTO();
+        result.setStatus("success");
+        result.setData(pagedSkills);
+        result.setTotal(total);
+        result.setPage(page);
+        result.setSize(size);
         return result;
     }
 
     @GetMapping("/market/{skillId}")
-    public Map<String, Object> getMarketSkill(@PathVariable String skillId) {
+    public SkillResultDTO getMarketSkill(@PathVariable String skillId) {
         SkillListing listing = marketManager.getSkillListing(skillId);
         
-        Map<String, Object> result = new HashMap<>();
+        SkillResultDTO result = new SkillResultDTO();
         if (listing != null) {
-            result.put("status", "success");
-            result.put("data", listing);
+            result.setStatus("success");
+            result.setData(listing);
         } else {
-            result.put("status", "error");
-            result.put("message", "Skill not found in market: " + skillId);
+            result.setStatus("error");
+            result.setMessage("Skill not found in market: " + skillId);
         }
         return result;
     }
 
     @GetMapping("/market/popular")
-    public Map<String, Object> getPopularSkills(
+    public SkillListResultDTO getPopularSkills(
             @RequestParam(required = false, defaultValue = "10") int limit) {
         
         List<SkillListing> skills = marketManager.getPopularSkills(limit);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", skills);
+        SkillListResultDTO result = new SkillListResultDTO();
+        result.setStatus("success");
+        result.setData(skills);
         return result;
     }
 
     @GetMapping("/market/latest")
-    public Map<String, Object> getLatestSkills(
+    public SkillListResultDTO getLatestSkills(
             @RequestParam(required = false, defaultValue = "10") int limit) {
         
         List<SkillListing> skills = marketManager.getLatestSkills(limit);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", skills);
+        SkillListResultDTO result = new SkillListResultDTO();
+        result.setStatus("success");
+        result.setData(skills);
         return result;
     }
 
     @GetMapping("/market/categories")
-    public Map<String, Object> getMarketCategories() {
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", marketManager.getCategories());
+    public SkillResultDTO getMarketCategories() {
+        SkillResultDTO result = new SkillResultDTO();
+        result.setStatus("success");
+        result.setData(marketManager.getCategories());
         return result;
     }
 
     @PostMapping("/market/{skillId}/rate")
-    public Map<String, Object> rateSkill(
+    public SkillResultDTO rateSkill(
             @PathVariable String skillId,
-            @RequestBody Map<String, Object> ratingData) {
+            @RequestBody SkillRateRequest ratingData) {
         
-        Map<String, Object> result = new HashMap<>();
+        SkillResultDTO result = new SkillResultDTO();
         try {
-            double rating = ((Number) ratingData.get("rating")).doubleValue();
-            String comment = (String) ratingData.getOrDefault("comment", "");
-            String userId = (String) ratingData.getOrDefault("userId", "anonymous");
+            double rating = ratingData.getRating();
+            String comment = ratingData.getComment() != null ? ratingData.getComment() : "";
+            String userId = ratingData.getUserId() != null ? ratingData.getUserId() : "anonymous";
             
             boolean success = marketManager.rateSkill(skillId, rating, comment, userId);
             
             if (success) {
-                result.put("status", "success");
-                result.put("message", "Rating submitted successfully");
+                result.setStatus("success");
+                result.setMessage("Rating submitted successfully");
             } else {
-                result.put("status", "error");
-                result.put("message", "Failed to submit rating");
+                result.setStatus("error");
+                result.setMessage("Failed to submit rating");
             }
         } catch (Exception e) {
-            result.put("status", "error");
-            result.put("message", e.getMessage());
+            result.setStatus("error");
+            result.setMessage(e.getMessage());
         }
         return result;
     }
 
     @GetMapping("/market/{skillId}/reviews")
-    public Map<String, Object> getSkillReviews(@PathVariable String skillId) {
+    public SkillListResultDTO getSkillReviews(@PathVariable String skillId) {
         List<SkillReview> reviews = marketManager.getSkillReviews(skillId);
         
-        Map<String, Object> result = new HashMap<>();
-        result.put("status", "success");
-        result.put("data", reviews);
+        SkillListResultDTO result = new SkillListResultDTO();
+        result.setStatus("success");
+        result.setData(reviews);
         return result;
     }
 }

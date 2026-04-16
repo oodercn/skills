@@ -4,7 +4,7 @@ kind: Skill
 metadata:
   id: skill-agent
   name: Agent管理服务
-  version: "3.0.1"
+  version: 1.0.0
   description: 提供Agent注册、监控、拓扑管理、聊天、会话管理等完整功能
   author: ooder Team
   type: system-service
@@ -12,11 +12,6 @@ metadata:
 
 spec:
   skillForm: PROVIDER
-  skillCategory: SERVICE
-  sceneType: AUTO
-  purposes:
-    - TEAM
-    - PERSISTENT
   type: system-skill
 
   ownership: platform
@@ -25,7 +20,7 @@ spec:
     address: 0x2C
     category: SYS
     code: SYS_AGENT
-    operations: [register, unregister, heartbeat, monitor, topology, chat, session, message, a2a]
+    operations: [register, unregister, heartbeat, monitor, topology, chat, session, message, a2a, rag-chat, knowledge-base-bind]
 
   runtime:
     language: java
@@ -47,9 +42,13 @@ spec:
 
   dependencies:
     - skillId: skill-llm-base
-      version: ">=3.0.1"
+      version: "1.0.0"
       required: false
       description: "LLM基础服务，用于Agent LLM功能"
+    - skillId: skill-rag
+      version: ">=3.0.1"
+      required: false
+      description: "RAG检索增强服务，用于Agent知识增强对话"
 
   providedInterfaces:
     - id: agent-service
@@ -105,6 +104,28 @@ spec:
       name: A2A通信
       description: Agent间通信协议
       category: agent
+    - id: rag-chat
+      name: RAG增强对话
+      description: 基于知识库的RAG检索增强对话能力
+      category: rag
+    - id: knowledge-base-bind
+      name: 知识库绑定
+      description: Agent绑定知识库以启用RAG模式
+      category: rag
+
+  services:
+    - name: agentService
+      interface: net.ooder.skill.agent.service.AgentService
+      implementation: net.ooder.skill.agent.service.impl.AgentServiceImpl
+    - name: agentChatService
+      interface: net.ooder.skill.agent.service.AgentChatService
+      implementation: net.ooder.skill.agent.service.impl.AgentChatServiceImpl
+    - name: agentSessionService
+      interface: net.ooder.skill.agent.service.AgentSessionService
+      implementation: net.ooder.skill.agent.service.impl.AgentSessionServiceImpl
+    - name: agentMessageService
+      interface: net.ooder.skill.agent.service.AgentMessageService
+      implementation: net.ooder.skill.agent.service.impl.AgentMessageServiceImpl
 
   endpoints:
     # ==================== AgentController - /api/agent ====================

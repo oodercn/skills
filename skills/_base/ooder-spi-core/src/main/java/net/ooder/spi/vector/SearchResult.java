@@ -3,9 +3,6 @@ package net.ooder.spi.vector;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- * 向量搜索结果
- */
 public class SearchResult {
     
     private String id;

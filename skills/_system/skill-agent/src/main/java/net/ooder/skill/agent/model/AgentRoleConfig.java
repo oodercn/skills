@@ -22,6 +22,16 @@ public class AgentRoleConfig {
     private long createdAt;
     private long updatedAt;
 
+    private TriggerMode triggerMode = TriggerMode.MENTION;
+    private List<String> triggerKeywords;
+    private boolean ragEnabled;
+    private List<String> knowledgeBaseIds;
+    private boolean active = true;
+    private List<String> mentionedAgents;
+    private List<Map<String, String>> recentMessages;
+
+    public enum TriggerMode { MENTION, KEYWORD, ALL, NONE }
+
     public AgentRoleConfig() {
         this.capabilities = new java.util.ArrayList<>();
         this.allowedTools = new java.util.ArrayList<>();
@@ -30,6 +40,9 @@ public class AgentRoleConfig {
         this.streamingEnabled = true;
         this.maxTokens = 4096;
         this.temperature = 0.7;
+        this.triggerKeywords = new java.util.ArrayList<>();
+        this.knowledgeBaseIds = new java.util.ArrayList<>();
+        this.recentMessages = new java.util.ArrayList<>();
     }
 
     public String getAgentId() { return agentId; }
@@ -81,4 +94,19 @@ public class AgentRoleConfig {
     public boolean isActionRestricted(String action) {
         return restrictedActions != null && restrictedActions.contains(action);
     }
+
+    public TriggerMode getTriggerMode() { return triggerMode; }
+    public void setTriggerMode(TriggerMode triggerMode) { this.triggerMode = triggerMode; }
+    public List<String> getTriggerKeywords() { return triggerKeywords; }
+    public void setTriggerKeywords(List<String> triggerKeywords) { this.triggerKeywords = triggerKeywords; }
+    public boolean isRagEnabled() { return ragEnabled; }
+    public void setRagEnabled(boolean ragEnabled) { this.ragEnabled = ragEnabled; }
+    public List<String> getKnowledgeBaseIds() { return knowledgeBaseIds; }
+    public void setKnowledgeBaseIds(List<String> knowledgeBaseIds) { this.knowledgeBaseIds = knowledgeBaseIds; }
+    public boolean isActive() { return active; }
+    public void setActive(boolean active) { this.active = active; }
+    public List<String> getMentionedAgents() { return mentionedAgents; }
+    public void setMentionedAgents(List<String> mentionedAgents) { this.mentionedAgents = mentionedAgents; }
+    public List<Map<String, String>> getRecentMessages() { return recentMessages; }
+    public void setRecentMessages(List<Map<String, String>> recentMessages) { this.recentMessages = recentMessages; }
 }

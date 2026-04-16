@@ -4,17 +4,19 @@ kind: SkillPackage
 metadata:
   id: skill-protocol
   name: 协议管理技能
-  version: "3.0.1"
+  version: "2.3.1"
   description: 协议管理技能，提供协议处理器注册、命令分发能力
   author: Ooder Team
   icon: ri-plug-line
 
 spec:
   skillForm: PROVIDER
-  
+
   capability:
-    category: sys
-  
+    category: util
+    code: UTIL_PROTOCOL
+    operations: [parse, adapt, convert, register, dispatch]
+
   capabilities:
     - id: protocol-parse
       name: 协议解析

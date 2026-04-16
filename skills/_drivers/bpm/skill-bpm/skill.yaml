@@ -1,45 +1,75 @@
-id: skill-bpm
-name: BPM Workflow Server
-version: 3.0.1
-description: BPM workflow server implementation for Ooder Skills - depends on ooder-bpm-web client library
-category: _drivers
-subcategory: bpm
-author: ooder
-license: MIT
-skillForm: DRIVER
-skillCategory: WORKFLOW
-sceneType: TRIGGER
-purposes:
-  - WORKFLOW_AUTOMATION
-  - TEAM
+apiVersion: skill.ooder.net/v1
+kind: Skill
 
-capabilities:
-  - process_definition
-  - process_instance
-  - activity_management
-  - workflow_execution
-  - task_assignment
+metadata:
+  id: skill-bpm
+  name: BPM工作流服务
+  version: "3.0.5"
+  description: BPM工作流服务实现，依赖ooder-bpm-web客户端库
+  author: ooder Team
+  type: driver-service
+  license: MIT
 
-dependencies:
-  - skill-common
-  - ooder-bpm-web
+spec:
+  skillForm: DRIVER
+  skillCategory: WORKFLOW
+  sceneType: TRIGGER
+  purposes:
+    - WORKFLOW_AUTOMATION
+    - TEAM
 
-exports:
-  - net.ooder.bpm.client.service.*
-  - net.ooder.bpm.client.*
-  - net.ooder.bpm.engine.*
+  ownership: platform
 
-configuration:
-  auto_configure: false
+  capability:
+    address: 0x46
+    category: WORKFLOW
+    code: DRV_BPM
+    operations: [process_definition, process_instance, activity_management, workflow_execution, task_assignment]
 
-notes: |
-  This module provides BPM server implementation.
-  It depends on ooder-bpm-web (net.ooder:ooder-bpm-web:3.0.1) which contains:
-  - IDSClientService interface
-  - ProcessDefService interface
-  - ProcessInstService interface
-  - ProcessHistoryService interface
-  - RightService interface
-  - FDTService interface
-  - All model classes (ProcessDef, ProcessInst, ActivityDef, ActivityInst, etc.)
-  - All enum classes
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skill-common
+    - ooder-bpm-web
+
+  capabilities:
+    - id: process_definition
+      name: 流程定义
+      description: 流程定义管理
+      category: workflow
+    - id: process_instance
+      name: 流程实例
+      description: 流程实例管理
+      category: workflow
+    - id: activity_management
+      name: 活动管理
+      description: 活动节点管理
+      category: workflow
+    - id: workflow_execution
+      name: 工作流执行
+      description: 工作流执行引擎
+      category: workflow
+    - id: task_assignment
+      name: 任务分配
+      description: 任务分配和委派
+      category: workflow
+
+  providedInterfaces:
+    - id: bpm-server
+      version: "1.0"
+      description: "BPM服务端接口"
+
+  config:
+    optional:
+      - name: AUTO_CONFIGURE
+        type: boolean
+        default: false
+        description: 是否自动配置
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "50Mi"

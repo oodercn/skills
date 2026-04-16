@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.chat.config.ChatAutoConfiguration
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.llm.chat.config.SkillLlmChatAutoConfiguration

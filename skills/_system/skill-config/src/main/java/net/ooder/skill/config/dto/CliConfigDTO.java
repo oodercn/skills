@@ -1,11 +1,18 @@
 package net.ooder.skill.config.dto;
 
+import java.util.Map;
+
 public class CliConfigDTO {
     
     private String cliId;
     private String name;
     private String type;
     private boolean enabled;
+    private String icon;
+    private String description;
+    private Map<String, Object> settings;
+    private String status;
+    private long lastSyncTime;
     private String appId;
     private String appSecret;
     private String baseUrl;
@@ -21,6 +28,16 @@ public class CliConfigDTO {
     public void setType(String type) { this.type = type; }
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
+    public String getIcon() { return icon; }
+    public void setIcon(String icon) { this.icon = icon; }
+    public String getDescription() { return description; }
+    public void setDescription(String description) { this.description = description; }
+    public Map<String, Object> getSettings() { return settings; }
+    public void setSettings(Map<String, Object> settings) { this.settings = settings; }
+    public String getStatus() { return status; }
+    public void setStatus(String status) { this.status = status; }
+    public long getLastSyncTime() { return lastSyncTime; }
+    public void setLastSyncTime(long lastSyncTime) { this.lastSyncTime = lastSyncTime; }
     public String getAppId() { return appId; }
     public void setAppId(String appId) { this.appId = appId; }
     public String getAppSecret() { return appSecret; }

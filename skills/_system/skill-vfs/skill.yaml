@@ -1,0 +1,64 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-vfs
+  name: 虚拟文件系统服务
+  version: "3.0.2"
+  description: 提供虚拟文件系统核心服务
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+
+  ownership: platform
+
+  capability:
+    address: 0x4F
+    category: SYS
+    code: SYS_VFS
+    operations: [read, write, delete, list]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  supportedSceneTypes:
+    - all
+
+  dynamicSceneTypes: true
+
+  autoStart:
+    enabled: true
+    delay: 0s
+
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+
+  capabilities:
+    - id: vfs-core
+      name: VFS核心
+      description: 虚拟文件系统核心服务
+      category: storage
+
+  providedInterfaces:
+    - id: vfs-service
+      version: "1.0"
+      description: "虚拟文件系统服务接口"
+
+  config:
+    optional:
+      - name: VFS_STORAGE_PATH
+        type: string
+        default: "./data/vfs"
+        description: VFS存储路径
+
+  resources:
+    cpu: "50m"
+    memory: "128Mi"
+    storage: "500Mi"

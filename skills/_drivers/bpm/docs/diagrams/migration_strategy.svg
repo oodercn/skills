@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 510" width="800px" height="510px">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800px" height="500px">
 <defs>
     <style>
         .bg { fill: #fafafa; }
@@ -12,42 +12,76 @@
         .text-title { font-size: 15px; font-weight: bold; fill: #1e40af; }
         .text-header { font-size: 16px; font-weight: bold; fill: #ffffff; }
         .text-small { font-size: 11px; fill: #64748b; }
+        .text-highlight { font-size: 12px; font-weight: bold; fill: #d97706; }
     </style>
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
         <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
     </marker>
 </defs>
-<rect class="bg" width="100%" height="100%"/>
+
+<!-- Background -->
+<rect class="bg" width="800" height="500"/>
+
+<!-- Title -->
 <rect class="title-box" x="20" y="15" width="760" height="35" rx="4"/>
-<text class="text-header" x="400" y="38" text-anchor="middle">架构迁移策略</text>
+<text class="text-header" x="400" y="38" text-anchor="middle">插件分类迁移策略</text>
 
-<rect class="box" x="30" y="70" width="740" height="90"/>
-<text class="text-title" x="50" y="95">阶段一：数据层迁移</text>
-<text class="text" x="50" y="120">├── 保留 XPDL 格式存储</text>
-<text class="text" x="50" y="140">├── 新增 JSON Schema 定义</text>
-<text class="text" x="50" y="160">└── 实现双向数据转换</text>
+<!-- Basic Plugins -->
+<rect class="box" x="30" y="70" width="240" height="130"/>
+<text class="text-title" x="150" y="95" text-anchor="middle">基础插件（20+ 个）</text>
+<text class="text" x="50" y="120">• 基本信息插件</text>
+<text class="text" x="50" y="140">• 时限配置插件</text>
+<text class="text" x="50" y="160">• 权限配置插件</text>
+<text class="text" x="50" y="180">• 表单配置插件</text>
+<text class="text-highlight" x="150" y="195" text-anchor="middle">AI 自动生成，人工验证</text>
 
-<line class="arrow" x1="400" y1="160" x2="400" y2="190"/>
+<!-- Advanced Plugins -->
+<rect class="box-alt" x="280" y="70" width="240" height="130"/>
+<text class="text-title" x="400" y="95" text-anchor="middle">高级插件（30+ 个）</text>
+<text class="text" x="300" y="120">• 服务集成插件</text>
+<text class="text" x="300" y="140">• 监听器插件</text>
+<text class="text" x="300" y="160">• 公式配置插件</text>
+<text class="text" x="300" y="180">• 组织机构插件</text>
+<text class="text-highlight" x="400" y="195" text-anchor="middle">保留核心逻辑，重构 UI</text>
 
-<rect class="box-alt" x="30" y="190" width="740" height="90"/>
-<text class="text-title" x="50" y="215">阶段二：业务层重构</text>
-<text class="text" x="50" y="240">├── Store 状态管理</text>
-<text class="text" x="50" y="260">├── Adapter 数据适配</text>
-<text class="text" x="50" y="280">└── Plugin 插件系统</text>
+<!-- Dynamic Plugins -->
+<rect class="box-highlight" x="530" y="70" width="240" height="130"/>
+<text class="text-title" x="650" y="95" text-anchor="middle">动态插件（50+ 个）</text>
+<text class="text" x="550" y="120">• 自定义字段插件</text>
+<text class="text" x="550" y="140">• 业务规则插件</text>
+<text class="text" x="550" y="160">• 第三方集成插件</text>
+<text class="text" x="550" y="180">• 行业专用插件</text>
+<text class="text-highlight" x="650" y="195" text-anchor="middle">提供标准接口，自行迁移</text>
 
-<line class="arrow" x1="400" y1="280" x2="400" y2="310"/>
+<!-- Migration Timeline -->
+<line class="arrow" x1="150" y1="230" x2="150" y2="270"/>
+<line class="arrow" x1="400" y1="230" x2="400" y2="270"/>
+<line class="arrow" x1="650" y1="230" x2="650" y2="270"/>
 
-<rect class="box" x="30" y="310" width="740" height="90"/>
-<text class="text-title" x="50" y="335">阶段三：展示层升级</text>
-<text class="text" x="50" y="360">├── Canvas 流程图绘制</text>
-<text class="text" x="50" y="380">├── Panel 属性面板</text>
-<text class="text" x="50" y="400">└── Palette 元素面板</text>
+<!-- Day 1 -->
+<rect class="box" x="30" y="280" width="240" height="80"/>
+<text class="text-title" x="150" y="305" text-anchor="middle">Day 1-2</text>
+<text class="text" x="150" y="330" text-anchor="middle">基础插件迁移</text>
+<text class="text-small" x="150" y="350" text-anchor="middle">AI 生成 + 人工验证</text>
 
-<line class="arrow" x1="400" y1="400" x2="400" y2="430"/>
+<!-- Day 2-3 -->
+<rect class="box-alt" x="280" y="280" width="240" height="80"/>
+<text class="text-title" x="400" y="305" text-anchor="middle">Day 3-4</text>
+<text class="text" x="400" y="330" text-anchor="middle">高级插件迁移</text>
+<text class="text-small" x="400" y="350" text-anchor="middle">保留逻辑，重构 UI</text>
 
-<rect class="box-highlight" x="30" y="430" width="740" height="90"/>
-<text class="text-title" x="50" y="455">阶段四：AI 能力集成</text>
-<text class="text" x="50" y="480">├── LLM Agent 配置</text>
-<text class="text" x="50" y="500">├── Scene 场景定义</text>
-<text class="text" x="50" y="520">└── Chat 智能助手</text>
+<!-- Day 4-5 -->
+<rect class="box-highlight" x="530" y="280" width="240" height="80"/>
+<text class="text-title" x="650" y="305" text-anchor="middle">Day 5-6</text>
+<text class="text" x="650" y="330" text-anchor="middle">动态插件迁移</text>
+<text class="text-small" x="650" y="350" text-anchor="middle">标准接口 + 自行迁移</text>
+
+<!-- Final Integration -->
+<line class="arrow" x1="150" y1="390" x2="150" y2="420"/>
+<line class="arrow" x1="400" y1="390" x2="400" y2="420"/>
+<line class="arrow" x1="650" y1="390" x2="650" y2="420"/>
+
+<rect class="box" x="30" y="430" width="740" height="50"/>
+<text class="text-title" x="400" y="460" text-anchor="middle">Day 7：集成测试 + 性能优化 + 文档编写</text>
+
 </svg>

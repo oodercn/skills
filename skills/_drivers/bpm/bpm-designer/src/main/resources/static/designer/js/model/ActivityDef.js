@@ -14,6 +14,9 @@ class ActivityDef {
         this.activityType = data?.activityType || 'TASK';
         this.position = this._normalizePosition(data?.position, this.activityType);
         
+        // 活动分类 - 重要：直接存储在活动对象上
+        this.activityCategory = data?.activityCategory || 'HUMAN';
+        
         // 坐标和参与者 (BPD属性) - 修复：添加participantId
         this.positionCoord = this._normalizeCoord(data?.positionCoord);
         this.participantId = data?.participantId || '';
@@ -57,6 +60,12 @@ class ActivityDef {
         this.startOfBlock = data?.startOfBlock || null;
         this.endOfBlock = data?.endOfBlock || null;
         this.participantVisualOrder = data?.participantVisualOrder || '';
+        
+        // Agent配置 - 直接存储在活动对象上
+        this.agentConfig = data?.agentConfig || null;
+        
+        // Scene配置 - 直接存储在活动对象上
+        this.sceneConfig = data?.sceneConfig || null;
         
         // 其他扩展属性
         this.extendedAttributes = data?.extendedAttributes || {};
@@ -225,8 +234,7 @@ class ActivityDef {
      */
     _handleExtendedFields(data) {
         const extendedFields = [
-            'activityCategory', 'performerType', 'agentConfig', 
-            'sceneConfig', 'listeners'
+            'performerType', 'listeners'
         ];
         
         extendedFields.forEach(field => {
@@ -337,6 +345,7 @@ class ActivityDef {
                 description: this.description,
                 position: this.position,
                 activityType: this.activityType,
+                activityCategory: this.activityCategory,
                 
                 // BPD属性 - 修复：添加participantId
                 positionCoord: this.positionCoord,
@@ -370,6 +379,10 @@ class ActivityDef {
                 startOfBlock: this.startOfBlock,
                 endOfBlock: this.endOfBlock,
                 participantVisualOrder: this.participantVisualOrder,
+                
+                // Agent/Scene 配置 - 修复：添加到序列化
+                agentConfig: this.agentConfig,
+                sceneConfig: this.sceneConfig,
                 
                 // 扩展属性
                 extendedAttributes: this._isEmptyObject(this.extendedAttributes) ? undefined : this.extendedAttributes

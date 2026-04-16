@@ -1,0 +1,724 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>从零开始的 SPAC 编程构建 BPM 设计器实战 - LLM 参与流程控制</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+            --accent-color: #10b981;
+            --warning-color: #f59e0b;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            margin-bottom: 10px;
+        }
+
+        .nav {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav h3 {
+            color: var(--primary-color);
+            margin-bottom: 15px;
+            font-size: 1.2rem;
+        }
+
+        .nav ul {
+            list-style: none;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .nav a {
+            color: var(--text-color);
+            text-decoration: none;
+            padding: 5px 15px;
+            border-radius: 20px;
+            background: var(--code-bg);
+            transition: all 0.3s;
+            font-size: 0.95rem;
+        }
+
+        .nav a:hover {
+            background: var(--primary-color);
+            color: white;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            font-size: 2rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.5rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+        }
+
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 15px 0 15px 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--highlight-bg);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding: 15px 20px;
+            margin: 20px 0;
+            background: var(--code-bg);
+            font-style: italic;
+        }
+
+        .highlight-box {
+            background: var(--highlight-bg);
+            border-left: 4px solid var(--primary-color);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 4px;
+        }
+
+        .dialogue-box {
+            background: white;
+            border: 2px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .dialogue-box .user {
+            color: var(--primary-color);
+            font-weight: bold;
+            margin-bottom: 10px;
+        }
+
+        .dialogue-box .assistant {
+            color: var(--accent-color);
+            font-weight: bold;
+            margin-top: 15px;
+            margin-bottom: 10px;
+        }
+
+        .action-box {
+            background: #d1fae5;
+            border-left: 4px solid var(--accent-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .api-box {
+            background: #fef3c7;
+            border-left: 4px solid var(--warning-color);
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+
+        .footer {
+            background: var(--code-bg);
+            padding: 30px 40px;
+            text-align: center;
+            border-top: 2px solid var(--border-color);
+            margin-top: 50px;
+        }
+
+        .footer p {
+            margin: 5px 0;
+            color: #64748b;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 40px 20px;
+            }
+
+            .header h1 {
+                font-size: 1.8rem;
+            }
+
+            .content {
+                padding: 20px;
+            }
+
+            h2 {
+                font-size: 1.5rem;
+            }
+
+            .nav ul {
+                flex-direction: column;
+            }
+
+            table {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>从零开始的 SPAC 编程构建 BPM 设计器实战</h1>
+            <p class="subtitle">LLM 参与流程控制的全新范式</p>
+            <p class="subtitle">将传统 Swing 桌面应用转换为现代化 H5 JS 实现</p>
+        </div>
+
+        <div class="nav">
+            <h3>目录导航</h3>
+            <ul>
+                <li><a href="#section1">1. 与 trae sole 的交互过程（重点）</a></li>
+                <li><a href="#section2">2. LLM API 交互细节</a></li>
+                <li><a href="#section3">3. LLM 驱动流程设计工作流</a></li>
+                <li><a href="#section4">4. 关键技术实现</a></li>
+                <li><a href="#section5">5. 总结与展望</a></li>
+            </ul>
+        </div>
+
+        <div class="content">
+            <h2 id="section0">前言：为什么需要 LLM 参与流程控制？</h2>
+
+            <div class="highlight-box">
+                <p><strong>核心目标</strong>：设计实现一个 LLM 参与流程控制的 BPM 设计器，让 AI 成为流程设计的核心参与者，而非仅仅是辅助工具。</p>
+            </div>
+
+            <h3>传统流程设计的痛点</h3>
+            <ul>
+                <li>❌ <strong>学习成本高</strong>：需要掌握复杂的流程建模语言</li>
+                <li>❌ <strong>设计效率低</strong>：手动拖拽、配置，耗时费力</li>
+                <li>❌ <strong>错误率高</strong>：人为配置容易出错，难以发现逻辑缺陷</li>
+                <li>❌ <strong>协作困难</strong>：业务人员与技术人员的沟通成本高</li>
+                <li>❌ <strong>优化困难</strong>：缺乏智能优化建议，依赖经验</li>
+            </ul>
+
+            <h3>LLM 参与流程控制的核心价值</h3>
+            <ul>
+                <li>✅ <strong>自然语言交互</strong>：业务人员用自然语言描述需求</li>
+                <li>✅ <strong>智能流程生成</strong>：AI 自动生成流程结构和配置</li>
+                <li>✅ <strong>实时优化建议</strong>：基于最佳实践提供优化建议</li>
+                <li>✅ <strong>错误检测与修复</strong>：自动检测逻辑错误并修复</li>
+                <li>✅ <strong>知识沉淀</strong>：将设计经验转化为可复用的知识库</li>
+            </ul>
+
+            <h2 id="section1">1. 与 trae sole 的交互过程（重点）</h2>
+
+            <h3>1.1 trae sole 开发环境</h3>
+
+            <p><strong>trae sole</strong> 是我们的主力 AI 辅助开发工具，整个项目在 trae sole 环境中完成。</p>
+
+            <p><strong>交互模式</strong>：</p>
+            <ul>
+                <li><strong>自然语言描述</strong>：用中文描述需求和设计思路</li>
+                <li><strong>代码生成</strong>：trae sole 根据描述生成代码框架</li>
+                <li><strong>迭代优化</strong>：通过对话不断优化和完善</li>
+                <li><strong>实时验证</strong>：即时测试和反馈</li>
+            </ul>
+
+            <h3>1.2 核心对话过程总结</h3>
+
+            <h4>对话 1：架构设计决策</h4>
+
+            <div class="dialogue-box">
+                <div class="user">👤 用户：我需要将 Swing 版本的 BPM 设计器迁移到 H5，应该如何设计架构？</div>
+                
+                <div class="assistant">🤖 trae sole：建议采用三层架构：</div>
+                <p>1. 前端展示层：Canvas 绘制 + Panel 属性面板</p>
+                <p>2. 业务逻辑层：Store 状态管理 + Adapter 数据适配</p>
+                <p>3. 数据持久层：REST API + XPDL 存储</p>
+                
+                <div class="highlight-box">
+                    <p><strong>关键点</strong>：</p>
+                    <ul>
+                        <li>保留 XPDL 格式，实现前后端数据适配</li>
+                        <li>引入插件系统，支持动态扩展</li>
+                        <li>集成 LLM Agent，实现智能流程设计</li>
+                    </ul>
+                </div>
+                
+                <div class="user">👤 用户：如何实现 LLM Agent 的集成？</div>
+                
+                <div class="assistant">🤖 trae sole：设计 AgentDef 和 SceneDef 两个核心类：</div>
+                <ul>
+                    <li><strong>AgentDef</strong>：定义智能体的类型、能力、协作模式</li>
+                    <li><strong>SceneDef</strong>：定义智能体的执行环境和交互方式</li>
+                </ul>
+                <p>通过 Chat 类实现与 LLM API 的交互，支持：</p>
+                <ul>
+                    <li>自然语言创建流程</li>
+                    <li>智能配置活动属性</li>
+                    <li>自动生成流程定义</li>
+                </ul>
+            </div>
+
+            <h4>对话 2：插件系统设计</h4>
+
+            <div class="dialogue-box">
+                <div class="user">👤 用户：面板系统如何设计才能支持灵活扩展？</div>
+                
+                <div class="assistant">🤖 trae sole：采用微内核 + 插件架构：</div>
+                
+                <p><strong>核心组件</strong>：</p>
+                <ol>
+                    <li>PanelPlugin：插件基类，定义标准接口</li>
+                    <li>PanelManager：插件管理器，负责注册和调度</li>
+                    <li>PluginDataAdapter：数据适配器，处理不同数据格式</li>
+                </ol>
+                
+                <p><strong>插件生命周期</strong>：</p>
+                <pre><code>init() -> render() -> validate() -> destroy()</code></pre>
+                
+                <div class="highlight-box">
+                    <p><strong>关键设计</strong>：</p>
+                    <ul>
+                        <li>每个面板（流程、活动、路由）都是独立插件</li>
+                        <li>支持动态加载和卸载</li>
+                        <li>数据变更采用"确认机制"，避免频繁重绘</li>
+                    </ul>
+                </div>
+                
+                <div class="user">👤 用户：如何实现数据变更的确认机制？</div>
+                
+                <div class="assistant">🤖 trae sole：设计 pendingChanges 机制：</div>
+                <ol>
+                    <li>用户修改字段时，记录到 pendingChanges</li>
+                    <li>只有点击"确认"按钮，才应用到 store</li>
+                    <li>支持"取消"和"重置"操作</li>
+                    <li>深度比较原始值，避免误判</li>
+                </ol>
+            </div>
+
+            <h4>对话 3：LLM API 交互设计</h4>
+
+            <div class="dialogue-box">
+                <div class="user">👤 用户：如何设计 LLM API 的交互细节？</div>
+                
+                <div class="assistant">🤖 trae sole：设计 Chat 类，实现与 LLM 的交互：</div>
+                
+                <p><strong>API 调用流程</strong>：</p>
+                <ol>
+                    <li>用户输入消息</li>
+                    <li>构建上下文（当前流程、活动信息）</li>
+                    <li>调用 LLM API</li>
+                    <li>解析返回结果</li>
+                    <li>执行动作（创建活动、更新配置等）</li>
+                </ol>
+                
+                <div class="action-box">
+                    <p><strong>动作类型</strong>：</p>
+                    <ul>
+                        <li>create_activity：创建活动</li>
+                        <li>update_activity：更新活动</li>
+                        <li>delete_activity：删除活动</li>
+                        <li>create_route：创建路由</li>
+                        <li>export_yaml：导出 YAML</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h2 id="section2">2. LLM API 交互细节</h2>
+
+            <h3>2.1 API 请求格式</h3>
+
+            <div class="api-box">
+                <p><strong>请求 URL</strong>：</p>
+                <pre><code>POST /api/v1/chat/sessions/{sessionId}/messages</code></pre>
+            </div>
+
+            <p><strong>请求体</strong>：</p>
+            <pre><code>{
+  "content": "帮我创建一个请假审批流程",
+  "skillId": "bpm-designer",
+  "userId": "bpm-designer-user",
+  "context": {
+    "processId": "proc_001",
+    "processName": "请假流程",
+    "activityId": null,
+    "activityName": null,
+    "activityType": null
+  },
+  "currentPage": "BPM Designer",
+  "currentUrl": "http://localhost:8080/designer"
+}</code></pre>
+
+            <p><strong>响应格式</strong>：</p>
+            <pre><code>{
+  "status": "success",
+  "data": {
+    "content": "已为您创建请假审批流程...",
+    "actions": [
+      {
+        "type": "create_activity",
+        "data": {
+          "name": "提交申请",
+          "activityType": "TASK",
+          "category": "HUMAN",
+          "position": { "x": 200, "y": 200 }
+        }
+      }
+    ]
+  }
+}</code></pre>
+
+            <h3>2.2 上下文构建策略</h3>
+
+            <p><strong>上下文信息</strong>：</p>
+            <pre><code>const context = {
+    // 流程信息
+    processId: process?.processDefId,
+    processName: process?.name,
+    
+    // 当前活动信息
+    activityId: currentActivity?.activityDefId,
+    activityName: currentActivity?.name,
+    activityType: currentActivity?.activityType,
+    
+    // 用户信息
+    userId: 'bpm-designer-user',
+    
+    // 页面信息
+    currentPage: 'BPM Designer',
+    currentUrl: window.location.href
+};</code></pre>
+
+            <p><strong>上下文的作用</strong>：</p>
+            <ol>
+                <li><strong>流程感知</strong>：LLM 知道当前在哪个流程中</li>
+                <li><strong>活动定位</strong>：LLM 知道用户正在编辑哪个活动</li>
+                <li><strong>意图理解</strong>：LLM 能更准确地理解用户意图</li>
+            </ol>
+
+            <h3>2.3 动作执行机制</h3>
+
+            <p><strong>动作处理器</strong>：</p>
+            <pre><code>_handleActions(actions) {
+    if (!actions || !Array.isArray(actions)) return;
+    
+    actions.forEach(action => {
+        switch (action.type) {
+            case 'create_activity':
+                this._createActivity(action.data);
+                break;
+            case 'update_activity':
+                this._updateActivity(action.data);
+                break;
+            case 'delete_activity':
+                this._deleteActivity(action.data);
+                break;
+            case 'create_route':
+                this._createRoute(action.data);
+                break;
+            case 'export_yaml':
+                this._exportYaml();
+                break;
+        }
+    });
+}</code></pre>
+
+            <h2 id="section3">3. LLM 驱动流程设计工作流</h2>
+
+            <h3>3.1 完整工作流程</h3>
+
+            <ol>
+                <li><strong>用户输入需求</strong><br>└─&gt; "帮我设计一个请假审批流程"</li>
+                <li><strong>构建上下文</strong><br>├─&gt; 获取当前流程信息<br>├─&gt; 获取当前活动信息<br>└─&gt; 构建请求参数</li>
+                <li><strong>调用 LLM API</strong><br>├─&gt; POST /api/v1/chat/sessions/{id}/messages<br>└─&gt; 等待响应</li>
+                <li><strong>解析响应</strong><br>├─&gt; 提取 content（文本回复）<br>└─&gt; 提取 actions（动作列表）</li>
+                <li><strong>执行动作</strong><br>├─&gt; create_activity<br>├─&gt; create_route<br>└─&gt; update_activity</li>
+                <li><strong>更新 UI</strong><br>├─&gt; Canvas 重绘流程图<br>├─&gt; Panel 显示属性<br>└─&gt; Chat 显示结果</li>
+            </ol>
+
+            <h3>3.2 实战对话示例</h3>
+
+            <h4>示例 1：创建流程</h4>
+
+            <div class="dialogue-box">
+                <div class="user">👤 用户：帮我设计一个请假审批流程</div>
+                
+                <div class="assistant">🤖 LLM：好的，我为您设计了一个标准的请假审批流程：</div>
+                
+                <p><strong>【流程结构】</strong></p>
+                <ol>
+                    <li>开始节点</li>
+                    <li>提交申请（表单场景）</li>
+                    <li>部门经理审批（Agent审批）</li>
+                    <li>HR备案（自动任务）</li>
+                    <li>结束节点</li>
+                </ol>
+                
+                <p><strong>【Agent配置】</strong></p>
+                <ul>
+                    <li>审批Agent: LLM类型，支持EMAIL和NOTIFICATION能力</li>
+                    <li>协作模式: 层级模式</li>
+                    <li>调度策略: 条件执行（根据请假天数）</li>
+                </ul>
+                
+                <div class="action-box">
+                    <p><strong>[执行动作]</strong></p>
+                    <p>✓ create_activity: 提交申请</p>
+                    <p>✓ create_activity: 部门经理审批</p>
+                    <p>✓ create_activity: HR备案</p>
+                    <p>✓ create_route: 开始 -&gt; 提交申请</p>
+                    <p>✓ create_route: 提交申请 -&gt; 部门经理审批</p>
+                    <p>✓ create_route: 部门经理审批 -&gt; HR备案</p>
+                    <p>✓ create_route: HR备案 -&gt; 结束</p>
+                </div>
+            </div>
+
+            <h4>示例 2：优化流程</h4>
+
+            <div class="dialogue-box">
+                <div class="user">👤 用户：增加一个总经理审批环节，如果请假天数超过3天</div>
+                
+                <div class="assistant">🤖 LLM：已为您更新流程：</div>
+                
+                <p><strong>【流程结构】</strong></p>
+                <ol>
+                    <li>开始节点</li>
+                    <li>提交申请（表单场景）</li>
+                    <li>部门经理审批（Agent审批）</li>
+                    <li>条件判断（请假天数 &gt; 3天？）<br>
+                        - 是: 总经理审批<br>
+                        - 否: 直接到HR备案</li>
+                    <li>HR备案（自动任务）</li>
+                    <li>结束节点</li>
+                </ol>
+                
+                <p><strong>【路由条件】</strong></p>
+                <ul>
+                    <li>部门经理审批 -&gt; 总经理审批: ${leaveDays &gt; 3}</li>
+                    <li>部门经理审批 -&gt; HR备案: ${leaveDays &lt;= 3}</li>
+                </ul>
+                
+                <div class="action-box">
+                    <p><strong>[执行动作]</strong></p>
+                    <p>✓ create_activity: 总经理审批</p>
+                    <p>✓ create_route: 部门经理审批 -&gt; 总经理审批</p>
+                    <p>✓ create_route: 部门经理审批 -&gt; HR备案</p>
+                    <p>✓ update_route: 条件配置</p>
+                </div>
+            </div>
+
+            <h2 id="section4">4. 关键技术实现</h2>
+
+            <h3>4.1 AgentDef 智能体定义</h3>
+
+            <pre><code>class AgentDef {
+    constructor(data) {
+        this.agentId = data?.agentId || this._generateId();
+        this.name = data?.name || '新Agent';
+        
+        // Agent 类型
+        this.agentType = data?.agentType || 'LLM';
+        // LLM: 大语言模型驱动
+        // TASK: 任务执行型
+        // EVENT: 事件触发型
+        // HYBRID: 混合模式
+        
+        // 调度策略
+        this.scheduleStrategy = data?.scheduleStrategy || 'SEQUENTIAL';
+        // SEQUENTIAL: 顺序执行
+        // PARALLEL: 并行执行
+        // CONDITIONAL: 条件执行
+        
+        // 协作模式
+        this.collaborationMode = data?.collaborationMode || 'SOLO';
+        // SOLO: 独立模式
+        // HIERARCHICAL: 层级模式
+        // PEER: 对等模式
+        
+        // 能力集合
+        this.capabilities = data?.capabilities || [];
+        
+        // LLM 配置
+        this.llmConfig = data?.llmConfig || new LLMConfig();
+    }
+}</code></pre>
+
+            <h3>4.2 SceneDef 场景定义</h3>
+
+            <pre><code>class SceneDef {
+    constructor(data) {
+        this.sceneId = data?.sceneId || this._generateId();
+        this.name = data?.name || '新场景';
+        
+        // 场景类型
+        this.sceneType = data?.sceneType || 'FORM';
+        // FORM: 表单场景
+        // LIST: 列表场景
+        // DASHBOARD: 仪表盘场景
+        
+        // PageAgent 配置
+        this.pageAgent = data?.pageAgent || new PageAgentConfig();
+        
+        // 函数调用配置
+        this.functionCalling = data?.functionCalling || [];
+        
+        // 交互定义
+        this.interactions = data?.interactions || [];
+        
+        // 存储配置
+        this.storage = data?.storage || new StorageConfig();
+    }
+}</code></pre>
+
+            <h2 id="section5">5. 总结与展望</h2>
+
+            <h3>5.1 核心成果</h3>
+
+            <p>通过本次实战，我们成功实现了：</p>
+
+            <ol>
+                <li><strong>LLM 参与流程控制</strong>：AI 不再是辅助工具，而是流程设计的核心参与者</li>
+                <li><strong>自然语言交互</strong>：业务人员可以用自然语言描述需求，AI 自动生成流程</li>
+                <li><strong>智能优化建议</strong>：基于最佳实践提供优化建议</li>
+                <li><strong>插件化架构</strong>：灵活可扩展的面板系统</li>
+                <li><strong>数据适配器模式</strong>：前后端数据无缝转换</li>
+            </ol>
+
+            <h3>5.2 技术亮点</h3>
+
+            <ol>
+                <li><strong>上下文感知</strong>：LLM 能准确理解当前流程和活动状态</li>
+                <li><strong>动作机制</strong>：通过 actions 实现流程的自动化创建和修改</li>
+                <li><strong>确认机制</strong>：避免频繁重绘，提升用户体验</li>
+                <li><strong>深度比较</strong>：准确判断数据变更，避免误操作</li>
+            </ol>
+
+            <h3>5.3 未来展望</h3>
+
+            <ol>
+                <li><strong>多模型支持</strong>：集成更多 LLM 模型（Claude、Gemini等）</li>
+                <li><strong>流程模板市场</strong>：建立流程模板共享平台</li>
+                <li><strong>智能优化引擎</strong>：基于历史数据的流程优化建议</li>
+                <li><strong>协作增强</strong>：多人实时协同编辑</li>
+                <li><strong>低代码集成</strong>：与低代码平台深度集成</li>
+            </ol>
+        </div>
+
+        <div class="footer">
+            <p><strong>项目地址</strong>：e:\github\ooder-skills\skills\_drivers\bpm</p>
+            <p><strong>开源协议</strong>：MIT</p>
+            <p><strong>Maven 中央仓库</strong>：搜索 <code>net.ooder</code></p>
+            <p style="margin-top: 20px; font-style: italic;">"The best way to predict the future is to create it."</p>
+            <p style="font-style: italic;">"预测未来的最好方式，就是创造未来。"</p>
+        </div>
+    </div>
+</body>
+</html>

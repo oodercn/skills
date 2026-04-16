@@ -16,6 +16,8 @@ public class LLMConfig {
     private int maxTokens = 4096;
     private int timeout = 60000;
     private int maxRetries = 3;
+    private int maxToolCallRounds = 5;
+    private int maxContextMessages = 20;
     
     public boolean isEnabled() { return enabled; }
     public void setEnabled(boolean enabled) { this.enabled = enabled; }
@@ -35,4 +37,8 @@ public class LLMConfig {
     public void setTimeout(int timeout) { this.timeout = timeout; }
     public int getMaxRetries() { return maxRetries; }
     public void setMaxRetries(int maxRetries) { this.maxRetries = maxRetries; }
+    public int getMaxToolCallRounds() { return maxToolCallRounds; }
+    public void setMaxToolCallRounds(int maxToolCallRounds) { this.maxToolCallRounds = maxToolCallRounds; }
+    public int getMaxContextMessages() { return maxContextMessages; }
+    public void setMaxContextMessages(int maxContextMessages) { this.maxContextMessages = maxContextMessages; }
 }

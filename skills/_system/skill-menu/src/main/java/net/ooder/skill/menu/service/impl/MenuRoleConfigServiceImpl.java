@@ -93,15 +93,45 @@ public class MenuRoleConfigServiceImpl implements MenuRoleConfigService {
     
     private JSONArray getAdminMenus() {
         JSONArray menus = new JSONArray();
-        menus.add(createMenuItem("menu-admin-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true));
-        menus.add(createMenuItem("menu-admin-2", "能力市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 2, false));
-        menus.add(createMenuItem("menu-admin-3", "已安装能力", "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 3, false));
+        
+        JSONObject workbench = createMenuItem("menu-admin-1", "工作台", "/console/pages/role-admin.html", "ri-home-line", 1, true);
+        menus.add(workbench);
+        
+        JSONObject capabilityCenter = createMenuItem("menu-admin-2", "能力中心", "#", "ri-puzzle-line", 2, false);
+        JSONArray capChildren = new JSONArray();
+        capChildren.add(createChildMenuItem("menu-admin-2-1", "能力市场", "/console/pages/capability-discovery.html", "ri-store-2-line", 1, "menu-admin-2"));
+        capChildren.add(createChildMenuItem("menu-admin-2-2", "已安装能力", "/console/pages/installed-scene-capabilities.html", "ri-download-cloud-line", 2, "menu-admin-2"));
+        capChildren.add(createChildMenuItem("menu-admin-2-3", "能力管理", "/console/pages/capability-management.html", "ri-settings-4-line", 3, "menu-admin-2"));
+        capabilityCenter.put("children", capChildren);
+        menus.add(capabilityCenter);
+        
+        JSONObject knowledgeCenter = createMenuItem("menu-admin-3", "知识中心", "#", "ri-book-3-line", 3, false);
+        JSONArray knowChildren = new JSONArray();
+        knowChildren.add(createChildMenuItem("menu-admin-3-1", "知识库管理", "/console/pages/knowledge-base.html", "ri-database-2-line", 1, "menu-admin-3"));
+        knowChildren.add(createChildMenuItem("menu-admin-3-2", "知识中心", "/console/pages/knowledge-center.html", "ri-folder-3-line", 2, "menu-admin-3"));
+        knowledgeCenter.put("children", knowChildren);
+        menus.add(knowledgeCenter);
+        
         menus.add(createMenuItem("menu-admin-4", "场景管理", "/console/pages/scene-group-management.html", "ri-folder-line", 4, false));
-        menus.add(createMenuItem("menu-admin-5", "组织管理", "/console/pages/org-management.html", "ri-organization-chart", 5, false));
-        menus.add(createMenuItem("menu-admin-6", "系统配置", "/console/pages/llm-config.html", "ri-settings-3-line", 6, false));
-        menus.add(createMenuItem("menu-admin-7", "系统监控", "/console/pages/llm-monitor.html", "ri-line-chart-line", 7, false));
-        menus.add(createMenuItem("menu-admin-8", "审计日志", "/console/pages/audit-logs.html", "ri-file-list-3-line", 8, false));
+        menus.add(createMenuItem("menu-admin-5", "工作流管理", "/console/pages/bpm-workflow.html", "ri-flow-chart", 5, false));
+        menus.add(createMenuItem("menu-admin-6", "组织管理", "/console/pages/org-management.html", "ri-team-line", 6, false));
+        
+        JSONObject systemConfig = createMenuItem("menu-admin-7", "系统配置", "#", "ri-settings-3-line", 7, false);
+        JSONArray sysChildren = new JSONArray();
+        sysChildren.add(createChildMenuItem("menu-admin-7-1", "LLM配置", "/console/pages/llm-config.html", "ri-robot-line", 1, "menu-admin-7"));
+        sysChildren.add(createChildMenuItem("menu-admin-7-2", "系统监控", "/console/pages/llm-monitor.html", "ri-line-chart-line", 2, "menu-admin-7"));
+        sysChildren.add(createChildMenuItem("menu-admin-7-3", "审计日志", "/console/pages/audit-logs.html", "ri-file-list-3-line", 3, "menu-admin-7"));
+        systemConfig.put("children", sysChildren);
+        menus.add(systemConfig);
+        
         return menus;
+    }
+    
+    private JSONObject createChildMenuItem(String id, String name, String url, String icon, int sort, String parentId) {
+        JSONObject item = createMenuItem(id, name, url, icon, sort, false);
+        item.put("parentId", parentId);
+        item.put("level", 1);
+        return item;
     }
     
     private JSONArray getUserMenus() {

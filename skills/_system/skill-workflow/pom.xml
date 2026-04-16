@@ -6,11 +6,11 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-workflow</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-workflow</name>
-    <description>工作流引擎服务 - 基于ooder-bpm-web驱动包实现企业级BPM流程管理</description>
+    <description>工作流引擎服�?- 基于ooder-bpm-web驱动包实现企业级BPM流程管理</description>
 
     <properties>
         <java.version>21</java.version>
@@ -43,28 +43,27 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
 
+        <!-- 解耦说明：
+             1. skill-audit: 仅使用 @Auditable 注解，标记为 optional
+             2. skill-tenant: 仅使用 TenantContext 工具类，标记为 optional
+             3. skill-notification: 已通过事件机制解耦，完全移除
+             这些依赖在运行时有则使用，无则跳过 -->
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-audit</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
+            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-tenant</artifactId>
-            <version>3.0.2</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.ooder</groupId>
-            <artifactId>skill-notification</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>

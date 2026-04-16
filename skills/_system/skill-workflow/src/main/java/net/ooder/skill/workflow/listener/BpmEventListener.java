@@ -3,6 +3,8 @@ package net.ooder.skill.workflow.listener;
 import net.ooder.bpm.client.event.BPMEvent;
 import net.ooder.bpm.client.event.ProcessEvent;
 import net.ooder.bpm.client.event.ActivityEvent;
+import net.ooder.skill.workflow.event.WorkflowEvent;
+import net.ooder.skill.workflow.event.WorkflowEventPublisher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,6 +12,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
 
 import jakarta.annotation.PostConstruct;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.function.Consumer;
@@ -26,6 +30,13 @@ public class BpmEventListener {
     private final CopyOnWriteArrayList<Consumer<BpmEventPayload>> routeToListeners = new CopyOnWriteArrayList<>();
     private final CopyOnWriteArrayList<Consumer<BpmEventPayload>> routeBackListeners = new CopyOnWriteArrayList<>();
     private final ConcurrentHashMap<String, Object> eventCache = new ConcurrentHashMap<>();
+
+    private final WorkflowEventPublisher eventPublisher;
+
+    @Autowired
+    public BpmEventListener(WorkflowEventPublisher eventPublisher) {
+        this.eventPublisher = eventPublisher;
+    }
 
     @PostConstruct
     public void init() {
@@ -127,6 +138,9 @@ public class BpmEventListener {
         payload.setTimestamp(System.currentTimeMillis());
         eventCache.put(eventType + ":" + targetId, payload);
 
+        // 同时发布 Spring 事件，实现解耦
+        publishWorkflowEvent(eventType, targetId, rawEvent);
+
         for (Consumer<BpmEventPayload> listener : listeners) {
             try {
                 listener.accept(payload);
@@ -136,6 +150,49 @@ public class BpmEventListener {
         }
         log.info("[BpmEventListener] Event fired: type={}, id={}, listeners={}",
                 eventType, targetId, listeners.size());
+    }
+
+    private void publishWorkflowEvent(String eventType, String targetId, Object rawEvent) {
+        try {
+            Map<String, Object> payload = new HashMap<>();
+            payload.put("rawEvent", rawEvent);
+
+            String userId = resolveUserId(rawEvent);
+            if (userId == null) userId = "system";
+
+            switch (eventType) {
+                case "TASK_ARRIVED":
+                    eventPublisher.publishTaskArrived(targetId, userId, payload);
+                    break;
+                case "TASK_COMPLETED":
+                    eventPublisher.publishTaskCompleted(targetId, userId, payload);
+                    break;
+                case "PROCESS_START":
+                    eventPublisher.publishProcessStarted(targetId, userId, payload);
+                    break;
+                case "PROCESS_COMPLETE":
+                    eventPublisher.publishProcessCompleted(targetId, userId, payload);
+                    break;
+                case "PROCESS_ABORT":
+                    eventPublisher.publishProcessAborted(targetId, userId, payload);
+                    break;
+                default:
+                    log.debug("[publishWorkflowEvent] Unhandled event type: {}", eventType);
+            }
+        } catch (Exception e) {
+            log.warn("[publishWorkflowEvent] Failed to publish event: {}", e.getMessage());
+        }
+    }
+
+    private String resolveUserId(Object rawEvent) {
+        if (rawEvent == null) return null;
+        try {
+            Object performerObj = invokeMethod(rawEvent, "getPerformer");
+            if (performerObj != null) return performerObj.toString();
+            Object userObj = invokeMethod(rawEvent, "getUserID");
+            if (userObj != null) return userObj.toString();
+        } catch (Exception ignored) {}
+        return null;
     }
 
     public BpmEventPayload getLastEvent(String eventType, String targetId) {
@@ -158,6 +215,16 @@ public class BpmEventListener {
             return result != null ? result.toString() : "";
         } catch (Exception e) {
             return "";
+        }
+    }
+
+    private Object invokeMethod(Object obj, String methodName) {
+        if (obj == null) return null;
+        try {
+            java.lang.reflect.Method method = obj.getClass().getMethod(methodName);
+            return method.invoke(obj);
+        } catch (Exception e) {
+            return null;
         }
     }
 

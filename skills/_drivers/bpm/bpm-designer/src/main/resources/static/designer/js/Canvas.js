@@ -153,18 +153,21 @@ class Canvas {
 
     /**
      * 更新连线显示
+     * 当路由属性变化时，重新渲染连线以更新标签、条件等显示
      */
     _updateEdgeDisplay(routeDef) {
         if (!routeDef || !routeDef.routeDefId) return;
 
-        const edgeEl = this.edges.get(routeDef.routeDefId);
-        if (edgeEl && edgeEl.label) {
-            // 更新连线标签
-            if (routeDef.name !== undefined) {
-                edgeEl.label.textContent = routeDef.name;
-                console.log('[Canvas] Updated edge label:', routeDef.name);
-            }
+        // 更新 edges 中存储的路由数据
+        const edgeData = this.edges.get(routeDef.routeDefId);
+        if (edgeData) {
+            // 合并更新的属性
+            Object.assign(edgeData, routeDef);
+            console.log('[Canvas] Edge data updated:', routeDef.routeDefId);
         }
+
+        // 重新渲染所有连线以更新显示
+        this._renderEdges();
     }
 
     _createSvgLayer() {
@@ -395,8 +398,10 @@ class Canvas {
             e.classList.remove('d-edge-selected');
         });
         this.selectedEdge = null;
+        if (this.selectedEdges) this.selectedEdges.clear();
         this.selectedNodes.clear();
         this.store.selectActivity(null);
+        this.store.selectRoute(null);
     }
 
     _showRouteHint(x, y) {
@@ -432,7 +437,7 @@ class Canvas {
         const activity = new ActivityDef({
             name: item.name,
             activityType: item.activityType,
-            activityCategory: item.category || 'HUMAN',
+            activityCategory: item.activityCategory || item.category || 'HUMAN',
             position: item.position || 'NORMAL',
             positionCoord: { x, y }
         });
@@ -446,13 +451,21 @@ class Canvas {
     }
 
     _renderNode(activity) {
+        console.log('[Canvas._renderNode] Rendering:', activity.activityDefId, 'type:', activity.activityType, 'coord:', activity.positionCoord);
+        
+        // 验证必要字段
+        if (!activity.activityDefId) {
+            console.error('[Canvas._renderNode] Missing activityDefId:', activity);
+            return null;
+        }
+        
         const node = document.createElement('div');
         const typeClass = this._getTypeClass(activity.activityType);
         const fillClass = this._getFillClass(activity.activityType);
         
         node.className = `d-node ${typeClass} ${fillClass}`;
         node.dataset.id = activity.activityDefId;
-        node.dataset.activityType = activity.activityType;
+        node.dataset.activityType = activity.activityType || 'TASK';
 
         const iconSvg = this._getIconSvg(activity.activityType);
         const isSmall = this._isSmallNode(activity.activityType);
@@ -956,6 +969,53 @@ class Canvas {
         paths.forEach(path => {
             path.setAttribute('d', pathD);
         });
+        
+        // 更新标签位置
+        if (!isTemp) {
+            const midX = (x1 + x2) / 2;
+            const midY = (y1 + y2) / 2;
+            
+            // 更新标签文本位置
+            const labelText = edge.querySelector('.d-edge-label');
+            if (labelText) {
+                labelText.setAttribute('x', midX);
+                labelText.setAttribute('y', midY - 5);
+            }
+            
+            // 更新条件文本位置
+            const conditionText = edge.querySelector('.d-edge-condition');
+            if (conditionText) {
+                conditionText.setAttribute('x', midX);
+                conditionText.setAttribute('y', midY + 10);
+            }
+            
+            // 更新标签背景位置
+            const labelBg = edge.querySelector('.d-edge-label-bg');
+            if (labelBg) {
+                const labelGroup = edge.querySelector('.d-edge-label-group');
+                if (labelGroup) {
+                    setTimeout(() => {
+                        const bbox = labelGroup.getBBox();
+                        labelBg.setAttribute('x', bbox.x - 4);
+                        labelBg.setAttribute('y', bbox.y - 2);
+                    }, 0);
+                }
+            }
+            
+            // 更新split指示器位置
+            const splitIndicator = edge.querySelector('.d-edge-split-indicator');
+            if (splitIndicator) {
+                splitIndicator.setAttribute('x', x1 + 20);
+                splitIndicator.setAttribute('y', y1);
+            }
+            
+            // 更新join指示器位置
+            const joinIndicator = edge.querySelector('.d-edge-join-indicator');
+            if (joinIndicator) {
+                joinIndicator.setAttribute('x', x2 - 20);
+                joinIndicator.setAttribute('y', y2);
+            }
+        }
     }
 
     _getEdgePath(x1, y1, x2, y2) {
@@ -970,9 +1030,10 @@ class Canvas {
     _createEdge(fromId, toId) {
         const edge = {
             id: 'edge_' + Date.now(),
+            routeDefId: 'edge_' + Date.now(),
             from: fromId,
             to: toId,
-            name: '路由',
+            name: '新路由',
             condition: ''
         };
         
@@ -982,7 +1043,8 @@ class Canvas {
         this.store.addRoute({
             routeDefId: edge.id,
             from: fromId,
-            to: toId
+            to: toId,
+            name: '新路由'
         });
     }
 
@@ -1000,53 +1062,46 @@ class Canvas {
         const edge = this.edges.get(edgeId);
         this.selectedEdge = edge;
         
-        if (edge) {
-            this.store.emit('route:select', edge);
+        if (!this.selectedEdges) this.selectedEdges = new Set();
+        this.selectedEdges.add(edgeId);
+        
+        if (edge && edge.routeDefId) {
+            this.store.selectRoute(edge.routeDefId);
         }
     }
 
     _renderEdges() {
         this.edgeGroup.innerHTML = '';
-        
-        console.log('[Canvas] _renderEdges called, nodes size:', this.nodes.size, 'edges size:', this.edges.size);
-        console.log('[Canvas] scale:', this.scale, 'offsetX:', this.offsetX, 'offsetY:', this.offsetY);
-        
+
         this.edges.forEach((edge, edgeId) => {
             const fromNode = this.nodes.get(edge.from);
             const toNode = this.nodes.get(edge.to);
-            
-            console.log('[Canvas] Processing edge:', edgeId, 'from:', edge.from, 'to:', edge.to);
-            console.log('[Canvas] fromNode:', fromNode ? 'found' : 'not found', 'toNode:', toNode ? 'found' : 'not found');
-            
+
             if (fromNode && toNode) {
                 const fromSize = this._getNodeSize(fromNode.activity.activityType);
                 const toSize = this._getNodeSize(toNode.activity.activityType);
-                
-                console.log('[Canvas] fromSize:', fromSize, 'toSize:', toSize);
-                console.log('[Canvas] fromNode.activity.positionCoord:', fromNode.activity.positionCoord);
-                console.log('[Canvas] toNode.activity.positionCoord:', toNode.activity.positionCoord);
-                
+
                 const fromCoord = fromNode.activity.positionCoord || { x: 0, y: 0 };
                 const toCoord = toNode.activity.positionCoord || { x: 0, y: 0 };
-                
+
+                // 计算连线起点（from节点底部中心）
                 const x1 = (parseFloat(fromCoord.x) || 0) * this.scale + this.offsetX + fromSize.width * this.scale / 2;
                 const y1 = (parseFloat(fromCoord.y) || 0) * this.scale + this.offsetY + fromSize.height * this.scale;
+
+                // 计算连线终点（to节点顶部中心）
                 const x2 = (parseFloat(toCoord.x) || 0) * this.scale + this.offsetX + toSize.width * this.scale / 2;
                 const y2 = (parseFloat(toCoord.y) || 0) * this.scale + this.offsetY;
-                
-                console.log('[Canvas] Edge coordinates:', { x1, y1, x2, y2 });
-                
+
                 if (isNaN(x1) || isNaN(y1) || isNaN(x2) || isNaN(y2)) {
                     console.warn('[Canvas] Invalid edge coordinates:', { edgeId, fromCoord, toCoord, x1, y1, x2, y2 });
                     return;
                 }
-                
+
                 const edgeEl = this._createEdgeElement(x1, y1, x2, y2, false, edge);
                 edgeEl.dataset.id = edgeId;
                 this.edgeGroup.appendChild(edgeEl);
             } else {
                 console.warn('[Canvas] Node not found for edge:', edgeId, 'from:', edge.from, 'to:', edge.to);
-                console.log('[Canvas] Available nodes:', Array.from(this.nodes.keys()));
             }
         });
     }
@@ -1055,19 +1110,22 @@ class Canvas {
         this.edges.forEach((edge, edgeId) => {
             const fromNode = this.nodes.get(edge.from);
             const toNode = this.nodes.get(edge.to);
-            
+
             if (fromNode && toNode) {
                 const fromSize = this._getNodeSize(fromNode.activity.activityType);
                 const toSize = this._getNodeSize(toNode.activity.activityType);
-                
+
                 const fromCoord = fromNode.activity.positionCoord || { x: 0, y: 0 };
                 const toCoord = toNode.activity.positionCoord || { x: 0, y: 0 };
-                
+
+                // 计算连线起点（from节点底部中心）
                 const x1 = (parseFloat(fromCoord.x) || 0) * this.scale + this.offsetX + fromSize.width * this.scale / 2;
                 const y1 = (parseFloat(fromCoord.y) || 0) * this.scale + this.offsetY + fromSize.height * this.scale;
+
+                // 计算连线终点（to节点顶部中心）
                 const x2 = (parseFloat(toCoord.x) || 0) * this.scale + this.offsetX + toSize.width * this.scale / 2;
                 const y2 = (parseFloat(toCoord.y) || 0) * this.scale + this.offsetY;
-                
+
                 const edgeEl = this.edgeGroup.querySelector(`[data-id="${edgeId}"]`);
                 if (edgeEl && !isNaN(x1) && !isNaN(y1) && !isNaN(x2) && !isNaN(y2)) {
                     this._updateEdgeElement(edgeEl, x1, y1, x2, y2);
@@ -1210,73 +1268,83 @@ class Canvas {
 
     loadProcess(processDef) {
         console.log('[Canvas] Loading process:', processDef);
-        console.log('[Canvas] Activities:', processDef.activities?.length);
-        console.log('[Canvas] Routes:', processDef.routes?.length);
         this.clear();
-        
+
         if (!processDef.activities) {
             processDef.activities = [];
         }
-        
-        const hasStart = processDef.activities.some(a => a.activityType === 'START');
-        const hasEnd = processDef.activities.some(a => a.activityType === 'END');
-        
-        const normalActivities = processDef.activities.filter(a => 
-            a.activityType !== 'START' && a.activityType !== 'END'
-        );
-        
-        if (!hasStart && normalActivities.length > 0) {
-            const startNode = {
-                activityDefId: 'start_' + processDef.processDefId,
-                name: '开始',
-                position: 'START',
-                activityType: 'START',
-                positionCoord: { x: 50, y: 200 }
-            };
-            processDef.activities.unshift(startNode);
-            console.log('[Canvas] Auto-added START node');
-        }
-        
-        if (!hasEnd && normalActivities.length > 0) {
-            const endNode = {
-                activityDefId: 'end_' + processDef.processDefId,
-                name: '结束',
-                position: 'END',
-                activityType: 'END',
-                positionCoord: { x: 700, y: 200 }
-            };
-            processDef.activities.push(endNode);
-            console.log('[Canvas] Auto-added END node');
-        }
-        
+
+        // 确保每个活动都有正确的坐标
+        processDef.activities.forEach(activity => {
+            if (!activity.positionCoord || typeof activity.positionCoord !== 'object') {
+                activity.positionCoord = { x: 100, y: 100 };
+            } else {
+                // 确保坐标是数字类型
+                activity.positionCoord = {
+                    x: parseFloat(activity.positionCoord.x) || 0,
+                    y: parseFloat(activity.positionCoord.y) || 0
+                };
+            }
+        });
+
+        // 注意：不再自动补充开始/结束节点
+        // 开始/结束节点应该由用户自行添加，或者从流程扩展属性中读取
+        // 这样可以避免：1)删不掉的节点 2)无限补充的问题
+
         if (processDef.activities.length === 0) {
             console.warn('[Canvas] No activities to render');
             return;
         }
-        
-        processDef.activities.forEach(activity => {
-            console.log('[Canvas] Adding activity:', activity.activityDefId, 'positionCoord:', activity.positionCoord);
-            const node = this._renderNode(activity);
-            this.container.appendChild(node);
-            this.nodes.set(activity.activityDefId, { element: node, activity });
+
+        // 渲染所有活动节点
+        console.log('[Canvas] Rendering', processDef.activities.length, 'activities');
+        processDef.activities.forEach((activity, index) => {
+            try {
+                console.log(`[Canvas] Rendering activity ${index}:`, activity.activityDefId, activity.name, 'type:', activity.activityType, 'coord:', activity.positionCoord);
+                const node = this._renderNode(activity);
+                if (!node) {
+                    console.error(`[Canvas] _renderNode returned null for activity ${index}`);
+                    return;
+                }
+                this.container.appendChild(node);
+                this.nodes.set(activity.activityDefId, { element: node, activity });
+                console.log(`[Canvas] Activity ${index} rendered successfully`);
+            } catch (error) {
+                console.error(`[Canvas] Error rendering activity ${index}:`, error, activity);
+            }
         });
-        
-        console.log('[Canvas] Nodes map size:', this.nodes.size);
-        console.log('[Canvas] Nodes keys:', Array.from(this.nodes.keys()));
-        
+        console.log('[Canvas] Finished rendering activities, total nodes:', this.nodes.size);
+
+        // 处理路由 - 标准化from/to字段
         if (processDef.routes && processDef.routes.length > 0) {
             processDef.routes.forEach(route => {
-                console.log('[Canvas] Adding route:', route.routeDefId, 'from:', route.from, 'to:', route.to);
-                this.edges.set(route.routeDefId, {
-                    id: route.routeDefId,
-                    from: route.from,
-                    to: route.to,
+                const routeId = route.routeDefId || route.id || 'route_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+
+                // 标准化from字段
+                let fromId = route.from || route.fromActivityDefId;
+                let toId = route.to || route.toActivityDefId;
+
+                // 验证from/to节点是否存在，不存在则跳过此路由
+                if (fromId && !this.nodes.has(fromId)) {
+                    console.warn(`[Canvas] Route ${routeId} references non-existent from node: ${fromId}, skipping route`);
+                    return;
+                }
+                if (toId && !this.nodes.has(toId)) {
+                    console.warn(`[Canvas] Route ${routeId} references non-existent to node: ${toId}, skipping route`);
+                    return;
+                }
+
+                this.edges.set(routeId, {
+                    id: routeId,
+                    routeDefId: routeId,
+                    from: fromId,
+                    to: toId,
                     name: route.name || '路由',
-                    condition: route.condition || ''
+                    condition: route.condition || route.routeCondition || ''
                 });
             });
         }
-        
+
         this._renderEdges();
     }
 
@@ -1303,7 +1371,7 @@ class Canvas {
     removeEdge(routeId) {
         const edgeData = this.edges.get(routeId);
         if (edgeData) {
-            const edgeEl = this.edgeGroup.querySelector(`[data-edge-id="${routeId}"]`);
+            const edgeEl = this.edgeGroup.querySelector(`[data-id="${routeId}"]`);
             if (edgeEl) {
                 edgeEl.remove();
             }
@@ -1313,6 +1381,8 @@ class Canvas {
         if (this.selectedEdges) {
             this.selectedEdges.delete(routeId);
         }
+        
+        this._renderEdges();
     }
 
     clear() {

@@ -65,6 +65,138 @@ spec:
       category: config
   
   endpoints:
+    - path: /api/v1/config/system
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getSystemConfig
+      description: 获取系统配置
+      capability: config-manage
+    - path: /api/v1/config/system
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateSystemConfig
+      description: 更新系统配置
+      capability: config-manage
+    - path: /api/v1/config/system/capabilities
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getCapabilityConfig
+      description: 获取能力配置
+      capability: config-manage
+    - path: /api/v1/config/system/profile
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getProfileConfig
+      description: 获取配置文件
+      capability: config-manage
+    - path: /api/v1/config/system/profile
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateProfileConfig
+      description: 更新配置文件
+      capability: config-manage
+    - path: /api/v1/config/system/reset
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: resetSystemConfig
+      description: 重置系统配置
+      capability: config-manage
+    - path: /api/v1/config/system/capabilities/{address}
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: configureCapability
+      description: 配置能力
+      capability: config-manage
+    - path: /api/v1/config/vfs
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getVfsConfig
+      description: 获取VFS配置
+      capability: config-manage
+    - path: /api/v1/config/vfs
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateVfsConfig
+      description: 更新VFS配置
+      capability: config-manage
+    - path: /api/v1/config/comm
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getCommConfig
+      description: 获取通信配置
+      capability: config-manage
+    - path: /api/v1/config/comm
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateCommConfig
+      description: 更新通信配置
+      capability: config-manage
+    - path: /api/v1/config/db/connections
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getDbConnections
+      description: 获取数据库连接
+      capability: config-manage
+    - path: /api/v1/config/db/test
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: testDbConnection
+      description: 测试数据库连接
+      capability: config-manage
+    - path: /api/v1/config/db/pool
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getDbPoolConfig
+      description: 获取数据库连接池配置
+      capability: config-manage
+    - path: /api/v1/config/db/monitor
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getDbMonitor
+      description: 获取数据库监控信息
+      capability: config-manage
+    - path: /api/v1/config/org
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getOrgConfig
+      description: 获取组织配置
+      capability: config-manage
+    - path: /api/v1/config/org
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateOrgConfig
+      description: 更新组织配置
+      capability: config-manage
+    - path: /api/v1/config/auth
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getAuthConfig
+      description: 获取认证配置
+      capability: config-manage
+    - path: /api/v1/config/auth
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateAuthConfig
+      description: 更新认证配置
+      capability: config-manage
+    - path: /api/v1/config/categories
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getCategories
+      description: 获取配置分类
+      capability: config-manage
+    - path: /api/v1/config/skills/{id}
+      method: GET
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: getSkillConfig
+      description: 获取技能配置
+      capability: config-manage
+    - path: /api/v1/config/skills/{id}
+      method: POST
+      controllerClass: net.ooder.skill.config.controller.SystemConfigController
+      methodName: updateSkillConfig
+      description: 更新技能配置
+      capability: config-manage
     - path: /api/v1/security/config
       method: GET
       controllerClass: net.ooder.skill.config.controller.SecurityConfigController

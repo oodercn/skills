@@ -16,7 +16,7 @@ spring:
     time-zone: Asia/Shanghai
 
 server:
-  port: 8084
+  port: 9004
   servlet:
     context-path: /bpm
 
@@ -27,7 +27,7 @@ logging:
 
 bpm:
   database:
-    init-mode: always
+    init-mode: never
 
 ooder:
   jds:

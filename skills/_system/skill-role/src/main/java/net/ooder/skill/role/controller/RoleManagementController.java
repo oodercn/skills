@@ -1,6 +1,6 @@
 package net.ooder.skill.role.controller;
 
-import net.ooder.skill.role.dto.PageResult;
+import net.ooder.skill.role.dto.*;
 import net.ooder.skill.role.model.ResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -15,26 +15,26 @@ public class RoleManagementController {
 
     private static final Logger log = LoggerFactory.getLogger(RoleManagementController.class);
 
-    private final Map<String, Map<String, Object>> roleStore = new HashMap<>();
-    private final Map<String, Map<String, Object>> userStore = new HashMap<>();
+    private final Map<String, RoleDTO> roleStore = new HashMap<>();
+    private final Map<String, UserInfoDTO> userStore = new HashMap<>();
 
     @GetMapping("/roles")
-    public ResultModel<List<Map<String, Object>>> getAllRoles() {
+    public ResultModel<List<RoleDTO>> getAllRoles() {
         log.info("[RoleManagementController] Get all roles");
         
         if (roleStore.isEmpty()) {
-            Map<String, Object> adminRole = new HashMap<>();
-            adminRole.put("id", "admin");
-            adminRole.put("name", "Administrator");
-            adminRole.put("description", "Full access to all features");
-            adminRole.put("permissions", Arrays.asList("read", "write", "delete", "admin"));
+            RoleDTO adminRole = new RoleDTO();
+            adminRole.setId("admin");
+            adminRole.setName("Administrator");
+            adminRole.setDescription("Full access to all features");
+            adminRole.setPermissions(Arrays.asList("read", "write", "delete", "admin"));
             roleStore.put("admin", adminRole);
             
-            Map<String, Object> userRole = new HashMap<>();
-            userRole.put("id", "user");
-            userRole.put("name", "User");
-            userRole.put("description", "Standard user access");
-            userRole.put("permissions", Arrays.asList("read", "write"));
+            RoleDTO userRole = new RoleDTO();
+            userRole.setId("user");
+            userRole.setName("User");
+            userRole.setDescription("Standard user access");
+            userRole.setPermissions(Arrays.asList("read", "write"));
             roleStore.put("user", userRole);
         }
         
@@ -42,19 +42,26 @@ public class RoleManagementController {
     }
 
     @PostMapping("/roles")
-    public ResultModel<Map<String, Object>> createRole(@RequestBody Map<String, Object> role) {
-        log.info("[RoleManagementController] Create role: {}", role.get("name"));
+    public ResultModel<RoleDTO> createRole(@RequestBody CreateRoleRequest request) {
+        log.info("[RoleManagementController] Create role: {}", request.getName());
         String id = UUID.randomUUID().toString();
-        role.put("id", id);
-        role.put("createTime", new Date().toString());
+        
+        RoleDTO role = new RoleDTO();
+        role.setId(id);
+        role.setName(request.getName());
+        role.setCode(request.getCode());
+        role.setDescription(request.getDescription());
+        role.setType(request.getType());
+        role.setPermissions(request.getPermissions());
+        role.setCreateTime(System.currentTimeMillis());
         roleStore.put(id, role);
         return ResultModel.success(role);
     }
 
     @GetMapping("/roles/{id}")
-    public ResultModel<Map<String, Object>> getRole(@PathVariable String id) {
+    public ResultModel<RoleDTO> getRole(@PathVariable String id) {
         log.info("[RoleManagementController] Get role: {}", id);
-        Map<String, Object> role = roleStore.get(id);
+        RoleDTO role = roleStore.get(id);
         if (role == null) {
             return ResultModel.notFound("Role not found: " + id);
         }
@@ -62,13 +69,17 @@ public class RoleManagementController {
     }
 
     @PutMapping("/roles/{id}")
-    public ResultModel<Map<String, Object>> updateRole(@PathVariable String id, @RequestBody Map<String, Object> role) {
+    public ResultModel<RoleDTO> updateRole(@PathVariable String id, @RequestBody UpdateRoleRequest request) {
         log.info("[RoleManagementController] Update role: {}", id);
-        if (!roleStore.containsKey(id)) {
+        RoleDTO role = roleStore.get(id);
+        if (role == null) {
             return ResultModel.notFound("Role not found: " + id);
         }
-        role.put("id", id);
-        role.put("updateTime", new Date().toString());
+        if (request.getName() != null) role.setName(request.getName());
+        if (request.getDescription() != null) role.setDescription(request.getDescription());
+        if (request.getStatus() != null) role.setStatus(request.getStatus());
+        if (request.getPermissions() != null) role.setPermissions(request.getPermissions());
+        role.setUpdateTime(System.currentTimeMillis());
         roleStore.put(id, role);
         return ResultModel.success(role);
     }
@@ -84,22 +95,24 @@ public class RoleManagementController {
     }
 
     @GetMapping("/users")
-    public ResultModel<List<Map<String, Object>>> getAllUsers() {
+    public ResultModel<List<UserInfoDTO>> getAllUsers() {
         log.info("[RoleManagementController] Get all users");
         
         if (userStore.isEmpty()) {
-            Map<String, Object> user1 = new HashMap<>();
-            user1.put("id", "user-001");
-            user1.put("name", "Admin");
-            user1.put("email", "admin@ooder.net");
-            user1.put("role", "admin");
+            UserInfoDTO user1 = new UserInfoDTO();
+            user1.setUserId("user-001");
+            user1.setUsername("admin");
+            user1.setNickname("Admin");
+            user1.setEmail("admin@ooder.net");
+            user1.setRoles(Arrays.asList("admin"));
             userStore.put("user-001", user1);
             
-            Map<String, Object> user2 = new HashMap<>();
-            user2.put("id", "user-002");
-            user2.put("name", "User");
-            user2.put("email", "user@ooder.net");
-            user2.put("role", "user");
+            UserInfoDTO user2 = new UserInfoDTO();
+            user2.setUserId("user-002");
+            user2.setUsername("user");
+            user2.setNickname("User");
+            user2.setEmail("user@ooder.net");
+            user2.setRoles(Arrays.asList("user"));
             userStore.put("user-002", user2);
         }
         
@@ -107,9 +120,9 @@ public class RoleManagementController {
     }
 
     @GetMapping("/users/{id}")
-    public ResultModel<Map<String, Object>> getUser(@PathVariable String id) {
+    public ResultModel<UserInfoDTO> getUser(@PathVariable String id) {
         log.info("[RoleManagementController] Get user: {}", id);
-        Map<String, Object> user = userStore.get(id);
+        UserInfoDTO user = userStore.get(id);
         if (user == null) {
             return ResultModel.notFound("User not found: " + id);
         }
@@ -117,13 +130,15 @@ public class RoleManagementController {
     }
 
     @PutMapping("/users/{id}")
-    public ResultModel<Map<String, Object>> updateUser(@PathVariable String id, @RequestBody Map<String, Object> user) {
+    public ResultModel<UserInfoDTO> updateUser(@PathVariable String id, @RequestBody UpdateUserRequest request) {
         log.info("[RoleManagementController] Update user: {}", id);
-        if (!userStore.containsKey(id)) {
+        UserInfoDTO user = userStore.get(id);
+        if (user == null) {
             return ResultModel.notFound("User not found: " + id);
         }
-        user.put("id", id);
-        user.put("updateTime", new Date().toString());
+        if (request.getNickname() != null) user.setNickname(request.getNickname());
+        if (request.getEmail() != null) user.setEmail(request.getEmail());
+        if (request.getDepartmentName() != null) user.setDepartmentName(request.getDepartmentName());
         userStore.put(id, user);
         return ResultModel.success(user);
     }
@@ -139,18 +154,24 @@ public class RoleManagementController {
     }
 
     @PostMapping("/users/{userId}/bind-role/{roleId}")
-    public ResultModel<Map<String, Object>> bindUserToRole(@PathVariable String userId, @PathVariable String roleId) {
+    public ResultModel<UserInfoDTO> bindUserToRole(@PathVariable String userId, @PathVariable String roleId) {
         log.info("[RoleManagementController] Bind role {} to user {}", roleId, userId);
         
-        Map<String, Object> user = userStore.get(userId);
+        UserInfoDTO user = userStore.get(userId);
         if (user == null) {
-            user = new HashMap<>();
-            user.put("id", userId);
+            user = new UserInfoDTO();
+            user.setUserId(userId);
             userStore.put(userId, user);
         }
         
-        user.put("role", roleId);
-        user.put("roleBindTime", new Date().toString());
+        List<String> roles = user.getRoles();
+        if (roles == null) {
+            roles = new ArrayList<>();
+        }
+        if (!roles.contains(roleId)) {
+            roles.add(roleId);
+        }
+        user.setRoles(roles);
         
         return ResultModel.success(user);
     }
@@ -160,11 +181,9 @@ public class RoleManagementController {
         log.info("[RoleManagementController] Get menus for role: {}", roleId);
         
         List<String> menus = new ArrayList<>();
-        Map<String, Object> role = roleStore.get(roleId);
-        if (role != null && role.containsKey("menus")) {
-            @SuppressWarnings("unchecked")
-            List<String> roleMenus = (List<String>) role.get("menus");
-            menus = roleMenus;
+        RoleDTO role = roleStore.get(roleId);
+        if (role != null && role.getMenuIds() != null) {
+            menus = role.getMenuIds();
         }
         
         return ResultModel.success(menus);
@@ -174,24 +193,24 @@ public class RoleManagementController {
     public ResultModel<Boolean> setRoleMenus(@PathVariable String roleId, @RequestBody List<String> menuIds) {
         log.info("[RoleManagementController] Set menus for role: {}, count: {}", roleId, menuIds != null ? menuIds.size() : 0);
         
-        Map<String, Object> role = roleStore.get(roleId);
+        RoleDTO role = roleStore.get(roleId);
         if (role == null) {
             return ResultModel.notFound("Role not found: " + roleId);
         }
         
-        role.put("menus", menuIds);
-        role.put("menuUpdateTime", new Date().toString());
+        role.setMenuIds(menuIds);
+        role.setUpdateTime(System.currentTimeMillis());
         
         return ResultModel.success(true);
     }
 
     @GetMapping("/roles/{roleId}/users")
-    public ResultModel<List<Map<String, Object>>> getUsersByRole(@PathVariable String roleId) {
+    public ResultModel<List<UserInfoDTO>> getUsersByRole(@PathVariable String roleId) {
         log.info("[RoleManagementController] Get users by role: {}", roleId);
         
-        List<Map<String, Object>> users = new ArrayList<>();
-        for (Map<String, Object> user : userStore.values()) {
-            if (roleId.equals(user.get("role"))) {
+        List<UserInfoDTO> users = new ArrayList<>();
+        for (UserInfoDTO user : userStore.values()) {
+            if (user.getRoles() != null && user.getRoles().contains(roleId)) {
                 users.add(user);
             }
         }
@@ -200,58 +219,63 @@ public class RoleManagementController {
     }
 
     @PostMapping("/users")
-    public ResultModel<Map<String, Object>> createUser(@RequestBody Map<String, Object> user) {
-        log.info("[RoleManagementController] Create user: {}", user.get("name"));
+    public ResultModel<UserInfoDTO> createUser(@RequestBody CreateUserRequest request) {
+        log.info("[RoleManagementController] Create user: {}", request.getUsername());
         String id = UUID.randomUUID().toString();
-        user.put("id", id);
-        user.put("createTime", new Date().toString());
+        
+        UserInfoDTO user = new UserInfoDTO();
+        user.setUserId(id);
+        user.setUsername(request.getUsername());
+        user.setNickname(request.getNickname());
+        user.setEmail(request.getEmail());
+        user.setCreateTime(System.currentTimeMillis());
         userStore.put(id, user);
         return ResultModel.success(user);
     }
 
     @GetMapping("/types")
-    public ResultModel<List<Map<String, Object>>> listRoleTypes() {
+    public ResultModel<List<RoleTypeDTO>> listRoleTypes() {
         log.info("[RoleManagementController] List role types");
         
-        List<Map<String, Object>> types = new ArrayList<>();
+        List<RoleTypeDTO> types = new ArrayList<>();
         
-        Map<String, Object> type1 = new HashMap<>();
-        type1.put("code", "system");
-        type1.put("name", "系统角色");
-        type1.put("description", "系统内置角色");
+        RoleTypeDTO type1 = new RoleTypeDTO();
+        type1.setCode("system");
+        type1.setName("系统角色");
+        type1.setDescription("系统内置角色");
         types.add(type1);
         
-        Map<String, Object> type2 = new HashMap<>();
-        type2.put("code", "custom");
-        type2.put("name", "自定义角色");
-        type2.put("description", "用户自定义角色");
+        RoleTypeDTO type2 = new RoleTypeDTO();
+        type2.setCode("custom");
+        type2.setName("自定义角色");
+        type2.setDescription("用户自定义角色");
         types.add(type2);
         
-        Map<String, Object> type3 = new HashMap<>();
-        type3.put("code", "business");
-        type3.put("name", "业务角色");
-        type3.put("description", "业务相关角色");
+        RoleTypeDTO type3 = new RoleTypeDTO();
+        type3.setCode("business");
+        type3.setName("业务角色");
+        type3.setDescription("业务相关角色");
         types.add(type3);
         
         return ResultModel.success(types);
     }
 
     @GetMapping("/statuses")
-    public ResultModel<List<Map<String, Object>>> listRoleStatuses() {
+    public ResultModel<List<RoleStatusDTO>> listRoleStatuses() {
         log.info("[RoleManagementController] List role statuses");
         
-        List<Map<String, Object>> statuses = new ArrayList<>();
+        List<RoleStatusDTO> statuses = new ArrayList<>();
         
-        Map<String, Object> status1 = new HashMap<>();
-        status1.put("code", "active");
-        status1.put("name", "启用");
-        status1.put("description", "角色已启用");
+        RoleStatusDTO status1 = new RoleStatusDTO();
+        status1.setCode("active");
+        status1.setName("启用");
+        status1.setDescription("角色已启用");
         statuses.add(status1);
         
-        Map<String, Object> status2 = new HashMap<>();
-        status2.put("code", "inactive");
-        status2.put("name", "禁用");
-        status2.put("description", "角色已禁用");
+        RoleStatusDTO status2 = new RoleStatusDTO();
+        status2.setCode("inactive");
+        status2.setName("禁用");
+        status2.setDescription("角色已禁用");
         statuses.add(status2);
         
         return ResultModel.success(statuses);

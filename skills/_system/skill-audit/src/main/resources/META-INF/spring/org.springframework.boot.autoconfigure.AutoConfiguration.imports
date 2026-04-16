@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.audit.config.AuditAutoConfiguration
+﻿net.ooder.skill.audit.config.AuditAutoConfiguration

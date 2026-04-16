@@ -6,7 +6,7 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-im-gateway</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-im-gateway</name>
@@ -36,7 +36,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -60,7 +60,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-tenant</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -68,7 +68,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-rag</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -76,7 +76,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-audit</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-spi-core</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.5</version>
         </dependency>
 
         <!-- Test Dependencies -->

@@ -434,12 +434,14 @@ class ProcessDef {
             listeners: this.listeners,
             rightGroups: this.rightGroups,
             
-            // 活动和路由 - 修复：确保activity是ActivityDef实例，过滤掉开始和结束虚拟节点
+            // 活动和路由 - 修复：确保activity是ActivityDef实例
+            // 注意：只过滤 activityType === 'START'/'END' 的虚拟节点
+            // 不过滤 position === 'START'/'END' 的真实业务活动（如起草、归档）
             activities: this.activities
                 .filter(a => {
-                    // 过滤掉开始和结束虚拟节点（这些节点信息已存储在startNode和endNodes中）
-                    const isVirtualNode = a.position === 'START' || a.position === 'END' ||
-                                          a.activityType === 'START' || a.activityType === 'END';
+                    // 只过滤真正的开始/结束虚拟节点（activityType为START/END）
+                    // position为START/END的是真实业务活动，不应过滤
+                    const isVirtualNode = a.activityType === 'START' || a.activityType === 'END';
                     return !isVirtualNode;
                 })
                 .map((a, index) => {

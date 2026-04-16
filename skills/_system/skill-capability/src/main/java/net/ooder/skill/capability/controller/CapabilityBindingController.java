@@ -1,5 +1,8 @@
 package net.ooder.skill.capability.controller;
 
+import net.ooder.skill.capability.dto.CapabilityBindingDTO;
+import net.ooder.skill.capability.dto.CreateBindingRequest;
+import net.ooder.skill.capability.dto.BindingTestResultDTO;
 import net.ooder.skill.capability.model.ResultModel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,18 +17,18 @@ public class CapabilityBindingController {
 
     private static final Logger log = LoggerFactory.getLogger(CapabilityBindingController.class);
 
-    private final Map<String, Map<String, Object>> bindingStore = new HashMap<>();
+    private final Map<String, CapabilityBindingDTO> bindingStore = new HashMap<>();
 
     @GetMapping
-    public ResultModel<List<Map<String, Object>>> listBindings() {
+    public ResultModel<List<CapabilityBindingDTO>> listBindings() {
         log.info("[CapabilityBindingController] List bindings");
         return ResultModel.success(new ArrayList<>(bindingStore.values()));
     }
 
     @GetMapping("/{id}")
-    public ResultModel<Map<String, Object>> getBinding(@PathVariable String id) {
+    public ResultModel<CapabilityBindingDTO> getBinding(@PathVariable String id) {
         log.info("[CapabilityBindingController] Get binding: {}", id);
-        Map<String, Object> binding = bindingStore.get(id);
+        CapabilityBindingDTO binding = bindingStore.get(id);
         if (binding == null) {
             return ResultModel.notFound("Binding not found: " + id);
         }
@@ -33,25 +36,37 @@ public class CapabilityBindingController {
     }
 
     @PostMapping
-    public ResultModel<Map<String, Object>> createBinding(@RequestBody Map<String, Object> request) {
+    public ResultModel<CapabilityBindingDTO> createBinding(@RequestBody CreateBindingRequest request) {
         log.info("[CapabilityBindingController] Create binding");
         String id = UUID.randomUUID().toString();
-        request.put("id", id);
-        request.put("createTime", new Date().toString());
-        bindingStore.put(id, request);
-        return ResultModel.success(request);
+        
+        CapabilityBindingDTO binding = new CapabilityBindingDTO();
+        binding.setId(id);
+        binding.setCapabilityId(request.getCapabilityId());
+        binding.setLinkId(request.getLinkId());
+        binding.setLinkType(request.getLinkType());
+        binding.setStatus(request.getStatus() != null ? request.getStatus() : "active");
+        binding.setCreateTime(new Date().toString());
+        
+        bindingStore.put(id, binding);
+        return ResultModel.success(binding);
     }
 
     @PutMapping("/{id}")
-    public ResultModel<Map<String, Object>> updateBinding(@PathVariable String id, @RequestBody Map<String, Object> request) {
+    public ResultModel<CapabilityBindingDTO> updateBinding(@PathVariable String id, @RequestBody CreateBindingRequest request) {
         log.info("[CapabilityBindingController] Update binding: {}", id);
         if (!bindingStore.containsKey(id)) {
             return ResultModel.notFound("Binding not found: " + id);
         }
-        request.put("id", id);
-        request.put("updateTime", new Date().toString());
-        bindingStore.put(id, request);
-        return ResultModel.success(request);
+        
+        CapabilityBindingDTO binding = bindingStore.get(id);
+        if (request.getCapabilityId() != null) binding.setCapabilityId(request.getCapabilityId());
+        if (request.getLinkId() != null) binding.setLinkId(request.getLinkId());
+        if (request.getLinkType() != null) binding.setLinkType(request.getLinkType());
+        if (request.getStatus() != null) binding.setStatus(request.getStatus());
+        binding.setUpdateTime(new Date().toString());
+        
+        return ResultModel.success(binding);
     }
 
     @DeleteMapping("/{id}")
@@ -65,21 +80,21 @@ public class CapabilityBindingController {
     }
 
     @PostMapping("/{id}/test")
-    public ResultModel<Map<String, Object>> testBinding(@PathVariable String id) {
+    public ResultModel<BindingTestResultDTO> testBinding(@PathVariable String id) {
         log.info("[CapabilityBindingController] Test binding: {}", id);
-        Map<String, Object> result = new HashMap<>();
-        result.put("bindingId", id);
-        result.put("status", "success");
-        result.put("testTime", new Date().toString());
+        BindingTestResultDTO result = new BindingTestResultDTO();
+        result.setBindingId(id);
+        result.setStatus("success");
+        result.setTestTime(new Date().toString());
         return ResultModel.success(result);
     }
 
     @GetMapping("/by-link/{linkId}")
-    public ResultModel<List<Map<String, Object>>> getBindingsByLink(@PathVariable String linkId) {
+    public ResultModel<List<CapabilityBindingDTO>> getBindingsByLink(@PathVariable String linkId) {
         log.info("[CapabilityBindingController] Get bindings by link: {}", linkId);
-        List<Map<String, Object>> result = new ArrayList<>();
-        for (Map<String, Object> binding : bindingStore.values()) {
-            if (linkId.equals(binding.get("linkId"))) {
+        List<CapabilityBindingDTO> result = new ArrayList<>();
+        for (CapabilityBindingDTO binding : bindingStore.values()) {
+            if (linkId.equals(binding.getLinkId())) {
                 result.add(binding);
             }
         }

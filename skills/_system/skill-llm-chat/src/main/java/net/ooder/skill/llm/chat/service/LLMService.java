@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -16,15 +17,49 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class LLMService {
+public class LLMService implements LLMServiceProvider {
     
     private static final Logger log = LoggerFactory.getLogger(LLMService.class);
+
+    private static Environment staticEnvironment;
     
+    @Autowired
+    public void setEnvironment(Environment environment) {
+        LLMService.staticEnvironment = environment;
+        this.environment = environment;
+    }
+
+    private Environment environment;
+
     @Autowired(required = false)
     private LlmConfigService llmConfigService;
     
-    @Value("${ooder.llm.provider:deepseek}")
     private String defaultProvider;
+    
+    public LLMService() {
+        this.defaultProvider = "qianwen";
+    }
+    
+    private String getDefaultProvider() {
+        String provider = getEnvProperty("ooder.llm.provider");
+        if (provider == null || provider.trim().isEmpty()) {
+            provider = System.getProperty("ooder.llm.provider");
+        }
+        if (provider == null || provider.trim().isEmpty()) {
+            provider = defaultProvider;
+        }
+        return (provider != null && !provider.trim().isEmpty()) ? provider : "qianwen";
+    }
+    
+    private String getEnvProperty(String key) {
+        if (environment != null) {
+            return environment.getProperty(key);
+        }
+        if (staticEnvironment != null) {
+            return staticEnvironment.getProperty(key);
+        }
+        return null;
+    }
     
     @Value("${ooder.llm.api-key:}")
     private String fallbackApiKey;
@@ -37,16 +72,67 @@ public class LLMService {
     
     @Value("${deepseek.api-key:}")
     private String deepseekApiKey;
-    
+
     @Value("${deepseek.base-url:https://api.deepseek.com}")
     private String deepseekBaseUrl;
-    
+
     @Value("${baidu.api-key:}")
     private String baiduApiKey;
-    
+
     @Value("${baidu.base-url:https://qianfan.baidubce.com/v2}")
     private String baiduBaseUrl;
-    
+
+    @Value("${ooder.llm.qianwen.api-key:}")
+    private String qianwenApiKey;
+
+    @Value("${ooder.llm.qianwen.base-url:https://dashscope.aliyuncs.com/compatible-mode/v1}")
+    private String qianwenBaseUrl;
+
+    @Value("${ooder.llm.qianwen.model:qwen-plus}")
+    private String qianwenModel;
+
+    private String getQianwenApiKey() {
+        String key = getEnvProperty("ooder.llm.qianwen.api-key");
+        if (key == null || key.trim().isEmpty()) {
+            key = System.getProperty("ooder.llm.qianwen.api-key");
+        }
+        if (key == null || key.trim().isEmpty()) {
+            key = qianwenApiKey;
+        }
+        if (key == null || key.trim().isEmpty()) {
+            key = "sk-f403a6a32efd4b00b75ee4874eec3b6b";
+        }
+        return (key != null && !key.trim().isEmpty()) ? key : null;
+    }
+
+    private String getQianwenBaseUrl() {
+        String url = getEnvProperty("ooder.llm.qianwen.base-url");
+        if (url == null || url.trim().isEmpty()) {
+            url = System.getProperty("ooder.llm.qianwen.base-url");
+        }
+        if (url == null || url.trim().isEmpty()) {
+            url = qianwenBaseUrl;
+        }
+        if (url == null || url.trim().isEmpty()) {
+            url = "https://dashscope.aliyuncs.com/compatible-mode/v1";
+        }
+        return url;
+    }
+
+    private String getQianwenModel() {
+        String model = getEnvProperty("ooder.llm.qianwen.model");
+        if (model == null || model.trim().isEmpty()) {
+            model = System.getProperty("ooder.llm.qianwen.model");
+        }
+        if (model == null || model.trim().isEmpty()) {
+            model = qianwenModel;
+        }
+        if (model == null || model.trim().isEmpty()) {
+            model = "qwen-plus";
+        }
+        return model;
+    }
+
     private final Map<String, Object> llmCache = new ConcurrentHashMap<>();
     private String lastUsedModel = "";
     
@@ -69,24 +155,31 @@ public class LLMService {
         
         boolean hasDeepseekKey = deepseekApiKey != null && !deepseekApiKey.trim().isEmpty();
         result.put("deepseekConfigured", hasDeepseekKey);
-        
+
         if (hasDeepseekKey) {
             result.put("deepseekKeyPreview", deepseekApiKey.substring(0, Math.min(8, deepseekApiKey.length())) + "...");
         }
-        
+
+        boolean hasQianwenKey = getQianwenApiKey() != null;
+        result.put("qianwenConfigured", hasQianwenKey);
+
+        if (hasQianwenKey) {
+            result.put("qianwenKeyPreview", getQianwenApiKey().substring(0, Math.min(8, getQianwenApiKey().length())) + "...");
+        }
+
         boolean apiAccessible = checkApiConnection(config);
         result.put("apiAccessible", apiAccessible);
-        
+
         List<String> issues = new ArrayList<>();
-        if (!hasApiKey && !hasDeepseekKey) {
+        if (!hasApiKey && !hasDeepseekKey && !hasQianwenKey) {
             issues.add("未配置任何LLM API Key，请在LLM配置管理中配置或设置环境变量");
         }
         if (!apiAccessible) {
             issues.add("API服务不可达，请检查网络连接或base-url配置");
         }
         result.put("issues", issues);
-        
-        result.put("ready", hasApiKey || hasDeepseekKey);
+
+        result.put("ready", hasApiKey || hasDeepseekKey || hasQianwenKey);
         
         return result;
     }
@@ -106,15 +199,20 @@ public class LLMService {
         }
         
         ResolvedConfig config = new ResolvedConfig();
-        config.setProviderType(defaultProvider);
+        String effectiveProvider = getDefaultProvider();
+        config.setProviderType(effectiveProvider);
         config.setModel(defaultModel);
-        
-        if ("deepseek".equals(defaultProvider)) {
+
+        if ("deepseek".equals(effectiveProvider)) {
             config.setApiKey(deepseekApiKey);
             config.setBaseUrl(deepseekBaseUrl);
-        } else if ("baidu".equals(defaultProvider)) {
+        } else if ("baidu".equals(effectiveProvider)) {
             config.setApiKey(baiduApiKey);
             config.setBaseUrl(baiduBaseUrl);
+        } else if ("qianwen".equals(effectiveProvider)) {
+            config.setApiKey(getQianwenApiKey());
+            config.setBaseUrl(getQianwenBaseUrl());
+            config.setModel(getQianwenModel());
         } else {
             config.setApiKey(fallbackApiKey);
             config.setBaseUrl(fallbackBaseUrl);
@@ -184,11 +282,14 @@ public class LLMService {
         
         if (provider != null && !provider.isEmpty()) {
             config.setProviderType(provider);
+            if ("qianwen".equals(provider) && (model == null || model.isEmpty())) {
+                config.setModel(qianwenModel);
+            }
         }
         if (model != null && !model.isEmpty()) {
             config.setModel(model);
         }
-        
+
         String apiKey = config.getApiKey();
         String baseUrl = config.getBaseUrl();
         String useModel = config.getModel();
@@ -275,15 +376,19 @@ public class LLMService {
             return deepseekApiKey;
         } else if ("baidu".equals(provider)) {
             return baiduApiKey;
+        } else if ("qianwen".equals(provider)) {
+            return getQianwenApiKey();
         }
         return fallbackApiKey;
     }
-    
+
     private String getFallbackBaseUrl(String provider) {
         if ("deepseek".equals(provider)) {
             return deepseekBaseUrl;
         } else if ("baidu".equals(provider)) {
             return baiduBaseUrl;
+        } else if ("qianwen".equals(provider)) {
+            return getQianwenBaseUrl();
         }
         return fallbackBaseUrl;
     }

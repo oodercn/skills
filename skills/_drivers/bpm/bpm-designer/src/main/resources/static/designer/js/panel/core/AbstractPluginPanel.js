@@ -280,6 +280,21 @@ class AbstractPluginPanel {
                 case 'listenerConfigs':
                     data = await this.dataSource.getListenerConfigs();
                     break;
+                case 'agentList':
+                    data = await this.dataSource.getAgentList();
+                    break;
+                case 'agentTypes':
+                    data = await this.dataSource.getAgentTypes();
+                    break;
+                case 'agentRoles':
+                    data = await this.dataSource.getAgentRoles();
+                    break;
+                case 'llmProviders':
+                    data = await this.dataSource.getLlmProviders();
+                    break;
+                case 'agentCapabilities':
+                    data = await this.dataSource.getAgentCapabilities();
+                    break;
                 default:
                     console.warn(`Unknown remote type: ${remoteType}`);
                     data = null;

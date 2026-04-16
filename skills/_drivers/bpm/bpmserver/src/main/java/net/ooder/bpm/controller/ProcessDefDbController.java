@@ -114,12 +114,16 @@ public class ProcessDefDbController {
                 formattedActivity.put("description", activity.get("description"));
                 
                 String position = (String) activity.get("position");
+                // 修复：activityType 始终为 TASK，不要用 START/END 作为 activityType
+                // START/END 只作为 position 的值，这样前端不会过滤掉这些活动
                 if ("POSITION_START".equals(position)) {
                     formattedActivity.put("position", "START");
-                    formattedActivity.put("activityType", "START");
+                    formattedActivity.put("activityType", "TASK");
+                    formattedActivity.put("activityCategory", "HUMAN");
                 } else if ("POSITION_END".equals(position)) {
                     formattedActivity.put("position", "END");
-                    formattedActivity.put("activityType", "END");
+                    formattedActivity.put("activityType", "TASK");
+                    formattedActivity.put("activityCategory", "HUMAN");
                 } else {
                     formattedActivity.put("position", "NORMAL");
                     formattedActivity.put("activityType", "TASK");

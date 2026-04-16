@@ -318,4 +318,14 @@ public class CapabilityDTO extends FullDTO {
     public void setInstallSource(String installSource) {
         this.installSource = installSource;
     }
+    
+    private String installPath;
+    
+    public String getInstallPath() {
+        return installPath;
+    }
+    
+    public void setInstallPath(String installPath) {
+        this.installPath = installPath;
+    }
 }

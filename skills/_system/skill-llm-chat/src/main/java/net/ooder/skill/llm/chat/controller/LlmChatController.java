@@ -2,14 +2,18 @@ package net.ooder.skill.llm.chat.controller;
 
 import net.ooder.skill.llm.chat.model.ChatRequest;
 import net.ooder.skill.llm.chat.model.SetModelRequest;
+import net.ooder.skill.llm.chat.service.LLMServiceProvider;
+import net.ooder.skill.llm.chat.service.LLMService;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.method.annotation.SseEmitter;
+import net.ooder.skill.hotplug.registry.ServiceRegistry;
 
 import java.io.IOException;
 import java.util.*;
@@ -17,9 +21,9 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-@RestController
-@RequestMapping("/api/llm")
-@CrossOrigin(origins = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.OPTIONS})
+@RestController("llmChatControllerV1")
+@RequestMapping("/api/v1/llm/chat")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*", methods = {RequestMethod.POST, RequestMethod.GET, RequestMethod.OPTIONS}, allowCredentials = "false")
 public class LlmChatController {
     
     private static final Logger log = LoggerFactory.getLogger(LlmChatController.class);
@@ -30,11 +34,47 @@ public class LlmChatController {
     private final Map<String, SessionInfo> sessions = new ConcurrentHashMap<String, SessionInfo>();
     private final Map<String, ProviderInfo> providers = new ConcurrentHashMap<String, ProviderInfo>();
     
-    private String currentProvider = "deepseek";
-    private String currentModel = "deepseek-chat";
+    private String currentProvider = System.getProperty("ooder.llm.provider", "qianwen");
+    private String currentModel = System.getProperty("ooder.llm.model", "qwen-plus");
+    
+    @Autowired
+    private ApplicationContext applicationContext;
     
     @Autowired(required = false)
-    private net.ooder.skill.llm.chat.service.LLMService llmService;
+    private LLMServiceProvider llmServiceProvider;
+    
+    @Autowired(required = false)
+    private ServiceRegistry serviceRegistry;
+    
+    private LLMServiceProvider getLlmService() {
+        if (llmServiceProvider != null) {
+            return llmServiceProvider;
+        }
+        
+        if (serviceRegistry != null) {
+            try {
+                Object service = serviceRegistry.getService("skill-llm-chat", "llmServiceProvider", LLMServiceProvider.class);
+                if (service instanceof LLMServiceProvider) {
+                    llmServiceProvider = (LLMServiceProvider) service;
+                    log.info("Got LLMServiceProvider from ServiceRegistry");
+                    return llmServiceProvider;
+                }
+            } catch (Exception e) {
+                log.debug("Failed to get LLMServiceProvider from ServiceRegistry: {}", e.getMessage());
+            }
+        }
+        
+        try {
+            LLMService service = applicationContext.getBean(LLMService.class);
+            if (service != null) {
+                llmServiceProvider = service;
+                return service;
+            }
+        } catch (Exception e) {
+            log.debug("LLMService not found in ApplicationContext: {}", e.getMessage());
+        }
+        return null;
+    }
     
     public LlmChatController() {
         initProviders();
@@ -54,7 +94,7 @@ public class LlmChatController {
             Arrays.asList("llama3", "llama2", "mistral", "codellama", "qwen2"), true, true));
     }
     
-    @PostMapping("/chat")
+    @PostMapping
     public ResponseEntity<Map<String, Object>> chat(@RequestBody ChatRequest request) {
         String message = request.getMessage();
         String sessionId = request.getSessionId();
@@ -75,6 +115,7 @@ public class LlmChatController {
             String response;
             int tokensUsed = 0;
             
+            LLMServiceProvider llmService = getLlmService();
             if (llmService != null) {
                 Map<String, Object> llmStatus = llmService.checkDependencies();
                 boolean llmReady = (Boolean) llmStatus.get("ready");
@@ -83,11 +124,11 @@ public class LlmChatController {
                     response = llmService.generateAnswer(message, null, model);
                     tokensUsed = response.length();
                 } else {
-                    response = "LLM服务未配置，请检查API Key设置。";
+                    response = "LLM service not configured, please check API Key settings.";
                     tokensUsed = response.length();
                 }
             } else {
-                response = "LLM服务不可用，请检查服务配置。";
+                response = "LLM service unavailable, please check service configuration.";
                 tokensUsed = response.length();
             }
             
@@ -120,7 +161,7 @@ public class LlmChatController {
         return ResponseEntity.ok(result);
     }
     
-    @GetMapping(value = "/chat/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    @GetMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter chatStream(
             @RequestParam(required = false) String message,
             @RequestParam(required = false) String sessionId,
@@ -129,7 +170,26 @@ public class LlmChatController {
             @RequestParam(required = false, defaultValue = "0.7") Double temperature,
             @RequestParam(required = false, defaultValue = "4096") Integer maxTokens) {
         
-        log.info("[chatStream] message: {}, sessionId: {}", message, sessionId);
+        log.info("[chatStream GET] message: {}, sessionId: {}", message, sessionId);
+        return doChatStream(message, sessionId, provider, model, temperature, maxTokens);
+    }
+    
+    @PostMapping(value = "/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
+    public SseEmitter chatStreamPost(@RequestBody ChatRequest request) {
+        String message = request.getMessage();
+        String sessionId = request.getSessionId();
+        String provider = request.getProvider() != null ? request.getProvider() : currentProvider;
+        String model = request.getModel() != null ? request.getModel() : currentModel;
+        Double temperature = request.getTemperature() != null ? request.getTemperature() : 0.7;
+        Integer maxTokens = request.getMaxTokens() != null ? request.getMaxTokens() : 4096;
+        
+        log.info("[chatStream POST] message: {}, sessionId: {}, provider: {}, model: {}", 
+            message, sessionId, provider, model);
+        return doChatStream(message, sessionId, provider, model, temperature, maxTokens);
+    }
+    
+    private SseEmitter doChatStream(String message, String sessionId, String provider, String model, 
+            Double temperature, Integer maxTokens) {
         
         SseEmitter emitter = new SseEmitter(SSE_TIMEOUT);
         
@@ -141,6 +201,7 @@ public class LlmChatController {
                     session.addMessage("user", message);
                     
                     String fullResponse;
+                    LLMServiceProvider llmService = getLlmService();
                     if (llmService != null) {
                         Map<String, Object> llmStatus = llmService.checkDependencies();
                         boolean llmReady = (Boolean) llmStatus.get("ready");
@@ -148,10 +209,10 @@ public class LlmChatController {
                         if (llmReady) {
                             fullResponse = llmService.generateAnswer(message, null, model);
                         } else {
-                            fullResponse = "LLM服务未配置，请检查API Key设置。";
+                            fullResponse = "LLM service not configured, please check API Key settings.";
                         }
                     } else {
-                        fullResponse = "LLM服务不可用，请检查服务配置。";
+                        fullResponse = "LLM service unavailable, please check service configuration.";
                     }
                     
                     int chunkSize = 8;
@@ -315,7 +376,7 @@ public class LlmChatController {
         SessionInfo removed = sessions.remove(sessionId);
         
         result.put("status", "success");
-        result.put("message", removed != null ? "会话已删除" : "会话不存在");
+        result.put("message", removed != null ? "Session deleted" : "Session not found");
         result.put("sessionId", sessionId);
         
         return ResponseEntity.ok(result);
@@ -334,7 +395,7 @@ public class LlmChatController {
             result.put("data", session.messages);
         } else {
             result.put("status", "error");
-            result.put("message", "会话不存在");
+            result.put("message", "Session not found");
         }
         
         return ResponseEntity.ok(result);
@@ -352,7 +413,7 @@ public class LlmChatController {
         data.put("currentModel", currentModel);
         data.put("providerCount", providers.size());
         data.put("sessionCount", sessions.size());
-        data.put("llmServiceReady", llmService != null);
+        data.put("llmServiceReady", getLlmService() != null);
         
         result.put("status", "success");
         result.put("data", data);
@@ -384,7 +445,7 @@ public class LlmChatController {
         
         SessionInfo(String id) {
             this.id = id;
-            this.title = "新对话";
+            this.title = "New Chat";
             this.messages = new ArrayList<>();
             this.createTime = System.currentTimeMillis();
             this.updateTime = this.createTime;

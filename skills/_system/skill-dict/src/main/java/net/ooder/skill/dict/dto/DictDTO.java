@@ -8,14 +8,6 @@ public class DictDTO {
     private String description;
     private List<DictItemDTO> items;
 
-    public DictDTO() {}
-
-    public DictDTO(String code, String name, String description) {
-        this.code = code;
-        this.name = name;
-        this.description = description;
-    }
-
     public String getCode() { return code; }
     public void setCode(String code) { this.code = code; }
     public String getName() { return name; }

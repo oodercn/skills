@@ -29,7 +29,7 @@ spec:
   ownership: platform
 
   capability:
-    address: 0x2E
+    address: 0x44
     category: LLM
     code: BIZ_LLM_CONFIG
     operations: [config, providers, templates, usage-stats]

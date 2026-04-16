@@ -15,6 +15,27 @@ public interface LLMService {
     
     LLMResponse chatWithFunctionResult(String originalPrompt, String functionName, Object result);
     
+    LLMResponse chatWithMessages(List<Map<String, Object>> messages);
+    
+    LLMResponse chatWithMessages(List<Map<String, Object>> messages, List<Map<String, Object>> tools);
+    
+    LLMResponse chatWithMessagesAndToolResults(
+        List<Map<String, Object>> messages,
+        List<Map<String, Object>> tools,
+        String toolCallId,
+        String functionName,
+        Object toolResult
+    );
+    
+    void chatWithMessagesStream(
+        List<Map<String, Object>> messages,
+        List<Map<String, Object>> tools,
+        java.util.function.Consumer<String> onContent,
+        java.util.function.Consumer<List<FunctionCall>> onToolCalls,
+        java.util.function.Consumer<LLMResponse> onComplete,
+        java.util.function.Consumer<Exception> onError
+    );
+    
     boolean isAvailable();
     
     String getModelName();

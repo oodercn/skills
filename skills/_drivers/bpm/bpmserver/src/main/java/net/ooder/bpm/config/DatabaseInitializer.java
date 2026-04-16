@@ -20,6 +20,9 @@ public class DatabaseInitializer {
     @Value("${spring.datasource.url}")
     private String datasourceUrl;
 
+    @Value("${bpm.database.init-mode:never}")
+    private String initMode;
+
     private final JdbcTemplate jdbcTemplate;
 
     public DatabaseInitializer(JdbcTemplate jdbcTemplate) {
@@ -30,14 +33,44 @@ public class DatabaseInitializer {
     public void init() {
         log.info("开始初始化BPM数据库...");
         log.info("数据库URL: {}", datasourceUrl);
-        
+        log.info("初始化模式: {}", initMode);
+
+        // 如果初始化模式为never，则跳过初始化
+        if ("never".equalsIgnoreCase(initMode)) {
+            log.info("初始化模式为never，跳过数据库初始化");
+            verifyData();
+            return;
+        }
+
         try {
+            // 检查数据库是否已初始化
+            if (isDatabaseInitialized()) {
+                log.info("数据库已初始化，跳过初始化步骤");
+                verifyData();
+                return;
+            }
+
             dropOldTables();
             initSchema();
             initData();
             verifyData();
         } catch (Exception e) {
             log.error("数据库初始化失败", e);
+        }
+    }
+
+    /**
+     * 检查数据库是否已初始化
+     */
+    private boolean isDatabaseInitialized() {
+        try {
+            Integer count = jdbcTemplate.queryForObject(
+                "SELECT COUNT(*) FROM BPM_PROCESSDEF", Integer.class);
+            return count != null && count > 0;
+        } catch (Exception e) {
+            // 表不存在，表示数据库未初始化
+            log.info("数据库表不存在，需要初始化");
+            return false;
         }
     }
 

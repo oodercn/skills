@@ -30,7 +30,7 @@ spec:
   ownership: platform
 
   capability:
-    address: 0x33
+    address: 0x3C
     category: KNOWLEDGE
     code: SYS_RAG
     operations: [classify, extract, enhance, ingest]

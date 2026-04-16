@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x2A
+    address: 0x42
     category: SYS
     code: SYS_KNOWLEDGE_PLATFORM
     operations: [create, read, update, delete, bind]

@@ -1,5 +1,5 @@
 server:
-  port: 8088
+  port: 9008
   servlet:
     context-path: /
 
@@ -21,7 +21,7 @@ spring:
 
 bpm:
   server:
-    url: http://127.0.0.1:8084/bpm
+    url: http://127.0.0.1:9004/bpm
 
 llm:
   enabled: true
@@ -34,11 +34,13 @@ llm:
   max-tokens: 4096
   timeout: 60000
   max-retries: 3
+  max-tool-call-rounds: 5
+  max-context-messages: 20
 
 datasource:
   bpm:
     use-real-data: false
-    bpm-server-url: http://127.0.0.1:8084
+    bpm-server-url: http://127.0.0.1:9004
     capability-service-url: http://127.0.0.1:8085/capability
     form-service-url: http://127.0.0.1:8086/form
     scene-service-url: http://127.0.0.1:8087/scene
@@ -55,6 +57,7 @@ logging:
     net.ooder.bpm.designer.llm: DEBUG
     net.ooder.bpm.designer.function: DEBUG
     net.ooder.bpm.designer.datasource: DEBUG
+    net.ooder.bpm.designer.chat: DEBUG
 
 management:
   endpoints:

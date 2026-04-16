@@ -1,0 +1,50 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-document-processor
+  name: 文档处理服务
+  version: "3.0.2"
+  description: 提供文档解析、分块、元数据提取等功能
+  author: ooder Team
+  type: tool-service
+  license: Apache-2.0
+
+spec:
+  skillForm: TOOL
+  skillCategory: DATA
+  sceneType: AUTO
+  purposes:
+    - TEAM
+
+  ownership: platform
+
+  capability:
+    address: 0x4E
+    category: DATA
+    code: TOOL_DOC_PROCESSOR
+    operations: [parse, chunk, extract]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  capabilities:
+    - id: document-parse
+      name: 文档解析
+      description: 多格式文档解析
+      category: document
+    - id: document-chunk
+      name: 文档分块
+      description: 文档智能分块
+      category: document
+    - id: metadata-extract
+      name: 元数据提取
+      description: 文档元数据提取
+      category: document
+
+  resources:
+    cpu: "100m"
+    memory: "256Mi"
+    storage: "50Mi"

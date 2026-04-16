@@ -4,9 +4,9 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <groupId>net.ooder.skill</groupId>
+    <groupId>net.ooder</groupId>
     <artifactId>skill-agent</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-agent</name>
@@ -33,63 +33,140 @@
     </dependencyManagement>
 
     <dependencies>
-        <!--
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-messaging</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
-        -->
-        
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!--
+
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>apex-os</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
-        -->
-        
+
         <dependency>
-            <groupId>net.ooder.skill</groupId>
+            <groupId>net.ooder</groupId>
             <artifactId>skill-scene</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
-        
-        <!--
+
         <dependency>
-            <groupId>net.ooder.skill</groupId>
+            <groupId>net.ooder</groupId>
             <artifactId>skill-dict</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
-        -->
-        
+
+        <!-- RAG 检索增�?- 可选依赖，用于 Agent 知识增强对话 -->
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-rag</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-tenant</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-audit</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-im-gateway</artifactId>
+            <version>3.0.3</version>
+            <scope>provided</scope>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>scene-engine</artifactId>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>ooder-spi-core</artifactId>
+            <version>3.0.5</version>
+        </dependency>
+
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-workflow</artifactId>
+            <version>${project.version}</version>
+            <scope>provided</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
             <version>1.18.30</version>
             <scope>provided</scope>
         </dependency>
-        
+
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <scope>provided</scope>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.ooder</groupId>
+            <artifactId>skill-llm-chat</artifactId>
+            <version>3.0.3</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.10.2</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>5.12.0</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -124,4 +201,3 @@
         </plugins>
     </build>
 </project>
-

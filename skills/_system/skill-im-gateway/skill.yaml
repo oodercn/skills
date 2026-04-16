@@ -23,7 +23,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x2B
+    address: 0x35
     category: SYS
     code: SYS_IM_GATEWAY
     operations: [send, receive, enhance, health]

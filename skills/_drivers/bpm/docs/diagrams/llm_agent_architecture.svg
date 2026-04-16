@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 680" width="800px" height="680px">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800px" height="400px">
 <defs>
     <style>
         .bg { fill: #fafafa; }
@@ -17,53 +17,57 @@
         <polygon points="0 0, 10 3.5, 0 7" fill="#64748b"/>
     </marker>
 </defs>
-<rect class="bg" width="100%" height="100%"/>
+
+<!-- Background -->
+<rect class="bg" width="800" height="400"/>
+
+<!-- Title -->
 <rect class="title-box" x="20" y="15" width="760" height="35" rx="4"/>
-<text class="text-header" x="400" y="38" text-anchor="middle">LLM Agent 架构图</text>
+<text class="text-header" x="400" y="38" text-anchor="middle">LLM Agent 架构</text>
 
-<rect class="box-highlight" x="30" y="70" width="740" height="100"/>
-<text class="text-title" x="400" y="95" text-anchor="middle">AgentDef (智能体定义)</text>
-<text class="text" x="50" y="120">• agentType: LLM / TASK / EVENT / HYBRID</text>
-<text class="text" x="50" y="140">• scheduleStrategy: 顺序/并行/条件/轮询/优先级</text>
-<text class="text" x="50" y="160">• collaborationMode: 独立/层级/对等/辩论/投票</text>
+<!-- LLM Chat Service -->
+<rect class="box-highlight" x="30" y="70" width="200" height="80"/>
+<text class="text-title" x="130" y="95" text-anchor="middle">skill-llm-chat</text>
+<text class="text" x="130" y="115" text-anchor="middle">LLM 服务</text>
+<text class="text-small" x="130" y="135" text-anchor="middle">提供 AI 对话能力</text>
 
-<line class="arrow" x1="145" y1="170" x2="145" y2="200"/>
-<line class="arrow" x1="400" y1="170" x2="400" y2="200"/>
-<line class="arrow" x1="655" y1="170" x2="655" y2="200"/>
+<!-- Arrow -->
+<line class="arrow" x1="230" y1="110" x2="270" y2="110"/>
 
-<rect class="box" x="30" y="200" width="230" height="120"/>
-<text class="text-title" x="145" y="225" text-anchor="middle">LLMConfig</text>
-<text class="text" x="50" y="250">• model</text>
-<text class="text" x="50" y="270">• temperature</text>
-<text class="text" x="50" y="290">• maxTokens</text>
-<text class="text" x="50" y="310">• functionCalling</text>
+<!-- BPM NLP Plugin -->
+<rect class="box" x="280" y="70" width="240" height="120"/>
+<text class="text-title" x="400" y="95" text-anchor="middle">BPMNLPPlugin</text>
+<text class="text" x="400" y="120" text-anchor="middle">上下文构建器</text>
+<text class="text" x="400" y="145" text-anchor="middle">动作执行器</text>
+<text class="text" x="400" y="170" text-anchor="middle">自然语言处理</text>
 
-<rect class="box" x="285" y="200" width="230" height="120"/>
-<text class="text-title" x="400" y="225" text-anchor="middle">Northbound Config</text>
-<text class="text" x="305" y="250">• protocol A2UI</text>
-<text class="text" x="305" y="270">• endpoints</text>
-<text class="text-small" x="400" y="295" text-anchor="middle">向上提供服务</text>
+<!-- Arrow -->
+<line class="arrow" x1="520" y1="130" x2="560" y2="130"/>
 
-<rect class="box" x="540" y="200" width="230" height="120"/>
-<text class="text-title" x="655" y="225" text-anchor="middle">Southbound Config</text>
-<text class="text" x="560" y="250">• protocol MCP</text>
-<text class="text" x="560" y="270">• endpoints</text>
-<text class="text-small" x="655" y="295" text-anchor="middle">向下调用服务</text>
+<!-- BPM Designer -->
+<rect class="box-alt" x="570" y="70" width="200" height="80"/>
+<text class="text-title" x="670" y="95" text-anchor="middle">BPM 设计器</text>
+<text class="text" x="670" y="115" text-anchor="middle">Canvas 渲染</text>
+<text class="text-small" x="670" y="135" text-anchor="middle">流程可视化编辑</text>
 
-<rect class="box-alt" x="30" y="340" width="740" height="120"/>
-<text class="text-title" x="400" y="365" text-anchor="middle">Tools (工具集)</text>
-<text class="text" x="50" y="390">• EMAIL: 邮件发送</text>
-<text class="text" x="50" y="410">• CALENDAR: 日程管理</text>
-<text class="text" x="50" y="430">• DOCUMENT: 文档处理</text>
-<text class="text" x="50" y="450">• ANALYSIS: 数据分析</text>
-<text class="text" x="400" y="390">• SEARCH: 信息检索</text>
-<text class="text" x="400" y="410">• NOTIFICATION: 消息通知</text>
-<text class="text" x="400" y="430">• APPROVAL: 审批处理</text>
-<text class="text" x="400" y="450">• SCHEDULING: 任务调度</text>
+<!-- User -->
+<circle cx="130" cy="300" r="40" fill="#2563eb"/>
+<text class="text-header" x="130" y="305" text-anchor="middle">用户</text>
 
-<rect class="box" x="30" y="480" width="740" height="80"/>
-<text class="text-title" x="400" y="505" text-anchor="middle">Memory (记忆系统)</text>
-<text class="text" x="50" y="530">• enabled: 是否启用</text>
-<text class="text" x="50" y="550">• maxTokens: 最大记忆容量</text>
-<text class="text" x="400" y="530">• context: 上下文管理</text>
+<!-- Arrow from user to NLP -->
+<line class="arrow" x1="170" y1="280" x2="350" y2="220"/>
+
+<!-- User input -->
+<rect class="box" x="280" y="240" width="240" height="60"/>
+<text class="text" x="400" y="265" text-anchor="middle">自然语言指令</text>
+<text class="text-small" x="400" y="285" text-anchor="middle">"创建一个请假审批流程"</text>
+
+<!-- Arrow from NLP to designer -->
+<line class="arrow" x1="400" y1="190" x2="400" y2="230"/>
+
+<!-- Process output -->
+<rect class="box-alt" x="570" y="240" width="200" height="60"/>
+<text class="text" x="670" y="265" text-anchor="middle">流程图形化显示</text>
+<text class="text-small" x="670" y="285" text-anchor="middle">Canvas 渲染</text>
+
 </svg>

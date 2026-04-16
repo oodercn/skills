@@ -4,6 +4,8 @@ import net.ooder.scene.spi.SceneServices;
 import net.ooder.scene.skill.conversation.*;
 import net.ooder.scene.skill.conversation.Message;
 import net.ooder.scene.skill.conversation.storage.ConversationStorageService;
+import net.ooder.skill.chat.dto.CreateSessionRequest;
+import net.ooder.skill.chat.dto.SendMessageRequest;
 import net.ooder.skill.chat.model.ChatMessage;
 import net.ooder.skill.chat.model.ChatSession;
 import net.ooder.skill.common.model.ResultModel;
@@ -21,7 +23,7 @@ import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/v1/chat")
-@CrossOrigin(origins = "*", allowedHeaders = "*")
+@CrossOrigin(originPatterns = "*", allowedHeaders = "*")
 public class ChatController {
 
     private static final Logger log = LoggerFactory.getLogger(ChatController.class);
@@ -68,9 +70,9 @@ public class ChatController {
     }
 
     @PostMapping("/sessions")
-    public ResultModel<ChatSession> createSession(@RequestBody Map<String, String> request) {
-        String userId = request.get("userId");
-        String title = request.get("title");
+    public ResultModel<ChatSession> createSession(@RequestBody CreateSessionRequest request) {
+        String userId = request.getUserId();
+        String title = request.getTitle();
         log.info("Create chat session: userId={}, title={}", userId, title);
         
         Conversation conversation = new Conversation();
@@ -157,12 +159,12 @@ public class ChatController {
     @PostMapping("/sessions/{sessionId}/messages")
     public ResultModel<ChatMessage> sendMessage(
             @PathVariable String sessionId,
-            @RequestBody Map<String, Object> request) {
-        String content = (String) request.get("content");
-        Boolean useKnowledge = (Boolean) request.get("useKnowledge");
-        Boolean enableTools = (Boolean) request.getOrDefault("enableTools", true);
-        String skillId = (String) request.getOrDefault("skillId", "skill-llm-chat");
-        String userId = (String) request.getOrDefault("userId", "default-user");
+            @RequestBody SendMessageRequest request) {
+        String content = request.getContent();
+        Boolean useKnowledge = request.getUseKnowledge();
+        Boolean enableTools = request.getEnableTools() != null ? request.getEnableTools() : true;
+        String skillId = request.getSkillId() != null ? request.getSkillId() : "skill-llm-chat";
+        String userId = request.getUserId() != null ? request.getUserId() : "default-user";
         
         log.info("Send message to session: {}, useKnowledge: {}, enableTools: {}", 
             sessionId, useKnowledge, enableTools);
@@ -171,7 +173,7 @@ public class ChatController {
         
         if (conversationService == null) {
             ChatMessage errorMsg = new ChatMessage();
-            errorMsg.setContent("对话服务不可用，请检查 SE 服务初始化状态");
+            errorMsg.setContent("对话服务不可用，请检查服务初始化状态");
             return ResultModel.success(errorMsg);
         }
         
@@ -202,11 +204,11 @@ public class ChatController {
     @PostMapping(value = "/sessions/{sessionId}/messages/stream", produces = MediaType.TEXT_EVENT_STREAM_VALUE)
     public SseEmitter sendMessageStream(
             @PathVariable String sessionId,
-            @RequestBody Map<String, Object> request) {
+            @RequestBody SendMessageRequest request) {
         
-        String content = (String) request.get("content");
-        Boolean useKnowledge = (Boolean) request.get("useKnowledge");
-        Boolean enableTools = (Boolean) request.getOrDefault("enableTools", true);
+        String content = request.getContent();
+        Boolean useKnowledge = request.getUseKnowledge();
+        Boolean enableTools = request.getEnableTools() != null ? request.getEnableTools() : true;
         
         log.info("Send stream message to session: {}, useKnowledge: {}", sessionId, useKnowledge);
         

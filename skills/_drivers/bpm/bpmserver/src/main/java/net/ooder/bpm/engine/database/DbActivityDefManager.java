@@ -289,25 +289,45 @@ public class DbActivityDefManager extends EIActivityDefManager {
     public List loadByProcessDefVersionId(String value) throws BPMException {
         Connection c = null;
         PreparedStatement ps = null;
+        ResultSet rs = null;
         try {
             c = getConnection();
-            if (log.isDebugEnabled())
-                log
-                        .debug("SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?");
-            ps = c
-                    .prepareStatement(
-                            "SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?",
-                            ResultSet.TYPE_FORWARD_ONLY,
-                            ResultSet.CONCUR_READ_ONLY);
+            log.info("[DEBUG] loadByProcessDefVersionId: value=" + value);
+            
+            // 先查询数量
+            ps = c.prepareStatement(
+                "SELECT COUNT(*) as cnt FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?",
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY);
+            ps.setString(1, value);
+            rs = ps.executeQuery();
+            int count = 0;
+            if (rs.next()) {
+                count = rs.getInt("cnt");
+            }
+            log.info("[DEBUG] Activity count in DB: " + count);
+            getManager().close(rs);
+            getManager().close(ps);
+            
+            // 查询所有ACTIVITYDEF_ID
+            ps = c.prepareStatement(
+                "SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID=?",
+                ResultSet.TYPE_FORWARD_ONLY,
+                ResultSet.CONCUR_READ_ONLY);
             ps.setString(1, value);
             DbActivityDef[] acts = loadByPreparedStatement(ps,
                     new int[]{ID_ACTIVITYDEF_ID});
+            log.info("[DEBUG] Loaded " + acts.length + " activity IDs");
+            for (int i = 0; i < acts.length; i++) {
+                log.info("[DEBUG] Activity " + i + ": id=" + acts[i].getActivityDefId());
+            }
             List list = new DbActivityDefList(acts);
             return Collections.unmodifiableList(list);
         } catch (SQLException e) {
             throw new BPMException("", e, BPMException.ACTIVITYDEFINITIONERROR);
 
         } finally {
+            getManager().close(rs);
             getManager().close(ps);
             freeConnection(c);
         }
@@ -1421,28 +1441,45 @@ public class DbActivityDefManager extends EIActivityDefManager {
      * @param activityDef
      */
     void saveAttribute(DbActivityDef activityDef) throws BPMException {
+        log.info("[saveAttribute] Called for activity: {}, isAttributeModified: {}", 
+            activityDef.getActivityDefId(), activityDef.isAttributeModified());
+        
         if (activityDef.isAttributeModified() == false) {
+            log.info("[saveAttribute] Attribute not modified, skipping save");
             return;
         }
+        
+        List list = activityDef.getAllAttribute();
+        log.info("[saveAttribute] Activity {} has {} attributes to save", 
+            activityDef.getActivityDefId(), list.size());
+        
+        for (Object obj : list) {
+            DbAttributeDef att = (DbAttributeDef) obj;
+            log.info("[saveAttribute] Attribute: id={}, name={}, type={}, value={}, parentId={}",
+                att.getId(), att.getName(), att.getType(), 
+                att.getValue() != null ? att.getValue().substring(0, Math.min(50, att.getValue().length())) : "null",
+                att.getParentId());
+        }
+        
         Connection c = null;
         PreparedStatement ps = null;
         try {
             c = getConnection();
-            if (log.isDebugEnabled())
-                log.debug(DELETE_EXTATTRIBUTRE);
+            log.info("[saveAttribute] Deleting old attributes for activity: {}", activityDef.getActivityDefId());
             ps = c.prepareStatement(DELETE_EXTATTRIBUTRE);
             ps.setString(1, activityDef.getActivityDefId());
-            ps.executeUpdate();
+            int deleted = ps.executeUpdate();
+            log.info("[saveAttribute] Deleted {} old attributes", deleted);
 
             getManager().close(ps);
-            if (log.isDebugEnabled())
-                log.debug(INSERT_EXTATTRIBUTRE);
             ps = c.prepareStatement(INSERT_EXTATTRIBUTRE);
-            List list = activityDef.getAllAttribute();
+            int savedCount = 0;
             for (Iterator it = list.iterator(); it.hasNext(); ) {
                 DbAttributeDef att = (DbAttributeDef) it.next();
                 saveAttribute(ps, activityDef, att);
+                savedCount++;
             }
+            log.info("[saveAttribute] Saved {} attributes for activity: {}", savedCount, activityDef.getActivityDefId());
 
         } catch (SQLException e) {
             throw new BPMException("", e, BPMException.PROCESSDEFINITIONERROR);

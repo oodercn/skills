@@ -1,50 +1,35 @@
 package net.ooder.skill.dict.dto;
 
-public class ResultModel<T> {
+import java.util.Random;
 
+public class ResultModel<T> {
     private int code;
     private String status;
     private String message;
     private T data;
     private long timestamp;
+    private String requestId;
 
     public ResultModel() {
         this.timestamp = System.currentTimeMillis();
-        this.status = "success";
+        this.requestId = "REQ_" + timestamp + "_" + new Random().nextInt(1000);
     }
 
     public static <T> ResultModel<T> success(T data) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(200);
-        r.setStatus("success");
-        r.setMessage("success");
-        r.setData(data);
-        return r;
-    }
-
-    public static <T> ResultModel<T> success(T data, String message) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(200);
-        r.setStatus("success");
-        r.setMessage(message);
-        r.setData(data);
-        return r;
-    }
-
-    public static <T> ResultModel<T> error(String message) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(500);
-        r.setStatus("error");
-        r.setMessage(message);
-        return r;
+        ResultModel<T> result = new ResultModel<>();
+        result.setCode(200);
+        result.setStatus("success");
+        result.setMessage("操作成功");
+        result.setData(data);
+        return result;
     }
 
     public static <T> ResultModel<T> error(int code, String message) {
-        ResultModel<T> r = new ResultModel<>();
-        r.setCode(code);
-        r.setStatus("error");
-        r.setMessage(message);
-        return r;
+        ResultModel<T> result = new ResultModel<>();
+        result.setCode(code);
+        result.setStatus("error");
+        result.setMessage(message);
+        return result;
     }
 
     public int getCode() { return code; }
@@ -57,4 +42,6 @@ public class ResultModel<T> {
     public void setData(T data) { this.data = data; }
     public long getTimestamp() { return timestamp; }
     public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public String getRequestId() { return requestId; }
+    public void setRequestId(String requestId) { this.requestId = requestId; }
 }

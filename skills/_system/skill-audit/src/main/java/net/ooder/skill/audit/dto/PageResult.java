@@ -3,11 +3,11 @@ package net.ooder.skill.audit.dto;
 import java.util.List;
 
 public class PageResult<T> {
+    
     private List<T> list;
     private long total;
     private int pageNum;
     private int pageSize;
-    private int pages;
 
     public PageResult() {}
 
@@ -16,7 +16,6 @@ public class PageResult<T> {
         this.total = total;
         this.pageNum = pageNum;
         this.pageSize = pageSize;
-        this.pages = (int) Math.ceil((double) total / pageSize);
     }
 
     public List<T> getList() { return list; }
@@ -27,6 +26,4 @@ public class PageResult<T> {
     public void setPageNum(int pageNum) { this.pageNum = pageNum; }
     public int getPageSize() { return pageSize; }
     public void setPageSize(int pageSize) { this.pageSize = pageSize; }
-    public int getPages() { return pages; }
-    public void setPages(int pages) { this.pages = pages; }
 }

@@ -13,7 +13,7 @@ class App {
         this.panelPinned = true;
     }
 
-    init() {
+    async init() {
         console.log('[App] Initializing BPM Designer...');
 
         this._initIcons();
@@ -25,7 +25,7 @@ class App {
 
         this._initSidebar();
         this._initCanvas();
-        this._initPanel();
+        await this._initPanel();
         this._initChat();
         this._initToolbar();
         this._initTabManager();
@@ -122,7 +122,7 @@ class App {
         this.canvas = new Canvas(document.getElementById('canvas'), this.store, this);
     }
 
-    _initPanel() {
+    async _initPanel() {
         console.log('[App] Initializing panel with new plugin system...');
         const panelEl = document.getElementById('panel');
         console.log('[App] Panel element:', panelEl);
@@ -149,14 +149,14 @@ class App {
         }
         
         // 初始化面板插件
-        if (typeof PanelInitializer !== 'undefined' && window.panelPluginManager) {
-            PanelInitializer.init(window.panelPluginManager);
+        if (window.panelInitializer) {
+            await window.panelInitializer.initialize();
             console.log('[App] PanelInitializer completed');
         }
         
-        // 使用新的插件架构面板管理器
-        this.panelManager = new PanelManagerNew(panelEl, this.store);
-        console.log('[App] PanelManagerNew initialized');
+        // 使用插件架构面板管理器
+        this.panelManager = new PanelManager(panelEl, this.store);
+        console.log('[App] PanelManager initialized');
 
         this.store.on('activity:select', (activity) => {
             console.log('[App] activity:select event received:', activity);
@@ -187,28 +187,8 @@ class App {
         this.store.on('process:change', (process) => {
             if (process) {
                 this.panelManager.render('process', process);
-                const panelTitle = document.getElementById('panelTitle');
-                if (panelTitle) {
-                    panelTitle.textContent = process.name || '流程属性';
-                }
             }
         });
-
-        const btnPanelClose = document.getElementById('btnPanelClose');
-        if (btnPanelClose) {
-            btnPanelClose.addEventListener('click', () => {
-                this._hidePanel();
-            });
-        }
-
-        const btnPanelPin = document.getElementById('btnPanelPin');
-        if (btnPanelPin) {
-            btnPanelPin.addEventListener('click', () => {
-                this.panelPinned = !this.panelPinned;
-                btnPanelPin.classList.toggle('pinned', this.panelPinned);
-                btnPanelPin.innerHTML = IconManager.render(this.panelPinned ? 'shield' : 'shield', 18, 'icon-pin');
-            });
-        }
     }
 
     _showPanel() {

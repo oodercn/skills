@@ -1,1 +1,1 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=net.ooder.skill.dict.config.DictAutoConfiguration
+﻿net.ooder.skill.dict.config.DictAutoConfiguration

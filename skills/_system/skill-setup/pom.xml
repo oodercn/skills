@@ -6,11 +6,11 @@
 
     <groupId>net.ooder</groupId>
     <artifactId>skill-setup</artifactId>
-    <version>3.0.2</version>
+    <version>3.0.3</version>
     <packaging>jar</packaging>
 
     <name>skill-setup</name>
-    <description>系统初始化安装模�?/description>
+    <description>系统初始化安装模块</description>
 
     <dependencies>
         <dependency>

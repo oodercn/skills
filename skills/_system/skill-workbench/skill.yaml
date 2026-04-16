@@ -1,0 +1,124 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-workbench
+  name: 工作台服务
+  version: 1.0.0
+  description: 提供工作台、场景待办等功能
+  author: ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: SCENE
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    address: 0x34
+    category: SYS
+    code: SYS_WORKBENCH
+    operations: [workbench, todos]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  supportedSceneTypes:
+    - all
+    
+  dynamicSceneTypes: true
+  
+  autoStart:
+    enabled: true
+    delay: 0s
+    
+  autoJoin:
+    enabled: true
+    matchSceneTypes: true
+  
+  providedInterfaces:
+    - id: workbench-service
+      version: "1.0"
+      description: "工作台服务接口"
+  
+  capabilities:
+    - id: workbench
+      name: 工作台
+      description: 工作台数据管理
+      category: scene
+    - id: todos
+      name: 待办管理
+      description: 场景待办管理
+      category: scene
+  
+  endpoints:
+    - path: /api/v1/workbench/data
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getWorkbenchData
+      description: 获取工作台数据
+      capability: workbench
+    - path: /api/v1/workbench/scene-todos
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getSceneTodoGroups
+      description: 获取场景待办分组
+      capability: todos
+    - path: /api/v1/workbench/scene/{sceneGroupId}/todos
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getSceneTodos
+      description: 获取场景待办列表
+      capability: todos
+    - path: /api/v1/workbench/process-todo
+      method: POST
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: processTodo
+      description: 处理待办
+      capability: todos
+    - path: /api/v1/workbench/complete-todo
+      method: POST
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: completeTodoWithCallback
+      description: 完成待办
+      capability: todos
+    - path: /api/v1/workbench/statistics
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getTodoStatistics
+      description: 获取待办统计
+      capability: todos
+    - path: /api/v1/workbench/scene/{sceneGroupId}/statistics
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getSceneTodoStatistics
+      description: 获取场景待办统计
+      capability: todos
+    - path: /api/v1/workbench/scene/{sceneGroupId}/has-pending
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: hasPendingTodos
+      description: 检查是否有待处理待办
+      capability: todos
+    - path: /api/v1/workbench/scene/{sceneGroupId}/next-action
+      method: GET
+      controllerClass: net.ooder.skill.scene.controller.WorkbenchController
+      methodName: getNextActionHint
+      description: 获取下一步操作提示
+      capability: todos
+  
+  config:
+    optional:
+      - name: MAX_PARTICIPANTS
+        type: integer
+        default: 100
+        description: 最大参与者数量
+  
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"
