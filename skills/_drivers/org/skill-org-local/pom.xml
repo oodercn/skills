@@ -45,13 +45,13 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>agent-sdk-core</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.3</version>
         </dependency>
 
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.2</version>
+            <version>3.0.5</version>
         </dependency>
 
         <dependency>

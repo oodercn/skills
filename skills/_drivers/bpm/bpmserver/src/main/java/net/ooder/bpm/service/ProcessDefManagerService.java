@@ -7,6 +7,7 @@ import net.ooder.bpm.engine.inter.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -28,6 +29,9 @@ public class ProcessDefManagerService {
     
     @Autowired
     private DbRouteDefManager routeDefManager;
+    
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     public Map<String, Object> getProcessDef(String processDefId) {
         try {
@@ -355,48 +359,38 @@ public class ProcessDefManagerService {
                     
                     Map<String, Object> positionCoord = (Map<String, Object>) activityData.get("positionCoord");
                     log.info("[SAVE] Activity {} received positionCoord: {}", activity.getActivityDefId(), positionCoord);
+                    
+                    activityDefManager.save(activity);
+                    log.info("[SAVE] Activity {} saved (basic info), now saving positionCoord", activity.getActivityDefId());
+                    
                     if (positionCoord != null) {
                         try {
                             String positionCoordJson = mapper.writeValueAsString(positionCoord);
                             log.info("[SAVE] Activity {} positionCoord JSON: {}", activity.getActivityDefId(), positionCoordJson);
                             
-                            // 先清除可能存在的旧属性，确保干净状态
-                            ((DbActivityDef) activity).clearAttribute();
-                            log.info("[SAVE] Activity {} cleared existing attributes", activity.getActivityDefId());
+                            String activityDefId = activity.getActivityDefId();
+                            String workflowPropId = "prop-" + activityDefId + "-workflow";
+                            String posPropId = "prop-" + activityDefId + "-poscoord";
                             
-                            DbAttributeDef workflowAttr = new DbAttributeDef();
-                            workflowAttr.setId(java.util.UUID.randomUUID().toString());
-                            workflowAttr.setName("WORKFLOW");
-                            workflowAttr.setType("WORKFLOW");
-                            activity.setAttribute(null, workflowAttr);
-                            log.info("[SAVE] Activity {} set WORKFLOW attribute", activity.getActivityDefId());
+                            jdbcTemplate.update("DELETE FROM BPM_ACTIVITYDEF_PROPERTY WHERE ACTIVITYDEF_ID = ?", activityDefId);
                             
-                            DbAttributeDef posCoordAttr = new DbAttributeDef();
-                            posCoordAttr.setId(java.util.UUID.randomUUID().toString());
-                            posCoordAttr.setName("positionCoord");
-                            posCoordAttr.setValue(positionCoordJson);
-                            posCoordAttr.setType("WORKFLOW");
-                            activity.setAttribute("WORKFLOW", posCoordAttr);
-                            log.info("[SAVE] Activity {} set positionCoord attribute: {}", activity.getActivityDefId(), positionCoordJson);
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                workflowPropId, activityDefId, "WORKFLOW", "", null, "WORKFLOW", null, 0, "Y"
+                            );
                             
-                            // 验证属性是否正确设置
-                            List<EIAttributeDef> allAttrs = activity.getAllAttribute();
-                            log.info("[SAVE] Activity {} has {} attributes after setting", activity.getActivityDefId(), allAttrs.size());
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                posPropId, activityDefId, "positionCoord", positionCoordJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            
+                            log.info("[SAVE] Activity {} positionCoord saved via JdbcTemplate: {}", activity.getActivityDefId(), positionCoordJson);
                         } catch (Exception e) {
-                            log.error("[SAVE] Failed to set positionCoord for activity {}: {}", activity.getActivityDefId(), e.getMessage(), e);
+                            log.error("[SAVE] Failed to save positionCoord for activity {}: {}", activity.getActivityDefId(), e.getMessage(), e);
+                            throw new RuntimeException("Failed to save positionCoord for activity " + activity.getActivityDefId(), e);
                         }
                     } else {
                         log.warn("[SAVE] Activity {} has no positionCoord!", activity.getActivityDefId());
-                    }
-                    
-                    activityDefManager.save(activity);
-                    log.info("[SAVE] Activity {} saved successfully", activity.getActivityDefId());
-                    
-                    // 验证保存后的属性
-                    EIActivityDef savedActivity = activityDefManager.loadByKey(activity.getActivityDefId());
-                    if (savedActivity != null) {
-                        String savedCoord = savedActivity.getAttributeValue("WORKFLOW.positionCoord");
-                        log.info("[SAVE] Verified - Activity {} positionCoord after save: {}", activity.getActivityDefId(), savedCoord);
                     }
                 }
             }

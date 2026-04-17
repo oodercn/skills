@@ -28,7 +28,7 @@
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>ooder-spi-core</artifactId>
+            <artifactId>skill-spi-core</artifactId>
             <version>3.0.5</version>
         </dependency>
         

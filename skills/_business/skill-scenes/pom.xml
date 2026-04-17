@@ -94,7 +94,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.3</version>
+            <version>3.0.5</version>
         </dependency>
 
         <!-- Skill Dict -->
