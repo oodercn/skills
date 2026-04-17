@@ -37,7 +37,21 @@ public class ProcessDefManagerService {
         try {
             EIProcessDef processDef = processDefManager.loadByKey(processDefId);
             if (processDef == null) {
-                return null;
+                // 如果 loadByKey 返回 null，尝试从 loadAll 中查找
+                // 这可能是因为缓存没有同步
+                log.warn("loadByKey returned null for {}, trying loadAll", processDefId);
+                List<EIProcessDef> allProcessDefs = processDefManager.loadAll();
+                for (EIProcessDef pd : allProcessDefs) {
+                    if (processDefId.equals(pd.getProcessDefId())) {
+                        processDef = pd;
+                        log.info("Found process {} in loadAll", processDefId);
+                        break;
+                    }
+                }
+                if (processDef == null) {
+                    log.error("Process {} not found in loadAll either", processDefId);
+                    return null;
+                }
             }
             return convertProcessDef(processDef);
         } catch (BPMException e) {
@@ -250,6 +264,32 @@ public class ProcessDefManagerService {
         
         log.info("[LOAD] Loading attributes for activity: {}", activityDef.getActivityDefId());
         
+        // 加载 activityType 和 activityCategory
+        String activityType = activityDef.getAttributeValue("WORKFLOW.activityType");
+        String activityCategory = activityDef.getAttributeValue("WORKFLOW.activityCategory");
+        
+        // 根据 position 推断 activityType（如果没有保存过）
+        if (activityType == null || activityType.isEmpty()) {
+            String position = activityDef.getPosition();
+            if ("POSITION_START".equals(position)) {
+                activityType = "START";
+            } else if ("POSITION_END".equals(position)) {
+                activityType = "END";
+            } else {
+                activityType = "TASK";
+            }
+        }
+        
+        // 默认 activityCategory 为 HUMAN
+        if (activityCategory == null || activityCategory.isEmpty()) {
+            activityCategory = "HUMAN";
+        }
+        
+        map.put("activityType", activityType);
+        map.put("activityCategory", activityCategory);
+        
+        log.info("[LOAD] activityType: {}, activityCategory: {}", activityType, activityCategory);
+        
         EIAttributeDef workflowAttr = activityDef.getAttribute("WORKFLOW");
         log.info("[LOAD] WORKFLOW attribute: {}", workflowAttr);
         
@@ -290,6 +330,28 @@ public class ProcessDefManagerService {
     public Map<String, Object> saveProcessDef(Map<String, Object> processData) {
         log.info("[SAVE] ========== saveProcessDef called ==========");
         log.info("[SAVE] processData keys: {}", processData.keySet());
+        
+        // 调试：打印接收到的 activities
+        Object activitiesObj = processData.get("activities");
+        log.info("[SAVE] activities type: {}", activitiesObj != null ? activitiesObj.getClass().getName() : "null");
+        log.info("[SAVE] activities value: {}", activitiesObj);
+        
+        List<Map<String, Object>> activities = null;
+        if (activitiesObj instanceof List) {
+            activities = (List<Map<String, Object>>) activitiesObj;
+        }
+        
+        if (activities != null) {
+            log.info("[SAVE] Received {} activities", activities.size());
+            for (int i = 0; i < activities.size(); i++) {
+                Map<String, Object> act = activities.get(i);
+                log.info("[SAVE] Activity {}: id={}, name={}, positionCoord={}", 
+                    i, act.get("activityDefId"), act.get("name"), act.get("positionCoord"));
+            }
+        } else {
+            log.warn("[SAVE] activities is null or not a List!");
+        }
+        
         try {
             String processDefId = (String) processData.get("processDefId");
             String name = (String) processData.get("name");
@@ -332,65 +394,83 @@ public class ProcessDefManagerService {
             activityDefManager.deleteByProcessDefVersionId(versionId);
             routeDefManager.deleteByProcessDefVersionId(versionId);
             
-            List<Map<String, Object>> activities = (List<Map<String, Object>>) processData.get("activities");
+            // 使用前面定义的 activities 变量
             if (activities != null) {
                 for (Map<String, Object> activityData : activities) {
                     EIActivityDef activity = activityDefManager.createActivityDef();
                     activity.setActivityDefId((String) activityData.get("activityDefId"));
-                    activity.setProcessDefId(processDefId);
-                    activity.setProcessDefVersionId(versionId);
-                    activity.setName((String) activityData.get("name"));
-                    activity.setDescription((String) activityData.get("description"));
+                    String activityDefId = activity.getActivityDefId();
+                    String activityName = (String) activityData.get("name");
+                    String activityDesc = (String) activityData.get("description");
                     
                     String position = (String) activityData.getOrDefault("position", "NORMAL");
+                    String dbPosition;
                     if ("START".equals(position)) {
-                        activity.setPosition("POSITION_START");
+                        dbPosition = "POSITION_START";
                     } else if ("END".equals(position)) {
-                        activity.setPosition("POSITION_END");
+                        dbPosition = "POSITION_END";
                     } else {
-                        activity.setPosition("POSITION_NORMAL");
+                        dbPosition = "POSITION_NORMAL";
                     }
                     
-                    activity.setImplementation("No");
-                    activity.setLimit(0);
-                    activity.setAlertTime(0);
-                    activity.setDurationUnit("D");
-                    activity.setCanRouteBack("N");
-                    
                     Map<String, Object> positionCoord = (Map<String, Object>) activityData.get("positionCoord");
-                    log.info("[SAVE] Activity {} received positionCoord: {}", activity.getActivityDefId(), positionCoord);
+                    String activityType = (String) activityData.get("activityType");
+                    String activityCategory = (String) activityData.get("activityCategory");
                     
-                    activityDefManager.save(activity);
-                    log.info("[SAVE] Activity {} saved (basic info), now saving positionCoord", activity.getActivityDefId());
+                    log.info("[SAVE] Activity {} received positionCoord: {}, activityType: {}, activityCategory: {}", 
+                        activityDefId, positionCoord, activityType, activityCategory);
                     
-                    if (positionCoord != null) {
-                        try {
+                    // 使用 JdbcTemplate 直接插入活动基本信息（在同一事务中）
+                    jdbcTemplate.update(
+                        "INSERT INTO BPM_ACTIVITYDEF (ACTIVITYDEF_ID, PROCESSDEF_ID, PROCESSDEF_VERSION_ID, DEFNAME, DESCRIPTION, POSITION, IMPLEMENTATION, LIMITTIME, ALERTTIME, DURATIONUNIT, CANROUTEBACK) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        activityDefId, processDefId, versionId, activityName, activityDesc, dbPosition, "No", 0, 0, "D", "N"
+                    );
+                    log.info("[SAVE] Activity {} inserted via JdbcTemplate", activityDefId);
+                    
+                    // 保存扩展属性（positionCoord, activityType, activityCategory）
+                    try {
+                        String workflowPropId = "prop-" + activityDefId + "-workflow";
+                        
+                        jdbcTemplate.update(
+                            "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                            workflowPropId, activityDefId, "WORKFLOW", "", null, "WORKFLOW", null, 0, "Y"
+                        );
+                        
+                        // 保存 positionCoord
+                        if (positionCoord != null) {
                             String positionCoordJson = mapper.writeValueAsString(positionCoord);
-                            log.info("[SAVE] Activity {} positionCoord JSON: {}", activity.getActivityDefId(), positionCoordJson);
-                            
-                            String activityDefId = activity.getActivityDefId();
-                            String workflowPropId = "prop-" + activityDefId + "-workflow";
                             String posPropId = "prop-" + activityDefId + "-poscoord";
-                            
-                            jdbcTemplate.update("DELETE FROM BPM_ACTIVITYDEF_PROPERTY WHERE ACTIVITYDEF_ID = ?", activityDefId);
-                            
-                            jdbcTemplate.update(
-                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                                workflowPropId, activityDefId, "WORKFLOW", "", null, "WORKFLOW", null, 0, "Y"
-                            );
-                            
                             jdbcTemplate.update(
                                 "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
                                 posPropId, activityDefId, "positionCoord", positionCoordJson, null, "WORKFLOW", workflowPropId, 0, "Y"
                             );
-                            
-                            log.info("[SAVE] Activity {} positionCoord saved via JdbcTemplate: {}", activity.getActivityDefId(), positionCoordJson);
-                        } catch (Exception e) {
-                            log.error("[SAVE] Failed to save positionCoord for activity {}: {}", activity.getActivityDefId(), e.getMessage(), e);
-                            throw new RuntimeException("Failed to save positionCoord for activity " + activity.getActivityDefId(), e);
+                            log.info("[SAVE] Activity {} positionCoord saved: {}", activityDefId, positionCoordJson);
+                        } else {
+                            log.warn("[SAVE] Activity {} has no positionCoord!", activityDefId);
                         }
-                    } else {
-                        log.warn("[SAVE] Activity {} has no positionCoord!", activity.getActivityDefId());
+                        
+                        // 保存 activityType
+                        if (activityType != null && !activityType.isEmpty()) {
+                            String typePropId = "prop-" + activityDefId + "-type";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                typePropId, activityDefId, "activityType", activityType, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} activityType saved: {}", activityDefId, activityType);
+                        }
+                        
+                        // 保存 activityCategory
+                        if (activityCategory != null && !activityCategory.isEmpty()) {
+                            String catPropId = "prop-" + activityDefId + "-cat";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                catPropId, activityDefId, "activityCategory", activityCategory, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} activityCategory saved: {}", activityDefId, activityCategory);
+                        }
+                    } catch (Exception e) {
+                        log.error("[SAVE] Failed to save attributes for activity {}: {}", activityDefId, e.getMessage(), e);
+                        throw new RuntimeException("Failed to save attributes for activity " + activityDefId, e);
                     }
                 }
             }
@@ -399,20 +479,19 @@ public class ProcessDefManagerService {
             if (routes != null) {
                 int routeOrder = 1;
                 for (Map<String, Object> routeData : routes) {
-                    EIRouteDef route = routeDefManager.createRouteDef();
-                    route.setRouteDefId((String) routeData.get("routeDefId"));
-                    route.setProcessDefId(processDefId);
-                    route.setProcessDefVersionId(versionId);
-                    route.setName((String) routeData.get("name"));
-                    route.setDescription("");
-                    route.setFromActivityDefId((String) routeData.get("from"));
-                    route.setToActivityDefId((String) routeData.get("to"));
-                    route.setRouteOrder(routeOrder++);
-                    route.setRouteDirection((String) routeData.getOrDefault("routeDirection", "FORWARD"));
-                    route.setRouteCondition((String) routeData.get("condition"));
-                    route.setRouteConditionType("CONDITION");
+                    String routeDefId = (String) routeData.get("routeDefId");
+                    String routeName = (String) routeData.get("name");
+                    String fromActivityId = (String) routeData.get("from");
+                    String toActivityId = (String) routeData.get("to");
+                    String routeDirection = (String) routeData.getOrDefault("routeDirection", "FORWARD");
+                    String routeCondition = (String) routeData.get("condition");
                     
-                    routeDefManager.save(route);
+                    // 使用 JdbcTemplate 直接插入路由（在同一事务中）
+                    jdbcTemplate.update(
+                        "INSERT INTO BPM_ROUTEDEF (ROUTEDEF_ID, PROCESSDEF_ID, PROCESSDEF_VERSION_ID, ROUTENAME, DESCRIPTION, FROMACTIVITYDEF_ID, TOACTIVITYDEF_ID, ROUTEORDER, ROUTEDIRECTION, ROUTECONDITION, ROUTECONDITIONTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                        routeDefId, processDefId, versionId, routeName, "", fromActivityId, toActivityId, routeOrder++, routeDirection, routeCondition, "CONDITION"
+                    );
+                    log.info("[SAVE] Route {} inserted via JdbcTemplate", routeDefId);
                 }
             }
             

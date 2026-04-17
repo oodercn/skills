@@ -14,7 +14,9 @@ class Api {
         };
 
         if (data && (method === 'POST' || method === 'PUT')) {
-            options.body = JSON.stringify(data);
+            const body = JSON.stringify(data);
+            console.log('[Api] Request body:', body.substring(0, 2000));
+            options.body = body;
         }
 
         try {

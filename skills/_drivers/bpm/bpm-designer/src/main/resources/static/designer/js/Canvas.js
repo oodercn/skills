@@ -793,9 +793,17 @@ class Canvas {
             dragNodes.forEach(({ element, activity: act }) => {
                 element.classList.remove('d-node-dragging');
                 // 保存坐标变化到store
+                console.log('[Canvas] Before updateActivity - act.positionCoord:', act.positionCoord);
+                console.log('[Canvas] act === store.process.activities[index]:', act === this.store.process?.activities?.find(a => a.activityDefId === act.activityDefId));
                 this.store.updateActivity(act);
                 console.log('[Canvas] Activity position saved:', act.activityDefId, act.positionCoord);
             });
+            
+            // 保存当前标签页数据，确保切换标签页时数据不会丢失
+            if (this.app.tabManager) {
+                this.app.tabManager._saveCurrentTabData();
+            }
+            
             document.removeEventListener('mousemove', onMouseMove);
             document.removeEventListener('mouseup', onMouseUp);
         };
@@ -1298,6 +1306,7 @@ class Canvas {
 
         // 渲染所有活动节点
         console.log('[Canvas] Rendering', processDef.activities.length, 'activities');
+        console.log('[Canvas] processDef === store.process:', processDef === this.store.process);
         processDef.activities.forEach((activity, index) => {
             try {
                 console.log(`[Canvas] Rendering activity ${index}:`, activity.activityDefId, activity.name, 'type:', activity.activityType, 'coord:', activity.positionCoord);
@@ -1308,6 +1317,9 @@ class Canvas {
                 }
                 this.container.appendChild(node);
                 this.nodes.set(activity.activityDefId, { element: node, activity });
+                // 检查 activity 是否是 store.process.activities 中的同一个对象
+                const storeActivity = this.store.process?.activities?.find(a => a.activityDefId === activity.activityDefId);
+                console.log(`[Canvas] Activity ${index} - activity === storeActivity:`, activity === storeActivity);
                 console.log(`[Canvas] Activity ${index} rendered successfully`);
             } catch (error) {
                 console.error(`[Canvas] Error rendering activity ${index}:`, error, activity);

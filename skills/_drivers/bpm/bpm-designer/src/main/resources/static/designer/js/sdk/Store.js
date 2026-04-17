@@ -53,6 +53,9 @@ class Store {
         );
         if (index >= 0) {
             const existing = this.process.activities[index];
+            console.log('[Store] updateActivity - existing === activityDef:', existing === activityDef);
+            console.log('[Store] updateActivity - existing.positionCoord:', existing?.positionCoord);
+            console.log('[Store] updateActivity - activityDef.positionCoord:', activityDef?.positionCoord);
             if (existing && typeof existing === 'object' && existing !== activityDef) {
                 Object.keys(activityDef).forEach(key => {
                     if (activityDef[key] !== undefined) {

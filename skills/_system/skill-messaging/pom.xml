@@ -28,8 +28,8 @@
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
-            <artifactId>skill-spi-core</artifactId>
-            <version>3.0.5</version>
+            <artifactId>ooder-spi-core</artifactId>
+            <version>3.0.6</version>
         </dependency>
         
         <dependency>

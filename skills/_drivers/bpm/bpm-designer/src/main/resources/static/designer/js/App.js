@@ -549,7 +549,24 @@ class App {
         }
 
         try {
-            await this.api.saveProcess(process.toJSON());
+            const processData = process.toJSON();
+            console.log('[App] Saving process data:', JSON.stringify(processData, null, 2));
+            console.log('[App] Activities positionCoord:', processData.activities?.map(a => ({ id: a.activityDefId, coord: a.positionCoord })));
+            const response = await this.api.saveProcess(processData);
+            
+            // 保存成功后，使用返回的数据更新 store
+            if (response && response.data) {
+                console.log('[App] Save response:', response);
+                const savedProcess = new ProcessDef(response.data);
+                this.store.setProcess(savedProcess);
+                
+                // 更新当前标签页的 processDef
+                const activeTab = this.tabManager.getActiveTab();
+                if (activeTab) {
+                    activeTab.processDef = savedProcess;
+                }
+            }
+            
             this.store.setDirty(false);
             this._toast('保存成功', 'success');
         } catch (error) {
@@ -642,8 +659,10 @@ class App {
     }
 
     loadProcess(processId, version) {
-        this.api.getProcess(processId, version).then(data => {
-            const process = new ProcessDef(data);
+        this.api.getProcess(processId, version).then(response => {
+            // 后端返回 { code, message, data } 格式，需要提取 data
+            const processData = response.data || response;
+            const process = new ProcessDef(processData);
             this.tabManager.openTab(process);
         }).catch(error => {
             console.error('[App] Load process failed:', error);

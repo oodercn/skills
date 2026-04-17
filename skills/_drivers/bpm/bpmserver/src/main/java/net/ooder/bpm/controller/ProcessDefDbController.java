@@ -114,21 +114,37 @@ public class ProcessDefDbController {
                 formattedActivity.put("description", activity.get("description"));
                 
                 String position = (String) activity.get("position");
-                // 修复：activityType 始终为 TASK，不要用 START/END 作为 activityType
-                // START/END 只作为 position 的值，这样前端不会过滤掉这些活动
+                // 使用从数据库加载的 activityType 和 activityCategory
+                // 如果没有保存过，则根据 position 推断默认值
+                String activityType = (String) activity.get("activityType");
+                String activityCategory = (String) activity.get("activityCategory");
+                
+                // 处理 position 值
                 if ("POSITION_START".equals(position)) {
                     formattedActivity.put("position", "START");
-                    formattedActivity.put("activityType", "TASK");
-                    formattedActivity.put("activityCategory", "HUMAN");
                 } else if ("POSITION_END".equals(position)) {
                     formattedActivity.put("position", "END");
-                    formattedActivity.put("activityType", "TASK");
-                    formattedActivity.put("activityCategory", "HUMAN");
                 } else {
                     formattedActivity.put("position", "NORMAL");
-                    formattedActivity.put("activityType", "TASK");
-                    formattedActivity.put("activityCategory", "HUMAN");
                 }
+                
+                // 使用数据库中的 activityType，如果没有则根据 position 推断
+                if (activityType == null || activityType.isEmpty()) {
+                    if ("POSITION_START".equals(position)) {
+                        activityType = "START";
+                    } else if ("POSITION_END".equals(position)) {
+                        activityType = "END";
+                    } else {
+                        activityType = "TASK";
+                    }
+                }
+                formattedActivity.put("activityType", activityType);
+                
+                // 使用数据库中的 activityCategory，如果没有则默认为 HUMAN
+                if (activityCategory == null || activityCategory.isEmpty()) {
+                    activityCategory = "HUMAN";
+                }
+                formattedActivity.put("activityCategory", activityCategory);
                 
                 formattedActivity.put("implementation", activity.get("implementation"));
                 formattedActivity.put("positionCoord", activity.get("positionCoord"));

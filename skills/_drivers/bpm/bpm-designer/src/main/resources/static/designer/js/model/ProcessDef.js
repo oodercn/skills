@@ -446,12 +446,16 @@ class ProcessDef {
                 })
                 .map((a, index) => {
                     try {
+                        console.log(`[ProcessDef.toJSON] Activity ${index}: type=${a?.constructor?.name}, instanceof ActivityDef=${a instanceof ActivityDef}, positionCoord=`, a?.positionCoord);
                         if (a instanceof ActivityDef) {
-                            return a.toJSON();
+                            const json = a.toJSON();
+                            console.log(`[ProcessDef.toJSON] Activity ${index} toJSON result: positionCoord=`, json?.positionCoord);
+                            return json;
                         } else if (a && typeof a.toJSON === 'function') {
                             return a.toJSON();
                         } else if (a && typeof a === 'object') {
                             // 如果是普通对象，直接返回
+                            console.warn(`[ProcessDef.toJSON] Activity ${index} is plain object, returning as-is:`, a);
                             return a;
                         } else {
                             console.warn(`[ProcessDef.toJSON] Invalid activity at index ${index}:`, a);

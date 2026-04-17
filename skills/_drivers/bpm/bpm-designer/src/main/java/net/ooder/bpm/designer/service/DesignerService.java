@@ -2,6 +2,7 @@ package net.ooder.bpm.designer.service;
 
 import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import net.ooder.bpm.designer.dto.ActivityDTO;
 import net.ooder.bpm.designer.dto.PositionCoordDTO;
 import net.ooder.bpm.designer.dto.ProcessDTO;
@@ -35,6 +36,7 @@ public class DesignerService {
     private String bpmServerUrl;
 
     private final RestTemplate restTemplate = new RestTemplate();
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     /**
      * 获取流程定义 - 直接从服务端获取
@@ -55,7 +57,8 @@ public class DesignerService {
                     String dataJson = JSON.toJSONString(result.get("data"));
                     log.debug("Data JSON: {}", dataJson);
                     
-                    ProcessDTO processDTO = JSON.parseObject(dataJson, ProcessDTO.class);
+                    // 使用 Jackson ObjectMapper 来正确解析泛型类型（包括嵌套的 PositionCoordDTO）
+                    ProcessDTO processDTO = objectMapper.readValue(dataJson, ProcessDTO.class);
                     log.debug("Parsed ProcessDTO: {}", processDTO);
                     
                     ProcessDef process = convertToProcessDef(processDTO);
@@ -245,7 +248,8 @@ public class DesignerService {
                 Map<String, Object> result = JSON.parseObject(body, new TypeReference<Map<String, Object>>() {});
                 if (result.get("data") != null) {
                     String dataJson = JSON.toJSONString(result.get("data"));
-                    ProcessDTO savedDTO = JSON.parseObject(dataJson, ProcessDTO.class);
+                    // 使用 Jackson ObjectMapper 来正确解析泛型类型（包括嵌套的 PositionCoordDTO）
+                    ProcessDTO savedDTO = objectMapper.readValue(dataJson, ProcessDTO.class);
                     return convertToProcessDef(savedDTO);
                 }
             }

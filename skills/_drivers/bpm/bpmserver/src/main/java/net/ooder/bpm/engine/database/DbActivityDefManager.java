@@ -1441,8 +1441,10 @@ public class DbActivityDefManager extends EIActivityDefManager {
      * @param activityDef
      */
     void saveAttribute(DbActivityDef activityDef) throws BPMException {
-        log.info("[saveAttribute] Called for activity: {}, isAttributeModified: {}", 
-            activityDef.getActivityDefId(), activityDef.isAttributeModified());
+        if (log.isInfoEnabled()) {
+            log.info("[saveAttribute] Called for activity: " + activityDef.getActivityDefId() + 
+                ", isAttributeModified: " + activityDef.isAttributeModified());
+        }
         
         if (activityDef.isAttributeModified() == false) {
             log.info("[saveAttribute] Attribute not modified, skipping save");
@@ -1450,26 +1452,35 @@ public class DbActivityDefManager extends EIActivityDefManager {
         }
         
         List list = activityDef.getAllAttribute();
-        log.info("[saveAttribute] Activity {} has {} attributes to save", 
-            activityDef.getActivityDefId(), list.size());
+        if (log.isInfoEnabled()) {
+            log.info("[saveAttribute] Activity " + activityDef.getActivityDefId() + 
+                " has " + list.size() + " attributes to save");
+        }
         
         for (Object obj : list) {
             DbAttributeDef att = (DbAttributeDef) obj;
-            log.info("[saveAttribute] Attribute: id={}, name={}, type={}, value={}, parentId={}",
-                att.getId(), att.getName(), att.getType(), 
-                att.getValue() != null ? att.getValue().substring(0, Math.min(50, att.getValue().length())) : "null",
-                att.getParentId());
+            if (log.isInfoEnabled()) {
+                String valueStr = att.getValue() != null ? 
+                    att.getValue().substring(0, Math.min(50, att.getValue().length())) : "null";
+                log.info("[saveAttribute] Attribute: id=" + att.getId() + 
+                    ", name=" + att.getName() + ", type=" + att.getType() + 
+                    ", value=" + valueStr + ", parentId=" + att.getParentId());
+            }
         }
         
         Connection c = null;
         PreparedStatement ps = null;
         try {
             c = getConnection();
-            log.info("[saveAttribute] Deleting old attributes for activity: {}", activityDef.getActivityDefId());
+            if (log.isInfoEnabled()) {
+                log.info("[saveAttribute] Deleting old attributes for activity: " + activityDef.getActivityDefId());
+            }
             ps = c.prepareStatement(DELETE_EXTATTRIBUTRE);
             ps.setString(1, activityDef.getActivityDefId());
             int deleted = ps.executeUpdate();
-            log.info("[saveAttribute] Deleted {} old attributes", deleted);
+            if (log.isInfoEnabled()) {
+                log.info("[saveAttribute] Deleted " + deleted + " old attributes");
+            }
 
             getManager().close(ps);
             ps = c.prepareStatement(INSERT_EXTATTRIBUTRE);
@@ -1479,7 +1490,9 @@ public class DbActivityDefManager extends EIActivityDefManager {
                 saveAttribute(ps, activityDef, att);
                 savedCount++;
             }
-            log.info("[saveAttribute] Saved {} attributes for activity: {}", savedCount, activityDef.getActivityDefId());
+            if (log.isInfoEnabled()) {
+                log.info("[saveAttribute] Saved " + savedCount + " attributes for activity: " + activityDef.getActivityDefId());
+            }
 
         } catch (SQLException e) {
             throw new BPMException("", e, BPMException.PROCESSDEFINITIONERROR);
