@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x37
+    address: 0x2C
     category: SYS
     code: SYS_DASHBOARD
     operations: [read, stats]

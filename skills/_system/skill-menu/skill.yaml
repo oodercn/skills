@@ -3,9 +3,9 @@ kind: Skill
 
 metadata:
   id: skill-menu
-  name: 鑿滃崟鏉冮檺鏈嶅姟
-  version: 3.0.5
-  description: 鎻愪緵鑿滃崟閰嶇疆銆佽鑹茶彍鍗曘€佺敤鎴疯彍鍗曠瓑鍔熻兘 - 鍖呭惈JPA瀛樺偍椹卞姩
+  name: 菜单权限服务
+  version: 3.0.2
+  description: 提供菜单配置、角色菜单、用户菜单等功能 - 包含JPA存储驱动
   author: ooder Team
   type: system-service
   license: Apache-2.0
@@ -26,13 +26,13 @@ spec:
         ddl-auto: update
       datasource:
         url: jdbc:sqlite:./data/menu.db
-    description: JPA + SQLite 瀛樺偍椹卞姩锛岀敤浜庢寔涔呭寲鑿滃崟鏁版嵁
+    description: JPA + SQLite 存储驱动，用于持久化菜单数据
 
   drivers:
     - id: jpa
-      name: JPA瀛樺偍椹卞姩
+      name: JPA存储驱动
       type: storage
-      description: 鍩轰簬Spring Data JPA + Hibernate鐨凷QLite瀛樺偍椹卞姩
+      description: 基于Spring Data JPA + Hibernate的SQLite存储驱动
       required: true
       version: ">=3.0.0"
       dependencies:
@@ -40,9 +40,10 @@ spec:
         - sqlite-jdbc
         - hibernate-community-dialect
     - id: json
-      name: JSON鏂囦欢瀛樺偍椹卞姩
+      name: JSON文件存储驱动
       type: storage
-      description: 鍩轰簬JSON鏂囦欢鐨勮交閲忕骇瀛樺偍椹卞姩锛堝紑鍙戜腑锛?      required: false
+      description: 基于JSON文件的轻量级存储驱动（开发中）
+      required: false
       version: ">=3.0.0"
 
   capability:
@@ -67,26 +68,27 @@ spec:
   endpoints:
     - path: /api/v1/menus
       method: GET
-      description: 鑾峰彇鑿滃崟鍒楄〃
+      description: 获取菜单列表
       capability: query
     - path: /api/v1/menus/tree
       method: GET
-      description: 鑾峰彇鑿滃崟鏍?      capability: query
+      description: 获取菜单树
+      capability: query
     - path: /api/v1/menus/{menuId}
       method: GET
-      description: 鑾峰彇鑿滃崟璇︽儏
+      description: 获取菜单详情
       capability: query
     - path: /api/v1/menus
       method: POST
-      description: 鍒涘缓鑿滃崟
+      description: 创建菜单
       capability: create
     - path: /api/v1/menus/{menuId}
       method: PUT
-      description: 鏇存柊鑿滃崟
+      description: 更新菜单
       capability: update
     - path: /api/v1/menus/{menuId}
       method: DELETE
-      description: 鍒犻櫎鑿滃崟
+      description: 删除菜单
       capability: delete
 
   config:
@@ -94,7 +96,7 @@ spec:
       - name: MENU_CACHE_ENABLED
         type: boolean
         default: true
-        description: 鏄惁鍚敤鑿滃崟缂撳瓨
+        description: 是否启用菜单缓存
 
   resources:
     cpu: "50m"

@@ -15,12 +15,12 @@ public class KeyAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean(KeyManagementService.class)
     public KeyManagementService keyManagementService() {
-        return new KeyManagementService();
+        return new KeyManagementServiceImpl();
     }
 
     @Bean
     @ConditionalOnMissingBean(KeyRuleService.class)
     public KeyRuleService keyRuleService() {
-        return new KeyRuleService();
+        return new KeyRuleServiceImpl();
     }
 }

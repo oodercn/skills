@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x38
+    address: 0x2C
     category: SYS
     code: SYS_TEMPLATE
     operations: [list, get, deploy, install, check]

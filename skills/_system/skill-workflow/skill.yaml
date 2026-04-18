@@ -2,9 +2,9 @@ apiVersion: skill.ooder.net/v1
 kind: Skill
 metadata:
   name: skill-workflow
-  displayName: "宸ヤ綔娴佸紩鎿?
-  description: "鍩轰簬ooder-bpm-web椹卞姩鍖呯殑浼佷笟绾PM娴佺▼绠＄悊鏈嶅姟锛屾彁渚涙祦绋嬪畾涔夈€佹祦绋嬪疄渚嬨€佸緟鍔炰换鍔°€佸凡鍔炰换鍔°€佹祦绋嬬洃鎺х瓑瀹屾暣鍔熻兘"
-  version: 3.0.5
+  displayName: "工作流引擎"
+  description: "基于ooder-bpm-web驱动包的企业级BPM流程管理服务，提供流程定义、流程实例、待办任务、已办任务、流程监控等完整功能"
+  version: 3.0.1
   address: "0x35"
   author: ooder-team
   labels:
@@ -41,124 +41,125 @@ spec:
     properties:
       - key: skill.workflow.enabled
         defaultValue: "true"
-        description: "鍚敤宸ヤ綔娴佹湇鍔?
+        description: "启用工作流服务"
       - key: skill.workflow.bpm.server-url
         defaultValue: ""
-        description: "BPM鏈嶅姟鍣ㄥ湴鍧€"
+        description: "BPM服务器地址"
       - key: skill.workflow.bpm.system-code
         defaultValue: "APEX"
-        description: "绯荤粺鏍囪瘑鐮?
+        description: "系统标识码"
 
   capabilities:
-    - name: 娴佺▼瀹氫箟绠＄悊
-      description: "娴佺▼瀹氫箟鐨勬煡璇€佺増鏈鐞嗐€佸睘鎬у姞杞?
+    - name: 流程定义管理
+      description: "流程定义的查询、版本管理、属性加载"
       apiGroup: "/api/v1/workflow/definition"
-    - name: 娴佺▼瀹炰緥绠＄悊
-      description: "娴佺▼鍚姩銆佹寕璧枫€佹仮澶嶃€佺粓姝€佸垹闄?
+    - name: 流程实例管理
+      description: "流程启动、挂起、恢复、终止、删除"
       apiGroup: "/api/v1/workflow/instance"
-    - name: 寰呭姙浠诲姟
-      description: "寰呭姙鍒楄〃銆佺鏀躲€佸姙鐞嗐€佸彂閫併€侀€€鍥炪€佹敹鍥?
+    - name: 待办任务
+      description: "待办列表、签收、办理、发送、退回、收回"
       apiGroup: "/api/v1/workflow/todo"
-    - name: 宸插姙浠诲姟
-      description: "宸插姙鐞嗐€佸凡闃呭姙銆佸綊妗ｆ枃浠跺垪琛?
+    - name: 已办任务
+      description: "已办理、已阅办、归档文件列表"
       apiGroup: "/api/v1/workflow/done"
-    - name: 娴佺▼鐩戞帶
-      description: "娴佺▼鍘嗙▼鏌ョ湅銆佹椿鍔ㄥ巻鍙茶拷韪€丼VG鍙鍖?
+    - name: 流程监控
+      description: "流程历程查看、活动历史追踪、SVG可视化"
       apiGroup: "/api/v1/workflow/monitor"
-    - name: 鑽夌绠?      description: "鏈惎鍔ㄦ祦绋嬪疄渚嬬鐞?
+    - name: 草稿箱
+      description: "未启动流程实例管理"
       apiGroup: "/api/v1/workflow/draft"
 
   apis:
     - path: /api/v1/workflow/definition/list
       method: POST
-      description: "鑾峰彇娴佺▼瀹氫箟鐗堟湰鍒楄〃"
+      description: "获取流程定义版本列表"
     - path: /api/v1/workflow/definition/{id}
       method: GET
-      description: "鑾峰彇娴佺▼瀹氫箟璇︽儏"
+      description: "获取流程定义详情"
     - path: /api/v1/workflow/definition/{id}/attributes
       method: GET
-      description: "鑾峰彇娴佺▼瀹氫箟灞炴€?
+      description: "获取流程定义属性"
     - path: /api/v1/workflow/definition/{id}/first-activity
       method: GET
-      description: "鑾峰彇娴佺▼棣栬妭鐐?
+      description: "获取流程首节点"
     - path: /api/v1/workflow/instance/start
       method: POST
-      description: "鍚姩鏂版祦绋?
+      description: "启动新流程"
     - path: /api/v1/workflow/instance/list
       method: POST
-      description: "鑾峰彇娴佺▼瀹炰緥鍒楄〃"
+      description: "获取流程实例列表"
     - path: /api/v1/workflow/instance/{id}
       method: GET
-      description: "鑾峰彇娴佺▼瀹炰緥璇︽儏"
+      description: "获取流程实例详情"
     - path: /api/v1/workflow/instance/{id}/complete
       method: POST
-      description: "瀹屾垚娴佺▼"
+      description: "完成流程"
     - path: /api/v1/workflow/instance/{id}/suspend
       method: POST
-      description: "鎸傝捣娴佺▼"
+      description: "挂起流程"
     - path: /api/v1/workflow/instance/{id}/resume
       method: POST
-      description: "鎭㈠娴佺▼"
+      description: "恢复流程"
     - path: /api/v1/workflow/instance/{id}/abort
       method: POST
-      description: "缁堟娴佺▼"
+      description: "终止流程"
     - path: /api/v1/workflow/instance/{id}/delete
       method: DELETE
-      description: "鍒犻櫎娴佺▼"
+      description: "删除流程"
     - path: /api/v1/workflow/todo/waited
       method: POST
-      description: "鏈€鏂板緟鍔炲垪琛?
+      description: "最新待办列表"
     - path: /api/v1/workflow/todo/my
       method: POST
-      description: "鎵€鏈夊湪鍔炲垪琛?
+      description: "所有在办列表"
     - path: /api/v1/workflow/todo/sign
       method: POST
-      description: "绛炬敹浠诲姟"
+      description: "签收任务"
     - path: /api/v1/workflow/todo/route-to
       method: POST
-      description: "鍙戦€?璺敱鍒颁笅涓€姝?"
+      description: "发送(路由到下一步)"
     - path: /api/v1/workflow/todo/route-back
       method: POST
-      description: "閫€鍥炰笂涓€姝?
+      description: "退回上一步"
     - path: /api/v1/workflow/todo/take-back
       method: POST
-      description: "鏀跺洖"
+      description: "收回"
     - path: /api/v1/workflow/todo/end-read
       method: POST
-      description: "闃呮瘯"
+      description: "阅毕"
     - path: /api/v1/workflow/todo/end-task
       method: POST
-      description: "瀹屾垚浠诲姟"
+      description: "完成任务"
     - path: /api/v1/workflow/todo/routes
       method: GET
-      description: "鑾峰彇鍙矾鐢卞垪琛?
+      description: "获取可路由列表"
     - path: /api/v1/workflow/done/completed
       method: POST
-      description: "宸插姙鐞嗗垪琛?
+      description: "已办理列表"
     - path: /api/v1/workflow/done/read
       method: POST
-      description: "宸查槄鍔炲垪琛?
+      description: "已阅办列表"
     - path: /api/v1/workflow/done/archive
       method: POST
-      description: "褰掓。鏂囦欢鍒楄〃"
+      description: "归档文件列表"
     - path: /api/v1/workflow/draft/list
       method: POST
-      description: "鑽夌绠卞垪琛?
+      description: "草稿箱列表"
     - path: /api/v1/workflow/monitor/history
       method: GET
-      description: "娲诲姩鍘嗗彶璁板綍"
+      description: "活动历史记录"
     - path: /api/v1/workflow/monitor/process-history
       method: GET
-      description: "娴佺▼鍘嗙▼"
+      description: "流程历程"
     - path: /api/v1/workflow/monitor/can-take-back
       method: GET
-      description: "鏄惁鍙敹鍥?
+      description: "是否可收回"
     - path: /api/v1/workflow/monitor/can-route-back
       method: GET
-      description: "鏄惁鍙€€鍥?
+      description: "是否可退回"
     - path: /api/v1/workform/values
       method: GET
-      description: "鑾峰彇琛ㄥ崟鏁版嵁"
+      description: "获取表单数据"
     - path: /api/v1/workform/save
       method: POST
-      description: "淇濆瓨琛ㄥ崟鏁版嵁"
+      description: "保存表单数据"

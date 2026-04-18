@@ -7,16 +7,89 @@ metadata:
   version: 1.0.0
   description: Security Skill - Security configuration and policy management
   author: ooder
+  type: business-service
+  license: Apache-2.0
 
 spec:
-  entryPoint: net.ooder.skill.security.SecurityAutoConfiguration
-  dependencies: []
+  skillForm: PROVIDER
+  type: business-skill
 
-  apis:
-    - /api/v1/security/config
-    - /api/v1/security/policies
-    - /api/v1/security/policies/{policyId}
-    - /api/v1/security/stats
+  ownership: tenant
+
+  capability:
+    address: 0x42
+    category: BIZ
+    code: BIZ_SECURITY
+    operations: [config, policy, stats]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=1.0.0"
+      required: false
+
+  endpoints:
+    - path: /api/v1/security/config
+      method: GET
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: getConfig
+      description: 获取安全配置
+      capability: config
+    - path: /api/v1/security/config
+      method: PUT
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: updateConfig
+      description: 更新安全配置
+      capability: config
+    - path: /api/v1/security/policies
+      method: GET
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: getPolicies
+      description: 获取策略列表
+      capability: policy
+    - path: /api/v1/security/policies
+      method: POST
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: createPolicy
+      description: 创建策略
+      capability: policy
+    - path: /api/v1/security/policies/{policyId}
+      method: GET
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: getPolicy
+      description: 获取策略详情
+      capability: policy
+    - path: /api/v1/security/policies/{policyId}
+      method: PUT
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: updatePolicy
+      description: 更新策略
+      capability: policy
+    - path: /api/v1/security/policies/{policyId}
+      method: DELETE
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: deletePolicy
+      description: 删除策略
+      capability: policy
+    - path: /api/v1/security/stats
+      method: GET
+      controllerClass: net.ooder.skill.security.controller.SecurityController
+      methodName: getStats
+      description: 获取安全统计
+      capability: stats
 
   config:
-    ooder.security.enabled: true
+    optional:
+      - name: SECURITY_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用安全服务
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

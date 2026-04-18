@@ -71,24 +71,40 @@ spec:
   endpoints:
     - path: /api/v1/auth/login
       method: POST
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: login
       description: 用户登录
       capability: login
     - path: /api/v1/auth/logout
       method: POST
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: logout
       description: 用户登出
       capability: logout
     - path: /api/v1/auth/session
       method: GET
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: getSession
       description: 获取会话信息
       capability: session
-    - path: /api/v1/auth/current-user
+    - path: /api/v1/auth/qrcode/{platform}
       method: GET
-      description: 获取当前用户
-      capability: session
-    - path: /api/v1/auth/check-permission
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: getQrcode
+      description: 获取二维码登录
+      capability: login
+    - path: /api/v1/auth/qrcode/check/{qrcodeId}
       method: GET
-      description: 检查权限
-      capability: permission
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: checkQrcode
+      description: 检查二维码状态
+      capability: login
+    - path: /api/v1/auth/callback/{platform}
+      method: GET
+      controllerClass: net.ooder.skill.auth.controller.AuthController
+      methodName: handleCallback
+      description: 处理登录回调
+      capability: login
   
   config:
     optional:

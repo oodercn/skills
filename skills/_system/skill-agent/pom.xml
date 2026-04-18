@@ -48,7 +48,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.5</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -135,7 +135,7 @@
         <dependency>
             <groupId>jakarta.validation</groupId>
             <artifactId>jakarta.validation-api</artifactId>
-            <version>3.0.3</version>
+            <scope>provided</scope>
         </dependency>
 
         <dependency>

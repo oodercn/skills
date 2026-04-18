@@ -1168,9 +1168,6 @@ public class DbActivityDef implements EIActivityDef, Cacheable, Serializable {
      * @return
      */
     public EIAttributeDef getAttribute(String name) {
-        if (name != null) {
-            name = name.toUpperCase();
-        }
         if (attributeIdMap == null && attributeTopMap == null) {
             attributeIdMap = new HashMap();
             attributeTopMap = new HashMap();
@@ -1185,15 +1182,16 @@ public class DbActivityDef implements EIActivityDef, Cacheable, Serializable {
             }
         }
 
-
         StringTokenizer st = new StringTokenizer(name, ".");
         DbAttributeDef subAtt = null;
         while (st.hasMoreTokens()) {
             String subname = st.nextToken();
             if (subAtt == null) { // top level
-                subAtt = (DbAttributeDef) attributeTopMap.get(subname);
+                // 顶层属性使用大写查找（保持原有行为）
+                subAtt = (DbAttributeDef) attributeTopMap.get(subname.toUpperCase());
             } else {
-                subAtt = (DbAttributeDef) subAtt.getChild(subname);
+                // 子属性使用不区分大小写查找（修复大小写不匹配问题）
+                subAtt = (DbAttributeDef) subAtt.getChildIgnoreCase(subname);
             }
 
             if (subAtt == null) {

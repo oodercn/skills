@@ -264,9 +264,24 @@ public class ProcessDefManagerService {
         
         log.info("[LOAD] Loading attributes for activity: {}", activityDef.getActivityDefId());
         
-        // 加载 activityType 和 activityCategory
+        // 首先尝试从 WORKFLOW 属性组中加载
         String activityType = activityDef.getAttributeValue("WORKFLOW.activityType");
         String activityCategory = activityDef.getAttributeValue("WORKFLOW.activityCategory");
+        String positionCoord = activityDef.getAttributeValue("WORKFLOW.positionCoord");
+        
+        // 如果 WORKFLOW 组中没有，尝试直接从顶层属性加载（兼容直接保存的属性名）
+        if (activityType == null || activityType.isEmpty()) {
+            activityType = activityDef.getAttributeValue("activityType");
+        }
+        if (activityCategory == null || activityCategory.isEmpty()) {
+            activityCategory = activityDef.getAttributeValue("activityCategory");
+        }
+        if (positionCoord == null || positionCoord.isEmpty()) {
+            positionCoord = activityDef.getAttributeValue("positionCoord");
+        }
+        
+        log.info("[LOAD] Found activityType: {}, activityCategory: {}, positionCoord: {}", 
+            activityType, activityCategory, positionCoord != null ? "present" : "null");
         
         // 根据 position 推断 activityType（如果没有保存过）
         if (activityType == null || activityType.isEmpty()) {
@@ -288,13 +303,8 @@ public class ProcessDefManagerService {
         map.put("activityType", activityType);
         map.put("activityCategory", activityCategory);
         
-        log.info("[LOAD] activityType: {}, activityCategory: {}", activityType, activityCategory);
+        log.info("[LOAD] Final activityType: {}, activityCategory: {}", activityType, activityCategory);
         
-        EIAttributeDef workflowAttr = activityDef.getAttribute("WORKFLOW");
-        log.info("[LOAD] WORKFLOW attribute: {}", workflowAttr);
-        
-        String positionCoord = activityDef.getAttributeValue("WORKFLOW.positionCoord");
-        log.info("[LOAD] positionCoord raw value: {}", positionCoord);
         if (positionCoord != null && !positionCoord.isEmpty()) {
             try {
                 Map<String, Object> positionCoordMap = mapper.readValue(positionCoord, Map.class);
@@ -356,7 +366,7 @@ public class ProcessDefManagerService {
             String processDefId = (String) processData.get("processDefId");
             String name = (String) processData.get("name");
             String description = (String) processData.get("description");
-            String classification = (String) processData.getOrDefault("category", "办公流程");
+            String classification = (String) processData.getOrDefault("classification", "办公流程");
             String accessLevel = (String) processData.getOrDefault("accessLevel", "Public");
             
             EIProcessDef processDef = processDefManager.loadByKey(processDefId);

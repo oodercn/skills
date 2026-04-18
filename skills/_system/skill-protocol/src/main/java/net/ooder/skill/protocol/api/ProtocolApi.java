@@ -7,7 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * 鍗忚绠＄悊API
+ * 协议管理API
  */
 public interface ProtocolApi {
     
@@ -19,7 +19,6 @@ public interface ProtocolApi {
     boolean isInitialized();
     boolean isRunning();
     
-    // 鍗忚澶勭悊
     Result<Map<String, Object>> executeCommand(String protocol, String command, Map<String, Object> params);
     Result<List<String>> listSupportedProtocols();
     Result<Boolean> registerHandler(String protocol, Map<String, Object> config);

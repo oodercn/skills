@@ -37,7 +37,7 @@ class TabManager {
         this.tabs.set(tabId, tab);
         this._renderTab(tab);
         this.activateTab(tabId);
-        this._saveLastProcess(tabId);
+        this._saveLastProcess(processDef.processDefId);
     }
 
     _renderTab(tab) {
@@ -123,7 +123,7 @@ class TabManager {
         console.log('[TabManager] Activating tab:', tabId, 'activities:', tab.processDef?.activities?.length);
         
         this.app._loadProcessContent(tab.processDef);
-        this._saveLastProcess(tabId);
+        this._saveLastProcess(tab.processDef?.processDefId || tabId);
         
         document.getElementById('processName').textContent = tab.name;
     }

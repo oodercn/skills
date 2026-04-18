@@ -3,9 +3,9 @@ kind: Skill
 
 metadata:
   id: skill-llm-chat
-  name: LLM鑱婂ぉ鍔╂墜
-  version: 3.0.5
-  description: LLM鑱婂ぉ鍔╂墜 - 鍐呯疆鐭ヨ瘑璧勬枡搴撳姛鑳斤紝鏀寔澶氳疆瀵硅瘽鍜岀煡璇嗘绱?
+  name: LLM聊天助手
+  version: 3.0.1
+  description: LLM聊天助手 - 内置知识资料库功能，支持多轮对话和知识检索
   author: ooder Team
   license: Apache-2.0
   type: service-skill
@@ -54,65 +54,65 @@ spec:
       enabled: true
       tools:
         - name: query_skill_capability
-          description: "鏌ヨ褰撳墠鎶€鑳界殑鑳藉姏鍜屼娇鐢ㄦ柟娉?
+          description: "查询当前技能的能力和使用方法"
           parameters:
             type: object
             properties:
               capability:
                 type: string
-                description: "鑳藉姏鍚嶇О"
+                description: "能力名称"
               detail:
                 type: string
                 enum: [brief, detailed, examples]
                 default: "brief"
         - name: execute_mvel_action
-          description: "閫氳繃MVEL琛ㄨ揪寮忔墽琛屽悗鍙版搷浣?
+          description: "通过MVEL表达式执行后台操作"
           parameters:
             type: object
             properties:
               expression:
                 type: string
-                description: "MVEL琛ㄨ揪寮?
+                description: "MVEL表达式"
               context:
                 type: object
-                description: "鎵ц涓婁笅鏂?
+                description: "执行上下文"
         - name: generate_ui_form
-          description: "鐢熸垚UI琛ㄥ崟渚涚敤鎴峰～鍐?
+          description: "生成UI表单供用户填写"
           parameters:
             type: object
             properties:
               formType:
                 type: string
-                description: "琛ㄥ崟绫诲瀷"
+                description: "表单类型"
               fields:
                 type: array
                 items:
                   type: object
-                description: "琛ㄥ崟瀛楁瀹氫箟"
+                description: "表单字段定义"
         - name: execute_batch_operation
-          description: "鎵ц鎵归噺鎿嶄綔"
+          description: "执行批量操作"
           parameters:
             type: object
             properties:
               operation:
                 type: string
-                description: "鎿嶄綔绫诲瀷"
+                description: "操作类型"
               items:
                 type: array
                 items:
                   type: object
-                description: "鎿嶄綔椤瑰垪琛?
+                description: "操作项列表"
         - name: convert_to_javascript
-          description: "杞崲涓篔avaScript浠ｇ爜渚涚敤鎴蜂娇鐢?
+          description: "转换为JavaScript代码供用户使用"
           parameters:
             type: object
             properties:
               action:
                 type: string
-                description: "瑕佹墽琛岀殑鍔ㄤ綔"
+                description: "要执行的动作"
               parameters:
                 type: object
-                description: "鍔ㄤ綔鍙傛暟"
+                description: "动作参数"
       toolChoice: auto
     embedding:
       required: true
@@ -124,18 +124,18 @@ spec:
 
   capabilities:
     - id: llm-chat
-      name: LLM鑱婂ぉ
-      description: 鏀寔澶氳疆瀵硅瘽鐨凩LM鑱婂ぉ鍔熻兘
+      name: LLM聊天
+      description: 支持多轮对话的LLM聊天功能
       category: ai
       
     - id: knowledge-base
-      name: 鐭ヨ瘑璧勬枡搴?
-      description: 鍐呯疆鐭ヨ瘑璧勬枡搴擄紝鏀寔鏂囨。涓婁紶鍜岀煡璇嗘绱?
+      name: 知识资料库
+      description: 内置知识资料库，支持文档上传和知识检索
       category: knowledge
       
     - id: rag-retrieval
-      name: RAG妫€绱?
-      description: 鍩轰簬鐭ヨ瘑搴撶殑妫€绱㈠寮虹敓鎴?
+      name: RAG检索
+      description: 基于知识库的检索增强生成
       category: ai
   
   routes:

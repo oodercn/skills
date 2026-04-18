@@ -19,16 +19,16 @@
 │  net.ooder.spi.*                 net.ooder.skill.common.spi.*  混合命名空间    │
 │  (3个Maven模块)                  (预构建JAR, 28接口)          (3个驱动目录)     │
 │                                                                             │
-│  ⚠️ ImService × 2               ✅ ImService × 1            LlmService × 2   │
+│  ⚠️ ImService � 2               ✅ ImService � 1            LlmService � 2   │
 │     (方法签名不同!)                (与A冲突)                   (完全重复!)       │
-│  ⚠️ MessageContent × 2           MessageService × 1         OrgService × 2   │
+│  ⚠️ MessageContent � 2           MessageService � 1         OrgService � 2   │
 │     (字段不同!)                                              (完全重复!)       │
-│  ⚠️ SendResult × 2               LLMServiceProvider × 1                       │
-│     (字段不同!)                   TodoSyncService × 1                          │
-│  LlmService × 1                  SceneServices(门面) × 1                     │
-│  UnifiedMessagingService × 1     Agent*Storage × 3                            │
-│  UnifiedSessionService × 1       Knowledge* × 3                              │
-│  UnifiedWebSocketService × 1     ...共28个接口...                             │
+│  ⚠️ SendResult � 2               LLMServiceProvider � 1                       │
+│     (字段不同!)                   TodoSyncService � 1                          │
+│  LlmService � 1                  SceneServices(门面) � 1                     │
+│  UnifiedMessagingService � 1     Agent*Storage � 3                            │
+│  UnifiedSessionService � 1       Knowledge* � 3                              │
+│  UnifiedWebSocketService � 1     ...共28个接口...                             │
 │                                                                             │
 │  ❓ 到底用哪套? → 运行时取决于 classpath 加载顺序 → 隐患!                    │
 │                                                                             │
@@ -146,7 +146,7 @@ import net.ooder.skill.common.spi.im.SendResult;
               ▼                ▼                ▼                  ▼
     ┌─────────────────┐ ┌───────────┐ ┌─────────────────┐ ┌──────────────┐
     │  skill-common   │ │ _base     │ │ scene-engine    │ │ Spring 等    │
-    │  (预构建JAR)     │ │ spi-* ×3  │ │ 3.0.1           │ │ 框架         │
+    │  (预构建JAR)     │ │ spi-* �3  │ │ 3.0.1           │ │ 框架         │
     │  28 interfaces  │ │ 7接口     │ │ SE SDK          │ │              │
     │  ★被24个模块依赖 │ │ ★仅3个    │ │ ★被skill-agent  │ │ PARENT_FIRST │
     └────────┬────────┘ └─────┬─────┘ └────────┬────────┘ └──────────────┘
@@ -200,12 +200,12 @@ import net.ooder.skill.common.spi.im.SendResult;
 ```
 net.ooder.spi/
 │
-├── core/                          # 🔵 核心基础类型（所有领域共享）
+├── core/                          # �� 核心基础类型（所有领域共享）
 │   ├── PageResult.java            # 分页结果（原 common.spi.storage.PageResult）
 │   ├── Result.java                # 通用结果（原 common.Result）
 │   └── SpiConstants.java          # SPI 常量
 │
-├── im/                            # 🟢 IM 即时通讯通道
+├── im/                            # �� IM 即时通讯通道
 │   ├── ImService.java             # IM发送接口（统一 A+B 两版）
 │   ├── ImDeliveryDriver.java      # IM投递扩展（★ 新增，原 MessageGateway 抽象）
 │   ├── model/
@@ -215,7 +215,7 @@ net.ooder.spi/
 │   └── handler/
 │       └── InboundHandler.java    # 入站消息处理器接口
 │
-├── messaging/                     # 🟣 消息与会话（统一 _base spi-messaging + common message）
+├── messaging/                     # �� 消息与会话（统一 _base spi-messaging + common message）
 │   ├── MessagingService.java      # 消息服务（合并 UnifiedMessagingService + MessageService）
 │   ├── SessionService.java        # 会话服务（合并 UnifiedSessionService）
 │   ├── WebSocketService.java      # WebSocket 服务（合并 UnifiedWebSocketService）
@@ -229,7 +229,7 @@ net.ooder.spi/
 │       ├── WsToken.java
 │       └── enum: ConversationType, MessageType, MessageStatus, SessionType
 │
-├── llm/                           # 🟡 大语言模型（合并三套 LlmService 为分层设计）
+├── llm/                           # �� 大语言模型（合并三套 LlmService 为分层设计）
 │   ├── LlmProvider.java           # Provider 能力描述（原 _base spi-llm.LlmService）
 │   ├── LlmChatService.java        # Chat 调用层（原 common.LLMServiceProvider 的 generate 系列）
 │   ├── LlmRegistryService.java    # 模型注册/发现（原 _drivers LlmService 的 getProviders/getModels）
@@ -243,61 +243,61 @@ net.ooder.spi/
 │   └── stream/
 │       └── LlmStreamHandler.java  # 流式回调
 │
-├── agent/                         # 🔴 Agent 智能体（保留 common.agent，微调）
+├── agent/                         # �� Agent 智能体（保留 common.agent，微调）
 │   ├── AgentStorage.java          # Agent 基础存储
 │   ├── AgentMessageStorage.java   # Agent 消息存储 + AgentMessageData
 │   └── AgentSessionStorage.java   # Agent 会话存储 + AgentSessionData
 │
-├── rag/                           # 🟠 RAG 检索增强（★ 全新，填补缺口）
+├── rag/                           # �� RAG 检索增强（★ 全新，填补缺口）
 │   ├── RagEnhanceDriver.java      # RAG 编排驱动（从 RagPipeline 抽象）
 │   └── model/
 │       ├── RagKnowledgeConfig.java
 │       └── RagRelatedDocument.java
 │
-├── workflow/                      # 🟤 工作流（★ 全新，填补缺口）
+├── workflow/                      # �� 工作流（★ 全新，填补缺口）
 │   └── WorkflowDriver.java        # 工作流操作驱动（从 WorkflowService 精简抽象）
 │
-├── knowledge/                     # 🔵 知识库（保留 common.knowledge）
+├── knowledge/                     # �� 知识库（保留 common.knowledge）
 │   ├── EmbeddingProvider.java     # 向量嵌入
 │   ├── VectorStoreProvider.java   # 向量存储
 │   └── KnowledgeBaseStorage.java  # 知识库 CRUD
 │
-├── todo/                          # 🟢 待办事项（保留 common.todo）
+├── todo/                          # �� 待办事项（保留 common.todo）
 │   ├── TodoSyncService.java
 │   └── model/
 │       ├── TodoInfo.java
 │       └── TodoStatus.java (enum)
 │
-├── storage/                       # 💜 存储服务（保留 common.storage）
+├── storage/                       # �� 存储服务（保留 common.storage）
 │   ├── KvStorageService.java      # KV 存储（原 StorageService）
 │   ├── SceneGroupStorage.java     # 场景组存储
 │   └── model/
 │       ├── SceneGroupData.java
 │       └── PageResult.java → core/PageResult
 │
-├── org/                           # 🏢 组织架构（合并 _drivers + common.org）
+├── org/                           # �� 组织架构（合并 _drivers + common.org）
 │   └── OrganizationService.java   # 统一组织服务（合并 OrgService + OrganizationService）
 │
-├── user/                          # 👤 用户
+├── user/                          # �� 用户
 │   └── UserService.java
 │   └── model/UserInfo.java
 │
-├── audit/                         # 📋 审计
+├── audit/                         # �� 审计
 │   └── AuditService.java
 │   └── model/AuditEvent.java
 │
 ├── config/                        # ⚙️ 配置
 │   └── ConfigService.java
 │
-├── calendar/                      # 📅 日历
+├── calendar/                      # �� 日历
 │   └── CalendarService.java
 │   └── model/(EventInfo, TimeSlot)
 │
-├── bind/                          # 🔗 平台绑定
+├── bind/                          # �� 平台绑定
 │   └── PlatformBindService.java
 │   └── model/(BindInfo, BindStatus, QrCodeInfo)
 │
-└── facade/                        # 🏛️ 聚合门面（原 SceneServices）
+└── facade/                        # ��️ 聚合门面（原 SceneServices）
     └── SpiServices.java           # 统一服务获取入口
 ```
 
@@ -516,7 +516,7 @@ public interface WorkflowDriver {
 
 ```
 skills/_base/
-├── ooder-spi-core/              # 🔵 核心: 基础类型 + im + facade
+├── ooder-spi-core/              # �� 核心: 基础类型 + im + facade
 │   ├── pom.xml (group: net.ooder, artifact: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/
 │       ├── core/               # PageResult, Result
@@ -524,23 +524,23 @@ skills/_base/
 │       ├── facade/             # SpiServices (聚合门面)
 │       └── ...其他轻量 domain
 │
-├── ooder-spi-messaging/         # 🟣 消息: messaging 完整子包
+├── ooder-spi-messaging/         # �� 消息: messaging 完整子包
 │   ├── pom.xml (depends: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/messaging/
 │
-├── ooder-spi-llm/              # 🟡 LLM: llm 完整子包 (含分层3接口)
+├── ooder-spi-llm/              # �� LLM: llm 完整子包 (含分层3接口)
 │   ├── pom.xml (depends: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/llm/
 │
-├── ooder-spi-agent/            # 🔴 Agent: agent 子包
+├── ooder-spi-agent/            # �� Agent: agent 子包
 │   ├── pom.xml (depends: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/agent/
 │
-├── ooder-spi-rag/              # 🟠 RAG: rag 子包 (★ 新模块)
+├── ooder-spi-rag/              # �� RAG: rag 子包 (★ 新模块)
 │   ├── pom.xml (depends: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/rag/
 │
-├── ooder-spi-workflow/         # 🟤 workflow 子包 (★ 新模块)
+├── ooder-spi-workflow/         # �� workflow 子包 (★ 新模块)
 │   ├── pom.xml (depends: ooder-spi-core)
 │   └── src/main/java/net/ooder/spi/workflow/
 │

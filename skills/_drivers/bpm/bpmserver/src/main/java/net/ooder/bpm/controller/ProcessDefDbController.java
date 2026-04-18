@@ -97,12 +97,12 @@ public class ProcessDefDbController {
         result.put("processDefId", processDef.get("processDefId"));
         result.put("name", processDef.get("name"));
         result.put("description", processDef.get("description"));
-        result.put("category", processDef.get("classification"));
+        result.put("classification", processDef.get("classification"));
         result.put("accessLevel", processDef.get("accessLevel"));
         
         if (activeVersion != null) {
             result.put("version", activeVersion.get("version"));
-            result.put("status", activeVersion.get("state"));
+            result.put("publicationStatus", activeVersion.get("state"));
         }
         
         List<Map<String, Object>> formattedActivities = new ArrayList<>();

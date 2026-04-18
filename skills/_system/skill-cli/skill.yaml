@@ -1,0 +1,126 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-cli
+  name: CLI Dashboard
+  version: "3.1.0"
+  description: Agent SDK CLI - 统一命令行界面，提供Skill/Scene/Task管理和可视化监控
+  author: Ooder Team
+  type: system-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: system-skill
+  
+  ownership: platform
+  
+  capability:
+    category: sys
+    code: SYS_CLI
+    operations: [install, invoke, status, config, monitor]
+  
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+  
+  capabilities:
+    - id: skill-management
+      name: Skill Management
+      description: Skill生命周期管理
+      category: cli
+    - id: scene-management
+      name: Scene Management
+      description: 场景生命周期管理
+      category: cli
+    - id: task-management
+      name: Task Management
+      description: 任务调度和监控
+      category: cli
+    - id: config-management
+      name: Config Management
+      description: 配置管理
+      category: cli
+    - id: visualization
+      name: Visualization
+      description: 可视化监控面板
+      category: cli
+  
+  endpoints:
+    - path: /api/cli/skill/list
+      method: GET
+      description: List all skills
+      capability: skill-management
+    - path: /api/cli/skill/{skillId}
+      method: GET
+      description: Get skill details
+      capability: skill-management
+    - path: /api/cli/skill/install
+      method: POST
+      description: Install skill
+      capability: skill-management
+    - path: /api/cli/skill/{skillId}/start
+      method: POST
+      description: Start skill
+      capability: skill-management
+    - path: /api/cli/skill/{skillId}/stop
+      method: POST
+      description: Stop skill
+      capability: skill-management
+    - path: /api/cli/scene/list
+      method: GET
+      description: List all scenes
+      capability: scene-management
+    - path: /api/cli/scene/create
+      method: POST
+      description: Create scene
+      capability: scene-management
+    - path: /api/cli/scene/{sceneId}
+      method: GET
+      description: Get scene details
+      capability: scene-management
+    - path: /api/cli/task/list
+      method: GET
+      description: List all tasks
+      capability: task-management
+    - path: /api/cli/task/submit
+      method: POST
+      description: Submit task
+      capability: task-management
+    - path: /api/cli/task/{taskId}
+      method: GET
+      description: Get task status
+      capability: task-management
+    - path: /api/cli/task/{taskId}/cancel
+      method: POST
+      description: Cancel task
+      capability: task-management
+    - path: /api/cli/config
+      method: GET
+      description: Get CLI config
+      capability: config-management
+    - path: /api/cli/config
+      method: PUT
+      description: Update CLI config
+      capability: config-management
+  
+  config:
+    optional:
+      - name: CLI_OUTPUT_FORMAT
+        type: enum[text, json, table]
+        default: text
+        description: CLI输出格式
+      - name: CLI_AUTO_REFRESH
+        type: boolean
+        default: true
+        description: 自动刷新监控数据
+      - name: CLI_REFRESH_INTERVAL
+        type: integer
+        default: 3000
+        description: 刷新间隔(ms)
+  
+  resources:
+    cpu: "100m"
+    memory: "128Mi"

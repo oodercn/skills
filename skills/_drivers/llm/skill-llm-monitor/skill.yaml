@@ -17,7 +17,7 @@ spec:
   ownership: platform
   
   capability:
-    address: 0x3F
+    address: 0x2D
     category: LLM
     code: LLM_MONITOR
     operations: [stats, logs, monitor, ranking]

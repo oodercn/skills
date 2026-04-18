@@ -1,4 +1,4 @@
-﻿apiVersion: skill.ooder.net/v1
+apiVersion: skill.ooder.net/v1
 kind: SkillPackage
 
 metadata:
@@ -23,23 +23,28 @@ spec:
   capabilities:
     - id: skill-registration
       name: Skill Registration
-      description: 鎶€鑳芥敞鍐岀鐞?      category: management
+      description: "技能注册管理"
+      category: management
       autoBind: true
     - id: skill-lifecycle
       name: Skill Lifecycle
-      description: 鎶€鑳界敓鍛藉懆鏈熺鐞?      category: management
+      description: "技能生命周期管理"
+      category: management
       autoBind: true
     - id: skill-marketplace
       name: Skill Marketplace
-      description: 鎶€鑳藉競鍦?      category: management
+      description: "技能市场"
+      category: management
       autoBind: false
     - id: skill-execution
       name: Skill Execution
-      description: 鎶€鑳芥墽琛?      category: management
+      description: "技能执行"
+      category: management
       autoBind: true
     - id: skill-rating
       name: Skill Rating
-      description: 鎶€鑳借瘎鍒?      category: management
+      description: "技能评分"
+      category: management
       autoBind: false
       
   dependencies:
@@ -53,15 +58,16 @@ spec:
       maxConcurrentExecutions:
         type: integer
         default: 10
-        title: 鏈€澶у苟鍙戞墽琛屾暟
+        title: "最大并发执行数"
       defaultTimeout:
         type: integer
         default: 30000
-        title: 榛樿瓒呮椂鏃堕棿(ms)
+        title: "默认超时时间(ms)"
       enableMarketplace:
         type: boolean
         default: true
-        title: 鍚敤鎶€鑳藉競鍦?        
+        title: "启用技能市场"
+        
   endpoints:
     - path: /api/skill/list
       method: GET

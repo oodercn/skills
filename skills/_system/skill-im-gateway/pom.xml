@@ -36,7 +36,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>skill-common</artifactId>
-            <version>3.0.5</version>
+            <version>3.0.3</version>
             <scope>provided</scope>
         </dependency>
 
@@ -84,7 +84,7 @@
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-spi-core</artifactId>
-            <version>3.0.6</version>
+            <version>3.2.0</version>
         </dependency>
 
         <!-- Test Dependencies -->

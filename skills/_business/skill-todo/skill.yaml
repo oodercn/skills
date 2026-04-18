@@ -51,6 +51,54 @@ spec:
       methodName: countByType
       description: 获取待办数量
       capability: query
+    - path: /api/v1/my/todos/{todoId}
+      method: GET
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: getTodo
+      description: 获取待办详情
+      capability: query
+    - path: /api/v1/my/todos
+      method: POST
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: createTodo
+      description: 创建待办
+      capability: create
+    - path: /api/v1/my/todos/{todoId}
+      method: PUT
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: updateTodo
+      description: 更新待办
+      capability: update
+    - path: /api/v1/my/todos/{todoId}
+      method: DELETE
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: deleteTodo
+      description: 删除待办
+      capability: delete
+    - path: /api/v1/my/todos/{todoId}/complete
+      method: POST
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: completeTodo
+      description: 完成待办
+      capability: update
+    - path: /api/v1/my/todos/{todoId}/process
+      method: POST
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: processTodo
+      description: 处理待办
+      capability: update
+    - path: /api/v1/my/todos/{todoId}/accept
+      method: POST
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: acceptTodo
+      description: 接受待办
+      capability: update
+    - path: /api/v1/my/todos/{todoId}/reject
+      method: POST
+      controllerClass: net.ooder.skill.todo.controller.TodoController
+      methodName: rejectTodo
+      description: 拒绝待办
+      capability: update
 
   config:
     optional:

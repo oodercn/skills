@@ -12,14 +12,14 @@ public class LlmCallLogDTO {
     private String sceneGroupId;
     private String prompt;
     private String response;
-    private int promptTokens;
-    private int completionTokens;
-    private int totalTokens;
-    private double cost;
-    private long latency;
+    private Integer promptTokens;
+    private Integer completionTokens;
+    private Integer totalTokens;
+    private Double cost;
+    private Long latency;
     private String status;
     private String errorMessage;
-    private long timestamp;
+    private Long timestamp;
     private String requestId;
 
     public String getLogId() { return logId; }
@@ -42,22 +42,22 @@ public class LlmCallLogDTO {
     public void setPrompt(String prompt) { this.prompt = prompt; }
     public String getResponse() { return response; }
     public void setResponse(String response) { this.response = response; }
-    public int getPromptTokens() { return promptTokens; }
-    public void setPromptTokens(int promptTokens) { this.promptTokens = promptTokens; }
-    public int getCompletionTokens() { return completionTokens; }
-    public void setCompletionTokens(int completionTokens) { this.completionTokens = completionTokens; }
-    public int getTotalTokens() { return totalTokens; }
-    public void setTotalTokens(int totalTokens) { this.totalTokens = totalTokens; }
-    public double getCost() { return cost; }
-    public void setCost(double cost) { this.cost = cost; }
-    public long getLatency() { return latency; }
-    public void setLatency(long latency) { this.latency = latency; }
+    public Integer getPromptTokens() { return promptTokens; }
+    public void setPromptTokens(Integer promptTokens) { this.promptTokens = promptTokens; }
+    public Integer getCompletionTokens() { return completionTokens; }
+    public void setCompletionTokens(Integer completionTokens) { this.completionTokens = completionTokens; }
+    public Integer getTotalTokens() { return totalTokens; }
+    public void setTotalTokens(Integer totalTokens) { this.totalTokens = totalTokens; }
+    public Double getCost() { return cost; }
+    public void setCost(Double cost) { this.cost = cost; }
+    public Long getLatency() { return latency; }
+    public void setLatency(Long latency) { this.latency = latency; }
     public String getStatus() { return status; }
     public void setStatus(String status) { this.status = status; }
     public String getErrorMessage() { return errorMessage; }
     public void setErrorMessage(String errorMessage) { this.errorMessage = errorMessage; }
-    public long getTimestamp() { return timestamp; }
-    public void setTimestamp(long timestamp) { this.timestamp = timestamp; }
+    public Long getTimestamp() { return timestamp; }
+    public void setTimestamp(Long timestamp) { this.timestamp = timestamp; }
     public String getRequestId() { return requestId; }
     public void setRequestId(String requestId) { this.requestId = requestId; }
 }

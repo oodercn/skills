@@ -1,0 +1,89 @@
+apiVersion: skill.ooder.net/v1
+kind: Skill
+
+metadata:
+  id: skill-keys
+  name: Keys
+  version: 1.0.0
+  description: Keys Skill - API Key management service
+  author: ooder
+  type: business-service
+  license: Apache-2.0
+
+spec:
+  skillForm: PROVIDER
+  type: business-skill
+
+  ownership: tenant
+
+  capability:
+    address: 0x43
+    category: BIZ
+    code: BIZ_KEYS
+    operations: [create, read, update, delete, rotate, revoke]
+
+  runtime:
+    language: java
+    javaVersion: "21"
+    framework: spring-boot
+
+  dependencies:
+    - skillId: skill-common
+      version: ">=1.0.0"
+      required: false
+
+  endpoints:
+    - path: /api/v1/keys
+      method: GET
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: listKeys
+      description: 获取密钥列表
+      capability: read
+    - path: /api/v1/keys/my
+      method: GET
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: listMyKeys
+      description: 获取我的密钥
+      capability: read
+    - path: /api/v1/keys/{keyId}
+      method: GET
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: getKey
+      description: 获取密钥详情
+      capability: read
+    - path: /api/v1/keys
+      method: POST
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: createKey
+      description: 创建密钥
+      capability: create
+    - path: /api/v1/keys/{keyId}/rotate
+      method: POST
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: rotateKey
+      description: 轮换密钥
+      capability: rotate
+    - path: /api/v1/keys/{keyId}/revoke
+      method: POST
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: revokeKey
+      description: 吊销密钥
+      capability: revoke
+    - path: /api/v1/keys/{keyId}
+      method: DELETE
+      controllerClass: net.ooder.skill.keys.controller.KeyController
+      methodName: deleteKey
+      description: 删除密钥
+      capability: delete
+
+  config:
+    optional:
+      - name: KEYS_ENABLED
+        type: boolean
+        default: true
+        description: 是否启用密钥服务
+
+  resources:
+    cpu: "50m"
+    memory: "64Mi"
+    storage: "10Mi"

@@ -20,14 +20,14 @@
 
     <properties>
         <java.version>21</java.version>
-        <ooder.sdk.version>3.0.5</ooder.sdk.version>
+        <ooder.sdk.version>3.0.3</ooder.sdk.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>net.ooder</groupId>
             <artifactId>ooder-spi-core</artifactId>
-            <version>3.0.6</version>
+            <version>3.0.5</version>
             <scope>provided</scope>
         </dependency>
 

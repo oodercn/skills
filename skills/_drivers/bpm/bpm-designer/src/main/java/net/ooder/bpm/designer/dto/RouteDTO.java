@@ -1,6 +1,7 @@
 package net.ooder.bpm.designer.dto;
 
 import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.util.Map;
 
@@ -10,33 +11,43 @@ import java.util.Map;
 public class RouteDTO {
 
     @JSONField(name = "routeDefId")
+    @JsonProperty("routeDefId")
     private String routeDefId;
 
     @JSONField(name = "name")
+    @JsonProperty("name")
     private String name;
 
     @JSONField(name = "description")
+    @JsonProperty("description")
     private String description;
 
     @JSONField(name = "from")
+    @JsonProperty("from")
     private String fromActivityId;
 
     @JSONField(name = "to")
+    @JsonProperty("to")
     private String toActivityId;
 
     @JSONField(name = "routeOrder")
+    @JsonProperty("routeOrder")
     private Integer routeOrder;
 
     @JSONField(name = "routeDirection")
+    @JsonProperty("routeDirection")
     private String routeDirection;
 
     @JSONField(name = "routeConditionType")
+    @JsonProperty("routeConditionType")
     private String routeConditionType;
 
     @JSONField(name = "condition")
+    @JsonProperty("condition")
     private String condition;
 
     @JSONField(name = "extendedAttributes")
+    @JsonProperty("extendedAttributes")
     private Map<String, Object> extendedAttributes;
 
     public String getRouteDefId() {

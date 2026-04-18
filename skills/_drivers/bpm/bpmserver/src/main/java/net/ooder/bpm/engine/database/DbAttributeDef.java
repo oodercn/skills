@@ -300,6 +300,27 @@ public class DbAttributeDef<T> implements EIAttributeDef, Cacheable, Serializabl
 		return children.get(name);
 	}
 
+	/**
+	 * 不区分大小写查找子属性
+	 */
+	public EIAttribute getChildIgnoreCase(String name) {
+		if (name == null) {
+			return children.get(null);
+		}
+		// 首先尝试直接查找
+		EIAttribute child = children.get(name);
+		if (child != null) {
+			return child;
+		}
+		// 如果不存在，尝试不区分大小写查找
+		for (Map.Entry<String, EIAttribute> entry : children.entrySet()) {
+			if (entry.getKey() != null && entry.getKey().equalsIgnoreCase(name)) {
+				return entry.getValue();
+			}
+		}
+		return null;
+	}
+
 	public void addChild(EIAttribute child) {
 
 		children.put(child.getName(), child);
