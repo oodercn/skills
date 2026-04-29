@@ -41,7 +41,7 @@ import net.ooder.common.logging.Log;
  * Title: JDS系统管理系统
  * </p>
  * <p>
- * Description: 流程定义版本数据库实�?
+ * Description: 流程定义版本数据库实现
  * </p>
  * <p>
  * Copyright: Copyright (c) 2008
@@ -1439,8 +1439,8 @@ public class DbProcessDefVersionManager extends EIProcessDefVersionManager {
 	}
 
 	/**
-	 * 取得流程定义版本的第一个活动定�?
-	 * 
+	 * 取得流程定义版本的第一个活动定义
+	 *
 	 * @param processDefVersionId
 	 * @return
 	 * @throws BPMException
