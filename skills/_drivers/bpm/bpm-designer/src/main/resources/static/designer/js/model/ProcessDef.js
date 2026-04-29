@@ -438,24 +438,13 @@ class ProcessDef {
             // 注意：只过滤 activityType === 'START'/'END' 的虚拟节点
             // 不过滤 position === 'START'/'END' 的真实业务活动（如起草、归档）
             activities: this.activities
-                .filter(a => {
-                    // 只过滤真正的开始/结束虚拟节点（activityType为START/END）
-                    // position为START/END的是真实业务活动，不应过滤
-                    const isVirtualNode = a.activityType === 'START' || a.activityType === 'END';
-                    return !isVirtualNode;
-                })
                 .map((a, index) => {
                     try {
-                        console.log(`[ProcessDef.toJSON] Activity ${index}: type=${a?.constructor?.name}, instanceof ActivityDef=${a instanceof ActivityDef}, positionCoord=`, a?.positionCoord);
                         if (a instanceof ActivityDef) {
-                            const json = a.toJSON();
-                            console.log(`[ProcessDef.toJSON] Activity ${index} toJSON result: positionCoord=`, json?.positionCoord);
-                            return json;
+                            return a.toJSON();
                         } else if (a && typeof a.toJSON === 'function') {
                             return a.toJSON();
                         } else if (a && typeof a === 'object') {
-                            // 如果是普通对象，直接返回
-                            console.warn(`[ProcessDef.toJSON] Activity ${index} is plain object, returning as-is:`, a);
                             return a;
                         } else {
                             console.warn(`[ProcessDef.toJSON] Invalid activity at index ${index}:`, a);

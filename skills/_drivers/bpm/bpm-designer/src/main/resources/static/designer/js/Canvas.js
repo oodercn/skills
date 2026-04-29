@@ -94,12 +94,14 @@ class Canvas {
             // 移除旧的类型类
             const oldTypeClass = this._getTypeClass(oldActivity.activityType);
             const oldFillClass = this._getFillClass(oldActivity.activityType);
-            nodeEl.classList.remove(oldTypeClass, oldFillClass);
+            if (oldTypeClass) nodeEl.classList.remove(oldTypeClass);
+            if (oldFillClass) nodeEl.classList.remove(oldFillClass);
 
             // 添加新的类型类
             const newTypeClass = this._getTypeClass(activityDef.activityType);
             const newFillClass = this._getFillClass(activityDef.activityType);
-            nodeEl.classList.add(newTypeClass, newFillClass);
+            if (newTypeClass) nodeEl.classList.add(newTypeClass);
+            if (newFillClass) nodeEl.classList.add(newFillClass);
 
             // 更新图标
             const iconEl = nodeEl.querySelector('.d-node-icon');
@@ -434,12 +436,20 @@ class Canvas {
     }
 
     _createNode(item, x, y) {
+        // HTML data 属性会自动转换为小写，需要转换为大写
+        const activityType = (item.activityType || 'TASK').toUpperCase();
+        const activityCategory = item.activityCategory || item.category || 'HUMAN';
+        
+        console.log('[Canvas._createNode] item:', item, 'activityType:', activityType, 'activityCategory:', activityCategory);
+        
         const activity = new ActivityDef({
             name: item.name,
-            activityType: item.activityType,
-            activityCategory: item.activityCategory || item.category || 'HUMAN',
+            activityType: activityType,
+            activityCategory: activityCategory,
             position: item.position || 'NORMAL',
-            positionCoord: { x, y }
+            positionCoord: { x, y },
+            classification: item.classification,
+            performer: item.performer
         });
 
         const node = this._renderNode(activity);
@@ -498,7 +508,7 @@ class Canvas {
     }
 
     _isSmallNode(activityType) {
-        const smallTypes = ['START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY'];
+        const smallTypes = ['START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'GATEWAY'];
         return smallTypes.includes(activityType);
     }
 
@@ -508,7 +518,8 @@ class Canvas {
             'END': 'd-node-type-end',
             'XOR_GATEWAY': 'd-node-type-gateway',
             'AND_GATEWAY': 'd-node-type-gateway',
-            'OR_GATEWAY': 'd-node-type-gateway'
+            'OR_GATEWAY': 'd-node-type-gateway',
+            'GATEWAY': 'd-node-type-gateway'
         };
         return typeMap[activityType] || '';
     }
@@ -518,15 +529,26 @@ class Canvas {
             'START': 'd-node-fill-start',
             'END': 'd-node-fill-end',
             'TASK': 'd-node-fill-task',
+            'HUMAN_TASK': 'd-node-fill-task',
+            'AGENT_TASK': 'd-node-fill-agent',
+            'AGENT_LLM': 'd-node-fill-llm',
+            'AGENT_EVENT': 'd-node-fill-event',
+            'AGENT_HYBRID': 'd-node-fill-hybrid',
             'SERVICE': 'd-node-fill-service',
             'SCRIPT': 'd-node-fill-script',
+            'SUBFLOW': 'd-node-fill-subprocess',
+            'BLOCK': 'd-node-fill-block',
+            'SCENE': 'd-node-fill-scene',
+            'EXTERNAL': 'd-node-fill-external',
+            'EVENT': 'd-node-fill-event',
             'XOR_GATEWAY': 'd-node-fill-gateway',
             'AND_GATEWAY': 'd-node-fill-gateway',
             'OR_GATEWAY': 'd-node-fill-gateway',
+            'GATEWAY': 'd-node-fill-gateway',
             'LLM_TASK': 'd-node-fill-llm',
-            'AGENT_TASK': 'd-node-fill-agent',
             'COORDINATOR': 'd-node-fill-coordinator',
-            'SCENE': 'd-node-fill-scene',
+            'ENDPOINT': 'd-node-fill-endpoint',
+            'BRIDGE': 'd-node-fill-bridge',
             'SUBPROCESS': 'd-node-fill-subprocess',
             'CALL_ACTIVITY': 'd-node-fill-subprocess',
             'ACTIVITY_BLOCK': 'd-node-fill-block'
@@ -539,15 +561,26 @@ class Canvas {
             'START': 'start',
             'END': 'end',
             'TASK': 'user',
+            'HUMAN_TASK': 'user',
+            'AGENT_TASK': 'robot',
+            'AGENT_LLM': 'brain',
+            'AGENT_EVENT': 'bell',
+            'AGENT_HYBRID': 'layers',
             'SERVICE': 'service',
             'SCRIPT': 'script',
+            'SUBFLOW': 'subprocess',
+            'BLOCK': 'block',
+            'SCENE': 'grid',
+            'EXTERNAL': 'external',
+            'EVENT': 'event',
             'XOR_GATEWAY': 'route',
             'AND_GATEWAY': 'route',
             'OR_GATEWAY': 'route',
+            'GATEWAY': 'route',
             'LLM_TASK': 'brain',
-            'AGENT_TASK': 'agent',
             'COORDINATOR': 'team',
-            'SCENE': 'grid',
+            'ENDPOINT': 'endpoint',
+            'BRIDGE': 'bridge',
             'SUBPROCESS': 'subprocess',
             'CALL_ACTIVITY': 'external',
             'ACTIVITY_BLOCK': 'block'
@@ -1282,10 +1315,22 @@ class Canvas {
             processDef.activities = [];
         }
 
-        // 确保每个活动都有正确的坐标
+        // 处理活动坐标
         processDef.activities.forEach(activity => {
             if (!activity.positionCoord || typeof activity.positionCoord !== 'object') {
-                activity.positionCoord = { x: 100, y: 100 };
+                // 检查是否有现有节点保留着坐标
+                const existingNode = this.nodes.get(activity.activityDefId);
+                if (existingNode && existingNode.activity && existingNode.activity.positionCoord) {
+                    // 保留现有坐标
+                    console.log(`[Canvas] Activity ${activity.activityDefId} keeping existing coord:`, existingNode.activity.positionCoord);
+                    activity.positionCoord = { ...existingNode.activity.positionCoord };
+                } else {
+                    // 没有现有坐标，使用画布中心作为默认位置
+                    const defaultX = (this.container.clientWidth / 2 - this.offsetX) / this.scale;
+                    const defaultY = (this.container.clientHeight / 2 - this.offsetY) / this.scale;
+                    activity.positionCoord = { x: Math.round(defaultX), y: Math.round(defaultY) };
+                    console.warn(`[Canvas] Activity ${activity.activityDefId} has no positionCoord, using center default:`, activity.positionCoord);
+                }
             } else {
                 // 确保坐标是数字类型
                 activity.positionCoord = {

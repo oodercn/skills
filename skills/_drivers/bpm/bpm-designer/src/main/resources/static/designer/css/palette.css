@@ -243,3 +243,231 @@
 .d-element-item.d-node-fill-block .d-element-icon svg {
     color: var(--rose);
 }
+
+/* ========== 树形节点面板样式 ========== */
+
+.d-element-group-header {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    background: var(--bg-input);
+    border-radius: var(--radius);
+    cursor: pointer;
+    margin-bottom: 8px;
+    transition: var(--transition);
+}
+
+.d-element-group-header:hover {
+    background: var(--bg-hover);
+}
+
+.d-element-group-icon {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.d-element-group-icon svg {
+    width: 16px;
+    height: 16px;
+    fill: var(--text-muted);
+}
+
+.d-element-group-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    flex: 1;
+}
+
+.d-element-group-desc {
+    font-size: 10px;
+    color: var(--text-muted);
+    margin-right: 8px;
+    display: none;
+}
+
+.d-element-group-toggle {
+    font-size: 10px;
+    color: var(--text-muted);
+    transition: transform 0.2s;
+}
+
+.d-element-group.collapsed .d-element-group-toggle {
+    transform: rotate(-90deg);
+}
+
+.d-element-group.collapsed .d-element-group-content {
+    display: none;
+}
+
+.d-element-group-content {
+    padding-left: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.d-element-subgroup {
+    grid-column: span 2;
+    margin-bottom: 8px;
+}
+
+.d-element-subgroup-title {
+    font-size: 11px;
+    font-weight: 500;
+    color: var(--text-secondary);
+    padding: 4px 8px;
+    margin-bottom: 4px;
+    border-left: 2px solid var(--border);
+    padding-left: 12px;
+}
+
+.d-element-subgroup-items {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+    padding-left: 4px;
+}
+
+.d-element-info {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+}
+
+.d-element-desc {
+    display: none;
+}
+
+/* 新增节点类型颜色 */
+.d-element-item.d-node-fill-skill {
+    border-color: var(--blue);
+}
+
+.d-element-item.d-node-fill-skill .d-element-icon svg {
+    color: var(--blue);
+}
+
+.d-element-item.d-node-fill-a2ui {
+    border-color: var(--fuchsia);
+}
+
+.d-element-item.d-node-fill-a2ui .d-element-icon svg {
+    color: var(--fuchsia);
+}
+
+.d-element-item.d-node-fill-router {
+    border-color: var(--slate);
+}
+
+.d-element-item.d-node-fill-router .d-element-icon svg {
+    color: var(--slate);
+}
+
+.d-element-item.d-node-fill-external {
+    border-color: var(--sky);
+}
+
+.d-element-item.d-node-fill-external .d-element-icon svg {
+    color: var(--sky);
+}
+
+.d-element-item.d-node-fill-endpoint {
+    border-color: var(--lime);
+}
+
+.d-element-item.d-node-fill-endpoint .d-element-icon svg {
+    color: var(--lime);
+}
+
+.d-element-item.d-node-fill-bridge {
+    border-color: var(--stone);
+}
+
+.d-element-item.d-node-fill-bridge .d-element-icon svg {
+    color: var(--stone);
+}
+
+.d-element-item.d-node-fill-event {
+    border-color: var(--teal);
+}
+
+.d-element-item.d-node-fill-event .d-element-icon svg {
+    color: var(--teal);
+}
+
+.d-element-item.d-node-fill-hybrid {
+    border-color: var(--fuchsia);
+}
+
+.d-element-item.d-node-fill-hybrid .d-element-icon svg {
+    color: var(--fuchsia);
+}
+
+/* ========== 平铺元素列表样式 ========== */
+
+.d-element-flat-list {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    padding: 0 12px 12px;
+}
+
+.d-element-flat-list .d-element-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 10px 8px;
+    background: var(--bg-input);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    cursor: grab;
+    transition: var(--transition);
+}
+
+.d-element-flat-list .d-element-item:hover {
+    background: var(--bg-hover);
+    border-color: var(--border-light);
+    transform: translateY(-2px);
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.d-element-flat-list .d-element-item:active {
+    cursor: grabbing;
+}
+
+/* ========== 分组样式 - 平铺展示 ========== */
+
+.d-element-groups {
+    padding: 12px;
+    overflow-y: auto;
+}
+
+.d-element-group {
+    margin-bottom: 16px;
+}
+
+.d-element-group-header {
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 10px;
+}
+
+.d-element-group-name {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.d-element-group-content {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}

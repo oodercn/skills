@@ -35,7 +35,8 @@ public class DatabaseInitializer {
         log.info("数据库URL: {}", datasourceUrl);
         log.info("初始化模式: {}", initMode);
 
-        // 如果初始化模式为never，则跳过初始化
+        ensureNewTablesExist();
+
         if ("never".equalsIgnoreCase(initMode)) {
             log.info("初始化模式为never，跳过数据库初始化");
             verifyData();
@@ -43,7 +44,6 @@ public class DatabaseInitializer {
         }
 
         try {
-            // 检查数据库是否已初始化
             if (isDatabaseInitialized()) {
                 log.info("数据库已初始化，跳过初始化步骤");
                 verifyData();
@@ -56,6 +56,68 @@ public class DatabaseInitializer {
             verifyData();
         } catch (Exception e) {
             log.error("数据库初始化失败", e);
+        }
+    }
+
+    private void ensureNewTablesExist() {
+        log.info("确保新表存在...");
+        try {
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS BPM_SKILL_DEF (" +
+                "SKILL_ID VARCHAR(64) PRIMARY KEY," +
+                "NAME VARCHAR(256) NOT NULL," +
+                "DESCRIPTION TEXT," +
+                "ICON VARCHAR(64)," +
+                "VERSION VARCHAR(32) DEFAULT '1.0'," +
+                "STATUS VARCHAR(32) DEFAULT 'PUBLISHED'," +
+                "FORM VARCHAR(32) NOT NULL DEFAULT 'STANDALONE'," +
+                "CATEGORY VARCHAR(32) NOT NULL DEFAULT 'SERVICE'," +
+                "PROVIDER VARCHAR(32) NOT NULL DEFAULT 'SYSTEM'," +
+                "CATEGORY_CONFIG TEXT," +
+                "PROVIDER_CONFIG TEXT," +
+                "EXECUTION_CONFIG TEXT," +
+                "INPUT_SCHEMA TEXT," +
+                "OUTPUT_SCHEMA TEXT," +
+                "DEPENDENCIES TEXT," +
+                "CREATED_BY VARCHAR(64)," +
+                "CREATED_TIME BIGINT," +
+                "MODIFIED_BY VARCHAR(64)," +
+                "MODIFIED_TIME BIGINT" +
+                ")");
+            jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS IDX_SKILL_FORM ON BPM_SKILL_DEF(FORM)");
+            jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS IDX_SKILL_CATEGORY ON BPM_SKILL_DEF(CATEGORY)");
+            jdbcTemplate.execute("CREATE INDEX IF NOT EXISTS IDX_SKILL_PROVIDER ON BPM_SKILL_DEF(PROVIDER)");
+
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS BPM_SCENE_CONFIG (" +
+                "SCENE_CONFIG_ID VARCHAR(64) PRIMARY KEY," +
+                "PROCESSDEF_ID VARCHAR(64) NOT NULL," +
+                "SCENE_TYPE VARCHAR(32) DEFAULT 'TRIGGER'," +
+                "LIFECYCLE_CONFIG TEXT," +
+                "ROLES TEXT," +
+                "MENUS TEXT," +
+                "CAPABILITIES TEXT," +
+                "ACTIVATION_STEPS TEXT," +
+                "DRIVER_CONDITIONS TEXT," +
+                "KNOWLEDGE_CONFIG TEXT," +
+                "CREATED_TIME BIGINT," +
+                "MODIFIED_TIME BIGINT" +
+                ")");
+
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS BPM_CONTEXT_ISOLATION (" +
+                "CONTEXT_ID VARCHAR(64) PRIMARY KEY," +
+                "ACTIVITYDEF_ID VARCHAR(64) NOT NULL," +
+                "NESTING_TYPE VARCHAR(32) NOT NULL DEFAULT 'SUBFLOW'," +
+                "ISOLATION_LEVEL VARCHAR(32) DEFAULT 'SHARED'," +
+                "VARIABLE_ISOLATION TEXT," +
+                "DATA_ISOLATION TEXT," +
+                "PERMISSION_ISOLATION TEXT," +
+                "IO_MAPPING TEXT," +
+                "LIFECYCLE TEXT," +
+                "CREATED_TIME BIGINT" +
+                ")");
+
+            log.info("新表确保完成");
+        } catch (Exception e) {
+            log.error("确保新表存在失败", e);
         }
     }
 

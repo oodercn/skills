@@ -1,0 +1,662 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SkillFlow技术深度解析：基于Skill的流程编排系统设计与实现</title>
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --secondary-color: #1e40af;
+            --bg-color: #f8fafc;
+            --text-color: #334155;
+            --code-bg: #f1f5f9;
+            --border-color: #e2e8f0;
+            --highlight-bg: #dbeafe;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.8;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 60px 40px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 2.2rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+        }
+
+        .header .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .nav {
+            background: white;
+            padding: 20px 40px;
+            border-bottom: 2px solid var(--border-color);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .nav-title {
+            font-size: 1rem;
+            color: var(--primary-color);
+            font-weight: 600;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        h2 {
+            font-size: 1.8rem;
+            color: var(--primary-color);
+            margin: 50px 0 25px;
+            padding-bottom: 15px;
+            border-bottom: 3px solid var(--primary-color);
+        }
+
+        h3 {
+            font-size: 1.4rem;
+            color: var(--secondary-color);
+            margin: 35px 0 20px;
+        }
+
+        h4 {
+            font-size: 1.2rem;
+            color: var(--text-color);
+            margin: 25px 0 15px;
+        }
+
+        p {
+            margin: 15px 0;
+            text-align: justify;
+        }
+
+        ul, ol {
+            margin: 15px 0;
+            padding-left: 30px;
+        }
+
+        li {
+            margin: 8px 0;
+        }
+
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 20px;
+            overflow-x: auto;
+            margin: 25px 0;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        code {
+            background: var(--code-bg);
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: "Consolas", "Monaco", "Courier New", monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background: none;
+            padding: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 25px 0;
+            background: white;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        th {
+            background: var(--primary-color);
+            color: white;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 12px 15px;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        tr:hover {
+            background: var(--highlight-bg);
+        }
+
+        blockquote {
+            border-left: 4px solid var(--primary-color);
+            padding-left: 20px;
+            margin: 25px 0;
+            color: #64748b;
+            font-style: italic;
+        }
+
+        .svg-diagram {
+            margin: 30px 0;
+            text-align: center;
+        }
+
+        .svg-diagram img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .diagram-caption {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-top: 10px;
+            font-style: italic;
+        }
+
+        .highlight-box {
+            background: var(--highlight-bg);
+            border: 1px solid var(--primary-color);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 25px 0;
+        }
+
+        .highlight-box strong {
+            color: var(--primary-color);
+        }
+
+        .section-intro {
+            font-size: 1.1rem;
+            color: #475569;
+            margin-bottom: 20px;
+        }
+
+        .footer {
+            background: #1e293b;
+            color: #94a3b8;
+            padding: 40px;
+            text-align: center;
+            margin-top: 50px;
+        }
+
+        .footer a {
+            color: #60a5fa;
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .ref-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .ref-list li {
+            padding: 8px 0;
+            border-bottom: 1px solid #334155;
+        }
+
+        @media (max-width: 768px) {
+            .content { padding: 20px; }
+            .header { padding: 40px 20px; }
+            .header h1 { font-size: 1.6rem; }
+            h2 { font-size: 1.4rem; }
+            h3 { font-size: 1.2rem; }
+            table { font-size: 0.9rem; }
+            th, td { padding: 10px; }
+        }
+
+        @media print {
+            .nav { position: static; }
+            .container { box-shadow: none; }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header class="header">
+            <h1>SkillFlow技术深度解析</h1>
+            <p class="subtitle">基于Skill的流程编排系统设计与实现</p>
+        </header>
+
+        <nav class="nav">
+            <div class="nav-title">SkillFlow 技术博文</div>
+        </nav>
+
+        <main class="content">
+            <h2 id="引言">引言</h2>
+            <p>在企业级业务流程管理（BPM）领域，如何将传统的流程引擎与现代的人工智能能力进行深度融合，一直是技术架构演进的核心命题。<strong>SkillFlow</strong> 正是这一探索的产物——一个基于 Skill（技能）的全新流程编排系统，它重新定义了"执行体"的概念，将 LLM、FORM、SERVICE、WORKFLOW 等各类执行内容统一抽象为 Skill 的不同形态，实现了执行模型的范式统一。</p>
+            <p>本文将深入解析 SkillFlow 的核心设计理念、系统架构、三维度分类体系、场景与 Workflow 的强绑定机制，以及递进式配置 UI 的交互方案，带你全面了解这一创新性的流程编排框架。</p>
+
+            <h2 id="一核心设计理念">一、核心设计理念</h2>
+
+            <h3 id="11-统一执行模型">1.1 统一执行模型</h3>
+            <p>传统 BPM 系统通常将"活动"定义为多种类型：人工任务、服务调用、脚本任务、规则任务等。这种多类型的执行模型虽然灵活，但带来了维护复杂、可扩展性差等问题。</p>
+            <div class="highlight-box">
+                <p><strong>SkillFlow 的核心突破</strong>在于：所有执行内容都是 Skill 的不同形态。无论是调用大模型进行推理、展示一个表单界面、发起一个 HTTP 请求，还是启动一个子流程，在 SkillFlow 中都统一为对 Skill 的调用。</p>
+            </div>
+
+            <div class="svg-diagram">
+                <img src="diagram_unified_execution_model.svg" alt="统一执行模型"/>
+                <p class="diagram-caption">图1：统一执行模型架构</p>
+            </div>
+
+            <p>这种统一模型带来了显著优势：</p>
+            <ul>
+                <li><strong>架构简化</strong>：无需为每种执行类型维护独立的处理逻辑</li>
+                <li><strong>能力复用</strong>：LLM 的能力可以无缝嵌入任何流程节点</li>
+                <li><strong>可扩展性</strong>：新增执行类型只需开发新的 Skill 实现</li>
+            </ul>
+
+            <h3 id="12-场景驱动的流程设计">1.2 场景驱动的流程设计</h3>
+            <p>SkillFlow 引入了 <strong>Scene（场景）</strong> 这一核心概念。场景是业务场景的抽象，代表一个完整的业务流程上下文。与传统流程定义不同，场景与 Workflow 强绑定，实现了业务场景的完整生命周期管理。</p>
+            <p>场景的核心特征：</p>
+            <ul>
+                <li><strong>独立生命周期</strong>：激活、暂停、恢复、终止</li>
+                <li><strong>上下文隔离</strong>：每个场景拥有独立的变量空间和数据环境</li>
+                <li><strong>角色体系</strong>：场景级别的用户角色和权限管理</li>
+                <li><strong>能力注入</strong>：场景可以注入特定的 Skill 能力和知识库</li>
+            </ul>
+
+            <h2 id="二系统架构设计">二、系统架构设计</h2>
+
+            <h3 id="21-整体架构">2.1 整体架构</h3>
+            <p>SkillFlow 采用经典的分层架构，前端使用原生 JavaScript（无框架依赖），后端基于 Spring Boot 3.x，数据库采用 SQLite。</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_system_architecture.svg" alt="系统架构"/>
+                <p class="diagram-caption">图2：SkillFlow 系统架构</p>
+            </div>
+
+            <h3 id="22-模块划分">2.2 模块划分</h3>
+            <p>系统核心模块分为前端、后端和数据三个层面：</p>
+            <p><strong>前端模块</strong></p>
+            <ul>
+                <li><strong>skill-manager</strong>：Skill 管理模块（SkillSelector、SkillEditor、SkillRegistry）</li>
+                <li><strong>panel-system</strong>：配置面板系统（四层级：基础/核心/高级/专家）</li>
+                <li><strong>classification</strong>：三维度分类管理（Form/Category/Provider 选择器）</li>
+                <li><strong>context-manager</strong>：上下文管理（隔离配置、角色配置、菜单配置）</li>
+            </ul>
+            <p><strong>后端模块</strong></p>
+            <ul>
+                <li><strong>skill-service</strong>：Skill 服务（定义、分类、执行）</li>
+                <li><strong>process-service</strong>：流程服务（流程定义、活动定义、路由定义）</li>
+                <li><strong>scene-service</strong>：场景服务（配置、生命周期、绑定）</li>
+                <li><strong>context-service</strong>：上下文服务（隔离、继承、注入）</li>
+            </ul>
+
+            <h2 id="三三维度分类体系">三、三维度分类体系</h2>
+            <p>SkillFlow 的核心创新之一是建立了 <strong>三维度分类体系</strong>，从形态、功能和提供者三个维度对 Skill 进行精确分类。</p>
+
+            <h3 id="31-维度架构">3.1 维度架构</h3>
+
+            <div class="svg-diagram">
+                <img src="diagram_three_dimension.svg" alt="三维度分类体系"/>
+                <p class="diagram-caption">图3：SkillNode 三维度分类体系</p>
+            </div>
+
+            <h3 id="32-维度组合矩阵">3.2 维度组合矩阵</h3>
+            <p>三个维度的组合定义了每个 Skill 的唯一身份：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Form</th>
+                        <th>Category</th>
+                        <th>Provider</th>
+                        <th>典型 Skill</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>STANDALONE</td>
+                        <td>LLM</td>
+                        <td>DRIVER</td>
+                        <td>skill-llm-deepseek</td>
+                        <td>DeepSeek 大模型驱动</td>
+                    </tr>
+                    <tr>
+                        <td>STANDALONE</td>
+                        <td>FORM</td>
+                        <td>SYSTEM</td>
+                        <td>skill-form-default</td>
+                        <td>默认表单能力</td>
+                    </tr>
+                    <tr>
+                        <td>STANDALONE</td>
+                        <td>SERVICE</td>
+                        <td>DRIVER</td>
+                        <td>skill-im-wecom</td>
+                        <td>企业微信 IM 驱动</td>
+                    </tr>
+                    <tr>
+                        <td>SCENE</td>
+                        <td>KNOWLEDGE</td>
+                        <td>BUSINESS</td>
+                        <td>skill-knowledge-qa</td>
+                        <td>知识问答场景</td>
+                    </tr>
+                    <tr>
+                        <td>SCENE</td>
+                        <td>WORKFLOW</td>
+                        <td>SYSTEM</td>
+                        <td>skill-bpm</td>
+                        <td>BPM 工作流场景</td>
+                    </tr>
+                    <tr>
+                        <td>SCENE</td>
+                        <td>WORKFLOW</td>
+                        <td>BUSINESS</td>
+                        <td>skill-approval-form</td>
+                        <td>审批流程场景</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="33-维度约束规则">3.3 维度约束规则</h3>
+            <p>三个维度之间存在明确的约束关系：</p>
+            <p><strong>Form 约束</strong></p>
+            <ul>
+                <li>SCENE 形态必须绑定 Workflow，有独立上下文</li>
+                <li>STANDALONE 形态可独立调用，无状态</li>
+                <li>SCENE + WORKFLOW = 强绑定关系</li>
+            </ul>
+            <p><strong>Category 约束</strong></p>
+            <ul>
+                <li>KNOWLEDGE 类必须关联知识库配置</li>
+                <li>WORKFLOW 类必须关联流程定义</li>
+                <li>FORM 类必须关联表单 Schema</li>
+                <li>LLM 类必须关联模型配置</li>
+            </ul>
+            <p><strong>Provider 约束</strong></p>
+            <ul>
+                <li>SYSTEM：不可删除，不可修改，系统级权限</li>
+                <li>DRIVER：同类互斥，需要配置认证信息</li>
+                <li>BUSINESS：企业级管理，可配置权限</li>
+                <li>USER：个人级管理，可分享给他人</li>
+            </ul>
+
+            <h2 id="四skillnode-属性体系">四、SkillNode 属性体系</h2>
+
+            <h3 id="41-完整属性树">4.1 完整属性树</h3>
+            <p>SkillNode 采用树形属性结构，清晰组织各类配置：</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_inheritance.svg" alt="属性继承关系"/>
+                <p class="diagram-caption">图4：属性继承关系</p>
+            </div>
+
+            <h3 id="42-属性继承关系">4.2 属性继承关系</h3>
+            <p>Skill 定义与活动节点之间存在清晰的继承关系：</p>
+            <ul>
+                <li><strong>继承自 Skill</strong>：skillId（引用）、classification（只读）、execution.io（可覆盖）</li>
+                <li><strong>节点专属</strong>：nodeId、name（可覆盖 Skill 名称）、position、flowControl</li>
+                <li><strong>运行时覆盖</strong>：performer、inputMapping、outputMapping</li>
+            </ul>
+
+            <h2 id="五场景与-workflow-强绑定">五、场景与 Workflow 强绑定</h2>
+
+            <h3 id="51-强绑定机制">5.1 强绑定机制</h3>
+            <p>这是 SkillFlow 的另一个核心设计：<strong>SCENE 形态必须绑定 WORKFLOW 类别</strong>。</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_scene_workflow_binding.svg" alt="场景与Workflow强绑定"/>
+                <p class="diagram-caption">图5：场景 + Workflow 强绑定关系</p>
+            </div>
+
+            <h3 id="52-场景配置结构">5.2 场景配置结构</h3>
+            <p>场景配置（SceneConfig）包含以下核心部分：</p>
+            <pre><code>sceneConfig = {
+    sceneType: AUTO | TRIGGER | HYBRID,
+    lifecycle: { type, activateTime, expireTime, autoDestroy },
+    roles: [{ name, description, permissions, minCount, maxCount }],
+    menus: [{ id, name, icon, url, order, roles, visible }],
+    capabilities: { skills, capabilities, resources },
+    activationSteps: [{ stepId, name, required, autoExecute, actions }],
+    driverConditions: [{ type: CRON | EVENT | CONDITION, config }],
+    knowledgeConfig: { knowledgeBaseId, embeddingConfig, retrievalConfig }
+}</code></pre>
+
+            <h2 id="六递进式配置-ui">六、递进式配置 UI</h2>
+
+            <h3 id="61-四层级设计">6.1 四层级设计</h3>
+            <p>SkillFlow 提供了递进式的配置界面，满足从入门到专家的不同层次需求：</p>
+
+            <div class="svg-diagram">
+                <img src="diagram_progressive_config.svg" alt="递进式配置层级"/>
+                <p class="diagram-caption">图6：递进式配置层级与动态显示规则</p>
+            </div>
+
+            <h3 id="62-动态显示规则">6.2 动态显示规则</h3>
+            <p>配置面板根据用户的选择动态显示相关配置项：</p>
+            <ul>
+                <li><strong>根据形态显示</strong>：SCENE → context.isolation, roles, menus；STANDALONE → 无额外配置</li>
+                <li><strong>根据功能分类显示</strong>：LLM → categoryConfig.llm；WORKFLOW → categoryConfig.workflow</li>
+                <li><strong>根据执行者类型显示</strong>：HUMAN → performerConfig.human；AGENT → performerConfig.agent</li>
+            </ul>
+
+            <h2 id="七多级多维度管理">七、多级多维度管理</h2>
+
+            <h3 id="71-管理约束层级">7.1 管理约束层级</h3>
+            <p>SkillFlow 支持四级管理约束，实现精细化的权限和配置管理：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>层级</th>
+                        <th>管理对象</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>System</strong></td>
+                        <td>全局知识库、全局角色、全局菜单</td>
+                        <td>全局生效</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Workflow</strong></td>
+                        <td>组织知识库、流程配置</td>
+                        <td>流程级别</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Scene</strong></td>
+                        <td>场景知识库、场景角色、场景菜单</td>
+                        <td>场景级别</td>
+                    </tr>
+                    <tr>
+                        <td><strong>Activity</strong></td>
+                        <td>活动知识库、活动配置</td>
+                        <td>活动级别</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="72-约束继承规则">7.2 约束继承规则</h3>
+
+            <div class="svg-diagram">
+                <img src="diagram_inheritance_rules.svg" alt="约束继承规则"/>
+                <p class="diagram-caption">图7：约束继承规则</p>
+            </div>
+
+            <h2 id="八上下文隔离机制">八、上下文隔离机制</h2>
+
+            <h3 id="81-隔离级别">8.1 隔离级别</h3>
+            <p>对于嵌套节点（子流程、活动块、场景、外部流程），SkillFlow 提供了三级上下文隔离：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>隔离级别</th>
+                        <th>说明</th>
+                        <th>适用场景</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>SHARED</strong></td>
+                        <td>共享父上下文</td>
+                        <td>普通活动块</td>
+                    </tr>
+                    <tr>
+                        <td><strong>PARTIAL</strong></td>
+                        <td>部分隔离</td>
+                        <td>子流程</td>
+                    </tr>
+                    <tr>
+                        <td><strong>ISOLATED</strong></td>
+                        <td>完全隔离</td>
+                        <td>场景、外部流程</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="82-隔离配置项">8.2 隔离配置项</h3>
+            <pre><code>contextIsolation = {
+    level: SHARED | PARTIAL | ISOLATED,
+    variableIsolation: {
+        inheritParent: boolean,
+        exposeLocal: boolean
+    },
+    dataIsolation: {
+        inheritFormData: boolean,
+        shareLocalData: boolean
+    },
+    permissionIsolation: {
+        inheritPermissions: boolean,
+        localPermissions: [...]
+    }
+}</code></pre>
+
+            <h2 id="九实现度与开发计划">九、实现度与开发计划</h2>
+
+            <h3 id="91-当前实现度">9.1 当前实现度</h3>
+            <p>根据最新分析，SkillFlow 整体实现度约为 <strong>40%</strong>：</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>模块</th>
+                        <th>实现度</th>
+                        <th>说明</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>流程定义管理</td>
+                        <td>100%</td>
+                        <td>已完成</td>
+                    </tr>
+                    <tr>
+                        <td>活动节点管理</td>
+                        <td>70%</td>
+                        <td>需新增 Skill 引用</td>
+                    </tr>
+                    <tr>
+                        <td>路由管理</td>
+                        <td>100%</td>
+                        <td>已完成</td>
+                    </tr>
+                    <tr>
+                        <td>画布引擎</td>
+                        <td>100%</td>
+                        <td>已完成</td>
+                    </tr>
+                    <tr>
+                        <td>Skill 定义管理</td>
+                        <td>0%</td>
+                        <td>待开发</td>
+                    </tr>
+                    <tr>
+                        <td>场景配置管理</td>
+                        <td>0%</td>
+                        <td>待开发</td>
+                    </tr>
+                    <tr>
+                        <td>上下文隔离管理</td>
+                        <td>0%</td>
+                        <td>待开发</td>
+                    </tr>
+                    <tr>
+                        <td>配置面板系统</td>
+                        <td>30%</td>
+                        <td>需重构为递进式</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3 id="92-开发计划">9.2 开发计划</h3>
+            <p><strong>阶段一：基础架构（P0）</strong></p>
+            <ul>
+                <li>数据库 Schema 设计</li>
+                <li>枚举类定义</li>
+                <li>Skill 定义 API</li>
+                <li>三维度分类前端</li>
+                <li>基础配置面板</li>
+            </ul>
+            <p><strong>阶段二：核心功能（P0）</strong></p>
+            <ul>
+                <li>场景配置 API</li>
+                <li>场景绑定服务</li>
+                <li>核心配置面板</li>
+                <li>分类专属插件</li>
+                <li>活动节点属性迁移</li>
+            </ul>
+            <p><strong>阶段三：高级功能（P1）</strong></p>
+            <ul>
+                <li>上下文隔离 API</li>
+                <li>隔离配置面板</li>
+                <li>高级配置面板</li>
+                <li>验证规则引擎</li>
+            </ul>
+            <p><strong>阶段四：完善优化（P2）</strong></p>
+            <ul>
+                <li>专家配置面板</li>
+                <li>性能优化</li>
+                <li>单元测试</li>
+            </ul>
+
+            <h2 id="十总结">十、总结</h2>
+            <p>SkillFlow 代表了 BPM 系统的一次重要进化。通过将所有执行内容统一抽象为 Skill，它简化了架构、提升了可扩展性；三维度分类体系提供了精确的能力分类；场景与 Workflow 的强绑定实现了业务场景的完整生命周期管理；递进式配置 UI 则满足了不同层次用户的需求。</p>
+            <p>虽然当前实现度为 40%，但核心框架已经清晰，各个模块的开发路线图也已经明确。随着后续功能的逐步完善，SkillFlow 将成为企业级流程编排的有力工具。</p>
+        </main>
+
+        <footer class="footer">
+            <h3>参考文档</h3>
+            <ul class="ref-list">
+                <li><a href="file:///e:/github/ooder-skills/skills/_drivers/bpm/docs/SkillFlow需求规格说明书.md">SkillFlow 需求规格说明书</a></li>
+                <li><a href="file:///e:/github/ooder-skills/skills/_drivers/bpm/docs/SkillFlow设计文档.md">SkillFlow 设计文档</a></li>
+                <li><a href="file:///e:/github/ooder-skills/skills/_drivers/bpm/docs/SkillFlow实现度分析报告.md">SkillFlow 实现度分析报告</a></li>
+                <li><a href="file:///e:/github/ooder-skills/skills/_drivers/bpm/SkillFlow节点类型与属性体系设计文档V5.md">SkillFlow 节点类型与属性体系设计文档 V5</a></li>
+            </ul>
+            <p style="margin-top: 30px; font-size: 0.9rem;">© 2026 SkillFlow 技术团队</p>
+        </footer>
+    </div>
+</body>
+</html>

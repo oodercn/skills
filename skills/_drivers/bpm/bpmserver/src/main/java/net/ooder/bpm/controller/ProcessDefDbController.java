@@ -87,6 +87,22 @@ public class ProcessDefDbController {
         }
     }
     
+    @DeleteMapping("/{processDefId}")
+    public ResponseEntity<Map<String, Object>> deleteProcessDef(@PathVariable String processDefId) {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            processDefManagerService.deleteProcessDef(processDefId);
+            response.put("code", 200);
+            response.put("message", "success");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to delete process def: {}", processDefId, e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
     private Map<String, Object> formatProcessDef(Map<String, Object> fullProcessDef) {
         Map<String, Object> processDef = (Map<String, Object>) fullProcessDef.get("processDef");
         Map<String, Object> activeVersion = (Map<String, Object>) fullProcessDef.get("activeVersion");
@@ -114,25 +130,21 @@ public class ProcessDefDbController {
                 formattedActivity.put("description", activity.get("description"));
                 
                 String position = (String) activity.get("position");
-                // 使用从数据库加载的 activityType 和 activityCategory
-                // 如果没有保存过，则根据 position 推断默认值
                 String activityType = (String) activity.get("activityType");
                 String activityCategory = (String) activity.get("activityCategory");
                 
-                // 处理 position 值
-                if ("POSITION_START".equals(position)) {
+                if ("POSITION_START".equals(position) || "START".equals(position)) {
                     formattedActivity.put("position", "START");
-                } else if ("POSITION_END".equals(position)) {
+                } else if ("POSITION_END".equals(position) || "END".equals(position)) {
                     formattedActivity.put("position", "END");
                 } else {
                     formattedActivity.put("position", "NORMAL");
                 }
                 
-                // 使用数据库中的 activityType，如果没有则根据 position 推断
                 if (activityType == null || activityType.isEmpty()) {
-                    if ("POSITION_START".equals(position)) {
+                    if ("POSITION_START".equals(position) || "START".equals(position)) {
                         activityType = "START";
-                    } else if ("POSITION_END".equals(position)) {
+                    } else if ("POSITION_END".equals(position) || "END".equals(position)) {
                         activityType = "END";
                     } else {
                         activityType = "TASK";

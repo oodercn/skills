@@ -225,6 +225,19 @@
     color: var(--text) !important;
 }
 
+.d-node-fill-event {
+    background: var(--bg-card) !important;
+    border-color: var(--teal) !important;
+}
+
+.d-node-fill-event .d-node-icon {
+    color: var(--teal) !important;
+}
+
+.d-node-fill-event .d-node-name {
+    color: var(--text) !important;
+}
+
 .d-node-fill-subprocess {
     background: var(--bg-card) !important;
     border-color: var(--pink) !important;

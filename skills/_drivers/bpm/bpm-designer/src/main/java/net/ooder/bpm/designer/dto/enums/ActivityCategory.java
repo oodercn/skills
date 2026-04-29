@@ -1,21 +1,12 @@
 package net.ooder.bpm.designer.dto.enums;
 
-import com.alibaba.fastjson2.annotation.JSONField;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonValue;
 
-/**
- * 活动类别枚举
- */
 public enum ActivityCategory {
-    @JSONField(name = "HUMAN")
     HUMAN("HUMAN", "人工活动"),
-
-    @JSONField(name = "AGENT")
     AGENT("AGENT", "Agent活动"),
-
-    @JSONField(name = "SCENE")
     SCENE("SCENE", "场景活动"),
-
-    @JSONField(name = "SYSTEM")
     SYSTEM("SYSTEM", "系统活动");
 
     private final String code;
@@ -26,6 +17,7 @@ public enum ActivityCategory {
         this.label = label;
     }
 
+    @JsonValue
     public String getCode() {
         return code;
     }
@@ -34,6 +26,7 @@ public enum ActivityCategory {
         return label;
     }
 
+    @JsonCreator
     public static ActivityCategory fromCode(String code) {
         if (code == null) return HUMAN;
         for (ActivityCategory category : values()) {

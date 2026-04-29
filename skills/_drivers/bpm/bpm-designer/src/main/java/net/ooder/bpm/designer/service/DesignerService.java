@@ -150,20 +150,17 @@ public class DesignerService {
         activity.setExtendedAttributes(dto.getExtendedAttributes());
         
         PositionCoordDTO coordDTO = dto.getPositionCoord();
-        log.debug("Activity {} received PositionCoordDTO: {}", dto.getActivityDefId(), coordDTO);
+        log.info("[DESIGNER] Activity {} received PositionCoordDTO: {}", dto.getActivityDefId(), coordDTO);
         
         if (coordDTO != null && coordDTO.getX() != null && coordDTO.getY() != null) {
             Map<String, Object> coord = new HashMap<>();
             coord.put("x", coordDTO.getX());
             coord.put("y", coordDTO.getY());
             activity.setPositionCoord(coord);
-            log.debug("Activity {} using received coord: {}", dto.getActivityDefId(), coord);
+            log.info("[DESIGNER] Activity {} using received coord: x={}, y={}", dto.getActivityDefId(), coordDTO.getX(), coordDTO.getY());
         } else {
-            Map<String, Object> defaultCoord = new HashMap<>();
-            defaultCoord.put("x", 100);
-            defaultCoord.put("y", 100);
-            activity.setPositionCoord(defaultCoord);
-            log.warn("Activity {} using DEFAULT coord: {} (received was: {})", dto.getActivityDefId(), defaultCoord, coordDTO);
+            log.warn("[DESIGNER] Activity {} has NO positionCoord from backend! coordDTO={}, will keep null", dto.getActivityDefId(), coordDTO);
+            // 不设置默认值，让前端保留当前坐标或处理缺失情况
         }
         
         if (dto.getTiming() != null) {

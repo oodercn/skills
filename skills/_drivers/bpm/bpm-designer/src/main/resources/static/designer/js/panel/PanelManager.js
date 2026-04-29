@@ -45,9 +45,16 @@ class PanelManager {
         if (typeof ProcessPanelPlugin !== 'undefined') {
             this.register('process', new ProcessPanelPlugin());
         }
-        if (typeof ActivityPanelPlugin !== 'undefined') {
+        
+        // 使用新的 ActivityPropertyPlugin 替代旧的 ActivityPanelPlugin
+        if (typeof ActivityPropertyPlugin !== 'undefined') {
+            console.log('[PanelManager] Registering ActivityPropertyPlugin');
+            this.register('activity', new ActivityPropertyPlugin());
+        } else if (typeof ActivityPanelPlugin !== 'undefined') {
+            console.log('[PanelManager] ActivityPropertyPlugin not found, falling back to ActivityPanelPlugin');
             this.register('activity', new ActivityPanelPlugin());
         }
+        
         if (typeof RoutePanelPlugin !== 'undefined') {
             this.register('route', new RoutePanelPlugin());
         }
@@ -62,21 +69,30 @@ class PanelManager {
         const allActivityPlugins = [];
         
         if (typeof ActivityPanelPlugins !== 'undefined') {
+            console.log('[PanelManager] ActivityPanelPlugins found, keys:', Object.keys(ActivityPanelPlugins));
             const pluginOrder = ['BasicPanelPlugin', 'TimingPanelPlugin', 'FlowControlPanelPlugin', 
-                               'RightPanelPlugin', 'FormPanelPlugin', 'ServicePanelPlugin'];
+                               'RightPanelPlugin', 'FormPanelPlugin', 'ServicePanelPlugin',
+                               'KnowledgePanelPlugin', 'DataPanelPlugin', 'CommPanelPlugin',
+                               'AgentPanelPlugin', 'ScenePanelPlugin'];
             
             pluginOrder.forEach(name => {
                 if (ActivityPanelPlugins[name]) {
+                    const category = this._getPluginCategory(name);
+                    console.log(`[PanelManager] Registering plugin: ${name}, category: ${category}`);
                     allActivityPlugins.push({
                         id: `activity-${name.toLowerCase().replace('panelplugin', '')}`,
                         name: ActivityPanelPlugins[name].name || name,
                         icon: ActivityPanelPlugins[name].icon || '',
                         plugin: ActivityPanelPlugins[name],
                         applicable: ActivityPanelPlugins[name].applicable,
-                        category: this._getPluginCategory(name)
+                        category: category
                     });
+                } else {
+                    console.warn(`[PanelManager] Plugin not found: ${name}`);
                 }
             });
+        } else {
+            console.error('[PanelManager] ActivityPanelPlugins is not defined!');
         }
 
         if (typeof AgentPanelPlugins !== 'undefined') {
@@ -160,24 +176,32 @@ class PanelManager {
     }
     
     _getPluginCategory(pluginName) {
-        const basicPlugins = ['BasicPanelPlugin', 'AgentBasicPanelPlugin', 'SceneBasicPanelPlugin', 
-                             'ProcessBasicPanelPlugin', 'StartNodePanelPlugin', 'EndNodesPanelPlugin'];
-        const businessPlugins = ['TimingPanelPlugin', 'FlowControlPanelPlugin', 'RightPanelPlugin', 
-                                'FormPanelPlugin', 'ServicePanelPlugin', 'LLMPanelPlugin', 
-                                'AgentToolsPanelPlugin', 'SceneEnginePanelPlugin', 'SceneParamsPanelPlugin',
-                                'SceneCapabilityPanelPlugin', 'ListenersPanelPlugin', 'RightGroupsPanelPlugin',
-                                'ProcessVariablesPanelPlugin', 'ProcessTimingPanelPlugin'];
-        const pluginPlugins = ['ActivityListenerPanelPlugin', 'ExecutionListenerPanelPlugin',
-                               'ExpressionPanelPlugin', 'MultiInstancePanelPlugin', 'ExtensionPropertiesPanelPlugin'];
+        // 流程标签：流程控制、时序、路由等流程相关配置
+        const flowPlugins = ['TimingPanelPlugin', 'FlowControlPanelPlugin', 
+                            'ListenersPanelPlugin', 'ProcessVariablesPanelPlugin', 
+                            'ProcessTimingPanelPlugin', 'RoutePanelPlugin'];
         
-        if (basicPlugins.some(p => pluginName.includes(p))) {
-            return 'common';
-        } else if (businessPlugins.some(p => pluginName.includes(p))) {
-            return 'business';
-        } else if (pluginPlugins.some(p => pluginName.includes(p))) {
-            return 'plugin';
+        // 技能标签：三维度分类、技能相关配置（表单、服务、知识、数据、通讯等）
+        const skillPlugins = ['BasicPanelPlugin', 'FormPanelPlugin', 'ServicePanelPlugin', 
+                             'KnowledgePanelPlugin', 'DataPanelPlugin', 'CommPanelPlugin',
+                             'LLMPanelPlugin', 'ScenePanelPlugin'];
+        
+        // Agent标签：Agent相关配置
+        const agentPlugins = ['AgentPanelPlugin', 'RightPanelPlugin', 
+                             'AgentToolsPanelPlugin', 'SceneEnginePanelPlugin', 
+                             'SceneParamsPanelPlugin', 'SceneCapabilityPanelPlugin',
+                             'ActivityListenerPanelPlugin', 'ExecutionListenerPanelPlugin',
+                             'ExpressionPanelPlugin', 'MultiInstancePanelPlugin', 
+                             'ExtensionPropertiesPanelPlugin'];
+        
+        if (flowPlugins.some(p => pluginName.includes(p))) {
+            return 'flow';
+        } else if (skillPlugins.some(p => pluginName.includes(p))) {
+            return 'skill';
+        } else if (agentPlugins.some(p => pluginName.includes(p))) {
+            return 'agent';
         }
-        return 'plugin';
+        return 'skill'; // 默认归类到技能
     }
     
     _bindEvents() {
@@ -312,12 +336,19 @@ class PanelManager {
 
         const applicablePlugins = subPlugins.filter(sp => {
             if (sp.applicable) {
-                return sp.applicable(data);
+                const result = sp.applicable(data);
+                console.log(`[PanelManager] Plugin ${sp.name} applicable: ${result}`, data);
+                return result;
             }
             return true;
         });
         
         console.log(`[PanelManager] Applicable plugins: ${applicablePlugins.length}/${subPlugins.length}`);
+        console.log('[PanelManager] Applicable plugins by category:', {
+            common: applicablePlugins.filter(p => p.category === 'common').map(p => p.name),
+            business: applicablePlugins.filter(p => p.category === 'business').map(p => p.name),
+            plugin: applicablePlugins.filter(p => p.category === 'plugin').map(p => p.name)
+        });
         
         if (applicablePlugins.length === 0) {
             this.tabsContainer.innerHTML = '';
@@ -326,15 +357,15 @@ class PanelManager {
         }
 
         const categories = [
-            { id: 'common', name: '通用', icon: '◈' },
-            { id: 'business', name: '业务', icon: '◆' },
-            { id: 'plugin', name: '扩展', icon: '◇' }
+            { id: 'flow', name: '流程', icon: '◈' },
+            { id: 'skill', name: '技能', icon: '◆' },
+            { id: 'agent', name: 'Agent', icon: '◇' }
         ];
         
         const pluginsByCategory = {
-            common: applicablePlugins.filter(p => p.category === 'common'),
-            business: applicablePlugins.filter(p => p.category === 'business'),
-            plugin: applicablePlugins.filter(p => p.category === 'plugin')
+            flow: applicablePlugins.filter(p => p.category === 'flow'),
+            skill: applicablePlugins.filter(p => p.category === 'skill'),
+            agent: applicablePlugins.filter(p => p.category === 'agent')
         };
 
         this.tabsContainer.innerHTML = categories.map((cat, index) => {
@@ -535,6 +566,20 @@ class PanelManager {
     
     setAutoSave(enabled) {
         this.autoSaveEnabled = enabled;
+    }
+    
+    refreshPlugins(data) {
+        console.log('[PanelManager] Refreshing plugins with data:', data);
+        
+        if (!this.currentType || !data) return;
+        
+        const group = this.getActivityGroup(data);
+        console.log(`[PanelManager] Refreshing for group: ${group}`);
+        
+        const subPlugins = this.subPlugins.get(group);
+        if (subPlugins && subPlugins.length > 0) {
+            this._renderCategoryTabs(subPlugins, data);
+        }
     }
     
     destroy() {

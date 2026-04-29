@@ -471,7 +471,20 @@ class Tree {
         } else if (nodeType === 'activity') {
             items = [
                 { label: '定位到画布', icon: 'location', action: () => this._locateActivity(data.activityId) },
+                { label: '查看属性', icon: 'setting', action: () => this.store.emit('tree:select-activity', data.activityId) },
+                { divider: true },
+                { label: '删除活动', icon: 'delete', action: () => this._deleteActivity(data.activityId) }
+            ];
+        } else if (nodeType === 'panel') {
+            items = [
+                { label: '打开配置', icon: 'folder-open', action: () => this.store.emit('tree:open-panel', { panelType: data.nodeEl.dataset.panelType }) },
                 { label: '查看属性', icon: 'setting', action: () => this.store.emit('tree:select-activity', data.activityId) }
+            ];
+        } else if (nodeType === 'route') {
+            items = [
+                { label: '查看属性', icon: 'setting', action: () => this.store.emit('tree:select-route', data.nodeEl.dataset.routeId) },
+                { divider: true },
+                { label: '删除路由', icon: 'delete', action: () => this._deleteRoute(data.nodeEl.dataset.routeId) }
             ];
         }
         
@@ -609,6 +622,16 @@ class Tree {
 
     _locateActivity(activityId) {
         this.store.emit('tree:select-activity', activityId);
+    }
+
+    _deleteActivity(activityId) {
+        if (!confirm('确定要删除此活动吗？')) return;
+        this.store.emit('tree:delete-activity', activityId);
+    }
+
+    _deleteRoute(routeId) {
+        if (!confirm('确定要删除此路由吗？')) return;
+        this.store.emit('tree:delete-route', routeId);
     }
 
     _onSelect(nodeEl, type, id) {

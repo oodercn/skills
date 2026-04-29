@@ -19,6 +19,10 @@ server:
   port: 9004
   servlet:
     context-path: /bpm
+    encoding:
+      charset: UTF-8
+      enabled: true
+      force: true
 
 logging:
   level:

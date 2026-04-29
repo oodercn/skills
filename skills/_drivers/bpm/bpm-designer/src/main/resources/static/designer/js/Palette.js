@@ -71,11 +71,19 @@ class Palette {
         const items = this.container.querySelectorAll('.d-palette-item');
         items.forEach(item => {
             item.addEventListener('dragstart', (e) => {
+                const activityType = item.dataset.activityType;
+                const category = item.dataset.category;
+                const name = item.querySelector('.d-palette-item-name').textContent;
+                
                 const data = {
-                    activityType: item.dataset.activityType,
-                    category: item.dataset.category,
-                    name: item.querySelector('.d-palette-item-name').textContent
+                    activityType: activityType,
+                    activityCategory: category || 'HUMAN',
+                    category: category,
+                    name: name
                 };
+                
+                console.log('[Palette] Drag start:', { activityType, category, name, data });
+                
                 e.dataTransfer.setData('application/json', JSON.stringify(data));
                 e.dataTransfer.effectAllowed = 'copy';
             });

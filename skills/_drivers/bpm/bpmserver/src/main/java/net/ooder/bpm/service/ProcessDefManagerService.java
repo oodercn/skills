@@ -60,6 +60,34 @@ public class ProcessDefManagerService {
         }
     }
 
+    public void deleteProcessDef(String processDefId) {
+        try {
+            List<String> versionIds = jdbcTemplate.queryForList(
+                "SELECT PROCESSDEF_VERSION_ID FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID = ?",
+                String.class, processDefId);
+            
+            for (String versionId : versionIds) {
+                List<String> activityIds = jdbcTemplate.queryForList(
+                    "SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID = ?",
+                    String.class, versionId);
+                for (String activityId : activityIds) {
+                    jdbcTemplate.update("DELETE FROM BPM_ACTIVITYDEF_PROPERTY WHERE ACTIVITYDEF_ID = ?", activityId);
+                }
+                jdbcTemplate.update("DELETE FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID = ?", versionId);
+                jdbcTemplate.update("DELETE FROM BPM_ROUTEDEF WHERE PROCESSDEF_VERSION_ID = ?", versionId);
+                jdbcTemplate.update("DELETE FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_VERSION_ID = ?", versionId);
+            }
+            
+            jdbcTemplate.update("DELETE FROM BPM_PROCESSDEF_PARTICIPANT WHERE PROCESSDEF_ID = ?", processDefId);
+            jdbcTemplate.update("DELETE FROM BPM_PROCESSDEF WHERE PROCESSDEF_ID = ?", processDefId);
+            
+            log.info("Deleted process def: {}", processDefId);
+        } catch (Exception e) {
+            log.error("Failed to delete process def: {}", processDefId, e);
+            throw new RuntimeException("Failed to delete process def: " + processDefId, e);
+        }
+    }
+
     public List<Map<String, Object>> getAllProcessDefs() {
         List<EIProcessDef> processDefs = processDefManager.loadAll();
         List<Map<String, Object>> result = new ArrayList<>();
@@ -123,23 +151,114 @@ public class ProcessDefManagerService {
     }
 
     public List<Map<String, Object>> getActivityDefsByVersion(String versionId) {
+        log.info("[DEBUG] getActivityDefsByVersion: versionId={}", versionId);
+        List<Map<String, Object>> result = new ArrayList<>();
+        
         try {
-            List<EIActivityDef> activities = activityDefManager.loadByProcessDefVersionId(versionId);
-            log.info("[DEBUG] getActivityDefsByVersion: versionId=" + versionId + ", activities.size()=" + activities.size());
-            List<Map<String, Object>> result = new ArrayList<>();
+            List<Map<String, Object>> activities = jdbcTemplate.queryForList(
+                "SELECT ACTIVITYDEF_ID, DEFNAME, DESCRIPTION, POSITION, IMPLEMENTATION FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID = ?",
+                versionId
+            );
+            
+            log.info("[DEBUG] Found {} activities in DB for versionId={}", activities.size(), versionId);
+            
             int index = 0;
-            for (EIActivityDef activity : activities) {
-                log.info("[DEBUG] Processing activity " + index + ": id=" + activity.getActivityDefId() 
-                    + ", name=" + activity.getName() + ", position=" + activity.getPosition());
-                result.add(convertActivityDef(activity));
+            for (Map<String, Object> activityData : activities) {
+                String activityDefId = (String) activityData.get("ACTIVITYDEF_ID");
+                String name = (String) activityData.get("DEFNAME");
+                String description = (String) activityData.get("DESCRIPTION");
+                String position = (String) activityData.get("POSITION");
+                
+                log.info("[DEBUG] Processing activity {}: id={}, name={}, position={}", index, activityDefId, name, position);
+                
+                Map<String, Object> activityMap = new LinkedHashMap<>();
+                activityMap.put("activityDefId", activityDefId);
+                activityMap.put("name", name);
+                activityMap.put("description", description);
+                // 将数据库的 POSITION_START/POSITION_END/POSITION_NORMAL 转换为前端期望的 START/END/NORMAL
+                String normalizedPosition = position;
+                if ("POSITION_START".equals(position)) {
+                    normalizedPosition = "START";
+                } else if ("POSITION_END".equals(position)) {
+                    normalizedPosition = "END";
+                } else if ("POSITION_NORMAL".equals(position)) {
+                    normalizedPosition = "NORMAL";
+                }
+                activityMap.put("position", normalizedPosition);
+                activityMap.put("implementation", activityData.get("IMPLEMENTATION"));
+                
+                List<Map<String, Object>> props = jdbcTemplate.queryForList(
+                    "SELECT PROPNAME, PROPVALUE, PARENTPROP_ID FROM BPM_ACTIVITYDEF_PROPERTY WHERE ACTIVITYDEF_ID = ?",
+                    activityDefId
+                );
+                
+                String activityType = null;
+                String activityCategory = null;
+                String positionCoord = null;
+                
+                log.info("[DEBUG] Activity {} has {} properties", activityDefId, props.size());
+                
+                for (Map<String, Object> prop : props) {
+                    String propName = (String) prop.get("PROPNAME");
+                    String propValue = (String) prop.get("PROPVALUE");
+                    Object parentPropId = prop.get("PARENTPROP_ID");
+                    
+                    log.debug("[DEBUG] Property: name={}, value={}, parentId={}", propName, propValue, parentPropId);
+                    
+                    // 检查属性名匹配（无论是否有父属性）
+                    if ("positionCoord".equals(propName)) {
+                        positionCoord = propValue;
+                        log.info("[DEBUG] Found positionCoord: {}", propValue);
+                    } else if ("activityType".equals(propName)) {
+                        activityType = propValue;
+                        log.info("[DEBUG] Found activityType: {}", propValue);
+                    } else if ("activityCategory".equals(propName)) {
+                        activityCategory = propValue;
+                        log.info("[DEBUG] Found activityCategory: {}", propValue);
+                    }
+                }
+                
+                if (activityType == null || activityType.isEmpty()) {
+                    if ("POSITION_START".equals(position)) {
+                        activityType = "START";
+                    } else if ("POSITION_END".equals(position)) {
+                        activityType = "END";
+                    } else {
+                        activityType = "TASK";
+                    }
+                    log.info("[DEBUG] Inferred activityType: {} from position: {}", activityType, position);
+                }
+                
+                if (activityCategory == null || activityCategory.isEmpty()) {
+                    activityCategory = "HUMAN";
+                    log.info("[DEBUG] Default activityCategory: {}", activityCategory);
+                }
+                
+                activityMap.put("activityType", activityType);
+                activityMap.put("activityCategory", activityCategory);
+                
+                if (positionCoord != null && !positionCoord.isEmpty()) {
+                    try {
+                        Map<String, Object> positionCoordMap = mapper.readValue(positionCoord, Map.class);
+                        activityMap.put("positionCoord", positionCoordMap);
+                        log.info("[DEBUG] Activity {} positionCoord: {}", activityDefId, positionCoordMap);
+                    } catch (Exception e) {
+                        log.error("[DEBUG] Failed to parse positionCoord for activity {}: {}", activityDefId, e.getMessage());
+                    }
+                } else {
+                    log.warn("[DEBUG] No positionCoord found for activity {}", activityDefId);
+                }
+                
+                result.add(activityMap);
                 index++;
             }
-            log.info("[DEBUG] Returning " + result.size() + " activities");
-            return result;
-        } catch (BPMException e) {
-            log.error("Failed to get activity defs by version: " + e.getMessage());
-            return new ArrayList<>();
+            
+            log.info("[DEBUG] Returning {} activities", result.size());
+        } catch (Exception e) {
+            log.error("[DEBUG] Failed to get activity defs by version: {}", e.getMessage(), e);
         }
+        
+        return result;
     }
 
     public List<Map<String, Object>> getStartActivitiesByVersion(String versionId) {
@@ -262,26 +381,30 @@ public class ProcessDefManagerService {
         map.put("durationUnit", activityDef.getDurationUnit());
         map.put("canRouteBack", activityDef.getCanRouteBack());
         
-        log.info("[LOAD] Loading attributes for activity: {}", activityDef.getActivityDefId());
+        String activityDefId = activityDef.getActivityDefId();
+        log.info("[LOAD] ===== Loading attributes for activity: {} =====", activityDefId);
         
         // 首先尝试从 WORKFLOW 属性组中加载
         String activityType = activityDef.getAttributeValue("WORKFLOW.activityType");
         String activityCategory = activityDef.getAttributeValue("WORKFLOW.activityCategory");
         String positionCoord = activityDef.getAttributeValue("WORKFLOW.positionCoord");
         
+        log.info("[LOAD] Step 1 - From WORKFLOW group: activityType={}, activityCategory={}, positionCoord={}", 
+            activityType, activityCategory, positionCoord);
+        
         // 如果 WORKFLOW 组中没有，尝试直接从顶层属性加载（兼容直接保存的属性名）
         if (activityType == null || activityType.isEmpty()) {
             activityType = activityDef.getAttributeValue("activityType");
+            log.info("[LOAD] Step 2 - From top-level: activityType={}", activityType);
         }
         if (activityCategory == null || activityCategory.isEmpty()) {
             activityCategory = activityDef.getAttributeValue("activityCategory");
+            log.info("[LOAD] Step 2 - From top-level: activityCategory={}", activityCategory);
         }
         if (positionCoord == null || positionCoord.isEmpty()) {
             positionCoord = activityDef.getAttributeValue("positionCoord");
+            log.info("[LOAD] Step 2 - From top-level: positionCoord={}", positionCoord);
         }
-        
-        log.info("[LOAD] Found activityType: {}, activityCategory: {}, positionCoord: {}", 
-            activityType, activityCategory, positionCoord != null ? "present" : "null");
         
         // 根据 position 推断 activityType（如果没有保存过）
         if (activityType == null || activityType.isEmpty()) {
@@ -293,29 +416,94 @@ public class ProcessDefManagerService {
             } else {
                 activityType = "TASK";
             }
+            log.info("[LOAD] Step 3 - Inferred activityType={} from position={}", activityType, position);
         }
         
         // 默认 activityCategory 为 HUMAN
         if (activityCategory == null || activityCategory.isEmpty()) {
             activityCategory = "HUMAN";
+            log.info("[LOAD] Step 3 - Default activityCategory={}", activityCategory);
         }
         
         map.put("activityType", activityType);
         map.put("activityCategory", activityCategory);
         
-        log.info("[LOAD] Final activityType: {}, activityCategory: {}", activityType, activityCategory);
-        
         if (positionCoord != null && !positionCoord.isEmpty()) {
             try {
                 Map<String, Object> positionCoordMap = mapper.readValue(positionCoord, Map.class);
-                log.info("[LOAD] Parsed positionCoord for activity {}: {}", activityDef.getActivityDefId(), positionCoordMap);
+                log.info("[LOAD] Step 4 - Parsed positionCoord for activity {}: {}", activityDefId, positionCoordMap);
                 map.put("positionCoord", positionCoordMap);
             } catch (Exception e) {
-                log.error("[LOAD] Failed to parse positionCoord for activity {}: {}", activityDef.getActivityDefId(), e.getMessage(), e);
+                log.error("[LOAD] Failed to parse positionCoord for activity {}: {}", activityDefId, e.getMessage(), e);
             }
         } else {
-            log.warn("[LOAD] No positionCoord found for activity {}", activityDef.getActivityDefId());
+            log.warn("[LOAD] Step 4 - No positionCoord found for activity {}, will NOT set default", activityDefId);
+            // 不设置默认值，让前端处理
         }
+        
+        // 加载三维度分类 (classification)
+        String classification = activityDef.getAttributeValue("classification");
+        if (classification != null && !classification.isEmpty()) {
+            try {
+                Map<String, Object> classificationMap = mapper.readValue(classification, Map.class);
+                map.put("classification", classificationMap);
+                log.info("[LOAD] Activity {} classification loaded: {}", activityDefId, classificationMap);
+            } catch (Exception e) {
+                log.warn("[LOAD] Failed to parse classification for activity {}: {}", activityDefId, e.getMessage());
+            }
+        }
+        
+        // 加载执行者配置 (performer)
+        String performer = activityDef.getAttributeValue("performer");
+        if (performer != null && !performer.isEmpty()) {
+            try {
+                Map<String, Object> performerMap = mapper.readValue(performer, Map.class);
+                map.put("performer", performerMap);
+                log.info("[LOAD] Activity {} performer loaded: {}", activityDefId, performerMap);
+            } catch (Exception e) {
+                log.warn("[LOAD] Failed to parse performer for activity {}: {}", activityDefId, e.getMessage());
+            }
+        }
+        
+        // 加载 Agent 配置 (agentConfig)
+        String agentConfig = activityDef.getAttributeValue("agentConfig");
+        if (agentConfig != null && !agentConfig.isEmpty()) {
+            try {
+                Map<String, Object> agentConfigMap = mapper.readValue(agentConfig, Map.class);
+                map.put("agentConfig", agentConfigMap);
+                log.info("[LOAD] Activity {} agentConfig loaded: {}", activityDefId, agentConfigMap);
+            } catch (Exception e) {
+                log.warn("[LOAD] Failed to parse agentConfig for activity {}: {}", activityDefId, e.getMessage());
+            }
+        }
+        
+        // 加载 Scene 配置 (sceneConfig)
+        String sceneConfig = activityDef.getAttributeValue("sceneConfig");
+        if (sceneConfig != null && !sceneConfig.isEmpty()) {
+            try {
+                Map<String, Object> sceneConfigMap = mapper.readValue(sceneConfig, Map.class);
+                map.put("sceneConfig", sceneConfigMap);
+                log.info("[LOAD] Activity {} sceneConfig loaded: {}", activityDefId, sceneConfigMap);
+            } catch (Exception e) {
+                log.warn("[LOAD] Failed to parse sceneConfig for activity {}: {}", activityDefId, e.getMessage());
+            }
+        }
+        
+        // 加载扩展属性 (extendedAttributes)
+        String extendedAttributes = activityDef.getAttributeValue("extendedAttributes");
+        if (extendedAttributes != null && !extendedAttributes.isEmpty()) {
+            try {
+                Map<String, Object> extAttrMap = mapper.readValue(extendedAttributes, Map.class);
+                map.put("extendedAttributes", extAttrMap);
+                log.info("[LOAD] Activity {} extendedAttributes loaded: {}", activityDefId, extAttrMap);
+            } catch (Exception e) {
+                log.warn("[LOAD] Failed to parse extendedAttributes for activity {}: {}", activityDefId, e.getMessage());
+            }
+        }
+        
+        log.info("[LOAD] ===== Final result for activity {}: activityType={}, activityCategory={}, hasPositionCoord={}, hasClassification={}, hasPerformer={} =====", 
+            activityDefId, activityType, activityCategory, map.containsKey("positionCoord"), 
+            map.containsKey("classification"), map.containsKey("performer"));
         
         return map;
     }
@@ -477,6 +665,66 @@ public class ProcessDefManagerService {
                                 catPropId, activityDefId, "activityCategory", activityCategory, null, "WORKFLOW", workflowPropId, 0, "Y"
                             );
                             log.info("[SAVE] Activity {} activityCategory saved: {}", activityDefId, activityCategory);
+                        }
+                        
+                        // 保存三维度分类 (classification)
+                        Map<String, Object> activityClassification = (Map<String, Object>) activityData.get("classification");
+                        if (activityClassification != null) {
+                            String classificationJson = mapper.writeValueAsString(activityClassification);
+                            String classPropId = "prop-" + activityDefId + "-classification";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                classPropId, activityDefId, "classification", classificationJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} classification saved: {}", activityDefId, classificationJson);
+                        }
+                        
+                        // 保存执行者配置 (performer)
+                        Map<String, Object> performer = (Map<String, Object>) activityData.get("performer");
+                        if (performer != null) {
+                            String performerJson = mapper.writeValueAsString(performer);
+                            String performerPropId = "prop-" + activityDefId + "-performer";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                performerPropId, activityDefId, "performer", performerJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} performer saved: {}", activityDefId, performerJson);
+                        }
+                        
+                        // 保存 Agent 配置 (agentConfig)
+                        Map<String, Object> agentConfig = (Map<String, Object>) activityData.get("agentConfig");
+                        if (agentConfig != null) {
+                            String agentConfigJson = mapper.writeValueAsString(agentConfig);
+                            String agentConfigPropId = "prop-" + activityDefId + "-agentConfig";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                agentConfigPropId, activityDefId, "agentConfig", agentConfigJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} agentConfig saved: {}", activityDefId, agentConfigJson);
+                        }
+                        
+                        // 保存 Scene 配置 (sceneConfig)
+                        Map<String, Object> sceneConfig = (Map<String, Object>) activityData.get("sceneConfig");
+                        if (sceneConfig != null) {
+                            String sceneConfigJson = mapper.writeValueAsString(sceneConfig);
+                            String sceneConfigPropId = "prop-" + activityDefId + "-sceneConfig";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                sceneConfigPropId, activityDefId, "sceneConfig", sceneConfigJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} sceneConfig saved: {}", activityDefId, sceneConfigJson);
+                        }
+                        
+                        // 保存扩展属性 (extendedAttributes)
+                        Map<String, Object> extendedAttributes = (Map<String, Object>) activityData.get("extendedAttributes");
+                        if (extendedAttributes != null && !extendedAttributes.isEmpty()) {
+                            String extAttrJson = mapper.writeValueAsString(extendedAttributes);
+                            String extAttrPropId = "prop-" + activityDefId + "-extendedAttributes";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ACTIVITYDEF_PROPERTY (PROPERTY_ID, ACTIVITYDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE, PARENTPROP_ID, ISEXTENSION, CANINSTANTIATE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)",
+                                extAttrPropId, activityDefId, "extendedAttributes", extAttrJson, null, "WORKFLOW", workflowPropId, 0, "Y"
+                            );
+                            log.info("[SAVE] Activity {} extendedAttributes saved: {}", activityDefId, extAttrJson);
                         }
                     } catch (Exception e) {
                         log.error("[SAVE] Failed to save attributes for activity {}: {}", activityDefId, e.getMessage(), e);

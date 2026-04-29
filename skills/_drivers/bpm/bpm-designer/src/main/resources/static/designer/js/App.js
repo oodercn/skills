@@ -378,6 +378,20 @@ class App {
             }
         });
 
+        this.store.on('tree:delete-activity', (activityId) => {
+            console.log('[App] Delete activity:', activityId);
+            this.canvas.removeNode(activityId);
+            this.store.removeActivity(activityId);
+            this._autoSave();
+        });
+
+        this.store.on('tree:delete-route', (routeId) => {
+            console.log('[App] Delete route:', routeId);
+            this.canvas.removeEdge(routeId);
+            this.store.removeRoute(routeId);
+            this._autoSave();
+        });
+
         this.store.on('subprocess:open', (data) => {
             console.log('[App] Opening subprocess:', data);
             this.tabManager.openTab(data.processDef, {

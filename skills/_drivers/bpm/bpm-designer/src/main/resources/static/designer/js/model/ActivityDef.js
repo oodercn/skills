@@ -67,6 +67,18 @@ class ActivityDef {
         // Scene配置 - 直接存储在活动对象上
         this.sceneConfig = data?.sceneConfig || null;
         
+        // 三维度分类 - 修复：新增
+        this.classification = data?.classification || {
+            form: 'STANDALONE',
+            category: 'SERVICE',
+            provider: 'SYSTEM'
+        };
+        
+        // 执行者配置 - 修复：新增
+        this.performer = data?.performer || {
+            type: this.activityCategory === 'AGENT' ? 'AGENT' : 'HUMAN'
+        };
+        
         // 其他扩展属性
         this.extendedAttributes = data?.extendedAttributes || {};
         
@@ -383,6 +395,10 @@ class ActivityDef {
                 // Agent/Scene 配置 - 修复：添加到序列化
                 agentConfig: this.agentConfig,
                 sceneConfig: this.sceneConfig,
+                
+                // 三维度分类和执行者 - 修复：新增
+                classification: this.classification,
+                performer: this.performer,
                 
                 // 扩展属性
                 extendedAttributes: this._isEmptyObject(this.extendedAttributes) ? undefined : this.extendedAttributes

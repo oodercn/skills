@@ -348,11 +348,94 @@ const EnumMapping = {
         }
     },
 
-    /**
-     * 权限组枚举映射
-     * 需求规格: PERFORMER/SPONSOR/READER/HISTORYPERFORMER/HISSPONSOR/HISTORYREADER/NORIGHT/NULL
-     * 后端实现: PERFORMER/SPONSOR/READER/HISTORYPERFORMER/HISSPONSOR/HISTORYREADER/NORIGHT/NULL
-     */
+    SkillForm: {
+        toBackend: {
+            'SCENE': 'SCENE',
+            'STANDALONE': 'STANDALONE'
+        },
+        toFrontend: {
+            'SCENE': 'SCENE',
+            'STANDALONE': 'STANDALONE'
+        }
+    },
+
+    SkillCategory: {
+        toBackend: {
+            'LLM': 'LLM',
+            'FORM': 'FORM',
+            'SERVICE': 'SERVICE',
+            'WORKFLOW': 'WORKFLOW',
+            'KNOWLEDGE': 'KNOWLEDGE',
+            'DATA': 'DATA',
+            'COMM': 'COMM',
+            'TOOL': 'TOOL'
+        },
+        toFrontend: {
+            'LLM': 'LLM',
+            'FORM': 'FORM',
+            'SERVICE': 'SERVICE',
+            'WORKFLOW': 'WORKFLOW',
+            'KNOWLEDGE': 'KNOWLEDGE',
+            'DATA': 'DATA',
+            'COMM': 'COMM',
+            'TOOL': 'TOOL'
+        }
+    },
+
+    SkillProvider: {
+        toBackend: {
+            'SYSTEM': 'SYSTEM',
+            'DRIVER': 'DRIVER',
+            'BUSINESS': 'BUSINESS',
+            'USER': 'USER'
+        },
+        toFrontend: {
+            'SYSTEM': 'SYSTEM',
+            'DRIVER': 'DRIVER',
+            'BUSINESS': 'BUSINESS',
+            'USER': 'USER'
+        }
+    },
+
+    PerformerType: {
+        toBackend: {
+            'HUMAN': 'HUMAN',
+            'AGENT': 'AGENT',
+            'SYSTEM': 'SYSTEM'
+        },
+        toFrontend: {
+            'HUMAN': 'HUMAN',
+            'AGENT': 'AGENT',
+            'SYSTEM': 'SYSTEM'
+        }
+    },
+
+    IsolationLevel: {
+        toBackend: {
+            'SHARED': 'SHARED',
+            'PARTIAL': 'PARTIAL',
+            'ISOLATED': 'ISOLATED'
+        },
+        toFrontend: {
+            'SHARED': 'SHARED',
+            'PARTIAL': 'PARTIAL',
+            'ISOLATED': 'ISOLATED'
+        }
+    },
+
+    SceneType: {
+        toBackend: {
+            'AUTO': 'AUTO',
+            'TRIGGER': 'TRIGGER',
+            'HYBRID': 'HYBRID'
+        },
+        toFrontend: {
+            'AUTO': 'AUTO',
+            'TRIGGER': 'TRIGGER',
+            'HYBRID': 'HYBRID'
+        }
+    },
+
     RightGroupEnums: {
         toBackend: {
             'PERFORMER': 'PERFORMER',
