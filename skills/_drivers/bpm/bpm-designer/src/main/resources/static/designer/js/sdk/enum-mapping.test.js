@@ -40,8 +40,8 @@ const testCases = {
         backend: ['NO', 'TOOL', 'SUBFLOW', 'OUTFLOW', 'DEVICE', 'EVENT', 'SERVICE', 'AGENT', 'ROUTE', 'BLOCK']
     },
     ActivityType: {
-        frontend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK'],
-        backend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK']
+        frontend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK', 'COORDINATOR', 'AGENT_TASK', 'AGENT_TOOL'],
+        backend: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK', 'COORDINATOR', 'AGENT_TASK', 'AGENT_TOOL']
     },
     ActivityCategory: {
         frontend: ['HUMAN', 'AGENT', 'SCENE'],
@@ -74,6 +74,18 @@ const testCases = {
     RightGroupEnums: {
         frontend: ['PERFORMER', 'SPONSOR', 'READER', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYREADER', 'NORIGHT', 'NULL'],
         backend: ['PERFORMER', 'SPONSOR', 'READER', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYREADER', 'NORIGHT', 'NULL']
+    },
+    AgentGroupEnums: {
+        frontend: ['PERFORMER', 'SPONSOR', 'MONITOR', 'COORDINATOR', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYMONITOR', 'NORIGHT', 'NULL'],
+        backend: ['PERFORMER', 'SPONSOR', 'MONITOR', 'COORDINATOR', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYMONITOR', 'NORIGHT', 'NULL']
+    },
+    AgentType: {
+        frontend: ['LLM', 'TASK', 'EVENT', 'HYBRID', 'COORDINATOR', 'TOOL'],
+        backend: ['LLM', 'TASK', 'EVENT', 'HYBRID', 'COORDINATOR', 'TOOL']
+    },
+    AgentPerformStatus: {
+        frontend: ['WAITING', 'CURRENT', 'FINISH', 'ERROR', 'TIMEOUT', 'DELETE'],
+        backend: ['WAITING', 'CURRENT', 'FINISH', 'ERROR', 'TIMEOUT', 'DELETE']
     }
 };
 

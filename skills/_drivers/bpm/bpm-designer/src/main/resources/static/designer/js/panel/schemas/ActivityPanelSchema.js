@@ -76,20 +76,37 @@ const ActivityPanelSchema = {
     },
     
     _getAgentSchema(activity) {
+        const agentType = activity.agentConfig?.agentType || 'LLM';
+        
+        const tabs = [
+            { id: 'basic', name: '基本信息', icon: 'info' },
+            { id: 'agent', name: 'Agent配置', icon: 'robot' },
+            { id: 'llm', name: 'LLM配置', icon: 'brain' },
+            { id: 'tools', name: '工具配置', icon: 'tool' },
+            { id: 'permission', name: '权限设置', icon: 'lock' },
+            { id: 'timing', name: '时限配置', icon: 'clock' },
+            { id: 'extended', name: '扩展属性', icon: 'settings' }
+        ];
+        
+        if (agentType === 'COORDINATOR') {
+            tabs.splice(2, 2);
+            tabs.splice(2, 0, { id: 'coordinator', name: '协调者配置', icon: 'team' });
+        }
+        
+        if (agentType === 'TOOL') {
+            const llmIdx = tabs.findIndex(t => t.id === 'llm');
+            if (llmIdx > -1) tabs.splice(llmIdx, 1);
+        }
+        
         return {
-            tabs: [
-                { id: 'basic', name: '基本信息', icon: 'info' },
-                { id: 'agent', name: 'Agent配置', icon: 'robot' },
-                { id: 'llm', name: 'LLM配置', icon: 'brain' },
-                { id: 'tools', name: '工具配置', icon: 'tool' },
-                { id: 'timing', name: '时限配置', icon: 'clock' },
-                { id: 'extended', name: '扩展属性', icon: 'settings' }
-            ],
+            tabs,
             fields: {
                 basic: this._getBasicFields(activity, 'IMPL_AGENT'),
                 agent: this._getAgentBasicFields(activity),
                 llm: this._getLLMFields(activity),
                 tools: this._getAgentToolsFields(activity),
+                coordinator: this._getCoordinatorFields(activity),
+                permission: this._getAgentPermissionFields(activity),
                 timing: this._getTimingFields(activity),
                 extended: this._getExtendedFields(activity)
             }
@@ -388,22 +405,28 @@ const ActivityPanelSchema = {
         return [
             { type: 'section', title: 'Agent基本信息' },
             { name: 'agentConfig.agentType', type: 'select', label: 'Agent类型', options: [
-                { value: 'LLM_AGENT', label: 'LLM Agent' },
-                { value: 'RULE_AGENT', label: '规则Agent' },
-                { value: 'HYBRID_AGENT', label: '混合Agent' }
+                { value: 'LLM', label: 'LLM Agent', description: '大语言模型智能体' },
+                { value: 'TASK', label: '任务Agent', description: '任务执行智能体' },
+                { value: 'EVENT', label: '事件Agent', description: '事件监听智能体' },
+                { value: 'HYBRID', label: '混合Agent', description: 'LLM+工具混合智能体' },
+                { value: 'COORDINATOR', label: '协调者Agent', description: '多Agent协调调度' },
+                { value: 'TOOL', label: '工具Agent', description: 'MCP工具调用智能体' }
             ]},
             { name: 'agentConfig.agentId', type: 'text', label: 'Agent ID', placeholder: 'agent-001' },
             { name: 'agentConfig.agentName', type: 'text', label: 'Agent名称', placeholder: '智能助手' },
-            { name: 'agentConfig.status', type: 'select', label: '状态', options: [
-                { value: 'online', label: '在线' },
-                { value: 'offline', label: '离线' },
-                { value: 'busy', label: '忙碌' }
+            { type: 'section', title: '办理方式' },
+            { name: 'agentConfig.performType', type: 'select', label: '办理类型', options: [
+                { value: 'SINGLE', label: '单人办理', description: '只需一个Agent办理' },
+                { value: 'MULTIPLE', label: '多人办理', description: '多个Agent参与办理' },
+                { value: 'JOINTSIGN', label: '会签', description: '多个Agent同时办理' }
             ]},
-            { name: 'agentConfig.role', type: 'select', label: '角色', options: [
-                { value: 'worker', label: '执行者' },
-                { value: 'supervisor', label: '监督者' },
-                { value: 'coordinator', label: '协调者' }
-            ]}
+            { name: 'agentConfig.performSequence', type: 'select', label: '办理顺序', options: [
+                { value: 'FIRST', label: '第一人办理', description: '第一个Agent签收后即可办理' },
+                { value: 'SEQUENCE', label: '顺序办理', description: '按顺序依次办理' },
+                { value: 'MEANWHILE', label: '同时办理', description: '多个Agent同时办理' },
+                { value: 'AUTOSIGN', label: '自动签收', description: '自动签收办理' }
+            ]},
+            { name: 'agentConfig.coordinatorId', type: 'text', label: '协调者ID', placeholder: 'coordinator-agent-id', description: '该Agent所属的协调者' }
         ];
     },
     
@@ -490,6 +513,60 @@ const ActivityPanelSchema = {
             { name: 'sceneConfig.timeout', type: 'number', label: '超时时间(秒)', min: 10, max: 3600 },
             { name: 'sceneConfig.retryCount', type: 'number', label: '重试次数', min: 0, max: 10 },
             { name: 'sceneConfig.async', type: 'checkbox', label: '异步执行' }
+        ];
+    },
+    
+    _getAgentPermissionFields(activity) {
+        return [
+            { type: 'section', title: 'Agent权限组' },
+            { name: 'agentConfig.agentGroup', type: 'select', label: '权限组', options: [
+                { value: 'PERFORMER', label: '执行者', description: '当前执行Agent' },
+                { value: 'SPONSOR', label: '发起者', description: '流程发起Agent' },
+                { value: 'MONITOR', label: '监控者', description: '监控执行Agent' },
+                { value: 'COORDINATOR', label: '协调者', description: '协调调度Agent' },
+                { value: 'HISTORYPERFORMER', label: '历史执行者', description: '历史执行Agent' },
+                { value: 'HISSPONSOR', label: '历史发起者', description: '历史发起Agent' },
+                { value: 'HISTORYMONITOR', label: '历史监控者', description: '历史监控Agent' },
+                { value: 'NORIGHT', label: '无权限', description: '无权限Agent' }
+            ]},
+            { type: 'section', title: '操作权限' },
+            { name: 'agentConfig.canRouteBack', type: 'checkbox', label: '允许退回', description: '是否允许Agent退回任务' },
+            { name: 'agentConfig.routeBackMethod', type: 'select', label: '退回路径', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'LAST', label: '上一环节', description: '退回到上一个处理Agent' },
+                { value: 'ANY', label: '任意环节', description: '退回到任意历史环节' },
+                { value: 'SPECIFY', label: '指定环节', description: '退回到指定环节' }
+            ]},
+            { name: 'agentConfig.canTakeBack', type: 'checkbox', label: '允许收回', description: '是否允许Agent收回已提交的任务' },
+            { name: 'agentConfig.canDelegate', type: 'checkbox', label: '允许委托', description: '是否允许Agent将任务委托给其他Agent' },
+            { name: 'agentConfig.canEscalate', type: 'checkbox', label: '允许升级', description: '是否允许Agent将任务升级到协调者' },
+            { type: 'section', title: '流程控制' },
+            { name: 'join', type: 'select', label: '汇聚类型', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'JOIN_AND', label: '与汇聚' },
+                { value: 'JOIN_XOR', label: '异或汇聚' }
+            ]},
+            { name: 'split', type: 'select', label: '分支类型', options: [
+                { value: 'DEFAULT', label: '默认' },
+                { value: 'SPLIT_AND', label: '与分支' },
+                { value: 'SPLIT_XOR', label: '异或分支' }
+            ]}
+        ];
+    },
+    
+    _getCoordinatorFields(activity) {
+        return [
+            { type: 'section', title: '协调策略' },
+            { name: 'agentConfig.coordinationStrategy', type: 'select', label: '协调策略', options: [
+                { value: 'ROUND_ROBIN', label: '轮询', description: '按顺序轮流分配' },
+                { value: 'LEAST_BUSY', label: '最闲优先', description: '分配给最空闲的Agent' },
+                { value: 'CAPABILITY_MATCH', label: '能力匹配', description: '根据能力匹配分配' },
+                { value: 'MANUAL', label: '手动指定', description: '由协调者手动指定' }
+            ]},
+            { name: 'agentConfig.maxConcurrentTasks', type: 'number', label: '最大并发数', min: 1, max: 100, description: '协调者同时分配的最大任务数' },
+            { type: 'section', title: '升级配置' },
+            { name: 'agentConfig.escalationEnabled', type: 'checkbox', label: '启用升级', description: '任务超时时是否升级到上级协调者' },
+            { name: 'agentConfig.escalationTimeout', type: 'number', label: '升级超时(秒)', min: 10, max: 86400, description: '触发升级的超时时间' }
         ];
     },
     

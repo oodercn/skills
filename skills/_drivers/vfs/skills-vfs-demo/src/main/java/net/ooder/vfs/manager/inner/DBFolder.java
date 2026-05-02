@@ -10,7 +10,7 @@ import net.ooder.vfs.VFSException;
 import net.ooder.vfs.VFSFolderNotFoundException;
 import net.ooder.vfs.engine.VFSRoManager;
 import net.ooder.vfs.manager.FolderManager;
-import net.ooder.vfs.manager.dbimpl.DBFolderManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFolderManager;
 
 import java.io.Serializable;
 import java.util.*;
@@ -40,7 +40,7 @@ public class DBFolder implements EIFolder, Cacheable, Serializable, Comparable<E
 
     public DBFolder() {
         this.ID = UUID.randomUUID().toString();
-        this.folderManager = DBFolderManager.getInstance();
+        this.folderManager = JdbcFolderManager.getInstance();
         isModified = false;
     }
 
@@ -48,6 +48,9 @@ public class DBFolder implements EIFolder, Cacheable, Serializable, Comparable<E
         prepareFiles();
         if (fileIdList == null) { fileIdList = new LinkedHashSet<>(); }
         if (!fileIdList.contains(fileId)) { fileIdList.add(fileId); }
+    }
+    public void addFileInfo(EIFileInfo info) {
+        addFileInfo(info.getID());
     }
     public void removeFileInfo(String fileId) {
         prepareFiles();
@@ -252,11 +255,11 @@ public class DBFolder implements EIFolder, Cacheable, Serializable, Comparable<E
     public void setCreateTime(long ct) { this.createTime = ct; }
     public boolean isInitialized() { return initialized; }
     public void setInitialized(boolean b) { this.initialized = b; this.setModified(false); }
-    public EIFileInfo createFile(String name, String descrition, String createPersonId) { return VFSRoManager.getInstance().createFile(this, name, descrition, createPersonId); }
+    public EIFileInfo createFile(String name, String descrition, String createPersonId) { return folderManager.createFile(this, name); }
     @Override
     public EIFolder createChildFolder(String name, String descrition, String createPersonId) throws VFSFolderNotFoundException {
         if (createPersonId == null) { createPersonId = this.getPersonId(); }
-        return VFSRoManager.getInstance().createFolder(this, name, descrition, createPersonId);
+        return folderManager.createFolder(this, name, descrition, createPersonId);
     }
     public EIFileInfo createFile(String name, String createPersonId) { return createFile(name, name, createPersonId); }
     public EIFolder createChildFolder(String name, String createPersonId) throws VFSFolderNotFoundException { return createChildFolder(name, name, createPersonId); }

@@ -739,17 +739,35 @@ public class ProcessDefManagerService {
                 for (Map<String, Object> routeData : routes) {
                     String routeDefId = (String) routeData.get("routeDefId");
                     String routeName = (String) routeData.get("name");
+                    String routeDesc = (String) routeData.get("description");
                     String fromActivityId = (String) routeData.get("from");
                     String toActivityId = (String) routeData.get("to");
                     String routeDirection = (String) routeData.getOrDefault("routeDirection", "FORWARD");
                     String routeCondition = (String) routeData.get("condition");
+                    String routeConditionType = (String) routeData.getOrDefault("routeConditionType", "CONDITION");
                     
                     // 使用 JdbcTemplate 直接插入路由（在同一事务中）
                     jdbcTemplate.update(
                         "INSERT INTO BPM_ROUTEDEF (ROUTEDEF_ID, PROCESSDEF_ID, PROCESSDEF_VERSION_ID, ROUTENAME, DESCRIPTION, FROMACTIVITYDEF_ID, TOACTIVITYDEF_ID, ROUTEORDER, ROUTEDIRECTION, ROUTECONDITION, ROUTECONDITIONTYPE) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)",
-                        routeDefId, processDefId, versionId, routeName, "", fromActivityId, toActivityId, routeOrder++, routeDirection, routeCondition, "CONDITION"
+                        routeDefId, processDefId, versionId, routeName, routeDesc != null ? routeDesc : "", fromActivityId, toActivityId, routeOrder++, routeDirection, routeCondition, routeConditionType
                     );
                     log.info("[SAVE] Route {} inserted via JdbcTemplate", routeDefId);
+                    
+                    // 保存路由扩展属性
+                    Map<String, Object> routeExtendedAttrs = (Map<String, Object>) routeData.get("extendedAttributes");
+                    if (routeExtendedAttrs != null && !routeExtendedAttrs.isEmpty()) {
+                        try {
+                            String extAttrJson = mapper.writeValueAsString(routeExtendedAttrs);
+                            String extAttrPropId = "route-prop-" + routeDefId + "-ext";
+                            jdbcTemplate.update(
+                                "INSERT INTO BPM_ROUTEDEF_PROPERTY (PROPERTY_ID, ROUTEDEF_ID, PROPNAME, PROPVALUE, PROPCLASS, PROPTYPE) VALUES (?, ?, ?, ?, ?, ?)",
+                                extAttrPropId, routeDefId, "extendedAttributes", extAttrJson, null, "ROUTE"
+                            );
+                            log.info("[SAVE] Route {} extendedAttributes saved", routeDefId);
+                        } catch (Exception e) {
+                            log.error("[SAVE] Failed to save extendedAttributes for route {}: {}", routeDefId, e.getMessage());
+                        }
+                    }
                 }
             }
             
@@ -757,6 +775,184 @@ public class ProcessDefManagerService {
          } catch (BPMException e) {
             log.error("Failed to save process def: {}", e.getMessage(), e);
             throw new RuntimeException("保存流程失败: " + e.getMessage(), e);
+        }
+    }
+
+    // ==================== 版本管理方法 ====================
+
+    /**
+     * 获取流程的所有版本
+     */
+    public List<Map<String, Object>> getProcessVersions(String processDefId) {
+        try {
+            List<EIProcessDefVersion> versions = processDefVersionManager.loadByProcessdefId(processDefId);
+            List<Map<String, Object>> result = new ArrayList<>();
+            
+            for (EIProcessDefVersion version : versions) {
+                Map<String, Object> versionMap = new LinkedHashMap<>();
+                versionMap.put("versionId", version.getProcessDefVersionId());
+                versionMap.put("version", version.getVersion());
+                versionMap.put("state", version.getPublicationStatus());
+                versionMap.put("createdTime", version.getCreated());
+                versionMap.put("activeTime", version.getActiveTime());
+                versionMap.put("freezeTime", version.getFreezeTime());
+                versionMap.put("description", version.getDescription());
+                result.add(versionMap);
+            }
+            
+            return result;
+        } catch (BPMException e) {
+            log.error("Failed to get versions for process: {}", processDefId, e);
+            throw new RuntimeException("获取流程版本失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 激活版本
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void activateVersion(String processDefId, String version) {
+        try {
+            // 解析版本号（支持字符串或数字）
+            int versionNum;
+            try {
+                versionNum = Integer.parseInt(version);
+            } catch (NumberFormatException e) {
+                // 如果解析失败，尝试从版本字符串中提取数字
+                String versionStr = version.replaceAll("[^0-9]", "");
+                if (versionStr.isEmpty()) {
+                    throw new RuntimeException("无效的版本号: " + version);
+                }
+                versionNum = Integer.parseInt(versionStr);
+            }
+            
+            // 先将所有版本置为非激活状态
+            jdbcTemplate.update(
+                "UPDATE BPM_PROCESSDEF_VERSION SET STATE = 'INACTIVE', ACTIVE_TIME = NULL WHERE PROCESSDEF_ID = ?",
+                processDefId
+            );
+            
+            // 激活指定版本
+            int updated = jdbcTemplate.update(
+                "UPDATE BPM_PROCESSDEF_VERSION SET STATE = 'ACTIVE', ACTIVE_TIME = CURRENT_TIMESTAMP WHERE PROCESSDEF_ID = ? AND VERSION = ?",
+                processDefId, versionNum
+            );
+            
+            if (updated == 0) {
+                throw new RuntimeException("版本不存在: " + version);
+            }
+            
+            log.info("Activated version {} for process {}", version, processDefId);
+        } catch (Exception e) {
+            log.error("Failed to activate version {} for process: {}", version, processDefId, e);
+            throw new RuntimeException("激活版本失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 冻结版本
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void freezeVersion(String processDefId, String version) {
+        try {
+            // 解析版本号（支持字符串或数字）
+            int versionNum;
+            try {
+                versionNum = Integer.parseInt(version);
+            } catch (NumberFormatException e) {
+                // 如果解析失败，尝试从版本字符串中提取数字
+                String versionStr = version.replaceAll("[^0-9]", "");
+                if (versionStr.isEmpty()) {
+                    throw new RuntimeException("无效的版本号: " + version);
+                }
+                versionNum = Integer.parseInt(versionStr);
+            }
+            
+            int updated = jdbcTemplate.update(
+                "UPDATE BPM_PROCESSDEF_VERSION SET STATE = 'FROZEN', FREEZE_TIME = CURRENT_TIMESTAMP WHERE PROCESSDEF_ID = ? AND VERSION = ?",
+                processDefId, versionNum
+            );
+            
+            if (updated == 0) {
+                throw new RuntimeException("版本不存在: " + version);
+            }
+            
+            log.info("Frozen version {} for process {}", version, processDefId);
+        } catch (Exception e) {
+            log.error("Failed to freeze version {} for process: {}", version, processDefId, e);
+            throw new RuntimeException("冻结版本失败: " + e.getMessage(), e);
+        }
+    }
+
+    /**
+     * 删除版本
+     */
+    @org.springframework.transaction.annotation.Transactional
+    public void deleteVersion(String processDefId, String version) {
+        try {
+            // 解析版本号（支持字符串或数字）
+            int versionNum;
+            try {
+                versionNum = Integer.parseInt(version);
+            } catch (NumberFormatException e) {
+                // 如果解析失败，尝试从版本字符串中提取数字
+                String versionStr = version.replaceAll("[^0-9]", "");
+                if (versionStr.isEmpty()) {
+                    throw new RuntimeException("无效的版本号: " + version);
+                }
+                versionNum = Integer.parseInt(versionStr);
+            }
+            
+            // 检查是否是激活版本
+            String state = jdbcTemplate.queryForObject(
+                "SELECT STATE FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID = ? AND VERSION = ?",
+                String.class, processDefId, versionNum
+            );
+            
+            if ("ACTIVE".equals(state)) {
+                throw new RuntimeException("不能删除激活状态的版本");
+            }
+            
+            // 删除版本相关的活动、路由等
+            String versionId = jdbcTemplate.queryForObject(
+                "SELECT PROCESSDEF_VERSION_ID FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID = ? AND VERSION = ?",
+                String.class, processDefId, versionNum
+            );
+            
+            // 删除路由
+            jdbcTemplate.update(
+                "DELETE FROM BPM_ROUTEDEF WHERE PROCESSDEF_VERSION_ID = ?",
+                versionId
+            );
+            
+            // 删除活动属性
+            jdbcTemplate.update(
+                "DELETE FROM BPM_ACTIVITYDEF_PROPERTY WHERE ACTIVITYDEF_ID IN (SELECT ACTIVITYDEF_ID FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID = ?)",
+                versionId
+            );
+            
+            // 删除活动
+            jdbcTemplate.update(
+                "DELETE FROM BPM_ACTIVITYDEF WHERE PROCESSDEF_VERSION_ID = ?",
+                versionId
+            );
+            
+            // 删除版本
+            int deleted = jdbcTemplate.update(
+                "DELETE FROM BPM_PROCESSDEF_VERSION WHERE PROCESSDEF_ID = ? AND VERSION = ?",
+                processDefId, versionNum
+            );
+            
+            if (deleted == 0) {
+                throw new RuntimeException("版本不存在: " + version);
+            }
+            
+            log.info("Deleted version {} for process {}", version, processDefId);
+        } catch (org.springframework.dao.EmptyResultDataAccessException e) {
+            throw new RuntimeException("版本不存在: " + version);
+        } catch (Exception e) {
+            log.error("Failed to delete version {} for process: {}", version, processDefId, e);
+            throw new RuntimeException("删除版本失败: " + e.getMessage(), e);
         }
     }
 }

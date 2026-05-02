@@ -341,10 +341,12 @@ const PanelSchema = {
             { name: 'agentId', type: 'text', label: 'Agent ID', readonly: true },
             { name: 'agentName', type: 'text', label: 'Agent名称', required: true },
             { name: 'agentType', type: 'select', label: 'Agent类型', options: [
-                { value: 'LLM_AGENT', label: 'LLM Agent' },
-                { value: 'TASK_AGENT', label: 'Task Agent' },
-                { value: 'DATA_AGENT', label: 'Data Agent' },
-                { value: 'COORDINATOR', label: 'Coordinator' }
+                { value: 'LLM', label: 'LLM Agent', description: '大语言模型智能体' },
+                { value: 'TASK', label: '任务Agent', description: '任务执行智能体' },
+                { value: 'EVENT', label: '事件Agent', description: '事件监听智能体' },
+                { value: 'HYBRID', label: '混合Agent', description: 'LLM+工具混合智能体' },
+                { value: 'COORDINATOR', label: '协调者Agent', description: '多Agent协调调度' },
+                { value: 'TOOL', label: '工具Agent', description: 'MCP工具调用智能体' }
             ]},
             { name: 'status', type: 'select', label: '状态', options: [
                 { value: 'online', label: '在线' },

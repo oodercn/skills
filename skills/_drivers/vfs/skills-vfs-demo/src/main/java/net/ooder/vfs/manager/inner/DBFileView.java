@@ -102,7 +102,7 @@ public class DBFileView implements FileView, Cacheable, Serializable, Comparable
         VFSRoManager cacheManager = VFSRoManager.getInstance();
         try {
             return cacheManager.getFileVersionByID(versionId);
-        } catch (VFSException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return null;

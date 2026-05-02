@@ -25,6 +25,8 @@ import net.ooder.vfs.service.VFSClient;
 import net.ooder.vfs.service.VFSClientService;
 import net.ooder.vfs.service.VFSDiskService;
 import net.ooder.vfs.service.impl.VFSClientImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @EsbBeanAnnotation(id = "VFSDiskService", name = "VFSDiskService服务", expressionArr = "VFSDiskServiceImpl()", desc = "VFSDiskService服务")
 public class VFSDiskServiceImpl implements VFSDiskService {
@@ -32,301 +34,230 @@ public class VFSDiskServiceImpl implements VFSDiskService {
     private VFSClient vfsClient;
 
     protected static Log log = LogFactory.getLog(OrgConstants.VFSCONFIG_KEY.getType(), VFSDiskServiceImpl.class);
+    private static final Logger slfLog = LoggerFactory.getLogger(VFSDiskServiceImpl.class);
 
     public VFSDiskServiceImpl() {
-
     }
 
+    private ResultModel<Folder> handleFolder(FolderOperation op) {
+        ResultModel<Folder> result = new ResultModel<>();
+        try {
+            result.setData(op.execute());
+        } catch (Throwable e) {
+            slfLog.error("VFSDiskService operation failed", e);
+            ErrorResultModel err = new ErrorResultModel();
+            err.setErrdes(e.getMessage());
+            return err;
+        }
+        return result;
+    }
+
+    private <T> ResultModel<T> handleResult(ResultOperation<T> op) {
+        ResultModel<T> result = new ResultModel<>();
+        try {
+            result.setData(op.execute());
+        } catch (Throwable e) {
+            slfLog.error("VFSDiskService operation failed", e);
+            ErrorResultModel err = new ErrorResultModel();
+            err.setErrdes(e.getMessage());
+            return err;
+        }
+        return result;
+    }
+
+    private ResultModel<Boolean> handleBoolean(BooleanOperation op) {
+        ResultModel<Boolean> result = new ResultModel<Boolean>();
+        try {
+            op.execute();
+        } catch (Throwable e) {
+            slfLog.error("VFSDiskService operation failed", e);
+            result = new ErrorResultModel();
+            result.setData(false);
+            if (e instanceof VFSException vfsEx) {
+                ((ErrorResultModel) result).setErrcode(vfsEx.getErrorCode());
+            }
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
+        }
+        return result;
+    }
+
+    @FunctionalInterface
+    interface FolderOperation { Folder execute() throws Exception; }
+    @FunctionalInterface
+    interface ResultOperation<T> { T execute() throws Exception; }
+    @FunctionalInterface
+    interface BooleanOperation { void execute() throws Exception; }
 
     @Override
     public ResultModel<Folder> mkDir(String path) {
-        ResultModel<Folder> userStatusInfo = new ResultModel<Folder>();
-        try {
-            Folder folder = getVFSClient().mkDir(path);
-            userStatusInfo.setData(folder);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleFolder(() -> getVFSClient().mkDir(path));
     }
 
     @Override
     public ResultModel<FileInfo> createFile(String path, String name) {
-        ResultModel<FileInfo> userStatusInfo = new ResultModel<FileInfo>();
-
-        try {
-            FileInfo fileInfo = getVFSClient().createFile(path, name);
-
-            userStatusInfo.setData(fileInfo);
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleResult(() -> getVFSClient().createFile(path, name));
     }
 
     @Override
     public ResultModel<Folder> getFolderByPath(String path) {
-        ResultModel<Folder> userStatusInfo = new ResultModel<Folder>();
-
-        try {
-            Folder folder = getVFSClient().getFolderByPath(path);
-            userStatusInfo.setData(folder);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleFolder(() -> getVFSClient().getFolderByPath(path));
     }
 
     @Override
     public ResultModel<FileInfo> getFileInfoByPath(String path) {
-        ResultModel<FileInfo> userStatusInfo = new ResultModel<FileInfo>();
-
-        try {
-            FileInfo fileInfo = getVFSClient().getFileByPath(path);
-            userStatusInfo.setData(fileInfo);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleResult(() -> getVFSClient().getFileByPath(path));
     }
 
     @Override
     public ResultModel<Boolean> delete(String path) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
-
-        try {
-            getVFSClient().delete(path);
-
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            userStatusInfo.setData(false);
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleBoolean(() -> getVFSClient().delete(path));
     }
-
 
     @Override
     public ResultModel<Boolean> cloneFolder(String spath, String tpaht) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
-        try {
-            getVFSClient().copyFolder(spath, tpaht, false);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleBoolean(() -> getVFSClient().copyFolder(spath, tpaht, false));
     }
-
 
     @Override
     public ResultModel<Boolean> copyFolder(String spath, String tpaht) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
-
-        try {
-            getVFSClient().copyFolder(spath, tpaht);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleBoolean(() -> getVFSClient().copyFolder(spath, tpaht));
     }
 
     @Override
     public ResultModel<FileVersion> getVersionByPath(String path) {
-        ResultModel<FileVersion> userStatusInfo = new ResultModel<FileVersion>();
-
-        try {
-            FileVersion version = getVFSClient().getVersionByPath(path);
-            userStatusInfo.setData(version);
-        } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
-        }
-
-        return userStatusInfo;
+        return handleResult(() -> getVFSClient().getVersionByPath(path));
     }
 
     @Override
     public ResultModel<Boolean> updateFileInfo(String path, String name, String descrition) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
+        ResultModel<Boolean> result = new ResultModel<Boolean>();
         try {
             getVFSClient().updateFileInfo(path, name, descrition);
         } catch (VFSException e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrcode(e.getErrorCode());
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("updateFileInfo failed: path={}", path, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrcode(e.getErrorCode());
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
-
 
     @Override
     public ResultModel<Boolean> updateFolderInfo(String path, String name, String descrition, FolderType type) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
+        ResultModel<Boolean> result = new ResultModel<Boolean>();
         try {
             getVFSClient().updateFolderInfo(path, name, descrition, type);
         } catch (VFSException e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrcode(e.getErrorCode());
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("updateFolderInfo failed: path={}", path, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrcode(e.getErrorCode());
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
 
     @Override
     public ResultModel<Boolean> updateFolderState(String path, FolderState state) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
+        ResultModel<Boolean> result = new ResultModel<Boolean>();
         try {
             getVFSClient().updateFolderState(path, state);
         } catch (VFSException e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrcode(e.getErrorCode());
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("updateFolderState failed: path={}", path, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrcode(e.getErrorCode());
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
 
     @Override
     public ResultModel<Boolean> copyFile(String path, String newpath) {
-        ResultModel<Boolean> userStatusInfo = new ResultModel<Boolean>();
+        ResultModel<Boolean> result = new ResultModel<Boolean>();
         try {
             getVFSClient().copyFile(path, newpath);
         } catch (VFSException e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-            ((ErrorResultModel) userStatusInfo).setErrcode(e.getErrorCode());
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("copyFile failed: {} -> {}", path, newpath, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrcode(e.getErrorCode());
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
 
     @Override
     public ResultModel<FileInfo> createFile2(String path, String name, String descrition) {
-        ResultModel<FileInfo> userStatusInfo = new ResultModel<FileInfo>();
-
+        ResultModel<FileInfo> result = new ResultModel<FileInfo>();
         try {
-
-
             FileInfo fileInfo = getVFSClient().createFile(path, name);
             if (descrition != null && !descrition.equals(name)) {
                 getVFSClient().updateFileInfo(fileInfo.getPath(), name, descrition);
             }
-            userStatusInfo.setData(fileInfo);
-
+            result.setData(fileInfo);
         } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("createFile2 failed: path={}", path, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
 
     @Override
     public ResultModel<Folder> mkDir2(String path, String descrition, FolderType type) {
-        ResultModel<Folder> userStatusInfo = new ResultModel<Folder>();
+        ResultModel<Folder> result = new ResultModel<Folder>();
         try {
             Folder folder = getVFSClient().mkDir(path);
             if ((descrition != null && !descrition.equals(folder.getName()))
                     || (type != null && !folder.getFolderType().equals(type))) {
                 getVFSClient().updateFolderInfo(path, folder.getName(), descrition, type);
             }
-
-            userStatusInfo.setData(folder);
+            result.setData(folder);
         } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel();
-
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("mkDir2 failed: path={}", path, e);
+            result = new ErrorResultModel();
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
-
 
     @Override
     public ResultModel<FileVersion> createFileVersion(String path, String filehash) {
-        ResultModel<FileVersion> userStatusInfo = new ResultModel<FileVersion>();
+        ResultModel<FileVersion> result = new ResultModel<FileVersion>();
         try {
             FileVersion fileVersion = getVFSClient().createFileVersion(path, filehash);
-
             if (fileVersion != null) {
-                userStatusInfo.setData(fileVersion);
+                result.setData(fileVersion);
             }
         } catch (Throwable e) {
-            e.printStackTrace();
-            userStatusInfo = new ErrorResultModel<FileVersion>();
-            //   ((ErrorResultModel) userStatusInfo).setErrcode(e.getErrorCode());
-            ((ErrorResultModel) userStatusInfo).setErrdes(e.getMessage());
+            slfLog.error("createFileVersion failed: path={}", path, e);
+            result = new ErrorResultModel<FileVersion>();
+            ((ErrorResultModel) result).setErrdes(e.getMessage());
         }
-
-        return userStatusInfo;
+        return result;
     }
 
     public VFSClient getVFSClient() {
-
         if (this.vfsClient == null) {
             try {
                 JDSClientService client = (JDSClientService) EsbUtil.parExpression("$JDSC");
                 vfsClient = VFSServer.getInstance().getVFSService(client);
             } catch (Exception e) {
-                e.printStackTrace();
-                // throw new Throwable("not login!", 1005);
+                slfLog.warn("Failed to get VFSClient from JDSC, falling back to local", e);
             }
 
             if (vfsClient == null) {
                 vfsClient = new VFSClientImpl();
-
                 try {
                     Person person = OrgManagerFactory.getOrgManager().getPersonByAccount(UserBean.getInstance().getUsername());
                     ConnectInfo connectInfo = new ConnectInfo(person.getID(), person.getAccount(), person.getPassword());
                     vfsClient.connect(connectInfo);
-                } catch (JDSException e) {
-                    // TODO Auto-generated catch block
-                    e.printStackTrace();
-                } catch (PersonNotFoundException e) {
-                    e.printStackTrace();
+                } catch (JDSException | PersonNotFoundException e) {
+                    slfLog.error("Failed to initialize VFSClient", e);
                 }
             }
         }
         if (vfsClient == null) {
-            this.log.error("vfsClient [" + vfsClient + "]");
+            this.log.error("vfsClient is null - VFS operations will fail");
         }
-
         return vfsClient;
     }
 }

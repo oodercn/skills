@@ -206,4 +206,148 @@ public class ProcessDefDbController {
         
         return result;
     }
+
+    // ==================== 前端适配 API ====================
+
+    @GetMapping("/process/{processId}")
+    public ResponseEntity<Map<String, Object>> getProcess(@PathVariable String processId) {
+        return getProcessDef(processId);
+    }
+
+    @GetMapping("/process/{processId}/version/{version}")
+    public ResponseEntity<Map<String, Object>> getProcessVersion(@PathVariable String processId, @PathVariable String version) {
+        // 如果version是latest，返回激活版本
+        if ("latest".equalsIgnoreCase(version)) {
+            return getProcessDef(processId);
+        }
+        // 否则返回指定版本
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> versions = processDefManagerService.getProcessVersions(processId);
+            Map<String, Object> targetVersion = null;
+            for (Map<String, Object> v : versions) {
+                if (version.equals(String.valueOf(v.get("version")))) {
+                    targetVersion = v;
+                    break;
+                }
+            }
+            if (targetVersion == null) {
+                response.put("code", 404);
+                response.put("message", "版本不存在: " + version);
+                return ResponseEntity.status(404).body(response);
+            }
+            // 返回流程定义（带版本信息）
+            return getProcessDef(processId);
+        } catch (Exception e) {
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/process")
+    public ResponseEntity<Map<String, Object>> saveProcess(@RequestBody Map<String, Object> processData) {
+        return saveProcessDef(processData);
+    }
+
+    @DeleteMapping("/process/{processId}")
+    public ResponseEntity<Map<String, Object>> deleteProcess(@PathVariable String processId) {
+        return deleteProcessDef(processId);
+    }
+
+    @GetMapping("/process/tree")
+    public ResponseEntity<Map<String, Object>> getProcessTree() {
+        Map<String, Object> response = new LinkedHashMap<>();
+        try {
+            List<Map<String, Object>> processDefs = processDefManagerService.getAllProcessDefs();
+            // 构建树形结构
+            List<Map<String, Object>> treeData = new ArrayList<>();
+            for (Map<String, Object> processDef : processDefs) {
+                Map<String, Object> node = new LinkedHashMap<>();
+                node.put("id", processDef.get("processDefId"));
+                node.put("name", processDef.get("name"));
+                node.put("type", "process");
+                node.put("description", processDef.get("description"));
+                node.put("classification", processDef.get("classification"));
+                node.put("accessLevel", processDef.get("accessLevel"));
+                treeData.add(node);
+            }
+            response.put("code", 200);
+            response.put("message", "success");
+            response.put("data", treeData);
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to get process tree", e);
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    // ==================== 版本管理 API ====================
+
+    @GetMapping("/process/{processId}/versions")
+    public ResponseEntity<?> getProcessVersions(@PathVariable String processId) {
+        try {
+            List<Map<String, Object>> versions = processDefManagerService.getProcessVersions(processId);
+            return ResponseEntity.ok(versions);
+        } catch (Exception e) {
+            log.error("Failed to get versions for process: {}", processId, e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/process/{processId}/version/{version}/activate")
+    public ResponseEntity<?> activateVersion(@PathVariable String processId, @PathVariable String version) {
+        try {
+            processDefManagerService.activateVersion(processId, version);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "版本激活成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to activate version {} for process: {}", version, processId, e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @PostMapping("/process/{processId}/version/{version}/freeze")
+    public ResponseEntity<?> freezeVersion(@PathVariable String processId, @PathVariable String version) {
+        try {
+            processDefManagerService.freezeVersion(processId, version);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "版本冻结成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to freeze version {} for process: {}", version, processId, e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
+
+    @DeleteMapping("/process/{processId}/version/{version}")
+    public ResponseEntity<?> deleteVersion(@PathVariable String processId, @PathVariable String version) {
+        try {
+            processDefManagerService.deleteVersion(processId, version);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 200);
+            response.put("message", "版本删除成功");
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            log.error("Failed to delete version {} for process: {}", version, processId, e);
+            Map<String, Object> response = new HashMap<>();
+            response.put("code", 500);
+            response.put("message", e.getMessage());
+            return ResponseEntity.internalServerError().body(response);
+        }
+    }
 }

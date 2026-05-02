@@ -534,6 +534,8 @@ class Canvas {
             'AGENT_LLM': 'd-node-fill-llm',
             'AGENT_EVENT': 'd-node-fill-event',
             'AGENT_HYBRID': 'd-node-fill-hybrid',
+            'AGENT_COORDINATOR': 'd-node-fill-coordinator',
+            'AGENT_TOOL': 'd-node-fill-tool',
             'SERVICE': 'd-node-fill-service',
             'SCRIPT': 'd-node-fill-script',
             'SUBFLOW': 'd-node-fill-subprocess',
@@ -566,6 +568,8 @@ class Canvas {
             'AGENT_LLM': 'brain',
             'AGENT_EVENT': 'bell',
             'AGENT_HYBRID': 'layers',
+            'AGENT_COORDINATOR': 'team',
+            'AGENT_TOOL': 'tool',
             'SERVICE': 'service',
             'SCRIPT': 'script',
             'SUBFLOW': 'subprocess',
@@ -678,11 +682,8 @@ class Canvas {
                 items.push({ label: '配置场景', icon: 'scene', action: () => this.store.selectActivity(activity.activityDefId) });
             }
             
-            if (typeof window.ContextMenu !== 'undefined' && window.ContextMenu.show) {
-                window.ContextMenu.show(e.clientX, e.clientY, items);
-            } else {
-                console.error('[Canvas] ContextMenu is not defined or show method is missing');
-            }
+            // 使用内嵌的上下文菜单实现
+            this._showContextMenu(e.clientX, e.clientY, items);
         });
         
         node.addEventListener('dblclick', (e) => {
@@ -1454,6 +1455,72 @@ class Canvas {
         const nodeData = this.nodes.get(activityId);
         if (nodeData) {
             this._selectNode(nodeData.element, nodeData.activity);
+        }
+    }
+
+    // 内嵌的上下文菜单实现
+    _showContextMenu(x, y, items) {
+        // 移除已存在的菜单
+        const existingMenu = document.querySelector('.d-context-menu');
+        if (existingMenu) {
+            existingMenu.remove();
+        }
+
+        const menu = document.createElement('div');
+        menu.className = 'd-context-menu';
+        menu.style.cssText = `position:fixed;left:${x}px;top:${y}px;z-index:9999;background:#2d2d2d;border:1px solid #444;border-radius:4px;padding:4px 0;min-width:150px;box-shadow:0 4px 12px rgba(0,0,0,0.4);`;
+
+        items.forEach(item => {
+            if (item.divider) {
+                const divider = document.createElement('div');
+                divider.style.cssText = 'height:1px;background:#444;margin:4px 0;';
+                menu.appendChild(divider);
+            } else {
+                const menuItem = document.createElement('div');
+                menuItem.style.cssText = `padding:8px 16px;cursor:pointer;color:#e0e0e0;font-size:13px;display:flex;align-items:center;gap:8px;${item.disabled ? 'opacity:0.5;cursor:not-allowed;' : ''}`;
+                menuItem.innerHTML = `<span>${item.label}</span>`;
+                
+                if (!item.disabled && item.action) {
+                    menuItem.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        menu.remove();
+                        item.action();
+                    });
+                    menuItem.addEventListener('mouseenter', () => {
+                        menuItem.style.background = '#3d3d3d';
+                    });
+                    menuItem.addEventListener('mouseleave', () => {
+                        menuItem.style.background = 'transparent';
+                    });
+                }
+                
+                menu.appendChild(menuItem);
+            }
+        });
+
+        document.body.appendChild(menu);
+
+        // 点击其他地方关闭菜单
+        const closeMenu = (e) => {
+            if (!menu.contains(e.target)) {
+                menu.remove();
+                document.removeEventListener('click', closeMenu);
+                document.removeEventListener('contextmenu', closeMenu);
+            }
+        };
+        
+        setTimeout(() => {
+            document.addEventListener('click', closeMenu);
+            document.addEventListener('contextmenu', closeMenu);
+        }, 0);
+
+        // 边界检查
+        const rect = menu.getBoundingClientRect();
+        if (x + rect.width > window.innerWidth) {
+            menu.style.left = (window.innerWidth - rect.width - 10) + 'px';
+        }
+        if (y + rect.height > window.innerHeight) {
+            menu.style.top = (window.innerHeight - rect.height - 10) + 'px';
         }
     }
 }

@@ -577,6 +577,106 @@ const ActivityPropertyGraph = {
                         description: '表单初始数据'
                     }
                 ]
+            },
+            
+            // 3.8 协调者配置 (仅COORDINATOR类型)
+            coordinator: {
+                name: '协调者配置',
+                order: 8,
+                showWhen: { agentType: ['COORDINATOR'] },
+                properties: [
+                    { 
+                        key: 'coordinationStrategy', 
+                        name: '协调策略', 
+                        type: 'select',
+                        options: [
+                            { value: 'ROUND_ROBIN', label: '轮询', description: '按顺序轮流分配' },
+                            { value: 'LEAST_BUSY', label: '最闲优先', description: '分配给最空闲的Agent' },
+                            { value: 'CAPABILITY_MATCH', label: '能力匹配', description: '根据能力匹配分配' },
+                            { value: 'MANUAL', label: '手动指定', description: '由协调者手动指定' }
+                        ],
+                        description: '任务分配策略'
+                    },
+                    { 
+                        key: 'maxConcurrentTasks', 
+                        name: '最大并发数', 
+                        type: 'number',
+                        description: '协调者同时分配的最大任务数'
+                    },
+                    { 
+                        key: 'escalationEnabled', 
+                        name: '启用升级', 
+                        type: 'boolean',
+                        description: '任务超时时是否升级到上级协调者'
+                    },
+                    { 
+                        key: 'escalationTimeout', 
+                        name: '升级超时(秒)', 
+                        type: 'number',
+                        description: '触发升级的超时时间'
+                    }
+                ]
+            },
+            
+            // 3.9 Agent权限配置 (与RightEngine对齐)
+            permission: {
+                name: 'Agent权限',
+                order: 9,
+                showWhen: { performerType: ['AGENT'] },
+                properties: [
+                    { 
+                        key: 'agentGroup', 
+                        name: 'Agent权限组', 
+                        type: 'select',
+                        options: [
+                            { value: 'PERFORMER', label: '执行者', description: '当前执行Agent' },
+                            { value: 'SPONSOR', label: '发起者', description: '流程发起Agent' },
+                            { value: 'MONITOR', label: '监控者', description: '监控执行Agent' },
+                            { value: 'COORDINATOR', label: '协调者', description: '协调调度Agent' },
+                            { value: 'HISTORYPERFORMER', label: '历史执行者', description: '历史执行Agent' },
+                            { value: 'HISSPONSOR', label: '历史发起者', description: '历史发起Agent' },
+                            { value: 'HISTORYMONITOR', label: '历史监控者', description: '历史监控Agent' },
+                            { value: 'NORIGHT', label: '无权限', description: '无权限Agent' }
+                        ],
+                        description: 'Agent在工作流中的权限角色'
+                    },
+                    { 
+                        key: 'canRouteBack', 
+                        name: '允许退回', 
+                        type: 'boolean',
+                        description: '是否允许Agent退回任务'
+                    },
+                    { 
+                        key: 'routeBackMethod', 
+                        name: '退回路径', 
+                        type: 'select',
+                        options: [
+                            { value: 'DEFAULT', label: '默认', description: '默认退回路径' },
+                            { value: 'LAST', label: '上一环节', description: '退回到上一个处理Agent' },
+                            { value: 'ANY', label: '任意环节', description: '退回到任意历史环节' },
+                            { value: 'SPECIFY', label: '指定环节', description: '退回到指定环节' }
+                        ],
+                        description: 'Agent退回任务的路径方式'
+                    },
+                    { 
+                        key: 'canTakeBack', 
+                        name: '允许收回', 
+                        type: 'boolean',
+                        description: '是否允许Agent收回已提交的任务'
+                    },
+                    { 
+                        key: 'canDelegate', 
+                        name: '允许委托', 
+                        type: 'boolean',
+                        description: '是否允许Agent将任务委托给其他Agent'
+                    },
+                    { 
+                        key: 'canEscalate', 
+                        name: '允许升级', 
+                        type: 'boolean',
+                        description: '是否允许Agent将任务升级到协调者'
+                    }
+                ]
             }
         }
     },
@@ -601,28 +701,42 @@ const ActivityPropertyGraph = {
         AGENT_LLM: {
             basic: ['identity', 'classification', 'performer'],
             execution: ['control', 'errorHandling', 'trigger', 'multiInstance', 'history'],
-            agent: ['skill', 'llm', 'knowledge', 'ioMapping']
+            agent: ['skill', 'llm', 'knowledge', 'ioMapping', 'permission']
         },
         
         // 任务 Agent
         AGENT_TASK: {
             basic: ['identity', 'classification', 'performer'],
             execution: ['control', 'errorHandling', 'trigger', 'multiInstance', 'history'],
-            agent: ['skill', 'tools', 'ioMapping']
+            agent: ['skill', 'tools', 'ioMapping', 'permission']
         },
         
         // 事件 Agent
         AGENT_EVENT: {
             basic: ['identity', 'classification', 'performer'],
             execution: ['control', 'errorHandling', 'history'],
-            agent: ['skill', 'event', 'ioMapping']
+            agent: ['skill', 'event', 'ioMapping', 'permission']
         },
         
         // 混合 Agent
         AGENT_HYBRID: {
             basic: ['identity', 'classification', 'performer'],
             execution: ['control', 'errorHandling', 'trigger', 'multiInstance', 'history'],
-            agent: ['skill', 'llm', 'knowledge', 'tools', 'ioMapping']
+            agent: ['skill', 'llm', 'knowledge', 'tools', 'ioMapping', 'permission']
+        },
+        
+        // 协调者 Agent
+        AGENT_COORDINATOR: {
+            basic: ['identity', 'classification', 'performer'],
+            execution: ['control', 'errorHandling', 'trigger', 'multiInstance', 'history'],
+            agent: ['skill', 'coordinator', 'ioMapping', 'permission']
+        },
+        
+        // 工具 Agent
+        AGENT_TOOL: {
+            basic: ['identity', 'classification', 'performer'],
+            execution: ['control', 'errorHandling', 'trigger', 'multiInstance', 'history'],
+            agent: ['skill', 'tools', 'ioMapping', 'permission']
         },
         
         // 子流程
@@ -725,6 +839,8 @@ const ActivityPropertyGraph = {
             'AGENT_TASK': '任务 Agent',
             'AGENT_EVENT': '事件 Agent',
             'AGENT_HYBRID': '混合 Agent',
+            'AGENT_COORDINATOR': '协调者 Agent',
+            'AGENT_TOOL': '工具 Agent',
             'SUBFLOW': '子流程',
             'SCENE': '场景',
             'EXTERNAL': '外部流程'

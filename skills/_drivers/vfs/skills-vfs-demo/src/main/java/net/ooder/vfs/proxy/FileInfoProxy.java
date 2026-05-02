@@ -17,7 +17,7 @@ import net.ooder.common.ConfigCode;
 import net.ooder.vfs.*;
 import net.ooder.vfs.engine.DbVFSManager;
 import net.ooder.vfs.manager.FileInfoProxyManager;
-import net.ooder.vfs.manager.dbimpl.DBFileInfoProxyManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFileInfoProxyManager;
 import net.ooder.vfs.manager.inner.EIFileInfo;
 
 import java.io.IOException;
@@ -69,7 +69,7 @@ public class FileInfoProxy implements FileInfo, Serializable, Comparable<FileInf
         this.ID = fileInfo.getID();
         this.fileInfo = fileInfo;
         this.config = OrgConfig.getInstance(configCode);
-        this.manager = DBFileInfoProxyManager.getInstance(configCode);
+        this.manager = JdbcFileInfoProxyManager.getInstance(configCode);
 
     }
 

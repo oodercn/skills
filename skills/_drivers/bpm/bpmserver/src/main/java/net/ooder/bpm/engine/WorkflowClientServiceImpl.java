@@ -17,6 +17,7 @@ import net.ooder.bpm.engine.query.BPMCondition;
 import net.ooder.bpm.engine.query.BPMConditionKey;
 import net.ooder.bpm.engine.query.FilterChain;
 import net.ooder.bpm.engine.util.UtilTimer;
+import net.ooder.bpm.enums.agent.AgentCtx;
 import net.ooder.bpm.enums.activitydef.ActivityDefJoin;
 import net.ooder.bpm.enums.activitydef.ActivityDefPerformSequence;
 import net.ooder.bpm.enums.activitydef.ActivityDefPerformtype;
@@ -97,6 +98,23 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
 
     private FileEngine fileEngine;
 
+    private AgentEngine agentEngine;
+
+    private boolean isAgentActivity(String activityDefId) throws BPMException {
+        return this.getActivityDef(activityDefId).getImplementation().equals(ActivityDefImpl.Agent);
+    }
+
+    private boolean isAgentActivityInst(String activityInstId) throws BPMException {
+        return this.getActivityInst(activityInstId).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent);
+    }
+
+    private Map<AgentCtx, Object> buildAgentCtx(String activityInstId, String processInstId) {
+        Map<AgentCtx, Object> agentCtx = new HashMap<AgentCtx, Object>();
+        agentCtx.put(AgentCtx.PROCESSINST_ID, processInstId);
+        agentCtx.put(AgentCtx.ACTIVITYINST_ID, activityInstId);
+        return agentCtx;
+    }
+
     // Org Manager
     public OrgManager orgManager = null;
 
@@ -119,6 +137,7 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         this.fileEngine = BPMServer.getFileEngine(systemCode);
         this.eventEngine = BPMServer.getEventEngine(systemCode);
         this.serviceEngine = BPMServer.getServiceEngine(systemCode);
+        this.agentEngine = BPMServer.getAgentEngine(systemCode);
 
     }
 
@@ -131,6 +150,7 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         this.fileEngine = BPMServer.getFileEngine(systemCode);
         this.eventEngine = BPMServer.getEventEngine(systemCode);
         this.serviceEngine = BPMServer.getServiceEngine(systemCode);
+        this.agentEngine = BPMServer.getAgentEngine(systemCode);
         // this(this.jdsClient);
 
     }
@@ -766,6 +786,7 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             deviceEngine.createProcessInst(eiProcessInst.getProcessInstId(), rightCtx);
             serviceEngine.createProcessInst(eiProcessInst.getProcessInstId(), rightCtx);
             eventEngine.createProcessInst(eiProcessInst.getProcessInstId(), rightCtx);
+            agentEngine.createProcessInst(eiProcessInst.getProcessInstId(), buildAgentCtx(null, eiProcessInst.getProcessInstId()));
             rtd = dataEngine.createProcessInst(eiProcessInst.getProcessInstId(), rightCtx);
             rtf = fileEngine.createProcessInst(eiProcessInst.getProcessInstId(), rightCtx);
             if (rt.mainCode() == ReturnType.MAINCODE_FAIL || rtd.mainCode() == ReturnType.MAINCODE_FAIL || rtf.mainCode() == ReturnType.MAINCODE_FAIL) {
@@ -783,6 +804,7 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             rtdi = deviceEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), rightCtx);
             eventEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), rightCtx);
             serviceEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), rightCtx);
+            agentEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), buildAgentCtx(eiActivityInst.getActivityInstId(), eiProcessInst.getProcessInstId()));
             rtd = dataEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), ctx);
             rtf = fileEngine.startProcessInst(eiProcessInst.getProcessInstId(), eiActivityInst.getActivityInstId(), rightCtx);
             if (rt.mainCode() == ReturnType.MAINCODE_FAIL || rtd.mainCode() == ReturnType.MAINCODE_FAIL || rtf.mainCode() == ReturnType.MAINCODE_FAIL) {
@@ -992,6 +1014,12 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             eventEngine.routeTo(activityInst.getActivityInstId(), activityDefId, ctx);
         } else if (this.getActivityDef(activityDefId).getImplementation().equals(ActivityDefImpl.Device)) {
             deviceEngine.routeTo(activityInst.getActivityInstId(), activityDefId, ctx);
+        } else if (this.getActivityDef(activityDefId).getImplementation().equals(ActivityDefImpl.Agent)) {
+            Map<AgentCtx, Object> agentCtx = new HashMap<AgentCtx, Object>();
+            agentCtx.put(AgentCtx.PROCESSINST_ID, activityInst.getProcessInstId());
+            agentCtx.put(AgentCtx.ACTIVITYINST_ID, activityInst.getActivityInstId());
+            agentEngine.routeTo(activityInst.getActivityInstId(), activityDefId, agentCtx);
+            agentEngine.invokeAgent(activityInst.getActivityInstId(), agentCtx);
         }
 
         fileEngine.routeTo(activityInst.getActivityInstId(), activityDefId, ctx);
@@ -1022,6 +1050,9 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             deviceEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, ctx);
         } else if (this.getActivityDef(nextActivityDefID).getImplementation().equals(ActivityDefImpl.Event)) {
             eventEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, ctx);
+        } else if (this.getActivityDef(nextActivityDefID).getImplementation().equals(ActivityDefImpl.Agent)) {
+            agentEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
+            agentEngine.invokeAgent(inst.getActivityInstId(), buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
         } else if (this.getActivityDef(nextActivityDefID).getImplementation().equals(ActivityDefImpl.Service)) {
             serviceEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, ctx);
         }
@@ -1054,6 +1085,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                         serviceEngine.suspendActivityInst(startActivityInstID, ctx);
                     } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
                         eventEngine.suspendActivityInst(startActivityInstID, ctx);
+                    } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+                        agentEngine.suspendActivityInst(startActivityInstID, buildAgentCtx(startActivityInstID, this.getActivityInst(startActivityInstID).getProcessInstId()));
                     }
 
                     fileEngine.suspendActivityInst(startActivityInstID, ctx);
@@ -1075,6 +1108,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                         serviceEngine.combineActivityInsts(activityInstIdArr, ctx);
                     } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
                         eventEngine.combineActivityInsts(activityInstIdArr, ctx);
+                    } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+                        agentEngine.combineActivityInsts(activityInstIdArr, buildAgentCtx(startActivityInstID, this.getActivityInst(startActivityInstID).getProcessInstId()));
                     }
 
                     fileEngine.combineActivityInsts(activityInstIdArr, ctx);
@@ -1205,6 +1240,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                 deviceEngine.splitActivityInst(startActivityInstID, ids, ctx);
             } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
                 eventEngine.splitActivityInst(startActivityInstID, ids, ctx);
+            } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+                agentEngine.splitActivityInst(startActivityInstID, ids, buildAgentCtx(startActivityInstID, this.getActivityInst(startActivityInstID).getProcessInstId()));
 
             }
 
@@ -1233,6 +1270,10 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                     serviceEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, map);
                 } else if (this.getActivityInst(inst.getActivityInstId()).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
                     eventEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, map);
+                
+                } else if (this.getActivityInst(inst.getActivityInstId()).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+                    agentEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
+                    agentEngine.invokeAgent(inst.getActivityInstId(), buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
                 }
 
                 dataEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, map);
@@ -1307,6 +1348,10 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                     serviceEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, multipleMap);
                 } else if (this.getActivityDef(nextActivityDefID).getImplementation().equals(ActivityDefImpl.Event)) {
                     eventEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, multipleMap);
+                
+                } else if (this.getActivityDef(nextActivityDefID).getImplementation().equals(ActivityDefImpl.Agent)) {
+                    agentEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
+                    agentEngine.invokeAgent(inst.getActivityInstId(), buildAgentCtx(inst.getActivityInstId(), inst.getProcessInstId()));
                 }
 
                 dataEngine.routeTo(inst.getActivityInstId(), (String) nextActivityDefID, multipleMap);
@@ -1435,6 +1480,12 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             ReturnType retd = eventEngine.saveActivityHistoryInst(startActivityInstID, newHistory.getActivityHistoryId(), ctxs.get(0));
             if (!retd.isSucess()) {
                 return ret;
+            
+        
+        } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            ReturnType reta = agentEngine.saveActivityHistoryInst(startActivityInstID, newHistory.getActivityHistoryId(), buildAgentCtx(startActivityInstID, this.getActivityInst(startActivityInstID).getProcessInstId()));
+            if (!reta.isSucess()) {
+                return ret;
             }
         }
 
@@ -1489,6 +1540,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                 }
             } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
                 ReturnType retdevice = eventEngine.splitActivityInst(startActivityInstID, ids, ctxs.get(0));
+            } else if (this.getActivityInst(startActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+                ReturnType retdevice = agentEngine.splitActivityInst(startActivityInstID, ids, buildAgentCtx(startActivityInstID, this.getActivityInst(startActivityInstID).getProcessInstId()));
                 if (!retdevice.isSucess()) {
                     return retdevice;
                 }
@@ -1570,6 +1623,11 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         } else if (activityDef.getImplementation().equals(ActivityDefImpl.Event)) {
             if (eventEngine.canTakeBack(activityInstID, rightCtx) == false) {
                 return false;
+            
+        
+        } else if (activityDef.getImplementation().equals(ActivityDefImpl.Agent)) {
+            if (agentEngine.canTakeBack(activityInstID, buildAgentCtx(activityInstID, null)) == false) {
+                return false;
             }
         }
         return true;
@@ -1631,6 +1689,11 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             if (!rt.isSucess()) {
                 return rt;
             }
+        } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            rt = agentEngine.tackBack(activityInstID, buildAgentCtx(activityInstID, this.getActivityInst(activityInstID).getProcessInstId()));
+            if (!rt.isSucess()) {
+                return rt;
+            }
         }
 
         // 2.执行数据引擎
@@ -1684,8 +1747,13 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             if (eventEngine.canRouteBack(activityInstID, rightCtx) == false) {
                 return false;
-            }
+            
 
+        
+        } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            if (agentEngine.canRouteBack(activityInstID, buildAgentCtx(activityInstID, null)) == false) {
+                return false;
+            }
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Service)) {
             if (serviceEngine.canRouteBack(activityInstID, rightCtx) == false) {
                 return false;
@@ -1788,6 +1856,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             }
         } else if (this.getActivityInst(fromActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             ret = eventEngine.saveActivityHistoryInst(fromActivityInstID, newHistory.getActivityHistoryId(), rightCtx);
+        } else if (this.getActivityInst(fromActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            ret = agentEngine.saveActivityHistoryInst(fromActivityInstID, newHistory.getActivityHistoryId(), buildAgentCtx(fromActivityInstID, this.getActivityInst(fromActivityInstID).getProcessInstId()));
             if (!ret.isSucess()) {
                 return ret;
             }
@@ -1840,6 +1910,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             }
         } else if (this.getActivityInst(fromActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             rt = eventEngine.routeBack(fromActivityInstID, toActivityInstHistoryID, rightCtx);
+        } else if (this.getActivityInst(fromActivityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            rt = agentEngine.routeBack(fromActivityInstID, toActivityInstHistoryID, buildAgentCtx(fromActivityInstID, this.getActivityInst(fromActivityInstID).getProcessInstId()));
             if (!ret.isSucess()) {
                 return ret;
             }
@@ -1900,6 +1972,11 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             if (eventEngine.canSignReceive(activityInstID, rightCtx) == false) {
                 return false;
+            
+        
+        } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            if (agentEngine.canSignReceive(activityInstID, buildAgentCtx(activityInstID, null)) == false) {
+                return false;
             }
         }
 
@@ -1953,6 +2030,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         } else if (eiActivityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Event.getType())) {
 
             rt = eventEngine.signReceive(activityInstID, rightCtx);
+        } else if (eiActivityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            rt = agentEngine.signReceive(activityInstID, buildAgentCtx(activityInstID, eiActivityInst.getProcessInstId()));
         }
         if (!rt.isSucess())
             return rt;
@@ -2000,6 +2079,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                 return rt;
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             rt = eventEngine.suspendActivityInst(activityInstID, ctx);
+        } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            rt = agentEngine.suspendActivityInst(activityInstID, buildAgentCtx(activityInstID, this.getActivityInst(activityInstID).getProcessInstId()));
             if (!rt.isSucess())
                 return rt;
         }
@@ -2040,6 +2121,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
                 return rt;
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             rt = eventEngine.resumeActivityInst(activityInstID, ctx);
+        } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            rt = agentEngine.resumeActivityInst(activityInstID, buildAgentCtx(activityInstID, this.getActivityInst(activityInstID).getProcessInstId()));
             if (!rt.isSucess())
                 return rt;
         } else if (this.getActivityInst(activityInstID).getActivityDef().getImplementation().equals(ActivityDefImpl.Device)) {
@@ -2089,6 +2172,9 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         rt = eventEngine.suspendProcessInst(processInstID, ctx);
         if (!rt.isSucess())
             return rt;
+        rt = agentEngine.suspendProcessInst(processInstID, buildAgentCtx(null, processInstID));
+        if (!rt.isSucess())
+            return rt;
         rt = serviceEngine.suspendProcessInst(processInstID, ctx);
         if (!rt.isSucess())
             return rt;
@@ -2129,6 +2215,9 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         rt = eventEngine.resumeProcessInst(processInstID, ctx);
         if (!rt.isSucess())
             return rt;
+        rt = agentEngine.resumeProcessInst(processInstID, buildAgentCtx(null, processInstID));
+        if (!rt.isSucess())
+            return rt;
         rt = fileEngine.resumeProcessInst(processInstID, ctx);
         if (!rt.isSucess())
             return rt;
@@ -2161,6 +2250,9 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         if (!rt.isSucess())
             return rt;
         rt = eventEngine.abortProcessInst(processInstID, ctx);
+        if (!rt.isSucess())
+            return rt;
+        rt = agentEngine.abortProcessInst(processInstID, buildAgentCtx(null, processInstID));
         if (!rt.isSucess())
             return rt;
         rt = serviceEngine.abortProcessInst(processInstID, ctx);
@@ -2223,6 +2315,10 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
         if (!rt.isSucess()) {
             return rt;
         }
+        rt = agentEngine.completeProcessInst(processInstID, buildAgentCtx(null, processInstID));
+        if (!rt.isSucess()) {
+            return rt;
+        }
         rt = serviceEngine.completeProcessInst(processInstID, ctx);
         if (!rt.isSucess()) {
             return rt;
@@ -2267,6 +2363,10 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             return rt;
         }
         rt = eventEngine.deleteProcessInst(processInstID, ctx);
+        if (!rt.isSucess()) {
+            return rt;
+        }
+        rt = agentEngine.deleteProcessInst(processInstID, buildAgentCtx(null, processInstID));
         if (!rt.isSucess()) {
             return rt;
         }
@@ -2623,6 +2723,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             ret = serviceEngine.endTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);
         } else if (activityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Event)) {
             ret = eventEngine.endTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);
+        } else if (activityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            ret = agentEngine.endTask(activityInstID, activityInstHistory.getActivityHistoryId(), buildAgentCtx(activityInstID, activityInst.getProcessInstId()));
         }
         ReturnType fret = fileEngine.endTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);
         if (ret.isSucess() && dret.isSucess() && fret.isSucess()) {
@@ -2645,7 +2747,8 @@ public class WorkflowClientServiceImpl implements WorkflowClientService, Seriali
             ret = deviceEngine.abortedTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);
         } else if (activityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Service)) {
             ret = serviceEngine.abortedTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);
-
+        } else if (activityInst.getActivityDef().getImplementation().equals(ActivityDefImpl.Agent)) {
+            ret = agentEngine.abortedTask(activityInstID, activityInstHistory.getActivityHistoryId(), buildAgentCtx(activityInstID, activityInst.getProcessInstId()));
         }
 
         ReturnType dret = dataEngine.abortedTask(activityInstID, activityInstHistory.getActivityHistoryId(), ctxRight);

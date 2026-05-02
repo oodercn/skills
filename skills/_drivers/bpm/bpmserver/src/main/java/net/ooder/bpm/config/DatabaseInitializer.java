@@ -115,6 +115,50 @@ public class DatabaseInitializer {
                 "CREATED_TIME BIGINT" +
                 ")");
 
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS BPM_ACTIVITYDEF_AGENT (" +
+                "ACTIVITYDEF_ID VARCHAR(64) PRIMARY KEY," +
+                "AGENT_SELECTED_ID VARCHAR(256)," +
+                "AGENT_TYPE VARCHAR(32) DEFAULT 'LLM'," +
+                "PERFORM_TYPE VARCHAR(32) DEFAULT 'SINGLE'," +
+                "PERFORM_SEQUENCE VARCHAR(32) DEFAULT 'FIRST'," +
+                "CAN_ROUTE_BACK VARCHAR(8) DEFAULT 'YES'," +
+                "ROUTE_BACK_METHOD VARCHAR(32) DEFAULT 'LAST'," +
+                "CAN_TAKE_BACK VARCHAR(8) DEFAULT 'YES'," +
+                "COORDINATOR_ID VARCHAR(64)," +
+                "LLM_PROVIDER VARCHAR(64)," +
+                "LLM_MODEL VARCHAR(128)," +
+                "SYSTEM_PROMPT TEXT," +
+                "TEMPERATURE DOUBLE DEFAULT 0.7," +
+                "MAX_TOKENS INT DEFAULT 4096," +
+                "MCP_TOOLS TEXT," +
+                "CAPABILITIES TEXT," +
+                "EXTENDED_ATTRIBUTES TEXT" +
+                ")");
+
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS RT_ACTIVITY_AGENT (" +
+                "ACTIVITY_INST_ID VARCHAR(64)," +
+                "PROCESS_INST_ID VARCHAR(64)," +
+                "AGENT_ID VARCHAR(64) NOT NULL," +
+                "AGENT_GROUP_ENUMS VARCHAR(32) DEFAULT 'PERFORMER'," +
+                "AGENT_STATUS VARCHAR(16) DEFAULT 'WAITING'," +
+                "AGENT_TYPE VARCHAR(32) DEFAULT 'LLM'," +
+                "START_TIME TIMESTAMP," +
+                "END_TIME TIMESTAMP," +
+                "PRIMARY KEY (ACTIVITY_INST_ID, AGENT_ID, AGENT_GROUP_ENUMS)" +
+                ")");
+
+            jdbcTemplate.execute("CREATE TABLE IF NOT EXISTS RT_ACTIVITYHISTORY_AGENT (" +
+                "ACTIVITY_HISTORY_ID VARCHAR(64)," +
+                "PROCESS_INST_ID VARCHAR(64)," +
+                "AGENT_ID VARCHAR(64) NOT NULL," +
+                "AGENT_GROUP_ENUMS VARCHAR(32) DEFAULT 'PERFORMER'," +
+                "AGENT_STATUS VARCHAR(16) DEFAULT 'FINISH'," +
+                "AGENT_TYPE VARCHAR(32) DEFAULT 'LLM'," +
+                "START_TIME TIMESTAMP," +
+                "END_TIME TIMESTAMP," +
+                "PRIMARY KEY (ACTIVITY_HISTORY_ID, AGENT_ID, AGENT_GROUP_ENUMS)" +
+                ")");
+
             log.info("新表确保完成");
         } catch (Exception e) {
             log.error("确保新表存在失败", e);

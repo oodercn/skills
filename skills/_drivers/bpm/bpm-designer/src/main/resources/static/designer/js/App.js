@@ -20,7 +20,7 @@ class App {
         
         this.theme = ThemeFactory.get();
         this.store = new Store();
-        this.api = ApiFactory.create({ baseUrl: '/api/bpm' });
+        this.api = ApiFactory.create({ baseUrl: '/api/processdef' });
         this.store.setApi(this.api);
 
         this._initSidebar();

@@ -15,7 +15,7 @@ import net.ooder.vfs.VFSManager;
 import net.ooder.vfs.engine.DbVFSManager;
 import net.ooder.vfs.engine.VFSRoManager;
 import net.ooder.vfs.manager.FolderProxyManager;
-import net.ooder.vfs.manager.dbimpl.DBFolderProxyManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFolderProxyManager;
 import net.ooder.vfs.manager.inner.EIFileInfo;
 import net.ooder.vfs.manager.inner.EIFolder;
 
@@ -56,7 +56,7 @@ public class FolderProxy implements Folder, Serializable, Comparable<Folder> {
         this.eiFolder = eiFolder;
         this.ID = eiFolder.getID();
         this.subSystemId = subSystemId.getType();
-        this.manager = DBFolderProxyManager.getInstance(subSystemId);
+        this.manager = JdbcFolderProxyManager.getInstance(subSystemId);
     }
 
     public String getName() {

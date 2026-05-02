@@ -15,7 +15,7 @@ import net.ooder.vfs.adapter.FileAdapter;
 import net.ooder.vfs.bigfile.BigFileUtil;
 import net.ooder.vfs.ct.CtVfsFactory;
 import net.ooder.vfs.engine.VFSRoManager;
-import net.ooder.vfs.manager.dbimpl.DBFileVersionManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFileVersionManager;
 
 import java.io.*;
 import java.util.*;
@@ -134,7 +134,7 @@ public class DBFileVersion implements FileVersion, Cacheable, Serializable {
     private void prepareFileView() {
         if (!fileIdViewList_is_initialized) {
             try {
-                DBFileVersionManager.getInstance().loadView(this);
+                JdbcFileVersionManager.getInstance().loadView(this);
             } catch (VFSException e) {
                 e.printStackTrace();
             }
@@ -213,7 +213,7 @@ public class DBFileVersion implements FileVersion, Cacheable, Serializable {
     public String getFileObjectId() {
         if (fileObjectId == null && versionID != null) {
             try {
-                DBFileVersionManager.getInstance().loadById(versionID);
+                JdbcFileVersionManager.getInstance().loadById(versionID);
             } catch (VFSException e) {
                 e.printStackTrace();
             }

@@ -10,6 +10,9 @@ import net.ooder.org.conf.OrgConfig;
 import net.ooder.org.conf.OrgConstants;
 import net.ooder.vfs.*;
 import net.ooder.vfs.manager.*;
+import net.ooder.vfs.manager.inner.*;
+import net.ooder.vfs.manager.dbimpl.JdbcFileVersionManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFileViewManager;
 
 import java.util.*;
 
@@ -132,5 +135,57 @@ public class VFSRoManager {
 
     public void setCacheEnabled(boolean cacheEnabled) {
         this.cacheEnabled = cacheEnabled;
+    }
+
+    public FileVersion getFileVersionByID(String versionId) {
+        if (versionId == null) return null;
+        try { return getFileVersionCache().get(versionId); }
+        catch (Exception e) { return null; }
+    }
+
+    public FileView getFileViewByID(String viewId) {
+        if (viewId == null) return null;
+        try { return getFileViewCache().get(viewId); }
+        catch (Exception e) { return null; }
+    }
+
+    public FileLink getFileLinkByID(String linkId) {
+        if (linkId == null) return null;
+        try { return getFileLinkCache().get(linkId); }
+        catch (Exception e) { return null; }
+    }
+
+    public FileObject getFileObjectByID(String objectId) {
+        return null;
+    }
+
+    public FileView createFileView(DBFileVersion version, String fileObjectId, Integer fileIndex) {
+        try { return JdbcFileViewManager.getInstance().createView(version.getVersionID(), fileIndex); }
+        catch (Exception e) { log.error("createFileView failed", e); return null; }
+    }
+
+    public void updateView(FileView view) {
+    }
+
+    public DBFileVersion createFileVersion(DBFileInfo fileInfo) {
+        try { return JdbcFileVersionManager.getInstance().createFileVersion(fileInfo); }
+        catch (Exception e) { log.error("createFileVersion failed", e); return null; }
+    }
+
+    public EIFileInfo createFile(EIFolder parentFolder, String name, String descrition, String createPersonId) {
+        try { return folderManager.createFile(parentFolder, name); }
+        catch (Exception e) { log.error("createFile failed", e); return null; }
+    }
+
+    public EIFolder createFolder(DBFolder parentFolder, String name, String descrition, String createPersonId) throws VFSFolderNotFoundException {
+        return folderManager.createFolder(parentFolder, name, descrition, createPersonId);
+    }
+
+    public void removeFolder(String folderId) throws VFSFolderNotFoundException {
+        folderManager.remove(folderId);
+    }
+
+    public void commitFolder(EIFolder folder) throws VFSException {
+        folderManager.commit(folder);
     }
 }

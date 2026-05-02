@@ -140,7 +140,7 @@ const BpmJsonSchema = {
             // 活动类型
             activityType: { 
                 type: 'string', 
-                enum: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK']
+                enum: ['TASK', 'SERVICE', 'SCRIPT', 'START', 'END', 'XOR_GATEWAY', 'AND_GATEWAY', 'OR_GATEWAY', 'SUBPROCESS', 'LLM_TASK', 'COORDINATOR', 'AGENT_TASK', 'AGENT_TOOL']
             },
             
             // 坐标 (BPD属性)
@@ -236,6 +236,63 @@ const BpmJsonSchema = {
                 properties: {
                     deadLineOperation: { type: 'string', enum: ['NOTIFY', 'ESCALATE', 'AUTO_COMPLETE'] },
                     specialScope: { type: 'string', enum: ['ALL', 'DEPARTMENT', 'GROUP', 'USER'] }
+                }
+            },
+            
+            // ==================== AGENT 属性组 ====================
+            AGENT: {
+                type: 'object',
+                properties: {
+                    agentType: { type: 'string', enum: ['LLM', 'TASK', 'EVENT', 'HYBRID', 'COORDINATOR', 'TOOL'] },
+                    agentId: { type: 'string', maxLength: 64 },
+                    agentName: { type: 'string', maxLength: 128 },
+                    coordinatorId: { type: 'string', maxLength: 64 },
+                    
+                    performType: { type: 'string', enum: ['SINGLE', 'MULTIPLE', 'JOINTSIGN'] },
+                    performSequence: { type: 'string', enum: ['FIRST', 'SEQUENCE', 'MEANWHILE', 'AUTOSIGN'] },
+                    
+                    agentGroup: { type: 'string', enum: ['PERFORMER', 'SPONSOR', 'MONITOR', 'COORDINATOR', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYMONITOR', 'NORIGHT'] },
+                    canRouteBack: { type: 'string', enum: ['YES', 'NO'] },
+                    routeBackMethod: { type: 'string', enum: ['DEFAULT', 'LAST', 'ANY', 'SPECIFY'] },
+                    canTakeBack: { type: 'string', enum: ['YES', 'NO'] },
+                    canDelegate: { type: 'string', enum: ['YES', 'NO'] },
+                    canEscalate: { type: 'string', enum: ['YES', 'NO'] },
+                    
+                    llmProvider: { type: 'string', maxLength: 64 },
+                    llmModel: { type: 'string', maxLength: 128 },
+                    systemPrompt: { type: 'string', maxLength: 4000 },
+                    temperature: { type: 'number', minimum: 0, maximum: 2 },
+                    maxTokens: { type: 'integer', minimum: 100, maximum: 128000 },
+                    
+                    mcpTools: { type: 'array', items: { type: 'string' } },
+                    capabilities: { type: 'array', items: { type: 'string' } },
+                    
+                    coordinationStrategy: { type: 'string', enum: ['ROUND_ROBIN', 'LEAST_BUSY', 'CAPABILITY_MATCH', 'MANUAL'] },
+                    maxConcurrentTasks: { type: 'integer', minimum: 1, maximum: 100 },
+                    escalationEnabled: { type: 'string', enum: ['YES', 'NO'] },
+                    escalationTimeout: { type: 'integer', minimum: 10, maximum: 86400 },
+                    
+                    northbound: {
+                        type: 'object',
+                        properties: {
+                            protocol: { type: 'string', enum: ['A2UI', 'HTTP', 'WEBSOCKET'] },
+                            endpoints: { type: 'array', items: { type: 'string' } }
+                        }
+                    },
+                    southbound: {
+                        type: 'object',
+                        properties: {
+                            protocol: { type: 'string', enum: ['MCP', 'HTTP', 'GRPC'] },
+                            endpoints: { type: 'array', items: { type: 'string' } }
+                        }
+                    },
+                    memory: {
+                        type: 'object',
+                        properties: {
+                            enabled: { type: 'string', enum: ['YES', 'NO'] },
+                            maxTokens: { type: 'integer', minimum: 100, maximum: 128000 }
+                        }
+                    }
                 }
             },
             
@@ -335,7 +392,22 @@ const BpmJsonSchema = {
         RouteBackMethod: ['PREV', 'START', 'ANY'],
         
         // 特殊发送范围
-        SpecialSendScope: ['ALL', 'DEPARTMENT', 'GROUP', 'USER']
+        SpecialSendScope: ['ALL', 'DEPARTMENT', 'GROUP', 'USER'],
+        
+        // Agent类型
+        AgentType: ['LLM', 'TASK', 'EVENT', 'HYBRID', 'COORDINATOR', 'TOOL'],
+        
+        // Agent权限组
+        AgentGroupEnums: ['PERFORMER', 'SPONSOR', 'MONITOR', 'COORDINATOR', 'HISTORYPERFORMER', 'HISSPONSOR', 'HISTORYMONITOR', 'NORIGHT'],
+        
+        // Agent执行状态
+        AgentPerformStatus: ['WAITING', 'CURRENT', 'FINISH', 'ERROR', 'TIMEOUT', 'DELETE'],
+        
+        // Agent条件类型
+        AgentConditionEnums: ['CONDITION_WAITEDWORK', 'CONDITION_CURRENTWORK', 'CONDITION_JOINWORK', 'CONDITION_OUTWORK', 'CONDITION_PERFORMWORK', 'CONDITION_MYWORK', 'CONDITION_COMPLETEDWORK', 'CONDITION_ALLWORK'],
+        
+        // 协调策略
+        CoordinationStrategy: ['ROUND_ROBIN', 'LEAST_BUSY', 'CAPABILITY_MATCH', 'MANUAL']
     },
     
     // ==================== 校验方法 ====================
@@ -403,6 +475,9 @@ const BpmJsonSchema = {
             }
             if (data.WORKFLOW) {
                 errors.push(...this.validateAttributeGroup('WORKFLOW', data.WORKFLOW, schema.properties.WORKFLOW));
+            }
+            if (data.AGENT) {
+                errors.push(...this.validateAttributeGroup('AGENT', data.AGENT, schema.properties.AGENT));
             }
             
             return errors;
@@ -577,6 +652,7 @@ const BpmJsonSchema = {
                 FORM: activity.FORM,
                 SERVICE: activity.SERVICE,
                 WORKFLOW: activity.WORKFLOW,
+                AGENT: activity.AGENT,
                 
                 // 块活动属性
                 startOfBlock: activity.startOfBlock,
@@ -613,6 +689,7 @@ const BpmJsonSchema = {
                 FORM: activity.FORM,
                 SERVICE: activity.SERVICE,
                 WORKFLOW: activity.WORKFLOW,
+                AGENT: activity.AGENT,
                 
                 // 块活动属性
                 startOfBlock: activity.startOfBlock,

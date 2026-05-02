@@ -9,7 +9,7 @@ import net.ooder.common.md5.MD5OutputStream;
 import net.ooder.vfs.*;
 import net.ooder.vfs.engine.VFSRoManager;
 import net.ooder.vfs.manager.FileInfoManager;
-import net.ooder.vfs.manager.dbimpl.DBFileInfoManager;
+import net.ooder.vfs.manager.dbimpl.JdbcFileInfoManager;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -55,7 +55,7 @@ public class DBFileInfo implements EIFileInfo, Cacheable, Serializable, Comparab
 
     public DBFileInfo() {
         this.setModified(false);
-        this.fileManager = DBFileInfoManager.getInstance();
+        this.fileManager = JdbcFileInfoManager.getInstance();
     }
 
     public String getName() { return name; }

@@ -66,6 +66,8 @@ public class BPMServer {
     // 应用与数据引擎映射
     private static Map<ConfigCode, FileEngine> fileEngines = new HashMap<ConfigCode, FileEngine>();
 
+    private static Map<ConfigCode, AgentEngine> agentEngines = new HashMap<ConfigCode, AgentEngine>();
+
     // 应用与存储引擎映射
     public static Map<JDSSessionHandle, Map<String, WorkflowClientService>> workflowServiceMap = new HashMap<JDSSessionHandle, Map<String, WorkflowClientService>>();
 
@@ -258,6 +260,9 @@ public class BPMServer {
                 // else
                 // throw new JDSException("dataEngine for application not configured.",
                 // JDSException.LOADRIGHTENGINEERROR);
+
+                AgentEngine agentEngine = new AgentEngineImpl();
+                agentEngines.put(ConfigCode.fromType(JDSActionContext.getActionContext().getSystemCode()), agentEngine);
             }
         }
 
@@ -598,6 +603,21 @@ public class BPMServer {
             engine = new VFSFileEngine(systemCode);
 
             // throw new JDSException("VFSEngine for system code '" + systemCode + "' not found. Please check the configuration file 'BPM_config.xml'.", JDSException.LOADRIGHTENGINEERROR);
+        }
+
+        return engine;
+    }
+
+    public static AgentEngine getAgentEngine(String systemCode) throws JDSException {
+        if (!JDSServer.started) {
+            throw new JDSException("JDSServer not started!", JDSException.SERVERNOTSTARTEDERROR);
+        }
+
+        AgentEngine engine = (AgentEngine) agentEngines.get(systemCode);
+
+        if (engine == null) {
+            engine = new AgentEngineImpl();
+            agentEngines.put(ConfigCode.fromType(systemCode), engine);
         }
 
         return engine;

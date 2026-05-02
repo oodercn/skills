@@ -135,7 +135,10 @@ const EnumMapping = {
             'IMPL_OUTFLOW': 'OutFlow',
             'IMPL_DEVICE': 'Device',
             'IMPL_EVENT': 'Event',
-            'IMPL_SERVICE': 'Service'
+            'IMPL_SERVICE': 'Service',
+            'IMPL_AGENT': 'Agent',
+            'IMPL_ROUTE': 'Route',
+            'IMPL_BLOCK': 'Block'
         },
         toFrontend: {
             'No': 'IMPL_NO',
@@ -144,7 +147,10 @@ const EnumMapping = {
             'OutFlow': 'IMPL_OUTFLOW',
             'Device': 'IMPL_DEVICE',
             'Event': 'IMPL_EVENT',
-            'Service': 'IMPL_SERVICE'
+            'Service': 'IMPL_SERVICE',
+            'Agent': 'IMPL_AGENT',
+            'Route': 'IMPL_ROUTE',
+            'Block': 'IMPL_BLOCK'
         }
     },
 
@@ -164,7 +170,10 @@ const EnumMapping = {
             'AND_GATEWAY': 'AND_GATEWAY',
             'OR_GATEWAY': 'OR_GATEWAY',
             'SUBPROCESS': 'SUBPROCESS',
-            'LLM_TASK': 'LLM_TASK'
+            'LLM_TASK': 'LLM_TASK',
+            'COORDINATOR': 'COORDINATOR',
+            'AGENT_TASK': 'AGENT_TASK',
+            'AGENT_TOOL': 'AGENT_TOOL'
         },
         toFrontend: {
             'TASK': 'TASK',
@@ -176,7 +185,10 @@ const EnumMapping = {
             'AND_GATEWAY': 'AND_GATEWAY',
             'OR_GATEWAY': 'OR_GATEWAY',
             'SUBPROCESS': 'SUBPROCESS',
-            'LLM_TASK': 'LLM_TASK'
+            'LLM_TASK': 'LLM_TASK',
+            'COORDINATOR': 'COORDINATOR',
+            'AGENT_TASK': 'AGENT_TASK',
+            'AGENT_TOOL': 'AGENT_TOOL'
         }
     },
 
@@ -457,6 +469,92 @@ const EnumMapping = {
             'NORIGHT': 'NORIGHT',
             'NULL': 'NULL'
         }
+    },
+
+    AgentGroupEnums: {
+        toBackend: {
+            'PERFORMER': 'PERFORMER',
+            'SPONSOR': 'SPONSOR',
+            'MONITOR': 'MONITOR',
+            'COORDINATOR': 'COORDINATOR',
+            'HISTORYPERFORMER': 'HISTORYPERFORMER',
+            'HISSPONSOR': 'HISSPONSOR',
+            'HISTORYMONITOR': 'HISTORYMONITOR',
+            'NORIGHT': 'NORIGHT',
+            'NULL': 'NULL'
+        },
+        toFrontend: {
+            'PERFORMER': 'PERFORMER',
+            'SPONSOR': 'SPONSOR',
+            'MONITOR': 'MONITOR',
+            'COORDINATOR': 'COORDINATOR',
+            'HISTORYPERFORMER': 'HISTORYPERFORMER',
+            'HISSPONSOR': 'HISSPONSOR',
+            'HISTORYMONITOR': 'HISTORYMONITOR',
+            'NORIGHT': 'NORIGHT',
+            'NULL': 'NULL'
+        }
+    },
+
+    AgentType: {
+        toBackend: {
+            'LLM': 'LLM',
+            'TASK': 'TASK',
+            'EVENT': 'EVENT',
+            'HYBRID': 'HYBRID',
+            'COORDINATOR': 'COORDINATOR',
+            'TOOL': 'TOOL'
+        },
+        toFrontend: {
+            'LLM': 'LLM',
+            'TASK': 'TASK',
+            'EVENT': 'EVENT',
+            'HYBRID': 'HYBRID',
+            'COORDINATOR': 'COORDINATOR',
+            'TOOL': 'TOOL'
+        }
+    },
+
+    AgentPerformStatus: {
+        toBackend: {
+            'WAITING': 'WAITING',
+            'CURRENT': 'CURRENT',
+            'FINISH': 'FINISH',
+            'ERROR': 'ERROR',
+            'TIMEOUT': 'TIMEOUT',
+            'DELETE': 'DELETE'
+        },
+        toFrontend: {
+            'WAITING': 'WAITING',
+            'CURRENT': 'CURRENT',
+            'FINISH': 'FINISH',
+            'ERROR': 'ERROR',
+            'TIMEOUT': 'TIMEOUT',
+            'DELETE': 'DELETE'
+        }
+    },
+
+    AgentConditionEnums: {
+        toBackend: {
+            'CONDITION_WAITEDWORK': 'CONDITION_WAITEDWORK',
+            'CONDITION_CURRENTWORK': 'CONDITION_CURRENTWORK',
+            'CONDITION_JOINWORK': 'CONDITION_JOINWORK',
+            'CONDITION_OUTWORK': 'CONDITION_OUTWORK',
+            'CONDITION_PERFORMWORK': 'CONDITION_PERFORMWORK',
+            'CONDITION_MYWORK': 'CONDITION_MYWORK',
+            'CONDITION_COMPLETEDWORK': 'CONDITION_COMPLETEDWORK',
+            'CONDITION_ALLWORK': 'CONDITION_ALLWORK'
+        },
+        toFrontend: {
+            'CONDITION_WAITEDWORK': 'CONDITION_WAITEDWORK',
+            'CONDITION_CURRENTWORK': 'CONDITION_CURRENTWORK',
+            'CONDITION_JOINWORK': 'CONDITION_JOINWORK',
+            'CONDITION_OUTWORK': 'CONDITION_OUTWORK',
+            'CONDITION_PERFORMWORK': 'CONDITION_PERFORMWORK',
+            'CONDITION_MYWORK': 'CONDITION_MYWORK',
+            'CONDITION_COMPLETEDWORK': 'CONDITION_COMPLETEDWORK',
+            'CONDITION_ALLWORK': 'CONDITION_ALLWORK'
+        }
     }
 };
 
@@ -568,7 +666,10 @@ const ActivityDefEnumFields = {
     deadlineOperation: 'ActivityDefDeadLineOperation',
     routeBackMethod: 'ActivityDefRouteBackMethod',
     specialSendScope: 'ActivityDefSpecialSendScope',
-    rightGroup: 'RightGroupEnums'
+    rightGroup: 'RightGroupEnums',
+    agentGroup: 'AgentGroupEnums',
+    agentType: 'AgentType',
+    agentPerformStatus: 'AgentPerformStatus'
 };
 
 // 导出

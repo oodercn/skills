@@ -1,6 +1,6 @@
 class Api {
     constructor(config) {
-        this.baseUrl = config?.baseUrl || '/api/bpm';
+        this.baseUrl = config?.baseUrl || '/api/processdef';
         this.timeout = config?.timeout || 30000;
     }
 
@@ -75,6 +75,18 @@ class Api {
 
     async deleteActivity(processId, activityId) {
         return this.request('DELETE', `/process/${processId}/activity/${activityId}`);
+    }
+
+    async activateVersion(processId, version) {
+        return this.request('POST', `/process/${processId}/version/${version}/activate`);
+    }
+
+    async freezeVersion(processId, version) {
+        return this.request('POST', `/process/${processId}/version/${version}/freeze`);
+    }
+
+    async deleteVersion(processId, version) {
+        return this.request('DELETE', `/process/${processId}/version/${version}`);
     }
 
     async getAgent(agentId) {

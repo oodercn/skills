@@ -35,7 +35,7 @@ class ContextMenu {
                 }
                 
                 let iconHtml = '';
-                if (item.icon && window.IconManager) {
+                if (item.icon && window.IconManager && typeof IconManager.render === 'function') {
                     try {
                         iconHtml = IconManager.render(item.icon, 16);
                     } catch (e) {
@@ -86,4 +86,9 @@ class ContextMenu {
     }
 }
 
-window.ContextMenu = new ContextMenu();
+try {
+    window.ContextMenu = new ContextMenu();
+    console.log('[ContextMenu] Initialized successfully');
+} catch (e) {
+    console.error('[ContextMenu] Failed to initialize:', e);
+}

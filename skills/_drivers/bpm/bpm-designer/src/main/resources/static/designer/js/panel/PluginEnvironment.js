@@ -13,7 +13,7 @@ class PluginEnvironment {
         this.options = {
             // 数据源配置
             dataSource: {
-                baseUrl: '/api/bpm',
+                baseUrl: '/api/processdef',
                 timeout: 30000,
                 enableCache: true
             },
